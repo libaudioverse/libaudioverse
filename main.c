@@ -60,10 +60,17 @@ void main() {
 	float *leftChannel, *rightChannel;
 	leftChannel = calloc(inputFileInfo.frames, sizeof(float));
 	rightChannel = calloc(inputFileInfo.frames, sizeof(float));
+	float* postClickRightChannel = calloc(inputFileInfo.frames, sizeof(float));
+	float* postClickLeftChannel = calloc(inputFileInfo.frames, sizeof(float));
 	printf("Beginning convolution.\n");
 	float startTime = omp_get_wtime();
 	convolution_kernel(leftChannel, inputFileInfo.frames, input, impulseResponseInfo.frames, leftImpulseResponse);
 	convolution_kernel(rightChannel, inputFileInfo.frames, input, impulseResponseInfo.frames, rightImpulseResponse);
+	float clickFilter[5] = {0.2, 0.2, 0.2, 0.2, 0.2};
+	convolution_kernel(postClickLeftChannel, inputFileInfo.frames, leftChannel, 5, clickFilter);
+	convolution_kernel(postClickRightChannel, inputFileInfo.frames, rightChannel, 5, clickFilter);
+	leftChannel = postClickLeftChannel;
+	rightChannel = postClickRightChannel;
 	printf("Convolution complete.  Elapsed time is %f\n", omp_get_wtime()-startTime);
 	printf("Writing output files.\n");
 	//we have to put this back together now.  This is just as evil as before.
