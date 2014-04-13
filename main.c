@@ -49,6 +49,11 @@ float* startWriteAt = &input[impulseResponseInfo.frames]; //get a pointer past t
 read = 0;
 while(read < inputFileInfo.frames) read += sf_readf_float(inputFile, startWriteAt+read, inputFileInfo.frames);
 
+//normalize, to be safe.
+//Note that a single signal above 1.0 in the input can have an extremely adverse effect on the output, because it actually affects the next 128 samples.
+float maxval = 0;
+for(unsigned int i = 0; i < inputFileInfo.frames; i++) if(startWriteAt[i] > maxval) maxval = startWriteAt[i];
+for(unsigned int i = 0; i < inputFileInfo.frames; i++) startWriteAt[i]/=maxval;
 //We have everything we need to perform the two necessary convolutions, and the convolution kernel can handle the rest.
 float *leftChannel, *rightChannel;
 leftChannel = calloc(inputFileInfo.frames, sizeof(float));
