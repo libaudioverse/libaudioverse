@@ -66,7 +66,7 @@ void main() {
 	float startTime = omp_get_wtime();
 	convolution_kernel(leftChannel, inputFileInfo.frames, input, impulseResponseInfo.frames, leftImpulseResponse);
 	convolution_kernel(rightChannel, inputFileInfo.frames, input, impulseResponseInfo.frames, rightImpulseResponse);
-	float clickFilter[5] = {0.2, 0.2, 0.2, 0.2, 0.2};
+	float clickFilter[5] = {0.2, 0.2, 0.2, 0.2, 0.2}; //Important: this is lowpass. It gets rid of clicks, but distorts audio, especially if it has high frequencies.
 	convolution_kernel(postClickLeftChannel, inputFileInfo.frames, leftChannel, 5, clickFilter);
 	convolution_kernel(postClickRightChannel, inputFileInfo.frames, rightChannel, 5, clickFilter);
 	leftChannel = postClickLeftChannel;
