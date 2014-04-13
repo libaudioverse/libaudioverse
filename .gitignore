@@ -5,3 +5,4 @@
 sndfile.h
 *.ilk
 *.pdb
+*.wav
