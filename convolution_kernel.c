@@ -14,10 +14,12 @@ It is assumed that the output buffer is zeroed.
 */
 
 void convolution_kernel(float* output, const int samplesToCalculate, float const* input, const unsigned int lengthOfImpulse, float const* impulseResponse) {
-	//This is expensive.  Parallelize this with omp later.
-	for(unsigned int sample = lengthOfImpulse; sample < samplesToCalculate; ++sample) {
+	int index;
+	#pragma omp parallel for if(samplesToCalculate>1024)
+	for(index = 0; index < samplesToCalculate; ++index) {
 		for(unsigned int impulseResponseIndex = 0; impulseResponseIndex < lengthOfImpulse; impulseResponseIndex++) {
-			output[sample] += impulseResponse[impulseResponseIndex]*input[sample-impulseResponseIndex-1]; //if not -1, we're including the current sample.
+			unsigned int sample = index + lengthOfImpulse;
+			output[index] += impulseResponse[impulseResponseIndex]*input[sample-impulseResponseIndex-1]; //if not -1, we're including the current sample.
 		}
 	}
 }
