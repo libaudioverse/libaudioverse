@@ -13,9 +13,9 @@ The kernel will start at the lth sample, and produce n samples.
 It is assumed that the output buffer is zeroed.
 */
 
-void convolution_kernel(float* output, const int samplesToCalculate, float const* input, const unsigned int lengthOfImpulse, float const* impulse) {
+void convolution_kernel(float* output, const int samplesToCalculate, float const* input, const unsigned int lengthOfImpulse, float const* impulseResponse) {
 	//This is expensive.  Parallelize this with omp later.
-	for(unsigned int sample = lengthOfImpulse; sample < samplesTocalculate; ++sample) {
+	for(unsigned int sample = lengthOfImpulse; sample < samplesToCalculate; ++sample) {
 		for(unsigned int impulseResponseIndex = 0; impulseResponseIndex < lengthOfImpulse; impulseResponseIndex++) {
 			output[sample] += impulseResponse[impulseResponseIndex]*input[sample-impulseResponseIndex-1]; //if not -1, we're including the current sample.
 		}
