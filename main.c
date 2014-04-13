@@ -56,4 +56,18 @@ rightChannel = calloc(inputFileInfo.frames, sizeof(float));
 
 convolution_kernel(leftChannel, inputFileInfo.frames, input, impulseResponseInfo.frames, leftImpulseResponse);
 convolution_kernel(rightChannel, inputFileInfo.frames, input, impulseResponseInfo.frames, rightImpulseResponse);
+
+//we have to put this back together now.  This is just as evil as before.
+float* output = calloc(inputFileInfo.frames*2, sizeof(float));
+for(unsigned int counter = 0; counter < inputFileInfo.frames*2; counter+=2) {
+	output[counter] = leftChannel[counter/2];
+	output[counter+1] = rightChannel[counter/2];
+}
+
+//write this monstrocity back to disk.
+sf_count_t write  = 0;
+while(write < inputFileInfo.frames*2) write+= sf_write_float(outputFile, output+write, 2*inputFileInfo.frames);
+sf_close(impulseResponseFile);
+sf_close(inputFile);
+sf_close(outputFile);
 }
