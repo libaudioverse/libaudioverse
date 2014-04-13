@@ -15,7 +15,7 @@ It is assumed that the output buffer is zeroed.
 
 void convolution_kernel(float* output, const int samplesToCalculate, float const* input, const unsigned int lengthOfImpulse, float const* impulseResponse) {
 	int index;
-	#pragma omp parallel for if(samplesToCalculate>1024)
+	#pragma omp parallel for if(samplesToCalculate>1024) schedule(dynamic, 256)
 	for(index = 0; index < samplesToCalculate; ++index) {
 		for(unsigned int impulseResponseIndex = 0; impulseResponseIndex < lengthOfImpulse; impulseResponseIndex++) {
 			unsigned int sample = index + lengthOfImpulse;
