@@ -6,3 +6,4 @@ sndfile.h
 *.ilk
 *.pdb
 *.wav
+mono_library/
