@@ -3,3 +3,5 @@
 *.exe
 *.dll
 sndfile.h
+*.ilk
+*.pdb
