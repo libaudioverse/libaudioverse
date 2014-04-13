@@ -2,3 +2,4 @@
 *.lib
 *.exe
 *.dll
+sndfile.h
