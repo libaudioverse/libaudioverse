@@ -3,7 +3,8 @@
 #include <stdlib.h>
 #include "convolution_kernel.h"
 #include <omp.h>
-
+//Malloc takes an int, but gets an sf_size_t.  This silences the generated warning by visual studio.
+#pragma warning(disable:4244)
 void main() {
 	SF_INFO inputFileInfo, impulseResponseInfo, outputFileInfo;
 	float* input, *leftImpulseResponse, *rightImpulseResponse;
@@ -66,7 +67,7 @@ void main() {
 	float startTime = omp_get_wtime();
 	convolution_kernel(leftChannel, inputFileInfo.frames, input, impulseResponseInfo.frames, leftImpulseResponse);
 	convolution_kernel(rightChannel, inputFileInfo.frames, input, impulseResponseInfo.frames, rightImpulseResponse);
-	float clickFilter[5] = {0.2, 0.2, 0.2, 0.2, -0.2}; //Important: this is lowpass. It gets rid of clicks, but distorts audio, especially if it has high frequencies.
+	float clickFilter[5] = {0.2f, 0.2f, 0.2f, 0.2f, -0.2f}; //Important: this is lowpass. It gets rid of clicks, but distorts audio, especially if it has high frequencies.
 	convolution_kernel(postClickLeftChannel, inputFileInfo.frames, leftChannel, 5, clickFilter);
 	convolution_kernel(postClickRightChannel, inputFileInfo.frames, rightChannel, 5, clickFilter);
 	leftChannel = postClickLeftChannel;
