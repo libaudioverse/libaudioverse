@@ -1,7 +1,8 @@
 #include "sndfile.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "convolution_kernel.h"
+#include <kernels.h>
+#include <camlorn_audio2.h>
 #include <omp.h>
 //Malloc takes an int, but gets an sf_size_t.  This silences the generated warning by visual studio.
 #pragma warning(disable:4244)
