@@ -11,5 +11,7 @@ SET(LIBSNDFILE_LIBRARY_DIR "C:/Program Files (x86)/Mega-Nerd/libsndfile/lib" CAC
 
 INCLUDE_DIRECTORIES(${LIBSNDFILE_INCLUDE_DIR})
 LINK_DIRECTORIES(${LIBSNDFILE_LIBRARY_DIR})
+link_directories("${CMAKE_BINARY_DIR}/portaudio")
 
+add_subdirectory(portaudio)
 add_subdirectory(src)
