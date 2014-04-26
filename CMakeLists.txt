@@ -13,5 +13,7 @@ INCLUDE_DIRECTORIES(${LIBSNDFILE_INCLUDE_DIR})
 LINK_DIRECTORIES(${LIBSNDFILE_LIBRARY_DIR})
 link_directories("${CMAKE_BINARY_DIR}/portaudio")
 
+#This fixes portaudio.
+add_definitions(-DPA_WDMKS_NO_KSGUID_LIB)
 add_subdirectory(portaudio)
 add_subdirectory(src)
