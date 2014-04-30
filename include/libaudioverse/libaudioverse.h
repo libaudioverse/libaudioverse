@@ -18,6 +18,12 @@ enum lav_PropertyResolution {
 	Lav_PROPERTYRESOLUTION_SAMPLE = 0x2,
 };
 
+/**These are used to tag nodes with their type, so that external languages may see them.*/
+enum Lav_NODETYPES{
+	Lav_NODETYPE_FILE_READER,
+	Lav_NODETYPE_CONVOLVER,
+};
+
 struct Lav_Property_s {
 	enum LavPropertyType type;
 	enum LavPropertyResolution resolution;
@@ -47,4 +53,5 @@ struct Lav_Node_s {
 	unsigned int num_inputs;
 	LavProperty *properties;
 	unsigned int num_properties;
+	enum Lav_NODETYPES type;
 };
