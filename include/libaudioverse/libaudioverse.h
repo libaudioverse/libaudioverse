@@ -55,3 +55,9 @@ struct Lav_Node_s {
 	unsigned int num_properties;
 	enum Lav_NODETYPES type;
 };
+
+struct Lav_NodeWithHistory_s {
+	LavNode base;
+	unsigned int history_length;
+	float* history;
+};

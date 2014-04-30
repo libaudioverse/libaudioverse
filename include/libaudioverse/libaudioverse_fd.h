@@ -11,3 +11,6 @@ typedef struct Lav_Node_s LavNode;
 
 struct Lav_Stream_s;
 typedef struct Lav_Stream_s LavStream;
+
+struct Lav_NodeWithHistory_s;
+typedef struct Lav_NodeWithHistory_s LavNodeWithHistory;

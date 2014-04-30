@@ -8,3 +8,11 @@ LavNode *makeNode(unsigned int size, unsigned int numInputs, unsigned int numOut
 	retval->type = type;
 	return retval;
 }
+
+LavNodeWithHistory *makeHistoryNode(unsigned int size, unsigned int numInputs,
+	unsigned int numOutputs, enum Lav_NODETYPE type, unsigned int historyLength) {
+	LavNodeWithHistory *retval = (LavNodeWithHistory*)makeNode(size, numInputs, numOutputs, type);
+	retval->history_length = historyLength;
+	retval->history = calloc(historyLength, sizeof(float));
+	return retval;
+}
