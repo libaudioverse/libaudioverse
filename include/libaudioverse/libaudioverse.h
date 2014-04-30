@@ -1,5 +1,7 @@
 /**The public interface to Libaudioverse.*/
 
+#include "libaudioverse_fd.h"
+
 /**These are property types, either int, float, double, or string.
 
 Note that they can be ored.  This is important and intended as an extension point.  Namely, some properties in future are going to allow themselves to be either a constant or an LFO.*/
@@ -19,18 +21,30 @@ enum lav_PropertyResolution {
 struct Lav_Property_s {
 	enum LavPropertyType type;
 	enum LavPropertyResolution resolution;
+	union {
+		int ival;
+		float fval;
+		double dval;
+		char* sval;
+	} value;
 };
 
-typedef struct Lav_Property_s LavProperty;
-
-struct Lav_Buffer_s {
-	int foo;
+struct Lav_SampleBuffer_s {
+	unsigned int length;
+	float *samples;
+	LavNode *owner;
 };
 
-typedef struct Lav_Buffer_s LavBuffer;
+struct Lav_Stream_s {
+	LavSampleBuffer *associated_buffer;
+	unsigned int position;
+};
 
 struct Lav_Node_s {
-	int foo;\
+	LavSampleBuffer *outputs;
+	unsigned int num_outputs;
+	LavStream *inputs;
+	unsigned int num_inputs;
+	LavProperty *properties;
+	unsigned int num_properties;
 };
-
-typedef struct Lav_Node_s LavNode;
