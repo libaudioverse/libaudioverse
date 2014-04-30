@@ -1,8 +1,8 @@
 #include "sndfile.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <xxx/kernels.h>
-#include <xxx/xxx.h>
+#include <libaudioverse/kernels.h>
+#include <libaudioverse/libaudioverse.h>
 #include <omp.h>
 //Malloc takes an int, but gets an sf_size_t.  This silences the generated warning by visual studio.
 #pragma warning(disable:4244)

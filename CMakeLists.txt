@@ -1,6 +1,6 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
-project(xxx)
+project(Libaudioverse)
 include_directories("${CMAKE_SOURCE_DIR}/include")
 
 #This is LibSNDFile.
@@ -18,6 +18,6 @@ link_directories("${CMAKE_BINARY_DIR}/portaudio")
 add_definitions(-DPA_WDMKS_NO_KSGUID_LIB)
 
 #This makes sure that we can link to ourself.
-link_directories(${xxx_BINARY_DIR})
+link_directories(${libaudioverse_BINARY_DIR})
 add_subdirectory(portaudio)
 add_subdirectory(src)

@@ -1,2 +1,2 @@
-add_subdirectory(xxx)
+add_subdirectory(libaudioverse)
 add_subdirectory(tests)
