@@ -1,6 +1,27 @@
 /**The public interface to Libaudioverse.*/
 
-#include "libaudioverse_fd.h"
+/*Forward-declares all Libaudioverse types.
+
+Search for begin_meaningful_content to skip.
+
+Enums can't go here. Everything else can.*/
+
+struct Lav_Property_s;
+typedef struct Lav_Property_s LavProperty;
+
+struct Lav_SampleBuffer_s;
+typedef struct Lav_SampleBuffer_s LavSampleBuffer;
+
+struct Lav_Node_s;
+typedef struct Lav_Node_s LavNode;
+
+struct Lav_Stream_s;
+typedef struct Lav_Stream_s LavStream;
+
+struct Lav_NodeWithHistory_s;
+typedef struct Lav_NodeWithHistory_s LavNodeWithHistory;
+
+//begin_meaningful_content
 
 /**Does whatever is appropriate on a given platform to expose a Libaudioverse function publically.*/
 #define Lav_PUBLIC_FUNCTION __declspec(dllexport)
