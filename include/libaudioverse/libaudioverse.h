@@ -32,7 +32,7 @@ struct Lav_Property_s {
 		float fval;
 		double dval;
 		char* sval;
-	} value;
+	} value, default_value;
 };
 
 struct Lav_SampleBuffer_s {
