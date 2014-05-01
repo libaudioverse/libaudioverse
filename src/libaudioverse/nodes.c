@@ -4,11 +4,11 @@ Note: this file is heavily intertwined with stream_buffers.c, though it does not
 #include <stdlib.h>
 #include <libaudioverse/libaudioverse.h>
 
-void freeNode(LavNode *node) {
+LAV_PUBLIC_FUNCTION void freeNode(LavNode *node) {
 	free(node);
 }
 
-LavNode *Lav_makeNode(unsigned int size, unsigned int numInputs, unsigned int numOutputs, enum  Lav_NODETYPE type) {
+LAV_PUBLIC_FUNCTION LavNode *Lav_makeNode(unsigned int size, unsigned int numInputs, unsigned int numOutputs, enum  Lav_NODETYPE type) {
 	LavNode *retval = calloc(0, size);
 	retval->num_inputs = numInputs;
 	retval->num_outputs = numOutputs;
@@ -16,7 +16,7 @@ LavNode *Lav_makeNode(unsigned int size, unsigned int numInputs, unsigned int nu
 	return retval;
 }
 
-LavNodeWithHistory *lav_makeHistoryNode(unsigned int size, unsigned int numInputs,
+LAV_PUBLIC_FUNCTION LavNodeWithHistory *lav_makeHistoryNode(unsigned int size, unsigned int numInputs,
 	unsigned int numOutputs, enum Lav_NODETYPE type, unsigned int historyLength) {
 	LavNodeWithHistory *retval = (LavNodeWithHistory*)makeNode(size, numInputs, numOutputs, type);
 	retval->history_length = historyLength;
@@ -24,38 +24,38 @@ LavNodeWithHistory *lav_makeHistoryNode(unsigned int size, unsigned int numInput
 	return retval;
 }
 
-int Lav_setParent(LavNode *node, LavNode *parent, unsigned int slot) {
+LAV_PUBLIC_FUNCTION int Lav_setParent(LavNode *node, LavNode *parent, unsigned int slot) {
 	return 1;
 }
 
-int Lav_setIntProperty(LavNode* node, unsigned int slot, int value) {
+LAV_PUBLIC_FUNCTION int Lav_setIntProperty(LavNode* node, unsigned int slot, int value) {
 	return 1;
 }
 
-int Lav_setFloatProperty(LavNode *node, unsigned int slot, float value) {
+LAV_PUBLIC_FUNCTION int Lav_setFloatProperty(LavNode *node, unsigned int slot, float value) {
 	return 1;
 }
 
-int Lav_setDoubleProperty(LavNode *node, unsigned int slot, double value) {
+LAV_PUBLIC_FUNCTION int Lav_setDoubleProperty(LavNode *node, unsigned int slot, double value) {
 	return 1;
 }
 
-int Lav_setStringProperty(LavNode *node, unsigned int slot, char* value) {
+LAV_PUBLIC_FUNCTION int Lav_setStringProperty(LavNode *node, unsigned int slot, char* value) {
 	return 1;
 }
 
-int Lav_getIntProperty(LavNode *node, unsigned int slot) {
+LAV_PUBLIC_FUNCTION int Lav_getIntProperty(LavNode *node, unsigned int slot) {
 	return 0;
 }
 
-float Lav_getFloatProperty(LavNode* node, unsigned int slot) {
+LAV_PUBLIC_FUNCTION float Lav_getFloatProperty(LavNode* node, unsigned int slot) {
 	return 0.0f;
 }
 
-double Lav_getDoubleProperty(LavNode *node, unsigned int slot) {
+LAV_PUBLIC_FUNCTION double Lav_getDoubleProperty(LavNode *node, unsigned int slot) {
 	return 0.0;
 }
 
-char* Lav_getStringProperty(LavNode* node, unsigned int slot) {
+LAV_PUBLIC_FUNCTION char* Lav_getStringProperty(LavNode* node, unsigned int slot) {
 	return "";
 }
