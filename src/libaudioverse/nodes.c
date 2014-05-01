@@ -47,6 +47,13 @@ Lav_PUBLIC_FUNCTION LavError Lav_clearParent(LavNode *node, unsigned int slot) {
 	return Lav_ERROR_NONE;
 }
 
+Lav_PUBLIC_FUNCTION LavError lav_resetProperty(LavNode *node, unsigned int slot) {
+	CHECK_NOT_NULL(node);
+	ERROR_IF_TRUE(slot >= node->num_properties || slot < 0, Lav_ERROR_INVALID_SLOT);
+	memcpy(&(node->properties[slot].value), &(node->properties[slot].default_value), sizeof(node->properties[slot].value)); //yes, really.
+	return Lav_ERROR_NONE;
+}
+
 #define PROPERTY_SETTER_CHECKS(proptype) CHECK_NOT_NULL(node);\
 ERROR_IF_TRUE(slot >= node->num_properties || slot<=0, Lav_ERROR_INVALID_SLOT);\
 ERROR_IF_TRUE(node->properties[slot].type != proptype, Lav_ERROR_TYPE_MISMATCH)\

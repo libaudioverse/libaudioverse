@@ -90,6 +90,9 @@ Lav_PUBLIC_FUNCTION LavError getParent(LavNode *node, unsigned int slot, LavNode
 Lav_PUBLIC_FUNCTION LavError Lav_setParent(LavNode *node, LavNode *parent, unsigned int slot);
 Lav_PUBLIC_FUNCTION LavError Lav_clearParent(LavNode *node, unsigned int slot);
 
+/**Resets a property to its default value, for any type.*/
+Lav_PUBLIC_FUNCTION LavError lav_resetProperty(LavNode *node, unsigned int slot);
+
 /**Property getters and setters.*/
 Lav_PUBLIC_FUNCTION LavError Lav_setIntProperty(LavNode* node, unsigned int slot, int value);
 Lav_PUBLIC_FUNCTION LavError Lav_setFloatProperty(LavNode *node, unsigned int slot, float value);
