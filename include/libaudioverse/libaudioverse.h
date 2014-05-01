@@ -2,6 +2,9 @@
 
 #include "libaudioverse_fd.h"
 
+/**Does whatever is appropriate on a given platform to expose a Libaudioverse function publically.*/
+#define LAV_PUBLIC_FUNCTION
+
 /**These are property types, either int, float, double, or string.
 
 Note that they can be ored.  This is important and intended as an extension point.  Namely, some properties in future are going to allow themselves to be either a constant or an LFO.*/
