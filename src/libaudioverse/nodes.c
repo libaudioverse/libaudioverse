@@ -18,6 +18,17 @@ Lav_PUBLIC_FUNCTION LavError Lav_makeNode(unsigned int size, unsigned int numInp
 	retval->type = type;
 	retval->process = Lav_processDefault;
 	retval->default_process = retval->process;
+
+	//Initialize this node's output buffers.
+	for(unsigned int i = 0; i < numInputs; i++) {
+		//Set the owned node to this one.
+		retval->outputs[i].owner = retval;
+		//Make its sample buffer.
+		retval->outputs[i].samples = calloc(2048, sizeof(float));
+		retval->outputs[i].length = 2048;
+		retval->outputs[i].write_position = 1; //feed the initial 0.
+	}
+	//There's nothing to do for the streams: they all point at NULL parents.
 	*destination = retval;
 	return Lav_ERROR_NONE;
 }

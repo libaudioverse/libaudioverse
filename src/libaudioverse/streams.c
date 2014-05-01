@@ -23,22 +23,6 @@ But suppose the reader is 5 and the writer is 2, that is the writer just went pa
 
 Note that we can only write to a buffer, at least without a stream.  Also, all buffers start with one sample written to them: a single 0.  This is part of allowing cyclic graphs, which is needed for reverb.*/
 
-Lav_PUBLIC_FUNCTION LavError Lav_MakeSampleBuffer(unsigned int length, LavSampleBuffer **destination) {
-	LavSampleBuffer *retval = calloc(1, sizeof(LavSampleBuffer));
-	retval->length = length;
-	retval->write_position = 1; //equivalent to writing 1 0.
-	retval->samples = calloc(length, sizeof(float));
-	retval->owner = NULL;
-	*destination = retval;
-	return Lav_ERROR_NONE;
-}
-
-Lav_PUBLIC_FUNCTION LavError Lav_freeSampleBuffer(LavSampleBuffer *buffer) {
-	CHECK_NOT_NULL(buffer);
-	free(buffer);
-	return Lav_ERROR_NONE;
-}
-
 Lav_PUBLIC_FUNCTION LavError Lav_bufferWriteSample(LavSampleBuffer *buffer, float sample) {
 	//calculate the next position.
 	unsigned int next_position = (buffer->write_position+1) % buffer->length; //wrap if necessary.
@@ -48,13 +32,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_bufferWriteSample(LavSampleBuffer *buffer, floa
 }
 
 /**Now, streams.*/
-
-Lav_PUBLIC_FUNCTION LavError Lav_makeStream(LavStream **destination) {
-	LavStream *retval = calloc(1, sizeof(LavStream));
-	*destination = retval;
-	return Lav_ERROR_NONE;
-}
-
 Lav_PUBLIC_FUNCTION Lav_streamReadSamples(LavStream *stream, unsigned int count, float *destination) {
 	CHECK_NOT_NULL(stream);
 	if(stream->associated_buffer == NULL) { //the best we can do is 0s.
