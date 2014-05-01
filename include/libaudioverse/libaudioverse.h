@@ -70,8 +70,9 @@ struct Lav_Property_s {
 	} value, default_value;
 };
 
+/**This is actually a ring buffer, but should be accessed only through the public interface.*/
 struct Lav_SampleBuffer_s {
-	unsigned int length;
+	unsigned int length, write_position;
 	float *samples;
 	LavNode *owner;
 };
@@ -128,4 +129,4 @@ Lav_PUBLIC_FUNCTION LavError Lav_getDoubleProperty(LavNode *node, unsigned int s
 Lav_PUBLIC_FUNCTION LavError Lav_getStringProperty(LavNode* node, unsigned int slot, char** destination);
 
 /**This is a default node processing function. It simply writes 0s to all outputs, and can be useful when you need to provide audio and have nothing to do.*/
-Lav_PUBLIC_FUNCTION LavError Lav_processDefault(LavNode *node);
+Lav_PUBLIC_FUNCTION LavError Lav_processDefault(LavNode *node, unsigned int count);
