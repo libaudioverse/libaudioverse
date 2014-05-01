@@ -17,6 +17,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_makeNode(unsigned int size, unsigned int numInp
 	retval->num_outputs = numOutputs;
 	retval->type = type;
 	retval->process = Lav_processDefault;
+	retval->default_process = retval->process;
 	*destination = retval;
 	return Lav_ERROR_NONE;
 }

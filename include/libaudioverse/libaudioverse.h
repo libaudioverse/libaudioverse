@@ -92,7 +92,7 @@ struct Lav_Node_s {
 	LavProperty *properties;
 	unsigned int num_properties;
 	enum Lav_NODETYPES type;
-	LavNodeProcessorFunction process; //what to call to process this node.
+	LavNodeProcessorFunction process, default_process; //what to call to process this node.
 };
 
 struct Lav_NodeWithHistory_s {
@@ -104,8 +104,7 @@ struct Lav_NodeWithHistory_s {
 /**Free an instance of a node.*/
 Lav_PUBLIC_FUNCTION LavError freeNode(LavNode *node);
 
-/**The following functions initialize nodes and work exactly as one would expect.
-They return NULL on error.*/
+/**The following functions initialize nodes and work exactly as one would expect.*/
 Lav_PUBLIC_FUNCTION LavError Lav_makeNode(unsigned int size, unsigned int numInputs, unsigned int numOutputs, enum  Lav_NODETYPE type, LavNode **destination);
 Lav_PUBLIC_FUNCTION LavError Lav_makeHistoryNode(unsigned int size, unsigned int numInputs,
 	unsigned int numOutputs, enum Lav_NODETYPE type, unsigned int historyLength, LavNodeWithHistory **destination);
