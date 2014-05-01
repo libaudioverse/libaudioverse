@@ -2,7 +2,7 @@
 
 Note: this file is heavily intertwined with stream_buffers.c, though it does not use private functionality of that file.*/
 #include <stdlib.h>
-#incllude <libaudioverse/libaudioverse.h>
+#include <libaudioverse/libaudioverse.h>
 
 void freeNode(LavNode *node) {
 	free(node);
