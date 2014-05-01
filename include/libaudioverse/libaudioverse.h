@@ -3,7 +3,7 @@
 #include "libaudioverse_fd.h"
 
 /**Does whatever is appropriate on a given platform to expose a Libaudioverse function publically.*/
-#define LAV_PUBLIC_FUNCTION
+#define LAV_PUBLIC_FUNCTION __declspec(dllexport)
 
 /**These are property types, either int, float, double, or string.
 

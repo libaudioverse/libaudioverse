@@ -18,7 +18,7 @@ LAV_PUBLIC_FUNCTION LavNode *Lav_makeNode(unsigned int size, unsigned int numInp
 
 LAV_PUBLIC_FUNCTION LavNodeWithHistory *lav_makeHistoryNode(unsigned int size, unsigned int numInputs,
 	unsigned int numOutputs, enum Lav_NODETYPE type, unsigned int historyLength) {
-	LavNodeWithHistory *retval = (LavNodeWithHistory*)makeNode(size, numInputs, numOutputs, type);
+	LavNodeWithHistory *retval = (LavNodeWithHistory*)Lav_makeNode(size, numInputs, numOutputs, type);
 	retval->history_length = historyLength;
 	retval->history = calloc(historyLength, sizeof(float));
 	return retval;
