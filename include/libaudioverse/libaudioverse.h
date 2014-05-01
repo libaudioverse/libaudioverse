@@ -112,7 +112,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_makeHistoryNode(unsigned int size, unsigned int
 
 /**Parent management.*/
 Lav_PUBLIC_FUNCTION LavError getParent(LavNode *node, unsigned int slot, LavNode** destination);
-Lav_PUBLIC_FUNCTION LavError Lav_setParent(LavNode *node, LavNode *parent, unsigned int slot);
+Lav_PUBLIC_FUNCTION LavError Lav_setParent(LavNode *node, LavNode *parent, unsigned int outputSlot, unsigned int inputSlot);
 Lav_PUBLIC_FUNCTION LavError Lav_clearParent(LavNode *node, unsigned int slot);
 
 /**Resets a property to its default value, for any type.*/

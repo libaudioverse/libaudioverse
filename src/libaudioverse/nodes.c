@@ -37,9 +37,18 @@ Lav_PUBLIC_FUNCTION LavError Lav_processDefault(LavNode *node, unsigned int coun
 	return Lav_ERROR_NONE;
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_setParent(LavNode *node, LavNode *parent, unsigned int slot) {
+Lav_PUBLIC_FUNCTION LavError Lav_setParent(LavNode *node, LavNode *parent, unsigned int outputSlot, unsigned int inputSlot) {
 	CHECK_NOT_NULL(node);
 	CHECK_NOT_NULL(parent);
+	ERROR_IF_TRUE(inputSlot >= node->num_inputs, Lav_ERROR_INVALID_SLOT);
+	ERROR_IF_TRUE(outputSlot >= parent->num_outputs, Lav_ERROR_INVALID_SLOT);
+	//We just connect the buffers, and set the read position of the stream to the write position of the buffer.
+	LavSampleBuffer *b = &parent->outputs[outputSlot];
+	LavStream *s = &node->inputs[inputSlot];
+	//Associate the stream to the buffer:
+	s->associated_buffer = b;
+	//And set its read position.
+	s->position = b->write_position;
 	return Lav_ERROR_NONE;
 }
 

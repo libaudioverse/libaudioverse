@@ -1,10 +1,10 @@
 /**There are two concepts in this file, streams and buffers.
 
-A node writes to a buffer.  A node reads from a stream.  Streams have associated buffers and positions, such that more than one stream can use one buffer.  no node may know about streams connected to it.
+A node writes to a buffer.  A node reads from a stream.  Streams have associated buffers and positions, such that more than one stream can use one buffer.  No node may know about streams connected to it.
 
 These concepts are incredibly tightly intertwined, and are thus included together here.  Bugs in one are bugs in the other, and implementation changes require touching both.
 
-The public functions will always work, but it is worth nothing that the current implementation is the simplest possible: if a writer writes faster than a reader, the reader will skip values.
+The public functions will always work, but it is worth noting that the current implementation is the simplest possible: if a writer writes faster than a reader, the reader will skip values.  If there is more than one reader, and one of them causes additional processing, values may also be skipped.
 
 Before reading this file, know the following mod trick:
 3 mod 10 is 3, -3 mod 10 is 7.
@@ -35,6 +35,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_MakeSampleBuffer(unsigned int length, LavSample
 
 Lav_PUBLIC_FUNCTION LavError Lav_freeSampleBuffer(LavSampleBuffer *buffer) {
 	CHECK_NOT_NULL(buffer);
+	free(buffer);
 	return Lav_ERROR_NONE;
 }
 
@@ -43,6 +44,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_bufferWriteSample(LavSampleBuffer *buffer, floa
 	unsigned int next_position = (buffer->write_position+1) % buffer->length; //wrap if necessary.
 	buffer->samples[next_position] = sample;
 	buffer->write_position = next_position;
+	return Lav_ERROR_NONE;
 }
 
 /**Now, streams.*/
