@@ -11,3 +11,9 @@ In English, you connect outputs to inputs, kind of like plugging in wires.  For 
 The specific technique is to call the process method on the output node in a thread, and read from its outputs.
 
 In order to support cyclic graphs, a 1-sample delay is introduced at every input-output connection.  There is literally no other way to do this sensibly, and it is how things actually work in the real world (electrons do take time to travel down a wire, we just can't notice it).
+
+##Error Handling##
+
+All functions that can error return error codes.  That is all.  That is also why property getter/setters return their value through an out parameter, but you can't have everything.
+
+This is much better than the alternative: an error flag. The error flag ends up making things living hell for users who need threads.  See Camlorn_audio and all the uglyness around OpenAL that makes it even come close to working, and why this is neccessary will become abundantly clear.
