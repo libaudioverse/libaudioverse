@@ -17,3 +17,14 @@ In order to support cyclic graphs, a 1-sample delay is introduced at every input
 All functions that can error return error codes.  That is all.  That is also why property getter/setters return their value through an out parameter, but you can't have everything.
 
 This is much better than the alternative: an error flag. The error flag ends up making things living hell for users who need threads.  See Camlorn_audio and all the uglyness around OpenAL that makes it even come close to working, and why this is neccessary will become abundantly clear.
+
+##Stylistic Convensions##
+
+Everything from this library intended for public use begins with `Lav`, even constants.  The actual stylistic convensions pertain to the rest:
+
+- Constants, macros, and enumeration values are alll uppercase with underscores, for example `Lav_PROPERTYTYPE_INT`.
+
+- Functions are camelcase proceeded by `Lav_`, for example `Lav_getIntProperty`.
+
+- Struct members are not proceedded by `Lav`, as they are part of the type and this is unnecessary; they are lower-case with ubnderscores separating words.
+
