@@ -3,14 +3,18 @@
 #include "libaudioverse_fd.h"
 
 /**Does whatever is appropriate on a given platform to expose a Libaudioverse function publically.*/
-#define LAV_PUBLIC_FUNCTION __declspec(dllexport)
+#define Lav_PUBLIC_FUNCTION __declspec(dllexport)
 
-enum LAV_ERRORS {
-	LAV_ERROR_NONE, //everything is OK.
-	LAV_ERROR_UNKNOWN, //We know something has gone wrong, but can't figure out what.
+enum Lav_ERRORS {
+	Lav_ERROR_NONE, //everything is OK.
+	Lav_ERROR_UNKNOWN, //We know something has gone wrong, but can't figure out what.
+	Lav_ERROR_TYPE_MISMATCH, //Tried to get/set something with the wrong type, i.e. properties.
+	Lav_ERROR_INVALID_SLOT, //one of the functions taking a slot got passed an invalid number.
+	Lav_ERROR_NULL_POINTER, //you passed a NULL pointer into something that shouldn't have it.
 };
+
 /**Typedef for error codes.*/
-typedef enum LAV_ERRORS LavError;
+typedef enum Lav_ERRORS LavError;
 
 /**These are property types, either int, float, double, or string.
 
@@ -23,7 +27,7 @@ enum Lav_PROPERRTYTYPES {
 };
 
 /**Whenh is this property processed?  Either block or per-sample.*/
-enum lav_PROPERTYRESOLUTION {
+enum Lav_PROPERTYRESOLUTION {
 	Lav_PROPERTYRESOLUTION_BLOCK = 0x1,
 	Lav_PROPERTYRESOLUTION_SAMPLE = 0x2,
 };
@@ -73,25 +77,25 @@ struct Lav_NodeWithHistory_s {
 };
 
 /**Free an instance of a node.*/
-LAV_PUBLIC_FUNCTION LavError freeNode(LavNode *node);
+Lav_PUBLIC_FUNCTION LavError freeNode(LavNode *node);
 
 /**The following functions initialize nodes and work exactly as one would expect.
 They return NULL on error.*/
-LAV_PUBLIC_FUNCTION LavError Lav_makeNode(unsigned int size, unsigned int numInputs, unsigned int numOutputs, enum  Lav_NODETYPE type, LavNode **destination);
-LAV_PUBLIC_FUNCTION LavError Lav_makeHistoryNode(unsigned int size, unsigned int numInputs,
+Lav_PUBLIC_FUNCTION LavError Lav_makeNode(unsigned int size, unsigned int numInputs, unsigned int numOutputs, enum  Lav_NODETYPE type, LavNode **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_makeHistoryNode(unsigned int size, unsigned int numInputs,
 	unsigned int numOutputs, enum Lav_NODETYPE type, unsigned int historyLength, LavNodeWithHistory **destination);
 
 /**Parent management.*/
-LAV_PUBLIC_FUNCTION LavError getParent(LavNode *node, unsigned int slot, LavNode** destination);
-LAV_PUBLIC_FUNCTION LavError Lav_setParent(LavNode *node, LavNode *parent, unsigned int slot);
-LAV_PUBLIC_FUNCTION LavError Lav_clearParent(LavNode *node, unsigned int slot);
+Lav_PUBLIC_FUNCTION LavError getParent(LavNode *node, unsigned int slot, LavNode** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_setParent(LavNode *node, LavNode *parent, unsigned int slot);
+Lav_PUBLIC_FUNCTION LavError Lav_clearParent(LavNode *node, unsigned int slot);
 
 /**Property getters and setters.*/
-LAV_PUBLIC_FUNCTION LavError Lav_setIntProperty(LavNode* node, unsigned int slot, int value);
-LAV_PUBLIC_FUNCTION LavError Lav_setFloatProperty(LavNode *node, unsigned int slot, float value);
-LAV_PUBLIC_FUNCTION LavError Lav_setDoubleProperty(LavNode *node, unsigned int slot, double value);
-LAV_PUBLIC_FUNCTION LavError Lav_setStringProperty(LavNode *node, unsigned int slot, char* value);
-LAV_PUBLIC_FUNCTION LavError Lav_getIntProperty(LavNode *node, unsigned int slot, int *destination);
-LAV_PUBLIC_FUNCTION LavError Lav_getFloatProperty(LavNode* node, unsigned int slot, float *destination);
-LAV_PUBLIC_FUNCTION LavError Lav_getDoubleProperty(LavNode *node, unsigned int slot, double *destination);
-LAV_PUBLIC_FUNCTION LavError Lav_getStringProperty(LavNode* node, unsigned int slot, char** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_setIntProperty(LavNode* node, unsigned int slot, int value);
+Lav_PUBLIC_FUNCTION LavError Lav_setFloatProperty(LavNode *node, unsigned int slot, float value);
+Lav_PUBLIC_FUNCTION LavError Lav_setDoubleProperty(LavNode *node, unsigned int slot, double value);
+Lav_PUBLIC_FUNCTION LavError Lav_setStringProperty(LavNode *node, unsigned int slot, char* value);
+Lav_PUBLIC_FUNCTION LavError Lav_getIntProperty(LavNode *node, unsigned int slot, int *destination);
+Lav_PUBLIC_FUNCTION LavError Lav_getFloatProperty(LavNode* node, unsigned int slot, float *destination);
+Lav_PUBLIC_FUNCTION LavError Lav_getDoubleProperty(LavNode *node, unsigned int slot, double *destination);
+Lav_PUBLIC_FUNCTION LavError Lav_getStringProperty(LavNode* node, unsigned int slot, char** destination);
