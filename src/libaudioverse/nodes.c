@@ -2,6 +2,7 @@
 
 Note: this file is heavily intertwined with stream_buffers.c, though it does not use private functionality of that file.*/
 #include <stdlib.h>
+#include <string.h>
 #include <libaudioverse/libaudioverse.h>
 #include "private_macros.h"
 
@@ -22,7 +23,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_makeNode(unsigned int size, unsigned int numInp
 Lav_PUBLIC_FUNCTION LavError Lav_makeNodeWithHistory(unsigned int size, unsigned int numInputs,
 	unsigned int numOutputs, enum Lav_NODETYPE type, unsigned int historyLength, LavNodeWithHistory **destination) {
 	LavNodeWithHistory* retval;
-	Lav_makeNode(size, numInputs, numOutputs, type, &retval);
+	Lav_makeNode(size, numInputs, numOutputs, type, (LavNode**)&retval);
 	retval->history_length = historyLength;
 	retval->history = calloc(historyLength, sizeof(float));
 	*destination = retval;
@@ -46,23 +47,33 @@ Lav_PUBLIC_FUNCTION LavError Lav_clearParent(LavNode *node, unsigned int slot) {
 	return Lav_ERROR_NONE;
 }
 
+#define PROPERTY_SETTER_CHECKS(proptype) CHECK_NOT_NULL(node);\
+ERROR_IF_TRUE(slot >= node->num_properties || slot<=0, Lav_ERROR_INVALID_SLOT);\
+ERROR_IF_TRUE(node->properties[slot].type != proptype, Lav_ERROR_TYPE_MISMATCH)\
+
 Lav_PUBLIC_FUNCTION LavError Lav_setIntProperty(LavNode* node, unsigned int slot, int value) {
-	CHECK_NOT_NULL(node);
+	PROPERTY_SETTER_CHECKS(Lav_PROPERTYTYPE_INT);
+	node->properties[slot].value.ival = value;
 	return Lav_ERROR_NONE;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_setFloatProperty(LavNode *node, unsigned int slot, float value) {
-	CHECK_NOT_NULL(node);
+	PROPERTY_SETTER_CHECKS(Lav_PROPERTYTYPE_FLOAT);
+	node->properties[slot].value.fval = value;
 	return Lav_ERROR_NONE;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_setDoubleProperty(LavNode *node, unsigned int slot, double value) {
-	CHECK_NOT_NULL(node);
+	PROPERTY_SETTER_CHECKS(Lav_PROPERTYTYPE_DOUBLE);
+	node->properties[slot].value.dval = value;
 	return Lav_ERROR_NONE;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_setStringProperty(LavNode *node, unsigned int slot, char* value) {
-	CHECK_NOT_NULL(node);
+	PROPERTY_SETTER_CHECKS(Lav_PROPERTYTYPE_STRING);
+	CHECK_NOT_NULL(value);
+	char* string = strdup(value);
+	node->properties[slot].value.sval = string;
 	return Lav_ERROR_NONE;
 }
 
