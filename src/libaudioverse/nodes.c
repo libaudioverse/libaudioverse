@@ -28,6 +28,14 @@ LAV_PUBLIC_FUNCTION int Lav_setParent(LavNode *node, LavNode *parent, unsigned i
 	return 1;
 }
 
+LAV_PUBLIC_FUNCTION LavNode* getParent(LavNode *node, unsigned int slot) {
+	return NULL;
+}
+
+LAV_PUBLIC_FUNCTION int Lav_clearParent(LavNode *node, unsigned int slot) {
+	return 0;
+}
+
 LAV_PUBLIC_FUNCTION int Lav_setIntProperty(LavNode* node, unsigned int slot, int value) {
 	return 1;
 }
