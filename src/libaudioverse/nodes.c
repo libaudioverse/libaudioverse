@@ -4,66 +4,70 @@ Note: this file is heavily intertwined with stream_buffers.c, though it does not
 #include <stdlib.h>
 #include <libaudioverse/libaudioverse.h>
 
-LAV_PUBLIC_FUNCTION void freeNode(LavNode *node) {
+LAV_PUBLIC_FUNCTION LavError freeNode(LavNode *node) {
 	free(node);
+	return LAV_ERROR_NONE;
 }
 
-LAV_PUBLIC_FUNCTION LavNode *Lav_makeNode(unsigned int size, unsigned int numInputs, unsigned int numOutputs, enum  Lav_NODETYPE type) {
+LAV_PUBLIC_FUNCTION LavError Lav_makeNode(unsigned int size, unsigned int numInputs, unsigned int numOutputs, enum  Lav_NODETYPE type, LavNode **destination) {
 	LavNode *retval = calloc(0, size);
 	retval->num_inputs = numInputs;
 	retval->num_outputs = numOutputs;
 	retval->type = type;
-	return retval;
+	*destination = retval;
+	return LAV_ERROR_NONE;
 }
 
-LAV_PUBLIC_FUNCTION LavNodeWithHistory *lav_makeHistoryNode(unsigned int size, unsigned int numInputs,
-	unsigned int numOutputs, enum Lav_NODETYPE type, unsigned int historyLength) {
-	LavNodeWithHistory *retval = (LavNodeWithHistory*)Lav_makeNode(size, numInputs, numOutputs, type);
+LAV_PUBLIC_FUNCTION LavError Lav_makeNodeWithHistory(unsigned int size, unsigned int numInputs,
+	unsigned int numOutputs, enum Lav_NODETYPE type, unsigned int historyLength, LavNodeWithHistory **destination) {
+	LavNodeWithHistory* retval;
+	Lav_makeNode(size, numInputs, numOutputs, type, &retval);
 	retval->history_length = historyLength;
 	retval->history = calloc(historyLength, sizeof(float));
-	return retval;
+	*destination = retval;
+	return LAV_ERROR_NONE;
 }
 
-LAV_PUBLIC_FUNCTION int Lav_setParent(LavNode *node, LavNode *parent, unsigned int slot) {
-	return 1;
+LAV_PUBLIC_FUNCTION LavError Lav_setParent(LavNode *node, LavNode *parent, unsigned int slot) {
+	return LAV_ERROR_NONE;
 }
 
-LAV_PUBLIC_FUNCTION LavNode* getParent(LavNode *node, unsigned int slot) {
-	return NULL;
+LAV_PUBLIC_FUNCTION LavError getParent(LavNode *node, unsigned int slot, LavNode **destination) {
+	return LAV_ERROR_NONE;
 }
 
-LAV_PUBLIC_FUNCTION int Lav_clearParent(LavNode *node, unsigned int slot) {
-	return 0;
+LAV_PUBLIC_FUNCTION LavError Lav_clearParent(LavNode *node, unsigned int slot) {
+	return LAV_ERROR_NONE;
 }
 
-LAV_PUBLIC_FUNCTION int Lav_setIntProperty(LavNode* node, unsigned int slot, int value) {
-	return 1;
+LAV_PUBLIC_FUNCTION LavError Lav_setIntProperty(LavNode* node, unsigned int slot, int value) {
+	return LAV_ERROR_NONE;
 }
 
-LAV_PUBLIC_FUNCTION int Lav_setFloatProperty(LavNode *node, unsigned int slot, float value) {
-	return 1;
+LAV_PUBLIC_FUNCTION LavError Lav_setFloatProperty(LavNode *node, unsigned int slot, float value) {
+	return LAV_ERROR_NONE;
 }
 
-LAV_PUBLIC_FUNCTION int Lav_setDoubleProperty(LavNode *node, unsigned int slot, double value) {
-	return 1;
+LAV_PUBLIC_FUNCTION LavError Lav_setDoubleProperty(LavNode *node, unsigned int slot, double value) {
+	return LAV_ERROR_NONE;
 }
 
-LAV_PUBLIC_FUNCTION int Lav_setStringProperty(LavNode *node, unsigned int slot, char* value) {
-	return 1;
+LAV_PUBLIC_FUNCTION LavError Lav_setStringProperty(LavNode *node, unsigned int slot, char* value) {
+	return LAV_ERROR_NONE;
 }
 
-LAV_PUBLIC_FUNCTION int Lav_getIntProperty(LavNode *node, unsigned int slot) {
-	return 0;
+LAV_PUBLIC_FUNCTION LavError Lav_getIntProperty(LavNode *node, unsigned int slot, int *destination) {
+	return LAV_ERROR_NONE;
 }
 
-LAV_PUBLIC_FUNCTION float Lav_getFloatProperty(LavNode* node, unsigned int slot) {
-	return 0.0f;
+LAV_PUBLIC_FUNCTION LavError Lav_getFloatProperty(LavNode* node, unsigned int slot, float *destination) {
+	return LAV_ERROR_NONE;
 }
 
-LAV_PUBLIC_FUNCTION double Lav_getDoubleProperty(LavNode *node, unsigned int slot) {
-	return 0.0;
+LAV_PUBLIC_FUNCTION LavError Lav_getDoubleProperty(LavNode *node, unsigned int slot, double *destination) {
+	return LAV_ERROR_NONE;
 }
 
-LAV_PUBLIC_FUNCTION char* Lav_getStringProperty(LavNode* node, unsigned int slot) {
-	return "";
+LAV_PUBLIC_FUNCTION LavError Lav_getStringProperty(LavNode* node, unsigned int slot, char** destination) {
+	return LAV_ERROR_NONE;
 }
