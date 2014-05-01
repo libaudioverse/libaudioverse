@@ -16,6 +16,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_makeNode(unsigned int size, unsigned int numInp
 	retval->num_inputs = numInputs;
 	retval->num_outputs = numOutputs;
 	retval->type = type;
+	retval->process = Lav_processDefault;
 	*destination = retval;
 	return Lav_ERROR_NONE;
 }
@@ -27,6 +28,11 @@ Lav_PUBLIC_FUNCTION LavError Lav_makeNodeWithHistory(unsigned int size, unsigned
 	retval->history_length = historyLength;
 	retval->history = calloc(historyLength, sizeof(float));
 	*destination = retval;
+	return Lav_ERROR_NONE;
+}
+
+/*Default Processing function.*/
+Lav_PUBLIC_FUNCTION LavError Lav_processDefault(LavNode *node) {
 	return Lav_ERROR_NONE;
 }
 
