@@ -76,6 +76,9 @@ struct Lav_NodeWithHistory_s {
 	float* history;
 };
 
+/**This is the processing function's typedef.  See external documentation for info on writing your own nodes.*/
+typedef LavError (NODE_PROCESSOR*)(LavNode* node, unsigned int samples);
+
 /**Free an instance of a node.*/
 Lav_PUBLIC_FUNCTION LavError freeNode(LavNode *node);
 
