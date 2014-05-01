@@ -21,8 +21,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_makeNode(unsigned int size, unsigned int numInp
 
 	//Initialize this node's output buffers.
 	for(unsigned int i = 0; i < numInputs; i++) {
-		//Set the owned node to this one.
-		retval->outputs[i].owner = retval;
+		//Set the owned node and slot to this one.
+		retval->outputs[i].owner.node = retval;
+		retval->outputs[i].owner.slot = i;
 		//Make its sample buffer.
 		retval->outputs[i].samples = calloc(2048, sizeof(float));
 		retval->outputs[i].length = 2048;
@@ -63,9 +64,18 @@ Lav_PUBLIC_FUNCTION LavError Lav_setParent(LavNode *node, LavNode *parent, unsig
 	return Lav_ERROR_NONE;
 }
 
-Lav_PUBLIC_FUNCTION LavError getParent(LavNode *node, unsigned int slot, LavNode **destination) {
+Lav_PUBLIC_FUNCTION LavError getParent(LavNode *node, unsigned int slot, LavNode **parent, unsigned int *outputNumber) {
 	CHECK_NOT_NULL(node);
-	CHECK_NOT_NULL(destination);
+	CHECK_NOT_NULL(parent);
+	CHECK_NOT_NULL(outputNumber);
+	if(node->inputs[slot].associated_buffer == NULL) {
+		*parent = NULL;
+		*outputNumber = 0;
+	}
+	else {
+		*parent = node->inputs[slot].associated_buffer->owner.node;
+		*outputNumber = node->inputs[slot].associated_buffer->owner.slot;
+	}
 	return Lav_ERROR_NONE;
 }
 

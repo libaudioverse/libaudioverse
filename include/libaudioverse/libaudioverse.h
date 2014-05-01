@@ -74,7 +74,10 @@ struct Lav_Property_s {
 struct Lav_SampleBuffer_s {
 	unsigned int length, write_position;
 	float *samples;
-	LavNode *owner;
+	struct {
+		LavNode *node;
+		unsigned int slot;
+	} owner;
 };
 
 struct Lav_Stream_s {
@@ -111,7 +114,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_makeHistoryNode(unsigned int size, unsigned int
 	unsigned int numOutputs, enum Lav_NODETYPE type, unsigned int historyLength, LavNodeWithHistory **destination);
 
 /**Parent management.*/
-Lav_PUBLIC_FUNCTION LavError getParent(LavNode *node, unsigned int slot, LavNode** destination);
+Lav_PUBLIC_FUNCTION LavError getParent(LavNode *node, unsigned int slot, LavNode** parent, unsigned int *outputNumber);
 Lav_PUBLIC_FUNCTION LavError Lav_setParent(LavNode *node, LavNode *parent, unsigned int outputSlot, unsigned int inputSlot);
 Lav_PUBLIC_FUNCTION LavError Lav_clearParent(LavNode *node, unsigned int slot);
 
