@@ -55,8 +55,10 @@ enum Lav_PROPERTYRESOLUTION {
 
 /**These are used to tag nodes with their type, so that external languages may see them.*/
 enum Lav_NODETYPES{
+	Lav_NODETYPE_ZEROS,
 	Lav_NODETYPE_FILE_READER,
 	Lav_NODETYPE_CONVOLVER,
+	Lav_NODETYPE_SINE,
 };
 
 struct Lav_Property_s {
@@ -97,7 +99,8 @@ struct Lav_Node_s {
 	LavProperty *properties;
 	unsigned int num_properties;
 	enum Lav_NODETYPES type;
-	LavNodeProcessorFunction process, default_process; //what to call to process this node.
+	LavNodeProcessorFunction process; //what to call to process this node.
+	float internal_time;
 };
 
 struct Lav_NodeWithHistory_s {

@@ -5,7 +5,7 @@ Note: this file is heavily intertwined with stream_buffers.c, though it does not
 #include <string.h>
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
-#include "private_macros.h"
+#include <libaudioverse/private_macros.h>
 
 Lav_PUBLIC_FUNCTION LavError freeNode(LavNode *node) {
 	free(node);
@@ -24,7 +24,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_makeNode(unsigned int size, unsigned int numInp
 	retval->outputs = calloc(numOutputs, sizeof(LavSampleBuffer));
 	retval->type = type;
 	retval->process = Lav_processDefault;
-	retval->default_process = retval->process;
 
 	//Initialize this node's output buffers.
 	for(unsigned int i = 0; i < numInputs; i++) {
