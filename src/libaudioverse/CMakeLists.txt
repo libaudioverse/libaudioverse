@@ -1,4 +1,4 @@
-add_library(libaudioverse
+add_library(libaudioverse SHARED
 nodes.c
 streams.c
 nodes/sine.c
