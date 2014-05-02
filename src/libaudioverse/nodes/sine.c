@@ -16,16 +16,16 @@ Lav_PUBLIC_FUNCTION LavError Lav_makeSineNode(LavNode **destination) {
 	retval->properties[Lav_SINE_FREQUENCY].default_value.fval = 440.0;
 	retval->properties[Lav_SINE_FREQUENCY].name = "frequency";
 	retval->process = sineProcessor;
+	retval->sr = 44100;
 	*destination = retval;
 	return Lav_ERROR_NONE;
 }
-
 
 LavError sineProcessor(LavNode *node, unsigned int count) {
 	float freq;
 	Lav_getFloatProperty(node, Lav_SINE_FREQUENCY, &freq);
 	for(unsigned int i = 0; i < count; i++) {
 		Lav_bufferWriteSample(node->outputs+i, sin(2*pi*freq*node->internal_time));
-		node->internal_time += 1/44100.0f;
+		node->internal_time += 1.0f/node->sr;
 	}
 }

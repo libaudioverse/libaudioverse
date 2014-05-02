@@ -100,7 +100,8 @@ struct Lav_Node_s {
 	unsigned int num_properties;
 	enum Lav_NODETYPES type;
 	LavNodeProcessorFunction process; //what to call to process this node.
-	float internal_time;
+	float internal_time; //Used for functions like sine.
+	unsigned int sr; //Set to the sampling rate at which this node outputs.
 };
 
 struct Lav_NodeWithHistory_s {
