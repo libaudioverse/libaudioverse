@@ -31,3 +31,8 @@ def test_basic_node_integrity():
 		lav.Lav_NODETYPE_ZEROS, #the type
 		node)  #and the destination
 	basic_node_checks(node[0])
+
+def test_sine_node_integrity():
+	node = ffi.new("LavNode **")
+	assert lav.Lav_makeSineNode(node) == lav.Lav_ERROR_NONE
+	basic_node_checks(node[0])
