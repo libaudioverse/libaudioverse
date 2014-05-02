@@ -46,6 +46,11 @@ Lav_PUBLIC_FUNCTION LavError Lav_makeNodeWithHistory(unsigned int size, unsigned
 
 /*Default Processing function.*/
 Lav_PUBLIC_FUNCTION LavError Lav_processDefault(LavNode *node, unsigned int count) {
+	for(unsigned int i = 0; i < node->num_outputs; i++) {
+		for(unsigned int j = 0; j < count; j++) {
+			Lav_bufferWriteSample(node->outputs+i, 0.0f);
+		}
+	}
 	return Lav_ERROR_NONE;
 }
 

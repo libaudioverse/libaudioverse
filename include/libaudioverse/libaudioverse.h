@@ -133,3 +133,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_getStringProperty(LavNode* node, unsigned int s
 
 /**This is a default node processing function. It simply writes 0s to all outputs, and can be useful when you need to provide audio and have nothing to do.*/
 Lav_PUBLIC_FUNCTION LavError Lav_processDefault(LavNode *node, unsigned int count);
+
+/**The following functions write and read streams.*/
+Lav_PUBLIC_FUNCTION LavError Lav_bufferWriteSample(LavSampleBuffer *buffer, float sample);
+Lav_PUBLIC_FUNCTION Lav_streamReadSamples(LavStream *stream, unsigned int count, float *destination);
+
