@@ -17,6 +17,8 @@ def basic_node_checks(node):
 			assert prop.value.dval == prop.default_value.dval
 		elif prop.type == lav.Lav_PROPERTYTYPE_STRING:
 			assert ffi.string(prop.value.sval) == ffi.string(prop.default_value.sval)
+		assert prop.name is not ffi.NULL
+	assert node.process is not ffi.NULL
 
 def test_basic_node_integrity():
 	"""Initializes the most basic type of node, and sees if it looks valid."""
