@@ -1,0 +1,187 @@
+
+
+#pragma once
+
+
+
+
+
+
+
+
+
+struct Lav_Property_s;
+typedef struct Lav_Property_s LavProperty;
+
+struct Lav_SampleBuffer_s;
+typedef struct Lav_SampleBuffer_s LavSampleBuffer;
+
+struct Lav_Node_s;
+typedef struct Lav_Node_s LavNode;
+
+struct Lav_Stream_s;
+typedef struct Lav_Stream_s LavStream;
+
+struct Lav_NodeWithHistory_s;
+typedef struct Lav_NodeWithHistory_s LavNodeWithHistory;
+
+
+
+
+
+
+enum Lav_ERRORS {
+	Lav_ERROR_NONE, 
+	Lav_ERROR_UNKNOWN, 
+	Lav_ERROR_TYPE_MISMATCH, 
+	Lav_ERROR_INVALID_SLOT, 
+	Lav_ERROR_NULL_POINTER, 
+};
+
+
+typedef enum Lav_ERRORS LavError;
+
+
+
+
+enum Lav_PROPERRTYTYPES {
+	Lav_PROPERTYTYPE_INT = 0x1,
+	Lav_PROPERTYTYPE_FLOAT = 0x2,
+	Lav_PROPERTYTYPE_DOUBLE = 0x4,
+	Lav_PROPERTYTYPE_STRING = 0x8,
+};
+
+
+enum Lav_PROPERTYRESOLUTION {
+	Lav_PROPERTYRESOLUTION_BLOCK = 0x0,
+	Lav_PROPERTYRESOLUTION_SAMPLE = 0x1,
+};
+
+
+enum Lav_NODETYPES{
+	Lav_NODETYPE_ZEROS,
+	Lav_NODETYPE_FILE_READER,
+	Lav_NODETYPE_CONVOLVER,
+	Lav_NODETYPE_SINE,
+};
+
+struct Lav_Property_s {
+	enum Lav_PROPERTYTYPE type;
+	enum Lav_PROPERTYRESOLUTION resolution;
+	union {
+		int ival;
+		float fval;
+		double dval;
+		char* sval;
+	} value, default_value;
+	char* name;
+};
+
+
+struct Lav_SampleBuffer_s {
+	unsigned int length, write_position;
+	float *samples;
+	struct {
+		LavNode *node;
+		unsigned int slot;
+	} owner;
+};
+
+struct Lav_Stream_s {
+	LavSampleBuffer *associated_buffer;
+	unsigned int position;
+};
+
+
+typedef LavError (*LavNodeProcessorFunction)(LavNode* node, unsigned int samples);
+
+struct Lav_Node_s {
+	LavSampleBuffer *outputs;
+	unsigned int num_outputs;
+	LavStream *inputs;
+	unsigned int num_inputs;
+	LavProperty *properties;
+	unsigned int num_properties;
+	enum Lav_NODETYPES type;
+	LavNodeProcessorFunction process; 
+	float internal_time;
+	float sr;
+};
+
+struct Lav_NodeWithHistory_s {
+	LavNode base;
+	unsigned int history_length;
+	float* history;
+};
+
+
+extern __declspec(dllexport) LavError freeNode(LavNode *node);
+
+
+extern __declspec(dllexport) LavError Lav_makeNode(unsigned int size, unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, enum  Lav_NODETYPE type, LavNode **destination);
+extern __declspec(dllexport) LavError Lav_makeHistoryNode(unsigned int size, unsigned int numInputs,
+	unsigned int numOutputs, unsigned int numProperties, enum Lav_NODETYPE type, unsigned int historyLength, LavNodeWithHistory **destination);
+
+
+extern __declspec(dllexport) LavError getParent(LavNode *node, unsigned int slot, LavNode** parent, unsigned int *outputNumber);
+extern __declspec(dllexport) LavError Lav_setParent(LavNode *node, LavNode *parent, unsigned int outputSlot, unsigned int inputSlot);
+extern __declspec(dllexport) LavError Lav_clearParent(LavNode *node, unsigned int slot);
+
+
+extern __declspec(dllexport) LavError Lav_resetProperty(LavNode *node, unsigned int slot);
+
+
+extern __declspec(dllexport) LavError Lav_setIntProperty(LavNode* node, unsigned int slot, int value);
+extern __declspec(dllexport) LavError Lav_setFloatProperty(LavNode *node, unsigned int slot, float value);
+extern __declspec(dllexport) LavError Lav_setDoubleProperty(LavNode *node, unsigned int slot, double value);
+extern __declspec(dllexport) LavError Lav_setStringProperty(LavNode *node, unsigned int slot, char* value);
+extern __declspec(dllexport) LavError Lav_getIntProperty(LavNode *node, unsigned int slot, int *destination);
+extern __declspec(dllexport) LavError Lav_getFloatProperty(LavNode* node, unsigned int slot, float *destination);
+extern __declspec(dllexport) LavError Lav_getDoubleProperty(LavNode *node, unsigned int slot, double *destination);
+extern __declspec(dllexport) LavError Lav_getStringProperty(LavNode* node, unsigned int slot, char** destination);
+
+
+extern __declspec(dllexport) LavError Lav_processDefault(LavNode *node, unsigned int count);
+
+
+extern __declspec(dllexport) LavError Lav_bufferWriteSample(LavSampleBuffer *buffer, float sample);
+extern __declspec(dllexport) Lav_streamReadSamples(LavStream *stream, unsigned int count, float *destination);
+
+
+
+#pragma once
+
+
+
+
+
+
+
+
+enum Lav_STDPROPERTIES {
+	Lav_STDPROPERTY_ADD = 0,
+	Lav_STDPROPERTY_MUL = 1,
+};
+
+enum Lav_SINE_PROPERTIES {
+	Lav_SINE_FREQUENCY = 3,
+};
+
+
+
+#pragma once
+
+
+
+
+
+
+
+
+
+
+#pragma once
+
+
+
+
