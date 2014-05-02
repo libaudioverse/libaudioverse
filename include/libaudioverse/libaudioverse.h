@@ -1,3 +1,5 @@
+#pragma once
+
 /**The public interface to Libaudioverse.*/
 
 /*Forward-declares all Libaudioverse types.
@@ -101,6 +103,7 @@ struct Lav_Node_s {
 	enum Lav_NODETYPES type;
 	LavNodeProcessorFunction process; //what to call to process this node.
 	float internal_time;
+	float sr;
 };
 
 struct Lav_NodeWithHistory_s {

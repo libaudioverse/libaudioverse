@@ -6,6 +6,7 @@ Note: this file is heavily intertwined with stream_buffers.c, though it does not
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/private_macros.h>
+#include <libaudioverse/private_constants.h>
 
 Lav_PUBLIC_FUNCTION LavError freeNode(LavNode *node) {
 	free(node);
@@ -47,6 +48,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_makeNode(unsigned int size, unsigned int numInp
 		retval->properties[Lav_STDPROPERTY_MUL].default_value.fval = 0.0f;
 		retval->properties[Lav_STDPROPERTY_MUL].name = "mul";
 	}
+
+	//For now, set sr to the global sampling rate constant.
+	retval->sr = SR;
 	*destination = retval;
 
 	return Lav_ERROR_NONE;

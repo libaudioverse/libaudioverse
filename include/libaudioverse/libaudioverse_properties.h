@@ -1,3 +1,4 @@
+#pragma once
 /**This file contains the property enums for Libaudioverse.
 
 It is worth keeping separate because it will grow rapidly and contain documentation comments and etc.

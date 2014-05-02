@@ -3,7 +3,7 @@
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/private_macros.h>
-const float pi = 3.14159f;
+#include <libaudioverse/private_constants.h>
 
 LavError sineProcessor(LavNode *node, unsigned int count);
 
@@ -25,7 +25,7 @@ LavError sineProcessor(LavNode *node, unsigned int count) {
 	float freq;
 	Lav_getFloatProperty(node, Lav_SINE_FREQUENCY, &freq);
 	for(unsigned int i = 0; i < count; i++) {
-		Lav_bufferWriteSample(node->outputs+i, sin(2*pi*freq*node->internal_time));
-		node->internal_time += 1/44100.0f;
+		Lav_bufferWriteSample(node->outputs+i, sin(2*PI*freq*node->internal_time));
+		node->internal_time += 1/node->sr;
 	}
 }

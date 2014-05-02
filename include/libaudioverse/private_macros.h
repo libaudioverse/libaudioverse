@@ -1,3 +1,5 @@
+#pragma once
+
 /**Private macro definitions.*/
 
 #define ERROR_IF_TRUE(expression, error) do {\
