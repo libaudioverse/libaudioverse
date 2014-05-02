@@ -14,8 +14,7 @@ But suppose the reader is 5 and the writer is 2, that is the writer just went pa
 (2-5) mod 10 = -3 mod 10 = 7.
 */
 
-#include <libaudioverse/libaudioverse.h>
-#include "private_macros.h"
+#include <libaudioverse/private_all.h>
 #include <stdlib.h>
 #include <string.h> //some functions here are useful for things that aren't strings.
 

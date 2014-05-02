@@ -1,9 +1,6 @@
 #include <math.h>
 #include <stdlib.h>
-#include <libaudioverse/libaudioverse.h>
-#include <libaudioverse/libaudioverse_properties.h>
-#include <libaudioverse/private_macros.h>
-#include <libaudioverse/private_constants.h>
+#include <libaudioverse/private_all.h>
 
 LavError sineProcessor(LavNode *node, unsigned int count);
 

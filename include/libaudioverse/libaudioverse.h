@@ -145,3 +145,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_processDefault(LavNode *node, unsigned int coun
 Lav_PUBLIC_FUNCTION LavError Lav_bufferWriteSample(LavSampleBuffer *buffer, float sample);
 Lav_PUBLIC_FUNCTION Lav_streamReadSamples(LavStream *stream, unsigned int count, float *destination);
 
+
+/**Make a sine node.*/
+Lav_PUBLIC_FUNCTION LavError Lav_makeSineNode(LavNode **destination);

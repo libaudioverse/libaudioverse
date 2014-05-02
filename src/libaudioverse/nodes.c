@@ -3,10 +3,7 @@
 Note: this file is heavily intertwined with stream_buffers.c, though it does not use private functionality of that file.*/
 #include <stdlib.h>
 #include <string.h>
-#include <libaudioverse/libaudioverse.h>
-#include <libaudioverse/libaudioverse_properties.h>
-#include <libaudioverse/private_macros.h>
-#include <libaudioverse/private_constants.h>
+#include <libaudioverse/private_all.h>
 
 Lav_PUBLIC_FUNCTION LavError freeNode(LavNode *node) {
 	free(node);
