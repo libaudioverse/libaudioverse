@@ -11,7 +11,8 @@ Lav_PUBLIC_FUNCTION LavError freeNode(LavNode *node) {
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_makeNode(unsigned int size, unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, enum  Lav_NODETYPE type, LavNode **destination) {
-	LavNode *retval = calloc(0, size);
+	LavNode *retval = calloc(1, size);
+	ERROR_IF_TRUE(retval == NULL, Lav_ERROR_MEMORY);
 	retval->num_inputs = numInputs;
 	retval->num_outputs = numOutputs;
 	retval->num_properties = numProperties;
@@ -41,8 +42,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_makeNode(unsigned int size, unsigned int numInp
 		retval->properties[Lav_STDPROPERTY_ADD].value.fval = 0.0f;
 		retval->properties[Lav_STDPROPERTY_ADD].default_value.fval = 0.0f;
 		retval->properties[Lav_STDPROPERTY_MUL].type = Lav_PROPERTYTYPE_FLOAT;
-		retval->properties[Lav_STDPROPERTY_MUL].value.fval = 90.0f;
-		retval->properties[Lav_STDPROPERTY_MUL].default_value.fval = 0.0f;
+		retval->properties[Lav_STDPROPERTY_MUL].value.fval = 1.0f;
+		retval->properties[Lav_STDPROPERTY_MUL].default_value.fval = 1.0f;
 		retval->properties[Lav_STDPROPERTY_MUL].name = "mul";
 	}
 

@@ -17,6 +17,8 @@ link_directories("${CMAKE_BINARY_DIR}/portaudio")
 #This fixes portaudio.
 add_definitions(-DPA_WDMKS_NO_KSGUID_LIB)
 
+#make sure we link to the static runtime.
+SET(FORCE_STATIC_VCRT ON)
 #This makes sure that we can link to ourself.
 link_directories(${libaudioverse_BINARY_DIR})
 add_subdirectory(portaudio)
