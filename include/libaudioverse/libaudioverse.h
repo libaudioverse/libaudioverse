@@ -49,8 +49,8 @@ enum Lav_PROPERRTYTYPES {
 
 /**Whenh is this property processed?  Either block or per-sample.*/
 enum Lav_PROPERTYRESOLUTION {
-	Lav_PROPERTYRESOLUTION_BLOCK = 0x1,
-	Lav_PROPERTYRESOLUTION_SAMPLE = 0x2,
+	Lav_PROPERTYRESOLUTION_BLOCK = 0x0,
+	Lav_PROPERTYRESOLUTION_SAMPLE = 0x1,
 };
 
 /**These are used to tag nodes with their type, so that external languages may see them.*/
@@ -68,6 +68,7 @@ struct Lav_Property_s {
 		double dval;
 		char* sval;
 	} value, default_value;
+	char* name;
 };
 
 /**This is actually a ring buffer, but should be accessed only through the public interface.*/
@@ -109,9 +110,9 @@ struct Lav_NodeWithHistory_s {
 Lav_PUBLIC_FUNCTION LavError freeNode(LavNode *node);
 
 /**The following functions initialize nodes and work exactly as one would expect.*/
-Lav_PUBLIC_FUNCTION LavError Lav_makeNode(unsigned int size, unsigned int numInputs, unsigned int numOutputs, enum  Lav_NODETYPE type, LavNode **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_makeNode(unsigned int size, unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, enum  Lav_NODETYPE type, LavNode **destination);
 Lav_PUBLIC_FUNCTION LavError Lav_makeHistoryNode(unsigned int size, unsigned int numInputs,
-	unsigned int numOutputs, enum Lav_NODETYPE type, unsigned int historyLength, LavNodeWithHistory **destination);
+	unsigned int numOutputs, unsigned int numProperties, enum Lav_NODETYPE type, unsigned int historyLength, LavNodeWithHistory **destination);
 
 /**Parent management.*/
 Lav_PUBLIC_FUNCTION LavError getParent(LavNode *node, unsigned int slot, LavNode** parent, unsigned int *outputNumber);

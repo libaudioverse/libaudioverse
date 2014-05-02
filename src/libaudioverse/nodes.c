@@ -4,6 +4,7 @@ Note: this file is heavily intertwined with stream_buffers.c, though it does not
 #include <stdlib.h>
 #include <string.h>
 #include <libaudioverse/libaudioverse.h>
+#include <libaudioverse/libaudioverse_properties.h>
 #include "private_macros.h"
 
 Lav_PUBLIC_FUNCTION LavError freeNode(LavNode *node) {
@@ -11,10 +12,16 @@ Lav_PUBLIC_FUNCTION LavError freeNode(LavNode *node) {
 	return Lav_ERROR_NONE;
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_makeNode(unsigned int size, unsigned int numInputs, unsigned int numOutputs, enum  Lav_NODETYPE type, LavNode **destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_makeNode(unsigned int size, unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, enum  Lav_NODETYPE type, LavNode **destination) {
 	LavNode *retval = calloc(0, size);
 	retval->num_inputs = numInputs;
 	retval->num_outputs = numOutputs;
+	retval->num_properties = numProperties;
+
+	//allocations:
+	retval->inputs = calloc(numInputs, sizeof(LavStream));
+	retval->properties = calloc(numProperties, sizeof(LavProperty));
+	retval->outputs = calloc(numOutputs, sizeof(LavSampleBuffer));
 	retval->type = type;
 	retval->process = Lav_processDefault;
 	retval->default_process = retval->process;
@@ -30,14 +37,26 @@ Lav_PUBLIC_FUNCTION LavError Lav_makeNode(unsigned int size, unsigned int numInp
 		retval->outputs[i].write_position = 1; //feed the initial 0.
 	}
 	//There's nothing to do for the streams: they all point at NULL parents.
+	//If we have a tleast two properties, they're add and mul.
+	if(numProperties >= 2) {
+		retval->properties[Lav_STDPROPERTY_ADD].name = "add";
+		retval->properties[Lav_STDPROPERTY_ADD].type = Lav_PROPERTYTYPE_FLOAT;
+		retval->properties[Lav_STDPROPERTY_ADD].value.fval = 0.0f;
+		retval->properties[Lav_STDPROPERTY_ADD].default_value.fval = 0.0f;
+		retval->properties[Lav_STDPROPERTY_MUL].type = Lav_PROPERTYTYPE_FLOAT;
+		retval->properties[Lav_STDPROPERTY_MUL].value.fval = 90.0f;
+		retval->properties[Lav_STDPROPERTY_MUL].default_value.fval = 0.0f;
+		retval->properties[Lav_STDPROPERTY_MUL].name = "mul";
+	}
 	*destination = retval;
+
 	return Lav_ERROR_NONE;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_makeNodeWithHistory(unsigned int size, unsigned int numInputs,
-	unsigned int numOutputs, enum Lav_NODETYPE type, unsigned int historyLength, LavNodeWithHistory **destination) {
+	unsigned int numOutputs, unsigned int numProperties, enum Lav_NODETYPE type, unsigned int historyLength, LavNodeWithHistory **destination) {
 	LavNodeWithHistory* retval;
-	Lav_makeNode(size, numInputs, numOutputs, type, (LavNode**)&retval);
+	Lav_makeNode(size, numInputs, numOutputs, numProperties, type, (LavNode**)&retval);
 	retval->history_length = historyLength;
 	retval->history = calloc(historyLength, sizeof(float));
 	*destination = retval;
