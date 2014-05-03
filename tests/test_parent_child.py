@@ -1,7 +1,8 @@
 """Tests the parent-child relationships."""
 from make_cffi import *
 
-def test_parent_child():
+def parent_child():
+	"""This function does a bunch of useful setup as well as being a test; thus, we return all the objects."""
 	node1, node2 = ffi.new("LavNode **"), ffi.new("LavNode **")
 	lav.Lav_makeNode(0, 1, 0, lav.Lav_NODETYPE_ZEROS, node1)
 	lav.Lav_makeNode(1, 0, 0, lav.Lav_NODETYPE_ZEROS, node2)
@@ -13,3 +14,13 @@ def test_parent_child():
 	assert lav.Lav_setParent(node2, node1, 0, 0) == lav.Lav_ERROR_NONE
 	assert lav.Lav_getParent(node2, 0, parent, slot) == lav.Lav_ERROR_NONE
 	assert parent[0] == node1 and slot[0] == 0
+	return node1, node2, parent, slot
+
+def test_parent_child():
+	parent_child()
+
+def test_clear_parent():
+	node1, node2, parent, slot = parent_child()
+	lav.Lav_clearParent(node2, 0)
+	lav.Lav_getParent(node2, 0, parent, slot)
+	assert parent[0] == ffi.NULL and slot == 0
