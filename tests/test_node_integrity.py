@@ -24,7 +24,6 @@ def test_basic_node_integrity():
 	"""Initializes the most basic type of node, and sees if it looks valid."""
 	node = ffi.new("LavNode **")
 	assert lav.Lav_ERROR_NONE == lav.Lav_makeNode(
-		ffi.sizeof("LavNode"), #size
 		5, #5 inputs.
 		3, #3 outputs.
 		3, #3 properties.

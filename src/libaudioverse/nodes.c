@@ -10,22 +10,22 @@ Lav_PUBLIC_FUNCTION LavError freeNode(LavNode *node) {
 	return Lav_ERROR_NONE;
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_makeNode(unsigned int size, unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, enum  Lav_NODETYPE type, LavNode **destination) {
-	LavNode *retval = calloc(1, size);
+Lav_PUBLIC_FUNCTION LavError Lav_makeNode(unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, enum  Lav_NODETYPE type, LavNode **destination) {
+	LavNode *retval = calloc(1, sizeof(LavNode));
 	ERROR_IF_TRUE(retval == NULL, Lav_ERROR_MEMORY);
 	retval->num_inputs = numInputs;
 	retval->num_outputs = numOutputs;
 	retval->num_properties = numProperties;
 
 	//allocations:
-	retval->inputs = calloc(numInputs, sizeof(LavStream));
-	retval->properties = calloc(numProperties, sizeof(LavProperty));
-	retval->outputs = calloc(numOutputs, sizeof(LavSampleBuffer));
+	if(numInputs > 0) retval->inputs = calloc(numInputs, sizeof(LavStream));
+	if(numProperties > 0) retval->properties = calloc(numProperties, sizeof(LavProperty));
+	if(numOutputs > 0) retval->outputs = calloc(numOutputs, sizeof(LavSampleBuffer));
 	retval->type = type;
 	retval->process = Lav_processDefault;
 
 	//Initialize this node's output buffers.
-	for(unsigned int i = 0; i < numInputs; i++) {
+	for(unsigned int i = 0; i < numOutputs; i++) {
 		//Set the owned node and slot to this one.
 		retval->outputs[i].owner.node = retval;
 		retval->outputs[i].owner.slot = i;

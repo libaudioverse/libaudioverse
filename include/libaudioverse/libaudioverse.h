@@ -118,7 +118,7 @@ struct Lav_NodeWithHistory_s {
 Lav_PUBLIC_FUNCTION LavError freeNode(LavNode *node);
 
 /**The following functions initialize nodes and work exactly as one would expect.*/
-Lav_PUBLIC_FUNCTION LavError Lav_makeNode(unsigned int size, unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, enum  Lav_NODETYPE type, LavNode **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_makeNode(unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, enum  Lav_NODETYPE type, LavNode **destination);
 
 /**Parent management.*/
 Lav_PUBLIC_FUNCTION LavError getParent(LavNode *node, unsigned int slot, LavNode** parent, unsigned int *outputNumber);
