@@ -3,7 +3,7 @@ Libaudioverse
 
 Libaudioverse is a library for 3D and environmental audio.
 
-High level abstractions exist for most things: 3D sources and reverb are some examples.  Simply create a source, load a file, apply whatever effects you want, and start it playing.  Even the type of output is abstracted away.
+Libaudioverse provides high level abstractions for most things: 3D sources and reverb among them.  Simply create a source, load a file, apply whatever effects you want, and start it playing.  Even the type of output is abstracted away.
 
 At its lowest level, Libaudioverse provides a model of digital signal processing, where the signal flow graph can be represented by nodes and edges between them.
 Nodes process audio.  They have some number of inputs and some number of outputs.  The edges in the graph are formed by input-output relationships; this graph is directed.
