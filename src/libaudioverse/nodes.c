@@ -95,6 +95,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_getParent(LavNode *node, unsigned int slot, Lav
 
 Lav_PUBLIC_FUNCTION LavError Lav_clearParent(LavNode *node, unsigned int slot) {
 	CHECK_NOT_NULL(node);
+	ERROR_IF_TRUE(slot >= node->num_inputs, Lav_ERROR_INVALID_SLOT);
+	//This is as simple as it looks.
+	node->inputs[slot].associated_buffer = NULL;
 	return Lav_ERROR_NONE;
 }
 

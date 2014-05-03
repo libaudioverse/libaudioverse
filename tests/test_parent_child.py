@@ -23,4 +23,4 @@ def test_clear_parent():
 	node1, node2, parent, slot = parent_child()
 	lav.Lav_clearParent(node2, 0)
 	lav.Lav_getParent(node2, 0, parent, slot)
-	assert parent[0] == ffi.NULL and slot == 0
+	assert parent[0] == ffi.NULL and slot[0] == 0
