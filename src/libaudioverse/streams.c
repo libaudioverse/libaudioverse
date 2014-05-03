@@ -25,7 +25,7 @@ Note that we can only write to a buffer, at least without a stream.*/
 Lav_PUBLIC_FUNCTION LavError Lav_bufferWriteSample(LavSampleBuffer *buffer, float sample) {
 	//calculate the next position.
 	unsigned int next_position = (buffer->write_position+1) % buffer->length; //wrap if necessary.
-	buffer->samples[next_position] = sample;
+	buffer->samples[buffer->write_position] = sample;
 	buffer->write_position = next_position;
 	return Lav_ERROR_NONE;
 }
