@@ -139,7 +139,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_setStringProperty(LavNode *node, unsigned int s
 #define PROPERTY_GETTER_CHECKS(proptype) CHECK_NOT_NULL(node);\
 CHECK_NOT_NULL(destination);\
 ERROR_IF_TRUE(slot >= node->num_properties || slot < 0, Lav_ERROR_INVALID_SLOT);\
-ERROR_IF_TRUE(proptype != node->properties[slot].type, Lav_ERROR_INVALID_SLOT)
+ERROR_IF_TRUE(proptype != node->properties[slot].type, Lav_ERROR_TYPE_MISMATCH)
 
 Lav_PUBLIC_FUNCTION LavError Lav_getIntProperty(LavNode *node, unsigned int slot, int *destination) {
 	PROPERTY_GETTER_CHECKS(Lav_PROPERTYTYPE_INT);
