@@ -121,7 +121,7 @@ Lav_PUBLIC_FUNCTION LavError freeNode(LavNode *node);
 Lav_PUBLIC_FUNCTION LavError Lav_makeNode(unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, enum  Lav_NODETYPE type, LavNode **destination);
 
 /**Parent management.*/
-Lav_PUBLIC_FUNCTION LavError getParent(LavNode *node, unsigned int slot, LavNode** parent, unsigned int *outputNumber);
+Lav_PUBLIC_FUNCTION LavError Lav_getParent(LavNode *node, unsigned int slot, LavNode** parent, unsigned int *outputNumber);
 Lav_PUBLIC_FUNCTION LavError Lav_setParent(LavNode *node, LavNode *parent, unsigned int outputSlot, unsigned int inputSlot);
 Lav_PUBLIC_FUNCTION LavError Lav_clearParent(LavNode *node, unsigned int slot);
 

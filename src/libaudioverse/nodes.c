@@ -78,7 +78,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_setParent(LavNode *node, LavNode *parent, unsig
 	return Lav_ERROR_NONE;
 }
 
-Lav_PUBLIC_FUNCTION LavError getParent(LavNode *node, unsigned int slot, LavNode **parent, unsigned int *outputNumber) {
+Lav_PUBLIC_FUNCTION LavError Lav_getParent(LavNode *node, unsigned int slot, LavNode **parent, unsigned int *outputNumber) {
 	CHECK_NOT_NULL(node);
 	CHECK_NOT_NULL(parent);
 	CHECK_NOT_NULL(outputNumber);
