@@ -21,7 +21,8 @@ LavError sineProcessor(LavNode *node, unsigned int count) {
 	float freq;
 	Lav_getFloatProperty(node, Lav_SINE_FREQUENCY, &freq);
 	for(unsigned int i = 0; i < count; i++) {
-		Lav_bufferWriteSample(node->outputs+i, sin(2*PI*freq*node->internal_time));
+		Lav_bufferWriteSample(node->outputs+i, (float)sin(2*PI*freq*node->internal_time));
 		node->internal_time += 1.0/node->sr;
 	}
+	return Lav_ERROR_NONE;
 }
