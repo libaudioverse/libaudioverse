@@ -20,7 +20,7 @@ But suppose the reader is 5 and the writer is 2, that is the writer just went pa
 
 /**First, buffers.
 
-Note that we can only write to a buffer, at least without a stream.  Also, all buffers start with one sample written to them: a single 0.  This is part of allowing cyclic graphs, which is needed for reverb.*/
+Note that we can only write to a buffer, at least without a stream.*/
 
 Lav_PUBLIC_FUNCTION LavError Lav_bufferWriteSample(LavSampleBuffer *buffer, float sample) {
 	//calculate the next position.

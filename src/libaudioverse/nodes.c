@@ -32,7 +32,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_makeNode(unsigned int numInputs, unsigned int n
 		//Make its sample buffer.
 		retval->outputs[i].samples = calloc(2048, sizeof(float));
 		retval->outputs[i].length = 2048;
-		retval->outputs[i].write_position = 1; //feed the initial 0.
 	}
 	//There's nothing to do for the streams: they all point at NULL parents.
 	//If we have a tleast two properties, they're add and mul.
