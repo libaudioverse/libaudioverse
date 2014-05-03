@@ -103,7 +103,7 @@ struct Lav_Node_s {
 	unsigned int num_properties;
 	enum Lav_NODETYPES type;
 	LavNodeProcessorFunction process; //what to call to process this node.
-	float internal_time;
+	double internal_time;
 	float sr;
 	void *type_specific_data; //place for node subtypes to place data.
 };
