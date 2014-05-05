@@ -23,7 +23,7 @@ def basic_node_checks(node):
 def test_basic_node_integrity():
 	"""Initializes the most basic type of node, and sees if it looks valid."""
 	node = ffi.new("LavNode **")
-	assert lav.Lav_ERROR_NONE == lav.Lav_makeNode(
+	assert lav.Lav_ERROR_NONE == lav.Lav_createNode(
 		5, #5 inputs.
 		3, #3 outputs.
 		3, #3 properties.
@@ -33,5 +33,5 @@ def test_basic_node_integrity():
 
 def test_sine_node_integrity():
 	node = ffi.new("LavNode **")
-	assert lav.Lav_makeSineNode(node) == lav.Lav_ERROR_NONE
+	assert lav.Lav_createSineNode(node) == lav.Lav_ERROR_NONE
 	basic_node_checks(node[0])

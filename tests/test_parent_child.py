@@ -4,8 +4,8 @@ from make_cffi import *
 def parent_child():
 	"""This function does a bunch of useful setup as well as being a test; thus, we return all the objects."""
 	node1, node2 = ffi.new("LavNode **"), ffi.new("LavNode **")
-	lav.Lav_makeNode(0, 1, 0, lav.Lav_NODETYPE_ZEROS, node1)
-	lav.Lav_makeNode(1, 0, 0, lav.Lav_NODETYPE_ZEROS, node2)
+	lav.Lav_createNode(0, 1, 0, lav.Lav_NODETYPE_ZEROS, node1)
+	lav.Lav_createNode(1, 0, 0, lav.Lav_NODETYPE_ZEROS, node2)
 	node1, node2 = node1[0], node2[0]
 	assert node1 is not ffi.NULL and node2 is not ffi.NULL
 	#the following let us pull out info.

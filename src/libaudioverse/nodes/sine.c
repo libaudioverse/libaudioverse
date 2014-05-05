@@ -4,10 +4,10 @@
 
 LavError sineProcessor(LavNode *node, unsigned int count);
 
-Lav_PUBLIC_FUNCTION LavError Lav_makeSineNode(LavNode **destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavNode **destination) {
 	CHECK_NOT_NULL(destination);
 	LavNode *retval = NULL;
-	Lav_makeNode(0, 1, 3, Lav_NODETYPE_SINE, &retval);
+	Lav_createNode(0, 1, 3, Lav_NODETYPE_SINE, &retval);
 	retval->properties[Lav_SINE_FREQUENCY].type = Lav_PROPERTYTYPE_FLOAT;
 	retval->properties[Lav_SINE_FREQUENCY].value.fval = 440.0;
 	retval->properties[Lav_SINE_FREQUENCY].default_value.fval = 440.0;

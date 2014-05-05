@@ -51,7 +51,7 @@ typedef LavError (*LavNodeProcessorFunction)(LavNode* node, unsigned int samples
 Lav_PUBLIC_FUNCTION LavError freeNode(LavNode *node);
 
 /**The following functions initialize nodes and work exactly as one would expect.*/
-Lav_PUBLIC_FUNCTION LavError Lav_makeNode(unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, enum  Lav_NODETYPE type, LavNode **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, enum  Lav_NODETYPE type, LavNode **destination);
 
 /**Parent management.*/
 Lav_PUBLIC_FUNCTION LavError Lav_getParent(LavNode *node, unsigned int slot, LavNode** parent, unsigned int *outputNumber);
@@ -80,4 +80,4 @@ Lav_PUBLIC_FUNCTION Lav_streamReadSamples(LavStream *stream, unsigned int count,
 
 
 /**Make a sine node.*/
-Lav_PUBLIC_FUNCTION LavError Lav_makeSineNode(LavNode **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavNode **destination);
