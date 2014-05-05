@@ -1,1 +1,2 @@
 add_subdirectory(libaudioverse)
+add_subdirectory(examples)
