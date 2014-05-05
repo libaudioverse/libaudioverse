@@ -1,4 +1,5 @@
 #pragma once
+#include "libaudioverse.h"
 
 /**Private macro definitions.*/
 

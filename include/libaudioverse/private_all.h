@@ -1,4 +1,5 @@
-#include <libaudioverse/libaudioverse.h>
-#include <libaudioverse/libaudioverse_properties.h>
-#include <libaudioverse/private_macros.h>
-#include <libaudioverse/private_constants.h>
+#include "libaudioverse.h"
+#include "libaudioverse_properties.h"
+#include "private_macros.h"
+#include "private_constants.h"
+#include "private_structs.h"

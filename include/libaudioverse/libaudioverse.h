@@ -3,27 +3,13 @@
 /**The public interface to Libaudioverse.*/
 
 /*Forward-declares all Libaudioverse types.
-
-Search for begin_meaningful_content to skip.
-
 Enums can't go here. Everything else can.*/
 
-struct Lav_Property_s;
 typedef struct Lav_Property_s LavProperty;
-
-struct Lav_SampleBuffer_s;
 typedef struct Lav_SampleBuffer_s LavSampleBuffer;
-
-struct Lav_Node_s;
 typedef struct Lav_Node_s LavNode;
-
-struct Lav_Stream_s;
 typedef struct Lav_Stream_s LavStream;
-
-struct Lav_NodeWithHistory_s;
 typedef struct Lav_NodeWithHistory_s LavNodeWithHistory;
-
-//begin_meaningful_content
 
 /**Does whatever is appropriate on a given platform to expose a Libaudioverse function publically.*/
 #define Lav_PUBLIC_FUNCTION extern __declspec(dllexport)
@@ -50,12 +36,6 @@ enum Lav_PROPERRTYTYPES {
 	Lav_PROPERTYTYPE_STRING = 0x8,
 };
 
-/**Whenh is this property processed?  Either block or per-sample.*/
-enum Lav_PROPERTYRESOLUTION {
-	Lav_PROPERTYRESOLUTION_BLOCK = 0x0,
-	Lav_PROPERTYRESOLUTION_SAMPLE = 0x1,
-};
-
 /**These are used to tag nodes with their type, so that external languages may see them.*/
 enum Lav_NODETYPES{
 	Lav_NODETYPE_ZEROS,
@@ -64,55 +44,8 @@ enum Lav_NODETYPES{
 	Lav_NODETYPE_SINE,
 };
 
-struct Lav_Property_s {
-	enum Lav_PROPERTYTYPE type;
-	enum Lav_PROPERTYRESOLUTION resolution;
-	union {
-		int ival;
-		float fval;
-		double dval;
-		char* sval;
-	} value, default_value;
-	char* name;
-};
-
-/**This is actually a ring buffer, but should be accessed only through the public interface.*/
-struct Lav_SampleBuffer_s {
-	unsigned int length, write_position;
-	float *samples;
-	struct {
-		LavNode *node;
-		unsigned int slot;
-	} owner;
-};
-
-struct Lav_Stream_s {
-	LavSampleBuffer *associated_buffer;
-	unsigned int position;
-};
-
 /**This is the processing function's typedef.  See external documentation for info on writing your own nodes.*/
 typedef LavError (*LavNodeProcessorFunction)(LavNode* node, unsigned int samples);
-
-struct Lav_Node_s {
-	LavSampleBuffer *outputs;
-	unsigned int num_outputs;
-	LavStream *inputs;
-	unsigned int num_inputs;
-	LavProperty *properties;
-	unsigned int num_properties;
-	enum Lav_NODETYPES type;
-	LavNodeProcessorFunction process; //what to call to process this node.
-	double internal_time;
-	float sr;
-	void *type_specific_data; //place for node subtypes to place data.
-};
-
-struct Lav_NodeWithHistory_s {
-	LavNode base;
-	unsigned int history_length;
-	float* history;
-};
 
 /**Free an instance of a node.*/
 Lav_PUBLIC_FUNCTION LavError freeNode(LavNode *node);
