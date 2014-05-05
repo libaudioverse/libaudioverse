@@ -1,7 +1,7 @@
 import subprocess
 import cffi
 
-input_file = 'include/libaudioverse/cffi.helper.h'
+input_file = 'include/libaudioverse/private_all.h'
 
 src = subprocess.check_output('cl /EP ' + input_file)
 src = src.replace("\r\n", "\n")
