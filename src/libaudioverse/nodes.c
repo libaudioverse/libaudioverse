@@ -10,7 +10,7 @@ Lav_PUBLIC_FUNCTION LavError freeNode(LavNode *node) {
 	return Lav_ERROR_NONE;
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, enum  Lav_NODETYPE type, LavNode **destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, enum  Lav_NODETYPE type, LavGraph *graph, LavNode **destination) {
 	LavNode *retval = calloc(1, sizeof(LavNode));
 	ERROR_IF_TRUE(retval == NULL, Lav_ERROR_MEMORY);
 	retval->num_inputs = numInputs;
