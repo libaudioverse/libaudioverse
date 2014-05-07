@@ -14,6 +14,9 @@ INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/portaudio/include")
 LINK_DIRECTORIES(${LIBSNDFILE_LIBRARY_DIR})
 link_directories("${CMAKE_BINARY_DIR}/portaudio")
 
+#For uthash.
+INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/uthash/src")
+
 #This fixes portaudio.
 add_definitions(-DPA_WDMKS_NO_KSGUID_LIB)
 
