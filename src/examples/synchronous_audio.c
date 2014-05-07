@@ -9,12 +9,13 @@ void main() {
 	//First, make a bunch of objects, connect them together, and get 5 seconds of a sine wave.
 	float sine_time = 5.0;
 	float sr = 44100;
-	LavGraph graph = Lav_createGraph(sr);
+	LavGraph *graph;
+	Lav_createGraph(sr, &graph);
 	LavNode *node;
 	Lav_createSineNode(graph, &node);
 
 	//Let's set its frequency to 150:
-	Lav_setFloatProperty(node, 150.0);
+	Lav_setFloatProperty(node, Lav_SINE_FREQUENCY, 150.0);
 
 	//Make it the output node:
 	Lav_graphSetOutputNode(graph, node);
@@ -31,7 +32,7 @@ void main() {
 	//Finally, play it.
 	Pa_Initialize();
 	PaStream *stream;
-	Pa_OpenDefaultStream(&stream, 0, 1, PaFloat32, 128, NULL, NULL);
+	Pa_OpenDefaultStream(&stream, 0, 1, paFloat32, sr, 128, NULL, NULL);
 	Pa_WriteStream(stream, output, (int)(sr*sine_time));
 	Pa_StopStream(stream);
 	Pa_Terminate();
