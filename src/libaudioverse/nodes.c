@@ -11,6 +11,7 @@ Lav_PUBLIC_FUNCTION LavError freeNode(LavNode *node) {
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, enum  Lav_NODETYPE type, LavGraph *graph, LavNode **destination) {
+	CHECK_NOT_NULL(graph);
 	LavNode *retval = calloc(1, sizeof(LavNode));
 	ERROR_IF_TRUE(retval == NULL, Lav_ERROR_MEMORY);
 	retval->num_inputs = numInputs;
@@ -48,8 +49,11 @@ Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int
 
 	//For now, set sr to the global sampling rate constant.
 	retval->sr = SR;
-	*destination = retval;
 
+	//remember what graph we belong to.
+	retval->graph = graph;
+
+	*destination = retval;
 	return Lav_ERROR_NONE;
 }
 
