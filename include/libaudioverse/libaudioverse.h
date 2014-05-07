@@ -47,11 +47,17 @@ enum Lav_NODETYPES{
 /**This is the processing function's typedef.  See external documentation for info on writing your own nodes.*/
 typedef LavError (*LavNodeProcessorFunction)(LavNode* node, unsigned int samples);
 
+/**Graph manipulation functions: creation, deletion, and configuration.
+
+All nodes must belong to a graph and exactly one node must be the "output node", the node which will be read from to determine a graph's output.*/
+Lav_PUBLIC_FUNCTION LavError Lav_createGraph(LavGraph **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_freeGraph(LavGraph *graph);
+
 /**Free an instance of a node.*/
-Lav_PUBLIC_FUNCTION LavError freeNode(LavNode *node);
+Lav_PUBLIC_FUNCTION LavError Lav_freeNode(LavNode *node);
 
 /**The following functions initialize nodes and work exactly as one would expect.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, enum  Lav_NODETYPE type, LavNode **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, enum  Lav_NODETYPE type, LavGraph *graph, LavNode **destination);
 
 /**Parent management.*/
 Lav_PUBLIC_FUNCTION LavError Lav_getParent(LavNode *node, unsigned int slot, LavNode** parent, unsigned int *outputNumber);
@@ -80,4 +86,4 @@ Lav_PUBLIC_FUNCTION Lav_streamReadSamples(LavStream *stream, unsigned int count,
 
 
 /**Make a sine node.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavNode **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavGraph *graph, LavNode **destination);
