@@ -33,6 +33,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_bufferWriteSample(LavSampleBuffer *buffer, floa
 /**Now, streams.*/
 Lav_PUBLIC_FUNCTION Lav_streamReadSamples(LavStream *stream, unsigned int count, float *destination) {
 	CHECK_NOT_NULL(stream);
+	CHECK_NOT_NULL(destination);
 	if(stream->associated_buffer == NULL) { //the best we can do is 0s.
 		for(unsigned int i = 0; i < count; i++) {
 			destination[i] = 0;

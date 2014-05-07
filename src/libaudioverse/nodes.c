@@ -196,9 +196,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeReadAllOutputs(LavNode *node, unsigned int 
 	}
 
 	//Copy to the output buffer.
-	for(unsigned int i = 0; i < samples; i++) {
-		for(unsigned int j = 0; j < node->num_outputs; j++) {
-			destination[i*j] = output_array[j][i];
+	for(unsigned int sample = 0;  sample < samples; sample++) {
+		for(unsigned int output = 0; output < node->num_outputs; output++) {
+			destination[(output+1)*sample] = output_array[output][sample]; //the +1 is necessary.
 		}
 	}
 
