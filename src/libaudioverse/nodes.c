@@ -168,3 +168,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_getStringProperty(LavNode* node, unsigned int s
 	*destination = node->properties[slot].value.sval;
 	return Lav_ERROR_NONE;
 }
+
+LavError Lav_nodeReadAllOutputs(LavNode *node, unsigned int samples, float* destination) {
+	CHECK_NOT_NULL(node);
+	CHECK_NOT_NULL(destination);
+	return Lav_ERROR_NONE;
+}

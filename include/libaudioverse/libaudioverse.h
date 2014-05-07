@@ -86,6 +86,13 @@ Lav_PUBLIC_FUNCTION LavError Lav_processDefault(LavNode *node, unsigned int coun
 Lav_PUBLIC_FUNCTION LavError Lav_bufferWriteSample(LavSampleBuffer *buffer, float sample);
 Lav_PUBLIC_FUNCTION Lav_streamReadSamples(LavStream *stream, unsigned int count, float *destination);
 
+/**Helper function to read all of a node's outputs at once.
+This is intended for the ability to do audio output.  The destination parameter should
+be long enough to hold node->num_outputs*samples.  The samples are interweaved in an appropriate manner for most audio output systems:
+the first sample of the first output, the first of the second, the first of the third,...the second of the first, second and third..., etc.
+Put another way, this function pretends that the passed node has node->num_outputs channels, and then interweaves them.*/
+Lav_PUBLIC_FUNCTION LavError Lav_nodeReadSamples(LavNode *node, unsigned int samples, float* destination);
+
 
 /**Make a sine node.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavGraph *graph, LavNode **destination);
