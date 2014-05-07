@@ -39,7 +39,6 @@ struct Lav_Node_s {
 	enum Lav_NODETYPES type;
 	LavNodeProcessorFunction process; //what to call to process this node.
 	double internal_time;
-	float sr;
 	void *type_specific_data; //place for node subtypes to place data.
 };
 
@@ -47,4 +46,5 @@ struct Lav_Graph_s {
 	LavNode **nodes;
 	unsigned int node_count, nodes_length;
 	LavNode *output_node;
+	float sr; //sampling rate.
 };

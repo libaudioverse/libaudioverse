@@ -8,6 +8,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_createGraph(LavGraph **destination) {
 	retval->nodes = (LavNode**)calloc(8, sizeof(LavNode*));
 	ERROR_IF_TRUE(retval->nodes, Lav_ERROR_MEMORY);
 	retval->nodes_length = 8;
+
+	//For now, set the graph's sampling rate to the global constant.
+	retval->sr = SR;
 	*destination = retval;
 	return Lav_ERROR_NONE;
 }

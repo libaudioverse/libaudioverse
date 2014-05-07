@@ -47,9 +47,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int
 		retval->properties[Lav_STDPROPERTY_MUL].name = "mul";
 	}
 
-	//For now, set sr to the global sampling rate constant.
-	retval->sr = SR;
-
 	//remember what graph we belong to.
 	retval->graph = graph;
 
