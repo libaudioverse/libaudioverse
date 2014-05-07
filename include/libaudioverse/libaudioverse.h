@@ -55,6 +55,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_freeGraph(LavGraph *graph);
 Lav_PUBLIC_FUNCTION LavError Lav_graphGetOutputNode(LavGraph *graph, LavNode **destination);
 Lav_PUBLIC_FUNCTION Lav_graphSetOutputNode(LavGraph *graph, LavNode *node);
 
+/**Works the same as Lav_nodeReadAllOutputs, below.*/
+Lav_PUBLIC_FUNCTION LavError Lav_graphReadAllOutputs(LavGraph *graph, unsigned int samples, float *destination);
+
 /**Free an instance of a node.*/
 Lav_PUBLIC_FUNCTION LavError Lav_freeNode(LavNode *node);
 

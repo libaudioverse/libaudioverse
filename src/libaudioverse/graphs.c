@@ -48,3 +48,7 @@ void graphAssociateNode(LavGraph *graph, LavNode *node) {
 	*(graph->nodes+graph->node_count) = node;
 	graph->node_count += 1;
 }
+
+Lav_PUBLIC_FUNCTION Lav_graphReadAllOutputs(LavGraph *graph, unsigned int samples, float* destination) {
+	return Lav_nodeReadAllOutputs(graph->output_node, samples, destination);
+}
