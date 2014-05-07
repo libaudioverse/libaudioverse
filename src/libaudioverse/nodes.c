@@ -172,5 +172,35 @@ Lav_PUBLIC_FUNCTION LavError Lav_getStringProperty(LavNode* node, unsigned int s
 LavError Lav_nodeReadAllOutputs(LavNode *node, unsigned int samples, float* destination) {
 	CHECK_NOT_NULL(node);
 	CHECK_NOT_NULL(destination);
+
+	//Make an array of LavStreams of the appropriate size.
+	LavStream *streams = calloc(node->num_outputs, sizeof(LavStream));
+	ERROR_IF_TRUE(streams == NULL, Lav_ERROR_MEMORY);
+
+	//point the streams at the node.
+	for(unsigned int i = 0; i < node->num_outputs; i++) {
+		streams[i].associated_buffer = &node->outputs[i];
+		streams[i].position = node->outputs[i].write_position;
+	}
+
+	//Now we need some output space.
+	float** output_array = calloc(samples*node->num_outputs, sizeof(float*));
+	ERROR_IF_TRUE(output_array == NULL, Lav_ERROR_MEMORY);
+
+	//Fill this up with arrays of read samples.
+	for(unsigned int i = 0; i < node->num_outputs; i++) {
+		output_array[i] = calloc(samples, sizeof(float));
+		ERROR_IF_TRUE(output_array[i] == NULL, Lav_ERROR_MEMORY);
+		LavError err = Lav_streamReadSamples(&streams[i], samples, output_array[i]);
+	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
+	}
+
+	//Copy to the output buffer.
+	for(unsigned int i = 0; i < samples; i++) {
+		for(unsigned int j = 0; j < node->num_outputs; j++) {
+			destination[i*j] = output_array[j][i];
+		}
+	}
+
 	return Lav_ERROR_NONE;
 }
