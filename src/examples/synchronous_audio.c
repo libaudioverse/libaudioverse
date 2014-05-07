@@ -33,6 +33,7 @@ void main() {
 	Pa_Initialize();
 	PaStream *stream;
 	Pa_OpenDefaultStream(&stream, 0, 1, paFloat32, sr, 128, NULL, NULL);
+	Pa_StartStream(stream);
 	Pa_WriteStream(stream, output, (int)(sr*sine_time));
 	Pa_StopStream(stream);
 	Pa_Terminate();
