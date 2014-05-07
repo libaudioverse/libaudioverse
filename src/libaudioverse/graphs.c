@@ -1,7 +1,6 @@
 #include <libaudioverse/private_all.h>
 #include <stdlib.h>
-
-void graphAssociateNode(LavGraph *graph, LavNode *node);
+#include "graphs.h"
 
 Lav_PUBLIC_FUNCTION LavError Lav_createGraph(LavGraph **destination) {
 	LavGraph *retval = calloc(1, sizeof(LavGraph));
