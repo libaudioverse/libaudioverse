@@ -91,7 +91,7 @@ This is intended for the ability to do audio output.  The destination parameter 
 be long enough to hold node->num_outputs*samples.  The samples are interweaved in an appropriate manner for most audio output systems:
 the first sample of the first output, the first of the second, the first of the third,...the second of the first, second and third..., etc.
 Put another way, this function pretends that the passed node has node->num_outputs channels, and then interweaves them.*/
-Lav_PUBLIC_FUNCTION LavError Lav_nodeReadSamples(LavNode *node, unsigned int samples, float* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeReadAllOutputs(LavNode *node, unsigned int samples, float* destination);
 
 
 /**Make a sine node.*/
