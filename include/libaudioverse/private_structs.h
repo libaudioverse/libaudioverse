@@ -29,6 +29,7 @@ struct Lav_Stream_s {
 };
 
 struct Lav_Node_s {
+	LavGraph *graph;
 	LavSampleBuffer *outputs;
 	unsigned int num_outputs;
 	LavStream *inputs;
