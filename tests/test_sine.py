@@ -10,6 +10,7 @@ We can be pretty sure, however, that the calculations done here and the calculat
 	n1 = ffi.new("LavNode **")
 	assert lav.Lav_createGraph(graph) == lav.Lav_ERROR_NONE
 	assert lav.Lav_createSineNode(graph[0], n1) == lav.Lav_ERROR_NONE
+	assert lav.Lav_graphSetOutputNode(graph[0], n1[0]) == lav.Lav_ERROR_NONE
 	n1= n1[0]
 	sr = n1.graph.sr
 	time_delta = 1/float(sr)
@@ -20,6 +21,6 @@ We can be pretty sure, however, that the calculations done here and the calculat
 	arr = ffi.new("float[]", len(verified_output))
 	arr_ptr = ffi.cast("float*", arr)
 	#do the read.
-	assert lav.Lav_nodeReadAllOutputs(n1, len(verified_output), arr_ptr) == lav.Lav_ERROR_NONE
+	assert lav.Lav_graphReadAllOutputs(graph[0], len(verified_output), arr_ptr) == lav.Lav_ERROR_NONE
 	for i, val in enumerate(verified_output):
 		assert abs(arr[i]-val) < accuracy
