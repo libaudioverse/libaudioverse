@@ -44,7 +44,7 @@ struct Lav_Node_s {
 };
 
 struct Lav_Graph_s {
-	LavNode *nodes;
-	unsigned int node_count;
+	LavNode **nodes;
+	unsigned int node_count, nodes_length;
 	LavNode *output_node;
 };
