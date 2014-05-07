@@ -4,6 +4,7 @@ Note: this file is heavily intertwined with stream_buffers.c, though it does not
 #include <stdlib.h>
 #include <string.h>
 #include <libaudioverse/private_all.h>
+#include "graphs.h"
 
 Lav_PUBLIC_FUNCTION LavError freeNode(LavNode *node) {
 	free(node);
@@ -47,9 +48,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int
 		retval->properties[Lav_STDPROPERTY_MUL].name = "mul";
 	}
 
-	//remember what graph we belong to.
+	//remember what graph we belong to, and asociate.
 	retval->graph = graph;
-
+	graphAssociateNode(retval->graph, retval);
 	*destination = retval;
 	return Lav_ERROR_NONE;
 }
