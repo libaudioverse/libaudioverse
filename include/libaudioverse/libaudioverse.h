@@ -52,6 +52,8 @@ typedef LavError (*LavNodeProcessorFunction)(LavNode* node, unsigned int samples
 All nodes must belong to a graph and exactly one node must be the "output node", the node which will be read from to determine a graph's output.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createGraph(LavGraph **destination);
 Lav_PUBLIC_FUNCTION LavError Lav_freeGraph(LavGraph *graph);
+Lav_PUBLIC_FUNCTION LavError Lav_graphGetOutputNode(LavGraph *graph, LavNode **destination);
+Lav_PUBLIC_FUNCTION Lav_graphSetOutputNode(LavGraph *graph, LavNode *node);
 
 /**Free an instance of a node.*/
 Lav_PUBLIC_FUNCTION LavError Lav_freeNode(LavNode *node);
