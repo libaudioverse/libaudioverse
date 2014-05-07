@@ -3,20 +3,22 @@ from make_cffi import *
 import itertools
 
 def property_node():
+	graph = ffi.new("LavGraph **")
 	node = ffi.new("LavNode **")
-	assert lav.Lav_createNode(1, 1, 4, lav.Lav_NODETYPE_ZEROS, node) == lav.Lav_ERROR_NONE
+	assert lav.Lav_createGraph(graph) == lav.Lav_ERROR_NONE
+	assert lav.Lav_createNode(1, 1, 4, lav.Lav_NODETYPE_ZEROS, graph[0], node) == lav.Lav_ERROR_NONE
 	node[0].properties[0].type = lav.Lav_PROPERTYTYPE_INT
 	node[0].properties[1].type = lav.Lav_PROPERTYTYPE_FLOAT
 	node[0].properties[2].type = lav.Lav_PROPERTYTYPE_DOUBLE
 	node[0].properties[3].type = lav.Lav_PROPERTYTYPE_STRING
-	return node
+	return graph, node
 
 def test_property_getters():
 	ival = ffi.new("int *")
 	fval = ffi.new("float *")
 	dval = ffi.new("double *")
 	sval = ffi.new("char **")
-	node = property_node()
+	graph, node = property_node()
 	assert lav.Lav_getIntProperty(node[0], 0, ival) == lav.Lav_ERROR_NONE
 	assert lav.Lav_getFloatProperty(node[0], 1, fval) == lav.Lav_ERROR_NONE
 	assert lav.Lav_getDoubleProperty(node[0], 2, dval) == lav.Lav_ERROR_NONE

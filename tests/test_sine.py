@@ -4,13 +4,15 @@ from math import *
 def test_sine():
 	"""This deserves explanation.
 There is almost no way in which we can actually match a sine wave's output reliably from run to run or computer to computer.
-We can be pretty sure, however, that the calculations done here and the calculations done in trhe C library are very, very close."""
+We can be pretty sure, however, that the calculations done here and the calculations done in the C library are very, very close."""
 	accuracy = 0.01
+	graph = ffi.new("LavGraph **")
 	n1, n2 = ffi.new("LavNode **"), ffi.new("LavNode **")
-	assert lav.Lav_createSineNode(n1) == lav.Lav_ERROR_NONE
-	assert lav.Lav_createNode(1, 0, 0, lav.Lav_NODETYPE_ZEROS, n2) == lav.Lav_ERROR_NONE
+	assert lav.Lav_createGraph(graph) == lav.Lav_ERROR_NONE
+	assert lav.Lav_createSineNode(graph[0], n1) == lav.Lav_ERROR_NONE
+	assert lav.Lav_createNode(1, 0, 0, lav.Lav_NODETYPE_ZEROS, graph[0], n2) == lav.Lav_ERROR_NONE
 	n1, n2 = n1[0], n2[0]
-	sr = n1.sr
+	sr = n1.graph.sr
 	time_delta = 1/float(sr)
 	freq = ffi.new("float*")
 	lav.Lav_getFloatProperty(n1, lav.Lav_SINE_FREQUENCY, freq)
