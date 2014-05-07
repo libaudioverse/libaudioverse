@@ -41,3 +41,9 @@ struct Lav_Node_s {
 	float sr;
 	void *type_specific_data; //place for node subtypes to place data.
 };
+
+struct Lav_Graph_s {
+	LavNode *nodes;
+	unsigned int node_count;
+	LavNode *output_node;
+};
