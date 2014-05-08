@@ -26,4 +26,6 @@ add_subdirectory(sdl-mirror)
 LINK_DIRECTORIES(${SDL2_BINARY_DIR})
 include_directories(${SDL2_SOURCE_DIR}/include)
 
+#below here is us.  First, set a variable to all the libraries we need to link with:
+SET(libaudioverse_required_libraries libsndfile-1 sdl2 winmm imm32 Version)
 add_subdirectory(src)

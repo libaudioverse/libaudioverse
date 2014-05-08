@@ -6,5 +6,5 @@ streams.c
 #specific node types.
 nodes/sine.c
 )
-TARGET_LINK_LIBRARIES(libaudioverse libsndfile-1 sdl2 winmm imm32 Version)
+TARGET_LINK_LIBRARIES(libaudioverse ${libaudioverse_required_libraries})
 SET_PROPERTY(TARGET libaudioverse PROPERTY RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_BINARY_DIR}")
