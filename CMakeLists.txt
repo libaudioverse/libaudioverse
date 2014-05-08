@@ -24,6 +24,6 @@ link_directories(${libaudioverse_BINARY_DIR})
 #build and setup sdl
 add_subdirectory(sdl-mirror)
 LINK_DIRECTORIES(${SDL2_BINARY_DIR})
-include_directories(${SDL2_SOURCE_DIR})
+include_directories(${SDL2_SOURCE_DIR}/include)
 
 add_subdirectory(src)
