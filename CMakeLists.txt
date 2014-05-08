@@ -10,9 +10,7 @@ SET(LIBSNDFILE_LIBRARY_DIR "C:/Program Files (x86)/Mega-Nerd/libsndfile/lib" CAC
 "Libsndfile library directory.")
 
 INCLUDE_DIRECTORIES(${LIBSNDFILE_INCLUDE_DIR})
-INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/portaudio/include")
 LINK_DIRECTORIES(${LIBSNDFILE_LIBRARY_DIR})
-link_directories("${CMAKE_BINARY_DIR}/portaudio")
 
 #For uthash.
 INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/uthash/src")
@@ -22,5 +20,5 @@ add_definitions(-DPA_WDMKS_NO_KSGUID_LIB)
 
 #This makes sure that we can link to ourself.
 link_directories(${libaudioverse_BINARY_DIR})
-add_subdirectory(sdl)
+add_subdirectory(sdl-mirror)
 add_subdirectory(src)

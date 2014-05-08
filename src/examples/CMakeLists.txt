@@ -1,6 +1,6 @@
 macro(example name)
 add_executable(${name} ${name}.c)
-target_link_libraries(${name} libaudioverse portaudio_static_x86)
+TARGET_LINK_LIBRARIES(${name} libaudioverse)
 SET_PROPERTY(TARGET ${name} PROPERTY RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_BINARY_DIR}/examples")
 endmacro()
 
