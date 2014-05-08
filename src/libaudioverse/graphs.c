@@ -14,8 +14,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_createGraph(float sr, LavGraph **destination) {
 	*destination = retval;
 
 	//Let's get a mutex:
-	retval->graph_lock = SDL_CreateMutex();
-	ERROR_IF_TRUE(retval->graph_lock == NULL, Lav_ERROR_UNKNOWN);
+	retval->mutex = SDL_CreateMutex();
+	ERROR_IF_TRUE(retval->mutex == NULL, Lav_ERROR_UNKNOWN);
 	return Lav_ERROR_NONE;
 }
 
@@ -23,10 +23,10 @@ Lav_PUBLIC_FUNCTION LavError Lav_graphGetOutputNode(LavGraph *graph, LavNode **d
 	WILL_RETURN(LavError);
 	CHECK_NOT_NULL(graph);
 	CHECK_NOT_NULL(destination);
-	SDL_LockMutex(graph->graph_lock);
+	SDL_LockMutex(graph->mutex);
 	*destination = graph->output_node;
 	BEGIN_RETURN_BLOCK
-	SDL_UnlockMutex(graph->graph_lock);
+	SDL_UnlockMutex(graph->mutex);
 	DO_ACTUAL_RETURN;
 }
 
@@ -34,10 +34,10 @@ Lav_PUBLIC_FUNCTION LavError Lav_graphSetOutputNode(LavGraph *graph, LavNode *no
 	WILL_RETURN(LavError);
 	CHECK_NOT_NULL(graph);
 	CHECK_NOT_NULL(node);
-	SDL_LockMutex(graph->graph_lock);
+	SDL_LockMutex(graph->mutex);
 	graph->output_node = node;
 	BEGIN_RETURN_BLOCK
-	SDL_UnlockMutex(graph->graph_lock);
+	SDL_UnlockMutex(graph->mutex);
 	DO_ACTUAL_RETURN;
 }
 

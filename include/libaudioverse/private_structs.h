@@ -48,5 +48,5 @@ struct Lav_Graph_s {
 	unsigned int node_count, nodes_length;
 	LavNode *output_node;
 	float sr; //sampling rate.
-	SDL_mutex* graph_lock; //lock this graph.
+	SDL_mutex* mutex; //lock this graph.
 };
