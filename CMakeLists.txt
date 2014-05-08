@@ -20,5 +20,10 @@ add_definitions(-DPA_WDMKS_NO_KSGUID_LIB)
 
 #This makes sure that we can link to ourself.
 link_directories(${libaudioverse_BINARY_DIR})
+
+#build and setup sdl
 add_subdirectory(sdl-mirror)
+LINK_DIRECTORIES(${SDL2_BINARY_DIR})
+include_directories(${SDL2_SOURCE_DIR})
+
 add_subdirectory(src)
