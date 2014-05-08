@@ -16,9 +16,13 @@ They exist because goto is a bad thing for clarity, and because they can.*/
 
 #define RETURN(value) do {\
 return_value = value;\
-goto Do_return_and_cleanup;\
+goto do_return_and_cleanup;\
 } while(0)
 
 #define BEGIN_RETURN_BLOCK do_return_and_cleanup:
 
 #define DO_ACTUAL_RETURN return return_value
+
+#define STANDARD_RETURN_BLOCK(mutex) BEGIN_RETURN_BLOCK \
+SDL_UnlockMutex((mutex));\
+DO_ACTUAL_RETURN

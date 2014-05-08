@@ -5,6 +5,7 @@ Note: this file is heavily intertwined with stream_buffers.c, though it does not
 #include <string.h>
 #include <libaudioverse/private_all.h>
 #include "graphs.h"
+#include <SDL_mutex.h>
 
 Lav_PUBLIC_FUNCTION LavError freeNode(LavNode *node) {
 	free(node);
@@ -13,6 +14,8 @@ Lav_PUBLIC_FUNCTION LavError freeNode(LavNode *node) {
 
 Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, enum  Lav_NODETYPE type, LavGraph *graph, LavNode **destination) {
 	CHECK_NOT_NULL(graph);
+	WILL_RETURN(LavError);
+	SDL_LockMutex(graph->mutex);
 	LavNode *retval = calloc(1, sizeof(LavNode));
 	ERROR_IF_TRUE(retval == NULL, Lav_ERROR_MEMORY);
 	retval->num_inputs = numInputs;
@@ -52,7 +55,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int
 	retval->graph = graph;
 	graphAssociateNode(retval->graph, retval);
 	*destination = retval;
-	return Lav_ERROR_NONE;
+	RETURN(Lav_ERROR_NONE);
+	STANDARD_RETURN_BLOCK(graph->mutex);
 }
 
 /*Default Processing function.*/
@@ -68,6 +72,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_processDefault(LavNode *node, unsigned int coun
 Lav_PUBLIC_FUNCTION LavError Lav_setParent(LavNode *node, LavNode *parent, unsigned int outputSlot, unsigned int inputSlot) {
 	CHECK_NOT_NULL(node);
 	CHECK_NOT_NULL(parent);
+	WILL_RETURN(LavError);
+	SDL_LockMutex(node->graph->mutex);
 	ERROR_IF_TRUE(inputSlot >= node->num_inputs, Lav_ERROR_INVALID_SLOT);
 	ERROR_IF_TRUE(outputSlot >= parent->num_outputs, Lav_ERROR_INVALID_SLOT);
 	//We just connect the buffers, and set the read position of the stream to the write position of the buffer.
@@ -77,13 +83,15 @@ Lav_PUBLIC_FUNCTION LavError Lav_setParent(LavNode *node, LavNode *parent, unsig
 	s->associated_buffer = b;
 	//And set its read position.
 	s->position = b->write_position;
-	return Lav_ERROR_NONE;
+	RETURN(Lav_ERROR_NONE);
+	STANDARD_RETURN_BLOCK(node->graph->mutex);
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_getParent(LavNode *node, unsigned int slot, LavNode **parent, unsigned int *outputNumber) {
 	CHECK_NOT_NULL(node);
 	CHECK_NOT_NULL(parent);
 	CHECK_NOT_NULL(outputNumber);
+	WILL_RETURN(LavError);
 	if(node->inputs[slot].associated_buffer == NULL) {
 		*parent = NULL;
 		*outputNumber = 0;
@@ -92,86 +100,107 @@ Lav_PUBLIC_FUNCTION LavError Lav_getParent(LavNode *node, unsigned int slot, Lav
 		*parent = node->inputs[slot].associated_buffer->owner.node;
 		*outputNumber = node->inputs[slot].associated_buffer->owner.slot;
 	}
-	return Lav_ERROR_NONE;
+	RETURN(Lav_ERROR_NONE);
+	STANDARD_RETURN_BLOCK(node->graph->mutex);
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_clearParent(LavNode *node, unsigned int slot) {
 	CHECK_NOT_NULL(node);
+	WILL_RETURN(LavError);
+	SDL_LockMutex(node->graph->mutex);
 	ERROR_IF_TRUE(slot >= node->num_inputs, Lav_ERROR_INVALID_SLOT);
 	//This is as simple as it looks.
 	node->inputs[slot].associated_buffer = NULL;
-	return Lav_ERROR_NONE;
+	RETURN(Lav_ERROR_NONE);
+	STANDARD_RETURN_BLOCK(node->graph->mutex);
 }
 
 Lav_PUBLIC_FUNCTION LavError lav_resetProperty(LavNode *node, unsigned int slot) {
 	CHECK_NOT_NULL(node);
+	WILL_RETURN(LavError);
+	SDL_LockMutex(node->graph->mutex);
 	ERROR_IF_TRUE(slot >= node->num_properties || slot < 0, Lav_ERROR_INVALID_SLOT);
 	memcpy(&(node->properties[slot].value), &(node->properties[slot].default_value), sizeof(node->properties[slot].value)); //yes, really.
-	return Lav_ERROR_NONE;
+	RETURN(Lav_ERROR_NONE);
+	STANDARD_RETURN_BLOCK(node->graph->mutex);
 }
 
-#define PROPERTY_SETTER_CHECKS(proptype) CHECK_NOT_NULL(node);\
+#define PROPERTY_SETTER_PREAMBLE(proptype) CHECK_NOT_NULL(node);\
+WILL_RETURN(LavError);\
+SDL_LockMutex(node->graph->mutex);\
 ERROR_IF_TRUE(slot >= node->num_properties || slot<=0, Lav_ERROR_INVALID_SLOT);\
 ERROR_IF_TRUE(node->properties[slot].type != proptype, Lav_ERROR_TYPE_MISMATCH)\
 
 Lav_PUBLIC_FUNCTION LavError Lav_setIntProperty(LavNode* node, unsigned int slot, int value) {
-	PROPERTY_SETTER_CHECKS(Lav_PROPERTYTYPE_INT);
+	PROPERTY_SETTER_PREAMBLE(Lav_PROPERTYTYPE_INT);
 	node->properties[slot].value.ival = value;
-	return Lav_ERROR_NONE;
+	RETURN(Lav_ERROR_NONE);
+	STANDARD_RETURN_BLOCK(node->graph->mutex);
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_setFloatProperty(LavNode *node, unsigned int slot, float value) {
-	PROPERTY_SETTER_CHECKS(Lav_PROPERTYTYPE_FLOAT);
+	PROPERTY_SETTER_PREAMBLE(Lav_PROPERTYTYPE_FLOAT);
 	node->properties[slot].value.fval = value;
-	return Lav_ERROR_NONE;
+	RETURN(Lav_ERROR_NONE);
+	STANDARD_RETURN_BLOCK(node->graph->mutex);
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_setDoubleProperty(LavNode *node, unsigned int slot, double value) {
-	PROPERTY_SETTER_CHECKS(Lav_PROPERTYTYPE_DOUBLE);
+	PROPERTY_SETTER_PREAMBLE(Lav_PROPERTYTYPE_DOUBLE);
 	node->properties[slot].value.dval = value;
-	return Lav_ERROR_NONE;
+	RETURN(Lav_ERROR_NONE);
+	STANDARD_RETURN_BLOCK(node->graph->mutex);
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_setStringProperty(LavNode *node, unsigned int slot, char* value) {
-	PROPERTY_SETTER_CHECKS(Lav_PROPERTYTYPE_STRING);
+	PROPERTY_SETTER_PREAMBLE(Lav_PROPERTYTYPE_STRING);
 	CHECK_NOT_NULL(value);
 	char* string = strdup(value);
 	node->properties[slot].value.sval = string;
-	return Lav_ERROR_NONE;
+	RETURN(Lav_ERROR_NONE);
+	STANDARD_RETURN_BLOCK(node->graph->mutex);
 }
 
-#define PROPERTY_GETTER_CHECKS(proptype) CHECK_NOT_NULL(node);\
+#define PROPERTY_GETTER_PREAMBLE(proptype) CHECK_NOT_NULL(node);\
 CHECK_NOT_NULL(destination);\
+WILL_RETURN(LavError);\
+SDL_LockMutex(node->graph->mutex);\
 ERROR_IF_TRUE(slot >= node->num_properties || slot < 0, Lav_ERROR_INVALID_SLOT);\
 ERROR_IF_TRUE(proptype != node->properties[slot].type, Lav_ERROR_TYPE_MISMATCH)
 
 Lav_PUBLIC_FUNCTION LavError Lav_getIntProperty(LavNode *node, unsigned int slot, int *destination) {
-	PROPERTY_GETTER_CHECKS(Lav_PROPERTYTYPE_INT);
+	PROPERTY_GETTER_PREAMBLE(Lav_PROPERTYTYPE_INT);
 	*destination = node->properties[slot].value.ival;
-	return Lav_ERROR_NONE;
+	RETURN(Lav_ERROR_NONE);
+	STANDARD_RETURN_BLOCK(node->graph->mutex);
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_getFloatProperty(LavNode* node, unsigned int slot, float *destination) {
-	PROPERTY_GETTER_CHECKS(Lav_PROPERTYTYPE_FLOAT);
+	PROPERTY_GETTER_PREAMBLE(Lav_PROPERTYTYPE_FLOAT);
 	*destination = node->properties[slot].value.fval;
-	return Lav_ERROR_NONE;
+	RETURN(Lav_ERROR_NONE);
+	STANDARD_RETURN_BLOCK(node->graph->mutex);
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_getDoubleProperty(LavNode *node, unsigned int slot, double *destination) {
-	PROPERTY_GETTER_CHECKS(Lav_PROPERTYTYPE_DOUBLE);
+	PROPERTY_GETTER_PREAMBLE(Lav_PROPERTYTYPE_DOUBLE);
 	*destination = node->properties[slot].value.dval;
-	return Lav_ERROR_NONE;
+	RETURN(Lav_ERROR_NONE);
+	STANDARD_RETURN_BLOCK(node->graph->mutex);
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_getStringProperty(LavNode* node, unsigned int slot, char** destination) {
-	PROPERTY_GETTER_CHECKS(Lav_PROPERTYTYPE_STRING);
+	PROPERTY_GETTER_PREAMBLE(Lav_PROPERTYTYPE_STRING);
 	*destination = node->properties[slot].value.sval;
-	return Lav_ERROR_NONE;
+	RETURN(Lav_ERROR_NONE);
+	STANDARD_RETURN_BLOCK(node->graph->mutex);
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_nodeReadAllOutputs(LavNode *node, unsigned int samples, float* destination) {
 	CHECK_NOT_NULL(node);
 	CHECK_NOT_NULL(destination);
+	WILL_RETURN(LavError);
+	SDL_LockMutex(node->graph->mutex);
 
 	//Make an array of LavStreams of the appropriate size.
 	LavStream *streams = calloc(node->num_outputs, sizeof(LavStream));
@@ -202,5 +231,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeReadAllOutputs(LavNode *node, unsigned int 
 		}
 	}
 
-	return Lav_ERROR_NONE;
+	RETURN(Lav_ERROR_NONE);
+	STANDARD_RETURN_BLOCK(node->graph->mutex);
 }
