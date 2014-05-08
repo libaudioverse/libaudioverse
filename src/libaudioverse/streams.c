@@ -23,15 +23,19 @@ But suppose the reader is 5 and the writer is 2, that is the writer just went pa
 Note that we can only write to a buffer, at least without a stream.*/
 
 Lav_PUBLIC_FUNCTION LavError Lav_bufferWriteSample(LavSampleBuffer *buffer, float sample) {
+	WILL_RETURN(LavError);
 	//calculate the next position.
 	unsigned int next_position = (buffer->write_position+1) % buffer->length; //wrap if necessary.
 	buffer->samples[buffer->write_position] = sample;
 	buffer->write_position = next_position;
-	return Lav_ERROR_NONE;
+	RETURN(Lav_ERROR_NONE);
+	BEGIN_CLEANUP_BLOCK
+	DO_ACTUAL_RETURN;
 }
 
 /**Now, streams.*/
 Lav_PUBLIC_FUNCTION Lav_streamReadSamples(LavStream *stream, unsigned int count, float *destination) {
+	WILL_RETURN(LavError);
 	CHECK_NOT_NULL(stream);
 	CHECK_NOT_NULL(destination);
 	if(stream->associated_buffer == NULL) { //the best we can do is 0s.
@@ -48,5 +52,7 @@ Lav_PUBLIC_FUNCTION Lav_streamReadSamples(LavStream *stream, unsigned int count,
 			stream->position = (stream->position+1)%stream->associated_buffer->length; //figure out our next position.
 		}
 	}
-	return Lav_ERROR_NONE;
+	RETURN(Lav_ERROR_NONE);
+	BEGIN_CLEANUP_BLOCK
+	DO_ACTUAL_RETURN;
 }

@@ -4,6 +4,7 @@
 #include <SDL_mutex.h>
 
 Lav_PUBLIC_FUNCTION LavError Lav_createGraph(float sr, LavGraph **destination) {
+	WILL_RETURN(LavError);
 	LavGraph *retval = calloc(1, sizeof(LavGraph));
 	ERROR_IF_TRUE(retval == NULL, Lav_ERROR_MEMORY);
 	retval->nodes = (LavNode**)calloc(8, sizeof(LavNode*));
@@ -16,7 +17,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_createGraph(float sr, LavGraph **destination) {
 	//Let's get a mutex:
 	retval->mutex = SDL_CreateMutex();
 	ERROR_IF_TRUE(retval->mutex == NULL, Lav_ERROR_UNKNOWN);
-	return Lav_ERROR_NONE;
+	RETURN(Lav_ERROR_NONE);
+	BEGIN_CLEANUP_BLOCK
+	DO_ACTUAL_RETURN;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_graphGetOutputNode(LavGraph *graph, LavNode **destination) {

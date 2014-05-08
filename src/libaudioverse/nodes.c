@@ -161,9 +161,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_setStringProperty(LavNode *node, unsigned int s
 	STANDARD_CLEANUP_BLOCK(node->graph->mutex);
 }
 
-#define PROPERTY_GETTER_PREAMBLE(proptype) CHECK_NOT_NULL(node);\
+#define PROPERTY_GETTER_PREAMBLE(proptype) WILL_RETURN(LavError);\
+CHECK_NOT_NULL(node);\
 CHECK_NOT_NULL(destination);\
-WILL_RETURN(LavError);\
 LOCK(node->graph->mutex);\
 ERROR_IF_TRUE(slot >= node->num_properties || slot < 0, Lav_ERROR_INVALID_SLOT);\
 ERROR_IF_TRUE(proptype != node->properties[slot].type, Lav_ERROR_TYPE_MISMATCH)
