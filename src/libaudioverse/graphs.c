@@ -23,18 +23,18 @@ Lav_PUBLIC_FUNCTION LavError Lav_graphGetOutputNode(LavGraph *graph, LavNode **d
 	WILL_RETURN(LavError);
 	CHECK_NOT_NULL(graph);
 	CHECK_NOT_NULL(destination);
-	SDL_LockMutex(graph->mutex);
+	LOCK(graph->mutex);
 	*destination = graph->output_node;
-	STANDARD_RETURN_BLOCK(graph->mutex);
+	STANDARD_CLEANUP_BLOCK(graph->mutex);
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_graphSetOutputNode(LavGraph *graph, LavNode *node) {
 	WILL_RETURN(LavError);
 	CHECK_NOT_NULL(graph);
 	CHECK_NOT_NULL(node);
-	SDL_LockMutex(graph->mutex);
+	LOCK(graph->mutex);
 	graph->output_node = node;
-	STANDARD_RETURN_BLOCK(graph->mutex);
+	STANDARD_CLEANUP_BLOCK(graph->mutex);
 }
 
 //Internal function for associating nodes with graphs.
