@@ -20,17 +20,25 @@ Lav_PUBLIC_FUNCTION LavError Lav_createGraph(float sr, LavGraph **destination) {
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_graphGetOutputNode(LavGraph *graph, LavNode **destination) {
+	WILL_RETURN(LavError);
 	CHECK_NOT_NULL(graph);
 	CHECK_NOT_NULL(destination);
+	SDL_LockMutex(graph->graph_lock);
 	*destination = graph->output_node;
-	return Lav_ERROR_NONE;
+	BEGIN_RETURN_BLOCK
+	SDL_UnlockMutex(graph->graph_lock);
+	DO_ACTUAL_RETURN;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_graphSetOutputNode(LavGraph *graph, LavNode *node) {
+	WILL_RETURN(LavError);
 	CHECK_NOT_NULL(graph);
 	CHECK_NOT_NULL(node);
+	SDL_LockMutex(graph->graph_lock);
 	graph->output_node = node;
-	return Lav_ERROR_NONE;
+	BEGIN_RETURN_BLOCK
+	SDL_UnlockMutex(graph->graph_lock);
+	DO_ACTUAL_RETURN;
 }
 
 //Internal function for associating nodes with graphs.

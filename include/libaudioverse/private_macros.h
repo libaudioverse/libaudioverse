@@ -20,3 +20,5 @@ goto Do_return_and_cleanup;\
 } while(0)
 
 #define BEGIN_RETURN_BLOCK do_return_and_cleanup:
+
+#define DO_ACTUAL_RETURN return return_value
