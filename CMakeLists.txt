@@ -22,5 +22,5 @@ add_definitions(-DPA_WDMKS_NO_KSGUID_LIB)
 
 #This makes sure that we can link to ourself.
 link_directories(${libaudioverse_BINARY_DIR})
-add_subdirectory(portaudio)
+add_subdirectory(sdl)
 add_subdirectory(src)
