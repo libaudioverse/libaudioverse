@@ -47,7 +47,7 @@ Lav_PUBLIC_FUNCTION Lav_streamReadSamples(LavStream *stream, unsigned int count,
 		for(unsigned int i = 0; i < count; i++) {
 			//If we are now at the position of the write head, we need to get more audio.
 			if(stream->position == stream->associated_buffer->write_position) stream->associated_buffer->owner.node->process(
-				stream->associated_buffer->owner.node, 1); //ask for a sample.
+				stream->associated_buffer->owner.node, 1); //ask for 128 samples.
 			destination[i] = stream->associated_buffer->samples[stream->position]; //read from our current position; and
 			stream->position = (stream->position+1)%stream->associated_buffer->length; //figure out our next position.
 		}
