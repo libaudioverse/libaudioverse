@@ -21,6 +21,10 @@ add_definitions(-DPA_WDMKS_NO_KSGUID_LIB)
 #This makes sure that we can link to ourself.
 link_directories(${libaudioverse_BINARY_DIR})
 
+#build and setup portaudio:
+add_subdirectory(portaudio)
+include_directories(${PORTAUDIO_SOURCE_DIR}/include)
+link_directories(${PORTAUDIO_BINARY_DIR})
 #below here is us.  First, set a variable to all the libraries we need to link with:
-SET(libaudioverse_required_libraries libsndfile-1)
+SET(libaudioverse_required_libraries libsndfile-1 portaudio)
 add_subdirectory(src)
