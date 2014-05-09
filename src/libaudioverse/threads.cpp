@@ -4,25 +4,26 @@ using namespace std;
 
 extern "C" LavError createMutex(LavMutex **destination) {
 	WILL_RETURN(LavError);
-	mutex *retval = new mutex();
+	recursive_mutex *retval = new recursive_mutex();
 	CHECK_NOT_NULL(retval);
 	*destination = (LavMutex*)retval;
+	RETURN(Lav_ERROR_NONE);
 	BEGIN_CLEANUP_BLOCK
 	DO_ACTUAL_RETURN;
 }
 
 extern "C" LavError freeMutex(LavMutex *m) {
-	mutex *mut = (mutex*)m;
+	recursive_mutex *mut = (recursive_mutex*)m;
 	delete mut;
 	return Lav_ERROR_NONE;
 }
 
 extern "C" LavError lockMutex(LavMutex *m) {
-	((mutex*)m)->lock();
+	((recursive_mutex*)m)->lock();
 	return Lav_ERROR_NONE;
 }
 
 extern "C" LavError unlockMutex(LavMutex *m) {
-	((mutex*)m)->unlock();
+	((recursive_mutex*)m)->unlock();
 	return Lav_ERROR_NONE;
 }

@@ -27,5 +27,5 @@ include_directories(${portaudio_SOURCE_DIR}/include)
 link_directories(${portaudio_BINARY_DIR})
 
 #below here is us.  First, set a variable to all the libraries we need to link with:
-SET(libaudioverse_required_libraries libsndfile-1 portaudio)
+SET(libaudioverse_required_libraries libsndfile-1 portaudio_static_x86)
 add_subdirectory(src)
