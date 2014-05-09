@@ -21,11 +21,6 @@ add_definitions(-DPA_WDMKS_NO_KSGUID_LIB)
 #This makes sure that we can link to ourself.
 link_directories(${libaudioverse_BINARY_DIR})
 
-#build and setup sdl
-add_subdirectory(sdl-mirror)
-LINK_DIRECTORIES(${SDL2_BINARY_DIR})
-include_directories(${SDL2_SOURCE_DIR}/include)
-
 #below here is us.  First, set a variable to all the libraries we need to link with:
-SET(libaudioverse_required_libraries libsndfile-1 sdl2 winmm imm32 Version)
+SET(libaudioverse_required_libraries libsndfile-1)
 add_subdirectory(src)

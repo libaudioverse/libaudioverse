@@ -53,7 +53,7 @@ All nodes must belong to a graph and exactly one node must be the "output node",
 Lav_PUBLIC_FUNCTION LavError Lav_createGraph(float sr, LavGraph **destination);
 Lav_PUBLIC_FUNCTION LavError Lav_freeGraph(LavGraph *graph);
 Lav_PUBLIC_FUNCTION LavError Lav_graphGetOutputNode(LavGraph *graph, LavNode **destination);
-Lav_PUBLIC_FUNCTION Lav_graphSetOutputNode(LavGraph *graph, LavNode *node);
+Lav_PUBLIC_FUNCTION LavError Lav_graphSetOutputNode(LavGraph *graph, LavNode *node);
 
 /**Works the same as Lav_nodeReadAllOutputs, below.*/
 Lav_PUBLIC_FUNCTION LavError Lav_graphReadAllOutputs(LavGraph *graph, unsigned int samples, float *destination);
@@ -87,7 +87,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_processDefault(LavNode *node, unsigned int coun
 
 /**The following functions write and read streams.*/
 Lav_PUBLIC_FUNCTION LavError Lav_bufferWriteSample(LavSampleBuffer *buffer, float sample);
-Lav_PUBLIC_FUNCTION Lav_streamReadSamples(LavStream *stream, unsigned int count, float *destination);
+Lav_PUBLIC_FUNCTION LavError Lav_streamReadSamples(LavStream *stream, unsigned int count, float *destination);
 
 /**Helper function to read all of a node's outputs at once.
 This is intended for the ability to do audio output.  The destination parameter should

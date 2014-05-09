@@ -2,6 +2,7 @@ add_library(libaudioverse SHARED
 nodes.c
 graphs.c
 streams.c
+threads.cpp
 
 #specific node types.
 nodes/sine.c

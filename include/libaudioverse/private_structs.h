@@ -1,6 +1,6 @@
 #pragma once
 #include "libaudioverse.h"
-#include <sdl_mutex.h>
+#include "private_threads.h"
 
 struct Lav_Property_s {
 	enum Lav_PROPERTYTYPE type;
@@ -48,5 +48,5 @@ struct Lav_Graph_s {
 	unsigned int node_count, nodes_length;
 	LavNode *output_node;
 	float sr; //sampling rate.
-	SDL_mutex* mutex; //lock this graph.
+	LavMutex* mutex; //lock this graph.
 };

@@ -5,7 +5,6 @@ Note: this file is heavily intertwined with stream_buffers.c, though it does not
 #include <string.h>
 #include <libaudioverse/private_all.h>
 #include "graphs.h"
-#include <SDL_mutex.h>
 
 Lav_PUBLIC_FUNCTION LavError freeNode(LavNode *node) {
 	free(node);

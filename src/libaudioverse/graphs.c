@@ -1,7 +1,6 @@
 #include <libaudioverse/private_all.h>
 #include <stdlib.h>
 #include "graphs.h"
-#include <SDL_mutex.h>
 
 Lav_PUBLIC_FUNCTION LavError Lav_createGraph(float sr, LavGraph **destination) {
 	WILL_RETURN(LavError);
@@ -15,7 +14,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createGraph(float sr, LavGraph **destination) {
 	*destination = retval;
 
 	//Let's get a mutex:
-	retval->mutex = SDL_CreateMutex();
+	createMutex(&(retval->mutex));
 	ERROR_IF_TRUE(retval->mutex == NULL, Lav_ERROR_UNKNOWN);
 	RETURN(Lav_ERROR_NONE);
 	BEGIN_CLEANUP_BLOCK
