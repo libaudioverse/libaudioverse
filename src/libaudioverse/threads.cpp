@@ -1,4 +1,5 @@
 #include <mutex>
+#include <thread>
 #include <libaudioverse/private_all.h>
 using namespace std;
 
@@ -27,4 +28,21 @@ extern "C" LavError lockMutex(void *m) {
 extern "C" LavError unlockMutex(void *m) {
 	((mutex*)m)->unlock();
 	return Lav_ERROR_NONE;
+}
+
+extern "C" LavError runInThread(LavThreadCapableFunction func, void* param, void** destination) {
+	WILL_RETURN(LavError);
+	thread *t = new thread(func, param);
+	CHECK_NOT_NULL(t);
+	BEGIN_CLEANUP_BLOCK
+	DO_ACTUAL_RETURN;
+}
+
+extern "C" LavError threadJoinAndFree(void* t) {
+	WILL_RETURN(LavError);
+	((thread*)t)->join();
+	delete (thread*)t;
+	RETURN(Lav_ERROR_NONE);
+	BEGIN_CLEANUP_BLOCK
+	DO_ACTUAL_RETURN;
 }

@@ -4,6 +4,10 @@
 extern "C" {
 #endif
 
+typedef void (*LavThreadCapableFunction)(void* param);
+
+LavError createThread(LavThreadCapableFunction fn, void* param, void** destination);
+LavError threadJoinAndFree(void* t);
 LavError createMutex(void **destination);
 LavError freeMutex(void *m);
 LavError lockMutex(void *m);
