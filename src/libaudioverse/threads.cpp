@@ -20,18 +20,20 @@ extern "C" LavError freeMutex(void *m) {
 	return Lav_ERROR_NONE;
 }
 
-extern "C" LavError lockMutex(void *m) {
+extern "C" LavError mutexLock(void *m) {
 	((mutex*)m)->lock();
 	return Lav_ERROR_NONE;
 }
 
-extern "C" LavError unlockMutex(void *m) {
+extern "C" LavError mutexUnlock(void *m) {
 	((mutex*)m)->unlock();
 	return Lav_ERROR_NONE;
 }
 
-extern "C" LavError runInThread(LavThreadCapableFunction func, void* param, void** destination) {
+extern "C" LavError threadRun(LavThreadCapableFunction func, void* param, void** destination) {
 	WILL_RETURN(LavError);
+	CHECK_NOT_NULL(destination);
+	CHECK_NOT_NULL(func);
 	thread *t = new thread(func, param);
 	CHECK_NOT_NULL(t);
 	BEGIN_CLEANUP_BLOCK
@@ -40,6 +42,7 @@ extern "C" LavError runInThread(LavThreadCapableFunction func, void* param, void
 
 extern "C" LavError threadJoinAndFree(void* t) {
 	WILL_RETURN(LavError);
+	CHECK_NOT_NULL(t);
 	((thread*)t)->join();
 	delete (thread*)t;
 	RETURN(Lav_ERROR_NONE);
