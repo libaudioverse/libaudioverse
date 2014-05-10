@@ -4,14 +4,10 @@
 extern "C" {
 #endif
 
-//The following types are bridging to C++, and thus opaque.
-typedef void* LavMutex;
-typedef void* LavThread;
-
-LavError createMutex(LavMutex **destination);
-LavError freeMutex(LavMutex *m);
-LavError lockMutex(LavMutex *m);
-LavError unlockMutex(LavMutex *m);
+LavError createMutex(void **destination);
+LavError freeMutex(void *m);
+LavError lockMutex(void *m);
+LavError unlockMutex(void *m);
 
 /**The following three macros abstract returning error codes, and make the cleanup logic for locks manageable.
 They exist because goto is a bad thing for clarity, and because they can.*/
