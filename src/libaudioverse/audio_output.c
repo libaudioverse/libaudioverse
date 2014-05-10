@@ -10,8 +10,15 @@ typedef struct {
 
 void audioOutputThread(void* vparam);
 
+unsigned int thread_counter = 0; //Used for portaudio init and deinit.  When decremented to 0, deinit portaudio.
+
 LavError createAudioOutputThread(LavGraph *graph, void **destination) {
 	WILL_RETURN(LavError);
+	if(thread_counter == 0) {
+		PaError e = Pa_Initialize();
+		ERROR_IF_TRUE(e != paNoError, Lav_ERROR_CANNOT_INIT_AUDIO);
+	}
+	thread_counter ++;
 	CHECK_NOT_NULL(graph);
 	LOCK(graph->mutex);
 	ThreadParams *param = calloc(1, sizeof(ThreadParams));

@@ -21,6 +21,7 @@ enum Lav_ERRORS {
 	Lav_ERROR_INVALID_SLOT, //one of the functions taking a slot got passed an invalid number.
 	Lav_ERROR_NULL_POINTER, //you passed a NULL pointer into something that shouldn't have it.
 	Lav_ERROR_MEMORY, //a memory problem which probably isn't the fault of the application.
+	Lav_ERROR_CANNOT_INIT_AUDIO, //We couldn't even initialize the audio library.
 };
 
 /**Typedef for error codes.*/
