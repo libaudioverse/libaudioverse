@@ -5,6 +5,7 @@
 typedef struct {
 	void* thread_handle;
 	LavGraph *graph;
+	PaStream *stream;
 	void* initial_startup_mutex; //needed so threads can know about themselves.
 } ThreadParams;
 
@@ -19,10 +20,14 @@ LavError createAudioOutputThread(LavGraph *graph, void **destination) {
 		ERROR_IF_TRUE(e != paNoError, Lav_ERROR_CANNOT_INIT_AUDIO);
 	}
 	thread_counter ++;
+	//let's try to get a stream.
+	PaStream *stream;
+	ERROR_IF_TRUE(Pa_OpenDefaultStream(&stream, 0, 2, paFloat32, SR, 128, NULL, NULL) != paNoError, Lav_ERROR_CANNOT_INIT_AUDIO);
 	CHECK_NOT_NULL(graph);
 	LOCK(graph->mutex);
 	ThreadParams *param = calloc(1, sizeof(ThreadParams));
 	param->graph = graph;
+	param->stream = stream;
 	LavError err;
 	err = createMutex(&(param->initial_startup_mutex));
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
@@ -42,4 +47,5 @@ void audioOutputThread(void* vparam) {
 	ThreadParams *param = (ThreadParams*)vparam;
 	LavGraph *graph = param->graph;
 	void* threadHandle = param->thread_handle;
+	PaStream *stream = param->stream;
 }
