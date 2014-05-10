@@ -49,4 +49,5 @@ struct Lav_Graph_s {
 	LavNode *output_node;
 	float sr; //sampling rate.
 	void* mutex; //lock this graph.
+	void* audio_thread; //not null thread handle for audio output graphs, otherwise null.
 };
