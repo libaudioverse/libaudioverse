@@ -3,6 +3,7 @@ nodes.c
 graphs.c
 streams.c
 threads.cpp
+audio_output.c
 
 #specific node types.
 nodes/sine.c
