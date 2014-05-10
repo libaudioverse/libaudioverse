@@ -3,7 +3,10 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+//The following types are bridging to C++, and thus opaque.
 typedef void* LavMutex;
+typedef void* LavThread;
 
 LavError createMutex(LavMutex **destination);
 LavError freeMutex(LavMutex *m);
