@@ -9,6 +9,7 @@ typedef struct {
 	LavCrossThreadRingBuffer *ring_buffer;
 } ThreadParams;
 
+int audioCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
 void audioOutputThread(void* vparam);
 
 unsigned int thread_counter = 0; //Used for portaudio init and deinit.  When decremented to 0, deinit portaudio.
