@@ -6,6 +6,7 @@ typedef struct {
 	void* thread_handle;
 	LavGraph *graph;
 	void* initial_startup_mutex; //needed so threads can know about themselves.
+	LavCrossThreadRingBuffer *ring_buffer;
 } ThreadParams;
 
 void audioOutputThread(void* vparam);
