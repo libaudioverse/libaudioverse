@@ -5,7 +5,7 @@ import itertools
 def property_node():
 	graph = ffi.new("LavGraph **")
 	node = ffi.new("LavNode **")
-	assert lav.Lav_createGraph(graph) == lav.Lav_ERROR_NONE
+	assert lav.Lav_createGraph(44100, graph) == lav.Lav_ERROR_NONE
 	assert lav.Lav_createNode(1, 1, 4, lav.Lav_NODETYPE_ZEROS, graph[0], node) == lav.Lav_ERROR_NONE
 	node[0].properties[0].type = lav.Lav_PROPERTYTYPE_INT
 	node[0].properties[1].type = lav.Lav_PROPERTYTYPE_FLOAT
