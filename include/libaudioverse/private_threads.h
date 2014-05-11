@@ -15,12 +15,12 @@ Lav_PUBLIC_FUNCTION LavError mutexLock(void *m);
 Lav_PUBLIC_FUNCTION LavError mutexUnlock(void *m);
 
 /**The following functions are threadsafe ringbuffers*/
-typedef struct CTRB LavCrossThreadRingBuffer;
-Lav_PUBLIC_FUNCTION LavError createCrossThreadRingBuffer(unsigned int length, unsigned int elementSize, LavCrossThreadRingBuffer **destination);
-Lav_PUBLIC_FUNCTION unsigned int CTRBGetAvailableWrites(LavCrossThreadRingBuffer* buffer);
-Lav_PUBLIC_FUNCTION unsigned int CTRBGetAvailableReads(LavCrossThreadRingBuffer *buffer);
-Lav_PUBLIC_FUNCTION void CTRBGetItems(LavCrossThreadRingBuffer *buffer, unsigned int count, void* destination);
-Lav_PUBLIC_FUNCTION void CTRBWriteItems(LavCrossThreadRingBuffer *buffer, unsigned int count, void* data);
+typedef struct Lav_CrossThreadRingBuffer_s LavCrossThreadRingBuffer;
+Lav_PUBLIC_FUNCTION LavError createCrossThreadRingBuffer(int length, int elementSize, LavCrossThreadRingBuffer **destination);
+Lav_PUBLIC_FUNCTION int CTRBGetAvailableWrites(LavCrossThreadRingBuffer* buffer);
+Lav_PUBLIC_FUNCTION int CTRBGetAvailableReads(LavCrossThreadRingBuffer *buffer);
+Lav_PUBLIC_FUNCTION void CTRBGetItems(LavCrossThreadRingBuffer *buffer, int count, void* destination);
+Lav_PUBLIC_FUNCTION void CTRBWriteItems(LavCrossThreadRingBuffer *buffer, int count, void* data);
 
 
 /**The following three macros abstract returning error codes, and make the cleanup logic for locks manageable.
