@@ -12,7 +12,7 @@ typedef struct CTRB {
 	char* data;
 } LavCrossThreadRingBuffer;
 
-Lav_PUBLIC_FUNCTION LavError createCrossThreadRingBuffer(unsigned int length, unsigned int elementSize, void **destination) {
+Lav_PUBLIC_FUNCTION LavError createCrossThreadRingBuffer(unsigned int length, unsigned int elementSize, LavCrossThreadRingBuffer **destination) {
 	WILL_RETURN(LavError);
 	ERROR_IF_TRUE(length == 0 || elementSize == 0, Lav_ERROR_RANGE);
 	unsigned int data_size = length*elementSize;
@@ -29,6 +29,7 @@ Lav_PUBLIC_FUNCTION LavError createCrossThreadRingBuffer(unsigned int length, un
 	retval->element_size = elementSize;
 	retval->length = length;
 	*destination = retval;
+	RETURN(Lav_ERROR_NONE);
 	BEGIN_CLEANUP_BLOCK
 	DO_ACTUAL_RETURN;
 }
