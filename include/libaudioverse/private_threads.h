@@ -1,5 +1,5 @@
 #pragma once
-#include <libaudioverse.h>
+#include "libaudioverse.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -10,7 +10,7 @@ typedef void (*LavThreadCapableFunction)(void* param);
 Lav_PUBLIC_FUNCTION LavError threadRun(LavThreadCapableFunction fn, void* param, void** destination);
 Lav_PUBLIC_FUNCTION LavError threadJoinAndFree(void* t);
 Lav_PUBLIC_FUNCTION LavError createMutex(void **destination);
-lav_PUBLIC_FUNCTION LavError freeMutex(void *m);
+Lav_PUBLIC_FUNCTION LavError freeMutex(void *m);
 Lav_PUBLIC_FUNCTION LavError mutexLock(void *m);
 Lav_PUBLIC_FUNCTION LavError mutexUnlock(void *m);
 
