@@ -2,9 +2,10 @@ add_library(libaudioverse SHARED
 nodes.c
 graphs.c
 streams.c
-threading/threads.cpp
 audio_output.c
 
+threading/threads.cpp
+threading/crossthread_ringbuffer.c
 #specific node types.
 nodes/sine.c
 )
