@@ -6,7 +6,7 @@ Todo: replace this with a lock-free implementation assuming that it becomes a bo
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct {
+typedef struct CTRB {
 	unsigned int read_position, write_position, element_size, length;
 	void* lock;
 	char* data;
@@ -40,7 +40,7 @@ is needed for include the audio mixing callback, in which we have some undetermi
 
 In addition, none of these block.  It is possible to write past the end.*/
 
-Lav_PUBLIC_FUNCTION unsigned int crossThreadRingBufferGetAvailableWrites(LavCrossThreadRingBuffer* buffer) {
+Lav_PUBLIC_FUNCTION unsigned int CTRBGetAvailableWrites(LavCrossThreadRingBuffer* buffer) {
 	WILL_RETURN(unsigned int);
 	LOCK(buffer->lock);
 	//First, find out how far apart the two heads of the buffer are.
@@ -50,7 +50,7 @@ Lav_PUBLIC_FUNCTION unsigned int crossThreadRingBufferGetAvailableWrites(LavCros
 	STANDARD_CLEANUP_BLOCK(buffer->lock);
 }
 
-Lav_PUBLIC_FUNCTION unsigned int crossThreadRingBufferGetAvailableReads(LavCrossThreadRingBuffer *buffer) {
+Lav_PUBLIC_FUNCTION unsigned int CTRBGetAvailableReads(LavCrossThreadRingBuffer *buffer) {
 	WILL_RETURN(unsigned int);
 	LOCK(buffer->lock);
 	//this one is realy simple.
@@ -58,12 +58,12 @@ Lav_PUBLIC_FUNCTION unsigned int crossThreadRingBufferGetAvailableReads(LavCross
 	STANDARD_CLEANUP_BLOCK(buffer->lock);
 }
 
-//This function is, qutie honestly, really and truly as bad as it looks.
 #define RB_RETURN do { mutexUnlock(buffer->lock); return; }  while(0)
-Lav_PUBLIC_FUNCTION void crossThreadRingBufferGetItems(LavCrossThreadRingBuffer *buffer, unsigned int count, void* destination) {
+
+Lav_PUBLIC_FUNCTION void CTRBGetItems(LavCrossThreadRingBuffer *buffer, unsigned int count, void* destination) {
 	memset(destination, 0, count*buffer->element_size);
 	mutexLock(buffer->lock);
-	unsigned int available = crossThreadRingBufferGetAvailableReads(buffer);
+	unsigned int available = CTRBGetAvailableReads(buffer);
 	char* data = buffer->data;
 	for(unsigned int i = 0; i < available && count > 0; i++, count--) {
 		memcpy(destination, data+buffer->write_position*buffer->element_size, buffer->element_size);
@@ -73,10 +73,10 @@ Lav_PUBLIC_FUNCTION void crossThreadRingBufferGetItems(LavCrossThreadRingBuffer 
 	RB_RETURN;
 }
 
-Lav_PUBLIC_FUNCTION void crossThreadRingBufferWriteItems(LavCrossThreadRingBuffer *buffer, unsigned int count, void* data) {
+Lav_PUBLIC_FUNCTION void CTRBWriteItems(LavCrossThreadRingBuffer *buffer, unsigned int count, void* data) {
 	mutexLock(buffer->lock);
 	char* data_ptr = data;
-	unsigned int available = crossThreadRingBufferGetAvailableWrites(buffer);
+	unsigned int available = CTRBGetAvailableWrites(buffer);
 	for(unsigned int i = 0; i < available && count > 0; i++, count--) {
 		memcpy(buffer->data+buffer->write_position*buffer->element_size, data_ptr, buffer->element_size);
 		data_ptr += buffer->element_size;

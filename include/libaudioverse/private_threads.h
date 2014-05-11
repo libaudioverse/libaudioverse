@@ -14,6 +14,15 @@ Lav_PUBLIC_FUNCTION LavError freeMutex(void *m);
 Lav_PUBLIC_FUNCTION LavError mutexLock(void *m);
 Lav_PUBLIC_FUNCTION LavError mutexUnlock(void *m);
 
+/**The following functions are threadsafe ringbuffers*/
+typedef struct CTRB LavCrossThreadRingBuffer;
+Lav_PUBLIC_FUNCTION LavError createCrossThreadRingBuffer(unsigned int length, unsigned int elementSize, void **destination);
+Lav_PUBLIC_FUNCTION unsigned int CTRBGetAvailableWrites(LavCrossThreadRingBuffer* buffer);
+Lav_PUBLIC_FUNCTION unsigned int CTRBGetAvailableReads(LavCrossThreadRingBuffer *buffer);
+Lav_PUBLIC_FUNCTION void CTRBGetItems(LavCrossThreadRingBuffer *buffer, unsigned int count, void* destination);
+Lav_PUBLIC_FUNCTION void CTRBWriteItems(LavCrossThreadRingBuffer *buffer, unsigned int count, void* data);
+
+
 /**The following three macros abstract returning error codes, and make the cleanup logic for locks manageable.
 They exist because goto is a bad thing for clarity, and because they can.*/
 
