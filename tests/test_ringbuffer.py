@@ -3,10 +3,21 @@ from make_cffi import *
 
 def test_ringbuffer():
 	"""Test the ringbuffer, extensively.
-We make a list of 1000 ints, and pass it through the ringbuffer 5 times.  In each case, we should *always* get the same back out."""
+We make a list of 1000 ints, and pass it through the ringbuffer 4 times.  In each case, we should *always* get the same back out.
+We skip 3 because it complicates the logic, and the others should be good enough."""
 	expected = [random.randint(0, 500) for i in xrange(1000)]
 	cffi_array = ffi.new("unsigned int[" + str(len(expected)) +"]", expected)
 	size = ffi.sizeof("unsigned int")
 	rb = ffi.new("LavCrossThreadRingBuffer **")
-	lav.createCrossThreadRingBuffer(5, size, rb)
+	assert lav.Lav_ERROR_NONE == lav.createCrossThreadRingBuffer(5, size, rb)
 	rb = rb[0]
+	for i in [1, 2, 4, 5]:
+		arr = ffi.new("unsigned int[" + str(i) + "]")
+		l = []
+		for j in xrange(0, 1000, i):
+			#write i items into the ring buffer.
+			writing = ffi.new("unsigned int [" + str(i) + "]", expected[j:j+i])
+			lav.CTRBWriteItems(rb, i, writing)
+			lav.CTRBGetItems(rb, i, arr)
+			l += list(arr)
+		assert l == expected
