@@ -18,6 +18,7 @@ We skip 3 because it complicates the logic, and the others should be good enough
 			#write i items into the ring buffer.
 			writing = ffi.new("unsigned int [" + str(i) + "]", expected[j:j+i])
 			lav.CTRBWriteItems(rb, i, writing)
+			assert lav.CTRBGetAvailableReads(rb) == i
 			lav.CTRBGetItems(rb, i, arr)
 			l += list(arr)
 		assert l == expected

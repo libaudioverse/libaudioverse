@@ -81,6 +81,8 @@ Lav_PUBLIC_FUNCTION void CTRBWriteItems(LavCrossThreadRingBuffer *buffer, unsign
 	for(unsigned int i = 0; i < available && count > 0; i++, count--) {
 		memcpy(buffer->data+buffer->write_position*buffer->element_size, data_ptr, buffer->element_size);
 		data_ptr += buffer->element_size;
+		buffer->write_position++;
+		buffer->write_position %= buffer->length;
 	}
 	RB_RETURN;
 }
