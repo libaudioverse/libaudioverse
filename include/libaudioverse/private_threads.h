@@ -1,4 +1,5 @@
 #pragma once
+#include <libaudioverse.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -6,12 +7,12 @@ extern "C" {
 
 typedef void (*LavThreadCapableFunction)(void* param);
 
-LavError threadRun(LavThreadCapableFunction fn, void* param, void** destination);
-LavError threadJoinAndFree(void* t);
-LavError createMutex(void **destination);
-LavError freeMutex(void *m);
-LavError mutexLock(void *m);
-LavError mutexUnlock(void *m);
+Lav_PUBLIC_FUNCTION LavError threadRun(LavThreadCapableFunction fn, void* param, void** destination);
+Lav_PUBLIC_FUNCTION LavError threadJoinAndFree(void* t);
+Lav_PUBLIC_FUNCTION LavError createMutex(void **destination);
+lav_PUBLIC_FUNCTION LavError freeMutex(void *m);
+Lav_PUBLIC_FUNCTION LavError mutexLock(void *m);
+Lav_PUBLIC_FUNCTION LavError mutexUnlock(void *m);
 
 /**The following three macros abstract returning error codes, and make the cleanup logic for locks manageable.
 They exist because goto is a bad thing for clarity, and because they can.*/

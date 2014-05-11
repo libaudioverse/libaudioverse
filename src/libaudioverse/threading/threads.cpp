@@ -3,7 +3,7 @@
 #include <libaudioverse/private_all.h>
 using namespace std;
 
-extern "C" LavError createMutex(void **destination) {
+Lav_PUBLIC_FUNCTION LavError createMutex(void **destination) {
 	WILL_RETURN(LavError);
 	recursive_mutex *retval = new recursive_mutex();
 	CHECK_NOT_NULL(retval);
@@ -14,23 +14,23 @@ extern "C" LavError createMutex(void **destination) {
 }
 
 
-extern "C" LavError freeMutex(void *m) {
+Lav_PUBLIC_FUNCTION LavError freeMutex(void *m) {
 	mutex *mut = (mutex*)m;
 	delete mut;
 	return Lav_ERROR_NONE;
 }
 
-extern "C" LavError mutexLock(void *m) {
+Lav_PUBLIC_FUNCTION LavError mutexLock(void *m) {
 	((mutex*)m)->lock();
 	return Lav_ERROR_NONE;
 }
 
-extern "C" LavError mutexUnlock(void *m) {
+Lav_PUBLIC_FUNCTION LavError mutexUnlock(void *m) {
 	((mutex*)m)->unlock();
 	return Lav_ERROR_NONE;
 }
 
-extern "C" LavError threadRun(LavThreadCapableFunction func, void* param, void** destination) {
+Lav_PUBLIC_FUNCTION LavError threadRun(LavThreadCapableFunction func, void* param, void** destination) {
 	WILL_RETURN(LavError);
 	CHECK_NOT_NULL(destination);
 	CHECK_NOT_NULL(func);
@@ -40,7 +40,7 @@ extern "C" LavError threadRun(LavThreadCapableFunction func, void* param, void**
 	DO_ACTUAL_RETURN;
 }
 
-extern "C" LavError threadJoinAndFree(void* t) {
+Lav_PUBLIC_FUNCTION LavError threadJoinAndFree(void* t) {
 	WILL_RETURN(LavError);
 	CHECK_NOT_NULL(t);
 	((thread*)t)->join();

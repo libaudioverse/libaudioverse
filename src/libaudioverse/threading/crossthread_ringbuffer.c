@@ -11,7 +11,7 @@ typedef struct {
 	char* data;
 } LavCrossThreadRingBuffer;
 
-LavError createCrossThreadRingBuffer(unsigned int length, unsigned int elementSize, void **destination) {
+Lav_PUBLIC_FUNCTION LavError createCrossThreadRingBuffer(unsigned int length, unsigned int elementSize, void **destination) {
 	WILL_RETURN(LavError);
 	ERROR_IF_TRUE(length == 0 || elementSize == 0, Lav_ERROR_RANGE);
 	unsigned int data_size = length*elementSize;
@@ -36,7 +36,7 @@ is needed for include the audio mixing callback, in which we have some undetermi
 
 In addition, none of these block.  It is possible to write past the end.*/
 
-unsigned int crossThreadRingBufferGetAvailableWrites(LavCrossThreadRingBuffer* buffer) {
+Lav_PUBLIC_FUNCTION unsigned int crossThreadRingBufferGetAvailableWrites(LavCrossThreadRingBuffer* buffer) {
 	WILL_RETURN(unsigned int);
 	LOCK(buffer->lock);
 	//First, find out how far apart the two heads of the buffer are.
@@ -46,7 +46,7 @@ unsigned int crossThreadRingBufferGetAvailableWrites(LavCrossThreadRingBuffer* b
 	STANDARD_CLEANUP_BLOCK(buffer->lock);
 }
 
-unsigned int crossThreadRingBufferGetAvailableReads(LavCrossThreadRingBuffer *buffer) {
+Lav_PUBLIC_FUNCTION unsigned int crossThreadRingBufferGetAvailableReads(LavCrossThreadRingBuffer *buffer) {
 	WILL_RETURN(unsigned int);
 	LOCK(buffer->lock);
 	//this one is realy simple.
@@ -56,7 +56,7 @@ unsigned int crossThreadRingBufferGetAvailableReads(LavCrossThreadRingBuffer *bu
 
 //This function is, qutie honestly, really and truly as bad as it looks.
 #define RB_RETURN do { mutexUnlock(buffer->lock); return; ) while(0)
-void crossThreadRingBufferGetItems(LavCrossThreadRingBuffer *buffer, unsigned int count, void* destination) {
+Lav_PUBLIC_FUNCTION void crossThreadRingBufferGetItems(LavCrossThreadRingBuffer *buffer, unsigned int count, void* destination) {
 	memset(destination, 0, count*buffer->element_size);
 	LOCK(buffer->lock);
 	//First case: we don't have enough.
@@ -93,7 +93,7 @@ Briefly, the place between the read and write pointers is not in use, only the e
 	RB_RETURN;
 }
 
-void crossThreadRingBufferWriteItems(LavCrossThreadRingBuffer *buffer, char* items, unsigned int count) {
+Lav_PUBLIC_FUNCTION void crossThreadRingBufferWriteItems(LavCrossThreadRingBuffer *buffer, char* items, unsigned int count) {
 	mutexLock(buffer->mutex);
 	mutexUnlock(buffer->mutex);
 }
