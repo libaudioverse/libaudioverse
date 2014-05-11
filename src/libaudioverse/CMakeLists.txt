@@ -2,7 +2,7 @@ add_library(libaudioverse SHARED
 nodes.c
 graphs.c
 streams.c
-threads.cpp
+threading/threads.cpp
 audio_output.c
 
 #specific node types.
