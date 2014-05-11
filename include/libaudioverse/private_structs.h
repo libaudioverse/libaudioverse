@@ -56,4 +56,5 @@ struct Lav_CrossThreadRingBuffer_s {
 	int read_position, write_position, element_size, length;
 	void* lock;
 	char* data;
+	int last_op;
 };

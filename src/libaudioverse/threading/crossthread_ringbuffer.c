@@ -5,6 +5,8 @@ Todo: replace this with a lock-free implementation assuming that it becomes a bo
 #include <libaudioverse/private_all.h>
 #include <stdlib.h>
 #include <string.h>
+const int READ_OP = -1;
+const int WRITE_OP = 1;
 
 //Apparently, C's mod is in fact not the discrete math operation.
 //This function handles that.
@@ -28,6 +30,7 @@ Lav_PUBLIC_FUNCTION LavError createCrossThreadRingBuffer(int length, int element
 	retval->read_position = retval->write_position = 0;
 	retval->element_size = elementSize;
 	retval->length = length;
+	retval->last_op = READ_OP;
 	*destination = retval;
 	RETURN(Lav_ERROR_NONE);
 	BEGIN_CLEANUP_BLOCK
@@ -47,6 +50,7 @@ Lav_PUBLIC_FUNCTION int CTRBGetAvailableWrites(LavCrossThreadRingBuffer* buffer)
 	//First, find out how far apart the two heads of the buffer are.
 	int used = ringmod(buffer->write_position-buffer->read_position, buffer->length); //number of elements currently in use.
 	int available = buffer->length-used; //how many are left?
+	if(available == 0 && buffer->last_op == READ_OP) available = buffer->length;
 	RETURN(available);
 	STANDARD_CLEANUP_BLOCK(buffer->lock);
 }
@@ -55,22 +59,27 @@ Lav_PUBLIC_FUNCTION int CTRBGetAvailableReads(LavCrossThreadRingBuffer *buffer) 
 	WILL_RETURN(int);
 	LOCK(buffer->lock);
 	//this one is realy simple.
-	RETURN(ringmod(buffer->write_position-buffer->read_position, buffer->length));
+	int available = ringmod(buffer->write_position-buffer->read_position, buffer->length);
+	if(available == 0 && buffer->last_op == WRITE_OP) available = buffer->length;
+	RETURN(available);
 	STANDARD_CLEANUP_BLOCK(buffer->lock);
 }
 
 #define RB_RETURN do { mutexUnlock(buffer->lock); return; }  while(0)
 
 Lav_PUBLIC_FUNCTION void CTRBGetItems(LavCrossThreadRingBuffer *buffer, int count, void* destination) {
-	memset(destination, 0, count*buffer->element_size);
+	char *dest = destination; //gives this a size.
+	memset(dest, 0, count*buffer->element_size);
 	mutexLock(buffer->lock);
 	int available = CTRBGetAvailableReads(buffer);
 	char* data = buffer->data;
 	for(int i = 0; i < available && count > 0; i++, count--) {
-		memcpy(destination, data+buffer->write_position*buffer->element_size, buffer->element_size);
+		memcpy(dest, data+buffer->read_position*buffer->element_size, buffer->element_size);
+		dest += buffer->element_size;
 		buffer->read_position++;
 		buffer->read_position%=buffer->length;
 	}
+	buffer->last_op = READ_OP;
 	RB_RETURN;
 }
 
@@ -84,5 +93,6 @@ Lav_PUBLIC_FUNCTION void CTRBWriteItems(LavCrossThreadRingBuffer *buffer, int co
 		buffer->write_position++;
 		buffer->write_position %= buffer->length;
 	}
+	buffer->last_op = WRITE_OP;
 	RB_RETURN;
 }
