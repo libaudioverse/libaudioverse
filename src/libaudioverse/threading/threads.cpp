@@ -1,5 +1,6 @@
 #include <mutex>
 #include <thread>
+#include <chrono>
 #include <libaudioverse/private_all.h>
 using namespace std;
 
@@ -48,4 +49,12 @@ Lav_PUBLIC_FUNCTION LavError threadJoinAndFree(void* t) {
 	RETURN(Lav_ERROR_NONE);
 	BEGIN_CLEANUP_BLOCK
 	DO_ACTUAL_RETURN;
+}
+
+void sleepFor(unsigned int milliseconds) {
+	this_thread::sleep_for(chrono::milliseconds(milliseconds));
+}
+
+void yield() {
+	this_thread::yield();
 }
