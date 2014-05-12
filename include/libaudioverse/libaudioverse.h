@@ -99,6 +99,15 @@ the first sample of the first output, the first of the second, the first of the 
 Put another way, this function pretends that the passed node has node->num_outputs channels, and then interweaves them.*/
 Lav_PUBLIC_FUNCTION LavError Lav_nodeReadAllOutputs(LavNode *node, unsigned int samples, float* destination);
 
+/**Interpolated tables.
+
+An interpolated table has some propeerties of ringbuffers, but with floating point math: reads past the end or before the beginning wrap.
+It is possible to read between samples; if so, it performs linear interpolation.*/
+Lav_PUBLIC_FUNCTION LavError Lav_createTable(LavTable** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_tableGetSample(LavTable *table, float seconds, float* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_tableComputeSampleRange(LavTable* table, float secondsStart, float secondsEnd, unsigned int destinationLength, float* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_tableSetSamples(LavTable *table, unsigned int count, float duration, float* samples);
+Lav_PUBLIC_FUNCTION LavError Lav_tableClear(LavTable *table);
 
 /**Make a sine node.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavGraph *graph, LavNode **destination);
