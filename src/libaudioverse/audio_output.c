@@ -5,10 +5,11 @@
 typedef struct {
 	LavGraph *graph;
 	LavCrossThreadRingBuffer *ring_buffer;
+	PaStream *stream;
 	unsigned int block_size, mix_ahead;
 } ThreadParams;
 
-int audioCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
+int audioOutputCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
 void audioOutputThread(void* vparam);
 
 unsigned int thread_counter = 0; //Used for portaudio init and deinit.  When decremented to 0, deinit portaudio.
@@ -29,10 +30,14 @@ Lav_PUBLIC_FUNCTION LavError createAudioOutputThread(LavGraph *graph, unsigned i
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
 	param->block_size = blockSize;
 	param->mix_ahead = mixAhead;
+	PaStream *stream;
+	Pa_OpenDefaultStream(&stream, 0, 2, paFloat32, graph->sr, blockSize, audioOutputCallback, param);
+	param->stream = stream;
 	void* th;
 	err = threadRun(audioOutputThread, param, &th);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
 	//let it go!
+	RETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK(graph->mutex);
 }
 
@@ -40,7 +45,7 @@ void audioOutputThread(void* vparam) {
 	ThreadParams *param = (ThreadParams*)vparam;
 	LavGraph *graph = param->graph;
 	LavCrossThreadRingBuffer *rb = param->ring_buffer;
-
+	Pa_StartStream(param->stream);
 	//This is simple.
 	//Process one block from the graph, write it to the ringbuffer, repeat.
 	float* samples = malloc(param->block_size*sizeof(float));
@@ -52,7 +57,7 @@ void audioOutputThread(void* vparam) {
 	}
 }
 
-int audioCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData) {
+int audioOutputCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData) {
 	//read length items into the output buffer.  That is it.
 	CTRBGetItems(((ThreadParams*)userData)->ring_buffer, frameCount, output);
 	return paNoError;
