@@ -17,6 +17,7 @@ void audioOutputThread(void* vparam);
 unsigned int thread_counter = 0; //Used for portaudio init and deinit.  When decremented to 0, deinit portaudio.
 
 Lav_PUBLIC_FUNCTION LavError createAudioOutputThread(LavGraph *graph, unsigned int blockSize, unsigned int mixAhead, void **destination) {
+	mixAhead+=1; //so we can actually mixahead 0 times.
 	WILL_RETURN(LavError);
 	if(thread_counter == 0) {
 		PaError e = Pa_Initialize();
