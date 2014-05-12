@@ -66,6 +66,7 @@ Lav_PUBLIC_FUNCTION LavError createAFlag(void** destination) {
 	void* retval = (void*)new atomic_flag();
 	ERROR_IF_TRUE(retval == NULL, Lav_ERROR_MEMORY);
 	*destination = retval;
+	RETURN(Lav_ERROR_NONE);
 	BEGIN_CLEANUP_BLOCK
 	DO_ACTUAL_RETURN;
 }
