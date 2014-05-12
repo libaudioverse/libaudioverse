@@ -4,3 +4,4 @@
 #include "private_constants.h"
 #include "private_structs.h"
 #include "private_threads.h"
+#include "private_audio_output.h"

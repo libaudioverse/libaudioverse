@@ -1,14 +1,39 @@
 #pragma once
+#include "libaudioverse.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-typedef void* LavMutex;
 
-LavError createMutex(LavMutex **destination);
-LavError freeMutex(LavMutex *m);
-LavError lockMutex(LavMutex *m);
-LavError unlockMutex(LavMutex *m);
+typedef void (*LavThreadCapableFunction)(void* param);
+
+Lav_PUBLIC_FUNCTION LavError threadRun(LavThreadCapableFunction fn, void* param, void** destination);
+Lav_PUBLIC_FUNCTION LavError threadJoinAndFree(void* t);
+Lav_PUBLIC_FUNCTION LavError createMutex(void **destination);
+Lav_PUBLIC_FUNCTION LavError freeMutex(void *m);
+Lav_PUBLIC_FUNCTION LavError mutexLock(void *m);
+Lav_PUBLIC_FUNCTION LavError mutexUnlock(void *m);
+
+/**The following functions are threadsafe ringbuffers*/
+typedef struct Lav_CrossThreadRingBuffer_s LavCrossThreadRingBuffer;
+Lav_PUBLIC_FUNCTION LavError createCrossThreadRingBuffer(int length, int elementSize, LavCrossThreadRingBuffer **destination);
+Lav_PUBLIC_FUNCTION int CTRBGetAvailableWrites(LavCrossThreadRingBuffer* buffer);
+Lav_PUBLIC_FUNCTION int CTRBGetAvailableReads(LavCrossThreadRingBuffer *buffer);
+Lav_PUBLIC_FUNCTION void CTRBGetItems(LavCrossThreadRingBuffer *buffer, int count, void* destination);
+Lav_PUBLIC_FUNCTION void CTRBWriteItems(LavCrossThreadRingBuffer *buffer, int count, void* data);
+
+/**These are utilities that operate on the current thread.*/
+Lav_PUBLIC_FUNCTION void sleepFor(unsigned int milliseconds); //sleep.
+Lav_PUBLIC_FUNCTION void yield(); //yield this thread.
+
+/**An atomic flag that can be either cleared or set.
+
+The point of this is to allow for thraed killing and other such communications.  It is guaranteed to be lock-free on all architectures.*/
+Lav_PUBLIC_FUNCTION LavError createAFlag(void** destination);
+Lav_PUBLIC_FUNCTION int aFlagTestAndSet(void* flag);
+Lav_PUBLIC_FUNCTION void aFlagClear(void* flag);
+Lav_PUBLIC_FUNCTION void freeAFlag(void* flag);
+
 
 /**The following three macros abstract returning error codes, and make the cleanup logic for locks manageable.
 They exist because goto is a bad thing for clarity, and because they can.*/
@@ -25,10 +50,10 @@ goto do_return_and_cleanup;\
 #define DO_ACTUAL_RETURN return return_value
 
 #define STANDARD_CLEANUP_BLOCK(mutex) BEGIN_CLEANUP_BLOCK \
-if(did_already_lock) unlockMutex((mutex));\
+if(did_already_lock) mutexUnlock((mutex));\
 DO_ACTUAL_RETURN
 
-#define LOCK(lock_expression) lockMutex((lock_expression));\
+#define LOCK(lock_expression) mutexLock((lock_expression));\
 did_already_lock = 1;
 
 #ifdef __cplusplus
