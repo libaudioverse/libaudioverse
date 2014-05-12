@@ -8,7 +8,7 @@ We can be pretty sure, however, that the calculations done here and the calculat
 	accuracy = 0.01
 	graph = ffi.new("LavGraph **")
 	n1 = ffi.new("LavNode **")
-	assert lav.Lav_createGraph(graph) == lav.Lav_ERROR_NONE
+	assert lav.Lav_createGraph(44100, graph) == lav.Lav_ERROR_NONE
 	assert lav.Lav_createSineNode(graph[0], n1) == lav.Lav_ERROR_NONE
 	assert lav.Lav_graphSetOutputNode(graph[0], n1[0]) == lav.Lav_ERROR_NONE
 	n1= n1[0]
