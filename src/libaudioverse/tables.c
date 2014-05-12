@@ -46,13 +46,13 @@ Lav_PUBLIC_FUNCTION LavError Lav_tableComputeSampleRange(LavTable* table, float 
 	float delta = (secondsEnd-secondsStart)/destinationLength;
 	float position = fmodf(secondsStart, table->duration);
 	for(unsigned int i = 0; i < destinationLength; i++) {
-	float midpoint = position/table->duration*table->length;
+		float midpoint = position/table->duration*table->length;
 		unsigned int samp1, samp2;
 		samp1 = (unsigned int)floorf(midpoint);
 		samp2 = (unsigned int)ceilf(midpoint);
-	samp2%=table->length;
-		float weight1 = midpoint-floorf(midpoint);
-		float weight2 = ceilf(midpoint)-midpoint;
+		samp2%=table->length;
+		float weight1 = ceilf(midpoint)-midpoint;
+		float weight2 = midpoint-floorf(midpoint);
 		destination[i] = weight1*table->samples[samp1]+weight2*table->samples[samp2];
 		position += delta;
 	}
