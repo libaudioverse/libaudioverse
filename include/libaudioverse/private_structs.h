@@ -64,4 +64,6 @@ struct Lav_Table_s {
 	float duration;
 	unsigned int length_in_samples;
 	float* samples;
+	float* sample_delta;
+	unsigned int has_samples;
 };
