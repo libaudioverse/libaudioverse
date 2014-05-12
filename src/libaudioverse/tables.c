@@ -18,6 +18,22 @@ Lav_PUBLIC_FUNCTION lavError Lav_createTable(LavTable** destination) {
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_tableGetSample(LavTable *table, float seconds, float* destination) {
+	WILL_RETURN(LavError);
+	CHECK_NOT_NULL(table);
+	//Compute the sample.
+	seconds = fmod(seconds, table->duration);
+	if(seconds < 0) seconds = table->duration-seconds;
+	unsigned int samp1, samp2;
+	float midpoint = seconds/table->duration*table->length;
+	samp1 = floorf(midpoint);
+	samp2 = ceilf(midpoint();
+	if(samp1 == samp2) samp2++;
+	//calculate weights.
+	float weight1=midpoint-floorf(midpoint);
+	float weight2 = ceilf(midpoint)-midpoint;
+	*destination = weight1*table->samples[samp1]+weight2*table->samples[samp2];
+	BEGIN_CLEANUP_BLOCK
+	DO_ACTUAL_RETURN;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_tableComputeSampleRange(LavTable* table, float seconds_start, float seconds_end, float time_delta, unsigned ibnt destinationLength, float* destination) {
