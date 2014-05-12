@@ -62,8 +62,8 @@ struct Lav_CrossThreadRingBuffer_s {
 /**A table of audio data.*/
 struct Lav_Table_s {
 	float duration;
-	unsigned int length_in_samples;
+	unsigned int length; //length in samples.
 	float* samples;
-	float* sample_delta;
+	float sample_delta;
 	unsigned int has_samples;
 };
