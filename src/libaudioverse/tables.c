@@ -37,8 +37,22 @@ Lav_PUBLIC_FUNCTION LavError Lav_tableGetSample(LavTable *table, float seconds, 
 	DO_ACTUAL_RETURN;
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_tableComputeSampleRange(LavTable* table, float seconds_start, float seconds_end, float time_delta, unsigned int destinationLength, float* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_tableComputeSampleRange(LavTable* table, float secondsStart, float secondsEnd, unsigned int destinationLength, float* destination) {
 	WILL_RETURN(LavError);
+	CHECK_NOT_NULL(table);
+	CHECK_NOT_NULL(destination);
+	float delta = (secondsEnd-secondsStart)/destinationLength;
+	float position = secondsStart;
+	for(unsigned int i = 0; i < destinationLength; i++) {
+	float midpoint = position/table->duration*table->length;
+		unsigned int samp1, samp2;
+		samp1 = (unsigned int)floorf(midpoint);
+		samp2 = (unsigned int)ceilf(midpoint);
+		float weight1 = midpoint-floorf(midpoint);
+		float weight2 = ceilf(midpoint)-midpoint;
+		destination[i] = weight1*samp1+weight2*samp2;
+		position += delta;
+	}
 	RETURN(Lav_ERROR_NONE);
 	BEGIN_CLEANUP_BLOCK
 	DO_ACTUAL_RETURN;
