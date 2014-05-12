@@ -1,6 +1,7 @@
 #include <libaudioverse/private_all.h>
 #include <portaudio.h>
 #include <uthash.h>
+#include <stdio.h>
 
 typedef struct {
 	LavGraph *graph;
@@ -26,7 +27,7 @@ Lav_PUBLIC_FUNCTION LavError createAudioOutputThread(LavGraph *graph, unsigned i
 	ThreadParams *param = calloc(1, sizeof(ThreadParams));
 	param->graph = graph;
 	LavError err;
-	err = createCrossThreadRingBuffer(blockSize, sizeof(float), &param->ring_buffer);
+	err = createCrossThreadRingBuffer(blockSize*mixAhead, sizeof(float), &param->ring_buffer);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
 	param->block_size = blockSize;
 	param->mix_ahead = mixAhead;
@@ -58,8 +59,8 @@ void audioOutputThread(void* vparam) {
 	while(1) {
 		memset(samples, 0, param->block_size*sizeof(float)*param->channels);
 		Lav_graphReadAllOutputs(graph, param->block_size, samples);
-		CTRBWriteItems(rb, param->block_size, samples);
-		while(CTRBGetAvailableWrites(rb) < param->block_size);// sleepFor(1); //sleep for 1 ms.
+		CTRBWriteItems(rb, param->block_size*param->channels, samples);
+		while(CTRBGetAvailableWrites(rb) <= param->block_size);// sleepFor(1); //sleep for 1 ms.
 	}
 }
 
