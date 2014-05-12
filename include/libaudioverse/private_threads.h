@@ -23,8 +23,8 @@ Lav_PUBLIC_FUNCTION void CTRBGetItems(LavCrossThreadRingBuffer *buffer, int coun
 Lav_PUBLIC_FUNCTION void CTRBWriteItems(LavCrossThreadRingBuffer *buffer, int count, void* data);
 
 /**These are utilities that operate on the current thread.*/
-void sleepFor(unsigned int milliseconds); //sleep.
-void yield(); //yield this thread.
+Lav_PUBLIC_FUNCTION void sleepFor(unsigned int milliseconds); //sleep.
+Lav_PUBLIC_FUNCTION void yield(); //yield this thread.
 
 /**The following three macros abstract returning error codes, and make the cleanup logic for locks manageable.
 They exist because goto is a bad thing for clarity, and because they can.*/

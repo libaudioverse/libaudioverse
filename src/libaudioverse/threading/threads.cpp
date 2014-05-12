@@ -51,10 +51,10 @@ Lav_PUBLIC_FUNCTION LavError threadJoinAndFree(void* t) {
 	DO_ACTUAL_RETURN;
 }
 
-void sleepFor(unsigned int milliseconds) {
+Lav_PUBLIC_FUNCTION void sleepFor(unsigned int milliseconds) {
 	this_thread::sleep_for(chrono::milliseconds(milliseconds));
 }
 
-void yield() {
+Lav_PUBLIC_FUNCTION void yield() {
 	this_thread::yield();
 }
