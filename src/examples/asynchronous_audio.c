@@ -8,7 +8,7 @@ void main() {
 	Lav_createGraph(SR, &graph);
 	Lav_createSineNode(graph, &node);
 	Lav_graphSetOutputNode(graph, node);
-	createAudioOutputThread(graph, 128, 2, &th);
+	createAudioOutputThread(graph, 8192, 5, &th);
 	while(1) {
 		sleepFor(100);
 	}

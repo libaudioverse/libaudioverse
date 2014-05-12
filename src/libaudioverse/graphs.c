@@ -27,6 +27,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_graphGetOutputNode(LavGraph *graph, LavNode **d
 	CHECK_NOT_NULL(destination);
 	LOCK(graph->mutex);
 	*destination = graph->output_node;
+	RETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK(graph->mutex);
 }
 

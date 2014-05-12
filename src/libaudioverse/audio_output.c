@@ -6,7 +6,7 @@ typedef struct {
 	LavGraph *graph;
 	LavCrossThreadRingBuffer *ring_buffer;
 	PaStream *stream;
-	unsigned int block_size, mix_ahead;
+	unsigned int block_size, mix_ahead, channels;
 } ThreadParams;
 
 int audioOutputCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
@@ -30,9 +30,15 @@ Lav_PUBLIC_FUNCTION LavError createAudioOutputThread(LavGraph *graph, unsigned i
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
 	param->block_size = blockSize;
 	param->mix_ahead = mixAhead;
+
+	//Calculate the number of channels.
+	LavNode *node;
+	Lav_graphGetOutputNode(graph, &node);
+	unsigned int channels = node->num_outputs;
 	PaStream *stream;
-	Pa_OpenDefaultStream(&stream, 0, 2, paFloat32, graph->sr, blockSize, audioOutputCallback, param);
+	Pa_OpenDefaultStream(&stream, 0, channels, paFloat32, graph->sr, blockSize, audioOutputCallback, param);
 	param->stream = stream;
+	param->channels = channels;
 	void* th;
 	err = threadRun(audioOutputThread, param, &th);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
@@ -48,12 +54,12 @@ void audioOutputThread(void* vparam) {
 	Pa_StartStream(param->stream);
 	//This is simple.
 	//Process one block from the graph, write it to the ringbuffer, repeat.
-	float* samples = malloc(param->block_size*sizeof(float));
+	float* samples = malloc(param->block_size*sizeof(float)*param->channels);
 	while(1) {
-		memset(samples, 0, param->block_size*sizeof(float));
+		memset(samples, 0, param->block_size*sizeof(float)*param->channels);
 		Lav_graphReadAllOutputs(graph, param->block_size, samples);
 		CTRBWriteItems(rb, param->block_size, samples);
-		while(CTRBGetAvailableWrites(rb) < param->block_size) sleepFor(1); //sleep for 1 ms.
+		while(CTRBGetAvailableWrites(rb) < param->block_size);// sleepFor(1); //sleep for 1 ms.
 	}
 }
 
