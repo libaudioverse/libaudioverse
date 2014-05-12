@@ -38,3 +38,14 @@ Lav_PUBLIC_FUNCTION LavError Lav_tableSetSamples(LavTable *table, unsigned int c
 	STANDARD_CLEANUP_BLOCK
 	DO_ACTUAL_RETURN;
 }
+
+Lav_PUBLIC_FUNCTION LavError Lav_tableClear(LavTable *table) {
+	WILL_RETURN(LavError);
+	CHECK_NOT_NULL(table);
+	float* samples;
+	samples = realloc(table->samples, sizeof(float));
+	table->samples = samples;
+	table->length = 0;
+	table->duration = 0.0f;
+	table->has_samples = 0;
+}

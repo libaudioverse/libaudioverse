@@ -10,7 +10,7 @@ typedef struct Lav_SampleBuffer_s LavSampleBuffer;
 typedef struct Lav_Node_s LavNode;
 typedef struct Lav_Stream_s LavStream;
 typedef struct Lav_Graph_s LavGraph;
-typedef struuct Lav_Table_s LavTable;
+typedef struct Lav_Table_s LavTable;
 
 /**Does whatever is appropriate on a given platform to expose a Libaudioverse function publically.*/
 #define Lav_PUBLIC_FUNCTION extern __declspec(dllexport)
