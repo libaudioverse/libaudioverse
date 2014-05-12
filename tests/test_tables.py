@@ -10,7 +10,7 @@ def make_outputs():
 	output1 = [i%2 for i in xrange(100)]
 	output2 = []
 	pos = 0.0
-	while pos < len(output1)*iterations:
+	while pos < len(output1)*iterations-delta: #-detal doesn't include the endpoint, like xrange.
 		samp1, samp2 = floor(pos), ceil(pos)
 		samp1%=len(output1)
 		samp2%=len(output1)
@@ -33,3 +33,14 @@ def test_compute_samples():
 	#now, we submit the sample buffer.
 	duration = delta*len(original)
 	assert lav.Lav_tableSetSamples(table, len(original), duration, original) == lav.Lav_ERROR_NONE
+	output = ffi.new("float[" + str(len(original)*iterations*int(1/delta)) + "]")
+	start, end = 0, delta*len(original)
+	output_ptr = output
+	for i in xrange(iterations):
+		assert lav.Lav_tableComputeSampleRange(table, start, end, abs(int((end-start)/delta)), output_ptr) == lav.Lav_ERROR_NONE
+		output_ptr += int((end-start)/delta)
+		start, end = end, start
+		start+=delta
+	assert len(output) == len(accepted)
+	for ioutput, iaccepted in zip(output, accepted):
+		assert (ioutput-iaccepted) < accuracy
