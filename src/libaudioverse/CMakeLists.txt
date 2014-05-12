@@ -4,8 +4,13 @@ graphs.c
 streams.c
 audio_output.c
 
+#data structures (non-thread):
+tables.c
+
+#threading related functions and structures
 threading/threads.cpp
 threading/crossthread_ringbuffer.c
+
 #specific node types.
 nodes/sine.c
 )
