@@ -26,6 +26,15 @@ Lav_PUBLIC_FUNCTION void CTRBWriteItems(LavCrossThreadRingBuffer *buffer, int co
 Lav_PUBLIC_FUNCTION void sleepFor(unsigned int milliseconds); //sleep.
 Lav_PUBLIC_FUNCTION void yield(); //yield this thread.
 
+/**An atomic flag that can be either cleared or set.
+
+The point of this is to allow for thraed killing and other such communications.  It is guaranteed to be lock-free on all architectures.*/
+Lav_PUBLIC_FUNCTION LavError createAFlag(void** destination);
+Lav_PUBLIC_FUNCTION int aFlagTestAndSet(void* flag);
+Lav_PUBLIC_FUNCTION void aFlagClear(void* flag);
+Lav_PUBLIC_FUNCTION void freeAFlag(void* flag);
+
+
 /**The following three macros abstract returning error codes, and make the cleanup logic for locks manageable.
 They exist because goto is a bad thing for clarity, and because they can.*/
 

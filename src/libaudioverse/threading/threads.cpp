@@ -1,5 +1,6 @@
 #include <mutex>
 #include <thread>
+#include <atomic>
 #include <chrono>
 #include <libaudioverse/private_all.h>
 using namespace std;
@@ -58,4 +59,25 @@ Lav_PUBLIC_FUNCTION void sleepFor(unsigned int milliseconds) {
 
 Lav_PUBLIC_FUNCTION void yield() {
 	this_thread::yield();
+}
+
+Lav_PUBLIC_FUNCTION LavError createAFlag(void** destination) {
+	WILL_RETURN(LavError);
+	void* retval = (void*)new atomic_flag();
+	ERROR_IF_TRUE(retval == NULL, Lav_ERROR_MEMORY);
+	*destination = retval;
+	BEGIN_CLEANUP_BLOCK
+	DO_ACTUAL_RETURN;
+}
+
+	int aFlagTestAndSet(void* flag) {
+	return ((atomic_flag*)flag)->test_and_set();
+}
+
+void aFlagClear(void* flag) {
+	((atomic_flag*)flag)->clear();
+}
+
+void aFlagFree(void* flag) {
+	delete (atomic_flag*)flag;
 }
