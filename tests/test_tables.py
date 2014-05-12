@@ -42,5 +42,9 @@ def test_compute_samples():
 		start = end+delta
 		end*=2
 	assert len(output) == len(accepted)
-	for ioutput, iaccepted in zip(output, accepted):
-		assert (ioutput-iaccepted) < accuracy
+	for i, j in zip(enumerate(output), enumerate(accepted)):
+		iaccepted = j[1]
+		ioutput = i[1]
+		output_counter = i[0]
+		accepted_counter = j[0]
+		assert abs(ioutput-iaccepted) < accuracy

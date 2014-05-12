@@ -65,6 +65,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_tableComputeSampleRange(LavTable* table, float 
 Lav_PUBLIC_FUNCTION LavError Lav_tableSetSamples(LavTable *table, unsigned int count, float duration, float* samples) {
 	WILL_RETURN(LavError);
 	CHECK_NOT_NULL(table);
+	ERROR_IF_TRUE(duration <= 0, Lav_ERROR_RANGE);
 	float *new_sample_buffer = realloc(table->samples, sizeof(float)*count);
 	ERROR_IF_TRUE(new_sample_buffer== NULL, Lav_ERROR_MEMORY);
 	table->duration = duration;
