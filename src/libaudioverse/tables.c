@@ -42,7 +42,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_tableComputeSampleRange(LavTable* table, float 
 	WILL_RETURN(LavError);
 	CHECK_NOT_NULL(table);
 	CHECK_NOT_NULL(destination);
-	ERROR_IF_TRUE(secondsEnd < secondsStart, Lav_ERROR_RANGE);
+	ERROR_IF_TRUE(secondsEnd <= secondsStart, Lav_ERROR_RANGE);
+	ERROR_IF_TRUE(destinationLength <= 0, Lav_ERROR_RANGE);
 	float delta = (secondsEnd-secondsStart)/destinationLength;
 	float position = fmodf(secondsStart, table->duration);
 	for(unsigned int i = 0; i < destinationLength; i++) {
