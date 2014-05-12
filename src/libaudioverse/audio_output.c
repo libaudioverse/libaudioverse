@@ -48,8 +48,7 @@ void audioOutputThread(void* vparam) {
 		memset(samples, 0, param->block_size*sizeof(float));
 		Lav_graphReadAllOutputs(graph, param->block_size, samples);
 		CTRBWriteItems(rb, param->block_size, samples);
-		//this is a very bad thing, but works for now.  Todo:reimplement.
-		while(CTRBGetAvailableWrites(rb) < param->block_size);
+		while(CTRBGetAvailableWrites(rb) < param->block_size) sleepFor(1); //sleep for 1 ms.
 	}
 }
 
