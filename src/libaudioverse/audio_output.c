@@ -3,10 +3,9 @@
 #include <uthash.h>
 
 typedef struct {
-	void* thread_handle;
 	LavGraph *graph;
-	void* initial_startup_mutex; //needed so threads can know about themselves.
 	LavCrossThreadRingBuffer *ring_buffer;
+	unsigned int block_size, mix_ahead;
 } ThreadParams;
 
 int audioCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
@@ -14,7 +13,7 @@ void audioOutputThread(void* vparam);
 
 unsigned int thread_counter = 0; //Used for portaudio init and deinit.  When decremented to 0, deinit portaudio.
 
-LavError createAudioOutputThread(LavGraph *graph, void **destination) {
+LavError createAudioOutputThread(LavGraph *graph, unsigned int blockSize, unsigned int mixAhead, void **destination) {
 	WILL_RETURN(LavError);
 	if(thread_counter == 0) {
 		PaError e = Pa_Initialize();
@@ -26,22 +25,36 @@ LavError createAudioOutputThread(LavGraph *graph, void **destination) {
 	ThreadParams *param = calloc(1, sizeof(ThreadParams));
 	param->graph = graph;
 	LavError err;
-	err = createMutex(&(param->initial_startup_mutex));
+	err = createCrossThreadRingBuffer(blockSize, sizeof(float), &param->ring_buffer);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
-	err = mutexLock(param->initial_startup_mutex);
-	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
+	param->block_size = blockSize;
+	param->mix_ahead = mixAhead;
 	void* th;
 	err = threadRun(audioOutputThread, param, &th);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
-	param->thread_handle = th;
 	//let it go!
-	err = mutexUnlock(param->initial_startup_mutex);
-	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
 	STANDARD_CLEANUP_BLOCK(graph->mutex);
 }
 
 void audioOutputThread(void* vparam) {
 	ThreadParams *param = (ThreadParams*)vparam;
 	LavGraph *graph = param->graph;
-	void* threadHandle = param->thread_handle;
+	LavCrossThreadRingBuffer *rb = param->ring_buffer;
+
+	//This is simple.
+	//Process one block from the graph, write it to the ringbuffer, repeat.
+	float* samples = malloc(param->block_size*sizeof(float));
+	while(1) {
+		memset(samples, 0, param->block_size*sizeof(float));
+		Lav_graphReadAllOutputs(graph, param->block_size, samples);
+		CTRBWriteItems(rb, param->block_size, samples);
+		//this is a very bad thing, but works for now.  Todo:reimplement.
+		while(CTRBGetAvailableWrites(rb) < param->block_size);
+	}
+}
+
+int audioCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData) {
+	//read length items into the output buffer.  That is it.
+	CTRBGetItems(((ThreadParams*)userData)->ring_buffer, frameCount, output);
+	return paNoError;
 }
