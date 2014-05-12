@@ -39,8 +39,8 @@ def test_compute_samples():
 	for i in xrange(iterations):
 		assert lav.Lav_tableComputeSampleRange(table, start, end, abs(int((end-start)/delta)), output_ptr) == lav.Lav_ERROR_NONE
 		output_ptr += int((end-start)/delta)
-		start, end = end, start
-		start+=delta
+		start = end+delta
+		end*=2
 	assert len(output) == len(accepted)
 	for ioutput, iaccepted in zip(output, accepted):
 		assert (ioutput-iaccepted) < accuracy
