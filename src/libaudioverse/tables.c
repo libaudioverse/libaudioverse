@@ -28,6 +28,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_tableGetSample(LavTable *table, float seconds, 
 	float midpoint = seconds/table->duration*table->length;
 	samp1 = (unsigned int)floorf(midpoint);
 	samp2 = (unsigned int)ceilf(midpoint);
+	samp2%=table->length;
 	if(samp1 == samp2) samp2++;
 	//calculate weights.
 	float weight1=midpoint-floorf(midpoint);
@@ -48,9 +49,10 @@ Lav_PUBLIC_FUNCTION LavError Lav_tableComputeSampleRange(LavTable* table, float 
 		unsigned int samp1, samp2;
 		samp1 = (unsigned int)floorf(midpoint);
 		samp2 = (unsigned int)ceilf(midpoint);
+	samp2%=table->length;
 		float weight1 = midpoint-floorf(midpoint);
 		float weight2 = ceilf(midpoint)-midpoint;
-		destination[i] = weight1*samp1+weight2*samp2;
+		destination[i] = weight1*table->samples[samp1]+weight2*table->samples[samp2];
 		position += delta;
 	}
 	RETURN(Lav_ERROR_NONE);
