@@ -37,6 +37,7 @@ Lav_PUBLIC_FUNCTION LavError threadRun(LavThreadCapableFunction func, void* para
 	CHECK_NOT_NULL(func);
 	thread *t = new thread(func, param);
 	CHECK_NOT_NULL(t);
+	RETURN(Lav_ERROR_NONE);
 	BEGIN_CLEANUP_BLOCK
 	DO_ACTUAL_RETURN;
 }
