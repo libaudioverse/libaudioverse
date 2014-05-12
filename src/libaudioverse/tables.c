@@ -4,6 +4,8 @@ Namely, reads past the end wrap to the beginning, and reads before the beginning
 #include <libaudioverse/private_all.h>
 #include <math.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 Lav_PUBLIC_FUNCTION LavError Lav_createTable(LavTable** destination) {
 	WILL_RETURN(LavError);
@@ -56,6 +58,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_tableComputeSampleRange(LavTable* table, float 
 		float weight2 = midpoint-floorf(midpoint);
 		destination[i] = weight1*table->samples[samp1]+weight2*table->samples[samp2];
 		position += delta;
+		printf("%f\n", position);
 	}
 	RETURN(Lav_ERROR_NONE);
 	BEGIN_CLEANUP_BLOCK
@@ -70,6 +73,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_tableSetSamples(LavTable *table, unsigned int c
 	ERROR_IF_TRUE(new_sample_buffer== NULL, Lav_ERROR_MEMORY);
 	table->duration = duration;
 	table->samples = samples;
+	memcpy(table->samples, samples, sizeof(float)*count);
 	table->length = count;
 	table->sample_delta = duration/count;
 	table->has_samples = 1;

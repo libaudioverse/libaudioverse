@@ -31,7 +31,7 @@ def test_compute_samples():
 	table = table[0]
 	assert table is not ffi.NULL
 	#now, we submit the sample buffer.
-	duration = delta*len(original)
+	duration = len(original) #put the samples on  one-second boundaries
 	assert lav.Lav_tableSetSamples(table, len(original), duration, original) == lav.Lav_ERROR_NONE
 	output = ffi.new("float[" + str(len(original)*iterations*int(1/delta)) + "]")
 	start, end = 0, delta*len(original)
