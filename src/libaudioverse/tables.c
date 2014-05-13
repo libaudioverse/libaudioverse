@@ -27,10 +27,12 @@ Lav_PUBLIC_FUNCTION LavError Lav_tableGetSample(LavTable *table, float index, fl
 	index = fmodf(index, table->length);
 	unsigned int samp1 = (unsigned int)floorf(index);
 	unsigned int samp2 = (unsigned int)ceilf(index);
+	if(samp1==samp2) samp2++;
 	while(index < 0) index += table->length; //wrap, if needed, so this is positive.
 	float weight1 = samp2-index;
 	float weight2 = index-samp1;
 	*destination = weight1*table->samples[samp1]+weight2*table->samples[samp2];
+//	printf("%d %d %f %f\n", samp1, samp2, weight1, weight2);
 	RETURN(Lav_ERROR_NONE);
 	BEGIN_CLEANUP_BLOCK
 	DO_ACTUAL_RETURN;
@@ -55,10 +57,10 @@ Lav_PUBLIC_FUNCTION LavError Lav_tableSetSamples(LavTable *table, unsigned int c
 	ERROR_IF_TRUE(count <= 0, Lav_ERROR_RANGE);
 	float *new_sample_buffer = realloc(table->samples, sizeof(float)*(count+1));
 	ERROR_IF_TRUE(new_sample_buffer== NULL, Lav_ERROR_MEMORY);
-	table->samples = samples;
+	table->samples = new_sample_buffer;
 	memcpy(table->samples, samples, sizeof(float)*count);
-	table->samples[count+1] = samples[0]; //the extra slot.
-	table->length = count+1;
+	table->samples[count] = samples[0]; //the extra slot.
+	table->length = count;
 	RETURN(Lav_ERROR_NONE);
 	BEGIN_CLEANUP_BLOCK
 	DO_ACTUAL_RETURN;
