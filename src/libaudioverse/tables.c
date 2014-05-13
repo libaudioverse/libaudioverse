@@ -31,6 +31,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_tableGetSample(LavTable *table, float index, fl
 	float weight1 = samp2-index;
 	float weight2 = index-samp1;
 	*destination = weight1*table->samples[samp1]+weight2*table->samples[samp2];
+	RETURN(Lav_ERROR_NONE);
 	BEGIN_CLEANUP_BLOCK
 	DO_ACTUAL_RETURN;
 }
