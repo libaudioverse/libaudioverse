@@ -57,11 +57,11 @@ def test_table_get_sample_range():
 	global halves, fourths, eighths, original, accuracy
 	table = make_table()
 	outarray = ffi.new("float[" + str(len(eighths)) + "]")
-	assert lav.Lav_tableComputeSampleRange(table, 0, 1, len(original), outarray) == lav.Lav_ERROR_NONE
+	assert lav.Lav_tableGetSamples(table, 0, 1, len(original), outarray) == lav.Lav_ERROR_NONE
 	for i in xrange(len(original)): assert abs(outarray[i]-original[i]) < accuracy
-	assert lav.Lav_tableComputeSampleRange(table, 0, 0.5, len(halves), outarray) == lav.Lav_ERROR_NONE
+	assert lav.Lav_tableGetSamples(table, 0, 0.5, len(halves), outarray) == lav.Lav_ERROR_NONE
 	for i in xrange(len(halves)): assert abs(outarray[i]-halves[i]) < accuracy
-	assert lav.Lav_tableComputeSampleRange(table, 0, 0.25, len(fourths), outarray) == lav.Lav_ERROR_NONE
+	assert lav.Lav_tableGetSamples(table, 0, 0.25, len(fourths), outarray) == lav.Lav_ERROR_NONE
 	for i in xrange(len(fourths)): assert abs(outarray[i]-fourths[i]) < accuracy
-	assert lav.Lav_tableComputeSampleRange(table, 0, 1/8.0, len(eighths), outarray) == lav.Lav_ERROR_NONE
+	assert lav.Lav_tableGetSamples(table, 0, 1/8.0, len(eighths), outarray) == lav.Lav_ERROR_NONE
 	for i in xrange(len(eighths)): assert abs(outarray[i]-eighths[i]) < accuracy

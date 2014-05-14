@@ -105,7 +105,7 @@ An interpolated table has some properties of ringbuffers, but with floating poin
 It is possible to read between samples; if so, it performs linear interpolation.  All times are in samples, but fractional values are allowed.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createTable(LavTable** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_tableGetSample(LavTable *table, float index, float* destination);
-Lav_PUBLIC_FUNCTION LavError Lav_tableComputeSampleRange(LavTable* table, float index, float delta, unsigned int count, float* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_tableGetSamples(LavTable* table, float index, float delta, unsigned int count, float* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_tableSetSamples(LavTable *table, unsigned int count, float* samples);
 Lav_PUBLIC_FUNCTION LavError Lav_tableClear(LavTable *table);
 

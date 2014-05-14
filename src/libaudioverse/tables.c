@@ -38,7 +38,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_tableGetSample(LavTable *table, float index, fl
 	DO_ACTUAL_RETURN;
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_tableComputeSampleRange(LavTable* table, float index, float delta, unsigned int count, float* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_tableGetSamples(LavTable* table, float index, float delta, unsigned int count, float* destination) {
 	WILL_RETURN(LavError);
 	CHECK_NOT_NULL(table);
 	CHECK_NOT_NULL(destination);
