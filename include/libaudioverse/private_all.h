@@ -5,3 +5,4 @@
 #include "private_structs.h"
 #include "private_threads.h"
 #include "private_audio_output.h"
+#include "private_tables.h"
