@@ -10,6 +10,7 @@ typedef struct Lav_SampleBuffer_s LavSampleBuffer;
 typedef struct Lav_Node_s LavNode;
 typedef struct Lav_Stream_s LavStream;
 typedef struct Lav_Graph_s LavGraph;
+typedef struct Lav_Table_s LavTable;
 
 /**Does whatever is appropriate on a given platform to expose a Libaudioverse function publically.*/
 #define Lav_PUBLIC_FUNCTION extern __declspec(dllexport)
@@ -98,6 +99,15 @@ the first sample of the first output, the first of the second, the first of the 
 Put another way, this function pretends that the passed node has node->num_outputs channels, and then interweaves them.*/
 Lav_PUBLIC_FUNCTION LavError Lav_nodeReadAllOutputs(LavNode *node, unsigned int samples, float* destination);
 
+/**Interpolated tables.
+
+An interpolated table has some properties of ringbuffers, but with floating point math: reads past the end or before the beginning wrap.
+It is possible to read between samples; if so, it performs linear interpolation.  All times are in samples, but fractional values are allowed.*/
+Lav_PUBLIC_FUNCTION LavError Lav_createTable(LavTable** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_tableGetSample(LavTable *table, float index, float* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_tableGetSamples(LavTable* table, float index, float delta, unsigned int count, float* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_tableSetSamples(LavTable *table, unsigned int count, float* samples);
+Lav_PUBLIC_FUNCTION LavError Lav_tableClear(LavTable *table);
 
 /**Make a sine node.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavGraph *graph, LavNode **destination);

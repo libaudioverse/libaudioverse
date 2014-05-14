@@ -58,3 +58,9 @@ struct Lav_CrossThreadRingBuffer_s {
 	char* data;
 	int last_op;
 };
+
+/**A table of audio data.*/
+struct Lav_Table_s {
+	unsigned int length; //length in samples.  Also the max index before index wrapping.  Includes the extra sample at the end.
+	float* samples;
+};
