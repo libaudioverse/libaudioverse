@@ -21,9 +21,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createTable(LavTable** destination) {
 	DO_ACTUAL_RETURN;
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_tableGetSample(LavTable *table, float index, float* destination) {
-	WILL_RETURN(LavError);
-	CHECK_NOT_NULL(table);
+float tableGetSampleFast(LavTable *table, float index) {
 	index = fmodf(index, table->length);
 	unsigned int samp1 = (unsigned int)floorf(index);
 	unsigned int samp2 = (unsigned int)ceilf(index);
@@ -31,8 +29,13 @@ Lav_PUBLIC_FUNCTION LavError Lav_tableGetSample(LavTable *table, float index, fl
 	while(index < 0) index += table->length; //wrap, if needed, so this is positive.
 	float weight1 = samp2-index;
 	float weight2 = index-samp1;
-	*destination = weight1*table->samples[samp1]+weight2*table->samples[samp2];
-//	printf("%d %d %f %f\n", samp1, samp2, weight1, weight2);
+	return weight1*table->samples[samp1]+weight2*table->samples[samp2];
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_tableGetSample(LavTable *table, float index, float* destination) {
+	WILL_RETURN(LavError);
+	CHECK_NOT_NULL(table);
+	*destination = tableGetSampleFast(table, index);
 	RETURN(Lav_ERROR_NONE);
 	BEGIN_CLEANUP_BLOCK
 	DO_ACTUAL_RETURN;
@@ -43,7 +46,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_tableGetSamples(LavTable* table, float index, f
 	CHECK_NOT_NULL(table);
 	CHECK_NOT_NULL(destination);
 	for(unsigned int i = 0; i < count; i++) {
-		Lav_tableGetSample(table, index+i*delta, destination+i);
+		*destination = tableGetSampleFast(table, index+i*delta);
+		++destination;
 	}
 	RETURN(Lav_ERROR_NONE);
 	BEGIN_CLEANUP_BLOCK
