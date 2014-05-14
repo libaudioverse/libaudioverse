@@ -1,5 +1,6 @@
 add_library(libaudioverse SHARED
 nodes.c
+properties.c
 graphs.c
 streams.c
 audio_output.c
