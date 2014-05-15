@@ -24,7 +24,7 @@ enum Lav_ERRORS {
 	Lav_ERROR_MEMORY, //a memory problem which probably isn't the fault of the application.
 	Lav_ERROR_RANGE, //out of range function parameter.
 	Lav_ERROR_CANNOT_INIT_AUDIO, //We couldn't even initialize the audio library.
-	Lav_ERROR_FILE; //error to do with files.
+	Lav_ERROR_FILE, //error to do with files.
 };
 
 /**Typedef for error codes.*/
@@ -43,7 +43,7 @@ enum Lav_PROPERRTYTYPES {
 /**These are used to tag nodes with their type, so that external languages may see them.*/
 enum Lav_NODETYPES{
 	Lav_NODETYPE_ZEROS,
-	Lav_NODETYPE_FILE_READER,
+	Lav_NODETYPE_FILE,
 	Lav_NODETYPE_CONVOLVER,
 	Lav_NODETYPE_SINE,
 };

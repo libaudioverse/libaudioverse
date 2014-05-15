@@ -40,7 +40,7 @@ struct Lav_Node_s {
 	enum Lav_NODETYPES type;
 	LavNodeProcessorFunction process; //what to call to process this node.
 	double internal_time;
-	void *type_specific_data; //place for node subtypes to place data.
+	void *data; //place for node subtypes to place data.
 };
 
 struct Lav_Graph_s {
