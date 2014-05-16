@@ -5,3 +5,4 @@ SET_PROPERTY(TARGET ${name} PROPERTY RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_BINARY_D
 endmacro()
 example(synchronous_audio)
 example(asynchronous_audio)
+example(file)
