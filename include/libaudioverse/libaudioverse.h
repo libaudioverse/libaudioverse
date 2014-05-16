@@ -112,3 +112,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_tableClear(LavTable *table);
 
 /**Make a sine node.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavGraph *graph, LavNode **destination);
+
+/**A node that plays a file.*/
+Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavGraph *graph, const char* path, LavNode **destination);
