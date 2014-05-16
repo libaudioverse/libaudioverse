@@ -140,13 +140,14 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeReadAllOutputs(LavNode *node, unsigned int 
 		output_array[i] = calloc(samples, sizeof(float));
 		ERROR_IF_TRUE(output_array[i] == NULL, Lav_ERROR_MEMORY);
 		LavError err = Lav_streamReadSamples(&streams[i], samples, output_array[i]);
-	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
+		ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
 	}
 
 	//Copy to the output buffer.
-	for(unsigned int sample = 0;  sample < samples; sample++) {
-		for(unsigned int output = 0; output < node->num_outputs; output++) {
-			destination[(output+1)*sample] = output_array[output][sample]; //the +1 is necessary.
+
+	for(unsigned int i = 0; i < node->num_outputs; i++) {
+		for(unsigned int j = 0; j < samples; j++) {
+			destination[i+node->num_outputs*j] = output_array[i][j];
 		}
 	}
 

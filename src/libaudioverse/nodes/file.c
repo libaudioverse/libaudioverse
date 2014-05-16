@@ -77,7 +77,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavGraph *graph, const char* pat
 	f->tables = tables;
 	f->table_delta = sr/graph->sr;
 
-	LavError err = Lav_createNode(0, 1, 0, Lav_NODETYPE_FILE, graph, &node);
+	LavError err = Lav_createNode(0, channels, 0, Lav_NODETYPE_FILE, graph, &node);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
 	node->data = f;
 	node->process = fileNodeProcessor;
