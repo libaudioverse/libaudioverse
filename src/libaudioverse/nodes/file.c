@@ -14,7 +14,7 @@ struct fileinfo {
 
 Lav_PUBLIC_FUNCTION LavError fileNodeProcessor(LavNode* node, unsigned int samples);
 
-Lav_PUBLIC_FUNCTION Lav_createFileNode(LavGraph *graph, const char* path, LavNode** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavGraph *graph, const char* path, LavNode** destination) {
 	WILL_RETURN(LavError);
 	CHECK_NOT_NULL(graph);
 	CHECK_NOT_NULL(path);
@@ -86,6 +86,15 @@ Lav_PUBLIC_FUNCTION Lav_createFileNode(LavGraph *graph, const char* path, LavNod
 
 Lav_PUBLIC_FUNCTION LavError fileNodeProcessor(LavNode* node, unsigned int samples) {
 	WILL_RETURN(LavError);
+	struct fileinfo *data = node->data;
+	for(unsigned int i = 0; i < samples; i++) {
+		for(unsigned int j = 0; j < node->num_outputs; j++) {
+			LavTable *table = data->tables[j];
+			float sample = tableGetSampleFast(table, data->current_index);
+			Lav_bufferWriteSample(node->outputs+j, sample);
+		}
+	data->current_index += data->table_delta;
+	}
 	RETURN(Lav_ERROR_NONE);
 	BEGIN_CLEANUP_BLOCK
 	DO_ACTUAL_RETURN;
