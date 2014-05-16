@@ -88,6 +88,10 @@ Lav_PUBLIC_FUNCTION LavError fileNodeProcessor(LavNode* node, unsigned int sampl
 	WILL_RETURN(LavError);
 	struct fileinfo *data = node->data;
 	for(unsigned int i = 0; i < samples; i++) {
+		if(data->current_index >= data->frames) {
+			for(unsigned int j = 0; j < node->num_outputs; j++) Lav_bufferWriteSample(node->outputs+j, 0.0f);
+			continue;
+		}
 		for(unsigned int j = 0; j < node->num_outputs; j++) {
 			LavTable *table = data->tables[j];
 			float sample = tableGetSampleFast(table, data->current_index);
