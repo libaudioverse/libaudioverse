@@ -27,7 +27,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavGraph *graph, const char* pat
 
 	//For the next little bit, we're holding onto an open file handle.  Do this part and then get it closed, because this will allow continued use of RETURN macro without huge if blocks.
 	sf_count_t fileBufferLength = info.channels*info.frames;
-	float* fileBuffer = malloc((size_t)(fileBufferLength*sizeof(float*)));
+	float* fileBuffer = malloc((size_t)(fileBufferLength*sizeof(float)));
 	if(fileBuffer == NULL) {
 		sf_close(handle);
 		return(Lav_ERROR_MEMORY);
@@ -36,10 +36,10 @@ Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavGraph *graph, const char* pat
 	//this is the only other file-sensitive thing in the function: read everything in, and error if we can't.
 	sf_count_t readSoFar = 0, readThisTime = 0;
 	do {
-		readThisTime = sf_readf_float(handle, fileBuffer+readThisTime*info.channels, fileBufferLength);
+		readThisTime = sf_readf_float(handle, fileBuffer+readSoFar*info.channels, fileBufferLength/info.channels-readSoFar);
 		readSoFar += readThisTime;
 	} while(readThisTime > 0);
-	if(readSoFar != fileBufferLength) {
+	if(readSoFar != fileBufferLength/info.channels) {
 		sf_close(handle);
 		free(fileBuffer);
 		RETURN(Lav_ERROR_FILE);
@@ -81,6 +81,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavGraph *graph, const char* pat
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
 	node->data = f;
 	node->process = fileNodeProcessor;
+	*destination = node;
+	RETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK(graph->mutex);
 }
 

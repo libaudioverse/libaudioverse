@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-Lav_PUBLIC_FUNCTION float** uninterleaveSamplesFast(unsigned int frames, unsigned int channels, float* samples) {
+Lav_PUBLIC_FUNCTION float** uninterleaveSamplesFast(unsigned int channels, unsigned int frames, float* samples) {
 	float** out = calloc(channels, sizeof(float*));
 	if(out == NULL) return NULL;
 	for(unsigned int i = 0; i < channels; i++) {
@@ -18,7 +18,7 @@ Lav_PUBLIC_FUNCTION float** uninterleaveSamplesFast(unsigned int frames, unsigne
 	return out;
 }
 
-Lav_PUBLIC_FUNCTION float* interweaveSamplesFast(unsigned int count, unsigned int channels, float** uninterleavedSamples) {
+Lav_PUBLIC_FUNCTION float* interweaveSamplesFast(unsigned int channels, unsigned int count, float** uninterleavedSamples) {
 	float* out = calloc(count*channels, sizeof(float));
 	if(out == NULL) return NULL;
 	for(unsigned int offset = 0; offset < channels; offset++) {

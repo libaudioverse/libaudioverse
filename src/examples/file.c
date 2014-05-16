@@ -14,11 +14,18 @@ int main(int argc, char** args) {
 	LavNode *node;
 	LavGraph *graph;
 	Lav_createGraph(44100, &graph);
-	Lav_createFileNode(graph, path, &node);
+	LavError err = Lav_createFileNode(graph, path, &node);
+	if(err != Lav_ERROR_NONE) {
+		printf("Error: %d", err);
+		return 1;
+	}
+
+
 	Lav_graphSetOutputNode(graph, node);
 	void* th;
 	createAudioOutputThread(graph, 1024, 3, &th);
-	sleepFor(5000);
+	char pause[100];
+	fgets(pause, 100, stdin);
 	stopAudioOutputThread(th);
 	return 0;
 }
