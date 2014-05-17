@@ -22,20 +22,44 @@ Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int
 	retval->num_properties = numProperties;
 
 	//allocations:
-	if(numInputs > 0) retval->inputs = calloc(numInputs, sizeof(LavStream));
-	if(numProperties > 0) retval->properties = calloc(numProperties, sizeof(LavProperty));
-	if(numOutputs > 0) retval->outputs = calloc(numOutputs, sizeof(LavSampleBuffer));
+	if(numInputs > 0) {
+		retval->inputs = calloc(numInputs, sizeof(LavStream*));
+		ERROR_IF_TRUE(retval->inputs == NULL, Lav_ERROR_MEMORY);
+		for(unsigned int i = 0; i < numInputs; i++) {
+			retval->inputs[i] = calloc(1, sizeof(LavStream));
+			ERROR_IF_TRUE(retval->inputs[i] == NULL, Lav_ERROR_MEMORY);
+		}
+	}
+
+	if(numProperties > 0) {
+		retval->properties = calloc(numProperties, sizeof(LavProperty*));
+		ERROR_IF_TRUE(retval->properties == NULL, Lav_ERROR_MEMORY);
+		for(unsigned int i = 0; i < numProperties; i++) {
+			retval->properties[i] = calloc(1, sizeof(LavProperty));
+			ERROR_IF_TRUE(retval->properties[i] == NULL, Lav_ERROR_MEMORY);
+		}
+	}
+
+	if(numOutputs > 0) {
+		retval->outputs = calloc(numOutputs, sizeof(LavSampleBuffer*));
+		ERROR_IF_TRUE(retval->outputs == NULL, Lav_ERROR_MEMORY);
+		for(unsigned int i = 0; i < numOutputs; i++) {
+			retval->outputs[i] = calloc(1, sizeof(LavSampleBuffer));
+			ERROR_IF_TRUE(retval->outputs[i] == NULL, Lav_ERROR_MEMORY);
+		}
+	}
+
 	retval->type = type;
 	retval->process = Lav_processDefault;
 
 	//Initialize this node's output buffers.
 	for(unsigned int i = 0; i < numOutputs; i++) {
 		//Set the owned node and slot to this one.
-		retval->outputs[i].owner.node = retval;
-		retval->outputs[i].owner.slot = i;
+		retval->outputs[i]->owner.node = retval;
+		retval->outputs[i]->owner.slot = i;
 		//Make its sample buffer.
-		retval->outputs[i].samples = calloc(2048, sizeof(float));
-		retval->outputs[i].length = 2048;
+		retval->outputs[i]->samples = calloc(2048, sizeof(float));
+		retval->outputs[i]->length = 2048;
 	}
 	//There's nothing to do for the streams: they all point at NULL parents.
 
@@ -51,7 +75,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int
 Lav_PUBLIC_FUNCTION LavError Lav_processDefault(LavNode *node, unsigned int count) {
 	for(unsigned int i = 0; i < node->num_outputs; i++) {
 		for(unsigned int j = 0; j < count; j++) {
-			Lav_bufferWriteSample(node->outputs+i, 0.0f);
+			Lav_bufferWriteSample(node->outputs[i], 0.0f);
 		}
 	}
 	return Lav_ERROR_NONE;
@@ -65,8 +89,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_setParent(LavNode *node, LavNode *parent, unsig
 	ERROR_IF_TRUE(inputSlot >= node->num_inputs, Lav_ERROR_INVALID_SLOT);
 	ERROR_IF_TRUE(outputSlot >= parent->num_outputs, Lav_ERROR_INVALID_SLOT);
 	//We just connect the buffers, and set the read position of the stream to the write position of the buffer.
-	LavSampleBuffer *b = &parent->outputs[outputSlot];
-	LavStream *s = &node->inputs[inputSlot];
+	LavSampleBuffer *b = parent->outputs[outputSlot];
+	LavStream *s = node->inputs[inputSlot];
 	//Associate the stream to the buffer:
 	s->associated_buffer = b;
 	//And set its read position.
@@ -80,13 +104,13 @@ Lav_PUBLIC_FUNCTION LavError Lav_getParent(LavNode *node, unsigned int slot, Lav
 	CHECK_NOT_NULL(node);
 	CHECK_NOT_NULL(parent);
 	CHECK_NOT_NULL(outputNumber);
-	if(node->inputs[slot].associated_buffer == NULL) {
+	if(node->inputs[slot]->associated_buffer == NULL) {
 		*parent = NULL;
 		*outputNumber = 0;
 	}
 	else {
-		*parent = node->inputs[slot].associated_buffer->owner.node;
-		*outputNumber = node->inputs[slot].associated_buffer->owner.slot;
+		*parent = node->inputs[slot]->associated_buffer->owner.node;
+		*outputNumber = node->inputs[slot]->associated_buffer->owner.slot;
 	}
 	RETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK(node->graph->mutex);
@@ -98,7 +122,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_clearParent(LavNode *node, unsigned int slot) {
 	LOCK(node->graph->mutex);
 	ERROR_IF_TRUE(slot >= node->num_inputs, Lav_ERROR_INVALID_SLOT);
 	//This is as simple as it looks.
-	node->inputs[slot].associated_buffer = NULL;
+	node->inputs[slot]->associated_buffer = NULL;
 	RETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK(node->graph->mutex);
 }
@@ -116,8 +140,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeReadAllOutputs(LavNode *node, unsigned int 
 
 	//point the streams at the node.
 	for(unsigned int i = 0; i < node->num_outputs; i++) {
-		streams[i].associated_buffer = &node->outputs[i];
-		streams[i].position = node->outputs[i].write_position;
+		streams[i].associated_buffer = node->outputs[i];
+		streams[i].position = node->outputs[i]->write_position;
 	}
 
 	//Now we need some output space.

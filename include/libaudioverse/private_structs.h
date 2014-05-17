@@ -31,11 +31,11 @@ struct Lav_Stream_s {
 
 struct Lav_Node_s {
 	LavGraph *graph;
-	LavSampleBuffer *outputs;
+	LavSampleBuffer **outputs;
 	unsigned int num_outputs;
-	LavStream *inputs;
+	LavStream **inputs;
 	unsigned int num_inputs;
-	LavProperty *properties;
+	LavProperty **properties;
 	unsigned int num_properties;
 	enum Lav_NODETYPES type;
 	LavNodeProcessorFunction process; //what to call to process this node.

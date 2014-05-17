@@ -78,7 +78,7 @@ Lav_PUBLIC_FUNCTION LavError fileNodeProcessor(LavNode* node, unsigned int sampl
 	struct fileinfo *data = node->data;
 	for(unsigned int i = 0; i < samples; i++) {
 		if(data->start >= data->frames) {
-			for(unsigned int j = 0; j < node->num_outputs; j++) Lav_bufferWriteSample(node->outputs+j, 0.0f);
+			for(unsigned int j = 0; j < node->num_outputs; j++) Lav_bufferWriteSample(node->outputs[j], 0.0f);
 			continue;
 		}
 
@@ -88,7 +88,7 @@ Lav_PUBLIC_FUNCTION LavError fileNodeProcessor(LavNode* node, unsigned int sampl
 		float weight2 = data->offset;
 		for(unsigned int j = 0; j < node->num_outputs; j++) {
 			float sample = data->sample_array[j][samp1]*weight1+data->sample_array[j][samp2]*weight2;
-			Lav_bufferWriteSample(node->outputs+j, sample);
+			Lav_bufferWriteSample(node->outputs[j], sample);
 		}
 		data->offset += data->delta;
 		while(data->offset >= 1) {
