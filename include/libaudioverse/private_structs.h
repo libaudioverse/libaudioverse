@@ -5,15 +5,17 @@
 //All structs here are private.
 //Anything not exposed indireclty through the public api is followed by its typedef in this file.
 
+union Lav_PropertyValue_u {
+	float fval;
+	int ival;
+	double dval;
+	char* sval;
+};
+
 struct Lav_Property_s {
 	enum Lav_PROPERTYTYPE type;
 	enum Lav_PROPERTYRESOLUTION resolution;
-	union {
-		int ival;
-		float fval;
-		double dval;
-		char* sval;
-	} value, default_value;
+	union Lav_PropertyValue_u value, default_value;
 	char* name;
 };
 
@@ -73,11 +75,7 @@ struct Lav_PropertyTableEntry_s {
 	int slot;
 	enum lav_PropertyType type;
 	char* name;
-	union {
-		float fval;
-		int ival;
-		char* sval;
-	} default_value;
+	union Lav_PropertyValue_u default_value;
 };
 
 typedef struct Lav_PropertyTableEntry_s LavPropertyTableEntry;
