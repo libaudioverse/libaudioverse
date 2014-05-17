@@ -13,15 +13,18 @@ In English, you connect outputs to inputs, kind of like plugging in wires.  For 
 
 ##Error Handling##
 
-All functions return an error code.  If the function is a getter, it also returns one or more additional values via pointers.
+All public functions return an error code.  If the function is a getter, it also returns one or more additional values via pointers.
 
 ##Stylistic Convensions##
 
 Everything from this library intended for public use begins with `Lav`, even constants.  The actual stylistic convensions pertain to the rest:
 
-- Constants, macros, and enumeration values are alll uppercase with underscores, for example `Lav_PROPERTYTYPE_INT`.
+- Constants, macros, and enumeration values are all uppercase with underscores, for example `Lav_PROPERTYTYPE_INT`.
 
-- Functions are camelcase proceeded by `Lav_`, for example `Lav_getIntProperty`.
+- Public functions are camelcase proceeded by `Lav_`, for example `Lav_getIntProperty`.
+
+- Private functions are camelcase without the `Lav_`.
 
 - Struct members are not proceedded by `Lav`, as they are part of the type and this is unnecessary; they are lower-case with ubnderscores separating words.
 
+- Function parameters and local variables are camelccase.
