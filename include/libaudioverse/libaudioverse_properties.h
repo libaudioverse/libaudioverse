@@ -15,6 +15,6 @@ enum Lav_STDPROPERTIES {
 };
 
 enum Lav_SINE_PROPERTIES {
-	Lav_SINE_FREQUENCY = 2,
+	Lav_SINE_FREQUENCY = 0,
 };
 

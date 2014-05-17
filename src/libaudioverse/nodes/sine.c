@@ -14,12 +14,11 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavGraph *graph, LavNode **desti
 	CHECK_NOT_NULL(graph);
 	LOCK(graph->mutex);
 	LavNode *retval = NULL;
-	LavError err = Lav_createNode(0, 1, sizeof(sinePropertyTable)/sizeof(sinePropertyTable[0]), sinePropertyTable, Lav_NODETYPE_SINE, graph, &retval);
+	LavError err = Lav_createNode(0, 1, Lav_NODETYPE_SINE, graph, &retval);
 	if(err != Lav_ERROR_NONE) RETURN(err);
-	retval->properties[Lav_SINE_FREQUENCY]->type = Lav_PROPERTYTYPE_FLOAT;
-	retval->properties[Lav_SINE_FREQUENCY]->value.fval = 440.0;
-	retval->properties[Lav_SINE_FREQUENCY]->default_value.fval = 440.0;
-	retval->properties[Lav_SINE_FREQUENCY]->name = "frequency";
+
+	retval->properties = makePropertyArrayFromTable(sizeof(sinePropertyTable)/sizeof(sinePropertyTable[0]), sinePropertyTable);
+
 	retval->process = sineProcessor;
 	*destination = retval;
 	RETURN(Lav_ERROR_NONE);
