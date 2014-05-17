@@ -11,6 +11,7 @@ typedef struct Lav_Node_s LavNode;
 typedef struct Lav_Stream_s LavStream;
 typedef struct Lav_Graph_s LavGraph;
 typedef struct Lav_Table_s LavTable;
+typedef struct Lav_PropertyTableEntry_s LavPropertyTableEntry;
 
 /**Does whatever is appropriate on a given platform to expose a Libaudioverse function publically.*/
 #define Lav_PUBLIC_FUNCTION extern __declspec(dllexport)
@@ -66,7 +67,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_graphReadAllOutputs(LavGraph *graph, unsigned i
 Lav_PUBLIC_FUNCTION LavError Lav_freeNode(LavNode *node);
 
 /**The following functions initialize nodes and work exactly as one would expect.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, enum  Lav_NODETYPE type, LavGraph *graph, LavNode **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, LavPropertyTableEntry *propertySpecifier, enum  Lav_NODETYPE type, LavGraph *graph, LavNode **destination);
 
 /**Parent management.*/
 Lav_PUBLIC_FUNCTION LavError Lav_getParent(LavNode *node, unsigned int slot, LavNode** parent, unsigned int *outputNumber);
