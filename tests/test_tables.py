@@ -65,22 +65,3 @@ def test_table_get_sample_range():
 	for i in xrange(len(fourths)): assert abs(outarray[i]-fourths[i]) < accuracy
 	assert lav.Lav_tableGetSamples(table, 0, 1/8.0, len(eighths), outarray) == lav.Lav_ERROR_NONE
 	for i in xrange(len(eighths)): assert abs(outarray[i]-eighths[i]) < accuracy
-
-def test_table_longterm_stability():
-	"""Tests for a problem with tables: extremely big tables, that is the size expected from audio files, become wildly unstable at large indices.
-
-Note that cffi apparently has problems with converting python lists to multi-megabyte arrays for us."""
-	global original
-	factor = long(1.5e6) #a bit less than 1.5 megs.
-	table = ffi.new("LavTable **")
-	assert lav.Lav_createTable(table) == lav.Lav_ERROR_NONE
-	table = table[0]
-	bigseq = list(original)*int(factor)
-	samparray = ffi.new("float[" + str(factor*len(original)) + "]")
-	for i in xrange(len(bigseq)): samparray[i]=bigseq[i]
-	del bigseq
-	assert lav.Lav_tableSetSamples(table, len(samparray), samparray) == lav.Lav_ERROR_NONE
-	outarray = ffi.new("float[" + str(int(len(samparray)*8)) + "]")
-	assert lav.Lav_tableGetSamples(table, 0, 1/8.0, len(outarray), outarray) == lav.Lav_ERROR_NONE
-	for i, val in enumerate(outarray):
-		assert abs(eighths[i%len(eighths)]-val) < accuracy
