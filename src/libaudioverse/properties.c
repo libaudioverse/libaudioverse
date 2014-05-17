@@ -15,7 +15,7 @@ Lav_PUBLIC_FUNCTION LavError lav_resetProperty(LavNode *node, unsigned int slot)
 #define PROPERTY_SETTER_PREAMBLE(proptype) WILL_RETURN(LavError);\
 CHECK_NOT_NULL(node);\
 LOCK(node->graph->mutex);\
-ERROR_IF_TRUE(slot >= node->num_properties || slot<=0, Lav_ERROR_INVALID_SLOT);\
+ERROR_IF_TRUE(slot >= node->num_properties || slot<0, Lav_ERROR_INVALID_SLOT);\
 ERROR_IF_TRUE(node->properties[slot]->type != proptype, Lav_ERROR_TYPE_MISMATCH)\
 
 Lav_PUBLIC_FUNCTION LavError Lav_setIntProperty(LavNode* node, unsigned int slot, int value) {

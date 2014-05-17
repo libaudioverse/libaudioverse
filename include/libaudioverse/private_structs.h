@@ -13,7 +13,7 @@ union Lav_PropertyValue_u {
 };
 
 struct Lav_Property_s {
-	enum Lav_PROPERTYTYPE type;
+	enum Lav_PROPERTYTYPES type;
 	enum Lav_PROPERTYRESOLUTION resolution;
 	union Lav_PropertyValue_u value, default_value;
 	char* name;
@@ -73,7 +73,7 @@ struct Lav_Table_s {
 //The struct for property table entries.
 struct Lav_PropertyTableEntry_s {
 	int slot;
-	enum lav_PropertyType type;
+	enum Lav_PROPERTYTYPES type;
 	char* name;
 	union Lav_PropertyValue_u default_value;
 };
