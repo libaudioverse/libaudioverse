@@ -5,9 +5,10 @@
 #include <string.h>
 
 struct fileinfo {
-	float table_delta;
-	LavTable **tables;
-	float current_index;
+	float delta;
+	float **sample_array;
+	unsigned int start;
+	float offset;
 	unsigned int channels, frames;
 	float graphSr, fileSr;
 };
@@ -27,7 +28,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavGraph *graph, const char* pat
 
 	//For the next little bit, we're holding onto an open file handle.  Do this part and then get it closed, because this will allow continued use of RETURN macro without huge if blocks.
 	sf_count_t fileBufferLength = info.channels*info.frames;
-	float* fileBuffer = malloc((size_t)(fileBufferLength*sizeof(float)));
+	float* fileBuffer = malloc((size_t)((fileBufferLength+info.channels)*sizeof(float)));
 	if(fileBuffer == NULL) {
 		sf_close(handle);
 		return(Lav_ERROR_MEMORY);
@@ -50,32 +51,18 @@ Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavGraph *graph, const char* pat
 
 	unsigned int sr = (unsigned int)info.samplerate, channels = (unsigned int)info.channels, frames = (unsigned int)info.frames; //for sanity, and suppresses some unnecessary warnings.
 
-	//Get some tables.
-	LavTable** tables = calloc(channels, sizeof(LavTable*));
-	for(unsigned int i = 0; i < channels; i++) {
-		LavError err = Lav_createTable(&tables[i]);
-		ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
-	}
-
 	float** uninterleavedSamples = NULL;
 	uninterleavedSamples = uninterleaveSamplesFast(channels, frames, fileBuffer);
 	if(uninterleavedSamples == NULL) RETURN(Lav_ERROR_MEMORY);
 
-	//Fill the tables.
-	for(unsigned int i = 0; i < channels; i++) {
-		LavError err = Lav_tableSetSamples(tables[i], frames, uninterleavedSamples[i]);
-		ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
-	}
-
-	//We have the tables.  Allocate and fill out a fileinfo struct with it all.
 	struct fileinfo *f = calloc(1, sizeof(struct fileinfo));
 	ERROR_IF_TRUE(f == NULL, Lav_ERROR_MEMORY);
 	f->fileSr = (float)sr;
 	f->graphSr = graph->sr;
 	f->channels = channels;
 	f->frames = frames;
-	f->tables = tables;
-	f->table_delta = sr/graph->sr;
+	f->sample_array = uninterleavedSamples;
+	f->delta = sr/graph->sr;
 
 	LavError err = Lav_createNode(0, channels, 0, Lav_NODETYPE_FILE, graph, &node);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
@@ -90,16 +77,24 @@ Lav_PUBLIC_FUNCTION LavError fileNodeProcessor(LavNode* node, unsigned int sampl
 	WILL_RETURN(LavError);
 	struct fileinfo *data = node->data;
 	for(unsigned int i = 0; i < samples; i++) {
-		if(data->current_index >= data->frames) {
+		if(data->start >= data->frames) {
 			for(unsigned int j = 0; j < node->num_outputs; j++) Lav_bufferWriteSample(node->outputs+j, 0.0f);
 			continue;
 		}
+
+		unsigned int samp1 = data->start;
+		unsigned int samp2 = data->start+1;
+		float weight1 = 1-data->offset;
+		float weight2 = data->offset;
 		for(unsigned int j = 0; j < node->num_outputs; j++) {
-			LavTable *table = data->tables[j];
-			float sample = tableGetSampleFast(table, data->current_index);
+			float sample = data->sample_array[j][samp1]*weight1+data->sample_array[j][samp2]*weight2;
 			Lav_bufferWriteSample(node->outputs+j, sample);
 		}
-	data->current_index += data->table_delta;
+		data->offset += data->delta;
+		while(data->offset >= 1) {
+			data->start += 1;
+			data->offset-= 1;
+		}
 	}
 	RETURN(Lav_ERROR_NONE);
 	BEGIN_CLEANUP_BLOCK
