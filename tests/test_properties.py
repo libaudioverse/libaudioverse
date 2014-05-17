@@ -2,11 +2,19 @@
 from make_cffi import *
 import itertools
 
+keep_forever = set() #cffi frees memory when garbage collection happens; this prevents it.
+
 def property_node():
 	graph = ffi.new("LavGraph **")
 	node = ffi.new("LavNode **")
 	assert lav.Lav_createGraph(44100, graph) == lav.Lav_ERROR_NONE
-	assert lav.Lav_createNode(1, 1, 4, lav.Lav_NODETYPE_ZEROS, graph[0], node) == lav.Lav_ERROR_NONE
+	assert lav.Lav_createNode(1, 1, lav.Lav_NODETYPE_ZEROS, graph[0], node) == lav.Lav_ERROR_NONE
+	property_array = ffi.new("LavProperty[4]")
+	keep_forever.add(property_array)
+	properties = ffi.new("LavProperty*[4]", [property_array, property_array+1, property_array+2, property_array+3])
+	keep_forever.add(properties)
+	node[0].properties = properties
+	node[0].num_properties = 4
 	node[0].properties[0].type = lav.Lav_PROPERTYTYPE_INT
 	node[0].properties[1].type = lav.Lav_PROPERTYTYPE_FLOAT
 	node[0].properties[2].type = lav.Lav_PROPERTYTYPE_DOUBLE

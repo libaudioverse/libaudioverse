@@ -29,11 +29,9 @@ def test_basic_node_integrity():
 	assert lav.Lav_ERROR_NONE == lav.Lav_createNode(
 		5, #5 inputs.
 		3, #3 outputs.
-		3, #3 properties.
 		lav.Lav_NODETYPE_ZEROS, #the type
-	graph[0], #the graph
+		graph[0], #the graph
 		node)  #and the destination
-
 	basic_node_checks(node[0])
 
 def test_sine_node_integrity():
