@@ -70,6 +70,7 @@ struct Lav_Table_s {
 
 //The struct for property table entries.
 struct Lav_PropertyTableEntry_s {
+	int slot;
 	enum lav_PropertyType type;
 	char* name;
 	union {
