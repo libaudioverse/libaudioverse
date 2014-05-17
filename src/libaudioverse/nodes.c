@@ -11,7 +11,7 @@ Lav_PUBLIC_FUNCTION LavError freeNode(LavNode *node) {
 	return Lav_ERROR_NONE;
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int numOutputs, LavPropertyTableEntry *propertySpecifier, enum  Lav_NODETYPE type, LavGraph *graph, LavNode **destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int numOutputs, enum  Lav_NODETYPE type, LavGraph *graph, LavNode **destination) {
 	WILL_RETURN(LavError);
 	CHECK_NOT_NULL(graph);
 	LOCK(graph->mutex);
