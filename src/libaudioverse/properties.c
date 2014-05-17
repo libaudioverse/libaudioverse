@@ -82,3 +82,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_getStringProperty(LavNode* node, unsigned int s
 	RETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK(node->graph->mutex);
 }
+
+Lav_PUBLIC_FUNCTION LavProperty *makePropertyArrayFromTable(unsigned int count, LavPropertyTableEntry *table) {
+}

@@ -7,3 +7,4 @@
 #include "private_audio_output.h"
 #include "private_tables.h"
 #include "private_interleaving.h"
+#include "private_properties.h"
