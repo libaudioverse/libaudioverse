@@ -38,17 +38,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int
 		retval->outputs[i].length = 2048;
 	}
 	//There's nothing to do for the streams: they all point at NULL parents.
-	//If we have a tleast two properties, they're add and mul.
-	if(numProperties >= 2) {
-		retval->properties[Lav_STDPROPERTY_ADD].name = "add";
-		retval->properties[Lav_STDPROPERTY_ADD].type = Lav_PROPERTYTYPE_FLOAT;
-		retval->properties[Lav_STDPROPERTY_ADD].value.fval = 0.0f;
-		retval->properties[Lav_STDPROPERTY_ADD].default_value.fval = 0.0f;
-		retval->properties[Lav_STDPROPERTY_MUL].type = Lav_PROPERTYTYPE_FLOAT;
-		retval->properties[Lav_STDPROPERTY_MUL].value.fval = 1.0f;
-		retval->properties[Lav_STDPROPERTY_MUL].default_value.fval = 1.0f;
-		retval->properties[Lav_STDPROPERTY_MUL].name = "mul";
-	}
 
 	//remember what graph we belong to, and asociate.
 	retval->graph = graph;
