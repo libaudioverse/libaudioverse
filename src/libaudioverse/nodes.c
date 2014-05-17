@@ -11,7 +11,7 @@ Lav_PUBLIC_FUNCTION LavError freeNode(LavNode *node) {
 	return Lav_ERROR_NONE;
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, LavPropertyTableEntry *propertySpecifier, enum  Lav_NODETYPE type, LavGraph *graph, LavNode **destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int numOutputs, LavPropertyTableEntry *propertySpecifier, enum  Lav_NODETYPE type, LavGraph *graph, LavNode **destination) {
 	WILL_RETURN(LavError);
 	CHECK_NOT_NULL(graph);
 	LOCK(graph->mutex);
@@ -19,7 +19,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int
 	ERROR_IF_TRUE(retval == NULL, Lav_ERROR_MEMORY);
 	retval->num_inputs = numInputs;
 	retval->num_outputs = numOutputs;
-	retval->num_properties = numProperties;
 
 	//allocations:
 	if(numInputs > 0) {
@@ -28,15 +27,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int
 		for(unsigned int i = 0; i < numInputs; i++) {
 			retval->inputs[i] = calloc(1, sizeof(LavStream));
 			ERROR_IF_TRUE(retval->inputs[i] == NULL, Lav_ERROR_MEMORY);
-		}
-	}
-
-	if(numProperties > 0) {
-		retval->properties = calloc(numProperties, sizeof(LavProperty*));
-		ERROR_IF_TRUE(retval->properties == NULL, Lav_ERROR_MEMORY);
-		for(unsigned int i = 0; i < numProperties; i++) {
-			retval->properties[i] = calloc(1, sizeof(LavProperty));
-			ERROR_IF_TRUE(retval->properties[i] == NULL, Lav_ERROR_MEMORY);
 		}
 	}
 
