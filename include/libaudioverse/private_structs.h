@@ -2,6 +2,9 @@
 #include "libaudioverse.h"
 #include "private_threads.h"
 
+//All structs here are private.
+//Anything not exposed indireclty through the public api is followed by its typedef in this file.
+
 struct Lav_Property_s {
 	enum Lav_PROPERTYTYPE type;
 	enum Lav_PROPERTYRESOLUTION resolution;
@@ -64,3 +67,16 @@ struct Lav_Table_s {
 	unsigned int length; //length in samples.  Also the max index before index wrapping.  Includes the extra sample at the end.
 	float* samples;
 };
+
+//The struct for property table entries.
+struct Lav_PropertyTableEntry_s {
+	enum lav_PropertyType type;
+	char* name;
+	union {
+		float fval;
+		int ival;
+		char* sval;
+	} default_value;
+};
+
+typedef struct Lav_PropertyTableEntry_s LavPropertyTableEntry;
