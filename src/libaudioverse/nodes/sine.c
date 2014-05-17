@@ -18,6 +18,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavGraph *graph, LavNode **desti
 	if(err != Lav_ERROR_NONE) RETURN(err);
 
 	retval->properties = makePropertyArrayFromTable(sizeof(sinePropertyTable)/sizeof(sinePropertyTable[0]), sinePropertyTable);
+	retval->num_properties = sizeof(sinePropertyTable)/sizeof(sinePropertyTable[0]);
 
 	retval->process = sineProcessor;
 	*destination = retval;
@@ -26,7 +27,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavGraph *graph, LavNode **desti
 }
 
 LavError sineProcessor(LavNode *node, unsigned int count) {
-	float freq;
+	float freq = 0;
 	float sr = node->graph->sr;
 	Lav_getFloatProperty(node, Lav_SINE_FREQUENCY, &freq);
 	for(unsigned int i = 0; i < count; i++) {
