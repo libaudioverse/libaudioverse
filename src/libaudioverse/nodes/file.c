@@ -15,6 +15,10 @@ struct fileinfo {
 
 Lav_PUBLIC_FUNCTION LavError fileNodeProcessor(LavNode* node, unsigned int samples);
 
+LavPropertyTableEntry filePropertyTable[] = {
+	Lav_FILE_PITCH_BEND, Lav_PROPERTYTYPE_FLOAT, "pitch_bend", {.fval = 1.0f},
+};
+
 Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavGraph *graph, const char* path, LavNode** destination) {
 	WILL_RETURN(LavError);
 	CHECK_NOT_NULL(graph);
@@ -66,6 +70,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavGraph *graph, const char* pat
 
 	LavError err = Lav_createNode(0, channels, Lav_NODETYPE_FILE, graph, &node);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
+	node->properties = makePropertyArrayFromTable(sizeof(filePropertyTable)/sizeof(filePropertyTable[0]), filePropertyTable);
+	ERROR_IF_TRUE(node->properties == NULL, Lav_ERROR_MEMORY);
+	node->num_properties = sizeof(filePropertyTable)/sizeof(filePropertyTable[0]);
 	node->data = f;
 	node->process = fileNodeProcessor;
 	*destination = node;
@@ -76,6 +83,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavGraph *graph, const char* pat
 Lav_PUBLIC_FUNCTION LavError fileNodeProcessor(LavNode* node, unsigned int samples) {
 	WILL_RETURN(LavError);
 	struct fileinfo *data = node->data;
+	float pitch_bend = 1.0f;
+	Lav_getFloatProperty(node, Lav_FILE_PITCH_BEND, &pitch_bend);
 	for(unsigned int i = 0; i < samples; i++) {
 		if(data->start >= data->frames) {
 			for(unsigned int j = 0; j < node->num_outputs; j++) Lav_bufferWriteSample(node->outputs[j], 0.0f);
@@ -90,7 +99,7 @@ Lav_PUBLIC_FUNCTION LavError fileNodeProcessor(LavNode* node, unsigned int sampl
 			float sample = data->sample_array[j][samp1]*weight1+data->sample_array[j][samp2]*weight2;
 			Lav_bufferWriteSample(node->outputs[j], sample);
 		}
-		data->offset += data->delta;
+		data->offset += data->delta*pitch_bend;
 		while(data->offset >= 1) {
 			data->start += 1;
 			data->offset-= 1;

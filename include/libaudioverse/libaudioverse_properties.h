@@ -18,3 +18,6 @@ enum Lav_SINE_PROPERTIES {
 	Lav_SINE_FREQUENCY = 0,
 };
 
+enum Lav_FILE_PROPERTIES {
+	Lav_FILE_PITCH_BEND = 0,
+};

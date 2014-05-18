@@ -20,6 +20,15 @@ int main(int argc, char** args) {
 		return 1;
 	}
 
+	float pitch_bend = 1.0f;
+	printf("Enter pitch bend factor (1.0 = identity): ");
+	scanf("%f", &pitch_bend);
+
+	char whitespace;
+	scanf("%c", &whitespace);
+
+	if(pitch_bend < 0) pitch_bend = 1.0f;
+	Lav_setFloatProperty(node, Lav_FILE_PITCH_BEND, pitch_bend);
 
 	Lav_graphSetOutputNode(graph, node);
 	void* th;
