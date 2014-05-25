@@ -11,3 +11,4 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "private_tables.h"
 #include "private_interleaving.h"
 #include "private_properties.h"
+#include "private_hrtf.h"
