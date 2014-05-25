@@ -6,6 +6,8 @@ Assume an integer is 4 bytes and a float is 4 bytes.
 
 - First, the integer 1 represented as 4 bytes.  This allows us to tell if the file was written on an endianness other than ours through a simple compare.  If it, when compared, is not equal to 1, then iterate over the file with a window size of 4 and swap appropriately.
 
+- The sample rate of the responses in this file in hertz as a 4-byte integer.
+
 - Next, the number of HRIR impulse responses as a 4-byte integer.
 
 - The number of elevations, as an integer.  This must be at least 1.
