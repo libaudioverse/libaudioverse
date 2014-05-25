@@ -6,6 +6,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 #include <libaudioverse/private_all.h>
 
 /**Swaps bytes to reverse endianness.*/
@@ -19,6 +20,14 @@ void reverse_endianness(char* buffer, unsigned int count, unsigned int window) {
 		}
 	}
 }
+
+//this makes sure that we aren't about to do something silently dangerous.
+#if sizeof(float) != 4
+#error Size of floating point type is not 4 bytes; reading HRTF files cannot safely run.
+#endif
+#ifndef int32_t
+#error We do not have a 4-byte integer type.
+#endif
 
 Lav_PUBLIC_FUNCTION LavError Lav_createHrtfTable(const char* path, LavHrtfData** destination) {
 }
