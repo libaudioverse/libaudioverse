@@ -8,5 +8,17 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <string.h>
 #include <libaudioverse/private_all.h>
 
+/**Swaps bytes to reverse endianness.*/
+void reverse_endianness(char* buffer, unsigned int count, unsigned int window) {
+	char* end = buffer+count*window;
+	for(; buffer < end; buffer+=window) {
+		for(unsigned int i = 0; i < window; i++) {
+			char temp = buffer[i];
+			buffer[i]=buffer[window-i];
+			buffer[window-i]=temp;
+		}
+	}
+}
+
 Lav_PUBLIC_FUNCTION LavError Lav_createHrtfTable(const char* path, LavHrtfData** destination) {
 }
