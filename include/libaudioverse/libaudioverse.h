@@ -29,6 +29,12 @@ enum Lav_ERRORS {
 	Lav_ERROR_RANGE, //out of range function parameter.
 	Lav_ERROR_CANNOT_INIT_AUDIO, //We couldn't even initialize the audio library.
 	Lav_ERROR_FILE, //error to do with files.
+	Lav_ERROR_FILE_NOT_FOUND, //specificaly, we couldn't find a file.
+
+	//these are for hrtf.
+	Lav_ERROR_HRTF_CORRUPT,
+	Lav_ERROR_HRTF_TOO_SMALL,
+	Lav_ERROR_HRTF_INVALID,
 };
 
 /**Typedef for error codes.*/
