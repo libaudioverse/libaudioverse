@@ -121,4 +121,4 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavGraph *graph, LavNode **desti
 Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavGraph *graph, const char* path, LavNode **destination);
 
 /**Load hrtf dataset from file.  This is for use with panner nodes.*/
-LavError Lav_createHrtfData(const char* path, LavHrtfData **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createHrtfData(const char* path, LavHrtfData **destination);
