@@ -14,6 +14,7 @@ typedef struct Lav_Node_s LavNode;
 typedef struct Lav_Stream_s LavStream;
 typedef struct Lav_Graph_s LavGraph;
 typedef struct Lav_Table_s LavTable;
+typedef struct LavHrtfData LavHrtfData;
 
 /**Does whatever is appropriate on a given platform to expose a Libaudioverse function publically.*/
 #define Lav_PUBLIC_FUNCTION extern __declspec(dllexport)
@@ -118,3 +119,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavGraph *graph, LavNode **desti
 
 /**A node that plays a file.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavGraph *graph, const char* path, LavNode **destination);
+
+/**Load hrtf dataset from file.  This is for use with panner nodes.*/
+LavError Lav_createHrtfData(const char* path, LavHrtfData **destination);
