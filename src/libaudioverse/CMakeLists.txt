@@ -5,6 +5,7 @@ graphs.c
 streams.c
 audio_output.c
 interleaving.c
+hrtf.c
 
 #data structures (non-thread):
 tables.c

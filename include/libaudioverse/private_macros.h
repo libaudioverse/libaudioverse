@@ -12,3 +12,8 @@ if(expression) RETURN(error);\
 } while(0)
 
 #define CHECK_NOT_NULL(ptr) ERROR_IF_TRUE(ptr == NULL, Lav_ERROR_NULL_POINTER)
+
+//gcc and clang both have _static_assert, but visual studio names it differently.
+#ifdef _MSC_VER
+#define _Static_assert(a, b) static_assert(a, b)
+#endif
