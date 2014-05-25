@@ -1,0 +1,19 @@
+Code will supplement this document; do not expect this document to remain.
+
+A file specifying an HRTF definition shall consist of the following, specified in the order below.  Note that everything is either ints or floats, so moving over the file with a window size of 4 and swapping bytes can totally reverse its endianness for little-endian processors.  HRTF files are written in whatever endianness the writing machine happens to have, and it is fixed on read.
+
+Assume an integer is 4 bytes and a float is 4 bytes.
+
+- First, the integer 1 represented as 4 bytes.  This allows us to tell if the file was written on an endianness other than ours through a simple compare.  If it, when compared, is not equal to 1, then iterate over the file with a window size of 4 and swap appropriately.
+
+- Next, the number of HRIR impulse responses as a 4-byte integer.
+
+- The number of elevations, as an integer.  This must be at least 1.
+
+- The minimum and maximum elevations, in degrees.  0 is horizontal; -90 is straight down; 90 is straight up.  Unless the elevation number is 1, these may not be equal.  Note that if max-min is not divisible by the number of elevations, floating point inaccuracies may accumulate.
+
+- The number of azimuths for each elevation, as 4-byte ints.  There shall be as many of these as elevations, so a length for this list is unnecessary.  00 is not valid.
+
+- The length of each response as 4 bytes.  All responses have the same length.
+
+- The responses themselves.  These are assumed to be for the left ear and are stored starting at the minimum elevation azimuth 0.  Storage then proceeds clockwise for the current elevation, before jumping up to the next one.
