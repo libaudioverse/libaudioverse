@@ -38,6 +38,6 @@ void main(int argc, char** args) {
 	Lav_setParent(hrtfNode, fileNode, 0, 0);
 	Lav_graphSetOutputNode(graph, hrtfNode);
 	createAudioOutputThread(graph, 1024, 3, &th);
-	sleepFor(5000);
+	sleepFor(50000);
 	stopAudioOutputThread(th);
 }
