@@ -6,7 +6,14 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 struct LavHrtfData {
 	unsigned int elev_count, hrir_count, hrir_length;
+	int min_elevation, max_elevation;
 	unsigned int *azimuth_counts;
 	unsigned int samplerate;
 	float ***hrirs;
 };
+
+//get the appropriate coefficients for one channel.  A stereo hrtf is two calls to this function.
+Lav_PUBLIC_FUNCTION void hrtfComputeCoefficientsMono(LavHrtfData *hrtf, float elevation, float azimuth, float* out);
+
+//warning: writes directly to the output destination, doesn't allocate a new one.
+Lav_PUBLIC_FUNCTION void hrtfComputeCoefficients(LavHrtfData *hrtf, float elevation, float azimuth, float* left, float* right);

@@ -12,7 +12,7 @@ Assume an integer is 4 bytes and a float is 4 bytes.
 
 - The number of elevations, as an integer.  This must be at least 1.
 
-- The minimum and maximum elevations, in degrees.  0 is horizontal; -90 is straight down; 90 is straight up.  Unless the elevation number is 1, these may not be equal.  Note that if max-min is not divisible by the number of elevations, floating point inaccuracies may accumulate.
+- The minimum and maximum elevations, in degrees.  0 is horizontal; -90 is straight down; 90 is straight up.  Unless the elevation number is 1, these may not be equal.  Note that if max-min is not divisible by the number of elevations, floating point inaccuracies may accumulate.  Furthermore, the minimum elevation must be less than or equal to 0, and the maximum elevation must be greater than or equal to 0.
 
 - The number of azimuths for each elevation, as 4-byte ints.  There shall be as many of these as elevations, so a length for this list is unnecessary.  00 is not valid.
 

@@ -10,6 +10,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdint.h>
 #include <stddef.h>
 #include <libaudioverse/private_all.h>
+#include <math.h>
 
 /**Swaps bytes to reverse endianness.*/
 void reverse_endianness(char* buffer, unsigned int count, unsigned int window) {
@@ -106,6 +107,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_createHrtfData(const char* path, LavHrtfData** 
 	hrtf->hrir_count = number_of_hrirs;
 	hrtf->hrir_length = hrir_length;
 	hrtf->samplerate = samplerate;
+	hrtf->min_elevation = minimum_elevation;
+	hrtf->max_elevation = maximum_elevation;
 
 	hrtf->azimuth_counts = calloc(number_of_elevations, sizeof(unsigned int));
 	if(hrtf->azimuth_counts == NULL) return Lav_ERROR_MEMORY;
@@ -133,4 +136,56 @@ Lav_PUBLIC_FUNCTION LavError Lav_createHrtfData(const char* path, LavHrtfData** 
 
 	*destination = hrtf;
 	return Lav_ERROR_NONE;
+}
+
+//a complete HRTF for stereo is two calls to this function.
+Lav_PUBLIC_FUNCTION void hrtfComputeCoefficientsMono(LavHrtfData *hrtf, float elevation, float azimuth, float* out) {
+	//clamp the elevation.
+	if(elevation < hrtf->min_elevation) {elevation = (float)hrtf->min_elevation;}
+	else if(elevation > hrtf->max_elevation) {elevation = (float)hrtf->max_elevation;}
+
+	//we need to convert the elevation into an index.  First, truncate it to an integer (which rounds towards 0).
+	int truncatedElevation = (int)truncf(elevation);
+	//we now need to know how many degrees there are per elevation increase/decrease.  This is a bit tricky and, if done wrong, will result in an off-by-one.
+	int degreesPerElevation = 0;
+	if(hrtf->min_elevation != hrtf->max_elevation) { //it's not 0, it has to be something else, and the count has to be at least 2.
+		//it's the difference between min and max, dividedd by the count.  The count includes 0, however, so we have to subtract one from it.
+		degreesPerElevation = (hrtf->max_elevation-hrtf->min_elevation)/(hrtf->elev_count-1);
+	}
+
+	//we have a truncated elevation.  We now simply take an integer division, or assume it's 0.
+	int elevationIndex = degreesPerElevation ? truncatedElevation/degreesPerElevation : 0;
+	//this is relative to whatever index happens to be "0", that is it is an offset from the 0 index.  We have to offset it upwards so it's not negative.
+	int elevationIndexOffset = degreesPerElevation ? abs(hrtf->min_elevation)/degreesPerElevation : 0;
+	elevationIndex += elevationIndexOffset;
+
+	//ElevationIndex lets us get an array of azimuth coefficients.  Go ahead and pull it out now, so we can conceptually forget about all the above variables.
+	float** azimuths = hrtf->hrirs[elevationIndex];
+	unsigned int azimuthCount = hrtf->azimuth_counts[elevationIndex];
+	float degreesPerAzimuth = 360.0f/azimuthCount;
+
+	unsigned int azimuthIndex1, azimuthIndex2;
+	azimuthIndex1 = (unsigned int)floorf(azimuth/degreesPerAzimuth);
+	azimuthIndex2 = (unsigned int)ceilf(azimuth/degreesPerAzimuth);
+	float azimuthWeight1, azimuthWeight2;
+	//this is the same logic as a bunch of other places, with a minor variation.
+	azimuthWeight1 = ceilf(azimuthIndex2*degreesPerAzimuth-azimuth)/degreesPerAzimuth;
+	azimuthWeight2 = floorf(azimuth-azimuthIndex1*degreesPerAzimuth)/degreesPerAzimuth;
+
+	//this is probably the only part of this that can't go wrong, assuming the above calculations are all correct.  Interpolate between the two azimuths.
+	for(unsigned int i = 0; i < hrtf->hrir_length; i++) {
+		out[i] = azimuthWeight1*azimuths[azimuthIndex1][i]+azimuthWeight2*azimuths[azimuthIndex2][i];
+	}
+}
+
+Lav_PUBLIC_FUNCTION void computeHrtfCoefficients(LavHrtfData *hrtf, float elevation, float azimuth, float *left, float* right) {
+	//wrap azimuth to be > 0 and < 360.
+	while(azimuth < 0) azimuth += 360.0f;
+	while(azimuth > 360.0f) azimuth -= 360.0f;
+	//the hrtf datasets are right ear coefficients.  Consequently, the right ear requires no changes.
+	hrtfComputeCoefficientsMono(hrtf, elevation, azimuth, right);
+	//the left ear is found at an azimuth which is reflectred about 0 degrees.
+	//by the while loops above, azimuth can't be >360 or <0, so it necessarily follows that this is >0 and <360.
+	azimuth = 360-azimuth;
+	hrtfComputeCoefficientsMono(hrtf, elevation, azimuth, left);
 }
