@@ -9,8 +9,11 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 LavError hrtfProcessor(LavNode *node, unsigned int count);
 
 struct HrtfNodeData {
-	int dummy; //for testing, just so we can compile.
+	float *left_history, *right_history;
+	LavHrtfData *hrtf;
+	unsigned int history_length;
 };
+
 typedef struct HrtfNodeData HrtfNodeData;
 
 LavPropertyTableEntry hrtfPropertyTable[] = {
