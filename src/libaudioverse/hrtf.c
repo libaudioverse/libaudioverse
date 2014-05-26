@@ -178,7 +178,7 @@ Lav_PUBLIC_FUNCTION void hrtfComputeCoefficientsMono(LavHrtfData *hrtf, float el
 	}
 }
 
-Lav_PUBLIC_FUNCTION void computeHrtfCoefficients(LavHrtfData *hrtf, float elevation, float azimuth, float *left, float* right) {
+Lav_PUBLIC_FUNCTION void hrtfComputeCoefficients(LavHrtfData *hrtf, float elevation, float azimuth, float *left, float* right) {
 	//wrap azimuth to be > 0 and < 360.
 	while(azimuth < 0) azimuth += 360.0f;
 	while(azimuth > 360.0f) azimuth -= 360.0f;

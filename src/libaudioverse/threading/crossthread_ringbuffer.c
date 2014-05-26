@@ -12,11 +12,7 @@ Todo: replace this with a lock-free implementation assuming that it becomes a bo
 const int READ_OP = -1;
 const int WRITE_OP = 1;
 
-//Apparently, C's mod is in fact not the discrete math operation.
-//This function handles that.
-int ringmod(int dividend, int divisor) {
-	return dividend < 0 ? dividend%divisor+divisor : dividend%divisor;
-}
+
 
 Lav_PUBLIC_FUNCTION LavError createCrossThreadRingBuffer(int length, int elementSize, LavCrossThreadRingBuffer **destination) {
 	WILL_RETURN(LavError);

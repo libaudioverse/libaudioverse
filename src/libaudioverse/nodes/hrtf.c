@@ -12,7 +12,7 @@ struct HrtfNodeData {
 	float *left_history, *right_history;
 	float* left_response, *right_response;
 	LavHrtfData *hrtf;
-	unsigned int history_length;
+	unsigned int hrir_length;
 };
 
 typedef struct HrtfNodeData HrtfNodeData;
@@ -40,7 +40,7 @@ Lav_PUBLIC_FUNCTION Lav_createHrtfNode(LavGraph *graph, LavHrtfData* hrtf, LavNo
 	HrtfNodeData *data = calloc(1, sizeof(HrtfNodeData));
 	ERROR_IF_TRUE(data == NULL, Lav_ERROR_MEMORY);
 	float* leftHistory = calloc(hrtf->hrir_length, sizeof(float));
-	float* rightHistory = calloc(hrtf->length, sizeof(float));
+	float* rightHistory = calloc(hrtf->hrir_length, sizeof(float));
 	ERROR_IF_TRUE(leftHistory == NULL || rightHistory == NULL, Lav_ERROR_MEMORY);
 	data->left_history = leftHistory;
 	data->right_history = rightHistory;
@@ -48,9 +48,9 @@ Lav_PUBLIC_FUNCTION Lav_createHrtfNode(LavGraph *graph, LavHrtfData* hrtf, LavNo
 	data->hrtf = hrtf;
 
 	//make room for the hrir itself.
-	data->left_coefficients = calloc(htrtf->hrir_length, sizeof(float));
-	data->right_coefficients = calloc(hrtf->length, sizeof(float));
-	ERROR_IF_TRUE(data->left_coefficients == NULL || data->right_coefficients == NULL, Lav_ERROR_MEMORY);
+	data->left_response = calloc(hrtf->hrir_length, sizeof(float));
+	data->right_response = calloc(hrtf->hrir_length, sizeof(float));
+	ERROR_IF_TRUE(data->left_response == NULL || data->right_response == NULL, Lav_ERROR_MEMORY);
 
 	*destination = retval;
 	RETURN(Lav_ERROR_NONE);
@@ -60,9 +60,9 @@ Lav_PUBLIC_FUNCTION Lav_createHrtfNode(LavGraph *graph, LavHrtfData* hrtf, LavNo
 LavError hrtfProcessor(LavNode *node, unsigned int count) {
 	HrtfNodeData *data = node->data;
 	float azimuth, elevation;
-	Lav_readFloatProperty(node, Lav_HRTF_AZIMUTH, &azimuth);
-	Lav_readFloatProperty(node, Lav_HRTF_ELEVATION, &elevation);
-	//compute hrirs.\
+	Lav_getFloatProperty(node, Lav_HRTF_AZIMUTH, &azimuth);
+	Lav_getFloatProperty(node, Lav_HRTF_ELEVATION, &elevation);
+	//compute hrirs.
 	hrtfComputeCoefficients(data->hrtf, elevation, azimuth, data->left_response, data->right_response);
 	return Lav_ERROR_NONE;
 }

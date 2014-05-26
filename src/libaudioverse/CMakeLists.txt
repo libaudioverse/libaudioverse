@@ -6,6 +6,7 @@ streams.c
 audio_output.c
 interleaving.c
 hrtf.c
+dspmath.c
 
 #data structures (non-thread):
 tables.c
