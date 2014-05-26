@@ -67,7 +67,7 @@ LavError hrtfProcessor(LavNode *node, unsigned int count) {
 	//compute hrirs.
 	hrtfComputeCoefficients(data->hrtf, elevation, azimuth, data->left_response, data->right_response);
 
-	//this is convolution, with a twist: it uses an extremely fast ringbuffer to avoid a ton of unnecessary copies.
+	//this is convolution, with a twist: it uses a ringbuffer to avoid a ton of unnecessary copies.
 	for(unsigned int i = 0; i < count; i++) {
 		data->history_pos = ringmod(data->history_pos+1, data->hrir_length); //putting it here for clarity. It doesn't matter if this is before everything or after it.
 		//first thing we do: read a sample into the ringbuffer, duplicating onto both channels.
@@ -76,10 +76,10 @@ LavError hrtfProcessor(LavNode *node, unsigned int count) {
 		data->right_history[data->history_pos] = data->left_history[data->history_pos];
 		float outLeft=0, outRight=0;
 		for(unsigned int j = 0; j < data->hrir_length; j++) {
-		//standard convolution.
-		unsigned int index = ringmod(data->history_pos-j, data->hrir_length);
-		outLeft += data->left_response[j]+data->left_history[index];
-		outRight += data->right_response[j]+data->right_history[index];
+			//standard convolution.
+			unsigned int index = ringmod(data->history_pos-j, data->hrir_length);
+			outLeft += data->left_response[j]*data->left_history[index];
+			outRight += data->right_response[j]*data->right_history[index];
 		}
 		Lav_bufferWriteSample(node->outputs[0], outLeft);
 		Lav_bufferWriteSample(node->outputs[1], outRight);
