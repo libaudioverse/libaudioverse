@@ -10,6 +10,7 @@ LavError hrtfProcessor(LavNode *node, unsigned int count);
 
 struct HrtfNodeData {
 	float *left_history, *right_history;
+	float* left_response, *right_response;
 	LavHrtfData *hrtf;
 	unsigned int history_length;
 };
@@ -43,8 +44,13 @@ Lav_PUBLIC_FUNCTION Lav_createHrtfNode(LavGraph *graph, LavHrtfData* hrtf, LavNo
 	ERROR_IF_TRUE(leftHistory == NULL || rightHistory == NULL, Lav_ERROR_MEMORY);
 	data->left_history = leftHistory;
 	data->right_history = rightHistory;
-	data->history_length = hrtf->hrir_length;
+	data->hrir_length = hrtf->hrir_length;
 	data->hrtf = hrtf;
+
+	//make room for the hrir itself.
+	data->left_coefficients = calloc(htrtf->hrir_length, sizeof(float));
+	data->right_coefficients = calloc(hrtf->length, sizeof(float));
+	ERROR_IF_TRUE(data->left_coefficients == NULL || data->right_coefficients == NULL, Lav_ERROR_MEMORY);
 
 	*destination = retval;
 	RETURN(Lav_ERROR_NONE);
