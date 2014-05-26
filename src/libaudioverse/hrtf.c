@@ -166,11 +166,14 @@ Lav_PUBLIC_FUNCTION void hrtfComputeCoefficientsMono(LavHrtfData *hrtf, float el
 
 	unsigned int azimuthIndex1, azimuthIndex2;
 	azimuthIndex1 = (unsigned int)floorf(azimuth/degreesPerAzimuth);
-	azimuthIndex2 = (unsigned int)ceilf(azimuth/degreesPerAzimuth);
+	azimuthIndex2 = azimuthIndex1+1;
 	float azimuthWeight1, azimuthWeight2;
 	//this is the same logic as a bunch of other places, with a minor variation.
 	azimuthWeight1 = ceilf(azimuthIndex2*degreesPerAzimuth-azimuth)/degreesPerAzimuth;
 	azimuthWeight2 = floorf(azimuth-azimuthIndex1*degreesPerAzimuth)/degreesPerAzimuth;
+	//now that we have some weights, we need to ringmod the azimuth indices. 360==0 in trig, but causes one of them to go past the end.
+	azimuthIndex1 = ringmod(azimuthIndex1, azimuthCount);
+	azimuthIndex2 = ringmod(azimuthIndex2, azimuthCount);
 
 	//this is probably the only part of this that can't go wrong, assuming the above calculations are all correct.  Interpolate between the two azimuths.
 	for(unsigned int i = 0; i < hrtf->hrir_length; i++) {
