@@ -9,7 +9,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 LavError hrtfProcessor(LavNode *node, unsigned int count);
 
 struct HrtfNodeData {
-	float *left_history, *right_history;
+	float *history;
 	float* left_response, *right_response;
 	LavHrtfData *hrtf;
 	unsigned int hrir_length;
@@ -41,11 +41,9 @@ Lav_PUBLIC_FUNCTION Lav_createHrtfNode(LavGraph *graph, LavHrtfData* hrtf, LavNo
 	HrtfNodeData *data = calloc(1, sizeof(HrtfNodeData));
 	ERROR_IF_TRUE(data == NULL, Lav_ERROR_MEMORY);
 	/*Making these one longer is intensional.  Sinze the reader is the same as the writer, and we never read backwards past hrir_length, this prevents us from seeing the most recent sample twice.*/
-	float* leftHistory = calloc(hrtf->hrir_length+1, sizeof(float));
-	float* rightHistory = calloc(hrtf->hrir_length+1, sizeof(float));
-	ERROR_IF_TRUE(leftHistory == NULL || rightHistory == NULL, Lav_ERROR_MEMORY);
-	data->left_history = leftHistory;
-	data->right_history = rightHistory;
+	float* history = calloc(hrtf->hrir_length+1, sizeof(float));
+	ERROR_IF_TRUE(history == NULL , Lav_ERROR_MEMORY);
+	data->history = history;
 	data->hrir_length = hrtf->hrir_length;
 	data->hrtf = hrtf;
 
@@ -71,16 +69,14 @@ LavError hrtfProcessor(LavNode *node, unsigned int count) {
 	//this is convolution, with a twist: it uses a ringbuffer to avoid a ton of unnecessary copies.
 	for(unsigned int i = 0; i < count; i++) {
 		data->history_pos = ringmod(data->history_pos+1, data->hrir_length); //putting it here for clarity. It doesn't matter if this is before everything or after it.
-		//first thing we do: read a sample into the ringbuffer, duplicating onto both channels.
-		Lav_streamReadSamples(node->inputs[0], 1, data->left_history+data->history_pos);
-		//duplicate this to the right channel.
-		data->right_history[data->history_pos] = data->left_history[data->history_pos];
+		//first thing we do: read a sample into the ringbuffer.
+		Lav_streamReadSamples(node->inputs[0], 1, data->history+data->history_pos);
 		float outLeft=0, outRight=0;
 		for(unsigned int j = 0; j < data->hrir_length; j++) {
 			//standard convolution.
 			unsigned int index = ringmod(data->history_pos-j, data->hrir_length);
-			outLeft += data->left_response[j]*data->left_history[index];
-			outRight += data->right_response[j]*data->right_history[index];
+			outLeft += data->left_response[j]*data->history[index];
+			outRight += data->right_response[j]*data->history[index];
 		}
 		Lav_bufferWriteSample(node->outputs[0], outLeft);
 		Lav_bufferWriteSample(node->outputs[1], outRight);
