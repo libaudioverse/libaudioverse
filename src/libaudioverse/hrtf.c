@@ -36,6 +36,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createHrtfData(const char* path, LavHrtfData** 
 	size_t size = 0;
 	fseek(fp, 0, SEEK_END);
 	size = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
 	if(size == 0) return Lav_ERROR_HRTF_INVALID;
 
 	//Okay, load everything.
@@ -46,10 +47,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_createHrtfData(const char* path, LavHrtfData** 
 
 	//do the read.
 	size_t read;
-	read = 0;
-	while(read < size) {
-		read += fread(data, 1, size, fp);
-	}
+	read = fread(data, 1, size, fp);
+	if(read != size) return Lav_ERROR_FILE;
 	fclose(fp);
 
 	//we now handle endianness.
@@ -125,6 +124,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_createHrtfData(const char* path, LavHrtfData** 
 	//fill it.
 	for(int elev = 0; elev < number_of_elevations; elev++) {
 		for(int azimuth = 0; azimuth < azimuths_per_elevation[elev]; azimuth++) {
+			hrtf->hrirs[elev][azimuth] = malloc(sizeof(float)*hrir_length);
+			if(hrtf->hrirs[elev][azimuth] == NULL) {return Lav_ERROR_NONE;}
 			memcpy(hrtf->hrirs[elev][azimuth], iterator, hrir_length*sizeof(float));
 			iterator+=hrir_length*sizeof(float);
 		}
