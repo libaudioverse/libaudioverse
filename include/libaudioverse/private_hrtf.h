@@ -5,7 +5,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "libaudioverse.h"
 
 struct LavHrtfData {
-	unsigned int elev_count, response_count, response_length;
+	unsigned int elev_count, hrir_count, hrir_length;
 	unsigned int *azimuth_counts;
-	float** responses;
+	unsigned int samplerate;
+	float ***hrirs;
 };
