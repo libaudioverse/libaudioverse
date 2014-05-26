@@ -9,3 +9,4 @@ sndfile.h
 mono_library/
 build/
 *.pyc
+*.hrtf
