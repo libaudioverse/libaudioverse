@@ -58,5 +58,11 @@ Lav_PUBLIC_FUNCTION Lav_createHrtfNode(LavGraph *graph, LavHrtfData* hrtf, LavNo
 }
 
 LavError hrtfProcessor(LavNode *node, unsigned int count) {
+	HrtfNodeData *data = node->data;
+	float azimuth, elevation;
+	Lav_readFloatProperty(node, Lav_HRTF_AZIMUTH, &azimuth);
+	Lav_readFloatProperty(node, Lav_HRTF_ELEVATION, &elevation);
+	//compute hrirs.\
+	hrtfComputeCoefficients(data->hrtf, elevation, azimuth, data->left_response, data->right_response);
 	return Lav_ERROR_NONE;
 }
