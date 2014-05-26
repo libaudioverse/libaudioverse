@@ -13,6 +13,7 @@ struct HrtfNodeData {
 	float* left_response, *right_response;
 	LavHrtfData *hrtf;
 	unsigned int hrir_length;
+	unsigned int history_pos; //for the ringbuffers.
 };
 
 typedef struct HrtfNodeData HrtfNodeData;
