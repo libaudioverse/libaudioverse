@@ -38,6 +38,13 @@ Lav_PUBLIC_FUNCTION Lav_createHrtfNode(LavGraph *graph, LavHrtfData* hrtf, LavNo
 
 	HrtfNodeData *data = calloc(1, sizeof(HrtfNodeData));
 	ERROR_IF_TRUE(data == NULL, Lav_ERROR_MEMORY);
+	float* leftHistory = calloc(hrtf->hrir_length, sizeof(float));
+	float* rightHistory = calloc(hrtf->length, sizeof(float));
+	ERROR_IF_TRUE(leftHistory == NULL || rightHistory == NULL, Lav_ERROR_MEMORY);
+	data->left_history = leftHistory;
+	data->right_history = rightHistory;
+	data->history_length = hrtf->hrir_length;
+	data->hrtf = hrtf;
 
 	*destination = retval;
 	RETURN(Lav_ERROR_NONE);
