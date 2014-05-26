@@ -54,7 +54,7 @@ enum Lav_PROPERTYTYPES {
 enum Lav_NODETYPES{
 	Lav_NODETYPE_ZEROS,
 	Lav_NODETYPE_FILE,
-	Lav_NODETYPE_CONVOLVER,
+	Lav_NODETYPE_HRTF,
 	Lav_NODETYPE_SINE,
 };
 
@@ -126,5 +126,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavGraph *graph, LavNode **desti
 /**A node that plays a file.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavGraph *graph, const char* path, LavNode **destination);
 
-/**Load hrtf dataset from file.  This is for use with panner nodes.*/
+/**Load hrtf dataset from file.  This is for use with hrtf nodes.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createHrtfData(const char* path, LavHrtfData **destination);
+
+/**Make a HRTF node.*/
+Lav_PUBLIC_FUNCTION LavError Lav_createHrtfNode(LavGraph *graph, LavHrtfData* hrtf, LavNode **destination);
