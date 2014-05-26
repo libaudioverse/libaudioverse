@@ -40,8 +40,9 @@ Lav_PUBLIC_FUNCTION Lav_createHrtfNode(LavGraph *graph, LavHrtfData* hrtf, LavNo
 
 	HrtfNodeData *data = calloc(1, sizeof(HrtfNodeData));
 	ERROR_IF_TRUE(data == NULL, Lav_ERROR_MEMORY);
-	float* leftHistory = calloc(hrtf->hrir_length, sizeof(float));
-	float* rightHistory = calloc(hrtf->hrir_length, sizeof(float));
+	/*Making these one longer is intensional.  Sinze the reader is the same as the writer, and we never read backwards past hrir_length, this prevents us from seeing the most recent sample twice.*/
+	float* leftHistory = calloc(hrtf->hrir_length+1, sizeof(float));
+	float* rightHistory = calloc(hrtf->hrir_length+1, sizeof(float));
 	ERROR_IF_TRUE(leftHistory == NULL || rightHistory == NULL, Lav_ERROR_MEMORY);
 	data->left_history = leftHistory;
 	data->right_history = rightHistory;

@@ -35,7 +35,7 @@ void main(int argc, char** args) {
 		printf("Error: %d", err);
 		return;
 	}
-
+	Lav_setParent(hrtfNode, fileNode, 0, 0);
 	Lav_graphSetOutputNode(graph, hrtfNode);
 	createAudioOutputThread(graph, 1024, 3, &th);
 	sleepFor(5000);
