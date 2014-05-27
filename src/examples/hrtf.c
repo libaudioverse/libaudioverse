@@ -38,6 +38,31 @@ void main(int argc, char** args) {
 	Lav_setParent(hrtfNode, fileNode, 0, 0);
 	Lav_graphSetOutputNode(graph, hrtfNode);
 	createAudioOutputThread(graph, 1024, 3, &th);
-	sleepFor(50000);
+	int shouldContinue = 1;
+	printf("Enter pairs of numbers separated by whitespace, where the first is azimuth (anything) and the second\n"
+"is elevation (-90 to 90).\n"
+"Input q to quit.\n");
+	char command[512] = "";
+	float elev = 0, az = 0;
+	int elevOrAz = 0;
+	while(shouldContinue) {
+		scanf("%s", command);
+		if(command[0] == 'q') {
+			shouldContinue = 0;
+			continue;
+		}
+		if(elevOrAz == 0) {
+			sscanf(command, "%f", &az);
+			elevOrAz = 1;
+			continue;
+		}
+		else if(elevOrAz == 1) {
+			sscanf(command, "%f", &elev);
+			Lav_setFloatProperty(hrtfNode, Lav_HRTF_ELEVATION, elev);
+			Lav_setFloatProperty(hrtfNode, Lav_HRTF_AZIMUTH, az);
+			elevOrAz = 0;
+			continue;
+		}
+	}
 	stopAudioOutputThread(th);
 }
