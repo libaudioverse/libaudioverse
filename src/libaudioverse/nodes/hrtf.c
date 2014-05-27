@@ -34,6 +34,8 @@ Lav_PUBLIC_FUNCTION Lav_createHrtfNode(LavGraph *graph, LavHrtfData* hrtf, LavNo
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
 
 	retval->properties = makePropertyArrayFromTable(sizeof(hrtfPropertyTable)/sizeof(hrtfPropertyTable[0]), hrtfPropertyTable);
+	retval->num_properties = sizeof(hrtfPropertyTable)/sizeof(hrtfPropertyTable[0]);
+
 	ERROR_IF_TRUE(retval->properties == NULL, Lav_ERROR_MEMORY);
 
 	retval->process = hrtfProcessor;
@@ -65,7 +67,6 @@ LavError hrtfProcessor(LavNode *node, unsigned int count) {
 	Lav_getFloatProperty(node, Lav_HRTF_ELEVATION, &elevation);
 	//compute hrirs.
 	hrtfComputeCoefficients(data->hrtf, elevation, azimuth, data->left_response, data->right_response);
-
 	//this is convolution, with a twist: it uses a ringbuffer to avoid a ton of unnecessary copies.
 	for(unsigned int i = 0; i < count; i++) {
 		data->history_pos = ringmod(data->history_pos+1, data->hrir_length); //putting it here for clarity. It doesn't matter if this is before everything or after it.
