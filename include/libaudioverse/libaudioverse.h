@@ -56,6 +56,7 @@ enum Lav_NODETYPES{
 	Lav_NODETYPE_FILE,
 	Lav_NODETYPE_HRTF,
 	Lav_NODETYPE_SINE,
+	Lav_NODETYPE_MIXER,
 };
 
 /**This is the processing function's typedef.  See external documentation for info on writing your own nodes.*/
