@@ -20,21 +20,21 @@ typedef struct LavHrtfData LavHrtfData;
 #define Lav_PUBLIC_FUNCTION extern __declspec(dllexport)
 
 enum Lav_ERRORS {
-	Lav_ERROR_NONE, //everything is OK.
-	Lav_ERROR_UNKNOWN, //We know something has gone wrong, but can't figure out what.
-	Lav_ERROR_TYPE_MISMATCH, //Tried to get/set something with the wrong type, i.e. properties.
-	Lav_ERROR_INVALID_SLOT, //one of the functions taking a slot got passed an invalid number.
-	Lav_ERROR_NULL_POINTER, //you passed a NULL pointer into something that shouldn't have it.
-	Lav_ERROR_MEMORY, //a memory problem which probably isn't the fault of the application.
-	Lav_ERROR_RANGE, //out of range function parameter.
-	Lav_ERROR_CANNOT_INIT_AUDIO, //We couldn't even initialize the audio library.
-	Lav_ERROR_FILE, //error to do with files.
-	Lav_ERROR_FILE_NOT_FOUND, //specificaly, we couldn't find a file.
+	Lav_ERROR_NONE = 0, //everything is OK.
+	Lav_ERROR_UNKNOWN = 1, //We know something has gone wrong, but can't figure out what.
+	Lav_ERROR_TYPE_MISMATCH = 2, //Tried to get/set something with the wrong type, i.e. properties.
+	Lav_ERROR_INVALID_SLOT = 3, //one of the functions taking a slot got passed an invalid number.
+	Lav_ERROR_NULL_POINTER = 4, //you passed a NULL pointer into something that shouldn't have it.
+	Lav_ERROR_MEMORY = 5, //a memory problem which probably isn't the fault of the application.
+	Lav_ERROR_RANGE = 6, //out of range function parameter.
+	Lav_ERROR_CANNOT_INIT_AUDIO = 7, //We couldn't even initialize the audio library.
+	Lav_ERROR_FILE = 8, //error to do with files.
+	Lav_ERROR_FILE_NOT_FOUND = 9, //specifically, we couldn't find a file.
 
 	//these are for hrtf.
-	Lav_ERROR_HRTF_CORRUPT,
-	Lav_ERROR_HRTF_TOO_SMALL,
-	Lav_ERROR_HRTF_INVALID,
+	Lav_ERROR_HRTF_CORRUPT = 10,
+	Lav_ERROR_HRTF_TOO_SMALL = 11,
+	Lav_ERROR_HRTF_INVALID = 12,
 };
 
 /**Typedef for error codes.*/
