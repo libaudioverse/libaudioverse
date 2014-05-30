@@ -35,7 +35,6 @@ void main(int argc, char** args) {
 		nodes[i] = n;
 	}
 	unsigned int channels = nodes[0]->num_outputs;
-	printf("Expected %i channels\n", channels);
 	for(int i = 0; i < argc-1; i++) {
 		if(nodes[i]->num_outputs != channels) {
 			printf("All files must have the same channel count.");
@@ -48,10 +47,8 @@ void main(int argc, char** args) {
 	LavError err;
 	err = Lav_createMixerNode(graph, argc-1, channels, &mixer);
 
-	for(int parent = 0; parent< argc-1; parent++) {
-		for(unsigned int channel = 0; channel < channels; channel++) {
-			Lav_setParent(mixer, nodes[parent], channel, channel*parent);
-		}
+	for(int input = 0; input < mixer->num_inputs ; input++) {
+		Lav_setParent(mixer, nodes[input/channels], input%channels, input);
 	}
 
 	if(err != Lav_ERROR_NONE) {
