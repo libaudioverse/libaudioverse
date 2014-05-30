@@ -132,3 +132,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createHrtfData(const char* path, LavHrtfData **
 
 /**Make a HRTF node.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createHrtfNode(LavGraph *graph, LavHrtfData* hrtf, LavNode **destination);
+
+/**Make a mixer.*/
+Lav_PUBLIC_FUNCTION LavError Lav_createMixerNode(LavGraph *graph, unsigned int maxParents, unsigned int inputsPerParent, LavNode **destination);
