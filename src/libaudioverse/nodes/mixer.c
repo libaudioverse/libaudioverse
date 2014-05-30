@@ -48,7 +48,7 @@ LavError mixerProcessor(LavNode *node, unsigned int count) {
 			data->accumulator_array[j%data->inputs_per_parent] += samp;
 		}
 		for(unsigned int j = 0; j < node->num_outputs; j++) {
-			Lav_bufferWriteSample(node->outputs[j], data->accumulator_array[j]);
+			Lav_bufferWriteSample(node->outputs[j], data->accumulator_array[j]/(node->num_inputs*data->inputs_per_parent));
 			data->accumulator_array[j] = 0;
 		}
 	}
