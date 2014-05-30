@@ -35,6 +35,7 @@ void main(int argc, char** args) {
 		nodes[i] = n;
 	}
 	unsigned int channels = nodes[0]->num_outputs;
+	printf("Expected %i channels\n", channels);
 	for(int i = 0; i < argc-1; i++) {
 		if(nodes[i]->num_outputs != channels) {
 			printf("All files must have the same channel count.");
