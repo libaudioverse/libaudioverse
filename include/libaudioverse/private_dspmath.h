@@ -7,5 +7,5 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 //Apparently, C's mod is in fact not the discrete math operation.
 //This function handles that.
 Lav_PUBLIC_FUNCTION int ringmodi(int dividend, int divisor);
-Lav_PUBLIC_FUNCTION int ringmodf(double dividend, double divisor);
-Lav_PUBLIC_FUNCTION int ringmod(int dividend, int divisor);
+Lav_PUBLIC_FUNCTION float ringmodf(float dividend, float divisor);
+Lav_PUBLIC_FUNCTION double ringmod(double dividend,double divisor);

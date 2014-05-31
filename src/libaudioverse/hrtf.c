@@ -183,11 +183,10 @@ Lav_PUBLIC_FUNCTION void hrtfComputeCoefficientsMono(LavHrtfData *hrtf, float el
 
 Lav_PUBLIC_FUNCTION void hrtfComputeCoefficients(LavHrtfData *hrtf, float elevation, float azimuth, float *left, float* right) {
 	//wrap azimuth to be > 0 and < 360.
-	ringmodf(azimuth, 360.0f);
+	azimuth = ringmodf(azimuth, 360.0f);
 	//the hrtf datasets are right ear coefficients.  Consequently, the right ear requires no changes.
 	hrtfComputeCoefficientsMono(hrtf, elevation, azimuth, right);
 	//the left ear is found at an azimuth which is reflectred about 0 degrees.
-	//by the while loops above, azimuth can't be >360 or <0, so it necessarily follows that this is >0 and <360.
-	azimuth = 360-azimuth;
+	azimuth = ringmodf(360-azimuth, 360.0f);
 	hrtfComputeCoefficientsMono(hrtf, elevation, azimuth, left);
 }
