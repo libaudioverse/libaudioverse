@@ -48,7 +48,7 @@ Lav_PUBLIC_FUNCTION int CTRBGetAvailableWrites(LavCrossThreadRingBuffer* buffer)
 	WILL_RETURN(int);
 	LOCK(buffer->lock);
 	//First, find out how far apart the two heads of the buffer are.
-	int used = ringmod(buffer->write_position-buffer->read_position, buffer->length); //number of elements currently in use.
+	int used = ringmodi(buffer->write_position-buffer->read_position, buffer->length); //number of elements currently in use.
 	int available = buffer->length-used; //how many are left?
 	if(available == 0 && buffer->last_op == READ_OP) available = buffer->length;
 	RETURN(available);
@@ -59,7 +59,7 @@ Lav_PUBLIC_FUNCTION int CTRBGetAvailableReads(LavCrossThreadRingBuffer *buffer) 
 	WILL_RETURN(int);
 	LOCK(buffer->lock);
 	//this one is realy simple.
-	int available = ringmod(buffer->write_position-buffer->read_position, buffer->length);
+	int available = ringmodi(buffer->write_position-buffer->read_position, buffer->length);
 	if(available == 0 && buffer->last_op == WRITE_OP) available = buffer->length;
 	RETURN(available);
 	STANDARD_CLEANUP_BLOCK(buffer->lock);

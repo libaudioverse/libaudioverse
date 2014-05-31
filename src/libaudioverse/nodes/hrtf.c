@@ -69,13 +69,13 @@ LavError hrtfProcessor(LavNode *node, unsigned int count) {
 	hrtfComputeCoefficients(data->hrtf, elevation, azimuth, data->left_response, data->right_response);
 	//this is convolution, with a twist: it uses a ringbuffer to avoid a ton of unnecessary copies.
 	for(unsigned int i = 0; i < count; i++) {
-		data->history_pos = ringmod(data->history_pos+1, data->hrir_length); //putting it here for clarity. It doesn't matter if this is before everything or after it.
+		data->history_pos = ringmodi(data->history_pos+1, data->hrir_length); //putting it here for clarity. It doesn't matter if this is before everything or after it.
 		//first thing we do: read a sample into the ringbuffer.
 		Lav_streamReadSamples(node->inputs[0], 1, data->history+data->history_pos);
 		float outLeft=0, outRight=0;
 		for(unsigned int j = 0; j < data->hrir_length; j++) {
 			//standard convolution.
-			unsigned int index = ringmod(data->history_pos-j, data->hrir_length);
+			unsigned int index = ringmodi(data->history_pos-j, data->hrir_length);
 			outLeft += data->left_response[j]*data->history[index];
 			outRight += data->right_response[j]*data->history[index];
 		}
