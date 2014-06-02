@@ -19,6 +19,7 @@ struct LavMemoryManager {
 typedef struct LavMemoryManager LavMemoryManager;
 
 LavMemoryManager* createMemoryManager();
+void FreeMemoryManager(LavMemoryManager* manager);
 //same as stdlib.
 void* managerAlloc(LavMemoryManager* manager, size_t size);
 void* managerCalloc(LavMemoryManager* manager, size_t elements, size_t size);
