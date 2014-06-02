@@ -34,11 +34,12 @@ Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavGraph *graph, const char* pat
 	SNDFILE *handle = sf_open(path, SFM_READ, &info);
 	if(handle == NULL) SAFERETURN(Lav_ERROR_FILE);
 
-	//For the next little bit, we're holding onto an open file handle.  Do this part and then get it closed, because this will allow continued use of RETURN macro without huge if blocks.
+	//we can associate with the memory manager and have the handle automatically close for us.
+	mmanagerAssociatePointer(localMemoryManager, handle, sf_close);
+
 	sf_count_t fileBufferLength = info.channels*info.frames;
 	float* fileBuffer = malloc((size_t)((fileBufferLength+info.channels)*sizeof(float)));
 	if(fileBuffer == NULL) {
-		sf_close(handle);
 		SAFERETURN(Lav_ERROR_MEMORY);
 	}
 
@@ -49,13 +50,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavGraph *graph, const char* pat
 		readSoFar += readThisTime;
 	} while(readThisTime > 0);
 	if(readSoFar != fileBufferLength/info.channels) {
-		sf_close(handle);
 		free(fileBuffer);
 		SAFERETURN(Lav_ERROR_FILE);
 	}
-
-	//After this, we are done being concerned about files.
-	sf_close(handle);
 
 	unsigned int sr = (unsigned int)info.samplerate, channels = (unsigned int)info.channels, frames = (unsigned int)info.frames; //for sanity, and suppresses some unnecessary warnings.
 
