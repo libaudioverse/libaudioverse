@@ -81,13 +81,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_setParent(LavNode *node, LavNode *parent, unsig
 	LOCK(node->graph->mutex);
 	ERROR_IF_TRUE(inputSlot >= node->num_inputs, Lav_ERROR_INVALID_SLOT);
 	ERROR_IF_TRUE(outputSlot >= parent->num_outputs, Lav_ERROR_INVALID_SLOT);
-	//We just connect the buffers, and set the read position of the stream to the write position of the buffer.
-	LavSampleBuffer *b = parent->outputs[outputSlot];
-	LavStream *s = node->inputs[inputSlot];
-	//Associate the stream to the buffer:
-	s->associated_buffer = b;
-	//And set its read position.
-	s->position = b->write_position;
+	node->input_descriptors[inputSlot].parent = parent;
+	node->input_descriptors[inputSlot].output = outputSlot;
+	nodeComputeInputBuffers(node);
 	RETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK(node->graph->mutex);
 }
@@ -97,14 +93,10 @@ Lav_PUBLIC_FUNCTION LavError Lav_getParent(LavNode *node, unsigned int slot, Lav
 	CHECK_NOT_NULL(node);
 	CHECK_NOT_NULL(parent);
 	CHECK_NOT_NULL(outputNumber);
-	if(node->inputs[slot]->associated_buffer == NULL) {
-		*parent = NULL;
-		*outputNumber = 0;
-	}
-	else {
-		*parent = node->inputs[slot]->associated_buffer->owner.node;
-		*outputNumber = node->inputs[slot]->associated_buffer->owner.slot;
-	}
+	LOCK(node->graph->mutex);
+	ERROR_IF_TRUE(slot < 0 || slot >= node->num_inputs, Lav_ERROR_RANGE);
+	*parent = node->input_desriptors[slot].parent;
+	*inputNumber = node->input_descriptors[slot].input;
 	RETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK(node->graph->mutex);
 }
@@ -114,8 +106,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_clearParent(LavNode *node, unsigned int slot) {
 	CHECK_NOT_NULL(node);
 	LOCK(node->graph->mutex);
 	ERROR_IF_TRUE(slot >= node->num_inputs, Lav_ERROR_INVALID_SLOT);
-	//This is as simple as it looks.
-	node->inputs[slot]->associated_buffer = NULL;
+	node->input_descriptors[slot].parent = NULL;
+	node->input_descriptors[slot].input = 0;
 	RETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK(node->graph->mutex);
 }
