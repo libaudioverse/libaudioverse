@@ -29,9 +29,9 @@ struct LavInputDescriptor {
 
 struct Lav_Node_s {
 	LavGraph *graph;
-	float** input_buffers;
+	float** inputs;
 	LavInputDescriptor *input_descriptors;
-	float** poutput_buffers;
+	float** outputs;
 	unsigned int num_outputs;
 	unsigned int num_inputs;
 	LavProperty **properties;

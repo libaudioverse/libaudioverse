@@ -17,7 +17,7 @@ struct fileinfo {
 	float graphSr, fileSr;
 };
 
-Lav_PUBLIC_FUNCTION LavError fileNodeProcessor(LavNode* node, unsigned int samples);
+Lav_PUBLIC_FUNCTION LavError fileNodeProcessor(LavNode* node);
 
 LavPropertyTableEntry filePropertyTable[] = {
 	Lav_FILE_PITCH_BEND, Lav_PROPERTYTYPE_FLOAT, "pitch_bend", {.fval = 1.0f},
@@ -101,7 +101,7 @@ Lav_PUBLIC_FUNCTION LavError fileNodeProcessor(LavNode* node) {
 		float weight2 = data->offset;
 		for(unsigned int j = 0; j < node->num_outputs; j++) {
 			float sample = data->sample_array[j][samp1]*weight1+data->sample_array[j][samp2]*weight2;
-			node->outputs[j][i] = sammp;
+			node->outputs[j][i] = sample;
 		}
 		data->offset += data->delta*pitch_bend;
 		while(data->offset >= 1) {

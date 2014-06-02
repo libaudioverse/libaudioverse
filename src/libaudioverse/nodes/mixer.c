@@ -11,7 +11,7 @@ struct LavMixerData {
 };
 typedef struct LavMixerData LavMixerData;
 
-LavError mixerProcessor(LavNode *node, unsigned int count);
+LavError mixerProcessor(LavNode *node);
 
 Lav_PUBLIC_FUNCTION LavError Lav_createMixerNode(LavGraph *graph, unsigned int maxParents, unsigned int inputsPerParent, LavNode **destination) {
 	WILL_RETURN(LavError);

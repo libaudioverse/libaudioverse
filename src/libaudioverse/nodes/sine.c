@@ -6,7 +6,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdlib.h>
 #include <libaudioverse/private_all.h>
 
-LavError sineProcessor(LavNode *node, unsigned int count);
+LavError sineProcessor(LavNode *node);
 struct sineinfo {
 	float table_delta;
 	unsigned int start;
@@ -67,7 +67,7 @@ LavError sineProcessor(LavNode *node) {
 	Lav_getFloatProperty(node, Lav_SINE_FREQUENCY, &freq);
 	struct sineinfo *data = node->data;
 	float delta = data->table_delta*freq;
-	for(unsigned int i = 0; i < node->block_size; i++) {
+	for(unsigned int i = 0; i < node->graph->block_size; i++) {
 		float weight1 = 1-data->offset;
 		float weight2 = data->offset;
 		unsigned int samp1 = data->start;

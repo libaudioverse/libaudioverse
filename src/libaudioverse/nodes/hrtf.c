@@ -6,7 +6,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdlib.h>
 #include <libaudioverse/private_all.h>
 
-LavError hrtfProcessor(LavNode *node, unsigned int count);
+LavError hrtfProcessor(LavNode *node);
 
 struct HrtfNodeData {
 	float *history;
@@ -71,7 +71,7 @@ LavError hrtfProcessor(LavNode *node) {
 	for(unsigned int i = 0; i < node->graph->block_size; i++) {
 		data->history_pos = ringmodi(data->history_pos+1, data->hrir_length); //putting it here for clarity. It doesn't matter if this is before everything or after it.
 		//first thing we do: read a sample into the ringbuffer.
-		(data->history+data->history_pos) = node->inputs[0][i];
+		*(data->history+data->history_pos) = node->inputs[0][i];
 		float outLeft=0, outRight=0;
 		for(unsigned int j = 0; j < data->hrir_length; j++) {
 			//standard convolution.
@@ -79,8 +79,8 @@ LavError hrtfProcessor(LavNode *node) {
 			outLeft += data->left_response[j]*data->history[index];
 			outRight += data->right_response[j]*data->history[index];
 		}
-		node->outputs[0][i] = outl;
-		node->outputs[1][i] = outr;
+		node->outputs[0][i] = outLeft;
+		node->outputs[1][i] = outRight;
 	}
 	return Lav_ERROR_NONE;
 }

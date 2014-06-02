@@ -15,7 +15,7 @@ Lav_PUBLIC_FUNCTION LavError freeNode(LavNode *node) {
 	return Lav_ERROR_NONE;
 }
 
-float zerobuffer[MAX_BLOCK_SIZE] = {0}; //this is a shared buffer for the "no parent" case.
+float zerobuffer[Lav_MAX_BLOCK_SIZE] = {0}; //this is a shared buffer for the "no parent" case.
 
 void nodeComputeInputBuffers(LavNode* node) {
 	//point our inputs either at a zeroed buffer or the output of our parent.
@@ -40,7 +40,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int
 
 	//allocations:
 	if(numInputs > 0) {
-		retval->inputs = calloc(numInputs, sizeof(LavInputDesccriptor));
+		retval->inputs = calloc(numInputs, sizeof(LavInputDescriptor));
 		ERROR_IF_TRUE(retval->inputs == NULL, Lav_ERROR_MEMORY);
 	}
 
@@ -69,7 +69,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int
 /*Default Processing function.*/
 Lav_PUBLIC_FUNCTION LavError Lav_processDefault(LavNode *node) {
 	for(unsigned int i = 0; i < node->num_outputs; i++) {
-		memset(node->outputs[i], 0, block_size*sizeof(float));
+		memset(node->outputs[i], 0, node->graph->block_size*sizeof(float));
 	}
 	return Lav_ERROR_NONE;
 }
@@ -95,8 +95,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_getParent(LavNode *node, unsigned int slot, Lav
 	CHECK_NOT_NULL(outputNumber);
 	LOCK(node->graph->mutex);
 	ERROR_IF_TRUE(slot < 0 || slot >= node->num_inputs, Lav_ERROR_RANGE);
-	*parent = node->input_desriptors[slot].parent;
-	*inputNumber = node->input_descriptors[slot].input;
+	*parent = node->input_descriptors[slot].parent;
+	*outputNumber = node->input_descriptors[slot].output;
 	RETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK(node->graph->mutex);
 }
@@ -107,7 +107,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_clearParent(LavNode *node, unsigned int slot) {
 	LOCK(node->graph->mutex);
 	ERROR_IF_TRUE(slot >= node->num_inputs, Lav_ERROR_INVALID_SLOT);
 	node->input_descriptors[slot].parent = NULL;
-	node->input_descriptors[slot].input = 0;
+	node->input_descriptors[slot].output = 0;
 	nodeComputeInputBuffers(node);
 	RETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK(node->graph->mutex);

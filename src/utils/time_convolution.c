@@ -20,7 +20,7 @@ void main(int argc, char** args) {
 
 	LavGraph *graph;
 	LavNode* fileNode, *hrtfNode;
-	Lav_createGraph(SR, &graph);
+	Lav_createGraph(SR, (int)(SR*seconds), &graph);
 	LavError err = Lav_createFileNode(graph, args[1], &fileNode);
 	if(err != Lav_ERROR_NONE) {
 		printf("Error: %d", err);
@@ -44,7 +44,7 @@ void main(int argc, char** args) {
 	printf("Convolving...\n");
 	clock_t start;
 	start = clock();
-	Lav_graphReadAllOutputs(graph, 44100*seconds, storage);
+	Lav_graphReadAllOutputs(graph, storage);
 	clock_t dur = clock()-start;
 	float secs = dur/(float)CLOCKS_PER_SEC;
 	printf("Done.\n");
