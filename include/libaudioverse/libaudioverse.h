@@ -9,6 +9,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 Enums can't go here. Everything else can.*/
 
 typedef struct Lav_Property_s LavProperty;
+typedef struct LavInputDescriptor LavInputDescriptor;
 typedef struct Lav_Node_s LavNode;
 typedef struct Lav_Graph_s LavGraph;
 typedef struct Lav_Table_s LavTable;
