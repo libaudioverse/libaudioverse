@@ -27,37 +27,37 @@ void reverse_endianness(char* buffer, unsigned int count, unsigned int window) {
 //this makes sure that we aren't about to do something silently dangerous and tels us at compile time.
 _Static_assert(sizeof(float) == 4, "Sizeof float is not 4; cannot safely work with hrtfs");
 
+void hrtf_fclose(void* p) {
+	fclose((FILE*)p);
+}
+
 Lav_PUBLIC_FUNCTION LavError Lav_createHrtfData(const char* path, LavHrtfData** destination) {
+	STANDARD_PREAMBLE;
 	//first, load the file if we can.
 	FILE *fp = fopen(path, "rb");
-	if(fp == NULL) {
-		return Lav_ERROR_FILE_NOT_FOUND;
-	}
-
+	ERROR_IF_TRUE(fp == NULL, Lav_ERROR_FILE_NOT_FOUND);
+	mmanagerAssociatePointer(localMemoryManager, fp, hrtf_fclose);
 	size_t size = 0;
 	fseek(fp, 0, SEEK_END);
 	size = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
-	if(size == 0) return Lav_ERROR_HRTF_INVALID;
+	ERROR_IF_TRUE(size == 0, Lav_ERROR_HRTF_INVALID);
 
 	//Okay, load everything.
-	char* data = malloc(size);
-	if(data == NULL) {
-		return Lav_ERROR_MEMORY;
-	}
+	char* data = mmanagerMalloc(localMemoryManager, size);
+	ERROR_IF_TRUE(data == NULL, Lav_ERROR_MEMORY);
 
 	//do the read.
 	size_t read;
 	read = fread(data, 1, size, fp);
-	if(read != size) return Lav_ERROR_FILE;
-	fclose(fp);
+	ERROR_IF_TRUE(read != size, Lav_ERROR_FILE);
 
 	//we now handle endianness.
 	int32_t endianness_marker = *(int32_t*)data;
 	if(endianness_marker != 1) reverse_endianness(data, size, 4);
 	//read it again; if it is still not 1, something has gone badly wrong.
 	endianness_marker = *(int32_t*)data;
-	if(endianness_marker != 1) return Lav_ERROR_HRTF_CORRUPT;
+	ERROR_IF_TRUE(endianness_marker != 1, Lav_ERROR_HRTF_CORRUPT);
 
 	char* iterator = data;
 	const unsigned int window_size = 4;
@@ -77,9 +77,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_createHrtfData(const char* path, LavHrtfData** 
 	iterator += window_size;
 
 	//do some sanity checks.
-	if(number_of_hrirs <= 0) {return Lav_ERROR_HRTF_INVALID;}
-	if(number_of_elevations <= 0) {return Lav_ERROR_HRTF_INVALID;}
-	if(number_of_elevations != 1 && minimum_elevation == maximum_elevation) {return Lav_ERROR_HRTF_INVALID;}
+	ERROR_IF_TRUE(number_of_hrirs <= 0 || number_of_elevations <= 0, Lav_ERROR_HRTF_INVALID);
+	ERROR_IF_TRUE(number_of_elevations != 1 && minimum_elevation == maximum_elevation, Lav_ERROR_HRTF_INVALID);
 
 	//this is the first "dynamic" piece of information.
 	int32_t  *azimuths_per_elevation = malloc(sizeof(int32_t)*number_of_elevations);
@@ -91,7 +90,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createHrtfData(const char* path, LavHrtfData** 
 	//sanity check: we must have as many hrirs as the sum of the above array.
 	int32_t sum_sanity_check = 0;
 	for(int i = 0; i < number_of_elevations; i++) sum_sanity_check +=azimuths_per_elevation[i];
-	if(sum_sanity_check != number_of_hrirs) {return Lav_ERROR_HRTF_INVALID;}
+	ERROR_IF_TRUE(sum_sanity_check != number_of_hrirs, Lav_ERROR_HRTF_INVALID);
 
 	int32_t hrir_length = *(int32_t*)iterator;
 	iterator += window_size;
@@ -100,7 +99,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createHrtfData(const char* path, LavHrtfData** 
 	size_t size_remaining = size-size_so_far;
 	//we must have enough remaining to be all hrir hrirs.
 	size_t hrir_size = hrir_length*number_of_hrirs*sizeof(float);
-	if(hrir_size != size_remaining) {return Lav_ERROR_HRTF_CORRUPT;} //justification: it's probably missing data, not invalid data.
+	ERROR_IF_TRUE(hrir_size != size_remaining, Lav_ERROR_HRTF_CORRUPT); //justification: it's probably missing data, not invalid data.
 
 	LavHrtfData *hrtf = calloc(1, sizeof(LavHrtfData));
 	hrtf->elev_count = number_of_elevations;
@@ -111,16 +110,19 @@ Lav_PUBLIC_FUNCTION LavError Lav_createHrtfData(const char* path, LavHrtfData** 
 	hrtf->max_elevation = maximum_elevation;
 
 	hrtf->azimuth_counts = calloc(number_of_elevations, sizeof(unsigned int));
-	if(hrtf->azimuth_counts == NULL) return Lav_ERROR_MEMORY;
-	for(int i = 0; i < number_of_elevations; i++) hrtf->azimuth_counts[i] = azimuths_per_elevation[i];
+	ERROR_IF_TRUE(hrtf->azimuth_counts == NULL, Lav_ERROR_MEMORY);
+	for(int i = 0; i < number_of_elevations; i++) {
+		hrtf->azimuth_counts[i] = azimuths_per_elevation[i];
+	}
 
 	//last step.  Initialize the HRIR array.
 	hrtf->hrirs = malloc(sizeof(float**)*number_of_elevations); //elevation dimension.
-	if(hrtf->hrirs == NULL) {return Lav_ERROR_MEMORY;}
+	ERROR_IF_TRUE(hrtf->hrirs == NULL, Lav_ERROR_MEMORY);
+
 	//do the azimuth dimension.
 	for(int i = 0; i < number_of_elevations; i++) {
 		hrtf->hrirs[i] = malloc(azimuths_per_elevation[i]*sizeof(float*));
-		if(hrtf->hrirs[i] == NULL) {return Lav_ERROR_MEMORY;}
+		ERROR_IF_TRUE(hrtf->hrirs[i] == NULL, Lav_ERROR_MEMORY);
 	}
 
 	//the above gives us what amounts to a 2d array.  The first dimension represents elevation.  The second dimension represents azimuth going clockwise.
@@ -128,14 +130,15 @@ Lav_PUBLIC_FUNCTION LavError Lav_createHrtfData(const char* path, LavHrtfData** 
 	for(int elev = 0; elev < number_of_elevations; elev++) {
 		for(int azimuth = 0; azimuth < azimuths_per_elevation[elev]; azimuth++) {
 			hrtf->hrirs[elev][azimuth] = malloc(sizeof(float)*hrir_length);
-			if(hrtf->hrirs[elev][azimuth] == NULL) {return Lav_ERROR_NONE;}
+			ERROR_IF_TRUE(hrtf->hrirs[elev][azimuth] == NULL, Lav_ERROR_NONE);
 			memcpy(hrtf->hrirs[elev][azimuth], iterator, hrir_length*sizeof(float));
 			iterator+=hrir_length*sizeof(float);
 		}
 	}
 
 	*destination = hrtf;
-	return Lav_ERROR_NONE;
+	SAFERETURN(Lav_ERROR_NONE);
+	STANDARD_CLEANUP_BLOCK;
 }
 
 //a complete HRTF for stereo is two calls to this function.

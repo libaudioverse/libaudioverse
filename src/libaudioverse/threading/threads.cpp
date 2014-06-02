@@ -10,15 +10,16 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 using namespace std;
 
 Lav_PUBLIC_FUNCTION LavError createMutex(void **destination) {
-	WILL_RETURN(LavError);
 	recursive_mutex *retval = new recursive_mutex();
-	CHECK_NOT_NULL(retval);
+	if(destination == NULL) {
+		return Lav_ERROR_NULL_POINTER;
+	}
+	if(retval == NULL) {
+		return Lav_ERROR_MEMORY;
+	}
 	*destination = (void*)retval;
-	RETURN(Lav_ERROR_NONE);
-	BEGIN_CLEANUP_BLOCK
-	DO_ACTUAL_RETURN;
+	return Lav_ERROR_NONE;
 }
-
 
 Lav_PUBLIC_FUNCTION LavError freeMutex(void *m) {
 	mutex *mut = (mutex*)m;
@@ -37,24 +38,20 @@ Lav_PUBLIC_FUNCTION LavError mutexUnlock(void *m) {
 }
 
 Lav_PUBLIC_FUNCTION LavError threadRun(LavThreadCapableFunction func, void* param, void** destination) {
-	WILL_RETURN(LavError);
-	CHECK_NOT_NULL(destination);
-	CHECK_NOT_NULL(func);
+	if(func == NULL || destination == NULL || param == NULL) {
+		return Lav_ERROR_NULL_POINTER;
+	}
 	thread *t = new thread(func, param);
-	CHECK_NOT_NULL(t);
-	RETURN(Lav_ERROR_NONE);
-	BEGIN_CLEANUP_BLOCK
-	DO_ACTUAL_RETURN;
+	return Lav_ERROR_NONE;
 }
 
 Lav_PUBLIC_FUNCTION LavError threadJoinAndFree(void* t) {
-	WILL_RETURN(LavError);
-	CHECK_NOT_NULL(t);
+	if(t == NULL) {
+		return Lav_ERROR_NULL_POINTER;
+	}
 	((thread*)t)->join();
 	delete (thread*)t;
-	RETURN(Lav_ERROR_NONE);
-	BEGIN_CLEANUP_BLOCK
-	DO_ACTUAL_RETURN;
+	return Lav_ERROR_NONE;
 }
 
 Lav_PUBLIC_FUNCTION void sleepFor(unsigned int milliseconds) {
@@ -66,13 +63,12 @@ Lav_PUBLIC_FUNCTION void yield() {
 }
 
 Lav_PUBLIC_FUNCTION LavError createAFlag(void** destination) {
-	WILL_RETURN(LavError);
 	void* retval = (void*)new atomic_flag();
-	ERROR_IF_TRUE(retval == NULL, Lav_ERROR_MEMORY);
+	if(retval == NULL) {
+		return Lav_ERROR_MEMORY;
+	}
 	*destination = retval;
-	RETURN(Lav_ERROR_NONE);
-	BEGIN_CLEANUP_BLOCK
-	DO_ACTUAL_RETURN;
+	return Lav_ERROR_NONE;
 }
 
 	int aFlagTestAndSet(void* flag) {

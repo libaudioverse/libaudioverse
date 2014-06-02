@@ -12,7 +12,7 @@ Namely, reads past the end wrap to the beginning, and reads before the beginning
 #include <string.h>
 
 Lav_PUBLIC_FUNCTION LavError Lav_createTable(LavTable** destination) {
-	WILL_RETURN(LavError);
+	STANDARD_PREAMBLE;
 	CHECK_NOT_NULL(destination);
 	LavTable *retval = calloc(1, sizeof(LavTable));
 	ERROR_IF_TRUE(retval == NULL, Lav_ERROR_MEMORY);
@@ -20,7 +20,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createTable(LavTable** destination) {
 	retval->length = 2;
 	ERROR_IF_TRUE(retval->samples == NULL, Lav_ERROR_MEMORY);
 	*destination = retval;
-	RETURN(Lav_ERROR_NONE);
+	SAFERETURN(Lav_ERROR_NONE);
 	BEGIN_CLEANUP_BLOCK
 	DO_ACTUAL_RETURN;
 }
@@ -37,29 +37,29 @@ float tableGetSampleFast(LavTable *table, float index) {
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_tableGetSample(LavTable *table, float index, float* destination) {
-	WILL_RETURN(LavError);
+	STANDARD_PREAMBLE;
 	CHECK_NOT_NULL(table);
 	*destination = tableGetSampleFast(table, index);
-	RETURN(Lav_ERROR_NONE);
+	SAFERETURN(Lav_ERROR_NONE);
 	BEGIN_CLEANUP_BLOCK
 	DO_ACTUAL_RETURN;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_tableGetSamples(LavTable* table, float index, float delta, unsigned int count, float* destination) {
-	WILL_RETURN(LavError);
+	STANDARD_PREAMBLE;
 	CHECK_NOT_NULL(table);
 	CHECK_NOT_NULL(destination);
 	for(unsigned int i = 0; i < count; i++) {
 		*destination = tableGetSampleFast(table, index+i*delta);
 		++destination;
 	}
-	RETURN(Lav_ERROR_NONE);
+	SAFERETURN(Lav_ERROR_NONE);
 	BEGIN_CLEANUP_BLOCK
 	DO_ACTUAL_RETURN;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_tableSetSamples(LavTable *table, unsigned int count, float* samples) {
-	WILL_RETURN(LavError);
+	STANDARD_PREAMBLE;
 	CHECK_NOT_NULL(table);
 	CHECK_NOT_NULL(samples);
 	ERROR_IF_TRUE(count <= 0, Lav_ERROR_RANGE);
@@ -69,17 +69,17 @@ Lav_PUBLIC_FUNCTION LavError Lav_tableSetSamples(LavTable *table, unsigned int c
 	memcpy(table->samples, samples, sizeof(float)*count);
 	table->samples[count] = samples[0]; //the extra slot.
 	table->length = count;
-	RETURN(Lav_ERROR_NONE);
+	SAFERETURN(Lav_ERROR_NONE);
 	BEGIN_CLEANUP_BLOCK
 	DO_ACTUAL_RETURN;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_tableClear(LavTable *table) {
-	WILL_RETURN(LavError);
+	STANDARD_PREAMBLE;
 	static float clearedSample = 0.0f;
 	CHECK_NOT_NULL(table);
 	Lav_tableSetSamples(table, 1, &clearedSample);
-	RETURN(Lav_ERROR_NONE);
+	SAFERETURN(Lav_ERROR_NONE);
 	BEGIN_CLEANUP_BLOCK
 	DO_ACTUAL_RETURN;
 }

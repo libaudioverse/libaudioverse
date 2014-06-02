@@ -4,11 +4,36 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include "libaudioverse.h"
 #include "private_threads.h"
+#include "private_memory.h"
 
 /**Private macro definitions.*/
 
+/**The following three macros abstract returning error codes, and make the cleanup logic for locks manageable.
+They exist because goto is a bad thing for clarity, and because they can.*/
+
+#define STANDARD_PREAMBLE LavError return_value;\
+int did_already_lock = 0;\
+void*localMemoryManager = createMmanager();\
+ERROR_IF_TRUE(localMemoryManager == NULL, Lav_ERROR_MEMORY);
+
+#define SAFERETURN(value) do {\
+return_value = value;\
+goto do_return_and_cleanup;\
+} while(0)
+
+#define BEGIN_CLEANUP_BLOCK do_return_and_cleanup:
+
+#define DO_ACTUAL_RETURN return return_value
+
+#define STANDARD_CLEANUP_BLOCK BEGIN_CLEANUP_BLOCK \
+freeMmanager(localMemoryManager);\
+DO_ACTUAL_RETURN
+
+#define LOCK(lock_expression) mutexLock((lock_expression));\
+mmanagerAssociatePointer(localMemoryManager, (lock_expression), mutexUnlock);
+
 #define ERROR_IF_TRUE(expression, error) do {\
-if(expression) RETURN(error);\
+if(expression) SAFERETURN(error);\
 } while(0)
 
 #define CHECK_NOT_NULL(ptr) ERROR_IF_TRUE(ptr == NULL, Lav_ERROR_NULL_POINTER)

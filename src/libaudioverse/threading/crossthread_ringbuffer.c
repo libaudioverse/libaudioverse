@@ -15,7 +15,7 @@ const int WRITE_OP = 1;
 
 
 Lav_PUBLIC_FUNCTION LavError createCrossThreadRingBuffer(int length, int elementSize, LavCrossThreadRingBuffer **destination) {
-	WILL_RETURN(LavError);
+	STANDARD_PREAMBLE;
 	ERROR_IF_TRUE(length == 0 || elementSize == 0, Lav_ERROR_RANGE);
 	int data_size = length*elementSize;
 	char* data = calloc(1, data_size);
@@ -32,7 +32,7 @@ Lav_PUBLIC_FUNCTION LavError createCrossThreadRingBuffer(int length, int element
 	retval->length = length;
 	retval->last_op = READ_OP;
 	*destination = retval;
-	RETURN(Lav_ERROR_NONE);
+	SAFERETURN(Lav_ERROR_NONE);
 	BEGIN_CLEANUP_BLOCK
 	DO_ACTUAL_RETURN;
 }
@@ -45,24 +45,22 @@ is needed for include the audio mixing callback, in which we have some undetermi
 In addition, none of these block.  It is possible to write past the end.*/
 
 Lav_PUBLIC_FUNCTION int CTRBGetAvailableWrites(LavCrossThreadRingBuffer* buffer) {
-	WILL_RETURN(int);
-	LOCK(buffer->lock);
+	mutexLock(buffer->lock);
 	//First, find out how far apart the two heads of the buffer are.
 	int used = ringmodi(buffer->write_position-buffer->read_position, buffer->length); //number of elements currently in use.
 	int available = buffer->length-used; //how many are left?
 	if(available == 0 && buffer->last_op == READ_OP) available = buffer->length;
-	RETURN(available);
-	STANDARD_CLEANUP_BLOCK(buffer->lock);
+	mutexUnlock(buffer->lock);
+	return available;
 }
 
 Lav_PUBLIC_FUNCTION int CTRBGetAvailableReads(LavCrossThreadRingBuffer *buffer) {
-	WILL_RETURN(int);
-	LOCK(buffer->lock);
+	mutexLock(buffer->lock);
 	//this one is realy simple.
 	int available = ringmodi(buffer->write_position-buffer->read_position, buffer->length);
 	if(available == 0 && buffer->last_op == WRITE_OP) available = buffer->length;
-	RETURN(available);
-	STANDARD_CLEANUP_BLOCK(buffer->lock);
+	mutexUnlock(buffer->lock);
+	return available;
 }
 
 #define RB_RETURN do { mutexUnlock(buffer->lock); return; }  while(0)

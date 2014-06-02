@@ -4,8 +4,9 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 #include <libaudioverse/private_all.h>
 #include <portaudio.h>
-#include <uthash.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 typedef struct {
 	LavGraph *graph;
@@ -22,7 +23,7 @@ unsigned int thread_counter = 0; //Used for portaudio init and deinit.  When dec
 
 Lav_PUBLIC_FUNCTION LavError createAudioOutputThread(LavGraph *graph, unsigned int mixAhead, void **destination) {
 	mixAhead+=1; //so we can actually mixahead 0 times.
-	WILL_RETURN(LavError);
+	STANDARD_PREAMBLE;
 	if(thread_counter == 0) {
 		PaError e = Pa_Initialize();
 		ERROR_IF_TRUE(e != paNoError, Lav_ERROR_CANNOT_INIT_AUDIO);
@@ -59,8 +60,8 @@ Lav_PUBLIC_FUNCTION LavError createAudioOutputThread(LavGraph *graph, unsigned i
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
 	//let it go!
 	*destination = param;
-	RETURN(Lav_ERROR_NONE);
-	STANDARD_CLEANUP_BLOCK(graph->mutex);
+	SAFERETURN(Lav_ERROR_NONE);
+	STANDARD_CLEANUP_BLOCK;
 }
 
 Lav_PUBLIC_FUNCTION void stopAudioOutputThread(void* thread) {
@@ -71,16 +72,18 @@ void audioOutputThread(void* vparam) {
 	ThreadParams *param = (ThreadParams*)vparam;
 	LavGraph *graph = param->graph;
 	LavCrossThreadRingBuffer *rb = param->ring_buffer;
+	void* localMemoryManager = createMmanager();
 	Pa_StartStream(param->stream);
 	//This is simple.
 	//Process one block from the graph, write it to the ringbuffer, repeat.
-	float* samples = malloc(param->block_size*sizeof(float)*param->channels);
+	float* samples = mmanagerMalloc(localMemoryManager, param->block_size*sizeof(float)*param->channels);
 	while(aFlagTestAndSet(param->running_flag)) {
 		memset(samples, 0, param->block_size*sizeof(float)*param->channels);
 		Lav_graphReadAllOutputs(graph, samples);
 		CTRBWriteItems(rb, param->block_size, samples);
 		while(CTRBGetAvailableWrites(rb) <= param->block_size);// sleepFor(1); //sleep for 1 ms.
 	}
+	freeMmanager(localMemoryManager);
 }
 
 int audioOutputCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData) {
