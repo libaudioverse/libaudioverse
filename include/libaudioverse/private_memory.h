@@ -5,7 +5,7 @@
 typedef void (*LavFreeingFunction)(void*);
 
 struct LavAllocatedPointer {
-	void* id; //the pointer itself, named specially for uthash.
+	void* pointer; //the pointer itself.
 	LavFreeingFunction free; //what to call with the pointer as argument to get rid of it and all memory associated with it.
 	UT_hash_handle hh; //magic internal field for uthash.
 };
