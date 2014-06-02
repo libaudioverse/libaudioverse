@@ -114,7 +114,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_clearParent(LavNode *node, unsigned int slot) {
 }
 
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeProcessBlock(LavNode *node, float* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeReadBlock(LavNode *node, float* destination) {
 	WILL_RETURN(LavError);
 	CHECK_NOT_NULL(node);
 	CHECK_NOT_NULL(destination);

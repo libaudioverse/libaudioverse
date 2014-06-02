@@ -66,6 +66,6 @@ void graphAssociateNode(LavGraph *graph, LavNode *node) {
 	graph->node_count += 1;
 }
 
-Lav_PUBLIC_FUNCTION Lav_graphReadAllOutputs(LavGraph *graph, unsigned int samples, float* destination) {
-	return Lav_nodeReadAllOutputs(graph->output_node, samples, destination);
+Lav_PUBLIC_FUNCTION Lav_graphReadAllOutputs(LavGraph *graph, float* destination) {
+	return Lav_nodeReadBlock(graph->output_node, destination);
 }
