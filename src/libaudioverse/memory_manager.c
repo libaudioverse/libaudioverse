@@ -46,3 +46,32 @@ LavError mmanagerAssociatePointer(LavMemoryManager* manager, void* ptr, LavFreei
 	RETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK(manager->lock);
 }
+
+void* mmanagerAlloc(LavMemoryManager* manager, size_t size) {
+	void* ptr = malloc(size);
+	if(ptr == NULL) {
+		return NULL;
+	}
+	LavAllocatedPointer *entry = calloc(1, sizeof(LavAllocatedPointer));
+	entry->pointer = ptr;
+	entry->free = free;
+	HASH_ADD_PTR(manager->managed_pointers, pointer, entry);
+	return ptr;
+}
+
+void* mmanagerCalloc(LavMemoryManager* manager, size_t elements, size_t size) {
+	void* ptr = mmanagerAlloc(manager, elements*size);
+	if(ptr == NULL) {
+		return NULL;
+	}
+	memset(ptr, 0, elements*size);
+	return ptr;
+}
+
+void mmanagerFree(LavMemoryManager* manager, void* ptr) {
+	LavAllocatedPointer *entry = NULL;
+	HASH_FIND_PTR(manager->managed_pointers, ptr, entry);
+	if(entry != NULL) {
+		entry->free(entry->pointer);
+	}
+}
