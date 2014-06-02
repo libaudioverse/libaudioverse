@@ -73,8 +73,8 @@ struct AlreadySeenNodes {
 	LavNode** nodes;
 };
 
-Lav_PUBLIC_FUNCTION void graphProcessHelper(LavNode* node, struct AlreadySeenNodes *done, int isRecursing) {
-	if(isRecursing == 0) {
+Lav_PUBLIC_FUNCTION void graphProcessHelper(LavNode* node, struct AlreadySeenNodes *done, int recursingLevel) {
+	if(recursingLevel == 0) {
 		done = malloc(sizeof(struct AlreadySeenNodes));
 		done->count = 0;
 		done->nodes = calloc(16, sizeof(LavNode*));
@@ -84,7 +84,7 @@ Lav_PUBLIC_FUNCTION void graphProcessHelper(LavNode* node, struct AlreadySeenNod
 		return;
 	}
 	for(unsigned int i = 0; i < node->num_inputs; i++) {
-		graphProcessHelper(node->input_descriptors[i].parent, done, 1);
+		graphProcessHelper(node->input_descriptors[i].parent, done, recursingLevel+1);
 	}
 	for(unsigned int i = 0; i < done->count; i++) {
 		if(done->nodes[i] == node) {
@@ -98,6 +98,10 @@ Lav_PUBLIC_FUNCTION void graphProcessHelper(LavNode* node, struct AlreadySeenNod
 	node->process(node);
 	done->nodes[done->count] = node;
 	done->count += 1;
+	if(recursingLevel == 0) {
+		free(done->nodes);
+		free(done);
+	}
 }
 
 
