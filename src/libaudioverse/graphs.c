@@ -5,15 +5,17 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdlib.h>
 #include "graphs.h"
 
-Lav_PUBLIC_FUNCTION LavError Lav_createGraph(float sr, LavGraph **destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createGraph(float sr, unsigned int blockSize, LavGraph **destination) {
 	WILL_RETURN(LavError);
 	LavGraph *retval = calloc(1, sizeof(LavGraph));
 	ERROR_IF_TRUE(retval == NULL, Lav_ERROR_MEMORY);
 	retval->nodes = (LavNode**)calloc(8, sizeof(LavNode*));
 	ERROR_IF_TRUE(retval->nodes == NULL, Lav_ERROR_MEMORY);
+	ERROR_IF_TRUE(blockSize < 1, Lav_ERROR_RANGE);
 	retval->nodes_length = 8;
 
 	retval->sr = sr;
+	retval->block_size = blockSize;
 	*destination = retval;
 
 	//Let's get a mutex:

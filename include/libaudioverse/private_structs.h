@@ -49,6 +49,7 @@ struct Lav_Graph_s {
 	float sr; //sampling rate.
 	void* mutex; //lock this graph.
 	void* audio_thread; //not null thread handle for audio output graphs, otherwise null.
+	unsigned int block_size;
 };
 
 struct Lav_CrossThreadRingBuffer_s {
