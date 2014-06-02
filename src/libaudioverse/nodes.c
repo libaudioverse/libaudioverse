@@ -40,7 +40,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int
 
 	//allocations:
 	if(numInputs > 0) {
-		retval->inputs = calloc(numInputs, sizeof(LavInputDescriptor));
+		retval->input_descriptors = calloc(numInputs, sizeof(LavInputDescriptor));
+		ERROR_IF_TRUE(retval->input_descriptors == NULL, Lav_ERROR_MEMORY);
+		retval->inputs = calloc(numInputs, sizeof(float*));
 		ERROR_IF_TRUE(retval->inputs == NULL, Lav_ERROR_MEMORY);
 	}
 
