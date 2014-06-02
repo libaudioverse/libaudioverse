@@ -17,7 +17,7 @@ int main(int argc, char** args) {
 	char* path = args[1];
 	LavNode *node;
 	LavGraph *graph;
-	Lav_createGraph(44100, 128, &graph);
+	Lav_createGraph(44100, 1024, &graph);
 	LavError err = Lav_createFileNode(graph, path, &node);
 	if(err != Lav_ERROR_NONE) {
 		printf("Error: %d", err);

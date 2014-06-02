@@ -27,7 +27,7 @@ void main(int argc, char** args) {
 	void* th;
 	LavGraph *graph;
 	LavNode** nodes;
-	Lav_createGraph(SR, 128, &graph);
+	Lav_createGraph(SR, 1024, &graph);
 	nodes = calloc(argc-1, sizeof(LavNode*));
 	for(int i = 0; i < argc-1; i++) {
 		LavNode* n = makeNode(graph, args[i+1]);
