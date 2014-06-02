@@ -26,12 +26,11 @@ goto do_return_and_cleanup;\
 #define DO_ACTUAL_RETURN return return_value
 
 #define STANDARD_CLEANUP_BLOCK(mutex) BEGIN_CLEANUP_BLOCK \
-if(did_already_lock) mutexUnlock((mutex));\
 freeMmanager(localMemoryManager);\
 DO_ACTUAL_RETURN
 
 #define LOCK(lock_expression) mutexLock((lock_expression));\
-did_already_lock = 1;
+mmanagerAssociatePointer(localMemoryManager, (lock_expression), mutexUnlock);
 
 #define ERROR_IF_TRUE(expression, error) do {\
 if(expression) SAFERETURN(error);\
