@@ -1,6 +1,7 @@
 #pragma once
 #include <uthash.h>
 #include "private_threads.h"
+#include "libaudioverse.h"
 
 typedef void (*LavFreeingFunction)(void*);
 
@@ -28,4 +29,4 @@ void mmanagerFree(LavMemoryManager* manager, void* ptr);
 //Declare ownership of a pointer, provided an appropriate function to free it.
 //This is incredibly useful for file handles.  File handles are the whole reason for this function.
 //it also makes internal operations easier.
-void managerAssociatePointer(void* ptr, LavFreeingFunction free);
+LavError mmanagerAssociatePointer(LavMemoryManager *manager, void* ptr, LavFreeingFunction freer);

@@ -23,6 +23,9 @@ LavMemoryManager* createMmanager() {
 }
 
 void freeMmanager(LavMemoryManager* manager) {
+	if(manager == NULL) {
+		return;
+	}
 	mutexLock(manager->lock);
 	//we can't fall back to our custom free: if we do, we're modifying the has while we iterate, and that is not a safe thing.
 	LavAllocatedPointer *pointer, *tmp; //needed for iteration by uthash.
@@ -36,6 +39,9 @@ void freeMmanager(LavMemoryManager* manager) {
 
 LavError mmanagerAssociatePointer(LavMemoryManager* manager, void* ptr, LavFreeingFunction freer) {
 	WILL_RETURN(LavError);
+	CHECK_NOT_NULL(manager);
+	CHECK_NOT_NULL(ptr);
+	CHECK_NOT_NULL(freer);
 	LOCK(manager->lock);
 	LavAllocatedPointer* assoc = calloc(1, sizeof(LavAllocatedPointer));
 	ERROR_IF_TRUE(assoc == NULL, Lav_ERROR_MEMORY);
