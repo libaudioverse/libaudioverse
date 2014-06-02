@@ -9,15 +9,19 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 Enums can't go here. Everything else can.*/
 
 typedef struct Lav_Property_s LavProperty;
-typedef struct Lav_SampleBuffer_s LavSampleBuffer;
+typedef struct LavInputDescriptor LavInputDescriptor;
 typedef struct Lav_Node_s LavNode;
-typedef struct Lav_Stream_s LavStream;
 typedef struct Lav_Graph_s LavGraph;
 typedef struct Lav_Table_s LavTable;
 typedef struct LavHrtfData LavHrtfData;
 
 /**Does whatever is appropriate on a given platform to expose a Libaudioverse function publically.*/
 #define Lav_PUBLIC_FUNCTION extern __declspec(dllexport)
+
+enum Lav_LIMITS {
+	Lav_MAX_BLOCK_SIZE = 1024,
+};
+typedef enum Lav_LIMITS LavLimits;
 
 enum Lav_ERRORS {
 	Lav_ERROR_NONE = 0, //everything is OK.
@@ -60,18 +64,18 @@ enum Lav_NODETYPES{
 };
 
 /**This is the processing function's typedef.  See external documentation for info on writing your own nodes.*/
-typedef LavError (*LavNodeProcessorFunction)(LavNode* node, unsigned int samples);
+typedef LavError (*LavNodeProcessorFunction)(LavNode* node);
 
 /**Graph manipulation functions: creation, deletion, and configuration.
 
 All nodes must belong to a graph and exactly one node must be the "output node", the node which will be read from to determine a graph's output.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createGraph(float sr, LavGraph **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createGraph(float sr, unsigned int blockSize, LavGraph **destination);
 Lav_PUBLIC_FUNCTION LavError Lav_freeGraph(LavGraph *graph);
 Lav_PUBLIC_FUNCTION LavError Lav_graphGetOutputNode(LavGraph *graph, LavNode **destination);
 Lav_PUBLIC_FUNCTION LavError Lav_graphSetOutputNode(LavGraph *graph, LavNode *node);
 
 /**Works the same as Lav_nodeReadAllOutputs, below.*/
-Lav_PUBLIC_FUNCTION LavError Lav_graphReadAllOutputs(LavGraph *graph, unsigned int samples, float *destination);
+Lav_PUBLIC_FUNCTION LavError Lav_graphReadAllOutputs(LavGraph *graph, float *destination);
 
 /**Free an instance of a node.*/
 Lav_PUBLIC_FUNCTION LavError Lav_freeNode(LavNode *node);
@@ -98,18 +102,14 @@ Lav_PUBLIC_FUNCTION LavError Lav_getDoubleProperty(LavNode *node, unsigned int s
 Lav_PUBLIC_FUNCTION LavError Lav_getStringProperty(LavNode* node, unsigned int slot, char** destination);
 
 /**This is a default node processing function. It simply writes 0s to all outputs, and can be useful when you need to provide audio and have nothing to do.*/
-Lav_PUBLIC_FUNCTION LavError Lav_processDefault(LavNode *node, unsigned int count);
-
-/**The following functions write and read streams.*/
-Lav_PUBLIC_FUNCTION LavError Lav_bufferWriteSample(LavSampleBuffer *buffer, float sample);
-Lav_PUBLIC_FUNCTION LavError Lav_streamReadSamples(LavStream *stream, unsigned int count, float *destination);
+Lav_PUBLIC_FUNCTION LavError Lav_processDefault(LavNode *node);
 
 /**Helper function to read all of a node's outputs at once.
 This is intended for the ability to do audio output.  The destination parameter should
-be long enough to hold node->num_outputs*samples.  The samples are interweaved in an appropriate manner for most audio output systems:
+be long enough to hold node->graph->block_size*node->num_output samples.  The samples are interweaved in an appropriate manner for most audio output systems:
 the first sample of the first output, the first of the second, the first of the third,...the second of the first, second and third..., etc.
 Put another way, this function pretends that the passed node has node->num_outputs channels, and then interweaves them.*/
-Lav_PUBLIC_FUNCTION LavError Lav_nodeReadAllOutputs(LavNode *node, unsigned int samples, float* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeReadBlock(LavNode *node, float* destination);
 
 /**Interpolated tables.
 

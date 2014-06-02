@@ -12,10 +12,10 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 void main() {
 	//First, make a bunch of objects, connect them together, and get 5 seconds of a sine wave.
-	float sine_time = 5.0;
+	int sine_time = 5;
 	float sr = 44100;
 	LavGraph *graph;
-	Lav_createGraph(sr, &graph);
+	Lav_createGraph(sr, sr*sine_time, &graph); //graph with SINE_TIME blocksize.  Don't do this in real code, as it's memory hungry.
 	LavNode *node;
 	Lav_createSineNode(graph, &node);
 
@@ -32,7 +32,7 @@ void main() {
 		return;
 	}
 
-	Lav_graphReadAllOutputs(graph, (int)(sr*sine_time), output);
+	Lav_graphReadAllOutputs(graph, output);
 
 	//Finally, play it.
 	Pa_Initialize();

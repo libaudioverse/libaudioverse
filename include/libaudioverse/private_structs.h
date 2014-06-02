@@ -22,26 +22,17 @@ struct Lav_Property_s {
 	char* name;
 };
 
-/**This is actually a ring buffer, but should be accessed only through the public interface.*/
-struct Lav_SampleBuffer_s {
-	unsigned int length, write_position;
-	float *samples;
-	struct {
-		LavNode *node;
-		unsigned int slot;
-	} owner;
-};
-
-struct Lav_Stream_s {
-	LavSampleBuffer *associated_buffer;
-	unsigned int position;
+struct LavInputDescriptor {
+	LavNode* parent;
+	unsigned int output;
 };
 
 struct Lav_Node_s {
 	LavGraph *graph;
-	LavSampleBuffer **outputs;
+	float** inputs;
+	LavInputDescriptor *input_descriptors;
+	float** outputs;
 	unsigned int num_outputs;
-	LavStream **inputs;
 	unsigned int num_inputs;
 	LavProperty **properties;
 	unsigned int num_properties;
@@ -58,6 +49,7 @@ struct Lav_Graph_s {
 	float sr; //sampling rate.
 	void* mutex; //lock this graph.
 	void* audio_thread; //not null thread handle for audio output graphs, otherwise null.
+	unsigned int block_size;
 };
 
 struct Lav_CrossThreadRingBuffer_s {

@@ -7,7 +7,7 @@ keep_forever = set() #cffi frees memory when garbage collection happens; this pr
 def property_node():
 	graph = ffi.new("LavGraph **")
 	node = ffi.new("LavNode **")
-	assert lav.Lav_createGraph(44100, graph) == lav.Lav_ERROR_NONE
+	assert lav.Lav_createGraph(44100, 128, graph) == lav.Lav_ERROR_NONE
 	assert lav.Lav_createNode(1, 1, lav.Lav_NODETYPE_ZEROS, graph[0], node) == lav.Lav_ERROR_NONE
 	property_array = ffi.new("LavProperty[4]")
 	keep_forever.add(property_array)

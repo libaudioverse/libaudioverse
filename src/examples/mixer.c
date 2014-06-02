@@ -27,7 +27,7 @@ void main(int argc, char** args) {
 	void* th;
 	LavGraph *graph;
 	LavNode** nodes;
-	Lav_createGraph(SR, &graph);
+	Lav_createGraph(SR, 1024, &graph);
 	nodes = calloc(argc-1, sizeof(LavNode*));
 	for(int i = 0; i < argc-1; i++) {
 		LavNode* n = makeNode(graph, args[i+1]);
@@ -57,7 +57,7 @@ void main(int argc, char** args) {
 	}
 
 	Lav_graphSetOutputNode(graph, mixer);
-	createAudioOutputThread(graph, 1024, 3, &th);
+	createAudioOutputThread(graph, 3, &th);
 	int shouldContinue = 1;
 	char command[512] = "";
 	printf("Enter q to quit.");

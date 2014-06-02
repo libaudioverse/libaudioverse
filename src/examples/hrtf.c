@@ -17,7 +17,7 @@ void main(int argc, char** args) {
 	void* th;
 	LavGraph *graph;
 	LavNode* fileNode, *hrtfNode;
-	Lav_createGraph(SR, &graph);
+	Lav_createGraph(SR, 1024, &graph);
 	LavError err = Lav_createFileNode(graph, args[1], &fileNode);
 	if(err != Lav_ERROR_NONE) {
 		printf("Error: %d", err);
@@ -37,7 +37,7 @@ void main(int argc, char** args) {
 	}
 	Lav_setParent(hrtfNode, fileNode, 0, 0);
 	Lav_graphSetOutputNode(graph, hrtfNode);
-	createAudioOutputThread(graph, 1024, 3, &th);
+	createAudioOutputThread(graph, 3, &th);
 	int shouldContinue = 1;
 	printf("Enter pairs of numbers separated by whitespace, where the first is azimuth (anything) and the second\n"
 "is elevation (-90 to 90).\n"
