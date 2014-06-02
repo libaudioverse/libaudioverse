@@ -108,6 +108,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_clearParent(LavNode *node, unsigned int slot) {
 	ERROR_IF_TRUE(slot >= node->num_inputs, Lav_ERROR_INVALID_SLOT);
 	node->input_descriptors[slot].parent = NULL;
 	node->input_descriptors[slot].input = 0;
+	nodeComputeInputBuffers(node);
 	RETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK(node->graph->mutex);
 }
