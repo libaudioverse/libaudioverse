@@ -114,42 +114,19 @@ Lav_PUBLIC_FUNCTION LavError Lav_clearParent(LavNode *node, unsigned int slot) {
 }
 
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeReadAllOutputs(LavNode *node, unsigned int samples, float* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeProcessBlock(LavNode *node, float* destination) {
 	WILL_RETURN(LavError);
 	CHECK_NOT_NULL(node);
 	CHECK_NOT_NULL(destination);
 	LOCK(node->graph->mutex);
-
-	//Make an array of LavStreams of the appropriate size.
-	LavStream *streams = calloc(node->num_outputs, sizeof(LavStream));
-	ERROR_IF_TRUE(streams == NULL, Lav_ERROR_MEMORY);
-
-	//point the streams at the node.
-	for(unsigned int i = 0; i < node->num_outputs; i++) {
-		streams[i].associated_buffer = node->outputs[i];
-		streams[i].position = node->outputs[i]->write_position;
-	}
-
-	//Now we need some output space.
-	float** output_array = calloc(samples*node->num_outputs, sizeof(float*));
-	ERROR_IF_TRUE(output_array == NULL, Lav_ERROR_MEMORY);
-
-	//Fill this up with arrays of read samples.
-	for(unsigned int i = 0; i < node->num_outputs; i++) {
-		output_array[i] = calloc(samples, sizeof(float));
-		ERROR_IF_TRUE(output_array[i] == NULL, Lav_ERROR_MEMORY);
-		LavError err = Lav_streamReadSamples(&streams[i], samples, output_array[i]);
-		ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
-	}
-
-	//Copy to the output buffer.
-
-	for(unsigned int i = 0; i < node->num_outputs; i++) {
-		for(unsigned int j = 0; j < samples; j++) {
-			destination[i+node->num_outputs*j] = output_array[i][j];
+	//process the node.
+	node->process(node);
+	//the outputs are now read to read.  Do so.
+	for(unsigned int i = 0; i < node->graph->block_size; i++) {
+		for(unsigned int output = 0; output < node->num_outputs; output++) {
+			destination[i*node->num_outputs+output] = node->outputs[output][i];
 		}
 	}
-
 	RETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK(node->graph->mutex);
 }
