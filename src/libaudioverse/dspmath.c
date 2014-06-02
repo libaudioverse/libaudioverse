@@ -7,13 +7,16 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 //Apparently, C's mod is in fact not the discrete math operation: modulus of negative numbers does not follow the description needed for a ringbuffer.
 //These function handles that.
 Lav_PUBLIC_FUNCTION int ringmodi(int dividend, int divisor) {
-	return dividend < 0 ? dividend%divisor+divisor : dividend%divisor;
+	const int result  = dividend%divisor;
+	return result < 0 ? result + divisor : result;
 }
 
 Lav_PUBLIC_FUNCTION float ringmodf(float dividend, float divisor) {
-	return dividend < 0 ? fmodf(dividend, divisor)+divisor : fmodf(dividend, divisor);
+	const float result = fmodf(dividend, divisor);
+	return result < 0 ? result+divisor : result;
 }
 
 Lav_PUBLIC_FUNCTION double ringmod(double dividend, double divisor) {
-	return dividend < 0 ? fmod(dividend, divisor)+divisor : fmod(dividend, divisor);
+	const double result  = fmod(dividend, divisor);
+	return result < 0 ? result+divisor : result;
 }
