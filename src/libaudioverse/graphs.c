@@ -66,6 +66,24 @@ void graphAssociateNode(LavGraph *graph, LavNode *node) {
 	graph->node_count += 1;
 }
 
+//exists so we can do a recursive call.
+Lav_PUBLIC_FUNCTION void graphProcessHelper(LavNode* node) {
+	if(node == NULL) {
+		return;
+	}
+	for(unsigned int i = 0; i < node->num_inputs; i++) {
+		graphProcessHelper(node->input_descriptors[i].parent);
+	}
+		node->process(node);
+}
+
+
 Lav_PUBLIC_FUNCTION Lav_graphReadAllOutputs(LavGraph *graph, float* destination) {
-	return Lav_nodeReadBlock(graph->output_node, destination);
+	WILL_RETURN(LavError);
+	CHECK_NOT_NULL(graph);
+	CHECK_NOT_NULL(destination);
+	LOCK(graph->mutex);
+	graphProcessHelper(graph->output_node);	
+	RETURN(Lav_nodeReadBlock(graph->output_node, destination));
+	STANDARD_CLEANUP_BLOCK(graph->mutex);
 }

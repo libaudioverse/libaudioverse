@@ -121,8 +121,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeReadBlock(LavNode *node, float* destination
 	CHECK_NOT_NULL(node);
 	CHECK_NOT_NULL(destination);
 	LOCK(node->graph->mutex);
-	//process the node.
-	node->process(node);
 	//the outputs are now read to read.  Do so.
 	for(unsigned int i = 0; i < node->graph->block_size; i++) {
 		for(unsigned int output = 0; output < node->num_outputs; output++) {
