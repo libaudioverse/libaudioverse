@@ -20,7 +20,7 @@ void audioOutputThread(void* vparam);
 
 unsigned int thread_counter = 0; //Used for portaudio init and deinit.  When decremented to 0, deinit portaudio.
 
-Lav_PUBLIC_FUNCTION LavError createAudioOutputThread(LavGraph *graph, unsigned int blockSize, unsigned int mixAhead, void **destination) {
+Lav_PUBLIC_FUNCTION LavError createAudioOutputThread(LavGraph *graph, unsigned int mixAhead, void **destination) {
 	mixAhead+=1; //so we can actually mixahead 0 times.
 	WILL_RETURN(LavError);
 	if(thread_counter == 0) {
@@ -30,9 +30,9 @@ Lav_PUBLIC_FUNCTION LavError createAudioOutputThread(LavGraph *graph, unsigned i
 	thread_counter ++;
 	CHECK_NOT_NULL(graph);
 	LOCK(graph->mutex);
+	unsigned int blockSize = graph->block_size;
 	ThreadParams *param = calloc(1, sizeof(ThreadParams));
 	param->graph = graph;
-
 
 	//Calculate the number of channels.
 	LavNode *node;
@@ -77,7 +77,7 @@ void audioOutputThread(void* vparam) {
 	float* samples = malloc(param->block_size*sizeof(float)*param->channels);
 	while(aFlagTestAndSet(param->running_flag)) {
 		memset(samples, 0, param->block_size*sizeof(float)*param->channels);
-		Lav_graphReadAllOutputs(graph, param->block_size, samples);
+		Lav_graphReadAllOutputs(graph, samples);
 		CTRBWriteItems(rb, param->block_size, samples);
 		while(CTRBGetAvailableWrites(rb) <= param->block_size);// sleepFor(1); //sleep for 1 ms.
 	}
