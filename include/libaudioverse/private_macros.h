@@ -13,7 +13,7 @@ They exist because goto is a bad thing for clarity, and because they can.*/
 
 #define STANDARD_PREAMBLE LavError return_value;\
 int did_already_lock = 0;\
-LavMemoryManager *localMemoryManager = createMmanager();\
+void*localMemoryManager = createMmanager();\
 ERROR_IF_TRUE(localMemoryManager == NULL, Lav_ERROR_MEMORY);
 
 #define SAFERETURN(value) do {\
