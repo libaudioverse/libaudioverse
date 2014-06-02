@@ -15,7 +15,7 @@ Lav_PUBLIC_FUNCTION LavError freeNode(LavNode *node) {
 	return Lav_ERROR_NONE;
 }
 
-float zerobuffer[MAX_BLOCK_SIZE] = {0};
+float zerobuffer[MAX_BLOCK_SIZE] = {0}; //this is a shared buffer for the "no parent" case.
 
 void nodeComputeInputBuffers(LavNode* node) {
 	//point our inputs either at a zeroed buffer or the output of our parent.
@@ -67,11 +67,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int
 }
 
 /*Default Processing function.*/
-Lav_PUBLIC_FUNCTION LavError Lav_processDefault(LavNode *node, unsigned int count) {
+Lav_PUBLIC_FUNCTION LavError Lav_processDefault(LavNode *node) {
 	for(unsigned int i = 0; i < node->num_outputs; i++) {
-		for(unsigned int j = 0; j < count; j++) {
-			Lav_bufferWriteSample(node->outputs[i], 0.0f);
-		}
+		memset(node->outputs[i], 0, block_size);
 	}
 	return Lav_ERROR_NONE;
 }
