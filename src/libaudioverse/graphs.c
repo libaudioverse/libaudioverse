@@ -33,7 +33,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_graphGetOutputNode(LavGraph *graph, LavNode **d
 	LOCK(graph->mutex);
 	*destination = graph->output_node;
 	SAFERETURN(Lav_ERROR_NONE);
-	STANDARD_CLEANUP_BLOCK(graph->mutex);
+	STANDARD_CLEANUP_BLOCK;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_graphSetOutputNode(LavGraph *graph, LavNode *node) {
@@ -43,7 +43,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_graphSetOutputNode(LavGraph *graph, LavNode *no
 	LOCK(graph->mutex);
 	graph->output_node = node;
 	SAFERETURN(Lav_ERROR_NONE);
-	STANDARD_CLEANUP_BLOCK(graph->mutex);
+	STANDARD_CLEANUP_BLOCK;
 }
 
 //Internal function for associating nodes with graphs.
@@ -112,5 +112,5 @@ Lav_PUBLIC_FUNCTION Lav_graphReadAllOutputs(LavGraph *graph, float* destination)
 	LOCK(graph->mutex);
 	graphProcessHelper(graph->output_node, NULL, 0);	
 	SAFERETURN(Lav_nodeReadBlock(graph->output_node, destination));
-	STANDARD_CLEANUP_BLOCK(graph->mutex);
+	STANDARD_CLEANUP_BLOCK;
 }

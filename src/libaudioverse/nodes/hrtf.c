@@ -57,7 +57,7 @@ Lav_PUBLIC_FUNCTION Lav_createHrtfNode(LavGraph *graph, LavHrtfData* hrtf, LavNo
 
 	*destination = retval;
 	SAFERETURN(Lav_ERROR_NONE);
-	STANDARD_CLEANUP_BLOCK(graph->mutex);
+	STANDARD_CLEANUP_BLOCK;
 }
 
 LavError hrtfProcessor(LavNode *node) {

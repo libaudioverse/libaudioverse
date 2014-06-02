@@ -64,7 +64,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int
 	graphAssociateNode(retval->graph, retval);
 	*destination = retval;
 	SAFERETURN(Lav_ERROR_NONE);
-	STANDARD_CLEANUP_BLOCK(graph->mutex);
+	STANDARD_CLEANUP_BLOCK;
 }
 
 /*Default Processing function.*/
@@ -86,7 +86,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_setParent(LavNode *node, LavNode *parent, unsig
 	node->input_descriptors[inputSlot].output = outputSlot;
 	nodeComputeInputBuffers(node);
 	SAFERETURN(Lav_ERROR_NONE);
-	STANDARD_CLEANUP_BLOCK(node->graph->mutex);
+	STANDARD_CLEANUP_BLOCK;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_getParent(LavNode *node, unsigned int slot, LavNode **parent, unsigned int *outputNumber) {
@@ -99,7 +99,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_getParent(LavNode *node, unsigned int slot, Lav
 	*parent = node->input_descriptors[slot].parent;
 	*outputNumber = node->input_descriptors[slot].output;
 	SAFERETURN(Lav_ERROR_NONE);
-	STANDARD_CLEANUP_BLOCK(node->graph->mutex);
+	STANDARD_CLEANUP_BLOCK;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_clearParent(LavNode *node, unsigned int slot) {
@@ -111,7 +111,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_clearParent(LavNode *node, unsigned int slot) {
 	node->input_descriptors[slot].output = 0;
 	nodeComputeInputBuffers(node);
 	SAFERETURN(Lav_ERROR_NONE);
-	STANDARD_CLEANUP_BLOCK(node->graph->mutex);
+	STANDARD_CLEANUP_BLOCK;
 }
 
 
@@ -127,5 +127,5 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeReadBlock(LavNode *node, float* destination
 		}
 	}
 	SAFERETURN(Lav_ERROR_NONE);
-	STANDARD_CLEANUP_BLOCK(node->graph->mutex);
+	STANDARD_CLEANUP_BLOCK;
 }

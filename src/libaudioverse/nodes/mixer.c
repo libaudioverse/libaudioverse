@@ -36,7 +36,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createMixerNode(LavGraph *graph, unsigned int m
 
 	*destination = retval;
 	SAFERETURN(Lav_ERROR_NONE);
-	STANDARD_CLEANUP_BLOCK(graph->mutex);
+	STANDARD_CLEANUP_BLOCK;
 }
 
 LavError mixerProcessor(LavNode *node) {

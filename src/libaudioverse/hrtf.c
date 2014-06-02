@@ -138,7 +138,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createHrtfData(const char* path, LavHrtfData** 
 
 	*destination = hrtf;
 	SAFERETURN(Lav_ERROR_NONE);
-	STANDARD_CLEANUP_BLOCK(asdf);
+	STANDARD_CLEANUP_BLOCK;
 }
 
 //a complete HRTF for stereo is two calls to this function.

@@ -25,7 +25,7 @@ goto do_return_and_cleanup;\
 
 #define DO_ACTUAL_RETURN return return_value
 
-#define STANDARD_CLEANUP_BLOCK(mutex) BEGIN_CLEANUP_BLOCK \
+#define STANDARD_CLEANUP_BLOCK BEGIN_CLEANUP_BLOCK \
 freeMmanager(localMemoryManager);\
 DO_ACTUAL_RETURN
 

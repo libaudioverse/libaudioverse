@@ -74,7 +74,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavGraph *graph, const char* pat
 	node->process = fileNodeProcessor;
 	*destination = node;
 	SAFERETURN(Lav_ERROR_NONE);
-	STANDARD_CLEANUP_BLOCK(graph->mutex);
+	STANDARD_CLEANUP_BLOCK;
 }
 
 Lav_PUBLIC_FUNCTION LavError fileNodeProcessor(LavNode* node) {

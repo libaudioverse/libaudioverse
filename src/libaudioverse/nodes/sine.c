@@ -58,7 +58,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavGraph *graph, LavNode **desti
 
 	*destination = retval;
 	SAFERETURN(Lav_ERROR_NONE);
-	STANDARD_CLEANUP_BLOCK(graph->mutex);
+	STANDARD_CLEANUP_BLOCK;
 }
 
 LavError sineProcessor(LavNode *node) {

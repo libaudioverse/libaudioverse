@@ -6,6 +6,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <portaudio.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct {
 	LavGraph *graph;
@@ -60,7 +61,7 @@ Lav_PUBLIC_FUNCTION LavError createAudioOutputThread(LavGraph *graph, unsigned i
 	//let it go!
 	*destination = param;
 	SAFERETURN(Lav_ERROR_NONE);
-	STANDARD_CLEANUP_BLOCK(graph->mutex);
+	STANDARD_CLEANUP_BLOCK;
 }
 
 Lav_PUBLIC_FUNCTION void stopAudioOutputThread(void* thread) {

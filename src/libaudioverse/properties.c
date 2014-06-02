@@ -12,7 +12,7 @@ Lav_PUBLIC_FUNCTION LavError lav_resetProperty(LavNode *node, unsigned int slot)
 	ERROR_IF_TRUE(slot >= node->num_properties || slot < 0, Lav_ERROR_INVALID_SLOT);
 	memcpy(&(node->properties[slot]->value), &(node->properties[slot]->default_value), sizeof(node->properties[slot]->value)); //yes, really.
 	SAFERETURN(Lav_ERROR_NONE);
-	STANDARD_CLEANUP_BLOCK(node->graph->mutex);
+	STANDARD_CLEANUP_BLOCK;
 }
 
 #define PROPERTY_SETTER_PREAMBLE(proptype) STANDARD_PREAMBLE;\
@@ -25,21 +25,21 @@ Lav_PUBLIC_FUNCTION LavError Lav_setIntProperty(LavNode* node, unsigned int slot
 	PROPERTY_SETTER_PREAMBLE(Lav_PROPERTYTYPE_INT);
 	node->properties[slot]->value.ival = value;
 	SAFERETURN(Lav_ERROR_NONE);
-	STANDARD_CLEANUP_BLOCK(node->graph->mutex);
+	STANDARD_CLEANUP_BLOCK;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_setFloatProperty(LavNode *node, unsigned int slot, float value) {
 	PROPERTY_SETTER_PREAMBLE(Lav_PROPERTYTYPE_FLOAT);
 	node->properties[slot]->value.fval = value;
 	SAFERETURN(Lav_ERROR_NONE);
-	STANDARD_CLEANUP_BLOCK(node->graph->mutex);
+	STANDARD_CLEANUP_BLOCK;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_setDoubleProperty(LavNode *node, unsigned int slot, double value) {
 	PROPERTY_SETTER_PREAMBLE(Lav_PROPERTYTYPE_DOUBLE);
 	node->properties[slot]->value.dval = value;
 	SAFERETURN(Lav_ERROR_NONE);
-	STANDARD_CLEANUP_BLOCK(node->graph->mutex);
+	STANDARD_CLEANUP_BLOCK;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_setStringProperty(LavNode *node, unsigned int slot, char* value) {
@@ -48,7 +48,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_setStringProperty(LavNode *node, unsigned int s
 	char* string = strdup(value);
 	node->properties[slot]->value.sval = string;
 	SAFERETURN(Lav_ERROR_NONE);
-	STANDARD_CLEANUP_BLOCK(node->graph->mutex);
+	STANDARD_CLEANUP_BLOCK;
 }
 
 #define PROPERTY_GETTER_PREAMBLE(proptype) STANDARD_PREAMBLE;\
@@ -62,28 +62,28 @@ Lav_PUBLIC_FUNCTION LavError Lav_getIntProperty(LavNode *node, unsigned int slot
 	PROPERTY_GETTER_PREAMBLE(Lav_PROPERTYTYPE_INT);
 	*destination = node->properties[slot]->value.ival;
 	SAFERETURN(Lav_ERROR_NONE);
-	STANDARD_CLEANUP_BLOCK(node->graph->mutex);
+	STANDARD_CLEANUP_BLOCK;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_getFloatProperty(LavNode* node, unsigned int slot, float *destination) {
 	PROPERTY_GETTER_PREAMBLE(Lav_PROPERTYTYPE_FLOAT);
 	*destination = node->properties[slot]->value.fval;
 	SAFERETURN(Lav_ERROR_NONE);
-	STANDARD_CLEANUP_BLOCK(node->graph->mutex);
+	STANDARD_CLEANUP_BLOCK;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_getDoubleProperty(LavNode *node, unsigned int slot, double *destination) {
 	PROPERTY_GETTER_PREAMBLE(Lav_PROPERTYTYPE_DOUBLE);
 	*destination = node->properties[slot]->value.dval;
 	SAFERETURN(Lav_ERROR_NONE);
-	STANDARD_CLEANUP_BLOCK(node->graph->mutex);
+	STANDARD_CLEANUP_BLOCK;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_getStringProperty(LavNode* node, unsigned int slot, char** destination) {
 	PROPERTY_GETTER_PREAMBLE(Lav_PROPERTYTYPE_STRING);
 	*destination = node->properties[slot]->value.sval;
 	SAFERETURN(Lav_ERROR_NONE);
-	STANDARD_CLEANUP_BLOCK(node->graph->mutex);
+	STANDARD_CLEANUP_BLOCK;
 }
 
 //Knows how to sort these.
