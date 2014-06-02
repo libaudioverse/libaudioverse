@@ -11,7 +11,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createGraph(float sr, unsigned int blockSize, L
 	ERROR_IF_TRUE(retval == NULL, Lav_ERROR_MEMORY);
 	retval->nodes = (LavNode**)calloc(8, sizeof(LavNode*));
 	ERROR_IF_TRUE(retval->nodes == NULL, Lav_ERROR_MEMORY);
-	ERROR_IF_TRUE(blockSize < 1, Lav_ERROR_RANGE);
+	ERROR_IF_TRUE(blockSize < 1 || blockSize > Lav_MAX_BLOCK_SIZE, Lav_ERROR_RANGE);
 	retval->nodes_length = 8;
 
 	retval->sr = sr;
