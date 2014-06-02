@@ -14,7 +14,7 @@ Lav_PUBLIC_FUNCTION void* createMmanager();
 Lav_PUBLIC_FUNCTION void freeMmanager(void* manager);
 
 //same as stdlib.
-Lav_PUBLIC_FUNCTION void* mmanagerAlloc(void* manager, unsigned int size);
+Lav_PUBLIC_FUNCTION void* mmanagerMalloc(void* manager, unsigned int size);
 Lav_PUBLIC_FUNCTION void* mmanagerCalloc(void* manager, unsigned int elements, unsigned int size);
 Lav_PUBLIC_FUNCTION void mmanagerFree(void* manager, void* ptr);
 

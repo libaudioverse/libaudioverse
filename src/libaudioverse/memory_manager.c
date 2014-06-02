@@ -69,7 +69,7 @@ Lav_PUBLIC_FUNCTION LavError mmanagerAssociatePointer(void* manager, void* ptr, 
 	return Lav_ERROR_NONE;
 }
 
-Lav_PUBLIC_FUNCTION void* mmanagerAlloc(void* manager, unsigned int size) {
+Lav_PUBLIC_FUNCTION void* mmanagerMalloc(void* manager, unsigned int size) {
 	if(manager == NULL) {
 		return NULL;
 	}
@@ -84,7 +84,7 @@ Lav_PUBLIC_FUNCTION void* mmanagerAlloc(void* manager, unsigned int size) {
 }
 
 Lav_PUBLIC_FUNCTION void* mmanagerCalloc(void* manager, unsigned int elements, unsigned int size) {
-	void* ptr = mmanagerAlloc(manager, elements*size);
+	void* ptr = mmanagerMalloc(manager, elements*size);
 	if(ptr == NULL) {
 		return NULL;
 	}

@@ -38,7 +38,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavGraph *graph, const char* pat
 	mmanagerAssociatePointer(localMemoryManager, handle, sf_close);
 
 	sf_count_t fileBufferLength = info.channels*info.frames;
-	float* fileBuffer = malloc((size_t)((fileBufferLength+info.channels)*sizeof(float)));
+	float* fileBuffer = mmanagerMalloc(localMemoryManager, (unsigned int)((fileBufferLength+info.channels)*sizeof(float)));
 	if(fileBuffer == NULL) {
 		SAFERETURN(Lav_ERROR_MEMORY);
 	}
@@ -49,11 +49,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavGraph *graph, const char* pat
 		readThisTime = sf_readf_float(handle, fileBuffer+readSoFar*info.channels, fileBufferLength/info.channels-readSoFar);
 		readSoFar += readThisTime;
 	} while(readThisTime > 0);
-	if(readSoFar != fileBufferLength/info.channels) {
-		free(fileBuffer);
-		SAFERETURN(Lav_ERROR_FILE);
-	}
-
+	ERROR_IF_TRUE(readSoFar != fileBufferLength/info.channels, Lav_ERROR_FILE);
 	unsigned int sr = (unsigned int)info.samplerate, channels = (unsigned int)info.channels, frames = (unsigned int)info.frames; //for sanity, and suppresses some unnecessary warnings.
 
 	float** uninterleavedSamples = NULL;
