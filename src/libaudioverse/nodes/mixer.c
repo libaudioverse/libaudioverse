@@ -43,8 +43,7 @@ LavError mixerProcessor(LavNode *node) {
 	LavMixerData* data = node->data;
 	for(unsigned int i = 0; i < node->graph->block_size; i++) {
 		for(unsigned int j = 0; j < node->num_inputs; j++) {
-			float samp = 0;
-			samp = node->inputs[j][i];
+			float samp = node->inputs[j][i];
 			data->accumulator_array[j%data->inputs_per_parent] += samp;
 		}
 		for(unsigned int j = 0; j < node->num_outputs; j++) {

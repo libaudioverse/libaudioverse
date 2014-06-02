@@ -67,14 +67,37 @@ void graphAssociateNode(LavGraph *graph, LavNode *node) {
 }
 
 //exists so we can do a recursive call.
-Lav_PUBLIC_FUNCTION void graphProcessHelper(LavNode* node) {
+//Todo: abstract arrays of arbetrary items out completely.
+struct AlreadySeenNodes {
+	unsigned int count, max_length;
+	LavNode** nodes;
+};
+
+Lav_PUBLIC_FUNCTION void graphProcessHelper(LavNode* node, struct AlreadySeenNodes *done, int isRecursing) {
+	if(isRecursing == 0) {
+		done = malloc(sizeof(struct AlreadySeenNodes));
+		done->count = 0;
+		done->nodes = calloc(16, sizeof(LavNode*));
+		done->max_length = 16;
+	}
 	if(node == NULL) {
 		return;
 	}
 	for(unsigned int i = 0; i < node->num_inputs; i++) {
-		graphProcessHelper(node->input_descriptors[i].parent);
+		graphProcessHelper(node->input_descriptors[i].parent, done, 1);
 	}
-		node->process(node);
+	for(unsigned int i = 0; i < done->count; i++) {
+		if(done->nodes[i] == node) {
+			return;
+		}
+	}
+	if(done->count == done->max_length) {
+		done->max_length *= 2;
+		realloc(done->nodes, done->max_length*sizeof(LavNode*));
+	}
+	node->process(node);
+	done->nodes[done->count] = node;
+	done->count += 1;
 }
 
 
@@ -83,7 +106,7 @@ Lav_PUBLIC_FUNCTION Lav_graphReadAllOutputs(LavGraph *graph, float* destination)
 	CHECK_NOT_NULL(graph);
 	CHECK_NOT_NULL(destination);
 	LOCK(graph->mutex);
-	graphProcessHelper(graph->output_node);	
+	graphProcessHelper(graph->output_node, NULL, 0);	
 	RETURN(Lav_nodeReadBlock(graph->output_node, destination));
 	STANDARD_CLEANUP_BLOCK(graph->mutex);
 }
