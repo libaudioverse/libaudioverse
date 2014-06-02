@@ -39,16 +39,16 @@ Lav_PUBLIC_FUNCTION LavError Lav_createMixerNode(LavGraph *graph, unsigned int m
 	STANDARD_CLEANUP_BLOCK(graph->mutex);
 }
 
-LavError mixerProcessor(LavNode *node, unsigned int count) {
+LavError mixerProcessor(LavNode *node) {
 	LavMixerData* data = node->data;
-	for(unsigned int i = 0; i < count; i++) {
+	for(unsigned int i = 0; i < node->graph->block_size; i++) {
 		for(unsigned int j = 0; j < node->num_inputs; j++) {
 			float samp = 0;
 			Lav_streamReadSamples(node->inputs[j], 1, &samp);
 			data->accumulator_array[j%data->inputs_per_parent] += samp;
 		}
 		for(unsigned int j = 0; j < node->num_outputs; j++) {
-			Lav_bufferWriteSample(node->outputs[j], data->accumulator_array[j]/(node->num_inputs/data->inputs_per_parent));
+			node->outputs[j][i] = data->accumulator_array[j]/(node->num_inputs/data->inputs_per_parent);
 			data->accumulator_array[j] = 0;
 		}
 	}
