@@ -30,7 +30,7 @@ void computeSineTable() {
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavGraph *graph, LavNode **destination) {
-	WILL_RETURN(LavError);
+	STANDARD_PREAMBLE;
 	LavError err = Lav_ERROR_NONE;
 	if(hasComputedSineTableFlag == NULL) err = createAFlag(&hasComputedSineTableFlag);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
@@ -42,7 +42,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavGraph *graph, LavNode **desti
 	LOCK(graph->mutex);
 	LavNode *retval = NULL;
 	err = Lav_createNode(0, 1, Lav_NODETYPE_SINE, graph, &retval);
-	if(err != Lav_ERROR_NONE) RETURN(err);
+	if(err != Lav_ERROR_NONE) SAFERETURN(err);
 
 	retval->properties = makePropertyArrayFromTable(sizeof(sinePropertyTable)/sizeof(sinePropertyTable[0]), sinePropertyTable);
 	ERROR_IF_TRUE(retval->properties == NULL, Lav_ERROR_MEMORY);
@@ -57,7 +57,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavGraph *graph, LavNode **desti
 	retval->data = data;
 
 	*destination = retval;
-	RETURN(Lav_ERROR_NONE);
+	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK(graph->mutex);
 }
 

@@ -14,7 +14,7 @@ They exist because goto is a bad thing for clarity, and because they can.*/
 #define STANDARD_PREAMBLE LavError return_value;\
 int did_already_lock = 0;\
 LavMemoryManager *localMemoryManager = createMmanager();\
-ERROR_IF_TRUE(localMemoryManagger == NULL, Lav_ERROR_MEMORY);
+ERROR_IF_TRUE(localMemoryManager == NULL, Lav_ERROR_MEMORY);
 
 #define SAFERETURN(value) do {\
 return_value = value;\
@@ -27,14 +27,14 @@ goto do_return_and_cleanup;\
 
 #define STANDARD_CLEANUP_BLOCK(mutex) BEGIN_CLEANUP_BLOCK \
 if(did_already_lock) mutexUnlock((mutex));\
-mmanagerFree(localMemoryManager);\
+freeMmanager(localMemoryManager);\
 DO_ACTUAL_RETURN
 
 #define LOCK(lock_expression) mutexLock((lock_expression));\
 did_already_lock = 1;
 
 #define ERROR_IF_TRUE(expression, error) do {\
-if(expression) RETURN(error);\
+if(expression) SAFERETURN(error);\
 } while(0)
 
 #define CHECK_NOT_NULL(ptr) ERROR_IF_TRUE(ptr == NULL, Lav_ERROR_NULL_POINTER)

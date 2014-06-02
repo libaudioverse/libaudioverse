@@ -22,7 +22,7 @@ unsigned int thread_counter = 0; //Used for portaudio init and deinit.  When dec
 
 Lav_PUBLIC_FUNCTION LavError createAudioOutputThread(LavGraph *graph, unsigned int mixAhead, void **destination) {
 	mixAhead+=1; //so we can actually mixahead 0 times.
-	WILL_RETURN(LavError);
+	STANDARD_PREAMBLE;
 	if(thread_counter == 0) {
 		PaError e = Pa_Initialize();
 		ERROR_IF_TRUE(e != paNoError, Lav_ERROR_CANNOT_INIT_AUDIO);
@@ -59,7 +59,7 @@ Lav_PUBLIC_FUNCTION LavError createAudioOutputThread(LavGraph *graph, unsigned i
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
 	//let it go!
 	*destination = param;
-	RETURN(Lav_ERROR_NONE);
+	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK(graph->mutex);
 }
 

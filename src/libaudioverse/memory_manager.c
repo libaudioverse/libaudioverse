@@ -4,12 +4,11 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_all.h>
 #include <stdlib.h>
 #include <string.h>
-#include <utarray.h>
 #include <uthash.h>
 
-/**This file uses uthash to implement local and global memory contexts.*/
+/*This file uses uthash to implement local and global memory contexts.*/
 
-LavMemoryManager* createMmanager() {
+Lav_PUBLIC_FUNCTION LavMemoryManager* createMmanager() {
 	LavMemoryManager *manager = NULL;
 	manager = calloc(1, sizeof(LavMemoryManager));
 	if(manager == NULL) {
@@ -22,7 +21,7 @@ LavMemoryManager* createMmanager() {
 	return manager;
 }
 
-void freeMmanager(LavMemoryManager* manager) {
+Lav_PUBLIC_FUNCTION void freeMmanager(LavMemoryManager* manager) {
 	if(manager == NULL) {
 		return;
 	}
@@ -37,22 +36,24 @@ void freeMmanager(LavMemoryManager* manager) {
 	free(manager);
 }
 
-LavError mmanagerAssociatePointer(LavMemoryManager* manager, void* ptr, LavFreeingFunction freer) {
-	WILL_RETURN(LavError);
-	CHECK_NOT_NULL(manager);
-	CHECK_NOT_NULL(ptr);
-	CHECK_NOT_NULL(freer);
-	LOCK(manager->lock);
+Lav_PUBLIC_FUNCTION LavError mmanagerAssociatePointer(LavMemoryManager* manager, void* ptr, LavFreeingFunction freer) {
+	if(manager == NULL || freer == NULL || ptr == NULL) {
+		return Lav_ERROR_NULL_POINTER;
+	}
+	mutexLock(manager->lock);
 	LavAllocatedPointer* assoc = calloc(1, sizeof(LavAllocatedPointer));
-	ERROR_IF_TRUE(assoc == NULL, Lav_ERROR_MEMORY);
+	if(assoc == NULL) {
+		mutexUnlock(manager->lock);
+		return Lav_ERROR_NONE;
+	}
 	assoc->pointer = ptr;
 	assoc->free = freer;
 	HASH_ADD_PTR(manager->managed_pointers, pointer, assoc);
-	RETURN(Lav_ERROR_NONE);
-	STANDARD_CLEANUP_BLOCK(manager->lock);
+	mutexUnlock(manager->lock);
+	return Lav_ERROR_NONE;
 }
 
-void* mmanagerAlloc(LavMemoryManager* manager, size_t size) {
+Lav_PUBLIC_FUNCTION void* mmanagerAlloc(LavMemoryManager* manager, size_t size) {
 	if(manager == NULL) {
 		return NULL;
 	}
@@ -66,7 +67,7 @@ void* mmanagerAlloc(LavMemoryManager* manager, size_t size) {
 	return ptr;
 }
 
-void* mmanagerCalloc(LavMemoryManager* manager, size_t elements, size_t size) {
+Lav_PUBLIC_FUNCTION void* mmanagerCalloc(LavMemoryManager* manager, size_t elements, size_t size) {
 	void* ptr = mmanagerAlloc(manager, elements*size);
 	if(ptr == NULL) {
 		return NULL;
@@ -75,7 +76,7 @@ void* mmanagerCalloc(LavMemoryManager* manager, size_t elements, size_t size) {
 	return ptr;
 }
 
-void mmanagerFree(LavMemoryManager* manager, void* ptr) {
+Lav_PUBLIC_FUNCTION void mmanagerFree(LavMemoryManager* manager, void* ptr) {
 	LavAllocatedPointer *entry = NULL;
 	mutexLock(manager->lock);
 	HASH_FIND_PTR(manager->managed_pointers, ptr, entry);

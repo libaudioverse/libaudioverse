@@ -24,7 +24,7 @@ LavPropertyTableEntry filePropertyTable[] = {
 };
 
 Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavGraph *graph, const char* path, LavNode** destination) {
-	WILL_RETURN(LavError);
+	STANDARD_PREAMBLE;
 	CHECK_NOT_NULL(graph);
 	CHECK_NOT_NULL(path);
 	CHECK_NOT_NULL(destination);
@@ -32,14 +32,14 @@ Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavGraph *graph, const char* pat
 	//the first thing we do is open the file. If this fails, we do nothing more.
 	SF_INFO info;
 	SNDFILE *handle = sf_open(path, SFM_READ, &info);
-	if(handle == NULL) RETURN(Lav_ERROR_FILE);
+	if(handle == NULL) SAFERETURN(Lav_ERROR_FILE);
 
 	//For the next little bit, we're holding onto an open file handle.  Do this part and then get it closed, because this will allow continued use of RETURN macro without huge if blocks.
 	sf_count_t fileBufferLength = info.channels*info.frames;
 	float* fileBuffer = malloc((size_t)((fileBufferLength+info.channels)*sizeof(float)));
 	if(fileBuffer == NULL) {
 		sf_close(handle);
-		return(Lav_ERROR_MEMORY);
+		SAFERETURN(Lav_ERROR_MEMORY);
 	}
 
 	//this is the only other file-sensitive thing in the function: read everything in, and error if we can't.
@@ -51,7 +51,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavGraph *graph, const char* pat
 	if(readSoFar != fileBufferLength/info.channels) {
 		sf_close(handle);
 		free(fileBuffer);
-		RETURN(Lav_ERROR_FILE);
+		SAFERETURN(Lav_ERROR_FILE);
 	}
 
 	//After this, we are done being concerned about files.
@@ -61,7 +61,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavGraph *graph, const char* pat
 
 	float** uninterleavedSamples = NULL;
 	uninterleavedSamples = uninterleaveSamplesFast(channels, frames, fileBuffer);
-	if(uninterleavedSamples == NULL) RETURN(Lav_ERROR_MEMORY);
+	if(uninterleavedSamples == NULL) SAFERETURN(Lav_ERROR_MEMORY);
 
 	struct fileinfo *f = calloc(1, sizeof(struct fileinfo));
 	ERROR_IF_TRUE(f == NULL, Lav_ERROR_MEMORY);
@@ -80,12 +80,12 @@ Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavGraph *graph, const char* pat
 	node->data = f;
 	node->process = fileNodeProcessor;
 	*destination = node;
-	RETURN(Lav_ERROR_NONE);
+	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK(graph->mutex);
 }
 
 Lav_PUBLIC_FUNCTION LavError fileNodeProcessor(LavNode* node) {
-	WILL_RETURN(LavError);
+	STANDARD_PREAMBLE;
 	struct fileinfo *data = node->data;
 	float pitch_bend = 1.0f;
 	Lav_getFloatProperty(node, Lav_FILE_PITCH_BEND, &pitch_bend);
@@ -109,7 +109,7 @@ Lav_PUBLIC_FUNCTION LavError fileNodeProcessor(LavNode* node) {
 			data->offset-= 1;
 		}
 	}
-	RETURN(Lav_ERROR_NONE);
+	SAFERETURN(Lav_ERROR_NONE);
 	BEGIN_CLEANUP_BLOCK
 	DO_ACTUAL_RETURN;
 }

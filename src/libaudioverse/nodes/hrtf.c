@@ -24,7 +24,7 @@ LavPropertyTableEntry hrtfPropertyTable[] = {
 };
 
 Lav_PUBLIC_FUNCTION Lav_createHrtfNode(LavGraph *graph, LavHrtfData* hrtf, LavNode **destination) {
-	WILL_RETURN(LavError);
+	STANDARD_PREAMBLE;
 	LavError err = Lav_ERROR_NONE;
 	CHECK_NOT_NULL(hrtf);
 	CHECK_NOT_NULL(destination);
@@ -56,7 +56,7 @@ Lav_PUBLIC_FUNCTION Lav_createHrtfNode(LavGraph *graph, LavHrtfData* hrtf, LavNo
 	retval->data = data;
 
 	*destination = retval;
-	RETURN(Lav_ERROR_NONE);
+	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK(graph->mutex);
 }
 

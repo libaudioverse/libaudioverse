@@ -6,7 +6,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "graphs.h"
 
 Lav_PUBLIC_FUNCTION LavError Lav_createGraph(float sr, unsigned int blockSize, LavGraph **destination) {
-	WILL_RETURN(LavError);
+	STANDARD_PREAMBLE;
 	LavGraph *retval = calloc(1, sizeof(LavGraph));
 	ERROR_IF_TRUE(retval == NULL, Lav_ERROR_MEMORY);
 	retval->nodes = (LavNode**)calloc(8, sizeof(LavNode*));
@@ -21,28 +21,28 @@ Lav_PUBLIC_FUNCTION LavError Lav_createGraph(float sr, unsigned int blockSize, L
 	//Let's get a mutex:
 	createMutex(&(retval->mutex));
 	ERROR_IF_TRUE(retval->mutex == NULL, Lav_ERROR_UNKNOWN);
-	RETURN(Lav_ERROR_NONE);
+	SAFERETURN(Lav_ERROR_NONE);
 	BEGIN_CLEANUP_BLOCK
 	DO_ACTUAL_RETURN;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_graphGetOutputNode(LavGraph *graph, LavNode **destination) {
-	WILL_RETURN(LavError);
+	STANDARD_PREAMBLE;
 	CHECK_NOT_NULL(graph);
 	CHECK_NOT_NULL(destination);
 	LOCK(graph->mutex);
 	*destination = graph->output_node;
-	RETURN(Lav_ERROR_NONE);
+	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK(graph->mutex);
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_graphSetOutputNode(LavGraph *graph, LavNode *node) {
-	WILL_RETURN(LavError);
+	STANDARD_PREAMBLE;
 	CHECK_NOT_NULL(graph);
 	CHECK_NOT_NULL(node);
 	LOCK(graph->mutex);
 	graph->output_node = node;
-	RETURN(Lav_ERROR_NONE);
+	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK(graph->mutex);
 }
 
@@ -106,11 +106,11 @@ Lav_PUBLIC_FUNCTION void graphProcessHelper(LavNode* node, struct AlreadySeenNod
 
 
 Lav_PUBLIC_FUNCTION Lav_graphReadAllOutputs(LavGraph *graph, float* destination) {
-	WILL_RETURN(LavError);
+	STANDARD_PREAMBLE;
 	CHECK_NOT_NULL(graph);
 	CHECK_NOT_NULL(destination);
 	LOCK(graph->mutex);
 	graphProcessHelper(graph->output_node, NULL, 0);	
-	RETURN(Lav_nodeReadBlock(graph->output_node, destination));
+	SAFERETURN(Lav_nodeReadBlock(graph->output_node, destination));
 	STANDARD_CLEANUP_BLOCK(graph->mutex);
 }
