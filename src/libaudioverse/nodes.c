@@ -69,7 +69,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int
 /*Default Processing function.*/
 Lav_PUBLIC_FUNCTION LavError Lav_processDefault(LavNode *node) {
 	for(unsigned int i = 0; i < node->num_outputs; i++) {
-		memset(node->outputs[i], 0, block_size);
+		memset(node->outputs[i], 0, block_size*sizeof(float));
 	}
 	return Lav_ERROR_NONE;
 }
