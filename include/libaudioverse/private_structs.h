@@ -22,8 +22,16 @@ struct Lav_Property_s {
 	char* name;
 };
 
+struct LavInputDescriptor {
+	LavNode* parent;
+	unsigned int output;
+};
+
 struct Lav_Node_s {
 	LavGraph *graph;
+	float** input_buffers;
+	LavInputDescriptor *input_descriptors;
+	float** poutput_buffers;
 	unsigned int num_outputs;
 	unsigned int num_inputs;
 	LavProperty **properties;
