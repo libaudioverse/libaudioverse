@@ -34,7 +34,6 @@ void freeMmanager(LavMemoryManager* manager) {
 	free(manager);
 }
 
-
 LavError mmanagerAssociatePointer(LavMemoryManager* manager, void* ptr, LavFreeingFunction freer) {
 	WILL_RETURN(LavError);
 	LOCK(manager->lock);
@@ -48,14 +47,16 @@ LavError mmanagerAssociatePointer(LavMemoryManager* manager, void* ptr, LavFreei
 }
 
 void* mmanagerAlloc(LavMemoryManager* manager, size_t size) {
+	if(manager == NULL) {
+		return NULL;
+	}
 	void* ptr = malloc(size);
 	if(ptr == NULL) {
 		return NULL;
 	}
-	LavAllocatedPointer *entry = calloc(1, sizeof(LavAllocatedPointer));
-	entry->pointer = ptr;
-	entry->free = free;
-	HASH_ADD_PTR(manager->managed_pointers, pointer, entry);
+	if(mmanagerAssociatePointer(manager, ptr, free) != Lav_ERROR_NONE) {
+		return NULL;
+	};
 	return ptr;
 }
 
@@ -70,8 +71,10 @@ void* mmanagerCalloc(LavMemoryManager* manager, size_t elements, size_t size) {
 
 void mmanagerFree(LavMemoryManager* manager, void* ptr) {
 	LavAllocatedPointer *entry = NULL;
+	mutexLock(manager->lock);
 	HASH_FIND_PTR(manager->managed_pointers, ptr, entry);
 	if(entry != NULL) {
 		entry->free(entry->pointer);
 	}
+	mutexUnlock(manager->lock);
 }
