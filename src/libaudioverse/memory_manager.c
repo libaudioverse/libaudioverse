@@ -8,3 +8,29 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <uthash.h>
 
 /**This file uses uthash to implement local and global memory contexts.*/
+
+LavMemoryManager* createMmanager() {
+	LavMemoryManager *manager = NULL;
+	manager = calloc(1, sizeof(LavMemoryManager));
+	if(manager == NULL) {
+		return NULL;
+	}
+	LavError err = createMutex(&manager->lock);
+	if(err != Lav_ERROR_NONE) {
+		return NULL;
+	}
+	return manager;
+}
+
+void freeMmanager(LavMemoryManager* manager) {
+	mutexLock(manager->lock);
+	//we can't fall back to our custom free: if we do, we're modifying the has while we iterate, and that is not a safe thing.
+	LavAllocatedPointer *pointer, *tmp; //needed for iteration by uthash.
+	HASH_ITER(hh, manager->managed_pointers, pointer, tmp) {
+		pointer->free(pointer->pointer);
+	}
+	mutexUnlock(manager->lock);
+	freeMutex(manager->lock);
+	free(manager);
+}
+
