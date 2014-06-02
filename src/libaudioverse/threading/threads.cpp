@@ -11,8 +11,11 @@ using namespace std;
 
 Lav_PUBLIC_FUNCTION LavError createMutex(void **destination) {
 	recursive_mutex *retval = new recursive_mutex();
-	if(retval == NULL) {
+	if(destination == NULL) {
 		return Lav_ERROR_NULL_POINTER;
+	}
+	if(retval == NULL) {
+		return Lav_ERROR_MEMORY;
 	}
 	*destination = (void*)retval;
 	return Lav_ERROR_NONE;
@@ -44,7 +47,7 @@ Lav_PUBLIC_FUNCTION LavError threadRun(LavThreadCapableFunction func, void* para
 
 Lav_PUBLIC_FUNCTION LavError threadJoinAndFree(void* t) {
 	if(t == NULL) {
-		return Lav_ERROR_NONE;
+		return Lav_ERROR_NULL_POINTER;
 	}
 	((thread*)t)->join();
 	delete (thread*)t;
