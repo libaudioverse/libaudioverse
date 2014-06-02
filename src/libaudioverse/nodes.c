@@ -15,6 +15,20 @@ Lav_PUBLIC_FUNCTION LavError freeNode(LavNode *node) {
 	return Lav_ERROR_NONE;
 }
 
+float zerobuffer[MAX_BLOCK_SIZE] = {0};
+
+void nodeComputeInputBuffers(LavNode* node) {
+	//point our inputs either at a zeroed buffer or the output of our parent.
+	for(unsigned int i = 0; i < node->num_inputs; i++) {
+		if(node->input_descriptors[i].parent != NULL) {
+			node->inputs[i] = node->input_descriptors[i].parent->outputs[node->input_descriptors[i].output];
+		}
+		else {
+			node->inputs[i] = zerobuffer;
+		}
+	}
+}
+
 Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int numOutputs, enum  Lav_NODETYPE type, LavGraph *graph, LavNode **destination) {
 	WILL_RETURN(LavError);
 	CHECK_NOT_NULL(graph);
@@ -26,19 +40,15 @@ Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int
 
 	//allocations:
 	if(numInputs > 0) {
-		retval->inputs = calloc(numInputs, sizeof(LavStream*));
+		retval->inputs = calloc(numInputs, sizeof(LavInputDesccriptor));
 		ERROR_IF_TRUE(retval->inputs == NULL, Lav_ERROR_MEMORY);
-		for(unsigned int i = 0; i < numInputs; i++) {
-			retval->inputs[i] = calloc(1, sizeof(LavStream));
-			ERROR_IF_TRUE(retval->inputs[i] == NULL, Lav_ERROR_MEMORY);
-		}
 	}
 
 	if(numOutputs > 0) {
-		retval->outputs = calloc(numOutputs, sizeof(LavSampleBuffer*));
+		retval->outputs = calloc(numOutputs, sizeof(float**));
 		ERROR_IF_TRUE(retval->outputs == NULL, Lav_ERROR_MEMORY);
 		for(unsigned int i = 0; i < numOutputs; i++) {
-			retval->outputs[i] = calloc(1, sizeof(LavSampleBuffer));
+			retval->outputs[i] = calloc(graph->block_size, sizeof(float));
 			ERROR_IF_TRUE(retval->outputs[i] == NULL, Lav_ERROR_MEMORY);
 		}
 	}
@@ -46,16 +56,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int
 	retval->type = type;
 	retval->process = Lav_processDefault;
 
-	//Initialize this node's output buffers.
-	for(unsigned int i = 0; i < numOutputs; i++) {
-		//Set the owned node and slot to this one.
-		retval->outputs[i]->owner.node = retval;
-		retval->outputs[i]->owner.slot = i;
-		//Make its sample buffer.
-		retval->outputs[i]->samples = calloc(2048, sizeof(float));
-		retval->outputs[i]->length = 2048;
-	}
-	//There's nothing to do for the streams: they all point at NULL parents.
+	nodeComputeInputBuffers(retval);
 
 	//remember what graph we belong to, and asociate.
 	retval->graph = graph;

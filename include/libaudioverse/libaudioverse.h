@@ -17,6 +17,11 @@ typedef struct LavHrtfData LavHrtfData;
 /**Does whatever is appropriate on a given platform to expose a Libaudioverse function publically.*/
 #define Lav_PUBLIC_FUNCTION extern __declspec(dllexport)
 
+enum Lav_LIMITS {
+	Lav_MAX_BLOCK_SIZE = 1024,
+};
+typedef enum Lav_LIMITS LavLimits;
+
 enum Lav_ERRORS {
 	Lav_ERROR_NONE = 0, //everything is OK.
 	Lav_ERROR_UNKNOWN = 1, //We know something has gone wrong, but can't figure out what.
