@@ -34,3 +34,15 @@ void freeMmanager(LavMemoryManager* manager) {
 	free(manager);
 }
 
+
+LavError mmanagerAssociatePointer(LavMemoryManager* manager, void* ptr, LavFreeingFunction freer) {
+	WILL_RETURN(LavError);
+	LOCK(manager->lock);
+	LavAllocatedPointer* assoc = calloc(1, sizeof(LavAllocatedPointer));
+	ERROR_IF_TRUE(assoc == NULL, Lav_ERROR_MEMORY);
+	assoc->pointer = ptr;
+	assoc->free = freer;
+	HASH_ADD_PTR(manager->managed_pointers, pointer, assoc);
+	RETURN(Lav_ERROR_NONE);
+	STANDARD_CLEANUP_BLOCK(manager->lock);
+}
