@@ -4,7 +4,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 #include <libaudioverse/private_all.h>
 #include <portaudio.h>
-#include <uthash.h>
 #include <stdio.h>
 
 typedef struct {
