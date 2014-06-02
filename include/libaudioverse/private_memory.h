@@ -4,8 +4,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include "private_threads.h"
 #include "libaudioverse.h"
-#ifdef _cplusplus
-extern "c" {
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 typedef void (*LavFreeingFunction)(void*);
@@ -23,6 +23,6 @@ Lav_PUBLIC_FUNCTION void mmanagerFree(void* manager, void* ptr);
 //it also makes internal operations easier.
 Lav_PUBLIC_FUNCTION LavError mmanagerAssociatePointer(void *manager, void* ptr, LavFreeingFunction freer);
 
-#ifdef _cplusplus
+#ifdef __cplusplus
 }
 #endif

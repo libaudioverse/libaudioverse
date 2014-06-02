@@ -16,7 +16,11 @@ typedef struct Lav_Table_s LavTable;
 typedef struct LavHrtfData LavHrtfData;
 
 /**Does whatever is appropriate on a given platform to expose a Libaudioverse function publically.*/
+#ifdef __cplusplus
+#define Lav_PUBLIC_FUNCTION extern "C" __declspec(dllexport)
+#else
 #define Lav_PUBLIC_FUNCTION extern __declspec(dllexport)
+#endif
 
 enum Lav_LIMITS {
 	Lav_MAX_BLOCK_SIZE = 1024,
