@@ -10,7 +10,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <string.h>
 
 #define seconds 5
-float storage[2*44100*seconds] = {0};
+#define blocksize 100
+float storage[blocksize] = {0};
 
 void main(int argc, char** args) {
 	if(argc != 3) {
@@ -20,7 +21,7 @@ void main(int argc, char** args) {
 
 	LavGraph *graph;
 	LavNode* fileNode, *hrtfNode;
-	Lav_createGraph(SR, (int)(SR*seconds), &graph);
+	Lav_createGraph(SR, blocksize, &graph);
 	LavError err = Lav_createFileNode(graph, args[1], &fileNode);
 	if(err != Lav_ERROR_NONE) {
 		printf("Error: %d", err);
@@ -44,7 +45,9 @@ void main(int argc, char** args) {
 	printf("Convolving...\n");
 	clock_t start;
 	start = clock();
-	Lav_graphReadAllOutputs(graph, storage);
+	for(unsigned int i = 0; i < 44100*seconds; i+= blocksize) {
+		Lav_graphReadAllOutputs(graph, storage);
+	}
 	clock_t dur = clock()-start;
 	float secs = dur/(float)CLOCKS_PER_SEC;
 	printf("Done.\n");
