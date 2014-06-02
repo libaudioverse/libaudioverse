@@ -22,26 +22,9 @@ struct Lav_Property_s {
 	char* name;
 };
 
-/**This is actually a ring buffer, but should be accessed only through the public interface.*/
-struct Lav_SampleBuffer_s {
-	unsigned int length, write_position;
-	float *samples;
-	struct {
-		LavNode *node;
-		unsigned int slot;
-	} owner;
-};
-
-struct Lav_Stream_s {
-	LavSampleBuffer *associated_buffer;
-	unsigned int position;
-};
-
 struct Lav_Node_s {
 	LavGraph *graph;
-	LavSampleBuffer **outputs;
 	unsigned int num_outputs;
-	LavStream **inputs;
 	unsigned int num_inputs;
 	LavProperty **properties;
 	unsigned int num_properties;

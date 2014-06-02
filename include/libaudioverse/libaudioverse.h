@@ -9,9 +9,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 Enums can't go here. Everything else can.*/
 
 typedef struct Lav_Property_s LavProperty;
-typedef struct Lav_SampleBuffer_s LavSampleBuffer;
 typedef struct Lav_Node_s LavNode;
-typedef struct Lav_Stream_s LavStream;
 typedef struct Lav_Graph_s LavGraph;
 typedef struct Lav_Table_s LavTable;
 typedef struct LavHrtfData LavHrtfData;
@@ -99,10 +97,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_getStringProperty(LavNode* node, unsigned int s
 
 /**This is a default node processing function. It simply writes 0s to all outputs, and can be useful when you need to provide audio and have nothing to do.*/
 Lav_PUBLIC_FUNCTION LavError Lav_processDefault(LavNode *node, unsigned int count);
-
-/**The following functions write and read streams.*/
-Lav_PUBLIC_FUNCTION LavError Lav_bufferWriteSample(LavSampleBuffer *buffer, float sample);
-Lav_PUBLIC_FUNCTION LavError Lav_streamReadSamples(LavStream *stream, unsigned int count, float *destination);
 
 /**Helper function to read all of a node's outputs at once.
 This is intended for the ability to do audio output.  The destination parameter should
