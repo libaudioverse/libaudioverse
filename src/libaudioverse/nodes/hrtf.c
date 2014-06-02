@@ -79,8 +79,8 @@ LavError hrtfProcessor(LavNode *node, unsigned int count) {
 			outLeft += data->left_response[j]*data->history[index];
 			outRight += data->right_response[j]*data->history[index];
 		}
-		Lav_bufferWriteSample(node->outputs[0], outLeft);
-		Lav_bufferWriteSample(node->outputs[1], outRight);
+		node->outputs[0][i] = outl;
+		node->outputs[1][i] = outr;
 	}
 	return Lav_ERROR_NONE;
 }
