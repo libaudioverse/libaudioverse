@@ -44,7 +44,7 @@ LavError mixerProcessor(LavNode *node) {
 	for(unsigned int i = 0; i < node->graph->block_size; i++) {
 		for(unsigned int j = 0; j < node->num_inputs; j++) {
 			float samp = 0;
-			Lav_streamReadSamples(node->inputs[j], 1, &samp);
+			samp = node->inputs[j][i];
 			data->accumulator_array[j%data->inputs_per_parent] += samp;
 		}
 		for(unsigned int j = 0; j < node->num_outputs; j++) {
