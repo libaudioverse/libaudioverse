@@ -78,7 +78,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavGraph *graph, const char* pat
 }
 
 Lav_PUBLIC_FUNCTION LavError fileNodeProcessor(LavNode* node) {
-	STANDARD_PREAMBLE;
 	struct fileinfo *data = node->data;
 	float pitch_bend = 1.0f;
 	Lav_getFloatProperty(node, Lav_FILE_PITCH_BEND, &pitch_bend);
@@ -102,7 +101,5 @@ Lav_PUBLIC_FUNCTION LavError fileNodeProcessor(LavNode* node) {
 			data->offset-= 1;
 		}
 	}
-	SAFERETURN(Lav_ERROR_NONE);
-	BEGIN_CLEANUP_BLOCK
-	DO_ACTUAL_RETURN;
+	return Lav_ERROR_NONE;
 }
