@@ -24,3 +24,8 @@ void FreeMemoryManager(LavMemoryManager* manager);
 void* managerAlloc(LavMemoryManager* manager, size_t size);
 void* managerCalloc(LavMemoryManager* manager, size_t elements, size_t size);
 void managerFree(LavMemoryManager* manager, void* ptr);
+
+//Declare ownership of a pointer, provided an appropriate function to free it.
+//This is incredibly useful for file handles.  File handles are the whole reason for this function.
+//it also makes internal operations easier.
+void managerAssociatePointer(void* ptr, LavFreeingFunction free);
