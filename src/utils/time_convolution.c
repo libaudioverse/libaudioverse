@@ -11,7 +11,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 #define seconds 5
 #define blocksize 100
-float storage[blocksize] = {0};
+float storage[blocksize*2] = {0};
 
 void main(int argc, char** args) {
 	if(argc != 3) {
