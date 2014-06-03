@@ -48,8 +48,8 @@ Lav_PUBLIC_FUNCTION void freeMmanager(void* manager) {
 	LavAllocatedPointer *pointer, *tmp; //needed for iteration by uthash.
 	HASH_ITER(hh, m->managed_pointers, pointer, tmp) {
 		HASH_DEL(m->managed_pointers, pointer);
-		pointer->free(pointer->pointer);
-		free(pointer);
+		pointer->free(pointer->pointer);//the free of the tracked object; and,
+		free(pointer);//the freeing of the entry that recorded it.
 	}
 	mutexUnlock(m->lock);
 	freeMutex(m->lock);
@@ -70,13 +70,14 @@ Lav_PUBLIC_FUNCTION LavError mmanagerAssociatePointer(void* manager, void* ptr, 
 	LavMemoryManager* m = manager;
 	mutexLock(m->lock);
 	LavAllocatedPointer* assoc = calloc(1, sizeof(LavAllocatedPointer));
+	LavAllocatedPointer *tmp; //unneeded variable for uthash.
 	if(assoc == NULL) {
 		mutexUnlock(m->lock);
 		return Lav_ERROR_NONE;
 	}
 	assoc->pointer = ptr;
 	assoc->free = freer;
-	HASH_ADD_PTR(m->managed_pointers, pointer, assoc);
+	HASH_REPLACE_PTR(m->managed_pointers, pointer, assoc, tmp);
 	mutexUnlock(m->lock);
 	return Lav_ERROR_NONE;
 }
