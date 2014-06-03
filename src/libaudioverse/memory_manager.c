@@ -4,7 +4,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_all.h>
 #include <stdlib.h>
 #include <string.h>
-#include <libaudioverse/uthash.h>
+#include <uthash.h>
 
 /*This file uses uthash to implement local and global memory contexts.*/
 

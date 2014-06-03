@@ -12,6 +12,9 @@ SET(LIBSNDFILE_LIBRARY_DIR "C:/Program Files (x86)/Mega-Nerd/libsndfile/lib" CAC
 INCLUDE_DIRECTORIES(${LIBSNDFILE_INCLUDE_DIR})
 LINK_DIRECTORIES(${LIBSNDFILE_LIBRARY_DIR})
 
+#uthash
+include_directories("${CMAKE_SOURCE_DIR}/uthash/src")
+
 #This fixes portaudio.
 add_definitions(-DPA_WDMKS_NO_KSGUID_LIB)
 
