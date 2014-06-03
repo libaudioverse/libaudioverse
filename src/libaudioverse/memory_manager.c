@@ -44,7 +44,9 @@ Lav_PUBLIC_FUNCTION void freeMmanager(void* manager) {
 	//we can't fall back to our custom free: if we do, we're modifying the has while we iterate, and that is not a safe thing.
 	LavAllocatedPointer *pointer, *tmp; //needed for iteration by uthash.
 	HASH_ITER(hh, m->managed_pointers, pointer, tmp) {
+		HASH_DEL(m->managed_pointers, pointer);
 		pointer->free(pointer->pointer);
+		free(pointer);
 	}
 	mutexUnlock(m->lock);
 	freeMutex(m->lock);
@@ -98,7 +100,9 @@ Lav_PUBLIC_FUNCTION void mmanagerFree(void* manager, void* ptr) {
 	mutexLock(m->lock);
 	HASH_FIND_PTR(m->managed_pointers, ptr, entry);
 	if(entry != NULL) {
+		HASH_DEL(m->managed_pointers, entry);
 		entry->free(entry->pointer);
+		free(entry);
 	}
 	mutexUnlock(m->lock);
 }

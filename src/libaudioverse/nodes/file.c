@@ -23,6 +23,10 @@ LavPropertyTableEntry filePropertyTable[] = {
 	Lav_FILE_PITCH_BEND, Lav_PROPERTYTYPE_FLOAT, "pitch_bend", {.fval = 1.0f},
 };
 
+void file_close(void* h) {
+	sf_close(h);
+}
+
 Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavGraph *graph, const char* path, LavNode** destination) {
 	STANDARD_PREAMBLE;
 	CHECK_NOT_NULL(graph);
@@ -35,7 +39,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavGraph *graph, const char* pat
 	if(handle == NULL) SAFERETURN(Lav_ERROR_FILE);
 
 	//we can associate with the memory manager and have the handle automatically close for us.
-	mmanagerAssociatePointer(localMemoryManager, handle, sf_close);
+	mmanagerAssociatePointer(localMemoryManager, handle, file_close);
 
 	sf_count_t fileBufferLength = info.channels*info.frames;
 	float* fileBuffer = mmanagerMalloc(localMemoryManager, (unsigned int)((fileBufferLength+info.channels)*sizeof(float)));
