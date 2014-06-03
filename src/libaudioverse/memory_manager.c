@@ -22,6 +22,9 @@ struct LavMemoryManager {
 
 typedef struct LavMemoryManager LavMemoryManager;
 
+/**Global memory manager.*/
+void* globalMemoryManager = NULL;
+
 Lav_PUBLIC_FUNCTION void* createMmanager() {
 	LavMemoryManager *manager = NULL;
 	manager = calloc(1, sizeof(LavMemoryManager));
@@ -51,6 +54,13 @@ Lav_PUBLIC_FUNCTION void freeMmanager(void* manager) {
 	mutexUnlock(m->lock);
 	freeMutex(m->lock);
 	free(m);
+}
+
+Lav_PUBLIC_FUNCTION void* mmanagerGetGlobalMemoryManager() {
+	if(globalMemoryManager == NULL) {
+		globalMemoryManager = createMmanager();
+	}
+	return globalMemoryManager;
 }
 
 Lav_PUBLIC_FUNCTION LavError mmanagerAssociatePointer(void* manager, void* ptr, LavFreeingFunction freer) {
