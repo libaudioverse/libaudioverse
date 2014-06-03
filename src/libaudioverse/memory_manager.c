@@ -56,10 +56,15 @@ Lav_PUBLIC_FUNCTION void freeMmanager(void* manager) {
 	free(m);
 }
 
-Lav_PUBLIC_FUNCTION void* mmanagerGetGlobalMemoryManager() {
+Lav_PUBLIC_FUNCTION LavError initializeGlobalMemoryManager() {
+	globalMemoryManager = createMmanager();
 	if(globalMemoryManager == NULL) {
-		globalMemoryManager = createMmanager();
+		return Lav_ERROR_MEMORY;
 	}
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION void* mmanagerGetGlobalMemoryManager() {
 	return globalMemoryManager;
 }
 

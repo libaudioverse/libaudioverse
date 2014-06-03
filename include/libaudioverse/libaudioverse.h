@@ -67,6 +67,9 @@ enum Lav_NODETYPES{
 	Lav_NODETYPE_MIXER,
 };
 
+/**Initialize Libaudioverse.*/
+Lav_PUBLIC_FUNCTION LavError Lav_initializeLibrary();
+
 /**This is the processing function's typedef.  See external documentation for info on writing your own nodes.*/
 typedef LavError (*LavNodeProcessorFunction)(LavNode* node);
 

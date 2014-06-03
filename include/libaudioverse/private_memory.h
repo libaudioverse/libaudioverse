@@ -13,7 +13,8 @@ typedef void (*LavFreeingFunction)(void*);
 Lav_PUBLIC_FUNCTION void* createMmanager();
 Lav_PUBLIC_FUNCTION void freeMmanager(void* manager);
 
-//Gets a global memory manager.
+//global memory manager.
+Lav_PUBLIC_FUNCTION LavError initializeGlobalMemoryManager();
 Lav_PUBLIC_FUNCTION void* mmanagerGetGlobalMemoryManager();
 
 //same as stdlib.

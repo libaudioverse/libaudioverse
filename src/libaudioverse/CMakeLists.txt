@@ -3,6 +3,7 @@ nodes.c
 properties.c
 graphs.c
 audio_output.c
+initialization.c
 interleaving.c
 hrtf.c
 dspmath.c
