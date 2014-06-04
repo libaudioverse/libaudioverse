@@ -1,15 +1,18 @@
 Libaudioverse
 ==============
+Note: this is a work in progress.
 
-Libaudioverse is a library for 3D and environmental audio.
+Libaudioverse is a library for 3D and environmental audio licensed under the GPLV3 or later.  Commercial and closed-source licenses will be made available.
 
 Libaudioverse provides high level abstractions for most things: 3D sources and reverb among them.  Simply create a source, load a file, apply whatever effects you want, and start it playing.  Even the type of output is abstracted away.
+Everyday usage of Libaudioverse is easier than OpenAL, as Libaudioverse is aimed at the working software developer and not the hardware vendor.
 
 At its lowest level, Libaudioverse provides a model of digital signal processing, where the signal flow graph can be represented by nodes and edges between them.
 Nodes process audio.  They have some number of inputs and some number of outputs.  The edges in the graph are formed by input-output relationships; this graph is directed.
 Outputs may be connected to any number of inputs, but an input may be connected to only one output.  How exactly this works is a library internal: you can write your own objects without understanding it, so long as you follow the rules discussed later in this document (todo: define these rules).
 
-In English, you connect outputs to inputs, kind of like plugging in wires.  For example, connecting the sound file reading node to the sound card node will play the sound file.  A sound file input node will have, for example, an output for each channel of the file. Technically, there is no sound card node, but there is an ultimate output node from which audio can be read by whatever wants to play it, and the library does provide an easy way to do so.  As was stated above, you do not need to work at this level.  You nevertheless can if you need to.
+In English, you connect outputs to inputs, kind of like plugging in wires.  For example, connecting the sound file reading node to the sound card node will play the sound file.  A sound file input node will have, for example, an output for each channel of the file. Technically, there is no sound card node, but there is an ultimate output node from which audio can be read by whatever wants to play it, and the library does provide an easy way to do so.
+As was stated above, you do not need to work at this level.  One key feature of the library is that you can if you need to: other options for 3D audio either run fast but provide a very rigid API or run slow but provide flexibility.  Libaudioverse aims to do both.
 
 ##Error Handling##
 
@@ -27,4 +30,4 @@ Everything from this library intended for public use begins with `Lav`, even con
 
 - Struct members are not proceedded by `Lav`, as they are part of the type and this is unnecessary; they are lower-case with ubnderscores separating words.
 
-- Function parameters and local variables are camelccase.
+- Function parameters, local variables, and types  are camelccase.  Types have their first letter capitalized.
