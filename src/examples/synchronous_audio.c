@@ -20,7 +20,7 @@ void main() {
 		printf("Failed to initialize library. Error: %i", err);
 		return;
 	}
-	Lav_createGraph(sr, sr*sine_time, &graph); //graph with SINE_TIME blocksize.  Don't do this in real code, as it's memory hungry.
+	Lav_createGraph(sr, 100, &graph); //graph with SINE_TIME blocksize.  Don't do this in real code, as it's memory hungry.
 	LavNode *node;
 	Lav_createSineNode(graph, &node);
 
@@ -37,7 +37,7 @@ void main() {
 		return;
 	}
 
-	Lav_graphReadAllOutputs(graph, output);
+	for(int i = 0; i < sr*sine_time; i+=100) Lav_graphReadAllOutputs(graph, output+i);
 
 	//Finally, play it.
 	Pa_Initialize();
