@@ -19,16 +19,17 @@ typedef struct {
 int audioOutputCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
 void audioOutputThread(void* vparam);
 
-unsigned int thread_counter = 0; //Used for portaudio init and deinit.  When decremented to 0, deinit portaudio.
+Lav_PUBLIC_FUNCTION initializeAudioOutput() {
+	PaError err = Pa_Initialize();
+	if(err < 0) {
+		return Lav_ERROR_CANNOT_INIT_AUDIO;
+	}
+	return Lav_ERROR_NONE;
+}
 
 Lav_PUBLIC_FUNCTION LavError createAudioOutputThread(LavGraph *graph, unsigned int mixAhead, void **destination) {
 	mixAhead+=1; //so we can actually mixahead 0 times.
 	STANDARD_PREAMBLE;
-	if(thread_counter == 0) {
-		PaError e = Pa_Initialize();
-		ERROR_IF_TRUE(e != paNoError, Lav_ERROR_CANNOT_INIT_AUDIO);
-	}
-	thread_counter ++;
 	CHECK_NOT_NULL(graph);
 	LOCK(graph->mutex);
 	unsigned int blockSize = graph->block_size;

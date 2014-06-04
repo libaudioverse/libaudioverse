@@ -14,6 +14,7 @@ typedef LavError (*initfunc_t)();
 initfunc_t initializers[] = {
 	initializeGlobalMemoryManager,
 	initializeFunctionTables,
+	initializeAudioOutput,
 };
 
 LavError Lav_initializeLibrary() {
