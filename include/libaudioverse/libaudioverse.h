@@ -65,6 +65,7 @@ enum Lav_NODETYPES{
 	Lav_NODETYPE_HRTF,
 	Lav_NODETYPE_SINE,
 	Lav_NODETYPE_MIXER,
+	Lav_NODETYPE_ATTENUATOR,
 };
 
 /**Initialize Libaudioverse.*/
