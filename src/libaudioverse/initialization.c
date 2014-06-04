@@ -16,13 +16,18 @@ initfunc_t initializers[] = {
 	initializeFunctionTables,
 	initializeAudioOutput,
 };
+unsigned int isInitialized = 0;
 
 LavError Lav_initializeLibrary() {
+	if(isInitialized == 1) {
+		return Lav_ERROR_NONE;
+	}
 	for(int i = 0; i < sizeof(initializers)/sizeof(initializers[0]); i++) {
 		LavError err = initializers[i]();
 		if(err != Lav_ERROR_NONE) {
 			return err;
 		}
 	}
+	isInitialized = 1;
 	return Lav_ERROR_NONE;
 }
