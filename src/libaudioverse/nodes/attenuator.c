@@ -18,6 +18,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createAttenuatorNode(LavGraph *graph, unsigned 
 
 	CHECK_NOT_NULL(destination);
 	CHECK_NOT_NULL(graph);
+	ERROR_IF_TRUE(numInputs <= 0, Lav_ERROR_RANGE);
 	LOCK(graph->mutex);
 	LavNode *retval = NULL;
 	err = Lav_createNode(numInputs, numInputs, Lav_NODETYPE_ATTENUATOR, graph, &retval);
