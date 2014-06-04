@@ -5,7 +5,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdlib.h>
 #include <string.h>
 
-Lav_PUBLIC_FUNCTION LavError lav_resetProperty(LavIProperties *what, unsigned int slot) {
+Lav_PUBLIC_FUNCTION LavError lav_resetProperty(LavObject *what, unsigned int slot) {
 		STANDARD_PREAMBLE;
 	CHECK_NOT_NULL(what);
 	LOCK(what->mutex);
@@ -21,28 +21,28 @@ LOCK(what->mutex);\
 ERROR_IF_TRUE(slot >= what->num_properties || slot<0, Lav_ERROR_INVALID_SLOT);\
 ERROR_IF_TRUE(what->properties[slot]->type != proptype, Lav_ERROR_TYPE_MISMATCH)\
 
-Lav_PUBLIC_FUNCTION LavError Lav_setIntProperty(LavIProperties *what, unsigned int slot, int value) {
+Lav_PUBLIC_FUNCTION LavError Lav_setIntProperty(LavObject *what, unsigned int slot, int value) {
 	PROPERTY_SETTER_PREAMBLE(Lav_PROPERTYTYPE_INT);
 	what->properties[slot]->value.ival = value;
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_setFloatProperty(LavIProperties *what, unsigned int slot, float value) {
+Lav_PUBLIC_FUNCTION LavError Lav_setFloatProperty(LavObject *what, unsigned int slot, float value) {
 	PROPERTY_SETTER_PREAMBLE(Lav_PROPERTYTYPE_FLOAT);
 	what->properties[slot]->value.fval = value;
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_setDoubleProperty(LavIProperties *what, unsigned int slot, double value) {
+Lav_PUBLIC_FUNCTION LavError Lav_setDoubleProperty(LavObject *what, unsigned int slot, double value) {
 	PROPERTY_SETTER_PREAMBLE(Lav_PROPERTYTYPE_DOUBLE);
 	what->properties[slot]->value.dval = value;
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_setStringProperty(LavIProperties *what, unsigned int slot, char* value) {
+Lav_PUBLIC_FUNCTION LavError Lav_setStringProperty(LavObject *what, unsigned int slot, char* value) {
 	PROPERTY_SETTER_PREAMBLE(Lav_PROPERTYTYPE_STRING);
 	CHECK_NOT_NULL(value);
 	char* string = strdup(value);
@@ -58,28 +58,28 @@ LOCK(what->mutex);\
 ERROR_IF_TRUE(slot >= what->num_properties || slot < 0, Lav_ERROR_INVALID_SLOT);\
 ERROR_IF_TRUE(proptype != what->properties[slot]->type, Lav_ERROR_TYPE_MISMATCH)
 
-Lav_PUBLIC_FUNCTION LavError Lav_getIntProperty(LavIProperties *what, unsigned int slot, int *destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_getIntProperty(LavObject *what, unsigned int slot, int *destination) {
 	PROPERTY_GETTER_PREAMBLE(Lav_PROPERTYTYPE_INT);
 	*destination = what->properties[slot]->value.ival;
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_getFloatProperty(LavIProperties* what, unsigned int slot, float *destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_getFloatProperty(LavObject* what, unsigned int slot, float *destination) {
 	PROPERTY_GETTER_PREAMBLE(Lav_PROPERTYTYPE_FLOAT);
 	*destination = what->properties[slot]->value.fval;
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_getDoubleProperty(LavIProperties *what, unsigned int slot, double *destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_getDoubleProperty(LavObject *what, unsigned int slot, double *destination) {
 	PROPERTY_GETTER_PREAMBLE(Lav_PROPERTYTYPE_DOUBLE);
 	*destination = what->properties[slot]->value.dval;
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_getStringProperty(LavIProperties *what, unsigned int slot, char** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_getStringProperty(LavObject *what, unsigned int slot, char** destination) {
 	PROPERTY_GETTER_PREAMBLE(Lav_PROPERTYTYPE_STRING);
 	*destination = what->properties[slot]->value.sval;
 	SAFERETURN(Lav_ERROR_NONE);

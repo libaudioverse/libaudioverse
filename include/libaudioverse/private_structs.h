@@ -30,25 +30,23 @@ struct LavInputDescriptor {
 	unsigned int output;
 };
 
-/**Placing this at the beginning of a struct makes it treatable as something with properties.*/
-struct LavIProperties {
+/**Things all Libaudioverse objects have.*/
+struct LavObject {
 		LavProperty **properties;
 	unsigned int num_properties;
-	void* mutex;
-};
-
-typedef struct LavIProperties LavIPropereties;
-
-struct LavNode {
-	LavIProperties base;
-	LavGraph *graph;
 	float** inputs;
 	LavInputDescriptor *input_descriptors;
 	float** outputs;
 	unsigned int num_outputs;
 	unsigned int num_inputs;
+	LavProcessorFunction process; //what to call to process this node.
+	void* mutex;
+};
+
+struct LavNode {
+	LavObject base;
+	LavGraph *graph;
 	enum Lav_NODETYPES type;
-	LavNodeProcessorFunction process; //what to call to process this node.
 	double internal_time;
 	void *data; //place for node subtypes to place data.
 };
