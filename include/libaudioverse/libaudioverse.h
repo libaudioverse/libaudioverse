@@ -147,6 +147,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_createHrtfNode(LavGraph *graph, LavHrtfData* hr
 /**Make a mixer.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createMixerNode(LavGraph *graph, unsigned int maxParents, unsigned int inputsPerParent, LavNode **destination);
 
+/**Make an attenuator.*/
+Lav_PUBLIC_FUNCTION LavError Lav_createAttenuatorNode(LavGraph* graph, unsigned int numInputs, LavNode** destination);
+
 #ifdef __cplusplus
 }
 #endif

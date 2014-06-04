@@ -22,6 +22,7 @@ nodes/sine.c
 nodes/file.c
 nodes/hrtf.c
 nodes/mixer.c
+nodes/attenuator.c
 )
 TARGET_LINK_LIBRARIES(libaudioverse ${libaudioverse_required_libraries})
 SET_PROPERTY(TARGET libaudioverse PROPERTY RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_BINARY_DIR}")
