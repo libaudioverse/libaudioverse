@@ -14,7 +14,7 @@ void main() {
 		printf("Failed to initialize library. Error: %i", err);
 		return;
 	}
-	Lav_createGraph(SR, 128, &graph);
+	Lav_createGraph(SR, 1024, &graph);
 	Lav_createSineNode(graph, &node);
 	Lav_graphSetOutputNode(graph, node);
 	createAudioOutputThread(graph, 3, &th);
