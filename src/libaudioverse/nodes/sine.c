@@ -29,9 +29,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavGraph *graph, LavNode **desti
 	err = Lav_createNode(0, 1, Lav_NODETYPE_SINE, graph, &retval);
 	if(err != Lav_ERROR_NONE) SAFERETURN(err);
 
-	retval->properties = makePropertyArrayFromTable(sizeof(sinePropertyTable)/sizeof(sinePropertyTable[0]), sinePropertyTable);
-	ERROR_IF_TRUE(retval->properties == NULL, Lav_ERROR_MEMORY);
-	retval->num_properties = sizeof(sinePropertyTable)/sizeof(sinePropertyTable[0]);
+	retval->base.properties = makePropertyArrayFromTable(sizeof(sinePropertyTable)/sizeof(sinePropertyTable[0]), sinePropertyTable);
+	ERROR_IF_TRUE(retval->base.properties == NULL, Lav_ERROR_MEMORY);
+	retval->base.num_properties = sizeof(sinePropertyTable)/sizeof(sinePropertyTable[0]);
 
 	retval->process = sineProcessor;
 
@@ -49,7 +49,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavGraph *graph, LavNode **desti
 LavError sineProcessor(LavNode *node) {
 	float freq = 0;
 	float sr = node->graph->sr;
-	Lav_getFloatProperty(node, Lav_SINE_FREQUENCY, &freq);
+	Lav_getFloatProperty((LavIProperties*)node, Lav_SINE_FREQUENCY, &freq);
 	struct sineinfo *data = node->data;
 	float delta = data->table_delta*freq;
 	for(unsigned int i = 0; i < node->graph->block_size; i++) {

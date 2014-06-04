@@ -23,7 +23,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createMixerNode(LavGraph *graph, unsigned int m
 	err = Lav_createNode(maxParents*inputsPerParent, inputsPerParent, Lav_NODETYPE_MIXER, graph, &retval);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
 
-	retval->num_properties = 0;
+	retval->base.num_properties = 0;
 
 	retval->process = mixerProcessor;
 
