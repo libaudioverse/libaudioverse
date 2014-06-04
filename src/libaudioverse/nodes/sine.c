@@ -13,29 +13,14 @@ struct sineinfo {
 	float offset;
 };
 
-//the array must be one more than length.
-float sineTable[44101];
-unsigned int sineTableLength = 44100;
-void* hasComputedSineTableFlag = NULL;
 
 LavPropertyTableEntry sinePropertyTable[1] = {
 	Lav_SINE_FREQUENCY, Lav_PROPERTYTYPE_FLOAT, "frequency", {.fval = 440},
 };
 
-void computeSineTable() {
-	for(unsigned int i = 0; i < sineTableLength; i++) {
-		sineTable[i] = sinf(2*PI*i/sineTableLength); //sine wave of frequency 1 for 1 second.
-	}
-	sineTable[sineTableLength] = sineTable[0]; //make sure the last sample mirrors the first.
-}
-
 Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavGraph *graph, LavNode **destination) {
 	STANDARD_PREAMBLE;
 	LavError err = Lav_ERROR_NONE;
-	if(hasComputedSineTableFlag == NULL) err = createAFlag(&hasComputedSineTableFlag);
-	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
-	ERROR_IF_TRUE(hasComputedSineTableFlag == NULL, Lav_ERROR_MEMORY);
-	if(aFlagTestAndSet(hasComputedSineTableFlag) == 0) computeSineTable();
 
 	CHECK_NOT_NULL(destination);
 	CHECK_NOT_NULL(graph);

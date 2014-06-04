@@ -13,6 +13,7 @@ typedef LavError (*initfunc_t)();
 //Initialization stops at the first failed function and does not continue.
 initfunc_t initializers[] = {
 	initializeGlobalMemoryManager,
+	initializeFunctionTables,
 };
 
 LavError Lav_initializeLibrary() {
