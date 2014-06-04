@@ -23,33 +23,33 @@ void objectComputeInputBuffers(LavObject* obj) {
 	}
 }
 
-Lav_PUBLIC_FUNCTION LavError initLavObject(unsigned int numInputs, unsigned int numOutputs, enum  Lav_NODETYPE type, unsigned int blockSize, void* mutex, LavObject **destination) {
+Lav_PUBLIC_FUNCTION LavError initLavObject(unsigned int numInputs, unsigned int numOutputs, enum  Lav_NODETYPE type, unsigned int blockSize, void* mutex, LavObject *destination) {
 	STANDARD_PREAMBLE;
 	CHECK_NOT_NULL(destination);
 	CHECK_NOT_NULL(mutex);
 	ERROR_IF_TRUE(blockSize > Lav_MAX_BLOCK_SIZE, Lav_ERROR_RANGE);
-	retval->num_inputs = numInputs;
-	retval->num_outputs = numOutputs;
-	retval->mutex = mutex;
+	destination->num_inputs = numInputs;
+	destination->num_outputs = numOutputs;
+	destination->mutex = mutex;
 	//allocations:
 	if(numInputs > 0) {
-		retval->input_descriptors = calloc(numInputs, sizeof(LavInputDescriptor));
-		ERROR_IF_TRUE(retval->input_descriptors == NULL, Lav_ERROR_MEMORY);
-		retval->inputs = calloc(numInputs, sizeof(float*));
-		ERROR_IF_TRUE(retval->inputs == NULL, Lav_ERROR_MEMORY);
+		destination->input_descriptors = calloc(numInputs, sizeof(LavInputDescriptor));
+		ERROR_IF_TRUE(destination->input_descriptors == NULL, Lav_ERROR_MEMORY);
+		destination->inputs = calloc(numInputs, sizeof(float*));
+		ERROR_IF_TRUE(destination->inputs == NULL, Lav_ERROR_MEMORY);
 	}
 
 	if(numOutputs > 0) {
-		retval->outputs = calloc(numOutputs, sizeof(float**));
-		ERROR_IF_TRUE(retval->outputs == NULL, Lav_ERROR_MEMORY);
+		destination->outputs = calloc(numOutputs, sizeof(float**));
+		ERROR_IF_TRUE(destination->outputs == NULL, Lav_ERROR_MEMORY);
 		for(unsigned int i = 0; i < retval->num_outputs; i++) {
-			retval->outputs[i] = calloc(blockSize, sizeof(float));
-			ERROR_IF_TRUE(retval->outputs[i] == NULL, Lav_ERROR_MEMORY);
+			destination->outputs[i] = calloc(blockSize, sizeof(float));
+			ERROR_IF_TRUE(destination->outputs[i] == NULL, Lav_ERROR_MEMORY);
 		}
 	}
 
-	retval->type = type;
-	objectComputeInputBuffers(retval); //at the moment, this is going to just make them all 0, but it takes effect once parents are added.
+	destination->type = type;
+	objectComputeInputBuffers(destination); //at the moment, this is going to just make them all 0, but it takes effect once parents are added.
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_createObject(unsigned int numInputs, unsigned int numOutputs, enum  Lav_OBJECTTYPE type, unsigned int blockSize, void* mutex, LavObject **destination) {

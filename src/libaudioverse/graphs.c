@@ -7,26 +7,25 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 Lav_PUBLIC_FUNCTION LavError Lav_createGraph(float sr, unsigned int blockSize, LavGraph **destination) {
 	STANDARD_PREAMBLE;
+	ERROR_IF_TRUE(blockSize < 1 || blockSize > Lav_MAX_BLOCK_SIZE, Lav_ERROR_RANGE);
 	LavGraph *retval = calloc(1, sizeof(LavGraph));
 	ERROR_IF_TRUE(retval == NULL, Lav_ERROR_MEMORY);
-	retval->nodes = (LavNode**)calloc(8, sizeof(LavNode*));
+	void* mut;
+	lavError err = createMutex(&mut);
+	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
+	initLavObject(0, 0, lav_OBJTYPE_GRAPH, blockSize, mut, graph);
+	retval->nodes = (LavObject**)calloc(8, sizeof(LavObject*));
 	ERROR_IF_TRUE(retval->nodes == NULL, Lav_ERROR_MEMORY);
-	ERROR_IF_TRUE(blockSize < 1 || blockSize > Lav_MAX_BLOCK_SIZE, Lav_ERROR_RANGE);
 	retval->nodes_length = 8;
-
 	retval->sr = sr;
 	retval->block_size = blockSize;
 	*destination = retval;
-
-	//Let's get a mutex:
-	createMutex(&(retval->mutex));
-	ERROR_IF_TRUE(retval->mutex == NULL, Lav_ERROR_UNKNOWN);
 	SAFERETURN(Lav_ERROR_NONE);
 	BEGIN_CLEANUP_BLOCK
 	DO_ACTUAL_RETURN;
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_graphGetOutputNode(LavGraph *graph, LavNode **destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_graphGetOutputNode(LavObject *graph, LavObject **destination) {
 	STANDARD_PREAMBLE;
 	CHECK_NOT_NULL(graph);
 	CHECK_NOT_NULL(destination);
@@ -36,7 +35,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_graphGetOutputNode(LavGraph *graph, LavNode **d
 	STANDARD_CLEANUP_BLOCK;
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_graphSetOutputNode(LavGraph *graph, LavNode *node) {
+Lav_PUBLIC_FUNCTION LavError Lav_graphSetOutputNode(LavObject *graph, LavObject *node) {
 	STANDARD_PREAMBLE;
 	CHECK_NOT_NULL(graph);
 	CHECK_NOT_NULL(node);
@@ -48,10 +47,10 @@ Lav_PUBLIC_FUNCTION LavError Lav_graphSetOutputNode(LavGraph *graph, LavNode *no
 
 //Internal function for associating nodes with graphs.
 //If the node is already in the graph, do nothing; otherwise, do necessary reallocations.
-void graphAssociateNode(LavGraph *graph, LavNode *node) {
+void graphAssociateNode(LavNode *graph, LavNode*node) {
 	//See if the node is in the graph.
 	for(unsigned int i = 0; i < graph->node_count; i++) {
-		if(graph->nodes[i] == node) return;
+		if(graph->nodes[i] == (LavObject*)node) return;
 	}
 
 	if(graph->node_count == graph->nodes_length) { //reallocation is needed.
@@ -70,14 +69,14 @@ void graphAssociateNode(LavGraph *graph, LavNode *node) {
 //Todo: abstract arrays of arbetrary items out completely.
 struct AlreadySeenNodes {
 	unsigned int count, max_length;
-	LavNode** nodes;
+	LavObject** nodes;
 };
 
-Lav_PUBLIC_FUNCTION void graphProcessHelper(LavNode* node, struct AlreadySeenNodes *done, int recursingLevel) {
+Lav_PUBLIC_FUNCTION void graphProcessHelper(LavObject* node, struct AlreadySeenNodes *done, int recursingLevel) {
 	if(recursingLevel == 0) {
 		done = malloc(sizeof(struct AlreadySeenNodes));
 		done->count = 0;
-		done->nodes = calloc(16, sizeof(LavNode*));
+		done->nodes = calloc(16, sizeof(LavObject*));
 		done->max_length = 16;
 	}
 	if(node == NULL) {
@@ -95,22 +94,11 @@ Lav_PUBLIC_FUNCTION void graphProcessHelper(LavNode* node, struct AlreadySeenNod
 		done->max_length *= 2;
 		realloc(done->nodes, done->max_length*sizeof(LavNode*));
 	}
-	node->process(node);
+	objectProcessSafe(node);
 	done->nodes[done->count] = node;
 	done->count += 1;
 	if(recursingLevel == 0) {
 		free(done->nodes);
 		free(done);
 	}
-}
-
-
-Lav_PUBLIC_FUNCTION Lav_graphReadAllOutputs(LavGraph *graph, float* destination) {
-	STANDARD_PREAMBLE;
-	CHECK_NOT_NULL(graph);
-	CHECK_NOT_NULL(destination);
-	LOCK(graph->mutex);
-	graphProcessHelper(graph->output_node, NULL, 0);	
-	SAFERETURN(Lav_nodeReadBlock(graph->output_node, destination));
-	STANDARD_CLEANUP_BLOCK;
 }
