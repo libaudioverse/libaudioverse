@@ -12,7 +12,7 @@ LavPropertyTableEntry attenuatorPropertyTable[1] = {
 	Lav_ATTENUATOR_MULTIPLIER, Lav_PROPERTYTYPE_FLOAT, "multiplier", {.fval = 440},
 };
 
-Lav_PUBLIC_FUNCTION LavError Lav_createAttenuatorNode(LavGraph *graph, LavNode **destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createAttenuatorNode(LavGraph *graph, unsigned int numInputs, LavNode **destination) {
 	STANDARD_PREAMBLE;
 	LavError err = Lav_ERROR_NONE;
 
@@ -20,7 +20,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createAttenuatorNode(LavGraph *graph, LavNode *
 	CHECK_NOT_NULL(graph);
 	LOCK(graph->mutex);
 	LavNode *retval = NULL;
-	err = Lav_createNode(1, 1, Lav_NODETYPE_ATTENUATOR, graph, &retval);
+	err = Lav_createNode(numInputs, numInputs, Lav_NODETYPE_ATTENUATOR, graph, &retval);
 	if(err != Lav_ERROR_NONE) SAFERETURN(err);
 
 	retval->properties = makePropertyArrayFromTable(sizeof(attenuatorPropertyTable)/sizeof(attenuatorPropertyTable[0]), attenuatorPropertyTable);
@@ -40,7 +40,9 @@ LavError attenuatorProcessor(LavNode *node) {
 	Lav_getFloatProperty(node, Lav_ATTENUATOR_MULTIPLIER, &mul);
 	float delta = data->table_delta*freq;
 	for(unsigned int i = 0; i < node->graph->block_size; i++) {
-	node->outputs[0][i] = node->inputs[0][i]*mul;
+		for9unsigned int o = 0; o < node->num_outputs; o++) {
+			node->outputs[o][i] = node->inputs[o][i]*mul;
+		}
 	}
 	return Lav_ERROR_NONE;
 }
