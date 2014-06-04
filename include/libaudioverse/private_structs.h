@@ -9,7 +9,7 @@ extern "C" {
 #endif
 
 //All structs here are private.
-//Anything not exposed indireclty through the public api is followed by its typedef in this file.
+//Anything not exposed directly through the public api is followed by its typedef in this file.
 
 union LavPropertyValue {
 	float fval;
@@ -30,15 +30,23 @@ struct LavInputDescriptor {
 	unsigned int output;
 };
 
+/**Placing this at the beginning of a struct makes it treatable as something with properties.*/
+struct LavIProperties {
+		LavProperty **properties;
+	unsigned int num_properties;
+	void* mutex;
+};
+
+typedef struct LavIProperties LavIPropereties;
+
 struct LavNode {
+	LavIProperties base;
 	LavGraph *graph;
 	float** inputs;
 	LavInputDescriptor *input_descriptors;
 	float** outputs;
 	unsigned int num_outputs;
 	unsigned int num_inputs;
-	LavProperty **properties;
-	unsigned int num_properties;
 	enum Lav_NODETYPES type;
 	LavNodeProcessorFunction process; //what to call to process this node.
 	double internal_time;

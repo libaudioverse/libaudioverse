@@ -36,6 +36,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int
 	ERROR_IF_TRUE(retval == NULL, Lav_ERROR_MEMORY);
 	retval->num_inputs = numInputs;
 	retval->num_outputs = numOutputs;
+	retval->base.mutex = graph->mutex;
 
 	//allocations:
 	if(numInputs > 0) {

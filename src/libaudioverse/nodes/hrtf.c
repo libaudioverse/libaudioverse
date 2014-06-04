@@ -33,10 +33,10 @@ Lav_PUBLIC_FUNCTION Lav_createHrtfNode(LavGraph *graph, LavHrtfData* hrtf, LavNo
 	err = Lav_createNode(1, 2, Lav_NODETYPE_HRTF, graph, &retval);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
 
-	retval->properties = makePropertyArrayFromTable(sizeof(hrtfPropertyTable)/sizeof(hrtfPropertyTable[0]), hrtfPropertyTable);
-	retval->num_properties = sizeof(hrtfPropertyTable)/sizeof(hrtfPropertyTable[0]);
+	retval->base.properties = makePropertyArrayFromTable(sizeof(hrtfPropertyTable)/sizeof(hrtfPropertyTable[0]), hrtfPropertyTable);
+	retval->base.num_properties = sizeof(hrtfPropertyTable)/sizeof(hrtfPropertyTable[0]);
 
-	ERROR_IF_TRUE(retval->properties == NULL, Lav_ERROR_MEMORY);
+	ERROR_IF_TRUE(retval->base.properties == NULL, Lav_ERROR_MEMORY);
 
 	retval->process = hrtfProcessor;
 
@@ -63,8 +63,8 @@ Lav_PUBLIC_FUNCTION Lav_createHrtfNode(LavGraph *graph, LavHrtfData* hrtf, LavNo
 LavError hrtfProcessor(LavNode *node) {
 	HrtfNodeData *data = node->data;
 	float azimuth, elevation;
-	Lav_getFloatProperty(node, Lav_HRTF_AZIMUTH, &azimuth);
-	Lav_getFloatProperty(node, Lav_HRTF_ELEVATION, &elevation);
+	Lav_getFloatProperty((LavIProperties*)node, Lav_HRTF_AZIMUTH, &azimuth);
+	Lav_getFloatProperty((LavIProperties*)node, Lav_HRTF_ELEVATION, &elevation);
 	//compute hrirs.
 	hrtfComputeCoefficients(data->hrtf, elevation, azimuth, data->left_response, data->right_response);
 	//this is convolution, with a twist: it uses a ringbuffer to avoid a ton of unnecessary copies.

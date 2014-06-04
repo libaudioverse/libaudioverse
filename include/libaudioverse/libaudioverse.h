@@ -17,6 +17,7 @@ typedef struct LavNode LavNode;
 typedef struct LavGraph LavGraph;
 typedef struct LavTable LavTable;
 typedef struct LavHrtfData LavHrtfData;
+typedef struct LavIProperties LavIProperties;
 
 /**Does whatever is appropriate on a given platform to expose a Libaudioverse function publically.*/
 #ifdef __cplusplus
@@ -100,17 +101,17 @@ Lav_PUBLIC_FUNCTION LavError Lav_setParent(LavNode *node, LavNode *parent, unsig
 Lav_PUBLIC_FUNCTION LavError Lav_clearParent(LavNode *node, unsigned int slot);
 
 /**Resets a property to its default value, for any type.*/
-Lav_PUBLIC_FUNCTION LavError Lav_resetProperty(LavNode *node, unsigned int slot);
+Lav_PUBLIC_FUNCTION LavError Lav_resetProperty(LavIProperties *node, unsigned int slot);
 
 /**Property getters and setters.*/
-Lav_PUBLIC_FUNCTION LavError Lav_setIntProperty(LavNode* node, unsigned int slot, int value);
-Lav_PUBLIC_FUNCTION LavError Lav_setFloatProperty(LavNode *node, unsigned int slot, float value);
-Lav_PUBLIC_FUNCTION LavError Lav_setDoubleProperty(LavNode *node, unsigned int slot, double value);
-Lav_PUBLIC_FUNCTION LavError Lav_setStringProperty(LavNode *node, unsigned int slot, char* value);
-Lav_PUBLIC_FUNCTION LavError Lav_getIntProperty(LavNode *node, unsigned int slot, int *destination);
-Lav_PUBLIC_FUNCTION LavError Lav_getFloatProperty(LavNode* node, unsigned int slot, float *destination);
-Lav_PUBLIC_FUNCTION LavError Lav_getDoubleProperty(LavNode *node, unsigned int slot, double *destination);
-Lav_PUBLIC_FUNCTION LavError Lav_getStringProperty(LavNode* node, unsigned int slot, char** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_setIntProperty(LavIProperties* what, unsigned int slot, int value);
+Lav_PUBLIC_FUNCTION LavError Lav_setFloatProperty(LavIProperties *what, unsigned int slot, float value);
+Lav_PUBLIC_FUNCTION LavError Lav_setDoubleProperty(LavIProperties *what, unsigned int slot, double value);
+Lav_PUBLIC_FUNCTION LavError Lav_setStringProperty(LavIProperties*what, unsigned int slot, char* value);
+Lav_PUBLIC_FUNCTION LavError Lav_getIntProperty(LavIProperties*what, unsigned int slot, int *destination);
+Lav_PUBLIC_FUNCTION LavError Lav_getFloatProperty(LavIProperties* what, unsigned int slot, float *destination);
+Lav_PUBLIC_FUNCTION LavError Lav_getDoubleProperty(LavIProperties*what, unsigned int slot, double *destination);
+Lav_PUBLIC_FUNCTION LavError Lav_getStringProperty(LavIProperties* what, unsigned int slot, char** destination);
 
 /**This is a default node processing function. It simply writes 0s to all outputs, and can be useful when you need to provide audio and have nothing to do.*/
 Lav_PUBLIC_FUNCTION LavError Lav_processDefault(LavNode *node);
