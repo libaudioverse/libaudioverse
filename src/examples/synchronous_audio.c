@@ -15,6 +15,11 @@ void main() {
 	int sine_time = 5;
 	float sr = 44100;
 	LavGraph *graph;
+	LavError err = Lav_initializeLibrary();
+	if(err != Lav_ERROR_NONE) {
+		printf("Failed to initialize library. Error: %i", err);
+		return;
+	}
 	Lav_createGraph(sr, sr*sine_time, &graph); //graph with SINE_TIME blocksize.  Don't do this in real code, as it's memory hungry.
 	LavNode *node;
 	Lav_createSineNode(graph, &node);

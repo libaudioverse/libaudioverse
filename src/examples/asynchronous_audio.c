@@ -9,6 +9,11 @@ void main() {
 	void* th;
 	LavGraph *graph;
 	LavNode* node;
+	LavError err = Lav_initializeLibrary();
+	if(err != Lav_ERROR_NONE) {
+		printf("Failed to initialize library. Error: %i", err);
+		return;
+	}
 	Lav_createGraph(SR, 128, &graph);
 	Lav_createSineNode(graph, &node);
 	Lav_graphSetOutputNode(graph, node);

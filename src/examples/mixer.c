@@ -10,7 +10,12 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 LavNode* makeNode(LavGraph *graph, char* file) {
 	LavNode *retval;
-	LavError err = Lav_createFileNode(graph, file, &retval);
+	LavError err = Lav_initializeLibrary();
+	if(err != Lav_ERROR_NONE) {
+		printf("Failed to initialize library. Error: %i", err);
+		return;
+	}
+	err = Lav_createFileNode(graph, file, &retval);
 	if(err != Lav_ERROR_NONE) {
 		printf("Error: %i", err);
 		return NULL;
