@@ -5,6 +5,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "libaudioverse.h"
 #include "private_threads.h"
 #include "private_memory.h"
+//this is only macros; consequently, no ifdef __cplusplus.
 
 /**Private macro definitions.*/
 

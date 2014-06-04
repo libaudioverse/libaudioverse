@@ -4,5 +4,13 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include "libaudioverse.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //Get a sample, with no error checking.
 float tableGetSampleFast(LavTable* table, float index);
+
+#ifdef __cplusplus
+}
+#endif

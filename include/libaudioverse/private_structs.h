@@ -4,6 +4,9 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include "libaudioverse.h"
 #include "private_threads.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 //All structs here are private.
 //Anything not exposed indireclty through the public api is followed by its typedef in this file.
@@ -74,3 +77,7 @@ struct LavPropertyTableEntry {
 };
 
 typedef struct LavPropertyTableEntry LavPropertyTableEntry;
+
+#ifdef __cplusplus
+}
+#endif
