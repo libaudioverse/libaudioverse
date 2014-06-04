@@ -1,5 +1,6 @@
 import random
 from make_cffi import *
+from .conf import *
 
 def test_ringbuffer():
 	"""Test the ringbuffer, extensively.

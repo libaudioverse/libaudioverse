@@ -1,6 +1,7 @@
 """Makes a node with a property of each type, and then tests getting, setting, and clearing."""
 from make_cffi import *
 import itertools
+from .conf import *
 
 keep_forever = set() #cffi frees memory when garbage collection happens; this prevents it.
 

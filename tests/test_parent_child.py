@@ -1,5 +1,6 @@
 """Tests the parent-child relationships."""
 from make_cffi import *
+from .conf import *
 
 def parent_child():
 	"""This function does a bunch of useful setup as well as being a test; thus, we return all the objects."""

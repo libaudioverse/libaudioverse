@@ -1,7 +1,7 @@
 """Test tables.  This follows very similar logic to the sine wave test, but uses a 0, 1, 0, 1...pattern."""
 from math import floor, ceil
 from make_cffi import *
-accuracy = 1e-3
+from .conf import *
 
 def test_create_table():
 	assert lav.Lav_initializeLibrary() == lav.Lav_ERROR_NONE

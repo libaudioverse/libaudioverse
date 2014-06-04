@@ -1,5 +1,6 @@
 """Initializes nodes, checking their integrity.  That is, whether or not it is likely to crash when used."""
 from make_cffi import *
+from .conf import *
 
 def basic_node_checks(node):
 	assert node is not ffi.NULL
