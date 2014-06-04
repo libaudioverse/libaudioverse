@@ -16,7 +16,8 @@ Justification: this greatly simplifies interpolating between samples when the en
 float sineTable[44101];
 const int sineTableLength = 44100;
 #define PI (3.14159f)
-Lav_PUBLIC_FUNCTION LavError computeSineTable() {
+
+Lav_PUBLIC_FUNCTION void computeSineTable() {
 	for(unsigned int i = 0; i < sineTableLength; i++) {
 		sineTable[i] = sinf(2*PI*i/sineTableLength); //sine wave of frequency 1 for 1 second.
 	}
