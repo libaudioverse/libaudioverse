@@ -8,11 +8,11 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 /*Forward-declares all Libaudioverse types.
 Enums can't go here. Everything else can.*/
 
-typedef struct Lav_Property_s LavProperty;
+typedef struct LavProperty LavProperty;
 typedef struct LavInputDescriptor LavInputDescriptor;
-typedef struct Lav_Node_s LavNode;
-typedef struct Lav_Graph_s LavGraph;
-typedef struct Lav_Table_s LavTable;
+typedef struct LavNode LavNode;
+typedef struct LavGraph LavGraph;
+typedef struct LavTable LavTable;
 typedef struct LavHrtfData LavHrtfData;
 
 /**Does whatever is appropriate on a given platform to expose a Libaudioverse function publically.*/

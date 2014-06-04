@@ -18,7 +18,7 @@ Lav_PUBLIC_FUNCTION LavError mutexLock(void *m);
 Lav_PUBLIC_FUNCTION LavError mutexUnlock(void *m);
 
 /**The following functions are threadsafe ringbuffers*/
-typedef struct Lav_CrossThreadRingBuffer_s LavCrossThreadRingBuffer;
+typedef struct LavCrossThreadRingBuffer LavCrossThreadRingBuffer;
 Lav_PUBLIC_FUNCTION LavError createCrossThreadRingBuffer(int length, int elementSize, LavCrossThreadRingBuffer **destination);
 Lav_PUBLIC_FUNCTION int CTRBGetAvailableWrites(LavCrossThreadRingBuffer* buffer);
 Lav_PUBLIC_FUNCTION int CTRBGetAvailableReads(LavCrossThreadRingBuffer *buffer);
