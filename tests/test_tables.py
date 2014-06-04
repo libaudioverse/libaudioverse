@@ -4,11 +4,13 @@ from make_cffi import *
 accuracy = 1e-3
 
 def test_create_table():
+	assert lav.Lav_initializeLibrary() == lav.Lav_ERROR_NONE
 	table = ffi.new("LavTable**")
 	assert lav.Lav_createTable(table) == lav.Lav_ERROR_NONE
 	assert table is not ffi.NULL and table[0] is not ffi.NULL
 
 def test_table_clear():
+	assert lav.Lav_initializeLibrary() == lav.Lav_ERROR_NONE
 	table = ffi.new("LavTable **")
 	assert lav.Lav_createTable(table) == lav.Lav_ERROR_NONE
 	table = table[0]
@@ -36,6 +38,7 @@ def make_table():
 	return table
 
 def test_table_get_sample():
+	assert lav.Lav_initializeLibrary() == lav.Lav_ERROR_NONE
 	global halves, fourths, eighths, correct, original, accuracy
 	table = make_table()
 	#test 1: reading exactly on integer boundaries should always produce the same value.  I like 500.
@@ -54,6 +57,7 @@ def test_table_get_sample():
 			assert abs(sample[0]-expected[correct_index]) < accuracy
 
 def test_table_get_sample_range():
+	assert lav.Lav_initializeLibrary() == lav.Lav_ERROR_NONE
 	global halves, fourths, eighths, original, accuracy
 	table = make_table()
 	outarray = ffi.new("float[" + str(len(eighths)) + "]")

@@ -19,9 +19,11 @@ def parent_child():
 	return graph[0], node1, node2, parent, slot
 
 def test_parent_child():
+	assert lav.Lav_initializeLibrary() == lav.Lav_ERROR_NONE
 	parent_child()
 
 def test_clear_parent():
+	assert lav.Lav_initializeLibrary() == lav.Lav_ERROR_NONE
 	graph, node1, node2, parent, slot = parent_child()
 	lav.Lav_clearParent(node2, 0)
 	lav.Lav_getParent(node2, 0, parent, slot)

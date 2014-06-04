@@ -23,6 +23,7 @@ def basic_node_checks(node):
 
 def test_basic_node_integrity():
 	"""Initializes the most basic type of node, and sees if it looks valid."""
+	assert lav.Lav_initializeLibrary() == lav.Lav_ERROR_NONE
 	graph = ffi.new("LavGraph **")
 	node = ffi.new("LavNode **")
 	assert lav.Lav_ERROR_NONE == lav.Lav_createGraph(44100, 128, graph)
@@ -35,6 +36,7 @@ def test_basic_node_integrity():
 	basic_node_checks(node[0])
 
 def test_sine_node_integrity():
+	assert lav.Lav_initializeLibrary() == lav.Lav_ERROR_NONE
 	graph = ffi.new("LavGraph **")
 	node = ffi.new("LavNode **")
 	assert lav.Lav_ERROR_NONE == lav.Lav_createGraph(44100, 128, graph)

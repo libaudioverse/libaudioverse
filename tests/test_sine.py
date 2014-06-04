@@ -5,6 +5,7 @@ def test_sine():
 	"""This deserves explanation.
 There is almost no way in which we can actually match a sine wave's output reliably from run to run or computer to computer.
 We can be pretty sure, however, that the calculations done here and the calculations done in the C library are very, very close."""
+	assert lav.Lav_initializeLibrary() == lav.Lav_ERROR_NONE
 	accuracy = 0.01
 	graph = ffi.new("LavGraph **")
 	n1 = ffi.new("LavNode **")

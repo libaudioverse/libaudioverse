@@ -22,6 +22,7 @@ def property_node():
 	return graph, node
 
 def test_property_getters():
+	assert lav.Lav_initializeLibrary() == lav.Lav_ERROR_NONE
 	ival = ffi.new("int *")
 	fval = ffi.new("float *")
 	dval = ffi.new("double *")
