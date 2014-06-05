@@ -5,7 +5,7 @@ from .conf import *
 def basic_node_checks(node):
 	assert node is not ffi.NULL
 	assert node.properties is not ffi.NULL
-	assert node.graph is not ffi.NULL
+	assert ffi.cast("LavNode*", node).graph is not ffi.NULL
 	for i in xrange(node.num_outputs):
 		assert node.outputs[i] is not ffi.NULL
 	for i in xrange(node.num_properties):
@@ -25,8 +25,8 @@ def basic_node_checks(node):
 def test_basic_node_integrity():
 	"""Initializes the most basic type of node, and sees if it looks valid."""
 	assert lav.Lav_initializeLibrary() == lav.Lav_ERROR_NONE
-	graph = ffi.new("LavGraph **")
-	node = ffi.new("LavNode **")
+	graph = ffi.new("LavObject **")
+	node = ffi.new("LavObject **")
 	assert lav.Lav_ERROR_NONE == lav.Lav_createGraph(44100, 128, graph)
 	assert lav.Lav_ERROR_NONE == lav.Lav_createNode(
 		5, #5 inputs.
@@ -38,8 +38,8 @@ def test_basic_node_integrity():
 
 def test_sine_node_integrity():
 	assert lav.Lav_initializeLibrary() == lav.Lav_ERROR_NONE
-	graph = ffi.new("LavGraph **")
-	node = ffi.new("LavNode **")
+	graph = ffi.new("LavObject **")
+	node = ffi.new("LavObject **")
 	assert lav.Lav_ERROR_NONE == lav.Lav_createGraph(44100, 128, graph)
 	assert lav.Lav_createSineNode(graph[0], node) == lav.Lav_ERROR_NONE
 	basic_node_checks(node[0])
