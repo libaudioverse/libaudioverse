@@ -9,7 +9,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <string.h>
 
 typedef struct {
-	LavGraph *graph;
+	LavObject *graph;
 	LavCrossThreadRingBuffer *ring_buffer;
 	PaStream *stream;
 	unsigned int block_size, mix_ahead, channels;
@@ -27,7 +27,7 @@ Lav_PUBLIC_FUNCTION initializeAudioOutput() {
 	return Lav_ERROR_NONE;
 }
 
-Lav_PUBLIC_FUNCTION LavError createAudioOutputThread(LavGraph *graph, unsigned int mixAhead, void **destination) {
+Lav_PUBLIC_FUNCTION LavError createAudioOutputThread(LavObject *graph, unsigned int mixAhead, void **destination) {
 	mixAhead+=1; //so we can actually mixahead 0 times.
 	STANDARD_PREAMBLE;
 	CHECK_NOT_NULL(graph);
@@ -37,7 +37,7 @@ Lav_PUBLIC_FUNCTION LavError createAudioOutputThread(LavGraph *graph, unsigned i
 	param->graph = graph;
 
 	//Calculate the number of channels.
-	LavNode *node;
+	LavObject *node;
 	Lav_graphGetOutputNode(graph, &node);
 	unsigned int channels = node->num_outputs;
 
@@ -48,7 +48,7 @@ Lav_PUBLIC_FUNCTION LavError createAudioOutputThread(LavGraph *graph, unsigned i
 	param->mix_ahead = mixAhead;
 
 	PaStream *stream;
-	Pa_OpenDefaultStream(&stream, 0, channels, paFloat32, graph->sr, blockSize, audioOutputCallback, param);
+	Pa_OpenDefaultStream(&stream, 0, channels, paFloat32, ((LavGraph*)graph)->sr, blockSize, audioOutputCallback, param);
 	param->stream = stream;
 	param->channels = channels;
 
@@ -71,7 +71,7 @@ Lav_PUBLIC_FUNCTION void stopAudioOutputThread(void* thread) {
 
 void audioOutputThread(void* vparam) {
 	ThreadParams *param = (ThreadParams*)vparam;
-	LavGraph *graph = param->graph;
+	LavObject *graph = param->graph;
 	LavCrossThreadRingBuffer *rb = param->ring_buffer;
 	void* localMemoryManager = createMmanager();
 	Pa_StartStream(param->stream);
@@ -80,7 +80,7 @@ void audioOutputThread(void* vparam) {
 	float* samples = mmanagerMalloc(localMemoryManager, param->block_size*sizeof(float)*param->channels);
 	while(aFlagTestAndSet(param->running_flag)) {
 		memset(samples, 0, param->block_size*sizeof(float)*param->channels);
-		Lav_graphReadAllOutputs(graph, samples);
+		Lav_graphGetBlock(graph, samples);
 		CTRBWriteItems(rb, param->block_size, samples);
 		while(CTRBGetAvailableWrites(rb) <= param->block_size);// sleepFor(1); //sleep for 1 ms.
 	}

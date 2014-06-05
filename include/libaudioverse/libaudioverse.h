@@ -17,7 +17,7 @@ typedef struct LavNode LavNode;
 typedef struct LavGraph LavGraph;
 typedef struct LavTable LavTable;
 typedef struct LavHrtfData LavHrtfData;
-typedef struct LavIProperties LavIProperties;
+typedef struct LavObject LavObject;
 
 /**Does whatever is appropriate on a given platform to expose a Libaudioverse function publically.*/
 #ifdef __cplusplus
@@ -64,6 +64,7 @@ enum Lav_PROPERTYTYPES {
 
 /**These are used to tag nodes with their type, so that external languages may see them.*/
 enum Lav_NODETYPES{
+	Lav_OBJTYPE_GRAPH,
 	Lav_NODETYPE_ZEROS,
 	Lav_NODETYPE_FILE,
 	Lav_NODETYPE_HRTF,
@@ -76,57 +77,53 @@ enum Lav_NODETYPES{
 Lav_PUBLIC_FUNCTION LavError Lav_initializeLibrary();
 
 /**This is the processing function's typedef.  See external documentation for info on writing your own nodes.*/
-typedef LavError (*LavNodeProcessorFunction)(LavNode* node);
+typedef LavError (*LavProcessorFunction)(LavObject* obj);
 
 /**Graph manipulation functions: creation, deletion, and configuration.
 
 All nodes must belong to a graph and exactly one node must be the "output node", the node which will be read from to determine a graph's output.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createGraph(float sr, unsigned int blockSize, LavGraph **destination);
-Lav_PUBLIC_FUNCTION LavError Lav_freeGraph(LavGraph *graph);
-Lav_PUBLIC_FUNCTION LavError Lav_graphGetOutputNode(LavGraph *graph, LavNode **destination);
-Lav_PUBLIC_FUNCTION LavError Lav_graphSetOutputNode(LavGraph *graph, LavNode *node);
-
-/**Works the same as Lav_nodeReadAllOutputs, below.*/
-Lav_PUBLIC_FUNCTION LavError Lav_graphReadAllOutputs(LavGraph *graph, float *destination);
-
-/**Free an instance of a node.*/
-Lav_PUBLIC_FUNCTION LavError Lav_freeNode(LavNode *node);
+Lav_PUBLIC_FUNCTION LavError Lav_createGraph(float sr, unsigned int blockSize, LavObject **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_graphGetOutputNode(LavObject *graph, LavObject **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_graphSetOutputNode(LavObject *graph, LavObject *node);
+Lav_PUBLIC_FUNCTION LavError Lav_graphGetBlock(LavObject* graph, float* samples);
 
 /**The following functions initialize nodes and work exactly as one would expect.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int numOutputs, enum  Lav_NODETYPE type, LavGraph *graph, LavNode **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int numOutputs, enum  Lav_NODETYPE type, LavObject *graph, LavObject **destination);
 
 /**Parent management.*/
-Lav_PUBLIC_FUNCTION LavError Lav_getParent(LavNode *node, unsigned int slot, LavNode** parent, unsigned int *outputNumber);
-Lav_PUBLIC_FUNCTION LavError Lav_setParent(LavNode *node, LavNode *parent, unsigned int outputSlot, unsigned int inputSlot);
-Lav_PUBLIC_FUNCTION LavError Lav_clearParent(LavNode *node, unsigned int slot);
+Lav_PUBLIC_FUNCTION LavError Lav_getParent(LavObject *obj, unsigned int slot, LavObject** parent, unsigned int *outputNumber);
+Lav_PUBLIC_FUNCTION LavError Lav_setParent(LavObject *obj, LavObject *parent, unsigned int outputSlot, unsigned int inputSlot);
+Lav_PUBLIC_FUNCTION LavError Lav_clearParent(LavObject *obj, unsigned int slot);
 
 /**Resets a property to its default value, for any type.*/
-Lav_PUBLIC_FUNCTION LavError Lav_resetProperty(LavIProperties *node, unsigned int slot);
+Lav_PUBLIC_FUNCTION LavError Lav_resetProperty(LavObject *obj, unsigned int slot);
 
 /**Property getters and setters.*/
-Lav_PUBLIC_FUNCTION LavError Lav_setIntProperty(LavIProperties* what, unsigned int slot, int value);
-Lav_PUBLIC_FUNCTION LavError Lav_setFloatProperty(LavIProperties *what, unsigned int slot, float value);
-Lav_PUBLIC_FUNCTION LavError Lav_setDoubleProperty(LavIProperties *what, unsigned int slot, double value);
-Lav_PUBLIC_FUNCTION LavError Lav_setStringProperty(LavIProperties*what, unsigned int slot, char* value);
-Lav_PUBLIC_FUNCTION LavError Lav_getIntProperty(LavIProperties*what, unsigned int slot, int *destination);
-Lav_PUBLIC_FUNCTION LavError Lav_getFloatProperty(LavIProperties* what, unsigned int slot, float *destination);
-Lav_PUBLIC_FUNCTION LavError Lav_getDoubleProperty(LavIProperties*what, unsigned int slot, double *destination);
-Lav_PUBLIC_FUNCTION LavError Lav_getStringProperty(LavIProperties* what, unsigned int slot, char** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_setIntProperty(LavObject* obj, unsigned int slot, int value);
+Lav_PUBLIC_FUNCTION LavError Lav_setFloatProperty(LavObject *obj, unsigned int slot, float value);
+Lav_PUBLIC_FUNCTION LavError Lav_setDoubleProperty(LavObject *obj, unsigned int slot, double value);
+Lav_PUBLIC_FUNCTION LavError Lav_setStringProperty(LavObject*obj, unsigned int slot, char* value);
+Lav_PUBLIC_FUNCTION LavError Lav_getIntProperty(LavObject*obj, unsigned int slot, int *destination);
+Lav_PUBLIC_FUNCTION LavError Lav_getFloatProperty(LavObject* obj, unsigned int slot, float *destination);
+Lav_PUBLIC_FUNCTION LavError Lav_getDoubleProperty(LavObject*obj, unsigned int slot, double *destination);
+Lav_PUBLIC_FUNCTION LavError Lav_getStringProperty(LavObject* obj, unsigned int slot, char** destination);
 
 /**This is a default node processing function. It simply writes 0s to all outputs, and can be useful when you need to provide audio and have nothing to do.*/
-Lav_PUBLIC_FUNCTION LavError Lav_processDefault(LavNode *node);
+Lav_PUBLIC_FUNCTION LavError Lav_processDefault(LavObject *obj);
 
 /**Helper function to read all of a node's outputs at once.
 This is intended for the ability to do audio output.  The destination parameter should
-be long enough to hold node->graph->block_size*node->num_output samples.  The samples are interweaved in an appropriate manner for most audio output systems:
+be long enough to hold obj->block_size*node->num_output samples.  The samples are interweaved in an appropriate manner for most audio output systems:
 the first sample of the first output, the first of the second, the first of the third,...the second of the first, second and third..., etc.
 Put another way, this function pretends that the passed node has node->num_outputs channels, and then interweaves them.*/
-Lav_PUBLIC_FUNCTION LavError Lav_nodeReadBlock(LavNode *node, float* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_objectReadBlock(LavObject *node, float* destination);
 
 /**Interpolated tables.
 
 An interpolated table has some properties of ringbuffers, but with floating point math: reads past the end or before the beginning wrap.
-It is possible to read between samples; if so, it performs linear interpolation.  All times are in samples, but fractional values are allowed.*/
+It is possible to read between samples; if so, it performs linear interpolation.  All times are in samples, but fractional values are allowed.
+
+Note that these are definitively not LavObjects.  They are intended to be used in tight loops.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createTable(LavTable** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_tableGetSample(LavTable *table, float index, float* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_tableGetSamples(LavTable* table, float index, float delta, unsigned int count, float* destination);
@@ -134,22 +131,22 @@ Lav_PUBLIC_FUNCTION LavError Lav_tableSetSamples(LavTable *table, unsigned int c
 Lav_PUBLIC_FUNCTION LavError Lav_tableClear(LavTable *table);
 
 /**Make a sine node.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavGraph *graph, LavNode **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavObject *graph, LavObject **destination);
 
 /**A node that plays a file.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavGraph *graph, const char* path, LavNode **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavObject *graph, const char* path, LavObject **destination);
 
 /**Load hrtf dataset from file.  This is for use with hrtf nodes.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createHrtfData(const char* path, LavHrtfData **destination);
 
 /**Make a HRTF node.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createHrtfNode(LavGraph *graph, LavHrtfData* hrtf, LavNode **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createHrtfNode(LavObject *graph, LavHrtfData* hrtf, LavObject **destination);
 
 /**Make a mixer.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createMixerNode(LavGraph *graph, unsigned int maxParents, unsigned int inputsPerParent, LavNode **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createMixerNode(LavObject *graph, unsigned int maxParents, unsigned int inputsPerParent, LavObject **destination);
 
 /**Make an attenuator.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createAttenuatorNode(LavGraph* graph, unsigned int numInputs, LavNode** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createAttenuatorNode(LavObject* graph, unsigned int numInputs, LavObject** destination);
 
 #ifdef __cplusplus
 }

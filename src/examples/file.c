@@ -15,8 +15,8 @@ int main(int argc, char** args) {
 	}
 
 	char* path = args[1];
-	LavNode *node;
-	LavGraph *graph;
+	LavObject *node;
+	LavObject *graph;
 	LavError err = Lav_initializeLibrary();
 	if(err != Lav_ERROR_NONE) {
 		printf("Failed to initialize library. Error: %i", err);
@@ -36,7 +36,7 @@ int main(int argc, char** args) {
 	}
 	float volume;
 	sscanf(args[3], "%f", &volume);
-	LavNode* atten;
+	LavObject* atten;
 	Lav_createAttenuatorNode(graph, node->num_outputs, &atten);
 	for(unsigned int i = 0; i < node->num_outputs; i++) {
 		Lav_setParent(atten, node, i, i);
