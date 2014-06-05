@@ -69,7 +69,7 @@ LavError hrtfProcessor(LavObject *obj) {
 	//compute hrirs.
 	hrtfComputeCoefficients(data->hrtf, elevation, azimuth, data->left_response, data->right_response);
 	//this is convolution, with a twist: it uses a ringbuffer to avoid a ton of unnecessary copies.
-	for(unsigned int i = 0; i < node->graph->block_size; i++) {
+	for(unsigned int i = 0; i < obj->block_size; i++) {
 		data->history_pos = ringmodi(data->history_pos+1, data->hrir_length); //putting it here for clarity. It doesn't matter if this is before everything or after it.
 		//first thing we do: read a sample into the ringbuffer.
 		*(data->history+data->history_pos) = obj->inputs[0][i];

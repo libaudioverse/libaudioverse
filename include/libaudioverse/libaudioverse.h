@@ -85,6 +85,7 @@ All nodes must belong to a graph and exactly one node must be the "output node",
 Lav_PUBLIC_FUNCTION LavError Lav_createGraph(float sr, unsigned int blockSize, LavObject **destination);
 Lav_PUBLIC_FUNCTION LavError Lav_graphGetOutputNode(LavObject *graph, LavObject **destination);
 Lav_PUBLIC_FUNCTION LavError Lav_graphSetOutputNode(LavObject *graph, LavObject *node);
+Lav_PUBLIC_FUNCTION LavError Lav_graphGetBlock(LavObject* graph, float* samples);
 
 /**The following functions initialize nodes and work exactly as one would expect.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int numOutputs, enum  Lav_NODETYPE type, LavObject *graph, LavObject **destination);

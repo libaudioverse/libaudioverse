@@ -86,7 +86,7 @@ Lav_PUBLIC_FUNCTION LavError fileNodeProcessor(LavObject* obj) {
 	struct fileinfo *data = node->data;
 	float pitch_bend = 1.0f;
 	Lav_getFloatProperty((LavObject*)node, Lav_FILE_PITCH_BEND, &pitch_bend);
-	for(unsigned int i = 0; i < node->graph->block_size; i++) {
+	for(unsigned int i = 0; i < obj->block_size; i++) {
 		if(data->start >= data->frames) {
 			for(unsigned int j = 0; j < obj->num_outputs; j++) obj->outputs[j][i] = 0.0f;
 			continue;

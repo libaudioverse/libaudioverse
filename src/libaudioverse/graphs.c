@@ -3,6 +3,7 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/private_all.h>
 #include <stdlib.h>
+#include <string.h>
 
 Lav_PUBLIC_FUNCTION LavError Lav_createGraph(float sr, unsigned int blockSize, LavObject **destination) {
 	STANDARD_PREAMBLE;
@@ -101,4 +102,12 @@ Lav_PUBLIC_FUNCTION void graphProcessHelper(LavObject* node, struct AlreadySeenN
 		free(done->nodes);
 		free(done);
 	}
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_graphGetBlock(LavObject* obj, float* samples) {
+	mutexLock(obj->mutex);
+	graphProcessHelper(((LavGraph*)obj)->output_node, NULL, 0);
+	Lav_objectReadBlock(((LavGraph*)obj)->output_node, samples);
+	mutexUnlock(obj->mutex);
+	return Lav_ERROR_NONE;
 }

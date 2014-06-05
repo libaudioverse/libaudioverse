@@ -51,7 +51,7 @@ void main(int argc, char** args) {
 	clock_t start;
 	start = clock();
 	for(unsigned int i = 0; i < 44100*seconds; i+= blocksize) {
-		Lav_objectReadBlock(graph, storage);
+		Lav_graphGetBlock(graph, storage);
 	}
 	clock_t dur = clock()-start;
 	float secs = dur/(float)CLOCKS_PER_SEC;

@@ -80,7 +80,7 @@ void audioOutputThread(void* vparam) {
 	float* samples = mmanagerMalloc(localMemoryManager, param->block_size*sizeof(float)*param->channels);
 	while(aFlagTestAndSet(param->running_flag)) {
 		memset(samples, 0, param->block_size*sizeof(float)*param->channels);
-		Lav_objectReadBlock(graph, samples);
+		Lav_graphGetBlock(graph, samples);
 		CTRBWriteItems(rb, param->block_size, samples);
 		while(CTRBGetAvailableWrites(rb) <= param->block_size);// sleepFor(1); //sleep for 1 ms.
 	}

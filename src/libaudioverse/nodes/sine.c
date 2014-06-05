@@ -53,7 +53,7 @@ LavError sineProcessor(LavObject *obj) {
 	Lav_getFloatProperty(obj, Lav_SINE_FREQUENCY, &freq);
 	struct sineinfo *data = node->data;
 	float delta = data->table_delta*freq;
-	for(unsigned int i = 0; i < node->graph->block_size; i++) {
+	for(unsigned int i = 0; i < obj->block_size; i++) {
 		float weight1 = 1-data->offset;
 		float weight2 = data->offset;
 		unsigned int samp1 = data->start;

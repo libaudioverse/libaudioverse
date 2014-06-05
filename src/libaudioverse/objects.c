@@ -11,7 +11,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 float zerobuffer[Lav_MAX_BLOCK_SIZE] = {0}; //this is a shared buffer for the "no parent" case.
 
 Lav_PUBLIC_FUNCTION LavError objectProcessSafe(LavObject* obj) {
-	return obj == NULL ? obj->process(obj) : Lav_ERROR_NONE;
+	return obj->process != NULL ? obj->process(obj) : Lav_ERROR_NONE;
 }
 
 void objectComputeInputBuffers(LavObject* obj) {
@@ -52,6 +52,7 @@ Lav_PUBLIC_FUNCTION LavError initLavObject(unsigned int numInputs, unsigned int 
 	}
 
 	destination->type = type;
+	destination->block_size = blockSize;
 	objectComputeInputBuffers(destination); //at the moment, this is going to just make them all 0, but it takes effect once parents are added.
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;

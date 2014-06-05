@@ -42,7 +42,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createMixerNode(LavObject *graph, unsigned int 
 LavError mixerProcessor(LavObject *obj) {
 	const LavNode* node = (LavNode*)obj;
 	LavMixerData* data = node->data;
-	for(unsigned int i = 0; i < node->graph->block_size; i++) {
+	for(unsigned int i = 0; i < obj->block_size; i++) {
 		for(unsigned int j = 0; j < obj->num_inputs; j++) {
 			float samp = obj->inputs[j][i];
 			data->accumulator_array[j%data->inputs_per_parent] += samp;
