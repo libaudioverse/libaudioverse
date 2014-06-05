@@ -25,4 +25,5 @@ Lav_PUBLIC_FUNCTION void computeSineTable() {
 
 Lav_PUBLIC_FUNCTION LavError initializeFunctionTables() {
 	computeSineTable();
+	return Lav_ERROR_NONE;
 }
