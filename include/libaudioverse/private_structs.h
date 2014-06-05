@@ -26,39 +26,38 @@ struct LavProperty {
 };
 
 struct LavInputDescriptor {
-	LavNode* parent;
+	LavObject* parent;
 	unsigned int output;
 };
 
-/**Placing this at the beginning of a struct makes it treatable as something with properties.*/
-struct LavIProperties {
+/**Things all Libaudioverse objects have.*/
+struct LavObject {
 		LavProperty **properties;
 	unsigned int num_properties;
-	void* mutex;
-};
-
-typedef struct LavIProperties LavIPropereties;
-
-struct LavNode {
-	LavIProperties base;
-	LavGraph *graph;
 	float** inputs;
 	LavInputDescriptor *input_descriptors;
 	float** outputs;
 	unsigned int num_outputs;
 	unsigned int num_inputs;
+	unsigned int block_size;
+	LavProcessorFunction process; //what to call to process this node.
+	void* mutex;
 	enum Lav_NODETYPES type;
-	LavNodeProcessorFunction process; //what to call to process this node.
+};
+
+struct LavNode {
+	LavObject base;
+	LavGraph *graph;
 	double internal_time;
 	void *data; //place for node subtypes to place data.
 };
 
 struct LavGraph {
-	LavNode **nodes;
+	LavObject base;
+	LavObject **nodes;
 	unsigned int node_count, nodes_length;
-	LavNode *output_node;
+	LavObject *output_node;
 	float sr; //sampling rate.
-	void* mutex; //lock this graph.
 	void* audio_thread; //not null thread handle for audio output graphs, otherwise null.
 	unsigned int block_size;
 };

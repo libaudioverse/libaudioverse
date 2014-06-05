@@ -4,11 +4,12 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 /**Demonstrates asynchronous audio output.*/
 #include <libaudioverse/private_all.h>
+#include <stdio.h>
 
 void main() {
 	void* th;
-	LavGraph *graph;
-	LavNode* node;
+	LavObject *graph;
+	LavObject* node;
 	LavError err = Lav_initializeLibrary();
 	if(err != Lav_ERROR_NONE) {
 		printf("Failed to initialize library. Error: %i", err);

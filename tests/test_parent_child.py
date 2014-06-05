@@ -4,15 +4,15 @@ from .conf import *
 
 def parent_child():
 	"""This function does a bunch of useful setup as well as being a test; thus, we return all the objects."""
-	graph = ffi.new("LavGraph **")
-	node1, node2 = ffi.new("LavNode **"), ffi.new("LavNode **")
+	graph = ffi.new("LavObject **")
+	node1, node2 = ffi.new("LavObject **"), ffi.new("LavObject **")
 	lav.Lav_createGraph(44100, 128, graph)
 	lav.Lav_createNode(0, 1, lav.Lav_NODETYPE_ZEROS, graph[0], node1)
 	lav.Lav_createNode(1, 0, lav.Lav_NODETYPE_ZEROS, graph[0], node2)
 	node1, node2 = node1[0], node2[0]
 	assert node1 is not ffi.NULL and node2 is not ffi.NULL
 	#the following let us pull out info.
-	parent = ffi.new("LavNode **")
+	parent = ffi.new("LavObject **")
 	slot = ffi.new("unsigned int*")
 	assert lav.Lav_setParent(node2, node1, 0, 0) == lav.Lav_ERROR_NONE
 	assert lav.Lav_getParent(node2, 0, parent, slot) == lav.Lav_ERROR_NONE
