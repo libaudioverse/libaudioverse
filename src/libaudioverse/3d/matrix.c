@@ -10,3 +10,28 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 /**This is a matrix transformation library adequate for Libaudioverse's purposes**/
 
+Lav_PUBLIC_FUNCTION void identityTransform(LavTransform m) {
+	m[0][0] = 1.0f;
+	m[1][1] = 1.0f;
+	m[2][2] = 1.0f;
+	m[3][3]=1.0f;
+}
+
+Lav_PUBLIC_FUNCTION void transformSetTranslation(LavTransform m, LavVector v) {
+	m[0][3]=v[0];
+	m[1][3]=v[1];
+	m[2][3]=v[2];
+}
+
+Lav_PUBLIC_FUNCTION void transformGetTranslation(LavTransform m, LavVector v) {
+	v[0]=m[0][3];
+	v[1]=m[1][3];
+	v[2]=m[2][3];
+	v[3]=m[3][3];
+}
+
+Lav_PUBLIC_FUNCTION void transformApply(LavTransform m, LavVector in, LavVector out) {
+	for(unsigned int i = 0; i < 4; i++) {
+		out[i] = m[i][0]*in[0]+m[i][1]*in[1]+m[i][2]*in[2]+m[i][3]*in[3];
+	}
+}
