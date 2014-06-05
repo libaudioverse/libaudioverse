@@ -6,7 +6,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdlib.h>
 #include <libaudioverse/private_all.h>
 
-LavError sineProcessor(LavNode *node);
+LavError sineProcessor(LavObject *obj);
 struct sineinfo {
 	float table_delta;
 	unsigned int start;
@@ -18,7 +18,7 @@ LavPropertyTableEntry sinePropertyTable[1] = {
 	Lav_SINE_FREQUENCY, Lav_PROPERTYTYPE_FLOAT, "frequency", {.fval = 440},
 };
 
-Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavGraph *graph, LavNode **destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavObject *graph, LavObject  **destination) {
 	STANDARD_PREAMBLE;
 	LavError err = Lav_ERROR_NONE;
 
@@ -46,7 +46,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavGraph *graph, LavNode **desti
 	STANDARD_CLEANUP_BLOCK;
 }
 
-LavError sineProcessor(LavNode *node) {
+LavError sineProcessor(LavObject *obj) {
+	const LavNode* node = obj;
 	float freq = 0;
 	float sr = node->graph->sr;
 	Lav_getFloatProperty((LavIProperties*)node, Lav_SINE_FREQUENCY, &freq);
@@ -58,7 +59,7 @@ LavError sineProcessor(LavNode *node) {
 		unsigned int samp1 = data->start;
 		unsigned int samp2 = samp1+1;
 		float sample = sineTable[samp1]*weight1+sineTable[samp2]*weight2;
-		node->outputs[0][i] = sample;
+		obj->outputs[0][i] = sample;
 		data->offset += delta;
 		while(data->offset >= 1) {
 			data->start+=1;

@@ -64,6 +64,7 @@ enum Lav_PROPERTYTYPES {
 
 /**These are used to tag nodes with their type, so that external languages may see them.*/
 enum Lav_NODETYPES{
+	Lav_OBJTYPE_GRAPH,
 	Lav_NODETYPE_ZEROS,
 	Lav_NODETYPE_FILE,
 	Lav_NODETYPE_HRTF,
@@ -82,7 +83,7 @@ typedef LavError (*LavProcessorFunction)(LavObject* obj);
 
 All nodes must belong to a graph and exactly one node must be the "output node", the node which will be read from to determine a graph's output.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createGraph(float sr, unsigned int blockSize, LavObject **destination);
-Lav_PUBLIC_FUNCTION LavError Lav_graphGetOutputNode(LavGraph *graph, LavObject **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_graphGetOutputNode(LavObject *graph, LavObject **destination);
 Lav_PUBLIC_FUNCTION LavError Lav_graphSetOutputNode(LavObject *graph, LavObject *node);
 
 /**The following functions initialize nodes and work exactly as one would expect.*/

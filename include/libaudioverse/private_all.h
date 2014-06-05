@@ -16,3 +16,5 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "private_dspmath.h"
 #include "private_memory.h"
 #include "private_functiontables.h"
+#include "private_objects.h"
+#include "private_graphs.h"

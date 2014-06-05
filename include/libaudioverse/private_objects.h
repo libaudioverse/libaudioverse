@@ -8,8 +8,9 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 extern "C" {
 #endif
 
-Lav_PUBLIC_FUNCTION LavError initLavObject(unsigned int numInputs, unsigned int numOutputs, enum  Lav_NODETYPE type, unsigned int blockSize, void* mutex, LavObject **destination);
+Lav_PUBLIC_FUNCTION LavError initLavObject(unsigned int numInputs, unsigned int numOutputs, enum  Lav_NODETYPE type, unsigned int blockSize, void* mutex, LavObject *destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createObject(unsigned int numInputs, unsigned int numOutputs, enum  Lav_OBJECTTYPE type, unsigned int blockSize, void* mutex, LavObject **destination);
+Lav_PUBLIC_FUNCTION LavError objectProcessSafe(LavObject* obj);
 
 #ifdef __cplusplus
 }

@@ -7,9 +7,12 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdlib.h>
 #include <string.h>
 #include <libaudioverse/private_all.h>
-#include "graphs.h"
 
 float zerobuffer[Lav_MAX_BLOCK_SIZE] = {0}; //this is a shared buffer for the "no parent" case.
+
+Lav_PUBLIC_FUNCTION LavError objectProcessSafe(LavObject* obj) {
+	return obj == NULL ? obj->process(obj) : Lav_ERROR_NONE;
+}
 
 void objectComputeInputBuffers(LavObject* obj) {
 	//point our inputs either at a zeroed buffer or the output of our parent.
@@ -42,7 +45,7 @@ Lav_PUBLIC_FUNCTION LavError initLavObject(unsigned int numInputs, unsigned int 
 	if(numOutputs > 0) {
 		destination->outputs = calloc(numOutputs, sizeof(float**));
 		ERROR_IF_TRUE(destination->outputs == NULL, Lav_ERROR_MEMORY);
-		for(unsigned int i = 0; i < retval->num_outputs; i++) {
+		for(unsigned int i = 0; i < destination->num_outputs; i++) {
 			destination->outputs[i] = calloc(blockSize, sizeof(float));
 			ERROR_IF_TRUE(destination->outputs[i] == NULL, Lav_ERROR_MEMORY);
 		}
@@ -50,15 +53,17 @@ Lav_PUBLIC_FUNCTION LavError initLavObject(unsigned int numInputs, unsigned int 
 
 	destination->type = type;
 	objectComputeInputBuffers(destination); //at the moment, this is going to just make them all 0, but it takes effect once parents are added.
+	SAFERETURN(Lav_ERROR_NONE);
+	STANDARD_CLEANUP_BLOCK;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_createObject(unsigned int numInputs, unsigned int numOutputs, enum  Lav_OBJECTTYPE type, unsigned int blockSize, void* mutex, LavObject **destination) {
 	STANDARD_PREAMBLE;
 	CHECK_NOT_NULL(mutex);
-	LavNode *retval = calloc(1, sizeof(LavObject));
+	LavObject *retval = calloc(1, sizeof(LavObject));
 	ERROR_IF_TRUE(retval == NULL, Lav_ERROR_MEMORY);
-	LavError err = initLavObject(numInputs, numOutputs, type, blockSize, &retval);
-	ERROR_IF_TRUE(err != lav_ERROR_NONE, err);
+	LavError err = initLavObject(numInputs, numOutputs, type, blockSize, mutex, retval);
+	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
 	SAFERETURN(Lav_ERROR_NONE);
 	*destination = retval;
 	STANDARD_CLEANUP_BLOCK;
@@ -66,7 +71,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createObject(unsigned int numInputs, unsigned i
 
 /*Default Processing function.*/
 Lav_PUBLIC_FUNCTION LavError Lav_processDefault(LavObject* obj) {
-	for(unsigned int i = 0; i < node->num_outputs; i++) {
+	for(unsigned int i = 0; i < obj->num_outputs; i++) {
 		memset(obj->outputs[i], 0, obj->block_size*sizeof(float));
 	}
 	return Lav_ERROR_NONE;
@@ -86,7 +91,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_setParent(LavObject *obj, LavObject*parent, uns
 	STANDARD_CLEANUP_BLOCK;
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_getParent(LavNode *obj, unsigned int slot, LavObject **parent, unsigned int *outputNumber) {
+Lav_PUBLIC_FUNCTION LavError Lav_getParent(LavObject *obj, unsigned int slot, LavObject **parent, unsigned int *outputNumber) {
 	STANDARD_PREAMBLE;
 	CHECK_NOT_NULL(obj);
 	CHECK_NOT_NULL(parent);
@@ -102,7 +107,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_getParent(LavNode *obj, unsigned int slot, LavO
 Lav_PUBLIC_FUNCTION LavError Lav_clearParent(LavObject *obj, unsigned int slot) {
 	STANDARD_PREAMBLE;
 	CHECK_NOT_NULL(obj);
-	LOCK(node->mutex);
+	LOCK(obj->mutex);
 	ERROR_IF_TRUE(slot >= obj->num_inputs, Lav_ERROR_INVALID_SLOT);
 	obj->input_descriptors[slot].parent = NULL;
 	obj->input_descriptors[slot].output = 0;
@@ -112,13 +117,13 @@ Lav_PUBLIC_FUNCTION LavError Lav_clearParent(LavObject *obj, unsigned int slot) 
 }
 
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeReadBlock(LavObject *what, float* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_objectReadBlock(LavObject *obj, float* destination) {
 	STANDARD_PREAMBLE;
 	CHECK_NOT_NULL(obj);
 	CHECK_NOT_NULL(destination);
 	LOCK(obj->mutex);
 	//the outputs are now read to read.  Do so.
-	for(unsigned int i = 0; i < node->block_size; i++) {
+	for(unsigned int i = 0; i < obj->block_size; i++) {
 		for(unsigned int output = 0; output < obj->num_outputs; output++) {
 			destination[i*obj->num_outputs+output] = obj->outputs[output][i];
 		}

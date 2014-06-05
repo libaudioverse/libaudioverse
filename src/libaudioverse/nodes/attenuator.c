@@ -6,13 +6,13 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdlib.h>
 #include <libaudioverse/private_all.h>
 
-LavError attenuatorProcessor(LavNode *node);
+LavError attenuatorProcessor(LavObject *node);
 
 LavPropertyTableEntry attenuatorPropertyTable[1] = {
 	Lav_ATTENUATOR_MULTIPLIER, Lav_PROPERTYTYPE_FLOAT, "multiplier", {.fval = 440},
 };
 
-Lav_PUBLIC_FUNCTION LavError Lav_createAttenuatorNode(LavGraph *graph, unsigned int numInputs, LavNode **destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createAttenuatorNode(LavObject *graph, unsigned int numInputs, LavObject **destination) {
 	STANDARD_PREAMBLE;
 	LavError err = Lav_ERROR_NONE;
 	CHECK_NOT_NULL(destination);
@@ -34,12 +34,13 @@ Lav_PUBLIC_FUNCTION LavError Lav_createAttenuatorNode(LavGraph *graph, unsigned 
 	STANDARD_CLEANUP_BLOCK;
 }
 
-LavError attenuatorProcessor(LavNode *node) {
+LavError attenuatorProcessor(LavObject *obj) {
+	const LavNode* node = obj;
 	float mul = 0;
 	Lav_getFloatProperty((LavIProperties*)node, Lav_ATTENUATOR_MULTIPLIER, &mul);
 	for(unsigned int i = 0; i < node->graph->block_size; i++) {
 		for(unsigned int o = 0; o < node->num_outputs; o++) {
-			node->outputs[o][i] = node->inputs[o][i]*mul;
+			obj->outputs[o][i] = obj->inputs[o][i]*mul;
 		}
 	}
 	return Lav_ERROR_NONE;

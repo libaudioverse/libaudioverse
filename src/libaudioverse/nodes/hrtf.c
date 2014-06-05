@@ -6,7 +6,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdlib.h>
 #include <libaudioverse/private_all.h>
 
-LavError hrtfProcessor(LavNode *node);
+LavError hrtfProcessor(LavObject *obj);
 
 struct HrtfNodeData {
 	float *history;
@@ -23,7 +23,7 @@ LavPropertyTableEntry hrtfPropertyTable[] = {
 {Lav_HRTF_ELEVATION, Lav_PROPERTYTYPE_FLOAT, "elevation", {.fval = 0.0f}},
 };
 
-Lav_PUBLIC_FUNCTION Lav_createHrtfNode(LavGraph *graph, LavHrtfData* hrtf, LavNode **destination) {
+Lav_PUBLIC_FUNCTION Lav_createHrtfNode(LavObject *graph, LavHrtfData* hrtf, LavObject **destination) {
 	STANDARD_PREAMBLE;
 	LavError err = Lav_ERROR_NONE;
 	CHECK_NOT_NULL(hrtf);
@@ -60,7 +60,8 @@ Lav_PUBLIC_FUNCTION Lav_createHrtfNode(LavGraph *graph, LavHrtfData* hrtf, LavNo
 	STANDARD_CLEANUP_BLOCK;
 }
 
-LavError hrtfProcessor(LavNode *node) {
+LavError hrtfProcessor(LavObject *obj) {
+	const LavNode* node = obj;
 	HrtfNodeData *data = node->data;
 	float azimuth, elevation;
 	Lav_getFloatProperty((LavIProperties*)node, Lav_HRTF_AZIMUTH, &azimuth);
@@ -71,7 +72,7 @@ LavError hrtfProcessor(LavNode *node) {
 	for(unsigned int i = 0; i < node->graph->block_size; i++) {
 		data->history_pos = ringmodi(data->history_pos+1, data->hrir_length); //putting it here for clarity. It doesn't matter if this is before everything or after it.
 		//first thing we do: read a sample into the ringbuffer.
-		*(data->history+data->history_pos) = node->inputs[0][i];
+		*(data->history+data->history_pos) = obj->inputs[0][i];
 		float outLeft=0, outRight=0;
 		for(unsigned int j = 0; j < data->hrir_length; j++) {
 			//standard convolution.
@@ -79,8 +80,8 @@ LavError hrtfProcessor(LavNode *node) {
 			outLeft += data->left_response[j]*data->history[index];
 			outRight += data->right_response[j]*data->history[index];
 		}
-		node->outputs[0][i] = outLeft;
-		node->outputs[1][i] = outRight;
+		obj->outputs[0][i] = outLeft;
+		obj->outputs[1][i] = outRight;
 	}
 	return Lav_ERROR_NONE;
 }

@@ -26,7 +26,7 @@ struct LavProperty {
 };
 
 struct LavInputDescriptor {
-	LavNode* parent;
+	LavObject* parent;
 	unsigned int output;
 };
 
@@ -39,22 +39,23 @@ struct LavObject {
 	float** outputs;
 	unsigned int num_outputs;
 	unsigned int num_inputs;
+	unsigned int block_size;
 	LavProcessorFunction process; //what to call to process this node.
 	void* mutex;
+	enum Lav_NODETYPES type;
 };
 
 struct LavNode {
 	LavObject base;
 	LavGraph *graph;
-	enum Lav_NODETYPES type;
 	double internal_time;
 	void *data; //place for node subtypes to place data.
 };
 
 struct LavGraph {
-	LavNode **nodes;
+	LavObject **nodes;
 	unsigned int node_count, nodes_length;
-	LavNode *output_node;
+	LavObject *output_node;
 	float sr; //sampling rate.
 	void* mutex; //lock this graph.
 	void* audio_thread; //not null thread handle for audio output graphs, otherwise null.
