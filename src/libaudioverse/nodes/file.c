@@ -63,32 +63,32 @@ Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavObject *graph, const char* pa
 	struct fileinfo *f = calloc(1, sizeof(struct fileinfo));
 	ERROR_IF_TRUE(f == NULL, Lav_ERROR_MEMORY);
 	f->fileSr = (float)sr;
-	f->graphSr = graph->sr;
+	f->graphSr = ((LavGraph*)graph)->sr;
 	f->channels = channels;
 	f->frames = frames;
 	f->sample_array = uninterleavedSamples;
-	f->delta = sr/graph->sr;
+	f->delta = sr/((LavGraph*)graph)->sr;
 
-	LavError err = Lav_createNode(0, channels, Lav_NODETYPE_FILE, graph, &node);
+	LavError err = Lav_createNode(0, channels, Lav_NODETYPE_FILE, graph, (LavObject**)&node);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
 	node->base.properties = makePropertyArrayFromTable(sizeof(filePropertyTable)/sizeof(filePropertyTable[0]), filePropertyTable);
 	ERROR_IF_TRUE(node->base.properties == NULL, Lav_ERROR_MEMORY);
 	node->base.num_properties = sizeof(filePropertyTable)/sizeof(filePropertyTable[0]);
 	node->data = f;
-	node->process = fileNodeProcessor;
-	*destination = node;
+	((LavObject*)node)->process = fileNodeProcessor;
+	*destination = (LavObject*)node;
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
 }
 
 Lav_PUBLIC_FUNCTION LavError fileNodeProcessor(LavObject* obj) {
-	const LavNode* node = obj;
+	const LavNode* node = (LavNode*)obj;
 	struct fileinfo *data = node->data;
 	float pitch_bend = 1.0f;
-	Lav_getFloatProperty((LavIProperties*)node, Lav_FILE_PITCH_BEND, &pitch_bend);
+	Lav_getFloatProperty((LavObject*)node, Lav_FILE_PITCH_BEND, &pitch_bend);
 	for(unsigned int i = 0; i < node->graph->block_size; i++) {
 		if(data->start >= data->frames) {
-			for(unsigned int j = 0; j < node->num_outputs; j++) node->outputs[j][i] = 0.0f;
+			for(unsigned int j = 0; j < obj->num_outputs; j++) obj->outputs[j][i] = 0.0f;
 			continue;
 		}
 
@@ -96,7 +96,7 @@ Lav_PUBLIC_FUNCTION LavError fileNodeProcessor(LavObject* obj) {
 		unsigned int samp2 = data->start+1;
 		float weight1 = 1-data->offset;
 		float weight2 = data->offset;
-		for(unsigned int j = 0; j < node->num_outputs; j++) {
+		for(unsigned int j = 0; j < obj->num_outputs; j++) {
 			float sample = data->sample_array[j][samp1]*weight1+data->sample_array[j][samp2]*weight2;
 			obj->outputs[j][i] = sample;
 		}

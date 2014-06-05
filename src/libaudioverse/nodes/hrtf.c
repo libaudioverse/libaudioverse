@@ -30,7 +30,7 @@ Lav_PUBLIC_FUNCTION Lav_createHrtfNode(LavObject *graph, LavHrtfData* hrtf, LavO
 	CHECK_NOT_NULL(destination);
 	LOCK(graph->mutex);
 	LavNode* retval = NULL;
-	err = Lav_createNode(1, 2, Lav_NODETYPE_HRTF, graph, &retval);
+	err = Lav_createNode(1, 2, Lav_NODETYPE_HRTF, graph, (LavObject**)&retval);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
 
 	retval->base.properties = makePropertyArrayFromTable(sizeof(hrtfPropertyTable)/sizeof(hrtfPropertyTable[0]), hrtfPropertyTable);
@@ -38,7 +38,7 @@ Lav_PUBLIC_FUNCTION Lav_createHrtfNode(LavObject *graph, LavHrtfData* hrtf, LavO
 
 	ERROR_IF_TRUE(retval->base.properties == NULL, Lav_ERROR_MEMORY);
 
-	retval->process = hrtfProcessor;
+	((LavObject*)retval)->process = hrtfProcessor;
 
 	HrtfNodeData *data = calloc(1, sizeof(HrtfNodeData));
 	ERROR_IF_TRUE(data == NULL, Lav_ERROR_MEMORY);
@@ -55,17 +55,17 @@ Lav_PUBLIC_FUNCTION Lav_createHrtfNode(LavObject *graph, LavHrtfData* hrtf, LavO
 	ERROR_IF_TRUE(data->left_response == NULL || data->right_response == NULL, Lav_ERROR_MEMORY);
 	retval->data = data;
 
-	*destination = retval;
+	*destination = (LavObject*)retval;
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
 }
 
 LavError hrtfProcessor(LavObject *obj) {
-	const LavNode* node = obj;
+	const LavNode* node = (LavNode*)obj;
 	HrtfNodeData *data = node->data;
 	float azimuth, elevation;
-	Lav_getFloatProperty((LavIProperties*)node, Lav_HRTF_AZIMUTH, &azimuth);
-	Lav_getFloatProperty((LavIProperties*)node, Lav_HRTF_ELEVATION, &elevation);
+	Lav_getFloatProperty((LavObject*)node, Lav_HRTF_AZIMUTH, &azimuth);
+	Lav_getFloatProperty((LavObject*)node, Lav_HRTF_ELEVATION, &elevation);
 	//compute hrirs.
 	hrtfComputeCoefficients(data->hrtf, elevation, azimuth, data->left_response, data->right_response);
 	//this is convolution, with a twist: it uses a ringbuffer to avoid a ton of unnecessary copies.

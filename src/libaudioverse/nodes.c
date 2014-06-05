@@ -7,5 +7,17 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdlib.h>
 #include <string.h>
 #include <libaudioverse/private_all.h>
-#include "graphs.h"
 
+
+Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int numOutputs, enum Lav_NODETYPE type, LavObject* graph, LavObject** destination) {
+	STANDARD_PREAMBLE;
+	CHECK_NOT_NULL(graph);
+	CHECK_NOT_NULL(destination);
+	LavNode* retval = calloc(1, sizeof(LavNode));
+	ERROR_IF_TRUE(retval == NULL, Lav_ERROR_MEMORY);
+	LavError err = initLavObject(numInputs, numOutputs, type, graph->block_size, graph->mutex, (LavObject*)retval);
+	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
+	*destination = (LavObject*)retval;
+	SAFERETURN(Lav_ERROR_NONE);
+	STANDARD_CLEANUP_BLOCK;
+}
