@@ -15,8 +15,8 @@ void main(int argc, char** args) {
 	}
 
 	void* th;
-	LavGraph *graph;
-	LavNode* fileNode, *hrtfNode;
+	LavObject *graph;
+	LavObject* fileNode, *hrtfNode;
 	LavError err = Lav_initializeLibrary();
 	if(err != Lav_ERROR_NONE) {
 		printf("Failed to initialize library. Error: %i", err);

@@ -8,12 +8,12 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <string.h>
 #include <stdlib.h>
 
-LavNode* makeNode(LavGraph *graph, char* file) {
-	LavNode *retval;
+LavObject* makeNode(LavObject *graph, char* file) {
+	LavObject *retval;
 	LavError err = Lav_initializeLibrary();
 	if(err != Lav_ERROR_NONE) {
 		printf("Failed to initialize library. Error: %i", err);
-		return;
+		return NULL;
 	}
 	err = Lav_createFileNode(graph, file, &retval);
 	if(err != Lav_ERROR_NONE) {
@@ -30,12 +30,12 @@ void main(int argc, char** args) {
 	}
 
 	void* th;
-	LavGraph *graph;
-	LavNode** nodes;
+	LavObject *graph;
+	LavObject** nodes;
 	Lav_createGraph(SR, 1024, &graph);
-	nodes = calloc(argc-1, sizeof(LavNode*));
+	nodes = calloc(argc-1, sizeof(LavObject*));
 	for(int i = 0; i < argc-1; i++) {
-		LavNode* n = makeNode(graph, args[i+1]);
+		LavObject* n = makeNode(graph, args[i+1]);
 		if(n == NULL) return; //makeNode prints errors already.
 		nodes[i] = n;
 	}
@@ -48,7 +48,7 @@ void main(int argc, char** args) {
 	}
 
 	//so far, so good. Make a mixer.
-	LavNode* mixer;
+	LavObject* mixer;
 	LavError err;
 	err = Lav_createMixerNode(graph, argc-1, channels, &mixer);
 

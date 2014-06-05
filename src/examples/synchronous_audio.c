@@ -14,14 +14,14 @@ void main() {
 	//First, make a bunch of objects, connect them together, and get 5 seconds of a sine wave.
 	int sine_time = 5;
 	float sr = 44100;
-	LavGraph *graph;
+	LavObject *graph;
 	LavError err = Lav_initializeLibrary();
 	if(err != Lav_ERROR_NONE) {
 		printf("Failed to initialize library. Error: %i", err);
 		return;
 	}
 	Lav_createGraph(sr, 100, &graph); //graph with SINE_TIME blocksize.  Don't do this in real code, as it's memory hungry.
-	LavNode *node;
+	LavObject *node;
 	Lav_createSineNode(graph, &node);
 
 	//Let's set its frequency to 150:
@@ -37,7 +37,7 @@ void main() {
 		return;
 	}
 
-	for(int i = 0; i < sr*sine_time; i+=100) Lav_graphReadAllOutputs(graph, output+i);
+	for(int i = 0; i < sr*sine_time; i+=100) Lav_objectReadBlock(graph, output+i);
 
 	//Finally, play it.
 	Pa_Initialize();
