@@ -19,8 +19,8 @@ void main(int argc, char** args) {
 		return;
 	}
 
-	LavGraph *graph;
-	LavNode* fileNode, *hrtfNode;
+	LavObject *graph;
+	LavObject* fileNode, *hrtfNode;
 	LavError err = Lav_initializeLibrary();
 	if(err != Lav_ERROR_NONE) {
 		printf("Failed to initialize library. Error: %i", err);
@@ -51,7 +51,7 @@ void main(int argc, char** args) {
 	clock_t start;
 	start = clock();
 	for(unsigned int i = 0; i < 44100*seconds; i+= blocksize) {
-		Lav_graphReadAllOutputs(graph, storage);
+		Lav_objectReadBlock(graph, storage);
 	}
 	clock_t dur = clock()-start;
 	float secs = dur/(float)CLOCKS_PER_SEC;
