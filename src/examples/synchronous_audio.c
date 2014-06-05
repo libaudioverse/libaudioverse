@@ -37,7 +37,7 @@ void main() {
 		return;
 	}
 
-	for(int i = 0; i < sr*sine_time; i+=100) Lav_objectReadBlock(graph, output+i);
+	for(int i = 0; i < sr*sine_time; i+=100) Lav_graphGetBlock(graph, output+i);
 
 	//Finally, play it.
 	Pa_Initialize();

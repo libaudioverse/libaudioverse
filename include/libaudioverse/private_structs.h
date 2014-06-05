@@ -53,11 +53,11 @@ struct LavNode {
 };
 
 struct LavGraph {
+	LavObject base;
 	LavObject **nodes;
 	unsigned int node_count, nodes_length;
 	LavObject *output_node;
 	float sr; //sampling rate.
-	void* mutex; //lock this graph.
 	void* audio_thread; //not null thread handle for audio output graphs, otherwise null.
 	unsigned int block_size;
 };

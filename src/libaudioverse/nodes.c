@@ -17,6 +17,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int
 	ERROR_IF_TRUE(retval == NULL, Lav_ERROR_MEMORY);
 	LavError err = initLavObject(numInputs, numOutputs, type, graph->block_size, graph->mutex, (LavObject*)retval);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
+	graphAssociateNode(graph, (LavObject*)retval);
+	retval->graph = (LavGraph*)graph;
 	*destination = (LavObject*)retval;
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
