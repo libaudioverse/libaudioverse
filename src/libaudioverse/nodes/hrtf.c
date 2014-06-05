@@ -5,6 +5,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <math.h>
 #include <stdlib.h>
 #include <libaudioverse/private_all.h>
+#include <string.h>
 
 LavError hrtfProcessor(LavObject *obj);
 
@@ -12,8 +13,7 @@ struct HrtfNodeData {
 	float *history;
 	float* left_response, *right_response;
 	LavHrtfData *hrtf;
-	unsigned int hrir_length;
-	unsigned int history_pos; //for the ringbuffers.
+	unsigned int hrir_length, history_length;
 };
 
 typedef struct HrtfNodeData HrtfNodeData;
@@ -42,11 +42,11 @@ Lav_PUBLIC_FUNCTION Lav_createHrtfNode(LavObject *graph, LavHrtfData* hrtf, LavO
 
 	HrtfNodeData *data = calloc(1, sizeof(HrtfNodeData));
 	ERROR_IF_TRUE(data == NULL, Lav_ERROR_MEMORY);
-	/*Making these one longer is intensional.  Sinze the reader is the same as the writer, and we never read backwards past hrir_length, this prevents us from seeing the most recent sample twice.*/
-	float* history = calloc(hrtf->hrir_length+1, sizeof(float));
+	float* history = calloc(hrtf->hrir_length+retval->base.block_size, sizeof(float));
 	ERROR_IF_TRUE(history == NULL , Lav_ERROR_MEMORY);
 	data->history = history;
 	data->hrir_length = hrtf->hrir_length;
+	data->history_length = data->hrir_length+retval->base.block_size;
 	data->hrtf = hrtf;
 
 	//make room for the hrir itself.
@@ -68,17 +68,15 @@ LavError hrtfProcessor(LavObject *obj) {
 	Lav_getFloatProperty((LavObject*)node, Lav_HRTF_ELEVATION, &elevation);
 	//compute hrirs.
 	hrtfComputeCoefficients(data->hrtf, elevation, azimuth, data->left_response, data->right_response);
-	//this is convolution, with a twist: it uses a ringbuffer to avoid a ton of unnecessary copies.
+	//copy the last hrir_length samples to the beginning, copy the input to the end.
+	//this moves the history back by a fixed amount.
+	memcpy(data->history, data->history+data->history_length-data->hrir_length, data->hrir_length*sizeof(float)); //this does not overlap.
+	memcpy(data->history+data->hrir_length, obj->inputs[0], obj->block_size*sizeof(float));
 	for(unsigned int i = 0; i < obj->block_size; i++) {
-		data->history_pos = ringmodi(data->history_pos+1, data->hrir_length); //putting it here for clarity. It doesn't matter if this is before everything or after it.
-		//first thing we do: read a sample into the ringbuffer.
-		*(data->history+data->history_pos) = obj->inputs[0][i];
 		float outLeft=0, outRight=0;
 		for(unsigned int j = 0; j < data->hrir_length; j++) {
-			//standard convolution.
-			unsigned int index = ringmodi(data->history_pos-j, data->hrir_length);
-			outLeft += data->left_response[j]*data->history[index];
-			outRight += data->right_response[j]*data->history[index];
+			outLeft += data->left_response[j]*data->history[data->hrir_length+i-j];
+			outRight += data->right_response[j]*data->history[data->hrir_length+i-j];
 		}
 		obj->outputs[0][i] = outLeft;
 		obj->outputs[1][i] = outRight;
