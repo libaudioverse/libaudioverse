@@ -10,10 +10,14 @@ extern "C" {
 typedef float LavTransform[4][4];
 typedef float LavVector[4];
 
-Lav_PUBLIC_FUNCTION void identityTransform(LavTransform m);
-Lav_PUBLIC_FUNCTION void transformSetTranslation(LavTransform m, LavVector v);
-Lav_PUBLIC_FUNCTION void transformGetTranslation(LavTransform m, LavVector v);
-Lav_PUBLIC_FUNCTION void transformApply(LavTransform m, LavVector in, LavVector out); //note: if in==out, this violates the aliasing rule and will break optimizers.
+Lav_PUBLIC_FUNCTION void identityTransform(LavTransform t);
+Lav_PUBLIC_FUNCTION void transformSetTranslation(LavTransform t, LavVector v);
+Lav_PUBLIC_FUNCTION void transformGetTranslation(LavTransform t, LavVector out);
+Lav_PUBLIC_FUNCTION void transformApply(LavTransform t, LavVector in, LavVector out); //note: if in==out, this violates the aliasing rule and will break optimizers.
+Lav_PUBLIC_FUNCTION void transformInverseOrthoganal(LavTransform t);
+Lav_PUBLIC_FUNCTION float vectorDotProduct(LavVector a, LavVector b);
+Lav_PUBLIC_FUNCTION void vectorCrossProduct(LavVector a, LavVector b, LavVector out);
+Lav_PUBLIC_FUNCTION void cameraTransform(LavTransform t, LavVector at, LavVector up);
 
 #ifdef __cplusplus
 }
