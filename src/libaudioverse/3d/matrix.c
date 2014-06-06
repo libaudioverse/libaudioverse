@@ -52,10 +52,10 @@ Lav_PUBLIC_FUNCTION void transformTranspose(LavTransform t, LavTransform out) {
 Lav_PUBLIC_FUNCTION void transformInvertOrthoganal(LavTransform t, LavTransform out) {
 	LavTransform tmp = {0};
 	LavVector trans = {0};
-	trans[0] = t[0][3];
-	trans[1] = t[1][3];
-	trans[2] = t[2][3];
-	trans[3] = 1.0f; //turn on the translation.
+	trans[0] = -1*t[0][3];
+	trans[1] = -1*t[1][3];
+	trans[2] = -1*t[2][3];
+	trans[3] = 0.0f; //turn off the translation.  Oddly, this is what we want here.
 	identityTransform(out);
 	LavTransform rot;
 	memcpy(rot, t, sizeof(LavTransform));
