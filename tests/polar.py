@@ -11,4 +11,4 @@ def direct(az, elev):
 	xz = cos(elev)
 	x = xz*cos(az)
 	z = xz*sin(az)
-	return (x, y, z)
+	return (x, y, z, 1.0)

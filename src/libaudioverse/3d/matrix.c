@@ -3,10 +3,10 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 
 #include <libaudioverse/private_all.h>
-#include <portaudio.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
 
 /**This is a matrix transformation library adequate for Libaudioverse's purposes**/
 
@@ -24,10 +24,9 @@ Lav_PUBLIC_FUNCTION void transformSetTranslation(LavTransform t, LavVector v) {
 }
 
 Lav_PUBLIC_FUNCTION void transformGetTranslation(LavTransform t, LavVector out) {
-	v[0]=m[0][3];
-	v[1]=m[1][3];
-	v[2]=m[2][3];
-	v[3]=m[3][3];
+	out[0]=t[0][3];
+	out[1]=t[1][3];
+	out[2]=t[2][3];
 }
 
 Lav_PUBLIC_FUNCTION void transformApply(LavTransform t, LavVector in, LavVector out) {
@@ -36,7 +35,7 @@ Lav_PUBLIC_FUNCTION void transformApply(LavTransform t, LavVector in, LavVector 
 	}
 }
 
-Lav_PUBLIC_FUNCTION void transformInvertOrthoganal(LavTransform t) {
+Lav_PUBLIC_FUNCTION void transformInvertOrthoganalInPlace(LavTransform t) {
 	for(int i = 0; i < 3; i++) {
 		for(int j = 0; j < 3; j++) {
 			t[i][j]=t[j][i];
@@ -45,6 +44,11 @@ Lav_PUBLIC_FUNCTION void transformInvertOrthoganal(LavTransform t) {
 	t[0][3]*=-1;
 	t[1][3] *= -1;
 	t[2][3] *= -1;
+}
+
+Lav_PUBLIC_FUNCTION void transformInvertOrthoganal(LavTransform t, LavTransform out) {
+	memcpy(out, t, sizeof(LavTransform));
+	transformInvertOrthoganalInPlace(out);
 }
 
 Lav_PUBLIC_FUNCTION float vectorDotProduct(LavVector a, LavVector b) {
@@ -57,7 +61,7 @@ Lav_PUBLIC_FUNCTION void vectorCrossProduct(LavVector a, LavVector b, LavVector 
 	out[2] = a[0]*b[1]-a[1]*b[0];
 }
 
-Lav_PUBLIC_FUNCTION void cameraTransform(LavTransform t, LavVector at, LavVector up) {
+Lav_PUBLIC_FUNCTION void cameraTransform(LavTransform t, LavVector at, LavVector up, LavVector position) {
 	identityTransform(t);
 	for(unsigned int i = 0; i < 3; i++) {
 		t[0][i]=at[i];
@@ -68,5 +72,8 @@ Lav_PUBLIC_FUNCTION void cameraTransform(LavTransform t, LavVector at, LavVector
 	t[2][0]=right[0];
 	t[2][1] = right[1];
 	t[2][2] = right[2];
-	transformInvertOrthoganal(t);
+	t[0][3] = position[0];
+	t[1][3] = position[1];
+	t[2][3] = position[2];
+	transformInvertOrthoganalInPlace(t);
 }
