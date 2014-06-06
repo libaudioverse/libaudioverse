@@ -17,11 +17,10 @@ Lav_PUBLIC_FUNCTION void identityTransform(LavTransform t) {
 	t[2][2] = 1.0f;
 	t[3][3]=1.0f;
 }
-
 Lav_PUBLIC_FUNCTION void transformApply(LavTransform t, LavVector in, LavVector out) {
 	LavVector tmp = {0};
 	for(unsigned int i = 0; i < 4; i++) {
-		tmp[i] = t[i][0]*in[0]+t[i][1]*in[1]+t[i][2]*in[2]+t[i][3]*in[3];
+		tmp[i] = t[0][i]*in[0]+t[1][i]*in[1]+t[2][i]*in[2]+t[3][i]*in[3];
 	}
 	memcpy(out, tmp, sizeof(LavVector));
 }
@@ -52,22 +51,22 @@ Lav_PUBLIC_FUNCTION void transformTranspose(LavTransform t, LavTransform out) {
 Lav_PUBLIC_FUNCTION void transformInvertOrthoganal(LavTransform t, LavTransform out) {
 	LavTransform tmp = {0};
 	LavVector trans = {0};
-	trans[0] = -1*t[0][3];
-	trans[1] = -1*t[1][3];
-	trans[2] = -1*t[2][3];
+	trans[0] = -1*t[3][0];
+	trans[1] = -1*t[3][1];
+	trans[2] = -1*t[3][2];
 	trans[3] = 0.0f; //turn off the translation.  Oddly, this is what we want here.
 	identityTransform(out);
 	LavTransform rot;
 	memcpy(rot, t, sizeof(LavTransform));
-	rot[0][3]=0;
-	rot[1][3]=0;
-	rot[2][3]=0;
+	rot[3][0]=0;
+	rot[3][1]=0;
+	rot[3][2]=0;
 	transformTranspose(rot, out); //gives us an inverted rotation.
 	transformApply(out, trans, trans); //gives us the inverted translation component.
 	//now, copy in the inverted translation.
-	out[0][3] = trans[0];
-	out[1][3] = trans[1];
-	out[2][3] = trans[2];
+	out[3][0] = trans[0];
+	out[3][1] = trans[1];
+	out[3][2] = trans[2];
 }
 
 Lav_PUBLIC_FUNCTION float vectorDotProduct(LavVector a, LavVector b) {
@@ -81,19 +80,14 @@ Lav_PUBLIC_FUNCTION void vectorCrossProduct(LavVector a, LavVector b, LavVector 
 }
 
 Lav_PUBLIC_FUNCTION void cameraTransform(LavVector at, LavVector up, LavVector position, LavTransform out) {
-	LavTransform t;
-	identityTransform(t);
-	for(unsigned int i = 0; i < 3; i++) {
-		t[0][i]=at[i];
-		t[1][i]=up[i];
-	}
 	LavVector right;
-	vectorCrossProduct(at, up, right);
-	t[2][0]=right[0];
-	t[2][1] = right[1];
-	t[2][2] = right[2];
-	t[0][3] = position[0];
-	t[1][3] = position[1];
-	t[2][3] = position[2];
-	transformInvertOrthoganal(t, out);
+	vectorCrossProduct(at, up, right); //we have 3 axis of a coordinate system.
+	LavTransform trans = {
+		right[0], right[1], right[2], 0,
+		up[0], up[1], up[2], 0,
+		at[0], at[1], at[2], 0,
+		position[0], position[1], position[2], 1,
+	};
+	//now invert it into out.
+	transformInvertOrthoganal(trans, out);
 }

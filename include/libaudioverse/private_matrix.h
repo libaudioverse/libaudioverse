@@ -10,6 +10,19 @@ extern "C" {
 typedef float LavTransform[4][4];
 typedef float LavVector[4];
 
+/**This library uses post multiplication for the transformation application step.  This has the following effect on your code:
+Suppose you wish to translate 6 units right and rotate counterclockwise about the origin.  You build the necessary matrices.  In post multiplication, rotate first and then translate.
+That is, transformations happen right to left.  This makes this library compatible with OpenGL for the most part (but that's really up to the shader authors) and mathematical docs.
+
+In terms of memory, matrices are layed out across the rows and down; that is, using the standard notion mrc (m11 is the top left, m41 is the bottom left):
+{m11, m12, m13, m14, ..., m41, m42, m43, m44}
+
+Vectors are arrays of 4 floats, {x, y, z, w}.
+When w=0, a vector represents a direction; when w=1, a vector represents a position.
+Another way to put this is that w is a boolean switch which turns off and on the translation component of any transformation.  For most purposes, set w to 1.
+Note that this is an oversimplification: w is important in the realm of graphical projection, but those portions of the pipeline are likely to be written on your GPU as shaders, and a full discussion of w is too verbose for this comment.
+*/
+
 Lav_PUBLIC_FUNCTION void identityTransform(LavTransform t);
 Lav_PUBLIC_FUNCTION void transformApply(LavTransform t, LavVector in, LavVector out); //note: if in==out, this violates the aliasing rule and will break optimizers.
 Lav_PUBLIC_FUNCTION void transformMultiply(LavTransform t1, LavTransform t2, LavTransform out);
