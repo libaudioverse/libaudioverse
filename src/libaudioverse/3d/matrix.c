@@ -17,38 +17,51 @@ Lav_PUBLIC_FUNCTION void identityTransform(LavTransform t) {
 	t[3][3]=1.0f;
 }
 
-Lav_PUBLIC_FUNCTION void transformSetTranslation(LavTransform t, LavVector v) {
-	t[0][3]=v[0];
-	t[1][3]=v[1];
-	t[2][3]=v[2];
-}
-
-Lav_PUBLIC_FUNCTION void transformGetTranslation(LavTransform t, LavVector out) {
-	out[0]=t[0][3];
-	out[1]=t[1][3];
-	out[2]=t[2][3];
-}
-
 Lav_PUBLIC_FUNCTION void transformApply(LavTransform t, LavVector in, LavVector out) {
 	for(unsigned int i = 0; i < 4; i++) {
 		out[i] = t[i][0]*in[0]+t[i][1]*in[1]+t[i][2]*in[2]+t[i][3]*in[3];
 	}
 }
-
-Lav_PUBLIC_FUNCTION void transformInvertOrthoganalInPlace(LavTransform t) {
-	for(int i = 0; i < 3; i++) {
-		for(int j = 0; j < 3; j++) {
-			t[i][j]=t[j][i];
+Lav_PUBLIC_FUNCTION void transformMultiply(LavTransform t1, LavTransform t2, LavTransform out) {
+	memset(out, 0, sizeof(LavTransform));
+	for(int i = 0; i < 4; i++) {
+		for(int j = 0; j < 4; j++) {
+			for(int k = 0; k < 4; k++) {	
+				out[i][j] += t1[i][k]*t2[k][j];
+			}
 		}
 	}
-	t[0][3]*=-1;
-	t[1][3] *= -1;
-	t[2][3] *= -1;
+}
+
+Lav_PUBLIC_FUNCTION void transformTranspose(LavTransform t, LavTransform out) {
+	for(int i = 0; i < 4; i++) {
+		for(int j = 0; j < 4; j++) {
+			out[i][j] = t[j][i];
+		}
+	}
+}
+
+Lav_PUBLIC_FUNCTION void transformSplitToRotationTranslation(LavTransform t, LavTransform outRot, LavTransform outTrans) {
+	identityTransform(outRot);
+	identityTransform(outTrans);
+	for(int i = 0; i < 3; i++) {
+		for(int j = 0; j < 3; j++) {
+			outRot[i][j] = t[i][j];
+		}
+	}
+	for(int i = 0; i < 3; i++) {
+		outTrans[i][3] = t[i][3];
+	}
 }
 
 Lav_PUBLIC_FUNCTION void transformInvertOrthoganal(LavTransform t, LavTransform out) {
-	memcpy(out, t, sizeof(LavTransform));
-	transformInvertOrthoganalInPlace(out);
+	LavTransform rot, trans;
+	transformSplitToRotationTranslation(t, rot, trans);
+	transformTranspose(rot, rot);
+	trans[0][3]*=-1;
+	trans[1][3]*=-1;
+	trans[2][3]*=-1;
+	transformMultiply(rot, trans, out);
 }
 
 Lav_PUBLIC_FUNCTION float vectorDotProduct(LavVector a, LavVector b) {
@@ -61,8 +74,8 @@ Lav_PUBLIC_FUNCTION void vectorCrossProduct(LavVector a, LavVector b, LavVector 
 	out[2] = a[0]*b[1]-a[1]*b[0];
 }
 
-Lav_PUBLIC_FUNCTION void cameraTransform(LavTransform t, LavVector at, LavVector up, LavVector position) {
-	identityTransform(t);
+Lav_PUBLIC_FUNCTION void cameraTransform(LavVector at, LavVector up, LavVector position, LavTransform out) {
+	LavTransform t;
 	for(unsigned int i = 0; i < 3; i++) {
 		t[0][i]=at[i];
 		t[1][i]=up[i];
@@ -75,5 +88,5 @@ Lav_PUBLIC_FUNCTION void cameraTransform(LavTransform t, LavVector at, LavVector
 	t[0][3] = position[0];
 	t[1][3] = position[1];
 	t[2][3] = position[2];
-	transformInvertOrthoganalInPlace(t);
+	transformInvertOrthoganal(t, out);
 }
