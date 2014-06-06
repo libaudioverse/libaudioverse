@@ -22,9 +22,9 @@ def test_transform_invert_orthoganal():
 	#we need a source of known orthoganal matrices.
 	#we thus use the camera function.
 	#it'll work so long as it returns something orthoganal, even if it fails its test.
-	lav.cameraTransform(trans[0], direct(0, -30), direct(0, 60), [5, -30, 0, 1])
-	lav.cameraTransform(trans[1], direct(45, 0), direct(45, 90), [0, 0, 0, 1])
-	lav.cameraTransform(trans[2], direct(0, -0), direct(0, -90), [0, 0, 0, 1])
+	lav.cameraTransform(direct(0, -30), direct(0, 60), [5, -30, 0, 1], trans[0])
+	lav.cameraTransform(direct(45, 0), direct(45, 90), [0, 0, 0, 1], trans[1],  )
+	lav.cameraTransform(direct(0, -0), direct(0, -90), [0, 0, 0, 1], trans[2])
 	lav.identityTransform(trans[3])
 	trans[3][0][3] = 5
 	trans[3][1][3] = 22

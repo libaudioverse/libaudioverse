@@ -11,6 +11,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 /**This is a matrix transformation library adequate for Libaudioverse's purposes**/
 
 Lav_PUBLIC_FUNCTION void identityTransform(LavTransform t) {
+	memset(t, 0, sizeof(LavTransform));
 	t[0][0] = 1.0f;
 	t[1][1] = 1.0f;
 	t[2][2] = 1.0f;
@@ -18,50 +19,55 @@ Lav_PUBLIC_FUNCTION void identityTransform(LavTransform t) {
 }
 
 Lav_PUBLIC_FUNCTION void transformApply(LavTransform t, LavVector in, LavVector out) {
+	LavVector tmp = {0};
 	for(unsigned int i = 0; i < 4; i++) {
-		out[i] = t[i][0]*in[0]+t[i][1]*in[1]+t[i][2]*in[2]+t[i][3]*in[3];
+		tmp[i] = t[i][0]*in[0]+t[i][1]*in[1]+t[i][2]*in[2]+t[i][3]*in[3];
 	}
+	memcpy(out, tmp, sizeof(LavVector));
 }
+
 Lav_PUBLIC_FUNCTION void transformMultiply(LavTransform t1, LavTransform t2, LavTransform out) {
-	memset(out, 0, sizeof(LavTransform));
+	LavTransform tmp;
+	memset(tmp, 0, sizeof(LavTransform));
 	for(int i = 0; i < 4; i++) {
 		for(int j = 0; j < 4; j++) {
 			for(int k = 0; k < 4; k++) {	
-				out[i][j] += t1[i][k]*t2[k][j];
+				tmp[i][j] += t1[i][k]*t2[k][j];
 			}
 		}
 	}
+	memcpy(out, tmp, sizeof(LavTransform));
 }
 
 Lav_PUBLIC_FUNCTION void transformTranspose(LavTransform t, LavTransform out) {
+	LavTransform tmp = {0};
 	for(int i = 0; i < 4; i++) {
 		for(int j = 0; j < 4; j++) {
-			out[i][j] = t[j][i];
+			tmp[i][j] = t[j][i];
 		}
 	}
-}
-
-Lav_PUBLIC_FUNCTION void transformSplitToRotationTranslation(LavTransform t, LavTransform outRot, LavTransform outTrans) {
-	identityTransform(outRot);
-	identityTransform(outTrans);
-	for(int i = 0; i < 3; i++) {
-		for(int j = 0; j < 3; j++) {
-			outRot[i][j] = t[i][j];
-		}
-	}
-	for(int i = 0; i < 3; i++) {
-		outTrans[i][3] = t[i][3];
-	}
+	memcpy(out, tmp, sizeof(LavTransform));
 }
 
 Lav_PUBLIC_FUNCTION void transformInvertOrthoganal(LavTransform t, LavTransform out) {
-	LavTransform rot, trans;
-	transformSplitToRotationTranslation(t, rot, trans);
-	transformTranspose(rot, rot);
-	trans[0][3]*=-1;
-	trans[1][3]*=-1;
-	trans[2][3]*=-1;
-	transformMultiply(rot, trans, out);
+	LavTransform tmp = {0};
+	LavVector trans = {0};
+	trans[0] = t[0][3];
+	trans[1] = t[1][3];
+	trans[2] = t[2][3];
+	trans[3] = 1.0f; //turn on the translation.
+	identityTransform(out);
+	LavTransform rot;
+	memcpy(rot, t, sizeof(LavTransform));
+	rot[0][3]=0;
+	rot[1][3]=0;
+	rot[2][3]=0;
+	transformTranspose(rot, out); //gives us an inverted rotation.
+	transformApply(out, trans, trans); //gives us the inverted translation component.
+	//now, copy in the inverted translation.
+	out[0][3] = trans[0];
+	out[1][3] = trans[1];
+	out[2][3] = trans[2];
 }
 
 Lav_PUBLIC_FUNCTION float vectorDotProduct(LavVector a, LavVector b) {
@@ -76,6 +82,7 @@ Lav_PUBLIC_FUNCTION void vectorCrossProduct(LavVector a, LavVector b, LavVector 
 
 Lav_PUBLIC_FUNCTION void cameraTransform(LavVector at, LavVector up, LavVector position, LavTransform out) {
 	LavTransform t;
+	identityTransform(t);
 	for(unsigned int i = 0; i < 3; i++) {
 		t[0][i]=at[i];
 		t[1][i]=up[i];
