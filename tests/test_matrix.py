@@ -17,8 +17,7 @@ def test_transform_identity():
 	vec[0], vec[1], vec[2] = 5, 10, 20
 	out = ffi.new("LavVector")
 	lav.transformApply(trans, vec, out)
-	for i, j in zip(vec, out):
-		assert abs(i-j) < accuracy
+	compare_vectors(vec, out)
 
 def test_transform_invert_orthoganal():
 	trans = ffi.new("LavTransform[4]")
@@ -40,8 +39,7 @@ def test_transform_invert_orthoganal():
 		output = ffi.new("LavVector", [0, 0, 0, 1])
 		lav.transformApply(i, input, output)
 		lav.transformApply(j, output, output)
-		for k, l in zip(input, output):
-			assert abs(k-l) < accuracy
+		compare_vectors(input, output)
 
 def test_transform_camera():
 	trans = ffi.new("LavTransform")
