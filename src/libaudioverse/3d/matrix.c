@@ -17,10 +17,12 @@ Lav_PUBLIC_FUNCTION void identityTransform(LavTransform t) {
 	t[2][2] = 1.0f;
 	t[3][3]=1.0f;
 }
-Lav_PUBLIC_FUNCTION void transformApply(LavTransform t, LavVector in, LavVector out) {
+
+Lav_PUBLIC_FUNCTION void transformApply(LavTransform trans, LavVector in, LavVector out) {
 	LavVector tmp = {0};
-	for(unsigned int i = 0; i < 4; i++) {
-		tmp[i] = t[0][i]*in[0]+t[1][i]*in[1]+t[2][i]*in[2]+t[3][i]*in[3];
+	//we're multiplying a 1x3 by a 3x3. Output is therefore 1x3.
+	for(int col = 0; col < 4; col++) {
+		tmp[col] = in[0]*trans[0][col]+in[1]*trans[1][col]+in[2]*trans[2][col]+in[3]*trans[3][col];
 	}
 	memcpy(out, tmp, sizeof(LavVector));
 }
@@ -83,10 +85,10 @@ Lav_PUBLIC_FUNCTION void cameraTransform(LavVector at, LavVector up, LavVector p
 	LavVector right;
 	vectorCrossProduct(at, up, right); //we have 3 axis of a coordinate system.
 	LavTransform trans = {
-		right[0], right[1], right[2], 0,
-		up[0], up[1], up[2], 0,
-		at[0], at[1], at[2], 0,
-		position[0], position[1], position[2], 1,
+	right[0], right[1], right[2], 0,
+	up[0], up[1], up[2], 0,
+	-at[0], -at[1], -at[2], 0,
+	position[0], position[1], position[2], 1,
 	};
 	//now invert it into out.
 	transformInvertOrthoganal(trans, out);

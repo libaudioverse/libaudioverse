@@ -45,11 +45,32 @@ def test_transform_invert_orthoganal():
 
 def test_transform_camera():
 	trans = ffi.new("LavTransform")
-	lav.cameraTransform(direct(-30, 0), direct(60, 0), [0, 0, 0, 0], trans)
+	lav.cameraTransform(direct(0, -30), direct(0, 60), [0, 0, 0, 0], trans)
 	#we have a camera looking east and down a bit, so that the x axis of the world is angled upward, the y axis is tilted back, and the z axis is to our right.
 	#first, a vector that points directly to the right of the camera.  In this case, the positive z direction.
 	out = ffi.new("LavVector")
-	#In world space, this points directly to the right of the camera, so we should get positive x axis in camera space.
+	#this is directly to the right of the camera as it is oriented in 3d space:
 	right = [0, 0, 1, 1]
 	lav.transformApply(trans, right, out)
+	#it should yield the positive x axis in camera space.
 	compare_vectors([1, 0, 0, 1], out)
+	#a vector directed in the same direction as the camera should yield the z axis:
+	lav.transformApply(trans, direct(0, -30), out)
+	compare_vectors([0, 00, -1, 1], out)
+	#and a vector in the up direction must give y.
+	lav.transformApply(trans, direct(0, 60), out)
+	compare_vectors([0, 1, 0, 1], out)
+	#this next bit tests translation.
+	offset = [10, 5, 13, 0]
+	lav.cameraTransform(direct(0, -30), direct(0, 60), offset, trans)
+	#in order for this to work, we have to pointwise add in our translation to the world coordinate test vectors.
+	#otherwise, it's identical.
+	expected_z = [i+j for i, j in zip(direct(0, -30), offset)]
+	expected_y = [i+j for i, j in zip(direct(0, 60), offset)]
+	expected_x = [i+j for i, j in zip([0, 0, 1, 1], offset)]
+	lav.transformApply(trans, expected_x, out)
+	compare_vectors([1, 0, 0, 1], out)
+	lav.transformApply(trans, expected_y, out)
+	compare_vectors([0, 1, 0, 1], out)
+	lav.transformApply(trans, expected_z, out)
+	compare_vectors([0, 0, -1, 1], out)
