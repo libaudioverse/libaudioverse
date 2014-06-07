@@ -7,8 +7,13 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #ifdef __cplusplus
 extern "C" {
 #endif
-typedef float LavTransform[4][4];
-typedef float LavVector[4];
+typedef struct lavTransform {
+	float mat[4][4];
+} LavTransform;
+typedef struct LavVector {
+	float vec[4];
+} LavVector;
+
 
 /**This library uses pre multiplication for the transformation application step.
 
@@ -20,19 +25,16 @@ When w=0, a vector represents a direction; when w=1, a vector represents a posit
 Another way to put this is that w is a boolean switch which turns off and on the translation component of any transformation.  For most purposes, set w to 1.
 Note that this is an oversimplification: w is important in the realm of graphical projection, but those portions of the pipeline are likely to be written on your GPU as shaders, and a full discussion of w is too verbose for this comment.
 
-Inplace usage is safe.  LavVector and LavTransform typedef to arrays.  If a parameter is called out, it'll be overridden with the result of the operation.
-In order to ensure that the c standard isn't violated, nothing is const.  Furthermore, all functions do their work on the stack with temporary copies.  You can pass the same vector or transformation as a parameter and the destination without a problem.
-The tiny performance loss of doing this was determined to be less than the gain of needing to clutter code with unneeded temporaries.
+To actually set a vector, set its .vec attribute appropriately. None of these functions allocate for you.
 */
 
-Lav_PUBLIC_FUNCTION void identityTransform(LavTransform out);
-Lav_PUBLIC_FUNCTION void transformApply(LavTransform t, LavVector in, LavVector out); //note: if in==out, this violates the aliasing rule and will break optimizers.
-Lav_PUBLIC_FUNCTION void transformMultiply(LavTransform t1, LavTransform t2, LavTransform out);
-Lav_PUBLIC_FUNCTION void transformSplitToRotationTranslation(LavTransform t, LavTransform outRot, LavTransform outTrans);
-Lav_PUBLIC_FUNCTION void transformInvertOrthoganal(LavTransform t, LavTransform out);
+Lav_PUBLIC_FUNCTION void identityTransform(LavTransform *out);
+Lav_PUBLIC_FUNCTION void transformApply(LavTransform t, LavVector in, LavVector *out);
+Lav_PUBLIC_FUNCTION void transformMultiply(LavTransform t1, LavTransform t2, LavTransform *out);
+Lav_PUBLIC_FUNCTION void transformInvertOrthoganal(LavTransform t, LavTransform *out);
 Lav_PUBLIC_FUNCTION float vectorDotProduct(LavVector a, LavVector b);
-Lav_PUBLIC_FUNCTION void vectorCrossProduct(LavVector a, LavVector b, LavVector out);
-Lav_PUBLIC_FUNCTION void cameraTransform(LavVector at, LavVector up, LavVector position, LavTransform out);
+Lav_PUBLIC_FUNCTION void vectorCrossProduct(LavVector a, LavVector b, LavVector *out);
+Lav_PUBLIC_FUNCTION void cameraTransform(LavVector at, LavVector up, LavVector position, LavTransform *out);
 
 #ifdef __cplusplus
 }
