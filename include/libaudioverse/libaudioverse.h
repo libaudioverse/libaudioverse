@@ -20,11 +20,16 @@ typedef struct LavHrtfData LavHrtfData;
 typedef struct LavObject LavObject;
 
 /**Does whatever is appropriate on a given platform to expose a Libaudioverse function publically.*/
-#define DLL_PUBLIC
+#define DLL_PUBLIC_ATTR
 #ifdef __cplusplus
-#define Lav_PUBLIC_FUNCTION extern "C" DLL_PUBLIC
+#define Lav_PUBLIC_FUNCTION extern "C" DLL_PUBLIC_ATTR
 #else
-#define Lav_PUBLIC_FUNCTION extern DLL_PUBLIC
+#define Lav_PUBLIC_FUNCTION extern DLL_PUBLIC_ATTR
+#endif
+
+/*This block takes effect if this header is being preprocessed for the tests, turning off whatever weird thing we need for the build.*/
+#ifdef IS_TESTING
+#define Lav_PUBLIC_FUNCTION
 #endif
 
 enum Lav_LIMITS {
