@@ -3,7 +3,9 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 project(Libaudioverse)
 include_directories("${CMAKE_SOURCE_DIR}/include")
 
-#This is LibSNDFile.
+#This is LibSNDFile for windows.
+#if you've got them somewhere else, you need to change these lines.
+if(${MSVC})
 SET(LIBSNDFILE_INCLUDE_DIR "C:/Program Files (x86)/Mega-Nerd/libsndfile/include" CACHE PATH
 "Directory for Libsndfile headers.")
 SET(LIBSNDFILE_LIBRARY_DIR "C:/Program Files (x86)/Mega-Nerd/libsndfile/lib" CACHE PATH
@@ -11,6 +13,7 @@ SET(LIBSNDFILE_LIBRARY_DIR "C:/Program Files (x86)/Mega-Nerd/libsndfile/lib" CAC
 
 INCLUDE_DIRECTORIES(${LIBSNDFILE_INCLUDE_DIR})
 LINK_DIRECTORIES(${LIBSNDFILE_LIBRARY_DIR})
+endif()
 
 #uthash
 include_directories("${CMAKE_SOURCE_DIR}/uthash/src")
