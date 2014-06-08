@@ -18,17 +18,28 @@ endif()
 #uthash
 include_directories("${CMAKE_SOURCE_DIR}/uthash/src")
 
+#more msvc specific stuff: if on windows, do special handling for portaudio.
+if(${MSVC})
 #This fixes portaudio.
 add_definitions(-DPA_WDMKS_NO_KSGUID_LIB)
-
-#This makes sure that we can link to ourself.
-link_directories(${libaudioverse_BINARY_DIR})
-
 #build and setup portaudio:
 add_subdirectory(portaudio)
 include_directories(${portaudio_SOURCE_DIR}/include)
 link_directories(${portaudio_BINARY_DIR})
+endif()
+
+#This makes sure that we can link to ourself.
+link_directories(${libaudioverse_BINARY_DIR})
+
+if(${CMAKE_COMPILER_IS_GNUCC})
+SET(portaudio_name portaudio)
+SET(libsndfile_name sndfile)
+endif()
+if(${MSVC})
+set(portaudio_name portaudio_static_x86)
+set(libsndfile_name libsndfile-1)
+endif()
 
 #below here is us.  First, set a variable to all the libraries we need to link with:
-SET(libaudioverse_required_libraries libsndfile-1 portaudio_static_x86)
+SET(libaudioverse_required_libraries ${libsndfile_name} ${portaudio_name})
 add_subdirectory(src)

@@ -9,7 +9,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_all.h>
 
 
-Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int numOutputs, enum Lav_NODETYPE type, LavObject* graph, LavObject** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int numOutputs, enum Lav_NODETYPES type, LavObject* graph, LavObject** destination) {
 	STANDARD_PREAMBLE;
 	CHECK_NOT_NULL(graph);
 	CHECK_NOT_NULL(destination);

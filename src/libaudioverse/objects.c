@@ -26,7 +26,7 @@ void objectComputeInputBuffers(LavObject* obj) {
 	}
 }
 
-Lav_PUBLIC_FUNCTION LavError initLavObject(unsigned int numInputs, unsigned int numOutputs, enum  Lav_NODETYPE type, unsigned int blockSize, void* mutex, LavObject *destination) {
+Lav_PUBLIC_FUNCTION LavError initLavObject(unsigned int numInputs, unsigned int numOutputs, enum  Lav_NODETYPES type, unsigned int blockSize, void* mutex, LavObject *destination) {
 	STANDARD_PREAMBLE;
 	CHECK_NOT_NULL(destination);
 	CHECK_NOT_NULL(mutex);
@@ -58,7 +58,7 @@ Lav_PUBLIC_FUNCTION LavError initLavObject(unsigned int numInputs, unsigned int 
 	STANDARD_CLEANUP_BLOCK;
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_createObject(unsigned int numInputs, unsigned int numOutputs, enum  Lav_OBJECTTYPE type, unsigned int blockSize, void* mutex, LavObject **destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createObject(unsigned int numInputs, unsigned int numOutputs, enum  Lav_NODETYPES type, unsigned int blockSize, void* mutex, LavObject **destination) {
 	STANDARD_PREAMBLE;
 	CHECK_NOT_NULL(mutex);
 	LavObject *retval = calloc(1, sizeof(LavObject));

@@ -23,7 +23,7 @@ LavPropertyTableEntry hrtfPropertyTable[] = {
 {Lav_HRTF_ELEVATION, Lav_PROPERTYTYPE_FLOAT, "elevation", {.fval = 0.0f}},
 };
 
-Lav_PUBLIC_FUNCTION Lav_createHrtfNode(LavObject *graph, LavHrtfData* hrtf, LavObject **destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createHrtfNode(LavObject *graph, LavHrtfData* hrtf, LavObject **destination) {
 	STANDARD_PREAMBLE;
 	LavError err = Lav_ERROR_NONE;
 	CHECK_NOT_NULL(hrtf);

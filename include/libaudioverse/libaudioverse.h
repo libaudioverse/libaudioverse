@@ -20,10 +20,11 @@ typedef struct LavHrtfData LavHrtfData;
 typedef struct LavObject LavObject;
 
 /**Does whatever is appropriate on a given platform to expose a Libaudioverse function publically.*/
+#define DLL_PUBLIC
 #ifdef __cplusplus
-#define Lav_PUBLIC_FUNCTION extern "C" __declspec(dllexport)
+#define Lav_PUBLIC_FUNCTION extern "C" DLL_PUBLIC
 #else
-#define Lav_PUBLIC_FUNCTION extern __declspec(dllexport)
+#define Lav_PUBLIC_FUNCTION extern DLL_PUBLIC
 #endif
 
 enum Lav_LIMITS {
@@ -88,7 +89,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_graphSetOutputNode(LavObject *graph, LavObject 
 Lav_PUBLIC_FUNCTION LavError Lav_graphGetBlock(LavObject* graph, float* samples);
 
 /**The following functions initialize nodes and work exactly as one would expect.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int numOutputs, enum  Lav_NODETYPE type, LavObject *graph, LavObject **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int numOutputs, enum  Lav_NODETYPES type, LavObject *graph, LavObject **destination);
 
 /**Parent management.*/
 Lav_PUBLIC_FUNCTION LavError Lav_getParent(LavObject *obj, unsigned int slot, LavObject** parent, unsigned int *outputNumber);

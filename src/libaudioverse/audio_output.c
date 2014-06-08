@@ -19,7 +19,7 @@ typedef struct {
 int audioOutputCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
 void audioOutputThread(void* vparam);
 
-Lav_PUBLIC_FUNCTION initializeAudioOutput() {
+Lav_PUBLIC_FUNCTION LavError initializeAudioOutput() {
 	PaError err = Pa_Initialize();
 	if(err < 0) {
 		return Lav_ERROR_CANNOT_INIT_AUDIO;

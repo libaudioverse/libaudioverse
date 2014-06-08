@@ -20,7 +20,6 @@ union LavPropertyValue {
 
 struct LavProperty {
 	enum Lav_PROPERTYTYPES type;
-	enum Lav_PROPERTYRESOLUTION resolution;
 	union LavPropertyValue value, default_value;
 	char* name;
 };
