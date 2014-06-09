@@ -7,6 +7,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/libaudioverse3d.h>
 #include <transmat.h>
 #include <stdlib.h>
+#include <libaudioverse/private_sources.h>
+
 void worldListenerUpdateCallback(LavObject* obj, unsigned int slot);
 void worldPreprocessingHook(LavObject* obj, void* param);
 
@@ -74,6 +76,6 @@ void worldListenerUpdateCallback(LavObject* obj, unsigned int slot) {
 void worldPreprocessingHook(LavObject* obj, void* param) {
 	LavWorld *const world = (LavWorld*)param;
 	for(unsigned int i = 0; i < world->num_sources; i++) {
-		sourceUpdate(world->sources[i]);
+		sourceUpdate(world->sources+i);
 	}
 }
