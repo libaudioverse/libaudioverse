@@ -56,7 +56,7 @@ struct LavObject {
 	enum Lav_NODETYPES type;
 };
 
-typedef void (*LavGraphPreprocessingHook)(LavObject* graph);
+typedef void (*LavGraphPreprocessingHook)(LavObject* graph, void* param);
 struct LavGraph {
 	LavObject base;
 	LavObject **nodes;
@@ -66,6 +66,7 @@ struct LavGraph {
 	void* audio_thread; //not null thread handle for audio output graphs, otherwise null.
 	unsigned int block_size;
 	LavGraphPreprocessingHook preprocessing_hook;
+	void* preprocessing_hook_argument;
 };
 typedef struct LavGraph LavGraph;
 

@@ -8,12 +8,12 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <transmat.h>
 #include <stdlib.h>
 void worldListenerUpdateCallback(LavObject* obj, unsigned int slot);
+void worldPreprocessingHook(LavObject* obj, void* param);
 
 LavPropertyTableEntry worldPropertyTable[] = {
 	{Lav_WORLD_LISTENER_ORIENTATION, Lav_PROPERTYTYPE_FLOAT6, "listener_orientation", {.f6val = {0, 0, -1, 0, 1, 0}}, worldListenerUpdateCallback},
 	{Lav_WORLD_LISTENER_POSITION, Lav_PROPERTYTYPE_FLOAT3, "listener_position", {.f3val = {0, 0, 0}}, worldListenerUpdateCallback},
 };
-
 
 Lav_PUBLIC_FUNCTION LavError Lav_createWorld(LavObject**destination) {
 	STANDARD_PREAMBLE;
@@ -26,6 +26,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_createWorld(LavObject**destination) {
 	//todo: make these configurable too.
 	Lav_createMixerNode(graph, 16, 2, &mixer);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
+	//assign the preprocessing hook.
+	((LavGraph*)graph)->preprocessing_hook = worldPreprocessingHook;
 	LavObject* obj= calloc(1, sizeof(LavWorld));
 	ERROR_IF_TRUE(obj == NULL, Lav_ERROR_MEMORY);
 	err = Lav_createObject(0, 0,
@@ -48,6 +50,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_createWorld(LavObject**destination) {
 	world->sources = source_array;
 	world->num_sources = 0;
 	world->max_sources = 16;
+	//we're going to use this world as the preprocessing hook's argument.
+	((LavGraph*)world->graph)->preprocessing_hook_argument = world;
 	*destination = obj;
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
@@ -64,4 +68,12 @@ void worldListenerUpdateCallback(LavObject* obj, unsigned int slot) {
 	up.vec[3] = 1;
 	pos.vec[3] = 1;
 	Tm_cameraTransform(at, up, pos, &(((LavWorld*)obj)->camera_transform)); //we unfortunately do need all the parentheses.
+}
+
+//simply asks all sources to update themselves as they see fit.
+void worldPreprocessingHook(LavObject* obj, void* param) {
+	LavWorld *const world = (LavWorld*)param;
+	for(unsigned int i = 0; i < world->num_sources; i++) {
+		sourceUpdate(world->sources[i]);
+	}
 }

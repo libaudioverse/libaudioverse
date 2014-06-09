@@ -107,7 +107,7 @@ Lav_PUBLIC_FUNCTION void graphProcessHelper(LavObject* node, struct AlreadySeenN
 Lav_PUBLIC_FUNCTION LavError Lav_graphGetBlock(LavObject* obj, float* samples) {
 	mutexLock(obj->mutex);
 	if(((LavGraph*)obj)->preprocessing_hook) {
-		((LavGraph*)obj)->preprocessing_hook(obj);
+		((LavGraph*)obj)->preprocessing_hook(obj, ((LavGraph*)obj)->preprocessing_hook_argument);
 	}
 	graphProcessHelper(((LavGraph*)obj)->output_node, NULL, 0);
 	Lav_objectReadBlock(((LavGraph*)obj)->output_node, samples);
