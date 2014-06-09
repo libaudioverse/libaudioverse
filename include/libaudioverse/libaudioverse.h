@@ -67,6 +67,8 @@ enum Lav_PROPERTYTYPES {
 	Lav_PROPERTYTYPE_FLOAT = 0x2,
 	Lav_PROPERTYTYPE_DOUBLE = 0x4,
 	Lav_PROPERTYTYPE_STRING = 0x8,
+	Lav_PROPERTYTYPE_FLOAT3 = 0xf,
+	Lav_PROPERTYTYPE_FLOAT6 = 0x10,
 };
 
 /**These are used to tag nodes with their type, so that external languages may see them.*/
@@ -105,11 +107,14 @@ Lav_PUBLIC_FUNCTION LavError Lav_setIntProperty(LavObject* obj, unsigned int slo
 Lav_PUBLIC_FUNCTION LavError Lav_setFloatProperty(LavObject *obj, unsigned int slot, float value);
 Lav_PUBLIC_FUNCTION LavError Lav_setDoubleProperty(LavObject *obj, unsigned int slot, double value);
 Lav_PUBLIC_FUNCTION LavError Lav_setStringProperty(LavObject*obj, unsigned int slot, char* value);
+Lav_PUBLIC_FUNCTION LavError Lav_setFloat3Property(LavObject* obj, unsigned int slot, float v1, float v2, float v3);
+Lav_PUBLIC_FUNCTION LavError Lav_setFloat6Property(LavObject* obj, unsigned int slot, float v1, float v2, float v3, float v4, float v5, float v6);
 Lav_PUBLIC_FUNCTION LavError Lav_getIntProperty(LavObject*obj, unsigned int slot, int *destination);
 Lav_PUBLIC_FUNCTION LavError Lav_getFloatProperty(LavObject* obj, unsigned int slot, float *destination);
 Lav_PUBLIC_FUNCTION LavError Lav_getDoubleProperty(LavObject*obj, unsigned int slot, double *destination);
 Lav_PUBLIC_FUNCTION LavError Lav_getStringProperty(LavObject* obj, unsigned int slot, char** destination);
-
+Lav_PUBLIC_FUNCTION LavError Lav_getFloat3Property(LavObject* obj, unsigned int slot, float* v1, float* v2, float* v3);
+Lav_PUBLIC_FUNCTION LavError Lav_getFloat6Property(LavObject* obj, unsigned int slot, float* v1, float* v2, float* v3, float* v4, float* v5, float* v6);
 /**This is a default node processing function. It simply writes 0s to all outputs, and can be useful when you need to provide audio and have nothing to do.*/
 Lav_PUBLIC_FUNCTION LavError Lav_processDefault(LavObject *obj);
 
