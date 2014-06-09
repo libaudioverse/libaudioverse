@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+cmake_MINIMUM_REQUIRED(VERSION 2.8)
 
 project(Libaudioverse)
 include_directories("${CMAKE_SOURCE_DIR}/include")
@@ -24,8 +24,7 @@ if(${MSVC})
 add_definitions(-DPA_WDMKS_NO_KSGUID_LIB)
 #build and setup portaudio:
 add_subdirectory(portaudio)
-include_directories(${portaudio_SOURCE_DIR}/include)
-link_directories(${portaudio_BINARY_DIR})
+include_directories("${portaudio_SOURCE_DIR}/include")
 endif()
 
 #For linux and mac, we must append -std=c99 and -std=c++99
@@ -34,18 +33,19 @@ SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 endif()
 
-#This makes sure that we can link to ourself.
-link_directories(${libaudioverse_BINARY_DIR})
-
 if(${CMAKE_COMPILER_IS_GNUCC})
 SET(portaudio_name portaudio)
 SET(libsndfile_name sndfile)
 endif()
 if(${MSVC})
-set(portaudio_name portaudio_static_x86)
+set(portaudio_name portaudio_static)
 set(libsndfile_name libsndfile-1)
 endif()
 
+#build and include transmat.
+add_subdirectory(transmat)
+include_directories("${CMAKE_SOURCE_DIR}/transmat")
+
 #below here is us.  First, set a variable to all the libraries we need to link with:
-SET(libaudioverse_required_libraries ${libsndfile_name} ${portaudio_name})
+SET(libaudioverse_required_libraries ${libsndfile_name} ${portaudio_name} transmat)
 add_subdirectory(src)
