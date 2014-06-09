@@ -21,7 +21,7 @@ struct LavWorld {
 	LavObject base;
 	LavSource *sources;
 	unsigned int num_sources, max_sources;
-	TmVector listener_at, listener_up, listener_pos;
+	TmTransform camera_transform; //the camera transform.
 	LavObject* mixer, *graph;
 };
 

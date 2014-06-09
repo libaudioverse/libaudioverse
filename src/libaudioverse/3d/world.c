@@ -51,3 +51,16 @@ Lav_PUBLIC_FUNCTION LavError Lav_createWorld(LavObject**destination) {
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
 }
+
+//called when the listener properties are changed.
+//updates the camera transform with whatever the new values are.
+void worldListenerUpdateCallback(LavObject* obj, unsigned int slot) {
+	TmVector at, up, pos;
+	float* at_p = at.vec, *up_p =up.vec, *pos_p = pos.vec;
+	Lav_getFloat6Property(obj, Lav_WORLD_LISTENER_ORIENTATION, at_p, at_p+1, at_p+2, up_p, up_p+1, up_p+2);
+	Lav_getFloat3Property(obj, Lav_WORLD_LISTENER_POSITION, pos_p, pos_p+1, pos_p+2);
+	at.vec[3] = 1;
+	up.vec[3] = 1;
+	pos.vec[3] = 1;
+	Tm_cameraTransform(at, up, pos, &(((LavWorld*)obj)->camera_transform)); //we unfortunately do need all the parentheses.
+}
