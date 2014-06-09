@@ -76,6 +76,7 @@ LavError hrtfRecomputeHrirProcessor(LavObject *obj) {
 	Lav_getFloatProperty((LavObject*)node, Lav_HRTF_ELEVATION, &elevation);
 	//compute hrirs.
 	hrtfComputeCoefficients(data->hrtf, elevation, azimuth, data->left_response, data->right_response);
+	obj->process = hrtfProcessor;
 	return hrtfProcessor(obj);
 }
 
