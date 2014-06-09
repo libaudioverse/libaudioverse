@@ -17,17 +17,20 @@ union LavPropertyValue {
 	double dval;
 	char* sval;
 };
+typedef union LavPropertyValue LavPropertyValue;
 
 struct LavProperty {
 	enum Lav_PROPERTYTYPES type;
-	union LavPropertyValue value, default_value;
+	LavPropertyValue value, default_value;
 	char* name;
 };
+typedef struct LavProperty LavProperty;
 
 struct LavInputDescriptor {
 	LavObject* parent;
 	unsigned int output;
 };
+typedef struct LavInputDescriptor LavInputDescriptor;
 
 /**Things all Libaudioverse objects have.*/
 struct LavObject {
@@ -44,13 +47,6 @@ struct LavObject {
 	enum Lav_NODETYPES type;
 };
 
-struct LavNode {
-	LavObject base;
-	LavGraph *graph;
-	double internal_time;
-	void *data; //place for node subtypes to place data.
-};
-
 struct LavGraph {
 	LavObject base;
 	LavObject **nodes;
@@ -60,6 +56,15 @@ struct LavGraph {
 	void* audio_thread; //not null thread handle for audio output graphs, otherwise null.
 	unsigned int block_size;
 };
+typedef struct LavGraph LavGraph;
+
+struct LavNode {
+	LavObject base;
+	LavGraph *graph;
+	double internal_time;
+	void *data; //place for node subtypes to place data.
+};
+typedef struct LavNode LavNode;
 
 struct LavCrossThreadRingBuffer {
 	int read_position, write_position, element_size, length;
@@ -67,12 +72,14 @@ struct LavCrossThreadRingBuffer {
 	char* data;
 	int last_op;
 };
+typedef struct LavCrossThreadRingBuffer LavCrossThreadRingBuffer;
 
 /**A table of audio data.*/
 struct LavTable {
 	unsigned int length; //length in samples.  Also the max index before index wrapping.  Includes the extra sample at the end.
 	float* samples;
 };
+typedef struct LavTable LavTable;
 
 //The struct for property table entries.
 struct LavPropertyTableEntry {
@@ -81,7 +88,6 @@ struct LavPropertyTableEntry {
 	char* name;
 	union LavPropertyValue default_value;
 };
-
 typedef struct LavPropertyTableEntry LavPropertyTableEntry;
 
 #ifdef __cplusplus

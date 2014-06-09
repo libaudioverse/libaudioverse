@@ -10,12 +10,6 @@ extern "C" {
 
 /*Forward-declares all Libaudioverse types.
 Enums can't go here. Everything else can.*/
-
-typedef struct LavProperty LavProperty;
-typedef struct LavInputDescriptor LavInputDescriptor;
-typedef struct LavNode LavNode;
-typedef struct LavGraph LavGraph;
-typedef struct LavTable LavTable;
 typedef struct LavHrtfData LavHrtfData;
 typedef struct LavObject LavObject;
 
@@ -130,18 +124,6 @@ be long enough to hold obj->block_size*node->num_output samples.  The samples ar
 the first sample of the first output, the first of the second, the first of the third,...the second of the first, second and third..., etc.
 Put another way, this function pretends that the passed node has node->num_outputs channels, and then interweaves them.*/
 Lav_PUBLIC_FUNCTION LavError Lav_objectReadBlock(LavObject *node, float* destination);
-
-/**Interpolated tables.
-
-An interpolated table has some properties of ringbuffers, but with floating point math: reads past the end or before the beginning wrap.
-It is possible to read between samples; if so, it performs linear interpolation.  All times are in samples, but fractional values are allowed.
-
-Note that these are definitively not LavObjects.  They are intended to be used in tight loops.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createTable(LavTable** destination);
-Lav_PUBLIC_FUNCTION LavError Lav_tableGetSample(LavTable *table, float index, float* destination);
-Lav_PUBLIC_FUNCTION LavError Lav_tableGetSamples(LavTable* table, float index, float delta, unsigned int count, float* destination);
-Lav_PUBLIC_FUNCTION LavError Lav_tableSetSamples(LavTable *table, unsigned int count, float* samples);
-Lav_PUBLIC_FUNCTION LavError Lav_tableClear(LavTable *table);
 
 /**Make a sine node.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavObject *graph, LavObject **destination);
