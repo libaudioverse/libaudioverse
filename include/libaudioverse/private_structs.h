@@ -16,6 +16,8 @@ union LavPropertyValue {
 	int ival;
 	double dval;
 	char* sval;
+	float f3val[3]; //vectors.
+	float f6val[6]; //orientations.
 };
 typedef union LavPropertyValue LavPropertyValue;
 

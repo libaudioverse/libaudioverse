@@ -66,6 +66,33 @@ Lav_PUBLIC_FUNCTION LavError Lav_setStringProperty(LavObject *obj, unsigned int 
 	STANDARD_CLEANUP_BLOCK;
 }
 
+Lav_PUBLIC_FUNCTION LavError Lav_setFloat3Property(LavObject* obj, unsigned int slot, float v1, float v2, float v3) {
+	PROPERTY_SETTER_PREAMBLE(Lav_PROPERTYTYPE_FLOAT3);
+	obj->properties[slot]->value.f3val[0] = v1;
+	obj->properties[slot]->value.f3val[1] = v2;
+	obj->properties[slot]->value.f3val[2] = v3;
+	if(obj->properties[slot]->post_changed_callback) {
+		obj->properties[slot]->post_changed_callback(obj, slot);
+	}
+	SAFERETURN(Lav_ERROR_NONE);
+	STANDARD_CLEANUP_BLOCK;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_setFloat6Property(LavObject* obj, unsigned int slot, float v1, float v2, float v3, float v4, float v5, float v6) {
+	PROPERTY_SETTER_PREAMBLE(Lav_PROPERTYTYPE_FLOAT6);
+	obj->properties[slot]->value.f6val[0] = v1;
+	obj->properties[slot]->value.f6val[1] = v2;
+	obj->properties[slot]->value.f6val[2] = v3;
+	obj->properties[slot]->value.f6val[3] = v4;
+	obj->properties[slot]->value.f6val[4] = v5;
+	obj->properties[slot]->value.f6val[5] = v6;
+	if(obj->properties[slot]->post_changed_callback) {
+		obj->properties[slot]->post_changed_callback(obj, slot);
+	}
+	SAFERETURN(Lav_ERROR_NONE);
+	STANDARD_CLEANUP_BLOCK;
+}
+
 #define PROPERTY_GETTER_PREAMBLE(proptype) STANDARD_PREAMBLE;\
 CHECK_NOT_NULL(obj);\
 CHECK_NOT_NULL(destination);\
