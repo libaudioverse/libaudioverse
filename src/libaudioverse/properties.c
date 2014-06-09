@@ -11,6 +11,9 @@ Lav_PUBLIC_FUNCTION LavError lav_resetProperty(LavObject *obj, unsigned int slot
 	LOCK(obj->mutex);
 	ERROR_IF_TRUE(slot >= obj->num_properties || slot < 0, Lav_ERROR_INVALID_SLOT);
 	memcpy(&(obj->properties[slot]->value), &(obj->properties[slot]->default_value), sizeof(obj->properties[slot]->value)); //yes, really.
+	if(obj->properties[slot]->post_changed_callback) {
+		obj->properties[slot]->post_changed_callback(obj, slot);
+	}
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
 }
@@ -25,12 +28,18 @@ Lav_PUBLIC_FUNCTION LavError Lav_setIntProperty(LavObject *obj, unsigned int slo
 	PROPERTY_SETTER_PREAMBLE(Lav_PROPERTYTYPE_INT);
 	obj->properties[slot]->value.ival = value;
 	SAFERETURN(Lav_ERROR_NONE);
+	if(obj->properties[slot]->post_changed_callback) {
+		obj->properties[slot]->post_changed_callback(obj, slot);
+	}
 	STANDARD_CLEANUP_BLOCK;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_setFloatProperty(LavObject *obj, unsigned int slot, float value) {
 	PROPERTY_SETTER_PREAMBLE(Lav_PROPERTYTYPE_FLOAT);
 	obj->properties[slot]->value.fval = value;
+	if(obj->properties[slot]->post_changed_callback) {
+		obj->properties[slot]->post_changed_callback(obj, slot);
+	}
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
 }
@@ -38,6 +47,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_setFloatProperty(LavObject *obj, unsigned int s
 Lav_PUBLIC_FUNCTION LavError Lav_setDoubleProperty(LavObject *obj, unsigned int slot, double value) {
 	PROPERTY_SETTER_PREAMBLE(Lav_PROPERTYTYPE_DOUBLE);
 	obj->properties[slot]->value.dval = value;
+	if(obj->properties[slot]->post_changed_callback) {
+		obj->properties[slot]->post_changed_callback(obj, slot);
+	}
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
 }
@@ -47,6 +59,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_setStringProperty(LavObject *obj, unsigned int 
 	CHECK_NOT_NULL(value);
 	char* string = strdup(value);
 	obj->properties[slot]->value.sval = string;
+	if(obj->properties[slot]->post_changed_callback) {
+		obj->properties[slot]->post_changed_callback(obj, slot);
+	}
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
 }

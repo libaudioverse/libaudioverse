@@ -26,7 +26,7 @@ struct LavProperty {
 	enum Lav_PROPERTYTYPES type;
 	LavPropertyValue value, default_value;
 	char* name;
-	LavPropertyChangedCallback post_changed;
+	LavPropertyChangedCallback post_changed_callback;
 };
 
 typedef struct LavProperty LavProperty;
