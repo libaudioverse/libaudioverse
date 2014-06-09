@@ -26,6 +26,7 @@ nodes/mixer.c
 nodes/attenuator.c
 
 #the 3D abstraction on top of libaudioverse.
+3d/world.c
 )
 TARGET_LINK_LIBRARIES(libaudioverse ${libaudioverse_required_libraries})
 

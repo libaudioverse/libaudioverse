@@ -20,8 +20,8 @@ typedef struct LavSource LavSource;
 struct LavWorld {
 	LavObject base;
 	LavSource *sources;
-	unsigned int num_sources;
-	Tm_vector listener_at, listener_up, listener_pos;
+	unsigned int num_sources, max_sources;
+	TmVector listener_at, listener_up, listener_pos;
 	LavObject* mixer, *graph;
 };
 
