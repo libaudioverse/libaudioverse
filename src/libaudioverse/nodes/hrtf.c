@@ -8,6 +8,9 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <string.h>
 
 LavError hrtfProcessor(LavObject *obj);
+//this is the processor we go to if the hrtf is moved.
+LavError hrtfRecomputeHrirProcessor(LavObject *obj);
+void hrtfPropertyChanged(LavObject* obj, int slot);
 
 struct HrtfNodeData {
 	float *history;
@@ -35,7 +38,12 @@ sizeof(hrtfPropertyTable)/sizeof(hrtfPropertyTable[0]), hrtfPropertyTable,
 Lav_NODETYPE_HRTF, graph, (LavObject**)&retval);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
 
-	((LavObject*)retval)->process = hrtfProcessor;
+	((LavObject*)retval)->process = hrtfRecomputeHrirProcessor;
+
+	//we now assign our callback to all properties.
+	for(unsigned int i = 0; i < ((LavObject*)retval)->num_properties; i++) {
+		((LavObject*)retval)->properties[i]->post_changed_callback = hrtfPropertyChanged;
+	}
 	HrtfNodeData *data = calloc(1, sizeof(HrtfNodeData));
 	ERROR_IF_TRUE(data == NULL, Lav_ERROR_MEMORY);
 	float* history = calloc(hrtf->hrir_length+retval->base.block_size, sizeof(float));
@@ -56,7 +64,11 @@ Lav_NODETYPE_HRTF, graph, (LavObject**)&retval);
 	STANDARD_CLEANUP_BLOCK;
 }
 
-LavError hrtfProcessor(LavObject *obj) {
+void hrtfPropertyChanged(LavObject* obj, int slot) {
+	obj->process = hrtfRecomputeHrirProcessor;
+}
+
+LavError hrtfRecomputeHrirProcessor(LavObject *obj) {
 	const LavNode* node = (LavNode*)obj;
 	HrtfNodeData *data = node->data;
 	float azimuth, elevation;
@@ -64,6 +76,12 @@ LavError hrtfProcessor(LavObject *obj) {
 	Lav_getFloatProperty((LavObject*)node, Lav_HRTF_ELEVATION, &elevation);
 	//compute hrirs.
 	hrtfComputeCoefficients(data->hrtf, elevation, azimuth, data->left_response, data->right_response);
+	return hrtfProcessor(obj);
+}
+
+LavError hrtfProcessor(LavObject* obj) {
+	const LavNode* node = (LavNode*)obj;
+	HrtfNodeData *data = node->data;
 	//copy the last hrir_length samples to the beginning, copy the input to the end.
 	//this moves the history back by a fixed amount.
 	memcpy(data->history, data->history+data->history_length-data->hrir_length, data->hrir_length*sizeof(float)); //this does not overlap.
