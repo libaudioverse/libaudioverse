@@ -83,8 +83,6 @@ enum Lav_NODETYPES{
 /**Initialize Libaudioverse.*/
 Lav_PUBLIC_FUNCTION LavError Lav_initializeLibrary();
 
-/**This is the processing function's typedef.  See external documentation for info on writing your own nodes.*/
-typedef LavError (*LavProcessorFunction)(LavObject* obj);
 
 /**Graph manipulation functions: creation, deletion, and configuration.
 
@@ -93,9 +91,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createGraph(float sr, unsigned int blockSize, L
 Lav_PUBLIC_FUNCTION LavError Lav_graphGetOutputNode(LavObject *graph, LavObject **destination);
 Lav_PUBLIC_FUNCTION LavError Lav_graphSetOutputNode(LavObject *graph, LavObject *node);
 Lav_PUBLIC_FUNCTION LavError Lav_graphGetBlock(LavObject* graph, float* samples);
-
-/**The following functions initialize nodes and work exactly as one would expect.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int numOutputs, enum  Lav_NODETYPES type, LavObject *graph, LavObject **destination);
 
 /**Parent management.*/
 Lav_PUBLIC_FUNCTION LavError Lav_getParent(LavObject *obj, unsigned int slot, LavObject** parent, unsigned int *outputNumber);

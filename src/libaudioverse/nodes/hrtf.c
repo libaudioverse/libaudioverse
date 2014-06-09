@@ -30,16 +30,12 @@ Lav_PUBLIC_FUNCTION LavError Lav_createHrtfNode(LavObject *graph, LavHrtfData* h
 	CHECK_NOT_NULL(destination);
 	LOCK(graph->mutex);
 	LavNode* retval = NULL;
-	err = Lav_createNode(1, 2, Lav_NODETYPE_HRTF, graph, (LavObject**)&retval);
+	err = Lav_createNode(1, 2,
+sizeof(hrtfPropertyTable)/sizeof(hrtfPropertyTable[0]), hrtfPropertyTable,
+Lav_NODETYPE_HRTF, graph, (LavObject**)&retval);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
 
-	retval->base.properties = makePropertyArrayFromTable(sizeof(hrtfPropertyTable)/sizeof(hrtfPropertyTable[0]), hrtfPropertyTable);
-	retval->base.num_properties = sizeof(hrtfPropertyTable)/sizeof(hrtfPropertyTable[0]);
-
-	ERROR_IF_TRUE(retval->base.properties == NULL, Lav_ERROR_MEMORY);
-
 	((LavObject*)retval)->process = hrtfProcessor;
-
 	HrtfNodeData *data = calloc(1, sizeof(HrtfNodeData));
 	ERROR_IF_TRUE(data == NULL, Lav_ERROR_MEMORY);
 	float* history = calloc(hrtf->hrir_length+retval->base.block_size, sizeof(float));

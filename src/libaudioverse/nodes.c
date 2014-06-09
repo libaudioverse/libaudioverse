@@ -9,13 +9,13 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_all.h>
 
 
-Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int numOutputs, enum Lav_NODETYPES type, LavObject* graph, LavObject** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, LavPropertyTableEntry* propertyTable, enum Lav_NODETYPES type, LavObject* graph, LavObject** destination) {
 	STANDARD_PREAMBLE;
 	CHECK_NOT_NULL(graph);
 	CHECK_NOT_NULL(destination);
 	LavNode* retval = calloc(1, sizeof(LavNode));
 	ERROR_IF_TRUE(retval == NULL, Lav_ERROR_MEMORY);
-	LavError err = initLavObject(numInputs, numOutputs, type, graph->block_size, graph->mutex, (LavObject*)retval);
+	LavError err = initLavObject(numInputs, numOutputs, numProperties, propertyTable, type, graph->block_size, graph->mutex, (LavObject*)retval);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
 	graphAssociateNode(graph, (LavObject*)retval);
 	retval->graph = (LavGraph*)graph;

@@ -13,7 +13,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createGraph(float sr, unsigned int blockSize, L
 	void* mut;
 	LavError err = createMutex(&mut);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
-	err = initLavObject(0, 0, Lav_OBJTYPE_GRAPH, blockSize, mut, (LavObject*)retval);
+	err = initLavObject(0, 0, 0, NULL, Lav_OBJTYPE_GRAPH, blockSize, mut, (LavObject*)retval);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
 	retval->nodes = (LavObject**)calloc(8, sizeof(LavObject*));
 	ERROR_IF_TRUE(retval->nodes == NULL, Lav_ERROR_MEMORY);

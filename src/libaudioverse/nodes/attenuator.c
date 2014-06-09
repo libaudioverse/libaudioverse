@@ -20,15 +20,12 @@ Lav_PUBLIC_FUNCTION LavError Lav_createAttenuatorNode(LavObject *graph, unsigned
 	ERROR_IF_TRUE(numInputs <= 0, Lav_ERROR_RANGE);
 	LOCK(graph->mutex);
 	LavNode *retval = NULL;
-	err = Lav_createNode(numInputs, numInputs, Lav_NODETYPE_ATTENUATOR, graph, (LavObject**)&retval);
+	err = Lav_createNode(numInputs, numInputs, 
+sizeof(attenuatorPropertyTable)/sizeof(attenuatorPropertyTable[0]), attenuatorPropertyTable,
+Lav_NODETYPE_ATTENUATOR, graph, (LavObject**)&retval);
 	if(err != Lav_ERROR_NONE) SAFERETURN(err);
 
-	retval->base.properties = makePropertyArrayFromTable(sizeof(attenuatorPropertyTable)/sizeof(attenuatorPropertyTable[0]), attenuatorPropertyTable);
-	ERROR_IF_TRUE(retval->base.properties == NULL, Lav_ERROR_MEMORY);
-	retval->base.num_properties = sizeof(attenuatorPropertyTable)/sizeof(attenuatorPropertyTable[0]);
-
 	((LavObject*)retval)->process = attenuatorProcessor;
-
 	*destination = (LavObject*)retval;
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;

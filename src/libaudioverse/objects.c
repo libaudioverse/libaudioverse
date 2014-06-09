@@ -26,7 +26,7 @@ void objectComputeInputBuffers(LavObject* obj) {
 	}
 }
 
-Lav_PUBLIC_FUNCTION LavError initLavObject(unsigned int numInputs, unsigned int numOutputs, enum  Lav_NODETYPES type, unsigned int blockSize, void* mutex, LavObject *destination) {
+Lav_PUBLIC_FUNCTION LavError initLavObject(unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, LavPropertyTableEntry* propertyTable, enum  Lav_NODETYPES type, unsigned int blockSize, void* mutex, LavObject *destination) {
 	STANDARD_PREAMBLE;
 	CHECK_NOT_NULL(destination);
 	CHECK_NOT_NULL(mutex);
@@ -53,17 +53,25 @@ Lav_PUBLIC_FUNCTION LavError initLavObject(unsigned int numInputs, unsigned int 
 
 	destination->type = type;
 	destination->block_size = blockSize;
+
+	if(numProperties > 0 && propertyTable != NULL) {
+		LavProperty** tbl = makePropertyArrayFromTable(numProperties, propertyTable);
+		ERROR_IF_TRUE(tbl == NULL, Lav_ERROR_MEMORY);
+		destination->num_properties = numProperties;
+		destination->properties = tbl;
+	}
+
 	objectComputeInputBuffers(destination); //at the moment, this is going to just make them all 0, but it takes effect once parents are added.
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_createObject(unsigned int numInputs, unsigned int numOutputs, enum  Lav_NODETYPES type, unsigned int blockSize, void* mutex, LavObject **destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createObject(unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, LavPropertyTableEntry *propertyTable, enum  Lav_NODETYPES type, unsigned int blockSize, void* mutex, LavObject **destination) {
 	STANDARD_PREAMBLE;
 	CHECK_NOT_NULL(mutex);
 	LavObject *retval = calloc(1, sizeof(LavObject));
 	ERROR_IF_TRUE(retval == NULL, Lav_ERROR_MEMORY);
-	LavError err = initLavObject(numInputs, numOutputs, type, blockSize, mutex, retval);
+	LavError err = initLavObject(numInputs, numOutputs, numProperties, propertyTable, type, blockSize, mutex, retval);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
 	SAFERETURN(Lav_ERROR_NONE);
 	*destination = retval;

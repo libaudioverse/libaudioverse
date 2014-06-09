@@ -69,11 +69,10 @@ Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavObject *graph, const char* pa
 	f->sample_array = uninterleavedSamples;
 	f->delta = sr/((LavGraph*)graph)->sr;
 
-	LavError err = Lav_createNode(0, channels, Lav_NODETYPE_FILE, graph, (LavObject**)&node);
+	LavError err = Lav_createNode(0, channels,
+sizeof(filePropertyTable)/sizeof(filePropertyTable[0]), filePropertyTable,
+Lav_NODETYPE_FILE, graph, (LavObject**)&node);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
-	node->base.properties = makePropertyArrayFromTable(sizeof(filePropertyTable)/sizeof(filePropertyTable[0]), filePropertyTable);
-	ERROR_IF_TRUE(node->base.properties == NULL, Lav_ERROR_MEMORY);
-	node->base.num_properties = sizeof(filePropertyTable)/sizeof(filePropertyTable[0]);
 	node->data = f;
 	((LavObject*)node)->process = fileNodeProcessor;
 	*destination = (LavObject*)node;

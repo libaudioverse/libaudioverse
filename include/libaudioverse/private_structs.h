@@ -38,6 +38,8 @@ struct LavInputDescriptor {
 typedef struct LavInputDescriptor LavInputDescriptor;
 
 /**Things all Libaudioverse objects have.*/
+//typedef for processing function:
+typedef LavError (*LavProcessorFunction)(LavObject* obj);
 struct LavObject {
 		LavProperty **properties;
 	unsigned int num_properties;

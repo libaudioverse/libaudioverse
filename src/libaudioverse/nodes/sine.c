@@ -26,13 +26,10 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavObject *graph, LavObject  **d
 	CHECK_NOT_NULL(graph);
 	LOCK(graph->mutex);
 	LavNode *retval = NULL;
-	err = Lav_createNode(0, 1, Lav_NODETYPE_SINE, graph, (LavObject**)&retval);
+	err = Lav_createNode(0, 1,
+sizeof(sinePropertyTable)/sizeof(sinePropertyTable[0]), sinePropertyTable,
+Lav_NODETYPE_SINE, graph, (LavObject**)&retval);
 	if(err != Lav_ERROR_NONE) SAFERETURN(err);
-
-	retval->base.properties = makePropertyArrayFromTable(sizeof(sinePropertyTable)/sizeof(sinePropertyTable[0]), sinePropertyTable);
-	ERROR_IF_TRUE(retval->base.properties == NULL, Lav_ERROR_MEMORY);
-	retval->base.num_properties = sizeof(sinePropertyTable)/sizeof(sinePropertyTable[0]);
-
 	((LavObject*)retval)->process = sineProcessor;
 
 	struct sineinfo* data = calloc(1, sizeof(struct sineinfo));

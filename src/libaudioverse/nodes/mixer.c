@@ -20,10 +20,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_createMixerNode(LavObject *graph, unsigned int 
 	CHECK_NOT_NULL(destination);
 	LOCK(graph->mutex);
 	LavNode* retval = NULL;
-	err = Lav_createNode(maxParents*inputsPerParent, inputsPerParent, Lav_NODETYPE_MIXER, graph, (LavObject**)&retval);
+	err = Lav_createNode(maxParents*inputsPerParent, inputsPerParent, 0, NULL, Lav_NODETYPE_MIXER, graph, (LavObject**)&retval);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
-
-	retval->base.num_properties = 0;
 
 	((LavObject*)retval)->process = mixerProcessor;
 
