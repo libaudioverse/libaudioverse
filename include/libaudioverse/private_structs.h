@@ -19,11 +19,16 @@ union LavPropertyValue {
 };
 typedef union LavPropertyValue LavPropertyValue;
 
+struct LavObject;
+typedef void (*LavPropertyChangedCallback)(struct LavObject* obj, int slot);
+
 struct LavProperty {
 	enum Lav_PROPERTYTYPES type;
 	LavPropertyValue value, default_value;
 	char* name;
+	LavPropertyChangedCallback post_changed;
 };
+
 typedef struct LavProperty LavProperty;
 
 struct LavInputDescriptor {
