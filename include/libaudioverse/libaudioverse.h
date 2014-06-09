@@ -74,6 +74,7 @@ enum Lav_PROPERTYTYPES {
 /**These are used to tag nodes with their type, so that external languages may see them.*/
 enum Lav_NODETYPES{
 	Lav_OBJTYPE_GRAPH,
+	Lav_OBJTYPE_WORLD,
 	Lav_NODETYPE_ZEROS,
 	Lav_NODETYPE_FILE,
 	Lav_NODETYPE_HRTF,
