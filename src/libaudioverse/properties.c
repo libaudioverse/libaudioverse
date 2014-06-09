@@ -125,6 +125,7 @@ Lav_PUBLIC_FUNCTION LavProperty **makePropertyArrayFromTable(unsigned int count,
 		property_array[i]->name = table[i].name;
 		property_array[i]->value = table[i].default_value;
 		property_array[i]->default_value = table[i].default_value;
+	property_array[i]->post_changed_callback = table[i].post_changed;
 	}
 
 	return property_array;

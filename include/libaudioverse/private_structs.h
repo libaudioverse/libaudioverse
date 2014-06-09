@@ -94,6 +94,7 @@ struct LavPropertyTableEntry {
 	enum Lav_PROPERTYTYPES type;
 	char* name;
 	union LavPropertyValue default_value;
+	LavPropertyChangedCallback post_changed;
 };
 typedef struct LavPropertyTableEntry LavPropertyTableEntry;
 

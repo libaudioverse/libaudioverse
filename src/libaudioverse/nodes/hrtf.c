@@ -22,8 +22,8 @@ struct HrtfNodeData {
 typedef struct HrtfNodeData HrtfNodeData;
 
 LavPropertyTableEntry hrtfPropertyTable[] = {
-{Lav_HRTF_AZIMUTH, Lav_PROPERTYTYPE_FLOAT, "azimuth", {.fval = 0.0f}},
-{Lav_HRTF_ELEVATION, Lav_PROPERTYTYPE_FLOAT, "elevation", {.fval = 0.0f}},
+	{Lav_HRTF_AZIMUTH, Lav_PROPERTYTYPE_FLOAT, "azimuth", {.fval = 0.0f}, hrtfPropertyChanged},
+	{Lav_HRTF_ELEVATION, Lav_PROPERTYTYPE_FLOAT, "elevation", {.fval = 0.0f}, hrtfPropertyChanged},
 };
 
 Lav_PUBLIC_FUNCTION LavError Lav_createHrtfNode(LavObject *graph, LavHrtfData* hrtf, LavObject **destination) {
@@ -37,13 +37,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_createHrtfNode(LavObject *graph, LavHrtfData* h
 sizeof(hrtfPropertyTable)/sizeof(hrtfPropertyTable[0]), hrtfPropertyTable,
 Lav_NODETYPE_HRTF, graph, (LavObject**)&retval);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
-
 	((LavObject*)retval)->process = hrtfRecomputeHrirProcessor;
 
-	//we now assign our callback to all properties.
-	for(unsigned int i = 0; i < ((LavObject*)retval)->num_properties; i++) {
-		((LavObject*)retval)->properties[i]->post_changed_callback = hrtfPropertyChanged;
-	}
 	HrtfNodeData *data = calloc(1, sizeof(HrtfNodeData));
 	ERROR_IF_TRUE(data == NULL, Lav_ERROR_MEMORY);
 	float* history = calloc(hrtf->hrir_length+retval->base.block_size, sizeof(float));
