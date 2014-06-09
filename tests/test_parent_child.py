@@ -7,8 +7,8 @@ def parent_child():
 	graph = ffi.new("LavObject **")
 	node1, node2 = ffi.new("LavObject **"), ffi.new("LavObject **")
 	lav.Lav_createGraph(44100, 128, graph)
-	lav.Lav_createNode(0, 1, lav.Lav_NODETYPE_ZEROS, graph[0], node1)
-	lav.Lav_createNode(1, 0, lav.Lav_NODETYPE_ZEROS, graph[0], node2)
+	lav.Lav_createNode(0, 1, 0, ffi.NULL, lav.Lav_NODETYPE_ZEROS, graph[0], node1)
+	lav.Lav_createNode(1, 0, 0, ffi.NULL, lav.Lav_NODETYPE_ZEROS, graph[0], node2)
 	node1, node2 = node1[0], node2[0]
 	assert node1 is not ffi.NULL and node2 is not ffi.NULL
 	#the following let us pull out info.

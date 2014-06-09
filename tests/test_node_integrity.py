@@ -4,7 +4,7 @@ from .conf import *
 
 def basic_node_checks(node):
 	assert node is not ffi.NULL
-	assert node.properties is not ffi.NULL
+	assert node.properties is not ffi.NULL or node.num_properties == 0
 	assert ffi.cast("LavNode*", node).graph is not ffi.NULL
 	for i in xrange(node.num_outputs):
 		assert node.outputs[i] is not ffi.NULL
@@ -31,6 +31,8 @@ def test_basic_node_integrity():
 	assert lav.Lav_ERROR_NONE == lav.Lav_createNode(
 		5, #5 inputs.
 		3, #3 outputs.
+	0, #no proprties.
+	ffi.NULL, #and no table.
 		lav.Lav_NODETYPE_ZEROS, #the type
 		graph[0], #the graph
 		node)  #and the destination
