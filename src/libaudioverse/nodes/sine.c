@@ -15,7 +15,7 @@ struct sineinfo {
 
 
 LavPropertyTableEntry sinePropertyTable[1] = {
-	Lav_SINE_FREQUENCY, Lav_PROPERTYTYPE_FLOAT, "frequency", {.fval = 440},
+	{Lav_SINE_FREQUENCY, Lav_PROPERTYTYPE_FLOAT, "frequency", {.fval = 440}, NULL},
 };
 
 Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavObject *graph, LavObject  **destination) {

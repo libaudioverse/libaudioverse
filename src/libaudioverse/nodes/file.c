@@ -20,7 +20,7 @@ struct fileinfo {
 Lav_PUBLIC_FUNCTION LavError fileNodeProcessor(LavObject* obj);
 
 LavPropertyTableEntry filePropertyTable[] = {
-	Lav_FILE_PITCH_BEND, Lav_PROPERTYTYPE_FLOAT, "pitch_bend", {.fval = 1.0f},
+	{Lav_FILE_PITCH_BEND, Lav_PROPERTYTYPE_FLOAT, "pitch_bend", {.fval = 1.0f}, NULL},
 };
 
 void file_close(void* h) {
