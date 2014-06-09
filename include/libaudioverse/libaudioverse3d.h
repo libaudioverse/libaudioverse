@@ -9,6 +9,7 @@ extern "C" {
 
 /**This is the interface to the 3d simulation of Libaudioverse, including its properties.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createWorld(LavObject** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createMonoSource(LavObject* node, LavObject* world, LavObject** destination);
 
 enum Lav_WORLD_PROPERTIES {
 	Lav_WORLD_LISTENER_ORIENTATION = 0,

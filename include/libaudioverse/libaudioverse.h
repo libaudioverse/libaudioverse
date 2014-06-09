@@ -54,6 +54,9 @@ enum Lav_ERRORS {
 	Lav_ERROR_HRTF_CORRUPT = 10,
 	Lav_ERROR_HRTF_TOO_SMALL = 11,
 	Lav_ERROR_HRTF_INVALID = 12,
+
+	/**This one is odd.  It is what is thrown if you pasas a node with the wrong "shape" to a function, most notably source creation.*/
+	Lav_ERROR_SHAPE = 13,
 };
 
 /**Typedef for error codes.*/

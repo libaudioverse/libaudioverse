@@ -13,7 +13,7 @@ extern "C" {
 struct LavSource {
 	LavObject base;
 	TmVector position;
-	LavObject* data_node, panner_node;
+	LavObject* data_node, *panner_node, *attenuator_node;
 };
 typedef struct LavSource LavSource;
 

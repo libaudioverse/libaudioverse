@@ -32,7 +32,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createWorld(LavObject**destination) {
 	((LavGraph*)graph)->preprocessing_hook = worldPreprocessingHook;
 	LavObject* obj= calloc(1, sizeof(LavWorld));
 	ERROR_IF_TRUE(obj == NULL, Lav_ERROR_MEMORY);
-	err = Lav_createObject(0, 0,
+	err = initLavObject(0, 0,
 	sizeof(worldPropertyTable)/sizeof(worldPropertyTable[0]), worldPropertyTable, Lav_OBJTYPE_WORLD, graph->block_size, graph->mutex, &obj);
 	//we use the graph's mutex because we need to synchronize with it: we can't be touching properties while the graph is in use.
 	//we use the graph's block size because it doesn't really matter right now but might later.
