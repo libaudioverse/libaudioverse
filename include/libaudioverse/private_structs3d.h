@@ -3,12 +3,29 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #pragma once
 #include "libaudioverse.h"
+#include "private_structs.h"
+#include <transmat.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/**This is the interface to the 3d simulation of Libaudioverse, including its properties.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createWorld(LavObject** destination);
+/**Structs for 3d worlds.*/
+struct LavSource {
+	LavObject base;
+	TmVector position;
+	LavObject* data_node, panner_node;
+};
+typedef struct LavSource LavSource;
+
+struct LavWorld {
+	LavObject base;
+	LavSource *sources;
+	unsigned int num_sources;
+	Tm_vector listener_at, listener_up, listener_pos;
+	LavObject* mixer, *graph;
+};
+
+typedef struct LavWorld LavWorld;
 #ifdef __cplusplus
 }
 #endif
