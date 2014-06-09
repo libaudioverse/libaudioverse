@@ -7,7 +7,12 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/libaudioverse3d.h>
 #include <transmat.h>
 #include <stdlib.h>
-LavPropertyTableEntry worldPropertyTable[10] = {0};
+
+LavPropertyTableEntry worldPropertyTable[] = {
+	Lav_WORLD_LISTENER_ORIENTATION, Lav_PROPERTYTYPE_FLOAT6, "listener_orientation", {.f6val = {0, 0, -1, 0, 1, 0}},
+	Lav_WORLD_LISTENER_POSITION, Lav_PROPERTYTYPE_FLOAT3, "listener_position", {.f3val = {0, 0, 0}},
+};
+
 
 Lav_PUBLIC_FUNCTION LavError Lav_createWorld(LavObject**destination) {
 	STANDARD_PREAMBLE;
