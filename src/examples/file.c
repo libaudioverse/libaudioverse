@@ -23,18 +23,10 @@ int main(int argc, char** args) {
 
 	char* path = args[1];
 	LavObject *node;
-	LavObject *graph;
-	LavError err = Lav_initializeLibrary();
-	if(err != Lav_ERROR_NONE) {
-		printf("Failed to initialize library. Error: %i", err);
-		return;
-	}
-	Lav_createGraph(44100, 1024, &graph);
-	err = Lav_createFileNode(graph, path, &node);
-	if(err != Lav_ERROR_NONE) {
-		printf("Error: %d", err);
-		return 1;
-	}
+	LavDevice* device;
+	ERRCHECK(Lav_initializeLibrary());
+	ERRCHECK(Lav_createDefaultAudioOutputDevice(&device));
+	ERRCHECK(Lav_createFileNode(device, path, &node));
 
 	float pitch_bend = 1.0f;
 	sscanf(args[2], "%f", &pitch_bend);
@@ -44,19 +36,17 @@ int main(int argc, char** args) {
 	float volume;
 	sscanf(args[3], "%f", &volume);
 	LavObject* atten;
-	Lav_createAttenuatorNode(graph, node->num_outputs, &atten);
+	ERRCHECK(Lav_createAttenuatorNode(device, node->num_outputs, &atten));
 	for(unsigned int i = 0; i < node->num_outputs; i++) {
-		Lav_setParent(atten, node, i, i);
+		ERRCHECK(Lav_setParent(atten, node, i, i));
 	}
 
-	Lav_setFloatProperty(node, Lav_FILE_PITCH_BEND, pitch_bend);
-	Lav_setFloatProperty(atten, Lav_ATTENUATOR_MULTIPLIER, volume);
+	ERRCHECK(Lav_setFloatProperty(node, Lav_FILE_PITCH_BEND, pitch_bend));
+	ERRCHECK(Lav_setFloatProperty(atten, Lav_ATTENUATOR_MULTIPLIER, volume));
 
-	Lav_graphSetOutputNode(graph, atten);
-	void* th;
-	createAudioOutputThread(graph, 3, &th);
+	ERRCHECK(Lav_deviceSetOutputObject(device, atten));
+
 	char pause[100];
 	fgets(pause, 100, stdin);
-	stopAudioOutputThread(th);
 	return 0;
 }

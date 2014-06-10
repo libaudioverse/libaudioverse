@@ -9,7 +9,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 At the moment, this is always portaudio's default, and the setup is all done via the private API.*/
 
-Lav_PUBLIC_FUNCTION LavError Lav_createDefaultAudioDevice(LavDevice** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createDefaultAudioOutputDevice(LavDevice** destination) {
 	STANDARD_PREAMBLE;
 	//create a device if possible, giving it our desired settings, and then pass it to the portaudio thread builder, which redirects callbacks on the device as appropriate.
 	CHECK_NOT_NULL(destination);

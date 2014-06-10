@@ -20,36 +20,18 @@ void main(int argc, char** args) {
 		printf("Usage: %s <sound file> <hrtf file>", args[0]);
 		return;
 	}
-
-	void* th;
-	LavObject *graph;
+	LavDevice* device;
 	LavObject* fileNode, *hrtfNode;
-	LavError err = Lav_initializeLibrary();
-	if(err != Lav_ERROR_NONE) {
-		printf("Failed to initialize library. Error: %i", err);
-		return;
-	}
-	Lav_createGraph(SR, 1024, &graph);
-	err = Lav_createFileNode(graph, args[1], &fileNode);
-	if(err != Lav_ERROR_NONE) {
-		printf("Error: %d", err);
-		return;
-	}
+	ERRCHECK(Lav_initializeLibrary());
+	ERRCHECK(Lav_createDefaultAudioOutputDevice(&device));
+	ERRCHECK(Lav_createFileNode(device, args[1], &fileNode));
 
 	LavHrtfData *hrtf = NULL;
-	err = Lav_createHrtfData(args[2], &hrtf);
-	if(err != Lav_ERROR_NONE) {
-		printf("Error: %d", err);
-		return;
-	}
-	err = Lav_createHrtfNode(graph, hrtf, &hrtfNode);
-	if(err != Lav_ERROR_NONE) {
-		printf("Error: %d", err);
-		return;
-	}
-	Lav_setParent(hrtfNode, fileNode, 0, 0);
-	Lav_graphSetOutputNode(graph, hrtfNode);
-	createAudioOutputThread(graph, 3, &th);
+	ERRCHECK(Lav_createHrtfData(args[2], &hrtf));
+	ERRCHECK(Lav_createHrtfNode(device, hrtf, &hrtfNode));
+
+	ERRCHECK(Lav_setParent(hrtfNode, fileNode, 0, 0));
+	ERRCHECK(Lav_deviceSetOutputObject(device, hrtfNode));
 	int shouldContinue = 1;
 	printf("Enter pairs of numbers separated by whitespace, where the first is azimuth (anything) and the second\n"
 "is elevation (-90 to 90).\n"
@@ -70,11 +52,10 @@ void main(int argc, char** args) {
 		}
 		else if(elevOrAz == 1) {
 			sscanf(command, "%f", &elev);
-			Lav_setFloatProperty(hrtfNode, Lav_HRTF_ELEVATION, elev);
-			Lav_setFloatProperty(hrtfNode, Lav_HRTF_AZIMUTH, az);
+			ERRCHECK(Lav_setFloatProperty(hrtfNode, Lav_HRTF_ELEVATION, elev));
+			ERRCHECK(Lav_setFloatProperty(hrtfNode, Lav_HRTF_AZIMUTH, az));
 			elevOrAz = 0;
 			continue;
 		}
 	}
-	stopAudioOutputThread(th);
 }

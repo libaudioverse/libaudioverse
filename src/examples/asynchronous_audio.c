@@ -14,23 +14,17 @@ if((x) != Lav_ERROR_NONE) {\
 } while(0)\
 
 void main() {
-	void* th;
-	LavObject *graph;
+	
+	LavDevice* device;
 	LavObject* node;
-	LavError err = Lav_initializeLibrary();
-	if(err != Lav_ERROR_NONE) {
-		printf("Failed to initialize library. Error: %i", err);
-		return;
-	}
-	Lav_createGraph(SR, 1024, &graph);
-	Lav_createSineNode(graph, &node);
-	Lav_graphSetOutputNode(graph, node);
-	createAudioOutputThread(graph, 3, &th);
-	Lav_setFloatProperty(node, Lav_SINE_FREQUENCY, 0);
+	ERRCHECK(Lav_initializeLibrary());
+	ERRCHECK(Lav_createDefaultAudioOutputDevice(&device));
+	ERRCHECK(Lav_createSineNode(device, &node));
+	ERRCHECK(Lav_deviceSetOutputObject(device, node));
+	ERRCHECK(Lav_setFloatProperty(node, Lav_SINE_FREQUENCY, 0));
 	for(unsigned int i = 0; i < 1000; i++) {
-		Lav_setFloatProperty(node, Lav_SINE_FREQUENCY, i);
+		ERRCHECK(Lav_setFloatProperty(node, Lav_SINE_FREQUENCY, i));
 		sleepFor(5);
 	}
-	stopAudioOutputThread(th);
 	sleepFor(2000);
 }

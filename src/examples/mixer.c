@@ -15,14 +15,10 @@ if((x) != Lav_ERROR_NONE) {\
 }\
 } while(0)\
 
-LavObject* makeNode(LavObject *graph, char* file) {
+LavObject* makeNode(LavDevice* device, char* file) {
+	LavError err = Lav_ERROR_NONE;
 	LavObject *retval;
-	LavError err = Lav_initializeLibrary();
-	if(err != Lav_ERROR_NONE) {
-		printf("Failed to initialize library. Error: %i", err);
-		return NULL;
-	}
-	err = Lav_createFileNode(graph, file, &retval);
+	err = Lav_createFileNode(device, file, &retval);
 	if(err != Lav_ERROR_NONE) {
 		printf("Error: %i", err);
 		return NULL;
@@ -36,13 +32,13 @@ void main(int argc, char** args) {
 		return;
 	}
 
-	void* th;
-	LavObject *graph;
+	LavDevice* device;
 	LavObject** nodes;
-	Lav_createGraph(SR, 1024, &graph);
+	ERRCHECK(Lav_initializeLibrary());
+	ERRCHECK(Lav_createDefaultAudioOutputDevice(&device));
 	nodes = calloc(argc-1, sizeof(LavObject*));
 	for(int i = 0; i < argc-1; i++) {
-		LavObject* n = makeNode(graph, args[i+1]);
+		LavObject* n = makeNode(device, args[i+1]);
 		if(n == NULL) return; //makeNode prints errors already.
 		nodes[i] = n;
 	}
@@ -56,20 +52,13 @@ void main(int argc, char** args) {
 
 	//so far, so good. Make a mixer.
 	LavObject* mixer;
-	LavError err;
-	err = Lav_createMixerNode(graph, argc-1, channels, &mixer);
+	ERRCHECK(Lav_createMixerNode(device, argc-1, channels, &mixer));
 
 	for(int input = 0; input < mixer->num_inputs ; input++) {
-		Lav_setParent(mixer, nodes[input/channels], input%channels, input);
+		ERRCHECK(Lav_setParent(mixer, nodes[input/channels], input%channels, input));
 	}
 
-	if(err != Lav_ERROR_NONE) {
-		printf("Error: %i", err);
-		return;
-	}
-
-	Lav_graphSetOutputNode(graph, mixer);
-	createAudioOutputThread(graph, 3, &th);
+	ERRCHECK(Lav_deviceSetOutputObject(device, mixer));
 	int shouldContinue = 1;
 	char command[512] = "";
 	printf("Enter q to quit.");
@@ -80,5 +69,4 @@ void main(int argc, char** args) {
 			continue;
 		}
 	}
-	stopAudioOutputThread(th);
 }
