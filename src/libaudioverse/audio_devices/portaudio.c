@@ -94,5 +94,6 @@ LavError portaudioDeviceConfigurer(LavDevice* device) {
 	err =  createAudioOutputThread(device, blockSize, channels, sr, mixahead, &th);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
 	device->device_specific_data = th;
+	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
 }
