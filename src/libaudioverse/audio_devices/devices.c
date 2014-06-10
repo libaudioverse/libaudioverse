@@ -163,6 +163,10 @@ LavError deviceDefaultGetBlock(LavDevice* device, float* destination) {
 	STANDARD_PREAMBLE;
 	CHECK_NOT_NULL(device);
 	CHECK_NOT_NULL(destination);
+	//(maybe) run the preprocessing hook.
+	if(device->preprocessing_hook) {
+		device->preprocessing_hook(device);
+	}
 	//if this device has no output, simply zero the destination and bail out.
 	if(device->output_object == NULL) {
 		memset(destination, 0, sizeof(float)*device->channels*device->block_size);
