@@ -83,6 +83,10 @@ enum Lav_NODETYPES{
 /**Initialize Libaudioverse.*/
 Lav_PUBLIC_FUNCTION LavError Lav_initializeLibrary();
 
+/**Make an audio output device.
+
+This is intensionally opaque, as the struct here varies based on platform, and there are no commonalities about what it is behind the scenes.*/
+Lav_PUBLIC_FUNCTION LavError Lav_createDefaultAudioOutputDevice(void** destination);
 
 /**Graph manipulation functions: creation, deletion, and configuration.
 
