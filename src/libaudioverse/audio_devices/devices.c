@@ -67,6 +67,14 @@ Lav_PUBLIC_FUNCTION LavError Lav_deviceSetOutputObject(LavDevice* device, LavObj
 	STANDARD_CLEANUP_BLOCK;
 }
 
+Lav_PUBLIC_FUNCTION LavError Lav_deviceGetBlock(LavDevice* device, float* destination) {
+	STANDARD_PREAMBLE;
+	CHECK_NOT_NULL(device);
+	CHECK_NOT_NULL(destination);
+	SAFERETURN(device->get_block(device, destination));
+	STANDARD_CLEANUP_BLOCK;
+}
+
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetOutputObject(LavDevice* device, LavObject** destination) {
 	STANDARD_PREAMBLE;
 	CHECK_NOT_NULL(device);
