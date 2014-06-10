@@ -3,7 +3,6 @@ objects.c
 nodes.c
 properties.c
 graphs.c
-audio_output.c
 functiontables.c
 initialization.c
 interleaving.c
