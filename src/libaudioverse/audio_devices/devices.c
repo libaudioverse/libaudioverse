@@ -41,14 +41,42 @@ Lav_PUBLIC_FUNCTION LavError createGenericDevice(
 	device->channels = channels;
 
 	//we start with an allotment of 128 nodes, an overhead of less than 1kb, and suitable for something on the order of 128/4=32 3d sources.
-	LavNode** node_array = calloc(128, sizeof(LavNode*));
-	ERROR_IF_TRUE(node_array == NULL, Lav_ERROR_MEMORY);
-	device->nodes = node_array;
-	device->node_count = 0;
-	device->max_node_count = 128;
-
+	LavNode** object_array = calloc(128, sizeof(LavObject*));
+	ERROR_IF_TRUE(object_array == NULL, Lav_ERROR_MEMORY);
+	device->objects = object_array;
+	device->object_count = 0;
+	device->max_object_count = 128;
 	//that's it, return.
 	*destination = retval;
+	SAFERETURN(Lav_ERROR_NONE);
+	STANDARD_CLEANUP_BLOCK;
+}
+
+LavError deviceAssociateObject(LavDevice* device, LavObject* object) {
+	STANDARD_PREAMBLE;
+	CHECK_NOT_NULL(device);
+	CHECK_NOT_NULL(object);
+	//if we're already associated with this device, bail out.
+	//we could check the array, but this is faster; and the association should never change outside this api.
+	if(object->device == device) {
+		SAFERETURN(Lav_ERROR_INTERNAL_BUG); //should never happen unless this function is called inappropriately.
+	}
+	if(object->device != NULL) { //this object already belongs to a device, error instead.
+		SAFERETURN(Lav_ERROR_INTERNAL_BUG); //if this bubbles as far as the user, the api is broken.  The only way this can happen is if this function is called inappropriately.
+	}
+	if(device->object_count == device->max_object_count) {
+		//simple power-of-2 expansion.
+		LavNode** new_object_array = realloc(device->nodes, device->max_node_count*2*sizeof(LavObject*));
+		ERROR_IF_TRUE(new_object_aray == NULL, Lav_ERROR_MEMORY);
+		//we now set everything after the current max node position to NULL.
+		for(unsigned int i = device->max_objecct_count; i < device->max_object_count*2; i++) {
+			new_object_array[i] = NULL;
+		}
+		//and put it in.
+		device->objects = new_object_array;
+		device->max_object_count *= 2;
+	}
+	device->objects[device->object_count] = object;
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
 }

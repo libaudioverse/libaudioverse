@@ -55,6 +55,8 @@ enum Lav_ERRORS {
 	Lav_ERROR_HRTF_CORRUPT = 10,
 	Lav_ERROR_HRTF_TOO_SMALL = 11,
 	Lav_ERROR_HRTF_INVALID = 12,
+
+	Lav_ERROR_INTERNAL_BUG = 0xFFFF, //an easily recognized value for debugging.
 };
 
 /**Typedef for error codes.*/
