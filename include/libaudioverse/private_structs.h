@@ -16,7 +16,7 @@ extern "C" {
 //furthermore, mutex *must* be set to something and block_size must be greater than 0.
 //The above assumptions are made throughout the entire library.
 struct LavDevice {
-	LavError (*getBlock)(LavDevice* device, float* destination);
+	LavError (*get_block)(LavDevice* device, float* destination);
 	LavError (*start)(LavDevice* device);
 	LavError (*stop)(LavDevice *device);
 	unsigned int block_size, channels, sr;
