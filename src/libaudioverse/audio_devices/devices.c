@@ -104,6 +104,45 @@ LavError deviceAssociateObject(LavDevice* device, LavObject* object) {
 	STANDARD_CLEANUP_BLOCK;
 }
 
+//processing algorithm.
+//This struct exists so we can do a recursive call.
+//Todo: abstract arrays of arbetrary items out completely.
+struct AlreadySeenObjects {
+	unsigned int count, max_length;
+	LavObject** objects;
+};
+
+Lav_PUBLIC_FUNCTION void deviceProcessHelper(LavObject* object, struct AlreadySeenObjects *done, int recursingLevel) {
+	if(recursingLevel == 0) {
+		done = malloc(sizeof(struct AlreadySeenObjects));
+		done->count = 0;
+		done->objects = calloc(16, sizeof(LavObject*));
+		done->max_length = 16;
+	}
+	if(object == NULL) {
+		return;
+	}
+	for(unsigned int i = 0; i < object->num_inputs; i++) {
+		deviceProcessHelper(object->input_descriptors[i].parent, done, recursingLevel+1);
+	}
+	for(unsigned int i = 0; i < done->count; i++) {
+		if(done->objects[i] == object) {
+			return;
+		}
+	}
+	if(done->count == done->max_length) {
+		done->max_length *= 2;
+		realloc(done->objects, done->max_length*sizeof(LavObject*));
+	}
+	objectProcessSafe(object);
+	done->objects[done->count] = object;
+	done->count += 1;
+	if(recursingLevel == 0) {
+		free(done->objects);
+		free(done);
+	}
+}
+
 LavError deviceDefaultGetBlock(LavDevice* device, float* destination) {
 	STANDARD_PREAMBLE;
 	SAFERETURN(Lav_ERROR_NONE);
