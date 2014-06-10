@@ -19,10 +19,11 @@ struct LavDevice {
 	LavError (*get_block)(LavDevice* device, float* destination);
 	LavError (*start)(LavDevice* device);
 	LavError (*stop)(LavDevice *device);
+	LavError (*kill)(LavDevice* device);
 	unsigned int block_size, channels, sr;
 	void* mutex, *device_specific_data;
-	struct LavNode* nodes;
-	unsigned node_count, max_node_count;
+	struct LavObject** objects;
+	unsigned object_count, max_object_count;
 };
 
 union LavPropertyValue {
@@ -55,7 +56,8 @@ typedef struct LavInputDescriptor LavInputDescriptor;
 //typedef for processing function:
 typedef LavError (*LavProcessorFunction)(LavObject* obj);
 struct LavObject {
-		LavProperty **properties;
+	LavDevice *device;
+	LavProperty **properties;
 	unsigned int num_properties;
 	float** inputs;
 	LavInputDescriptor *input_descriptors;

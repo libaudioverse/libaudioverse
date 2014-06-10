@@ -13,7 +13,7 @@ Lav_PUBLIC_FUNCTION LavError createGenericDevice(
 	unsigned int channels,
 	unsigned int sr,
 	LavError (*getBlock)(LavDevice* device, float* destination),
-	LavError (*play)(LavDevice* device),
+	LavError (*start)(LavDevice* device),
 	LavError (*stop)(LavDevice* device),
 	LavError (*kill)(LavDevice* device),
 	LavvDevice** destination);
