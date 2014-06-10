@@ -172,7 +172,7 @@ LavError deviceDefaultGetBlock(LavDevice* device, float* destination) {
 	deviceProcessHelper(device->output_object, NULL, 0);
 	for(unsigned int i = 0; i < device->block_size; i++) {
 		for(unsigned int j = 0; j < device->channels; j++) {
-			if(j <= device->channels) {
+			if(j >= device->output_object->num_outputs) {
 				destination[i*device->channels+j] = 0;
 				continue;
 			}
