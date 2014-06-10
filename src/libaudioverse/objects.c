@@ -132,7 +132,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectReadBlock(LavObject *obj, float* destinat
 	CHECK_NOT_NULL(destination);
 	LOCK(obj->mutex);
 	//the outputs are now read to read.  Do so.
-	for(unsigned int i = 0; i < obj->block_size; i++) {
+	for(unsigned int i = 0; i < obj->device->block_size; i++) {
 		for(unsigned int output = 0; output < obj->num_outputs; output++) {
 			destination[i*obj->num_outputs+output] = obj->outputs[output][i];
 		}

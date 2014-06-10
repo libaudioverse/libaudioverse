@@ -41,11 +41,11 @@ Lav_NODETYPE_HRTF, device, (LavObject**)&retval);
 
 	HrtfNodeData *data = calloc(1, sizeof(HrtfNodeData));
 	ERROR_IF_TRUE(data == NULL, Lav_ERROR_MEMORY);
-	float* history = calloc(hrtf->hrir_length+retval->base.block_size, sizeof(float));
+	float* history = calloc(hrtf->hrir_length+retval->base.device->block_size, sizeof(float));
 	ERROR_IF_TRUE(history == NULL , Lav_ERROR_MEMORY);
 	data->history = history;
 	data->hrir_length = hrtf->hrir_length;
-	data->history_length = data->hrir_length+retval->base.block_size;
+	data->history_length = data->hrir_length+retval->base.device->block_size;
 	data->hrtf = hrtf;
 
 	//make room for the hrir itself.

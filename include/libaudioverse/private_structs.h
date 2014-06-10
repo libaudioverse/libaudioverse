@@ -66,7 +66,6 @@ struct LavObject {
 	float** outputs;
 	unsigned int num_outputs;
 	unsigned int num_inputs;
-	unsigned int block_size;
 	LavProcessorFunction process; //what to call to process this node.
 	void* mutex;
 	enum Lav_NODETYPES type;
