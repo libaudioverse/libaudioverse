@@ -11,6 +11,7 @@ extern "C" {
 /*Forward-declares all Libaudioverse types.
 Enums can't go here. Everything else can.*/
 typedef struct LavHrtfData LavHrtfData;
+typedef struct LavDevice LavDevice;
 typedef struct LavObject LavObject;
 
 /**Does whatever is appropriate on a given platform to expose a Libaudioverse function publically.*/
@@ -83,10 +84,8 @@ enum Lav_NODETYPES{
 /**Initialize Libaudioverse.*/
 Lav_PUBLIC_FUNCTION LavError Lav_initializeLibrary();
 
-/**Make an audio output device.
-
-This is intensionally opaque, as the struct here varies based on platform, and there are no commonalities about what it is behind the scenes.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createDefaultAudioOutputDevice(void** destination);
+/**Make an audio output device.*/
+Lav_PUBLIC_FUNCTION LavError Lav_createDefaultAudioOutputDevice(LavDevice** destination);
 
 /**Graph manipulation functions: creation, deletion, and configuration.
 

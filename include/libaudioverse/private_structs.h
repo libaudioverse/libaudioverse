@@ -11,6 +11,18 @@ extern "C" {
 //All structs here are private.
 //Anything not exposed directly through the public api is followed by its typedef in this file.
 
+//audio devices.
+//the specific functionality of an audio device needs to be hidden behind the void* data parameter, but the three function pointers *must* be filled out.
+//furthermore, mutex *must* be set to something and block_size must be greater than 0.
+//The above assumptions are made throughout the entire library.
+struct LavDevice {
+	LavError (*getBlock)(LavDevice* device, float* destination);
+	LavError (*start)(LavDevice* device);
+	LavError (*stop)(LavDevice *device);
+	unsigned int block_size, channels, sr;
+	void* mutex;
+};
+
 union LavPropertyValue {
 	float fval;
 	int ival;
