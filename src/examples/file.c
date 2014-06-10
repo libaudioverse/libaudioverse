@@ -8,6 +8,13 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdlib.h>
 #include <string.h>
 
+#define ERRCHECK(x) do {\
+if((x) != Lav_ERROR_NONE) {\
+	printf(#x " errored: %i", (x));\
+	return;\
+}\
+} while(0)\
+
 int main(int argc, char** args) {
 	if(argc != 4) {
 		printf("Syntax: %s <path> <pitch_bend> <volume>", args[0]);

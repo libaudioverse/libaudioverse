@@ -8,6 +8,13 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <string.h>
 #include <stdlib.h>
 
+#define ERRCHECK(x) do {\
+if((x) != Lav_ERROR_NONE) {\
+	printf(#x " errored: %i", (x));\
+	return;\
+}\
+} while(0)\
+
 LavObject* makeNode(LavObject *graph, char* file) {
 	LavObject *retval;
 	LavError err = Lav_initializeLibrary();

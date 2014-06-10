@@ -6,6 +6,13 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_all.h>
 #include <stdio.h>
 
+#define ERRCHECK(x) do {\
+if((x) != Lav_ERROR_NONE) {\
+	printf(#x " errored: %i", (x));\
+	return;\
+}\
+} while(0)\
+
 void main() {
 	void* th;
 	LavObject *graph;
