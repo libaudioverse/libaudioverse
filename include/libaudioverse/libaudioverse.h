@@ -118,13 +118,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_getStringProperty(LavObject* obj, unsigned int 
 /**This is a default node processing function. It simply writes 0s to all outputs, and can be useful when you need to provide audio and have nothing to do.*/
 Lav_PUBLIC_FUNCTION LavError Lav_processDefault(LavObject *obj);
 
-/**Helper function to read all of a node's outputs at once.
-This is intended for the ability to do audio output.  The destination parameter should
-be long enough to hold obj->block_size*node->num_output samples.  The samples are interweaved in an appropriate manner for most audio output systems:
-the first sample of the first output, the first of the second, the first of the third,...the second of the first, second and third..., etc.
-Put another way, this function pretends that the passed node has node->num_outputs channels, and then interweaves them.*/
-Lav_PUBLIC_FUNCTION LavError Lav_objectReadBlock(LavObject *node, float* destination);
-
 /**Make a sine node.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavDevice* device, LavObject **destination);
 
