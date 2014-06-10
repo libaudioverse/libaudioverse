@@ -16,7 +16,7 @@ Lav_PUBLIC_FUNCTION LavError createGenericDevice(
 	LavError (*start)(LavDevice* device),
 	LavError (*stop)(LavDevice* device),
 	LavError (*kill)(LavDevice* device),
-	LavvDevice** destination);
+	LavDevice** destination);
 
 LavError deviceAssociateObject(LavDevice* device, LavObject* object);
 #ifdef __cplusplus
