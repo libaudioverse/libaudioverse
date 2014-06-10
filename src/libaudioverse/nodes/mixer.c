@@ -13,14 +13,14 @@ typedef struct LavMixerData LavMixerData;
 
 LavError mixerProcessor(LavObject *obj);
 
-Lav_PUBLIC_FUNCTION LavError Lav_createMixerNode(LavObject *graph, unsigned int maxParents, unsigned int inputsPerParent, LavObject **destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createMixerNode(LavDevice* device, unsigned int maxParents, unsigned int inputsPerParent, LavObject **destination) {
 	STANDARD_PREAMBLE;
 	LavError err = Lav_ERROR_NONE;
-	CHECK_NOT_NULL(graph);
+	CHECK_NOT_NULL(device);
 	CHECK_NOT_NULL(destination);
-	LOCK(graph->mutex);
+	LOCK(device->mutex);
 	LavNode* retval = NULL;
-	err = Lav_createNode(maxParents*inputsPerParent, inputsPerParent, 0, NULL, Lav_NODETYPE_MIXER, graph, (LavObject**)&retval);
+	err = Lav_createNode(maxParents*inputsPerParent, inputsPerParent, 0, NULL, Lav_NODETYPE_MIXER, device, (LavObject**)&retval);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
 
 	((LavObject*)retval)->process = mixerProcessor;
@@ -40,7 +40,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createMixerNode(LavObject *graph, unsigned int 
 LavError mixerProcessor(LavObject *obj) {
 	const LavNode* node = (LavNode*)obj;
 	LavMixerData* data = node->data;
-	for(unsigned int i = 0; i < obj->block_size; i++) {
+	for(unsigned int i = 0; i < obj->device->block_size; i++) {
 		for(unsigned int j = 0; j < obj->num_inputs; j++) {
 			float samp = obj->inputs[j][i];
 			data->accumulator_array[j%data->inputs_per_parent] += samp;

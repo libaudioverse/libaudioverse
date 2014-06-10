@@ -12,17 +12,17 @@ LavPropertyTableEntry attenuatorPropertyTable[1] = {
 	{Lav_ATTENUATOR_MULTIPLIER, Lav_PROPERTYTYPE_FLOAT, "multiplier", {.fval = 440}, NULL},
 };
 
-Lav_PUBLIC_FUNCTION LavError Lav_createAttenuatorNode(LavObject *graph, unsigned int numInputs, LavObject **destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createAttenuatorNode(LavDevice* device, unsigned int numInputs, LavObject **destination) {
 	STANDARD_PREAMBLE;
 	LavError err = Lav_ERROR_NONE;
 	CHECK_NOT_NULL(destination);
-	CHECK_NOT_NULL(graph);
+	CHECK_NOT_NULL(device);
 	ERROR_IF_TRUE(numInputs <= 0, Lav_ERROR_RANGE);
-	LOCK(graph->mutex);
+	LOCK(device->mutex);
 	LavNode *retval = NULL;
 	err = Lav_createNode(numInputs, numInputs, 
 sizeof(attenuatorPropertyTable)/sizeof(attenuatorPropertyTable[0]), attenuatorPropertyTable,
-Lav_NODETYPE_ATTENUATOR, graph, (LavObject**)&retval);
+Lav_NODETYPE_ATTENUATOR, device, (LavObject**)&retval);
 	if(err != Lav_ERROR_NONE) SAFERETURN(err);
 
 	((LavObject*)retval)->process = attenuatorProcessor;
@@ -35,7 +35,7 @@ LavError attenuatorProcessor(LavObject *obj) {
 	const LavNode* node = (LavNode*)obj;
 	float mul = 0;
 	Lav_getFloatProperty((LavObject*)node, Lav_ATTENUATOR_MULTIPLIER, &mul);
-	for(unsigned int i = 0; i < obj->block_size; i++) {
+	for(unsigned int i = 0; i < obj->device->block_size; i++) {
 		for(unsigned int o = 0; o < obj->num_outputs; o++) {
 			obj->outputs[o][i] = obj->inputs[o][i]*mul;
 		}

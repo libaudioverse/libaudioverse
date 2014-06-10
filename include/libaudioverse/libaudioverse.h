@@ -11,6 +11,7 @@ extern "C" {
 /*Forward-declares all Libaudioverse types.
 Enums can't go here. Everything else can.*/
 typedef struct LavHrtfData LavHrtfData;
+typedef struct LavDevice LavDevice;
 typedef struct LavObject LavObject;
 
 /**Does whatever is appropriate on a given platform to expose a Libaudioverse function publically.*/
@@ -57,6 +58,10 @@ enum Lav_ERRORS {
 
 	/**This one is odd.  It is what is thrown if you pasas a node with the wrong "shape" to a function, most notably source creation.*/
 	Lav_ERROR_SHAPE = 13,
+
+	Lav_ERROR_CANNOT_CROSS_DEVICES = 14, //an attempto either create a parent-child connect with objects from different devices or to set an output with an object from a different device.
+	Lav_ERROR_NO_OUTPUTS = 15, //we expected the node to have outputs here, but it didn't.
+	Lav_ERROR_INTERNAL_BUG = 0xFFFF, //an easily recognized value for debugging.
 };
 
 /**Typedef for error codes.*/
@@ -76,7 +81,6 @@ enum Lav_PROPERTYTYPES {
 
 /**These are used to tag nodes with their type, so that external languages may see them.*/
 enum Lav_NODETYPES{
-	Lav_OBJTYPE_GRAPH,
 	Lav_OBJTYPE_WORLD,
 	Lav_NODETYPE_ZEROS,
 	Lav_NODETYPE_FILE,
@@ -89,14 +93,15 @@ enum Lav_NODETYPES{
 /**Initialize Libaudioverse.*/
 Lav_PUBLIC_FUNCTION LavError Lav_initializeLibrary();
 
+//devices...
+Lav_PUBLIC_FUNCTION LavError Lav_createDefaultAudioOutputDevice(LavDevice** destination);
 
-/**Graph manipulation functions: creation, deletion, and configuration.
-
-All nodes must belong to a graph and exactly one node must be the "output node", the node which will be read from to determine a graph's output.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createGraph(float sr, unsigned int blockSize, LavObject **destination);
-Lav_PUBLIC_FUNCTION LavError Lav_graphGetOutputNode(LavObject *graph, LavObject **destination);
-Lav_PUBLIC_FUNCTION LavError Lav_graphSetOutputNode(LavObject *graph, LavObject *node);
-Lav_PUBLIC_FUNCTION LavError Lav_graphGetBlock(LavObject* graph, float* samples);
+/**This type of device is intended for apps that wish to handle audio themselves: it will not output and time will not advance for it.
+Combine it with Lav_deviceReadBlock to make use of it.*/
+Lav_PUBLIC_FUNCTION LavError Lav_createReadDevice(unsigned int blockSize, unsigned int channels, unsigned int sr, LavDevice** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_deviceSetOutputObject(LavDevice* device, LavObject* object);
+Lav_PUBLIC_FUNCTION LavError Lav_deviceGetOutputObject(LavDevice* device, LavObject** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_deviceGetBlock(LavDevice* device, float* destination);
 
 /**Parent management.*/
 Lav_PUBLIC_FUNCTION LavError Lav_getParent(LavObject *obj, unsigned int slot, LavObject** parent, unsigned int *outputNumber);
@@ -122,30 +127,23 @@ Lav_PUBLIC_FUNCTION LavError Lav_getFloat6Property(LavObject* obj, unsigned int 
 /**This is a default node processing function. It simply writes 0s to all outputs, and can be useful when you need to provide audio and have nothing to do.*/
 Lav_PUBLIC_FUNCTION LavError Lav_processDefault(LavObject *obj);
 
-/**Helper function to read all of a node's outputs at once.
-This is intended for the ability to do audio output.  The destination parameter should
-be long enough to hold obj->block_size*node->num_output samples.  The samples are interweaved in an appropriate manner for most audio output systems:
-the first sample of the first output, the first of the second, the first of the third,...the second of the first, second and third..., etc.
-Put another way, this function pretends that the passed node has node->num_outputs channels, and then interweaves them.*/
-Lav_PUBLIC_FUNCTION LavError Lav_objectReadBlock(LavObject *node, float* destination);
-
 /**Make a sine node.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavObject *graph, LavObject **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavDevice* device, LavObject **destination);
 
 /**A node that plays a file.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavObject *graph, const char* path, LavObject **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavDevice*device, const char* path, LavObject **destination);
 
 /**Load hrtf dataset from file.  This is for use with hrtf nodes.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createHrtfData(const char* path, LavHrtfData **destination);
 
 /**Make a HRTF node.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createHrtfNode(LavObject *graph, LavHrtfData* hrtf, LavObject **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createHrtfNode(LavDevice* device, LavHrtfData* hrtf, LavObject **destination);
 
 /**Make a mixer.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createMixerNode(LavObject *graph, unsigned int maxParents, unsigned int inputsPerParent, LavObject **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createMixerNode(LavDevice* device, unsigned int maxParents, unsigned int inputsPerParent, LavObject **destination);
 
 /**Make an attenuator.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createAttenuatorNode(LavObject* graph, unsigned int numInputs, LavObject** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createAttenuatorNode(LavDevice* device, unsigned int numInputs, LavObject** destination);
 
 #ifdef __cplusplus
 }

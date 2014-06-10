@@ -11,6 +11,23 @@ extern "C" {
 //All structs here are private.
 //Anything not exposed directly through the public api is followed by its typedef in this file.
 
+//audio devices.
+//the specific functionality of an audio device needs to be hidden behind the void* data parameter, but the three function pointers *must* be filled out.
+//furthermore, mutex *must* be set to something and block_size must be greater than 0.
+//The above assumptions are made throughout the entire library.
+struct LavDevice {
+	LavError (*get_block)(LavDevice* device, float* destination);
+	LavError (*start)(LavDevice* device);
+	LavError (*stop)(LavDevice *device);
+	LavError (*kill)(LavDevice* device);
+	unsigned int block_size, channels, mixahead;
+	float sr;
+	void* mutex, *device_specific_data;
+	struct LavObject** objects;
+	unsigned object_count, max_object_count;
+	struct LavObject* output_object;
+};
+
 union LavPropertyValue {
 	float fval;
 	int ival;
@@ -43,36 +60,21 @@ typedef struct LavInputDescriptor LavInputDescriptor;
 //typedef for processing function:
 typedef LavError (*LavProcessorFunction)(LavObject* obj);
 struct LavObject {
-		LavProperty **properties;
+	LavDevice *device;
+	LavProperty **properties;
 	unsigned int num_properties;
 	float** inputs;
 	LavInputDescriptor *input_descriptors;
 	float** outputs;
 	unsigned int num_outputs;
 	unsigned int num_inputs;
-	unsigned int block_size;
 	LavProcessorFunction process; //what to call to process this node.
 	void* mutex;
 	enum Lav_NODETYPES type;
 };
 
-typedef void (*LavGraphPreprocessingHook)(LavObject* graph, void* param);
-struct LavGraph {
-	LavObject base;
-	LavObject **nodes;
-	unsigned int node_count, nodes_length;
-	LavObject *output_node;
-	float sr; //sampling rate.
-	void* audio_thread; //not null thread handle for audio output graphs, otherwise null.
-	unsigned int block_size;
-	LavGraphPreprocessingHook preprocessing_hook;
-	void* preprocessing_hook_argument;
-};
-typedef struct LavGraph LavGraph;
-
 struct LavNode {
 	LavObject base;
-	LavGraph *graph;
 	double internal_time;
 	void *data; //place for node subtypes to place data.
 };

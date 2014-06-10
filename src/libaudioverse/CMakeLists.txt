@@ -2,8 +2,6 @@ add_library(libaudioverse SHARED
 objects.c
 nodes.c
 properties.c
-graphs.c
-audio_output.c
 functiontables.c
 initialization.c
 interleaving.c
@@ -24,6 +22,11 @@ nodes/file.c
 nodes/hrtf.c
 nodes/mixer.c
 nodes/attenuator.c
+
+#the audio backends and related functionality.
+audio_devices/device_negociation.c
+audio_devices/devices.c
+audio_devices/portaudio.c
 
 #the 3D abstraction on top of libaudioverse.
 3d/world.c

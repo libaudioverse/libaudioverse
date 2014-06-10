@@ -26,14 +26,13 @@ void objectComputeInputBuffers(LavObject* obj) {
 	}
 }
 
-Lav_PUBLIC_FUNCTION LavError initLavObject(unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, LavPropertyTableEntry* propertyTable, enum  Lav_NODETYPES type, unsigned int blockSize, void* mutex, LavObject *destination) {
+Lav_PUBLIC_FUNCTION LavError initLavObject(unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, LavPropertyTableEntry* propertyTable, enum  Lav_NODETYPES type, LavDevice* device, LavObject *destination) {
 	STANDARD_PREAMBLE;
 	CHECK_NOT_NULL(destination);
-	CHECK_NOT_NULL(mutex);
-	ERROR_IF_TRUE(blockSize > Lav_MAX_BLOCK_SIZE, Lav_ERROR_RANGE);
+	CHECK_NOT_NULL(device);
 	destination->num_inputs = numInputs;
 	destination->num_outputs = numOutputs;
-	destination->mutex = mutex;
+	destination->mutex = device->mutex;
 	//allocations:
 	if(numInputs > 0) {
 		destination->input_descriptors = calloc(numInputs, sizeof(LavInputDescriptor));
@@ -46,13 +45,12 @@ Lav_PUBLIC_FUNCTION LavError initLavObject(unsigned int numInputs, unsigned int 
 		destination->outputs = calloc(numOutputs, sizeof(float**));
 		ERROR_IF_TRUE(destination->outputs == NULL, Lav_ERROR_MEMORY);
 		for(unsigned int i = 0; i < destination->num_outputs; i++) {
-			destination->outputs[i] = calloc(blockSize, sizeof(float));
+			destination->outputs[i] = calloc(device->block_size, sizeof(float));
 			ERROR_IF_TRUE(destination->outputs[i] == NULL, Lav_ERROR_MEMORY);
 		}
 	}
 
 	destination->type = type;
-	destination->block_size = blockSize;
 
 	if(numProperties > 0 && propertyTable != NULL) {
 		LavProperty** tbl = makePropertyArrayFromTable(numProperties, propertyTable);
@@ -61,27 +59,29 @@ Lav_PUBLIC_FUNCTION LavError initLavObject(unsigned int numInputs, unsigned int 
 		destination->properties = tbl;
 	}
 
+	LavError err = deviceAssociateObject(device, destination);
+	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
 	objectComputeInputBuffers(destination); //at the moment, this is going to just make them all 0, but it takes effect once parents are added.
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_createObject(unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, LavPropertyTableEntry *propertyTable, enum  Lav_NODETYPES type, unsigned int blockSize, void* mutex, LavObject **destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createObject(unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, LavPropertyTableEntry *propertyTable, enum  Lav_NODETYPES type, LavDevice* device, LavObject **destination) {
 	STANDARD_PREAMBLE;
-	CHECK_NOT_NULL(mutex);
+	CHECK_NOT_NULL(device);
 	LavObject *retval = calloc(1, sizeof(LavObject));
 	ERROR_IF_TRUE(retval == NULL, Lav_ERROR_MEMORY);
-	LavError err = initLavObject(numInputs, numOutputs, numProperties, propertyTable, type, blockSize, mutex, retval);
+	LavError err = initLavObject(numInputs, numOutputs, numProperties, propertyTable, type, device, retval);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
-	SAFERETURN(Lav_ERROR_NONE);
 	*destination = retval;
+	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
 }
 
 /*Default Processing function.*/
 Lav_PUBLIC_FUNCTION LavError Lav_processDefault(LavObject* obj) {
 	for(unsigned int i = 0; i < obj->num_outputs; i++) {
-		memset(obj->outputs[i], 0, obj->block_size*sizeof(float));
+		memset(obj->outputs[i], 0, obj->device->block_size*sizeof(float));
 	}
 	return Lav_ERROR_NONE;
 }
@@ -121,22 +121,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_clearParent(LavObject *obj, unsigned int slot) 
 	obj->input_descriptors[slot].parent = NULL;
 	obj->input_descriptors[slot].output = 0;
 	objectComputeInputBuffers(obj);
-	SAFERETURN(Lav_ERROR_NONE);
-	STANDARD_CLEANUP_BLOCK;
-}
-
-
-Lav_PUBLIC_FUNCTION LavError Lav_objectReadBlock(LavObject *obj, float* destination) {
-	STANDARD_PREAMBLE;
-	CHECK_NOT_NULL(obj);
-	CHECK_NOT_NULL(destination);
-	LOCK(obj->mutex);
-	//the outputs are now read to read.  Do so.
-	for(unsigned int i = 0; i < obj->block_size; i++) {
-		for(unsigned int output = 0; output < obj->num_outputs; output++) {
-			destination[i*obj->num_outputs+output] = obj->outputs[output][i];
-		}
-	}
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
 }
