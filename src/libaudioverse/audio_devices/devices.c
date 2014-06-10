@@ -76,6 +76,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_deviceGetBlock(LavDevice* device, float* destin
 	STANDARD_PREAMBLE;
 	CHECK_NOT_NULL(device);
 	CHECK_NOT_NULL(destination);
+	LOCK(device->mutex);
 	SAFERETURN(device->get_block(device, destination));
 	STANDARD_CLEANUP_BLOCK;
 }
@@ -84,6 +85,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_deviceGetOutputObject(LavDevice* device, LavObj
 	STANDARD_PREAMBLE;
 	CHECK_NOT_NULL(device);
 	CHECK_NOT_NULL(destination);
+	LOCK(device->mutex);
 	*destination = device->output_object;
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
