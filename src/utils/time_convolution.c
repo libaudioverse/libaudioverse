@@ -13,6 +13,13 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #define blocksize 100
 float storage[blocksize*2] = {0};
 
+#define ERRCHECK(x) do {\
+if((x) != Lav_ERROR_NONE) {\
+	printf(#x " errored: %i", (x));\
+	return;\
+}\
+} while(0)\
+
 void main(int argc, char** args) {
 	if(argc != 3) {
 		printf("Usage: %s <sound file> <hrtf file>", args[0]);
@@ -21,37 +28,20 @@ void main(int argc, char** args) {
 
 	LavDevice* device;
 	LavObject* fileNode, *hrtfNode;
-	LavError err = Lav_initializeLibrary();
-	if(err != Lav_ERROR_NONE) {
-		printf("Failed to initialize library. Error: %i", err);
-		return;
-	}
-	Lav_createReadDevice(blocksize, 2, 44100, &device);
-	err = Lav_createFileNode(device, args[1], &fileNode);
-	if(err != Lav_ERROR_NONE) {
-		printf("Error: %d", err);
-		return;
-	}
-
+	ERRCHECK(Lav_initializeLibrary());
+	ERRCHECK(Lav_createReadDevice(blocksize, 2, 44100, &device));
+	ERRCHECK(Lav_createFileNode(device, args[1], &fileNode));
 	LavHrtfData *hrtf = NULL;
-	err = Lav_createHrtfData(args[2], &hrtf);
-	if(err != Lav_ERROR_NONE) {
-		printf("Error: %d", err);
-		return;
-	}
-	err = Lav_createHrtfNode(device, hrtf, &hrtfNode);
-	if(err != Lav_ERROR_NONE) {
-		printf("Error: %d", err);
-		return;
-	}
-	Lav_setParent(hrtfNode, fileNode, 0, 0);
-	Lav_deviceSetOutputObject(device, hrtfNode);
+	ERRCHECK(Lav_createHrtfData(args[2], &hrtf));
+	ERRCHECK(Lav_createHrtfNode(device, hrtf, &hrtfNode));
+	ERRCHECK(Lav_setParent(hrtfNode, fileNode, 0, 0));
+	ERRCHECK(Lav_deviceSetOutputObject(device, hrtfNode));
 
 	printf("Convolving...\n");
 	clock_t start;
 	start = clock();
 	for(unsigned int i = 0; i < 44100*seconds; i+= blocksize) {
-		Lav_deviceGetBlock(device, storage);
+		ERRCHECK(Lav_deviceGetBlock(device, storage));
 	}
 	clock_t dur = clock()-start;
 	float secs = dur/(float)CLOCKS_PER_SEC;
