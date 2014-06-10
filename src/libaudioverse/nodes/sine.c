@@ -18,24 +18,24 @@ LavPropertyTableEntry sinePropertyTable[1] = {
 	{Lav_SINE_FREQUENCY, Lav_PROPERTYTYPE_FLOAT, "frequency", {.fval = 440}, NULL},
 };
 
-Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavObject *graph, LavObject  **destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavDevice* device, LavObject  **destination) {
 	STANDARD_PREAMBLE;
 	LavError err = Lav_ERROR_NONE;
 
 	CHECK_NOT_NULL(destination);
-	CHECK_NOT_NULL(graph);
-	LOCK(graph->mutex);
+	CHECK_NOT_NULL(device);
+	LOCK(device->mutex);
 	LavNode *retval = NULL;
 	err = Lav_createNode(0, 1,
 sizeof(sinePropertyTable)/sizeof(sinePropertyTable[0]), sinePropertyTable,
-Lav_NODETYPE_SINE, graph, (LavObject**)&retval);
+Lav_NODETYPE_SINE, device, (LavObject**)&retval);
 	if(err != Lav_ERROR_NONE) SAFERETURN(err);
 	((LavObject*)retval)->process = sineProcessor;
 
 	struct sineinfo* data = calloc(1, sizeof(struct sineinfo));
 	ERROR_IF_TRUE(data == NULL, Lav_ERROR_MEMORY);
 
-	data->table_delta = (float)sineTableLength/((LavGraph*)graph)->sr;
+	data->table_delta = (float)sineTableLength/device->sr;
 	retval->data = data;
 
 	*destination = (LavObject*)retval;
@@ -46,11 +46,11 @@ Lav_NODETYPE_SINE, graph, (LavObject**)&retval);
 LavError sineProcessor(LavObject *obj) {
 	const LavNode* node = (LavNode*)obj;
 	float freq = 0;
-	float sr = node->graph->sr;
+	float sr = node->device->sr;
 	Lav_getFloatProperty(obj, Lav_SINE_FREQUENCY, &freq);
 	struct sineinfo *data = node->data;
 	float delta = data->table_delta*freq;
-	for(unsigned int i = 0; i < obj->block_size; i++) {
+	for(unsigned int i = 0; i < obj->device->block_size; i++) {
 		float weight1 = 1-data->offset;
 		float weight2 = data->offset;
 		unsigned int samp1 = data->start;

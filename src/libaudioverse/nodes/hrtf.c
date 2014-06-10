@@ -26,16 +26,16 @@ LavPropertyTableEntry hrtfPropertyTable[] = {
 	{Lav_HRTF_ELEVATION, Lav_PROPERTYTYPE_FLOAT, "elevation", {.fval = 0.0f}, hrtfPropertyChanged},
 };
 
-Lav_PUBLIC_FUNCTION LavError Lav_createHrtfNode(LavObject *graph, LavHrtfData* hrtf, LavObject **destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createHrtfNode(LavDevice* device, LavHrtfData* hrtf, LavObject **destination) {
 	STANDARD_PREAMBLE;
 	LavError err = Lav_ERROR_NONE;
 	CHECK_NOT_NULL(hrtf);
 	CHECK_NOT_NULL(destination);
-	LOCK(graph->mutex);
+	LOCK(device->mutex);
 	LavNode* retval = NULL;
 	err = Lav_createNode(1, 2,
 sizeof(hrtfPropertyTable)/sizeof(hrtfPropertyTable[0]), hrtfPropertyTable,
-Lav_NODETYPE_HRTF, graph, (LavObject**)&retval);
+Lav_NODETYPE_HRTF, device, (LavObject**)&retval);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
 	((LavObject*)retval)->process = hrtfRecomputeHrirProcessor;
 
@@ -81,8 +81,8 @@ LavError hrtfProcessor(LavObject* obj) {
 	//copy the last hrir_length samples to the beginning, copy the input to the end.
 	//this moves the history back by a fixed amount.
 	memcpy(data->history, data->history+data->history_length-data->hrir_length, data->hrir_length*sizeof(float)); //this does not overlap.
-	memcpy(data->history+data->hrir_length, obj->inputs[0], obj->block_size*sizeof(float));
-	for(unsigned int i = 0; i < obj->block_size; i++) {
+	memcpy(data->history+data->hrir_length, obj->inputs[0], obj->device->block_size*sizeof(float));
+	for(unsigned int i = 0; i < obj->device->block_size; i++) {
 		float outLeft=0, outRight=0;
 		for(unsigned int j = 0; j < data->hrir_length; j++) {
 			outLeft += data->left_response[j]*data->history[data->hrir_length+i-j];
