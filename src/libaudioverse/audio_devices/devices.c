@@ -53,6 +53,28 @@ Lav_PUBLIC_FUNCTION LavError createGenericDevice(
 	STANDARD_CLEANUP_BLOCK;
 }
 
+Lav_PUBLIC_FUNCTION LavError Lav_deviceSetOutputObject(LavDevice* device, LavObject* object) {
+	STANDARD_PREAMBLE;
+	CHECK_NOT_NULL(device);
+	CHECK_NOT_NULL(object);
+	LOCK(device->mutex);
+	ERROR_IF_TRUE(object->device != device, Lav_ERROR_CANNOT_CROSS_DEVICES);
+	//Must have at least 1 output, or fail.
+	ERROR_IF_TRUE(object->num_outputs == 0, Lav_ERROR_NO_OUTPUTS);
+	device->output_object = object;
+	SAFERETURN(Lav_ERROR_NONE);
+	STANDARD_CLEANUP_BLOCK;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_deviceGetOutputObject(LavDevice* device, LavObject** destination) {
+	STANDARD_PREAMBLE;
+	CHECK_NOT_NULL(device);
+	CHECK_NOT_NULL(destination);
+	*destination = device->output_object;
+	SAFERETURN(Lav_ERROR_NONE);
+	STANDARD_CLEANUP_BLOCK;
+}
+
 LavError deviceAssociateObject(LavDevice* device, LavObject* object) {
 	STANDARD_PREAMBLE;
 	CHECK_NOT_NULL(device);

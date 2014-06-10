@@ -24,6 +24,7 @@ struct LavDevice {
 	void* mutex, *device_specific_data;
 	struct LavObject** objects;
 	unsigned object_count, max_object_count;
+	struct LavObject* output_object;
 };
 
 union LavPropertyValue {

@@ -56,6 +56,8 @@ enum Lav_ERRORS {
 	Lav_ERROR_HRTF_TOO_SMALL = 11,
 	Lav_ERROR_HRTF_INVALID = 12,
 
+	Lav_ERROR_CANNOT_CROSS_DEVICES = 13, //an attempto either create a parent-child connect with objects from different devices or to set an output with an object from a different device.
+	Lav_ERROR_NO_OUTPUTS = 14, //we expected the node to have outputs here, but it didn't.
 	Lav_ERROR_INTERNAL_BUG = 0xFFFF, //an easily recognized value for debugging.
 };
 
@@ -86,8 +88,10 @@ enum Lav_NODETYPES{
 /**Initialize Libaudioverse.*/
 Lav_PUBLIC_FUNCTION LavError Lav_initializeLibrary();
 
-/**Make an audio output device.*/
+//devices...
 Lav_PUBLIC_FUNCTION LavError Lav_createDefaultAudioOutputDevice(LavDevice** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_deviceSetOutputObject(LavDevice* device, LavObject* object);
+Lav_PUBLIC_FUNCTION LavError Lav_deviceGetOutputObject(LavDevice* device, LavObject** destination);
 
 /**Graph manipulation functions: creation, deletion, and configuration.
 
