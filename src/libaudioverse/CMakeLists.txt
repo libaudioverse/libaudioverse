@@ -25,6 +25,9 @@ nodes/hrtf.c
 nodes/mixer.c
 nodes/attenuator.c
 
+#the audio backends and related functionality.
+audio_devices/portaudio.c
+
 #the 3D abstraction on top of libaudioverse.
 )
 TARGET_LINK_LIBRARIES(libaudioverse ${libaudioverse_required_libraries})
