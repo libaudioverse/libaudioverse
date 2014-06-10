@@ -2,7 +2,6 @@ add_library(libaudioverse SHARED
 objects.c
 nodes.c
 properties.c
-graphs.c
 functiontables.c
 initialization.c
 interleaving.c

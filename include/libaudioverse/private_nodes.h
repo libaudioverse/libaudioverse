@@ -7,7 +7,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #ifdef __cplusplus
 extern "C" {
 #endif
-Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, LavPropertyTableEntry* propertyTable, enum Lav_NODETYPES type, LavObject* graph, LavObject** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, LavPropertyTableEntry* propertyTable, enum Lav_NODETYPES type, LavDevice* device, LavObject** destination);
 #ifdef __cplusplus
 }
 #endif

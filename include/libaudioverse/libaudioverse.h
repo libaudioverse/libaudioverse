@@ -76,7 +76,6 @@ enum Lav_PROPERTYTYPES {
 
 /**These are used to tag nodes with their type, so that external languages may see them.*/
 enum Lav_NODETYPES{
-	Lav_OBJTYPE_GRAPH,
 	Lav_NODETYPE_ZEROS,
 	Lav_NODETYPE_FILE,
 	Lav_NODETYPE_HRTF,
@@ -97,14 +96,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createReadDevice(unsigned int blockSize, unsign
 Lav_PUBLIC_FUNCTION LavError Lav_deviceSetOutputObject(LavDevice* device, LavObject* object);
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetOutputObject(LavDevice* device, LavObject** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetBlock(LavDevice* device, float* destination);
-
-/**Graph manipulation functions: creation, deletion, and configuration.
-
-All nodes must belong to a graph and exactly one node must be the "output node", the node which will be read from to determine a graph's output.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createGraph(float sr, unsigned int blockSize, LavObject **destination);
-Lav_PUBLIC_FUNCTION LavError Lav_graphGetOutputNode(LavObject *graph, LavObject **destination);
-Lav_PUBLIC_FUNCTION LavError Lav_graphSetOutputNode(LavObject *graph, LavObject *node);
-Lav_PUBLIC_FUNCTION LavError Lav_graphGetBlock(LavObject* graph, float* samples);
 
 /**Parent management.*/
 Lav_PUBLIC_FUNCTION LavError Lav_getParent(LavObject *obj, unsigned int slot, LavObject** parent, unsigned int *outputNumber);
@@ -135,22 +126,22 @@ Put another way, this function pretends that the passed node has node->num_outpu
 Lav_PUBLIC_FUNCTION LavError Lav_objectReadBlock(LavObject *node, float* destination);
 
 /**Make a sine node.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavObject *graph, LavObject **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavDevice* device, LavObject **destination);
 
 /**A node that plays a file.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavObject *graph, const char* path, LavObject **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavDevice*device, const char* path, LavObject **destination);
 
 /**Load hrtf dataset from file.  This is for use with hrtf nodes.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createHrtfData(const char* path, LavHrtfData **destination);
 
 /**Make a HRTF node.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createHrtfNode(LavObject *graph, LavHrtfData* hrtf, LavObject **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createHrtfNode(LavDevice* device, LavHrtfData* hrtf, LavObject **destination);
 
 /**Make a mixer.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createMixerNode(LavObject *graph, unsigned int maxParents, unsigned int inputsPerParent, LavObject **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createMixerNode(LavDevice* device, unsigned int maxParents, unsigned int inputsPerParent, LavObject **destination);
 
 /**Make an attenuator.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createAttenuatorNode(LavObject* graph, unsigned int numInputs, LavObject** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createAttenuatorNode(LavDevice* device, unsigned int numInputs, LavObject** destination);
 
 #ifdef __cplusplus
 }

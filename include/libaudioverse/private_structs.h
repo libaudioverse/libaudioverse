@@ -71,20 +71,8 @@ struct LavObject {
 	enum Lav_NODETYPES type;
 };
 
-struct LavGraph {
-	LavObject base;
-	LavObject **nodes;
-	unsigned int node_count, nodes_length;
-	LavObject *output_node;
-	float sr; //sampling rate.
-	void* audio_thread; //not null thread handle for audio output graphs, otherwise null.
-	unsigned int block_size;
-};
-typedef struct LavGraph LavGraph;
-
 struct LavNode {
 	LavObject base;
-	LavGraph *graph;
 	double internal_time;
 	void *data; //place for node subtypes to place data.
 };

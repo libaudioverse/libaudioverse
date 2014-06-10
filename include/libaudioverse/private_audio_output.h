@@ -7,9 +7,6 @@ extern "C" {
 #endif
 
 Lav_PUBLIC_FUNCTION LavError initializeAudioOutput();
-Lav_PUBLIC_FUNCTION LavError createAudioOutputThread(LavObject *graph, unsigned int mixAhead, void **destination);
-Lav_PUBLIC_FUNCTION void stopAudioOutputThread(void* thread);
-
 #ifdef __cplusplus
 }
 #endif
