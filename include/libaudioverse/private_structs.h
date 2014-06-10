@@ -20,7 +20,7 @@ struct LavDevice {
 	LavError (*start)(LavDevice* device);
 	LavError (*stop)(LavDevice *device);
 	LavError (*kill)(LavDevice* device);
-	unsigned int block_size, channels, sr, mix_ahead;
+	unsigned int block_size, channels, sr, mixahead;
 	void* mutex, *device_specific_data;
 	struct LavObject** objects;
 	unsigned object_count, max_object_count;

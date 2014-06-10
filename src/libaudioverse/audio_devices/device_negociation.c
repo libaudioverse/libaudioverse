@@ -10,4 +10,18 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 At the moment, this is always portaudio's default, and the setup is all done via the private API.*/
 
 Lav_PUBLIC_FUNCTION LavError Lav_createDefaultAudioDevice(LavDevice** destination) {
+	STANDARD_PREAMBLE;
+	//create a device if possible, giving it our desired settings, and then pass it to the portaudio thread builder, which redirects callbacks on the device as appropriate.
+	CHECK_NOT_NULL(destination);
+	LavDevice* retval;
+	//we prefer 44100 sr, 2 channel, and block size of 1024 with mixahead 2.
+	//this gives a granularity of 23 MS between hearing property changes and about 69 MS between the app setting a property and the properety's new value being sent to the sound card.
+	LavError err = createGenericDevice(1024, 2, 44100, NULL, NULL, NULL, NULL, &retval);
+	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
+	retval->mixahead = 2;
+	err = portaudioDeviceConfigurer(retval);
+	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
+	*destination = retval;
+	SAFERETURN(Lav_ERROR_NONE);
+	STANDARD_CLEANUP_BLOCK;
 }

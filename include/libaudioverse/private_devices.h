@@ -7,6 +7,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 extern "C" {
 #endif
 
+//initialize the audio backend.
+Lav_PUBLIC_FUNCTION LavError initializeAudioBackend();
 //any null callback gets replaced with a default implementation that "does something sensible".
 Lav_PUBLIC_FUNCTION LavError createGenericDevice(
 	unsigned int blockSize,
@@ -19,6 +21,7 @@ Lav_PUBLIC_FUNCTION LavError createGenericDevice(
 	LavDevice** destination);
 
 LavError deviceAssociateObject(LavDevice* device, LavObject* object);
+LavError portaudioDeviceConfigurer(LavDevice* device);
 #ifdef __cplusplus
 }
 #endif
