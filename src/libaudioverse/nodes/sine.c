@@ -46,7 +46,7 @@ Lav_NODETYPE_SINE, device, (LavObject**)&retval);
 LavError sineProcessor(LavObject *obj) {
 	const LavNode* node = (LavNode*)obj;
 	float freq = 0;
-	float sr = node->device->sr;
+	float sr = ((LavObject*)node)->device->sr;
 	Lav_getFloatProperty(obj, Lav_SINE_FREQUENCY, &freq);
 	struct sineinfo *data = node->data;
 	float delta = data->table_delta*freq;

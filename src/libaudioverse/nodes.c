@@ -15,9 +15,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int
 	CHECK_NOT_NULL(destination);
 	LavNode* retval = calloc(1, sizeof(LavNode));
 	ERROR_IF_TRUE(retval == NULL, Lav_ERROR_MEMORY);
-	LavError err = initLavObject(numInputs, numOutputs, numProperties, propertyTable, type, device->block_size, device->mutex, (LavObject*)retval);
+	LavError err = initLavObject(numInputs, numOutputs, numProperties, propertyTable, type, device, (LavObject*)retval);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
-	deviceAssociateNode(device, (LavObject*)retval);
 	*destination = (LavObject*)retval;
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
