@@ -111,11 +111,11 @@ LavError deviceAssociateObject(LavDevice* device, LavObject* object) {
 		for(unsigned int i = device->max_object_count; i < device->max_object_count*2; i++) {
 			new_object_array[i] = NULL;
 		}
-		//and put it in.
 		device->objects = new_object_array;
 		device->max_object_count *= 2;
 	}
 	device->objects[device->object_count] = object;
+	object->device = device;
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
 }
