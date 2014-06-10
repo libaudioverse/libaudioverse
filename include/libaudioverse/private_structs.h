@@ -20,7 +20,9 @@ struct LavDevice {
 	LavError (*start)(LavDevice* device);
 	LavError (*stop)(LavDevice *device);
 	unsigned int block_size, channels, sr;
-	void* mutex;
+	void* mutex, *device_specific_data;
+	struct LavNode* nodes;
+	unsigned node_count, max_node_count;
 };
 
 union LavPropertyValue {
