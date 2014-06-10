@@ -54,6 +54,11 @@ Lav_PUBLIC_FUNCTION LavError createGenericDevice(
 	STANDARD_CLEANUP_BLOCK;
 }
 
+Lav_PUBLIC_FUNCTION LavError Lav_createReadDevice(unsigned int blockSize, unsigned int channels, unsigned int sr, LavDevice** destination) {
+	//simply delegate: this is a specific call to createGenericDevice.
+	return createGenericDevice(blockSize, channels, sr, NULL, NULL, NULL, NULL, destination);
+}
+
 Lav_PUBLIC_FUNCTION LavError Lav_deviceSetOutputObject(LavDevice* device, LavObject* object) {
 	STANDARD_PREAMBLE;
 	CHECK_NOT_NULL(device);
