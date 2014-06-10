@@ -25,6 +25,7 @@ nodes/mixer.c
 nodes/attenuator.c
 
 #the audio backends and related functionality.
+audio_devices/device_negociation.c
 audio_devices/devices.c
 audio_devices/portaudio.c
 
