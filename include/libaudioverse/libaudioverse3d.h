@@ -8,7 +8,7 @@ extern "C" {
 #endif
 
 /**This is the interface to the 3d simulation of Libaudioverse, including its properties.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createWorld(LavDevice* device, LavObject** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createWorld(LavDevice* device, LavHrtfData *hrtf, LavObject** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createMonoSource(LavObject* node, LavObject* world, LavObject** destination);
 
 enum Lav_WORLD_PROPERTIES {

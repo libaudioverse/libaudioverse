@@ -17,8 +17,11 @@ LavPropertyTableEntry worldPropertyTable[] = {
 	{Lav_WORLD_LISTENER_POSITION, Lav_PROPERTYTYPE_FLOAT3, "listener_position", {.f3val = {0, 0, 0}}, worldListenerUpdateCallback},
 };
 
-Lav_PUBLIC_FUNCTION LavError Lav_createWorld(LavDevice* device, LavObject**destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createWorld(LavDevice* device, LavHrtfData *hrtf, LavObject**destination) {
 	STANDARD_PREAMBLE;
+	CHECK_NOT_NULL(device);
+	CHECK_NOT_NULL(hrtf);
+	CHECK_NOT_NULL(destination);
 	LavObject *mixer;
 	LavError err;
 	//todo: make these configurable too.
@@ -48,6 +51,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_createWorld(LavDevice* device, LavObject**desti
 	//we're going to use this world as the preprocessing hook's argument.
 	device->preprocessing_hook_argument = world;
 	*destination = obj;
+	//save the hrtf.
+	world->hrtf = hrtf;
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
 }
@@ -74,4 +79,5 @@ void worldPreprocessingHook(LavDevice* device, void* param) {
 }
 
 LavError worldAssociateSource(LavWorld* world, LavSource* source) {
+	return Lav_ERROR_NONE;
 }
