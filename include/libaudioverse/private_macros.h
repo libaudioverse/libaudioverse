@@ -8,6 +8,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 //this is only macros; consequently, no ifdef __cplusplus.
 
 /**Private macro definitions.*/
+//pi.
+#define PI (3.14159)
 
 /**The following three macros abstract returning error codes, and make the cleanup logic for locks manageable.
 They exist because goto is a bad thing for clarity, and because they can.*/
