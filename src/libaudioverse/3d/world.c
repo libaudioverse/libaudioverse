@@ -95,6 +95,7 @@ LavError worldAssociateSource(LavWorld* world, LavSource* source) {
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
 	err = Lav_setParent((LavObject*)source, world->mixer, 1, world->base.device->channels*slot+1); //the right stereo channel.
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
+	source->world = world;
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
 }

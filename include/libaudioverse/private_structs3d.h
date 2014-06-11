@@ -8,12 +8,14 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+struct LavSource;
+struct LavWorld;
 /**Structs for 3d worlds.*/
 struct LavSource {
 	LavObject base;
 	TmVector position;
 	LavObject* data_node, *panner_node, *attenuator_node;
+	struct LavWorld *world;
 };
 typedef struct LavSource LavSource;
 
