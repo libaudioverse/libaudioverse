@@ -6,6 +6,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <transmat.h>
 #include <stdlib.h>
 #include <libaudioverse/private_sources.h>
+#include <math.h>
 
 LavPropertyTableEntry sourceProperties[] = {
 	{Lav_SOURCE_POSITION, Lav_PROPERTYTYPE_FLOAT3, "position", {.f3val = {0, 0, 0}}, NULL,}
@@ -46,4 +47,31 @@ Lav_PUBLIC_FUNCTION LavError Lav_createMonoSource(LavObject* node, LavObject* wo
 }
 
 void sourceUpdate(LavSource* source) {
+	//run our position in world coordinates through the camera transform, and then pull out elevation and azimuth.
+	TmVector pos;
+	Lav_getFloat3Property((LavObject*)source, Lav_SOURCE_POSITION, pos.vec, pos.vec+1, pos.vec+2);
+	pos.vec[3] = 1.0f; //turn on translation.
+	//now run through the camera matrix.
+	Tm_transformApply(source->world->camera_transform, pos, &pos);
+	//normalize pos.
+	TmVector npos;
+	float magnitude = pos.vec[0]*pos.vec[0]+pos.vec[1]*pos.vec[1]+pos.vec[2]*pos.vec[2];
+	magnitude = sqrtf(magnitude);
+	npos.vec[0] = pos.vec[0]/magnitude;
+	npos.vec[1] = pos.vec[1]/magnitude;
+	npos.vec[2] = pos.vec[2] / magnitude;
+	//this is the standard cartesian to spherical conversion.
+	const float x = pos.vec[0];
+	const float y = pos.vec[1]; //the vertical component.
+	const float z = pos.vec[2];
+	const float xz = sqrtf(x*x+z*z); //the part in the xz plane.
+	const float elevation = asinf(y/xz); //the elevation angle, from -pi to pi radians.
+	//the weirdness is because we face -z, not -x, and we're taking angles relative to an x of -z.
+	//by negating the x value, we get the angle to also fall clockwise, which is what panners need because of the hrtf data.
+	const float azimuth = atan2f(-z, -x);
+	//now we just set our panner.
+	Lav_setFloatProperty(source->panner_node, Lav_HRTF_AZIMUTH, azimuth);
+	Lav_setFloatProperty(source->panner_node, Lav_HRTF_ELEVATION, elevation);
+	//todo: implement attenuation.
+	return;
 }
