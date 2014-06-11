@@ -21,7 +21,8 @@ struct LavDevice {
 	LavError (*stop)(LavDevice *device);
 	LavError (*kill)(LavDevice* device);
 	//this one is optional.  Intended for simulations and the like that want a chance to do stuff every block.
-	void (*preprocessing_hook)(LavDevice* device);
+	void (*preprocessing_hook)(LavDevice* device, void* argument);
+	void* preprocessing_hook_argument;
 	unsigned int block_size, channels, mixahead;
 	float sr;
 	void* mutex, *device_specific_data;

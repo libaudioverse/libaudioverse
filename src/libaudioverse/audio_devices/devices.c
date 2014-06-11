@@ -165,7 +165,7 @@ LavError deviceDefaultGetBlock(LavDevice* device, float* destination) {
 	CHECK_NOT_NULL(destination);
 	//(maybe) run the preprocessing hook.
 	if(device->preprocessing_hook) {
-		device->preprocessing_hook(device);
+		device->preprocessing_hook(device, device->preprocessing_hook_argument);
 	}
 	//if this device has no output, simply zero the destination and bail out.
 	if(device->output_object == NULL) {

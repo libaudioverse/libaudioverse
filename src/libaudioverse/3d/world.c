@@ -10,39 +10,32 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_sources.h>
 
 void worldListenerUpdateCallback(LavObject* obj, unsigned int slot);
-void worldPreprocessingHook(LavObject* obj, void* param);
+void worldPreprocessingHook(LavDevice* obj, void* param);
 
 LavPropertyTableEntry worldPropertyTable[] = {
 	{Lav_WORLD_LISTENER_ORIENTATION, Lav_PROPERTYTYPE_FLOAT6, "listener_orientation", {.f6val = {0, 0, -1, 0, 1, 0}}, worldListenerUpdateCallback},
 	{Lav_WORLD_LISTENER_POSITION, Lav_PROPERTYTYPE_FLOAT3, "listener_position", {.f3val = {0, 0, 0}}, worldListenerUpdateCallback},
 };
 
-Lav_PUBLIC_FUNCTION LavError Lav_createWorld(LavObject**destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createWorld(LavDevice* device, LavObject**destination) {
 	STANDARD_PREAMBLE;
-	//we need a graph and a mixer node.  If we can't get them, just abort now and save ourselves trouble.
-	LavObject *mixer, *graph;
+	LavObject *mixer;
 	LavError err;
-	//Todo: make these parameters configurable.
-	err = Lav_createGraph(44100, 1024, &graph);
-	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
 	//todo: make these configurable too.
-	Lav_createMixerNode(graph, 16, 2, &mixer);
+	err = Lav_createMixerNode(device, 16, 2, &mixer);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
 	//assign the preprocessing hook.
-	((LavGraph*)graph)->preprocessing_hook = worldPreprocessingHook;
+	device->preprocessing_hook = worldPreprocessingHook;
 	LavObject* obj= calloc(1, sizeof(LavWorld));
 	ERROR_IF_TRUE(obj == NULL, Lav_ERROR_MEMORY);
 	err = initLavObject(0, 0,
-	sizeof(worldPropertyTable)/sizeof(worldPropertyTable[0]), worldPropertyTable, Lav_OBJTYPE_WORLD, graph->block_size, graph->mutex, &obj);
-	//we use the graph's mutex because we need to synchronize with it: we can't be touching properties while the graph is in use.
-	//we use the graph's block size because it doesn't really matter right now but might later.
+	sizeof(worldPropertyTable)/sizeof(worldPropertyTable[0]), worldPropertyTable, Lav_OBJTYPE_WORLD, device, obj);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
 	//this is a convenience pointer wrapping the above pointer.
 	LavWorld* const world = (LavWorld*)obj;
 
 	world->mixer = mixer;
-	world->graph = graph;
-	err = Lav_graphSetOutputNode(graph, mixer);
+	err = Lav_deviceSetOutputObject(device, mixer);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
 
 	//make room for sources.
@@ -53,7 +46,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createWorld(LavObject**destination) {
 	world->num_sources = 0;
 	world->max_sources = 16;
 	//we're going to use this world as the preprocessing hook's argument.
-	((LavGraph*)world->graph)->preprocessing_hook_argument = world;
+	device->preprocessing_hook_argument = world;
 	*destination = obj;
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
@@ -73,9 +66,12 @@ void worldListenerUpdateCallback(LavObject* obj, unsigned int slot) {
 }
 
 //simply asks all sources to update themselves as they see fit.
-void worldPreprocessingHook(LavObject* obj, void* param) {
+void worldPreprocessingHook(LavDevice* device, void* param) {
 	LavWorld *const world = (LavWorld*)param;
 	for(unsigned int i = 0; i < world->num_sources; i++) {
 		sourceUpdate(world->sources+i);
 	}
+}
+
+LavError worldAssociateSource(LavWorld* world, LavSource* source) {
 }
