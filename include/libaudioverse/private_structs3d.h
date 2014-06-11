@@ -19,7 +19,7 @@ typedef struct LavSource LavSource;
 
 struct LavWorld {
 	LavObject base;
-	LavSource *sources;
+	LavSource **sources;
 	unsigned int num_sources, max_sources;
 	TmTransform camera_transform; //the camera transform.
 	LavObject* mixer, *graph;

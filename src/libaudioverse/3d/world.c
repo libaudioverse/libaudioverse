@@ -40,7 +40,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createWorld(LavDevice* device, LavHrtfData *hrt
 
 	//make room for sources.
 	//Todo: also make these hard-coded maxes configurable.
-	LavSource* source_array = calloc(16, sizeof(LavSource*));
+	LavSource** source_array = calloc(16, sizeof(LavSource**));
 	ERROR_IF_TRUE(source_array == NULL, Lav_ERROR_MEMORY);
 	world->sources = source_array;
 	world->num_sources = 0;
@@ -71,10 +71,30 @@ void worldListenerUpdateCallback(LavObject* obj, unsigned int slot) {
 void worldPreprocessingHook(LavDevice* device, void* param) {
 	LavWorld *const world = (LavWorld*)param;
 	for(unsigned int i = 0; i < world->num_sources; i++) {
-		sourceUpdate(world->sources+i);
+		sourceUpdate(world->sources[i]);
 	}
 }
 
 LavError worldAssociateSource(LavWorld* world, LavSource* source) {
-	return Lav_ERROR_NONE;
+	STANDARD_PREAMBLE;
+	//find a free slot.
+	unsigned int slot = 0, found = 0;
+	for(unsigned int i = 0; i < world->max_sources; i++) {
+		if(world->sources[i] == NULL) {
+			slot = i;
+			found = 1;
+			break;
+		}
+	}
+	if(found == 0) {
+		SAFERETURN(Lav_ERROR_MEMORY);
+	}
+	//first, we put it in the slot, then hook it into the mixer.
+	world->sources[slot] = source;
+	LavError err = Lav_setParent((LavObject*)source, world->mixer, 0, world->base.device->channels*slot); //left stereo channel.
+	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
+	err = Lav_setParent((LavObject*)source, world->mixer, 1, world->base.device->channels*slot+1); //the right stereo channel.
+	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
+	SAFERETURN(Lav_ERROR_NONE);
+	STANDARD_CLEANUP_BLOCK;
 }
