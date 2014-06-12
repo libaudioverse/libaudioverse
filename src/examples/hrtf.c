@@ -21,7 +21,7 @@ void main(int argc, char** args) {
 		return;
 	}
 	LavDevice* device;
-	LavObject* fileNode, *hrtfNode;
+	LavObject* fileNode, *hrtfNode, *limit;
 	ERRCHECK(Lav_initializeLibrary());
 	ERRCHECK(Lav_createDefaultAudioOutputDevice(&device));
 	ERRCHECK(Lav_createFileNode(device, args[1], &fileNode));
@@ -31,7 +31,10 @@ void main(int argc, char** args) {
 	ERRCHECK(Lav_createHrtfNode(device, hrtf, &hrtfNode));
 
 	ERRCHECK(Lav_setParent(hrtfNode, fileNode, 0, 0));
-	ERRCHECK(Lav_deviceSetOutputObject(device, hrtfNode));
+	ERRCHECK(Lav_createHardLimiterNode(device, 2, &limit));
+	ERRCHECK(Lav_setParent(limit, hrtfNode, 0, 0));
+	ERRCHECK(Lav_setParent(limit, hrtfNode, 1, 1));
+	ERRCHECK(Lav_deviceSetOutputObject(device, limit));
 	int shouldContinue = 1;
 	printf("Enter pairs of numbers separated by whitespace, where the first is azimuth (anything) and the second\n"
 "is elevation (-90 to 90).\n"
