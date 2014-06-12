@@ -58,7 +58,7 @@ float calculateAttenuation(float distance, float maxDistance, int dm) {
 	switch(dm) {
 		case Lav_DISTANCE_MODEL_LINEAR: return 1.0f-(float)fmin(distance, maxDistance)/maxDistance;
 		case Lav_DISTANCE_MODEL_EXPONENTIAL: return 1.0f/(float)fmax(distance, maxDistance);
-		case Lav_DISTANCE_MODEL_INVERSE_SQUARE: return 1.0f/(float)powf((float)fmax(distance, maxDistance), 2.0f);
+		case Lav_DISTANCE_MODEL_INVERSE_SQUARE: return 1.0f/(float)powf((float)fmin(distance, maxDistance), 2.0f);
 		default: return 0.0f;
 	}
 }

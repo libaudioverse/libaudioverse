@@ -13,6 +13,17 @@ if((x) != Lav_ERROR_NONE) {\
 }\
 } while(0)\
 
+/**Explanation: distance models are 0, 1, and 2.  This function uses that to give us the next one, given the current.  Not great practice.  For testing only.*/
+int calcNextDistanceModel(int model) {
+	model = (model+1)%3;
+	switch(model) {
+		case Lav_DISTANCE_MODEL_LINEAR: printf("Using Linear distance model.\n"); break;
+		case Lav_DISTANCE_MODEL_EXPONENTIAL: printf("Using exponential distance model.\n"); break;
+		case Lav_DISTANCE_MODEL_INVERSE_SQUARE: printf("Using inverse square distance model.\n"); break;
+	}
+	return model;
+}
+
 void main(int argc, char** args) {
 	if(argc != 3) {
 		printf("Usage:%s <soundfile> <hrtf>", args[0]);
@@ -31,6 +42,8 @@ void main(int argc, char** args) {
 	const int resolution = 1000, length = 3000; //length in ms.
 	const float width = 60.0;
 	//do a square over and over.
+	int model = 0;
+	printf("Using linear distance model.");
 	while(1) {
 		for(int i = 0; i < resolution; i++) {
 			Lav_setFloat3Property(source, Lav_SOURCE_POSITION, width*(i/(float)resolution)-width/2, 0, -width/2);
@@ -48,6 +61,8 @@ void main(int argc, char** args) {
 			Lav_setFloat3Property(source, Lav_SOURCE_POSITION, -width/2, 0, -(width*((float)i/resolution)-width/2));
 			sleepFor(length/resolution);
 		}
+		model = calcNextDistanceModel(model);
+		Lav_setIntProperty(source, Lav_SOURCE_DISTANCE_MODEL, model);
 	}
 	sleepFor(2000);
 }
