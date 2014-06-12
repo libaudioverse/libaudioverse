@@ -29,7 +29,7 @@ void main(int argc, char** args) {
 	ERRCHECK(Lav_createFileNode(device, soundFile, &node));
 	ERRCHECK(Lav_createMonoSource(node, world, &source));
 	const int resolution = 1000, length = 3000; //length in ms.
-	const float width = 15.0;
+	const float width = 60.0;
 	//do a square over and over.
 	while(1) {
 		for(int i = 0; i < resolution; i++) {
