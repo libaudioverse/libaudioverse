@@ -72,6 +72,7 @@ struct LavObject {
 	void* mutex;
 	enum Lav_NODETYPES type;
 	int has_processed; //used for optimizations of the graph algorithm.
+	int should_always_process; //if true, this node will be processed every tick regardless of if the graph algorithm finds it.
 };
 
 struct LavNode {
