@@ -43,7 +43,7 @@ void main(int argc, char** args) {
 	const float width = 60.0;
 	//do a square over and over.
 	int model = 0;
-	printf("Using linear distance model.");
+	printf("Using linear distance model.\n");
 	while(1) {
 		for(int i = 0; i < resolution; i++) {
 			Lav_setFloat3Property(source, Lav_SOURCE_POSITION, width*(i/(float)resolution)-width/2, 0, -width/2);
