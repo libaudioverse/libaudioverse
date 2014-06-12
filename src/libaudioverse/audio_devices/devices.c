@@ -115,6 +115,7 @@ LavError deviceAssociateObject(LavDevice* device, LavObject* object) {
 		device->max_object_count *= 2;
 	}
 	device->objects[device->object_count] = object;
+	device->object_count += 1;
 	object->device = device;
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
@@ -139,13 +140,13 @@ LavError deviceDefaultGetBlock(LavDevice* device, float* destination) {
 	if(device->preprocessing_hook) {
 		device->preprocessing_hook(device, device->preprocessing_hook_argument);
 	}
-	//if this device has no output, simply zero the destination and bail out.
 	if(device->output_object == NULL) {
 		memset(destination, 0, sizeof(float)*device->channels*device->block_size);
 		SAFERETURN(Lav_ERROR_NONE);
 	}
-	//tick the device.
-	deviceProcessHelper(device->output_object);
+	else {
+		deviceProcessHelper(device->output_object);
+	}
 	//handle the should_always_process.
 	for(unsigned int i = 0; i < device->object_count; i++) {
 		if(device->objects[i]->should_always_process && device->objects[i]->has_processed == 0) {
