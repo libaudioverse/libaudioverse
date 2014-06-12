@@ -51,14 +51,16 @@ void main(int argc, char** args) {
 	}
 
 	//so far, so good. Make a mixer.
-	LavObject* mixer;
+	LavObject* mixer, *limit;
 	ERRCHECK(Lav_createMixerNode(device, argc-1, channels, &mixer));
-
+	ERRCHECK(Lav_createHardLimiterNode(device, channels, &limit));
 	for(int input = 0; input < mixer->num_inputs ; input++) {
 		ERRCHECK(Lav_setParent(mixer, nodes[input/channels], input%channels, input));
 	}
-
-	ERRCHECK(Lav_deviceSetOutputObject(device, mixer));
+	for(unsigned int i = 0; i < channels; i++) {
+		ERRCHECK(Lav_setParent(limit, mixer, i, i));
+	}
+	ERRCHECK(Lav_deviceSetOutputObject(device, limit));
 	int shouldContinue = 1;
 	char command[512] = "";
 	printf("Enter q to quit.");
