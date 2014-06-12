@@ -28,9 +28,26 @@ void main(int argc, char** args) {
 	ERRCHECK(Lav_createWorld(device, hrtf, &world));
 	ERRCHECK(Lav_createFileNode(device, soundFile, &node));
 	ERRCHECK(Lav_createMonoSource(node, world, &source));
-	for(int i = 0; i < 10; i++) {
-		Lav_setFloat3Property(source, Lav_SOURCE_POSITION, i-5, 0, -1);
-		sleepFor(500);
+	const int resolution = 1000, length = 3000; //length in ms.
+	const float width = 15.0;
+	//do a square over and over.
+	while(1) {
+		for(int i = 0; i < resolution; i++) {
+			Lav_setFloat3Property(source, Lav_SOURCE_POSITION, width*(i/(float)resolution)-width/2, 0, -width/2);
+			sleepFor(length/resolution);
+		}
+		for(int i = 0; i < resolution; i++) {
+			Lav_setFloat3Property(source, Lav_SOURCE_POSITION, width/2, 0, (width*((float)i/resolution)-width/2) );
+			sleepFor(length/resolution);
+		}
+		for(int i = 0; i < resolution; i++) {
+			Lav_setFloat3Property(source, Lav_SOURCE_POSITION, -(width*(i/(float)resolution)-width/2), 0, width/2);
+			sleepFor(length/resolution);
+		}
+		for(int i = 0; i < resolution; i++) {
+			Lav_setFloat3Property(source, Lav_SOURCE_POSITION, -width/2, 0, -(width*((float)i/resolution)-width/2));
+			sleepFor(length/resolution);
+		}
 	}
 	sleepFor(2000);
 }
