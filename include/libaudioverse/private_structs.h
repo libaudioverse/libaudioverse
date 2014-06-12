@@ -71,6 +71,7 @@ struct LavObject {
 	LavProcessorFunction process; //what to call to process this node.
 	void* mutex;
 	enum Lav_NODETYPES type;
+	int has_processed; //used for optimizations of the graph algorithm.
 };
 
 struct LavNode {
