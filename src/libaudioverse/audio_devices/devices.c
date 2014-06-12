@@ -119,44 +119,16 @@ LavError deviceAssociateObject(LavDevice* device, LavObject* object) {
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
 }
-
-//processing algorithm.
-//This struct exists so we can do a recursive call.
-//Todo: abstract arrays of arbetrary items out completely.
-struct AlreadySeenObjects {
-	unsigned int count, max_length;
-	LavObject** objects;
-};
-
-Lav_PUBLIC_FUNCTION void deviceProcessHelper(LavObject* object, struct AlreadySeenObjects *done, int recursingLevel) {
-	if(recursingLevel == 0) {
-		done = malloc(sizeof(struct AlreadySeenObjects));
-		done->count = 0;
-		done->objects = calloc(16, sizeof(LavObject*));
-		done->max_length = 16;
-	}
-	if(object == NULL) {
+Lav_PUBLIC_FUNCTION void deviceProcessHelper(LavObject* object) {
+	if(object == NULL || object->has_processed) { //either it's a null parent, or we've already processed it for someone else.
 		return;
 	}
 	for(unsigned int i = 0; i < object->num_inputs; i++) {
-		deviceProcessHelper(object->input_descriptors[i].parent, done, recursingLevel+1);
-	}
-	for(unsigned int i = 0; i < done->count; i++) {
-		if(done->objects[i] == object) {
-			return;
-		}
-	}
-	if(done->count == done->max_length) {
-		done->max_length *= 2;
-		realloc(done->objects, done->max_length*sizeof(LavObject*));
+		deviceProcessHelper(object->input_descriptors[i].parent);
 	}
 	objectProcessSafe(object);
-	done->objects[done->count] = object;
-	done->count += 1;
-	if(recursingLevel == 0) {
-		free(done->objects);
-		free(done);
-	}
+	//mark the object.
+	object->has_processed = 1;
 }
 
 LavError deviceDefaultGetBlock(LavDevice* device, float* destination) {
@@ -173,7 +145,15 @@ LavError deviceDefaultGetBlock(LavDevice* device, float* destination) {
 		SAFERETURN(Lav_ERROR_NONE);
 	}
 	//tick the device.
-	deviceProcessHelper(device->output_object, NULL, 0);
+	deviceProcessHelper(device->output_object);
+	//handle the should_always_process.
+	for(unsigned int i = 0; i < device->object_count; i++) {
+		if(device->objects[i]->should_always_process && device->objects[i]->has_processed == 0) {
+			objectProcessSafe(device->objects[i]);
+		}
+		//clear the has_processed flag.
+		device->objects[i]->has_processed = 0;
+	}
 	for(unsigned int i = 0; i < device->block_size; i++) {
 		for(unsigned int j = 0; j < device->channels; j++) {
 			if(j >= device->output_object->num_outputs) {
