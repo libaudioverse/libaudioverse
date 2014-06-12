@@ -89,6 +89,7 @@ enum Lav_NODETYPES{
 	Lav_NODETYPE_SINE,
 	Lav_NODETYPE_MIXER,
 	Lav_NODETYPE_ATTENUATOR,
+	Lav_NODETYPE_HARD_LIMITER,
 };
 
 /**Initialize Libaudioverse.*/
@@ -145,6 +146,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_createMixerNode(LavDevice* device, unsigned int
 
 /**Make an attenuator.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createAttenuatorNode(LavDevice* device, unsigned int numInputs, LavObject** destination);
+
+/**A hard limiter*/
+Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterNode(LavDevice* device, unsigned int numInputs, LavObject** destination);
 
 #ifdef __cplusplus
 }

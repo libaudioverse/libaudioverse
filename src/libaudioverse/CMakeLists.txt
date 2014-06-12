@@ -19,6 +19,7 @@ threading/crossthread_ringbuffer.c
 #specific node types.
 nodes/sine.c
 nodes/file.c
+nodes/hard_limiter.c
 nodes/hrtf.c
 nodes/mixer.c
 nodes/attenuator.c
