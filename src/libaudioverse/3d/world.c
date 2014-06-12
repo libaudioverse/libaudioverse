@@ -20,11 +20,15 @@ Lav_PUBLIC_FUNCTION LavError Lav_createWorld(LavDevice* device, LavHrtfData *hrt
 	CHECK_NOT_NULL(hrtf);
 	CHECK_NOT_NULL(destination);
 	LOCK(device->mutex);
-	LavObject *mixer;
+	LavObject *mixer, *limiter;
 	LavError err;
 	//todo: make these configurable too.
 	err = Lav_createMixerNode(device, 16, 2, &mixer);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
+	err = Lav_createHardLimiterNode(device, 2, &limiter);
+	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
+	Lav_setParent(limiter, mixer, 0, 0);
+	Lav_setParent(limiter, mixer, 1, 1);
 	//assign the preprocessing hook.
 	device->preprocessing_hook = worldPreprocessingHook;
 	LavObject* obj= calloc(1, sizeof(LavWorld));
@@ -36,6 +40,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createWorld(LavDevice* device, LavHrtfData *hrt
 	LavWorld* const world = (LavWorld*)obj;
 
 	world->mixer = mixer;
+	world->limiter = limiter;
 	err = Lav_deviceSetOutputObject(device, mixer);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
 
