@@ -75,12 +75,13 @@ void sourceUpdateAzimuthElevation(LavSource* source) {
 	const float z = pos.vec[2];
 	const float xz = sqrtf(x*x+z*z); //the part in the xz plane.
 	const float elevation = asinf(y/xz); //the elevation angle, from -pi to pi radians.
-	//the weirdness is because we face -z, not -x, and we're taking angles relative to an x of -z.
-	//by negating the x value, we get the angle to also fall clockwise, which is what panners need because of the hrtf data.
-	const float azimuth = atan2f(-z, -x);
+	//this next line took a while to get right.
+	//basically, by negating the z axis and leaving everything else alone, angles start going clockwise.
+	const float azimuth = atan2f(x, -z);
 	//now we just set our panner.
-	Lav_setFloatProperty(source->panner_node, Lav_HRTF_AZIMUTH, azimuth);
-	Lav_setFloatProperty(source->panner_node, Lav_HRTF_ELEVATION, elevation);
+	//recall that these want degrees.
+	Lav_setFloatProperty(source->panner_node, Lav_HRTF_AZIMUTH, azimuth/PI*180.0f);
+	Lav_setFloatProperty(source->panner_node, Lav_HRTF_ELEVATION, elevation/PI*180.0f);
 	return;
 }
 
