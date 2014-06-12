@@ -9,7 +9,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <math.h>
 
 LavPropertyTableEntry sourceProperties[] = {
-	{Lav_SOURCE_POSITION, Lav_PROPERTYTYPE_FLOAT3, "position", {.f3val = {0, 0, 0}}, NULL,}
+	{Lav_SOURCE_POSITION, Lav_PROPERTYTYPE_FLOAT3, "position", {.f3val = {0.0f, 0.0f, 0.0f}}, NULL,}
 };
 
 Lav_PUBLIC_FUNCTION LavError Lav_createMonoSource(LavObject* node, LavObject* world, LavObject** destination) {

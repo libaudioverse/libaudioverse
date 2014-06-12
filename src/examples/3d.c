@@ -28,9 +28,9 @@ void main(int argc, char** args) {
 	ERRCHECK(Lav_createWorld(device, hrtf, &world));
 	ERRCHECK(Lav_createFileNode(device, soundFile, &node));
 	ERRCHECK(Lav_createMonoSource(node, world, &source));
-	for(unsigned int i = 0; i < 10; i++) {
+	for(int i = 0; i < 10; i++) {
 		Lav_setFloat3Property(source, Lav_SOURCE_POSITION, i-5, 0, -1);
-		sleepFor(250);
+		sleepFor(500);
 	}
 	sleepFor(2000);
 }
