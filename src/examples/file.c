@@ -35,16 +35,18 @@ int main(int argc, char** args) {
 	}
 	float volume;
 	sscanf(args[3], "%f", &volume);
-	LavObject* atten;
+	LavObject* atten, *limit;
 	ERRCHECK(Lav_createAttenuatorNode(device, node->num_outputs, &atten));
+	ERRCHECK(Lav_createHardLimiterNode(device, node->num_outputs, &limit));
 	for(unsigned int i = 0; i < node->num_outputs; i++) {
 		ERRCHECK(Lav_setParent(atten, node, i, i));
+		ERRCHECK(Lav_setParent(limit, atten, i, i));
 	}
 
 	ERRCHECK(Lav_setFloatProperty(node, Lav_FILE_PITCH_BEND, pitch_bend));
 	ERRCHECK(Lav_setFloatProperty(atten, Lav_ATTENUATOR_MULTIPLIER, volume));
 
-	ERRCHECK(Lav_deviceSetOutputObject(device, atten));
+	ERRCHECK(Lav_deviceSetOutputObject(device, limit));
 
 	char pause[100];
 	fgets(pause, 100, stdin);
