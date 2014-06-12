@@ -14,10 +14,11 @@ if((x) != Lav_ERROR_NONE) {\
 } while(0)\
 
 void main(int argc, char** args) {
-	if(argc != 2) {
-		printf("Usage:%s <souindfile> <hrtf>", args[0]);
+	if(argc != 3) {
+		printf("Usage:%s <soundfile> <hrtf>", args[0]);
+		return;
 	}
-	char soundFile = args[1], hrtfFile = args[2];
+	char *soundFile = args[1], *hrtfFile = args[2];
 	LavDevice* device;
 	LavObject* node, *world, *source;
 	ERRCHECK(Lav_initializeLibrary());
