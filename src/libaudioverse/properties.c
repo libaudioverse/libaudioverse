@@ -144,7 +144,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_getFloat3Property(LavObject* obj, unsigned int 
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_getFloat6Property(LavObject* obj, unsigned int slot, float* v1, float* v2, float* v3, float* v4, float* v5, float* v6) {
-	PROPERTY_GETTER_PREAMBLE(Lav_PROPERTYTYPE_FLOAT3);
+	PROPERTY_GETTER_PREAMBLE(Lav_PROPERTYTYPE_FLOAT6);
 	CHECK_NOT_NULL(v1);
 	CHECK_NOT_NULL(v2);
 	CHECK_NOT_NULL(v3);

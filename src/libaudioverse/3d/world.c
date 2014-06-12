@@ -10,8 +10,8 @@ void worldListenerUpdateCallback(LavObject* obj, unsigned int slot);
 void worldPreprocessingHook(LavDevice* obj, void* param);
 
 LavPropertyTableEntry worldPropertyTable[] = {
-	{Lav_WORLD_LISTENER_ORIENTATION, Lav_PROPERTYTYPE_FLOAT6, "listener_orientation", {.f6val = {0, 0, -1, 0, 1, 0}}, worldListenerUpdateCallback},
-	{Lav_WORLD_LISTENER_POSITION, Lav_PROPERTYTYPE_FLOAT3, "listener_position", {.f3val = {0, 0, 0}}, worldListenerUpdateCallback},
+	{Lav_WORLD_LISTENER_ORIENTATION, Lav_PROPERTYTYPE_FLOAT6, "listener_orientation", {.f6val = {0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f}}, worldListenerUpdateCallback},
+	{Lav_WORLD_LISTENER_POSITION, Lav_PROPERTYTYPE_FLOAT3, "listener_position", {.f3val = {0.0f, 0.0f, 0.0f}}, worldListenerUpdateCallback},
 };
 
 Lav_PUBLIC_FUNCTION LavError Lav_createWorld(LavDevice* device, LavHrtfData *hrtf, LavObject**destination) {
@@ -48,9 +48,11 @@ Lav_PUBLIC_FUNCTION LavError Lav_createWorld(LavDevice* device, LavHrtfData *hrt
 	world->max_sources = 16;
 	//we're going to use this world as the preprocessing hook's argument.
 	device->preprocessing_hook_argument = world;
-	*destination = obj;
 	//save the hrtf.
 	world->hrtf = hrtf;
+	//make the matrix by delegating out to the function responsible for the property.
+	worldListenerUpdateCallback(obj, 0);
+	*destination = obj;
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
 }
