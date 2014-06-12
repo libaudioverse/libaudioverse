@@ -19,6 +19,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createWorld(LavDevice* device, LavHrtfData *hrt
 	CHECK_NOT_NULL(device);
 	CHECK_NOT_NULL(hrtf);
 	CHECK_NOT_NULL(destination);
+	LOCK(device->mutex);
 	LavObject *mixer;
 	LavError err;
 	//todo: make these configurable too.
@@ -77,6 +78,7 @@ void worldPreprocessingHook(LavDevice* device, void* param) {
 
 LavError worldAssociateSource(LavWorld* world, LavSource* source) {
 	STANDARD_PREAMBLE;
+	LOCK(((LavObject*)world)->mutex);
 	//find a free slot.
 	unsigned int slot = 0, found = 0;
 	for(unsigned int i = 0; i < world->max_sources; i++) {
