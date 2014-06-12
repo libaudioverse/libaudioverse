@@ -11,6 +11,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 LavPropertyTableEntry sourceProperties[] = {
 	{Lav_SOURCE_POSITION, Lav_PROPERTYTYPE_FLOAT3, "position", {.f3val = {0.0f, 0.0f, 0.0f}}, NULL,},
 	{Lav_SOURCE_MAX_DISTANCE, Lav_PROPERTYTYPE_FLOAT, "max_distance", {.fval = 50.0f}, NULL},
+	{Lav_SOURCE_DISTANCE_MODEL, Lav_PROPERTYTYPE_INT, "distance_model", {.ival = Lav_DISTANCE_MODEL_LINEAR}, NULL},
 };
 
 Lav_PUBLIC_FUNCTION LavError Lav_createMonoSource(LavObject* node, LavObject* world, LavObject** destination) {
