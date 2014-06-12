@@ -120,6 +120,7 @@ LavError deviceAssociateObject(LavDevice* device, LavObject* object) {
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
 }
+
 Lav_PUBLIC_FUNCTION void deviceProcessHelper(LavObject* object) {
 	if(object == NULL || object->has_processed) { //either it's a null parent, or we've already processed it for someone else.
 		return;
@@ -142,17 +143,22 @@ LavError deviceDefaultGetBlock(LavDevice* device, float* destination) {
 	}
 	if(device->output_object == NULL) {
 		memset(destination, 0, sizeof(float)*device->channels*device->block_size);
-		SAFERETURN(Lav_ERROR_NONE);
 	}
 	else {
 		deviceProcessHelper(device->output_object);
 	}
 	//handle the should_always_process.
-	for(unsigned int i = 0; i < device->object_count; i++) {
-		if(device->objects[i]->should_always_process && device->objects[i]->has_processed == 0) {
-			objectProcessSafe(device->objects[i]);
+	unsigned int did_process = 0;
+	do {
+		did_process = 0;
+		for(unsigned int i = 0; i < device->object_count; i++) {
+			if(device->objects[i]->should_always_process && device->objects[i]->has_processed == 0) {
+				objectProcessSafe(device->objects[i]);
+				did_process = 1;
+			}
 		}
-		//clear the has_processed flag.
+	} while(did_process);
+	for(unsigned int i = 0; i < device->object_count; i++) {
 		device->objects[i]->has_processed = 0;
 	}
 	for(unsigned int i = 0; i < device->block_size; i++) {
