@@ -163,7 +163,7 @@ LavError deviceDefaultGetBlock(LavDevice* device, float* destination) {
 	}
 	for(unsigned int i = 0; i < device->block_size; i++) {
 		for(unsigned int j = 0; j < device->channels; j++) {
-			if(j >= device->output_object->num_outputs) {
+			if(device->output_object == NULL||j >= device->output_object->num_outputs) { //either no output object, or not enough outputs on it.
 				destination[i*device->channels+j] = 0;
 				continue;
 			}
