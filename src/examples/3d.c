@@ -40,7 +40,7 @@ void main(int argc, char** args) {
 	ERRCHECK(Lav_createFileNode(device, soundFile, &node));
 	ERRCHECK(Lav_createMonoSource(node, world, &source));
 	const int resolution = 1000, length = 3000; //length in ms.
-	const float width = 60.0;
+	const float width = 30.0;
 	//do a square over and over.
 	int model = 0;
 	printf("Using linear distance model.\n");
