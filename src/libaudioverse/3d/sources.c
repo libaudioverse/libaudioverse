@@ -42,8 +42,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_createMonoSource(LavObject* node, LavObject* wo
 	source->panner_node = panner;
 	source->attenuator_node = atten;
 	worldAssociateSource((LavWorld*)world, source); //we're interested in playing, etc.
-	SAFERETURN(Lav_ERROR_NONE);
 	*destination = obj; //use the object "view" of the source for this.
+	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
 }
 
