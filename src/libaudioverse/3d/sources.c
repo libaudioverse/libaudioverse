@@ -87,6 +87,16 @@ void sourceUpdateAzimuthElevation(LavSource* source) {
 }
 
 void sourceUpdateAttenuation(LavSource* source) {
+	float x1, y1, z1, x2, y2, z2;
+	Lav_getFloat3Property((LavObject*)source->world, Lav_WORLD_LISTENER_POSITION, &x1, &y1, &z1);
+	Lav_getFloat3Property((LavObject*)source, Lav_SOURCE_POSITION, &x2, &y2, &z2);
+	const float dx=x2-x1, dy=y2-y1, dz=z2-z1;
+	float magnitude = sqrtf(dx*dx+dy*dy+dz*dz);
+	float max_distance;
+	Lav_getFloatProperty((LavObject*)source, Lav_SOURCE_MAX_DISTANCE, &max_distance);
+	magnitude = magnitude > max_distance? max_distance : magnitude;
+	float atten = 1-magnitude/max_distance;
+	Lav_setFloatProperty(source->attenuator_node, Lav_ATTENUATOR_MULTIPLIER, atten);
 }
 
 void sourceUpdate(LavSource* source) {
