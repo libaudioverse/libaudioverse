@@ -93,9 +93,9 @@ LavError worldAssociateSource(LavWorld* world, LavSource* source) {
 	}
 	//first, we put it in the slot, then hook it into the mixer.
 	world->sources[slot] = source;
-	LavError err = Lav_setParent(source->panner_node, world->mixer, 0, world->base.device->channels*slot); //left stereo channel.
+	LavError err = Lav_setParent(world->mixer, source->panner_node, 0, world->base.device->channels*slot); //left stereo channel.
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
-	err = Lav_setParent(source->panner_node, world->mixer, 1, world->base.device->channels*slot+1); //the right stereo channel.
+	err = Lav_setParent(world->mixer, source->panner_node, 1, world->base.device->channels*slot+1); //the right stereo channel.
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
 	source->world = world;
 	SAFERETURN(Lav_ERROR_NONE);
