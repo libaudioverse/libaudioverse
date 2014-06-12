@@ -18,6 +18,7 @@ enum Lav_WORLD_PROPERTIES {
 
 enum Lav_SOURCE_PROPERTIES {
 	Lav_SOURCE_POSITION = 0,
+	Lav_SOURCE_MAX_DISTANCE = 1,
 };
 
 #ifdef __cplusplus
