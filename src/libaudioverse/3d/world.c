@@ -71,7 +71,10 @@ void worldListenerUpdateCallback(LavObject* obj, unsigned int slot) {
 //simply asks all sources to update themselves as they see fit.
 void worldPreprocessingHook(LavDevice* device, void* param) {
 	LavWorld *const world = (LavWorld*)param;
-	for(unsigned int i = 0; i < world->num_sources; i++) {
+	for(unsigned int i = 0; i < world->max_sources; i++) {
+		if(world->sources[i] == NULL) {
+			continue;
+		}
 		sourceUpdate(world->sources[i]);
 	}
 }

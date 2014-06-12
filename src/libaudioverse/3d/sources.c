@@ -47,7 +47,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createMonoSource(LavObject* node, LavObject* wo
 	STANDARD_CLEANUP_BLOCK;
 }
 
-void sourceUpdate(LavSource* source) {
+void sourceUpdateAzimuthElevation(LavSource* source) {
 	//run our position in world coordinates through the camera transform, and then pull out elevation and azimuth.
 	TmVector pos;
 	Lav_getFloat3Property((LavObject*)source, Lav_SOURCE_POSITION, pos.vec, pos.vec+1, pos.vec+2);
@@ -58,6 +58,14 @@ void sourceUpdate(LavSource* source) {
 	TmVector npos;
 	float magnitude = pos.vec[0]*pos.vec[0]+pos.vec[1]*pos.vec[1]+pos.vec[2]*pos.vec[2];
 	magnitude = sqrtf(magnitude);
+	//if magnitude<1, we're "inside the listener"
+	//todo: this needs to be configurable, and is just a quick way to prevent things from blowing up while I work on other stuff.
+	if(magnitude < 1) {
+		Lav_setFloatProperty(source->panner_node, Lav_HRTF_AZIMUTH, 0.0f);
+		Lav_setFloatProperty(source->panner_node, Lav_HRTF_ELEVATION, 0.0f);
+		return;
+	}
+	//if we get heree, we're far enough outside the listener's head that we can do the calculations.
 	npos.vec[0] = pos.vec[0]/magnitude;
 	npos.vec[1] = pos.vec[1]/magnitude;
 	npos.vec[2] = pos.vec[2] / magnitude;
@@ -73,6 +81,13 @@ void sourceUpdate(LavSource* source) {
 	//now we just set our panner.
 	Lav_setFloatProperty(source->panner_node, Lav_HRTF_AZIMUTH, azimuth);
 	Lav_setFloatProperty(source->panner_node, Lav_HRTF_ELEVATION, elevation);
-	//todo: implement attenuation.
 	return;
+}
+
+void sourceUpdateAttenuation(LavSource* source) {
+}
+
+void sourceUpdate(LavSource* source) {
+	sourceUpdateAzimuthElevation(source);
+	sourceUpdateAttenuation(source);
 }
