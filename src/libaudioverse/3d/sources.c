@@ -28,7 +28,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_createMonoSource(LavObject* node, LavObject* wo
 	LavObject *atten, *panner;
 	err = Lav_createHrtfNode(world->device, ((LavWorld*)world)->hrtf, &panner);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
-	Lav_createAttenuatorNode(world->device, 1, &atten);
+	err = Lav_createAttenuatorNode(world->device, 1, &atten);
+	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
 	//we connect the attenuator to the source node, because it's cheeper to attenuate before convolving/panning.
 	err = Lav_setParent(atten, node, 0, 0);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
