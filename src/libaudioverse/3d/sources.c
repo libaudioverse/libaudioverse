@@ -48,6 +48,20 @@ Lav_PUBLIC_FUNCTION LavError Lav_createMonoSource(LavObject* node, LavObject* wo
 	STANDARD_CLEANUP_BLOCK;
 }
 
+//all the casts in the following are due to visual studio brokenness: fmax, fmin, and powf are apparently doing doubles or somesuch nonsense, and I've committed not to have warnings anywhere if possible.
+float calculateAttenuation(float distance, float maxDistance, enum Lav_DISTANCE_MODELS dm) {
+	//if either of these is less than 1, we need to fix that case.
+	//todo: we really need to add in head width or something.  Inside the user's head is a big singularity for all the math.
+	distance = (float)fmax(distance, 1.0f);
+	maxDistance = (float)fmax(maxDistance, 1.0f);
+	switch(dm) {
+		case Lav_DISTANCE_MODEL_LINEAR: return 1.0f-(float)fmin(distance, maxDistance)/maxDistance;
+		case Lav_DISTANCE_MODEL_EXPONENTIAL: return 1.0f/(float)fmax(distance, maxDistance);
+		case Lav_DISTANCE_MODEL_INVERSE_SQUARE: return 1.0f/(float)powf((float)fmax(distance, maxDistance), 2.0f);
+		default: return 0.0f;
+	}
+}
+
 void sourceUpdateAzimuthElevation(LavSource* source) {
 	//run our position in world coordinates through the camera transform, and then pull out elevation and azimuth.
 	TmVector pos;
