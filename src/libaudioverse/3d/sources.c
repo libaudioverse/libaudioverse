@@ -49,7 +49,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createMonoSource(LavObject* node, LavObject* wo
 }
 
 //all the casts in the following are due to visual studio brokenness: fmax, fmin, and powf are apparently doing doubles or somesuch nonsense, and I've committed not to have warnings anywhere if possible.
-float calculateAttenuation(float distance, float maxDistance, enum Lav_DISTANCE_MODELS dm) {
+float calculateAttenuation(float distance, float maxDistance, int dm) {
 	//if either of these is less than 1, we need to fix that case.
 	//todo: we really need to add in head width or something.  Inside the user's head is a big singularity for all the math.
 	distance = (float)fmax(distance, 1.0f);
