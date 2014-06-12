@@ -3,24 +3,32 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #pragma once
 #include "libaudioverse.h"
+#include "private_structs.h"
+#include <transmat.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
+struct LavSource;
+struct LavWorld;
+/**Structs for 3d worlds.*/
+struct LavSource {
+	LavObject base;
+	TmVector position;
+	LavObject* data_node, *panner_node, *attenuator_node;
+	struct LavWorld *world;
+};
+typedef struct LavSource LavSource;
 
-/**This is the interface to the 3d simulation of Libaudioverse, including its properties.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createWorld(LavDevice* device, LavHrtfData *hrtf, LavObject** destination);
-Lav_PUBLIC_FUNCTION LavError Lav_createMonoSource(LavObject* node, LavObject* world, LavObject** destination);
-
-enum Lav_WORLD_PROPERTIES {
-	Lav_WORLD_LISTENER_ORIENTATION = 0,
-	Lav_WORLD_LISTENER_POSITION = 1,
+struct LavWorld {
+	LavObject base;
+	LavSource **sources;
+	unsigned int num_sources, max_sources;
+	TmTransform camera_transform; //the camera transform.
+	LavObject* mixer, *graph;
+	LavHrtfData *hrtf;
 };
 
-enum Lav_SOURCE_PROPERTIES {
-	Lav_SOURCE_POSITION = 0,
-	Lav_SOURCE_MAX_DISTANCE = 1,
-};
-
+typedef struct LavWorld LavWorld;
 #ifdef __cplusplus
 }
 #endif

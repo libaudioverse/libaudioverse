@@ -56,8 +56,11 @@ enum Lav_ERRORS {
 	Lav_ERROR_HRTF_TOO_SMALL = 11,
 	Lav_ERROR_HRTF_INVALID = 12,
 
-	Lav_ERROR_CANNOT_CROSS_DEVICES = 13, //an attempto either create a parent-child connect with objects from different devices or to set an output with an object from a different device.
-	Lav_ERROR_NO_OUTPUTS = 14, //we expected the node to have outputs here, but it didn't.
+	/**This one is odd.  It is what is thrown if you pasas a node with the wrong "shape" to a function, most notably source creation.*/
+	Lav_ERROR_SHAPE = 13,
+
+	Lav_ERROR_CANNOT_CROSS_DEVICES = 14, //an attempto either create a parent-child connect with objects from different devices or to set an output with an object from a different device.
+	Lav_ERROR_NO_OUTPUTS = 15, //we expected the node to have outputs here, but it didn't.
 	Lav_ERROR_INTERNAL_BUG = 0xFFFF, //an easily recognized value for debugging.
 };
 
@@ -72,10 +75,14 @@ enum Lav_PROPERTYTYPES {
 	Lav_PROPERTYTYPE_FLOAT = 0x2,
 	Lav_PROPERTYTYPE_DOUBLE = 0x4,
 	Lav_PROPERTYTYPE_STRING = 0x8,
+	Lav_PROPERTYTYPE_FLOAT3 = 0xf,
+	Lav_PROPERTYTYPE_FLOAT6 = 0x10,
 };
 
 /**These are used to tag nodes with their type, so that external languages may see them.*/
 enum Lav_NODETYPES{
+	Lav_OBJTYPE_WORLD,
+	Lav_OBJTYPE_SOURCE_MONO,
 	Lav_NODETYPE_ZEROS,
 	Lav_NODETYPE_FILE,
 	Lav_NODETYPE_HRTF,
@@ -110,11 +117,14 @@ Lav_PUBLIC_FUNCTION LavError Lav_setIntProperty(LavObject* obj, unsigned int slo
 Lav_PUBLIC_FUNCTION LavError Lav_setFloatProperty(LavObject *obj, unsigned int slot, float value);
 Lav_PUBLIC_FUNCTION LavError Lav_setDoubleProperty(LavObject *obj, unsigned int slot, double value);
 Lav_PUBLIC_FUNCTION LavError Lav_setStringProperty(LavObject*obj, unsigned int slot, char* value);
+Lav_PUBLIC_FUNCTION LavError Lav_setFloat3Property(LavObject* obj, unsigned int slot, float v1, float v2, float v3);
+Lav_PUBLIC_FUNCTION LavError Lav_setFloat6Property(LavObject* obj, unsigned int slot, float v1, float v2, float v3, float v4, float v5, float v6);
 Lav_PUBLIC_FUNCTION LavError Lav_getIntProperty(LavObject*obj, unsigned int slot, int *destination);
 Lav_PUBLIC_FUNCTION LavError Lav_getFloatProperty(LavObject* obj, unsigned int slot, float *destination);
 Lav_PUBLIC_FUNCTION LavError Lav_getDoubleProperty(LavObject*obj, unsigned int slot, double *destination);
 Lav_PUBLIC_FUNCTION LavError Lav_getStringProperty(LavObject* obj, unsigned int slot, char** destination);
-
+Lav_PUBLIC_FUNCTION LavError Lav_getFloat3Property(LavObject* obj, unsigned int slot, float* v1, float* v2, float* v3);
+Lav_PUBLIC_FUNCTION LavError Lav_getFloat6Property(LavObject* obj, unsigned int slot, float* v1, float* v2, float* v3, float* v4, float* v5, float* v6);
 /**This is a default node processing function. It simply writes 0s to all outputs, and can be useful when you need to provide audio and have nothing to do.*/
 Lav_PUBLIC_FUNCTION LavError Lav_processDefault(LavObject *obj);
 

@@ -9,7 +9,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 LavError attenuatorProcessor(LavObject *node);
 
 LavPropertyTableEntry attenuatorPropertyTable[1] = {
-	{Lav_ATTENUATOR_MULTIPLIER, Lav_PROPERTYTYPE_FLOAT, "multiplier", {.fval = 440}, NULL},
+	{Lav_ATTENUATOR_MULTIPLIER, Lav_PROPERTYTYPE_FLOAT, "multiplier", {.fval = 1.0}, NULL},
 };
 
 Lav_PUBLIC_FUNCTION LavError Lav_createAttenuatorNode(LavDevice* device, unsigned int numInputs, LavObject **destination) {

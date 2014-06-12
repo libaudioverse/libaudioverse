@@ -46,7 +46,7 @@ LavError mixerProcessor(LavObject *obj) {
 			data->accumulator_array[j%data->inputs_per_parent] += samp;
 		}
 		for(unsigned int j = 0; j < obj->num_outputs; j++) {
-			obj->outputs[j][i] = data->accumulator_array[j]/(obj->num_inputs/data->inputs_per_parent);
+			obj->outputs[j][i] = data->accumulator_array[j];
 			data->accumulator_array[j] = 0;
 		}
 	}
