@@ -94,13 +94,6 @@ struct LavCrossThreadRingBuffer {
 };
 typedef struct LavCrossThreadRingBuffer LavCrossThreadRingBuffer;
 
-/**A table of audio data.*/
-struct LavTable {
-	unsigned int length; //length in samples.  Also the max index before index wrapping.  Includes the extra sample at the end.
-	float* samples;
-};
-typedef struct LavTable LavTable;
-
 //The struct for property table entries.
 struct LavPropertyTableEntry {
 	int slot;
