@@ -10,7 +10,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 LavError hrtfProcessor(LavObject *obj);
 //this is the processor we go to if the hrtf is moved.
 LavError hrtfRecomputeHrirProcessor(LavObject *obj);
-void hrtfPropertyChanged(LavObject* obj, int slot);
+void hrtfPropertyChanged(LavObject* obj, unsigned int slot, int isInProcessor);
 
 struct HrtfNodeData {
 	float *history;
@@ -59,7 +59,7 @@ Lav_NODETYPE_HRTF, device, (LavObject**)&retval);
 	STANDARD_CLEANUP_BLOCK;
 }
 
-void hrtfPropertyChanged(LavObject* obj, int slot) {
+void hrtfPropertyChanged(LavObject* obj, unsigned int slot, int isInProcessor) {
 	obj->process = hrtfRecomputeHrirProcessor;
 }
 

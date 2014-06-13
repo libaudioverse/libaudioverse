@@ -19,7 +19,7 @@ struct fileinfo {
 };
 
 Lav_PUBLIC_FUNCTION LavError fileNodeProcessor(LavObject* obj);
-void fileNodePositionChanged(LavObject* obj, unsigned int slot);
+void fileNodePositionChanged(LavObject* obj, unsigned int slot, int isInProcessor);
 
 LavPropertyTableEntry filePropertyTable[] = {
 	{Lav_FILE_POSITION, Lav_PROPERTYTYPE_FLOAT, "position", {.fval = 0.0f}, fileNodePositionChanged},
@@ -83,7 +83,10 @@ Lav_NODETYPE_FILE, device, (LavObject**)&node);
 	STANDARD_CLEANUP_BLOCK;
 }
 
-void fileNodePositionChanged(LavObject* obj, unsigned int slot) {
+void fileNodePositionChanged(LavObject* obj, unsigned int slot, int isInProcessor) {
+	if(isInProcessor) {
+		return;
+	}
 	float pos;
 	Lav_getFloatProperty(obj, Lav_FILE_POSITION, &pos);
 	struct fileinfo *data = ((LavNode*)obj)->data;
@@ -118,7 +121,6 @@ Lav_PUBLIC_FUNCTION LavError fileNodeProcessor(LavObject* obj) {
 		}
 		prevStart = data->start;
 	}
-//This needs infrastructure, or we get clicking.
-//	Lav_setFloatProperty(obj, Lav_FILE_POSITION, (data->start+data->offset)/data->fileSr);
+	Lav_setFloatProperty(obj, Lav_FILE_POSITION, (data->start+data->offset)/data->fileSr);
 	return Lav_ERROR_NONE;
 }
