@@ -48,7 +48,21 @@ int main(int argc, char** args) {
 
 	ERRCHECK(Lav_deviceSetOutputObject(device, limit));
 
-	char pause[100];
-	fgets(pause, 100, stdin);
-	return 0;
+	//enter the transducer loop.
+	char command[1024];
+	printf("Commands: q(q)uit, (s)eek, (v)olume, (p)itch bend\n");
+	while(1) {
+		fgets(command, 1023, stdin);
+		if(command[0] == 'q') break;
+		float value;
+		char* start = &command[1];
+		while(*start == ' ') start+=1; //skip spaces.
+		sscanf(start, "%f", &value);
+		switch(command[0]) {
+			case 'p': Lav_setFloatProperty(node, Lav_FILE_PITCH_BEND, value); break;
+			case 'v': Lav_setFloatProperty(atten, Lav_ATTENUATOR_MULTIPLIER, value); break;
+			case 's': Lav_setFloatProperty(node, Lav_FILE_POSITION, value); break;
+			default: printf("Unrecognized command.\n"); break;
+		}
+	}
 }
