@@ -87,7 +87,7 @@ LavError portaudioDeviceConfigurer(LavDevice* device) {
 	unsigned int blockSize, mixahead, sr, channels;
 	blockSize = device->block_size;
 	mixahead = device->mixahead;
-	sr = device->sr;
+	sr = (unsigned int)device->sr;
 	channels = device->channels;
 	void* th; //the audio output thread.
 	LavError err;

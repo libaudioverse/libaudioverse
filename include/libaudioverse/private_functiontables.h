@@ -7,7 +7,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 extern "C" {
 #endif
 extern float sineTable[];
-const extern int sineTableLength;
+const extern unsigned int sineTableLength;
 
 Lav_PUBLIC_FUNCTION LavError initializeFunctionTables();
 

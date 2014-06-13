@@ -38,7 +38,7 @@ Lav_PUBLIC_FUNCTION LavError createGenericDevice(
 	void* mut;
 	LavError err = createMutex(&mut);
 	retval->mutex = mut;
-	retval->sr = sr;
+	retval->sr = (float)sr;
 	retval->block_size = blockSize;
 	retval->channels = channels;
 

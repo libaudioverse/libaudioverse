@@ -6,7 +6,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <transmat.h>
 #include <stdlib.h>
 
-void worldListenerUpdateCallback(LavObject* obj, unsigned int slot);
+void worldListenerUpdateCallback(LavObject* obj, unsigned int slot, int isInProcessor);
 void worldPreprocessingHook(LavDevice* obj, void* param);
 
 LavPropertyTableEntry worldPropertyTable[] = {
@@ -56,7 +56,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createWorld(LavDevice* device, LavHrtfData *hrt
 	//save the hrtf.
 	world->hrtf = hrtf;
 	//make the matrix by delegating out to the function responsible for the property.
-	worldListenerUpdateCallback(obj, 0);
+	worldListenerUpdateCallback(obj, 0, 0);
 	*destination = obj;
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
@@ -64,7 +64,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createWorld(LavDevice* device, LavHrtfData *hrt
 
 //called when the listener properties are changed.
 //updates the camera transform with whatever the new values are.
-void worldListenerUpdateCallback(LavObject* obj, unsigned int slot) {
+void worldListenerUpdateCallback(LavObject* obj, unsigned int slot, int isInProcessor) {
 	TmVector at, up, pos;
 	float* at_p = at.vec, *up_p =up.vec, *pos_p = pos.vec;
 	Lav_getFloat6Property(obj, Lav_WORLD_LISTENER_ORIENTATION, at_p, at_p+1, at_p+2, up_p, up_p+1, up_p+2);

@@ -13,7 +13,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 Justification: this greatly simplifies interpolating between samples when the end of the array is coming up, completely removing some operations and simplifying weight calculations.*/
 float sineTable[44101];
-const int sineTableLength = 44100;
+const unsigned int sineTableLength = 44100;
 #define PI (3.14159f)
 
 Lav_PUBLIC_FUNCTION void computeSineTable() {

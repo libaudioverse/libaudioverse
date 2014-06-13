@@ -54,7 +54,7 @@ void main(int argc, char** args) {
 	LavObject* mixer, *limit;
 	ERRCHECK(Lav_createMixerNode(device, argc-1, channels, &mixer));
 	ERRCHECK(Lav_createHardLimiterNode(device, channels, &limit));
-	for(int input = 0; input < mixer->num_inputs ; input++) {
+	for(unsigned int input = 0; input < mixer->num_inputs ; input++) {
 		ERRCHECK(Lav_setParent(mixer, nodes[input/channels], input%channels, input));
 	}
 	for(unsigned int i = 0; i < channels; i++) {

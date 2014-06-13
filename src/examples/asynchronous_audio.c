@@ -23,7 +23,7 @@ void main() {
 	ERRCHECK(Lav_deviceSetOutputObject(device, node));
 	ERRCHECK(Lav_setFloatProperty(node, Lav_SINE_FREQUENCY, 0));
 	for(unsigned int i = 0; i < 1000; i++) {
-		ERRCHECK(Lav_setFloatProperty(node, Lav_SINE_FREQUENCY, i));
+		ERRCHECK(Lav_setFloatProperty(node, Lav_SINE_FREQUENCY, (float)i));
 		sleepFor(5);
 	}
 	sleepFor(2000);
