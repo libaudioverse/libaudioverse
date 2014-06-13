@@ -12,7 +12,7 @@ Lav_PUBLIC_FUNCTION LavError lav_resetProperty(LavObject *obj, unsigned int slot
 	ERROR_IF_TRUE(slot >= obj->num_properties || slot < 0, Lav_ERROR_INVALID_SLOT);
 	memcpy(&(obj->properties[slot]->value), &(obj->properties[slot]->default_value), sizeof(obj->properties[slot]->value)); //yes, really.
 	if(obj->properties[slot]->post_changed_callback) {
-		obj->properties[slot]->post_changed_callback(obj, slot);
+		obj->properties[slot]->post_changed_callback(obj, slot, obj->is_in_processor);
 	}
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
@@ -29,7 +29,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_setIntProperty(LavObject *obj, unsigned int slo
 	obj->properties[slot]->value.ival = value;
 	SAFERETURN(Lav_ERROR_NONE);
 	if(obj->properties[slot]->post_changed_callback) {
-		obj->properties[slot]->post_changed_callback(obj, slot);
+		obj->properties[slot]->post_changed_callback(obj, slot, obj->is_in_processor);
 	}
 	STANDARD_CLEANUP_BLOCK;
 }
@@ -38,7 +38,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_setFloatProperty(LavObject *obj, unsigned int s
 	PROPERTY_SETTER_PREAMBLE(Lav_PROPERTYTYPE_FLOAT);
 	obj->properties[slot]->value.fval = value;
 	if(obj->properties[slot]->post_changed_callback) {
-		obj->properties[slot]->post_changed_callback(obj, slot);
+		obj->properties[slot]->post_changed_callback(obj, slot, obj->is_in_processor);
 	}
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
@@ -48,7 +48,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_setDoubleProperty(LavObject *obj, unsigned int 
 	PROPERTY_SETTER_PREAMBLE(Lav_PROPERTYTYPE_DOUBLE);
 	obj->properties[slot]->value.dval = value;
 	if(obj->properties[slot]->post_changed_callback) {
-		obj->properties[slot]->post_changed_callback(obj, slot);
+		obj->properties[slot]->post_changed_callback(obj, slot, obj->is_in_processor);
 	}
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
@@ -60,7 +60,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_setStringProperty(LavObject *obj, unsigned int 
 	char* string = strdup(value);
 	obj->properties[slot]->value.sval = string;
 	if(obj->properties[slot]->post_changed_callback) {
-		obj->properties[slot]->post_changed_callback(obj, slot);
+		obj->properties[slot]->post_changed_callback(obj, slot, obj->is_in_processor);
 	}
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
@@ -72,7 +72,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_setFloat3Property(LavObject* obj, unsigned int 
 	obj->properties[slot]->value.f3val[1] = v2;
 	obj->properties[slot]->value.f3val[2] = v3;
 	if(obj->properties[slot]->post_changed_callback) {
-		obj->properties[slot]->post_changed_callback(obj, slot);
+		obj->properties[slot]->post_changed_callback(obj, slot, obj->is_in_processor);
 	}
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
@@ -87,7 +87,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_setFloat6Property(LavObject* obj, unsigned int 
 	obj->properties[slot]->value.f6val[4] = v5;
 	obj->properties[slot]->value.f6val[5] = v6;
 	if(obj->properties[slot]->post_changed_callback) {
-		obj->properties[slot]->post_changed_callback(obj, slot);
+		obj->properties[slot]->post_changed_callback(obj, slot, obj->is_in_processor);
 	}
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
@@ -185,7 +185,7 @@ Lav_PUBLIC_FUNCTION LavProperty **makePropertyArrayFromTable(unsigned int count,
 		property_array[i]->name = table[i].name;
 		property_array[i]->value = table[i].default_value;
 		property_array[i]->default_value = table[i].default_value;
-	property_array[i]->post_changed_callback = table[i].post_changed;
+		property_array[i]->post_changed_callback = table[i].post_changed;
 	}
 
 	return property_array;

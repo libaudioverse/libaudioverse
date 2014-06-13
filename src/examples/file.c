@@ -16,8 +16,8 @@ if((x) != Lav_ERROR_NONE) {\
 } while(0)\
 
 int main(int argc, char** args) {
-	if(argc != 4) {
-		printf("Syntax: %s <path> <pitch_bend> <volume>", args[0]);
+	if(argc != 2) {
+		printf("Syntax: %s <path>");
 		return 0;
 	}
 
@@ -27,28 +27,37 @@ int main(int argc, char** args) {
 	ERRCHECK(Lav_initializeLibrary());
 	ERRCHECK(Lav_createDefaultAudioOutputDevice(&device));
 	ERRCHECK(Lav_createFileNode(device, path, &node));
-
-	float pitch_bend = 1.0f;
-	sscanf(args[2], "%f", &pitch_bend);
-	if(pitch_bend <= 0.0f) {
-		pitch_bend = 1.0f;
-	}
-	float volume;
-	sscanf(args[3], "%f", &volume);
-	LavObject* atten, *limit;
+	LavObject* atten, *limit, *mix;
 	ERRCHECK(Lav_createAttenuatorNode(device, node->num_outputs, &atten));
-	ERRCHECK(Lav_createHardLimiterNode(device, node->num_outputs, &limit));
+	ERRCHECK(Lav_createHardLimiterNode(device, node->num_outputs == 1 ? 2 : node->num_outputs , &limit));
+	ERRCHECK(Lav_createMixerNode(device, 1, 2, &mix));
 	for(unsigned int i = 0; i < node->num_outputs; i++) {
 		ERRCHECK(Lav_setParent(atten, node, i, i));
-		ERRCHECK(Lav_setParent(limit, atten, i, i));
+		ERRCHECK(Lav_setParent(mix, atten, i, i));
+		ERRCHECK(Lav_setParent(limit, mix, i, i));
 	}
-
-	ERRCHECK(Lav_setFloatProperty(node, Lav_FILE_PITCH_BEND, pitch_bend));
-	ERRCHECK(Lav_setFloatProperty(atten, Lav_ATTENUATOR_MULTIPLIER, volume));
-
+	//this makes mono play through both channels.
+	if(node->num_outputs == 1) {
+		ERRCHECK(Lav_setParent(mix, atten, 0, 1));
+		ERRCHECK(Lav_setParent(limit, mix, 0, 1));
+	}
 	ERRCHECK(Lav_deviceSetOutputObject(device, limit));
 
-	char pause[100];
-	fgets(pause, 100, stdin);
-	return 0;
+	//enter the transducer loop.
+	char command[1024];
+	printf("Commands: q(q)uit, (s)eek, (v)olume, (p)itch bend\n");
+	while(1) {
+		fgets(command, 1023, stdin);
+		if(command[0] == 'q') break;
+		float value;
+		char* start = &command[1];
+		while(*start == ' ') start+=1; //skip spaces.
+		sscanf(start, "%f", &value);
+		switch(command[0]) {
+			case 'p': Lav_setFloatProperty(node, Lav_FILE_PITCH_BEND, value); break;
+			case 'v': Lav_setFloatProperty(atten, Lav_ATTENUATOR_MULTIPLIER, value); break;
+			case 's': Lav_setFloatProperty(node, Lav_FILE_POSITION, value); break;
+			default: printf("Unrecognized command.\n"); break;
+		}
+	}
 }
