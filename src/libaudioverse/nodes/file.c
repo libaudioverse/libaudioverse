@@ -7,6 +7,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <sndfile.h>
 #include <stdlib.h>
 #include <string.h>
+#include <intrin.h>
 
 struct fileinfo {
 	float delta;
@@ -95,6 +96,7 @@ Lav_PUBLIC_FUNCTION LavError fileNodeProcessor(LavObject* obj) {
 	struct fileinfo *data = node->data;
 	float pitch_bend = 1.0f;
 	Lav_getFloatProperty((LavObject*)node, Lav_FILE_PITCH_BEND, &pitch_bend);
+	unsigned int prevStart = data->start;
 	for(unsigned int i = 0; i < obj->device->block_size; i++) {
 		if(data->start >= data->frames) {
 			for(unsigned int j = 0; j < obj->num_outputs; j++) obj->outputs[j][i] = 0.0f;
@@ -114,7 +116,9 @@ Lav_PUBLIC_FUNCTION LavError fileNodeProcessor(LavObject* obj) {
 			data->start += 1;
 			data->offset-= 1;
 		}
+		prevStart = data->start;
 	}
-	Lav_setFloatProperty(obj, Lav_FILE_POSITION, (data->start+data->offset)/data->fileSr);
+//This needs infrastructure, or we get clicking.
+//	Lav_setFloatProperty(obj, Lav_FILE_POSITION, (data->start+data->offset)/data->fileSr);
 	return Lav_ERROR_NONE;
 }
