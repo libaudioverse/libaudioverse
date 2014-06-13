@@ -18,9 +18,10 @@ struct fileinfo {
 };
 
 Lav_PUBLIC_FUNCTION LavError fileNodeProcessor(LavObject* obj);
+void fileNodePositionChanged(LavObject* obj, unsigned int slot);
 
 LavPropertyTableEntry filePropertyTable[] = {
-	{Lav_FILE_POSITION, Lav_PROPERTYTYPE_FLOAT, "position", {.fval = 0.0f}, NULL},
+	{Lav_FILE_POSITION, Lav_PROPERTYTYPE_FLOAT, "position", {.fval = 0.0f}, fileNodePositionChanged},
 	{Lav_FILE_PITCH_BEND, Lav_PROPERTYTYPE_FLOAT, "pitch_bend", {.fval = 1.0f}, NULL},
 };
 
@@ -79,6 +80,14 @@ Lav_NODETYPE_FILE, device, (LavObject**)&node);
 	*destination = (LavObject*)node;
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
+}
+
+void fileNodePositionChanged(LavObject* obj, unsigned int slot) {
+	float pos;
+	Lav_getFloatProperty(obj, Lav_FILE_POSITION, &pos);
+	struct fileinfo *data = ((LavNode*)obj)->data;
+	data->start = (unsigned int)(pos*data->fileSr);
+	data->offset = 0;
 }
 
 Lav_PUBLIC_FUNCTION LavError fileNodeProcessor(LavObject* obj) {
