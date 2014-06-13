@@ -128,8 +128,13 @@ Lav_PUBLIC_FUNCTION void deviceProcessHelper(LavObject* object) {
 	for(unsigned int i = 0; i < object->num_inputs; i++) {
 		deviceProcessHelper(object->input_descriptors[i].parent);
 	}
-	objectProcessSafe(object);
-	//mark the object.
+	if(object->process) { //protect against objects without processors, which can happen.
+		//object->is_in_processor is the third parameter to property callbacks.
+		object->is_in_processor = 1;
+		object->process(object);
+		object->is_in_processor = 0;
+	}
+	//mark the object as processed.
 	object->has_processed = 1;
 }
 
@@ -153,7 +158,11 @@ LavError deviceDefaultGetBlock(LavDevice* device, float* destination) {
 		did_process = 0;
 		for(unsigned int i = 0; i < device->object_count; i++) {
 			if(device->objects[i]->should_always_process && device->objects[i]->has_processed == 0) {
-				objectProcessSafe(device->objects[i]);
+				if(device->objects[i]->process) {
+					device->objects[i]->is_in_processor = 1;
+					device->objects[i]->process(device->objects[i]);
+					device->objects[i]->is_in_processor = 0;
+				}
 				did_process = 1;
 			}
 		}
