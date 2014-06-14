@@ -217,6 +217,8 @@ Lav_PUBLIC_FUNCTION LavProperty **makePropertyArrayFromTable(unsigned int count,
 		property_array[i]->name = table[i].name;
 		property_array[i]->value = table[i].default_value;
 		property_array[i]->default_value = table[i].default_value;
+		property_array[i]->minimum_value = table[i].minimum_value;
+		property_array[i]->maximum_value = table[i].maximum_value;
 		property_array[i]->post_changed_callback = table[i].post_changed;
 	}
 
