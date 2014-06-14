@@ -46,7 +46,7 @@ typedef void (*LavPropertyChangedCallback)(struct LavObject* obj, unsigned int s
 
 struct LavProperty {
 	enum Lav_PROPERTYTYPES type;
-	LavPropertyValue value, default_value;
+	LavPropertyValue value, default_value, minimum_value, maximum_value;
 	char* name;
 	LavPropertyChangedCallback post_changed_callback;
 };

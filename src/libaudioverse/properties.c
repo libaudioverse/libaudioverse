@@ -161,6 +161,38 @@ Lav_PUBLIC_FUNCTION LavError Lav_getFloat6Property(LavObject* obj, unsigned int 
 	STANDARD_CLEANUP_BLOCK;
 }
 
+/**Functions to get property ranges.*/
+
+Lav_PUBLIC_FUNCTION LavError Lav_getIntPropertyRange(LavObject* obj, unsigned int slot, int* lower, int* upper) {
+	PROPERTY_GETTER_PREAMBLE(Lav_PROPERTYTYPE_INT);
+	CHECK_NOT_NULL(lower);
+	CHECK_NOT_NULL(upper);
+	*lower = obj->properties[slot]->minimum_value.ival;
+	*upper = obj->properties[slot]->maximum_value.ival;
+	SAFERETURN(Lav_ERROR_NONE);
+	STANDARD_CLEANUP_BLOCK;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_getFloatPropertyRange(LavObject* obj, unsigned int slot, float* lower, float* upper) {
+	PROPERTY_GETTER_PREAMBLE(Lav_PROPERTYTYPE_FLOAT);
+	CHECK_NOT_NULL(lower);
+	CHECK_NOT_NULL(upper);
+	*lower = obj->properties[slot]->minimum_value.fval;
+	*upper = obj->properties[slot]->maximum_value.fval;
+	SAFERETURN(Lav_ERROR_NONE);
+	STANDARD_CLEANUP_BLOCK;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_getDoublePropertyRange(LavObject* obj, unsigned int slot, double* lower, double* upper) {
+	PROPERTY_GETTER_PREAMBLE(Lav_PROPERTYTYPE_DOUBLE);
+	CHECK_NOT_NULL(lower);
+	CHECK_NOT_NULL(upper);
+	*lower = obj->properties[slot]->minimum_value.dval;
+	*upper = obj->properties[slot]->maximum_value.dval;
+	SAFERETURN(Lav_ERROR_NONE);
+	STANDARD_CLEANUP_BLOCK;
+}
+
 //Knows how to sort these.
 int compareLavPropertyTableEntries(const void* a, const void* b) {
 	const LavPropertyTableEntry *i1 = a, *i2 = b;
