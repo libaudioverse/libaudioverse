@@ -22,8 +22,8 @@ struct HrtfNodeData {
 typedef struct HrtfNodeData HrtfNodeData;
 
 LavPropertyTableEntry hrtfPropertyTable[] = {
-	{Lav_HRTF_AZIMUTH, Lav_PROPERTYTYPE_FLOAT, "azimuth", {.fval = 0.0f}, hrtfPropertyChanged},
-	{Lav_HRTF_ELEVATION, Lav_PROPERTYTYPE_FLOAT, "elevation", {.fval = 0.0f}, hrtfPropertyChanged},
+	{Lav_HRTF_AZIMUTH, Lav_PROPERTYTYPE_FLOAT, "azimuth", {.fval = 0.0f},{.fval = -INFINITY}, {.fval = INFINITY}, hrtfPropertyChanged},
+	{Lav_HRTF_ELEVATION, Lav_PROPERTYTYPE_FLOAT, "elevation", {.fval = 0.0f}, {.fval = -90.0f}, {.fval = 90.0f}, hrtfPropertyChanged},
 };
 
 Lav_PUBLIC_FUNCTION LavError Lav_createHrtfNode(LavDevice* device, LavHrtfData* hrtf, LavObject **destination) {

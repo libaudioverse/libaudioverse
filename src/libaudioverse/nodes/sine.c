@@ -5,6 +5,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <math.h>
 #include <stdlib.h>
 #include <libaudioverse/private_all.h>
+#include <math.h>
 
 LavError sineProcessor(LavObject *obj);
 struct sineinfo {
@@ -15,7 +16,7 @@ struct sineinfo {
 
 
 LavPropertyTableEntry sinePropertyTable[1] = {
-	{Lav_SINE_FREQUENCY, Lav_PROPERTYTYPE_FLOAT, "frequency", {.fval = 440}, NULL},
+	{Lav_SINE_FREQUENCY, Lav_PROPERTYTYPE_FLOAT, "frequency", {.fval = 440}, {.fval = 0.0f}, {.fval = INFINITY}, NULL},
 };
 
 Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavDevice* device, LavObject  **destination) {

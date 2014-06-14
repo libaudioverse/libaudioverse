@@ -99,7 +99,7 @@ struct LavPropertyTableEntry {
 	int slot;
 	enum Lav_PROPERTYTYPES type;
 	char* name;
-	union LavPropertyValue default_value;
+	union LavPropertyValue default_value, minimum_value, maximum_value;
 	LavPropertyChangedCallback post_changed;
 };
 typedef struct LavPropertyTableEntry LavPropertyTableEntry;
