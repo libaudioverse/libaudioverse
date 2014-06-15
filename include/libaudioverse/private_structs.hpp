@@ -31,27 +31,10 @@ struct LavDevice {
 	struct LavObject* output_object;
 };
 
-union LavPropertyValue {
-	float fval;
-	int ival;
-	double dval;
-	char* sval;
-	float f3val[3]; //vectors.
-	float f6val[6]; //orientations.
-};
-typedef union LavPropertyValue LavPropertyValue;
 
 struct LavObject;
-typedef void (*LavPropertyChangedCallback)(struct LavObject* obj, unsigned int slot, int isFromProcessMethod);
 
-struct LavProperty {
-	enum Lav_PROPERTYTYPES type;
-	LavPropertyValue value, default_value, minimum_value, maximum_value;
-	char* name;
-	LavPropertyChangedCallback post_changed_callback;
-};
 
-typedef struct LavProperty LavProperty;
 
 struct LavInputDescriptor {
 	LavObject* parent;
@@ -93,16 +76,6 @@ struct LavCrossThreadRingBuffer {
 	int last_op;
 };
 typedef struct LavCrossThreadRingBuffer LavCrossThreadRingBuffer;
-
-//The struct for property table entries.
-struct LavPropertyTableEntry {
-	int slot;
-	enum Lav_PROPERTYTYPES type;
-	char* name;
-	union LavPropertyValue default_value, minimum_value, maximum_value;
-	LavPropertyChangedCallback post_changed;
-};
-typedef struct LavPropertyTableEntry LavPropertyTableEntry;
 
 #ifdef __cplusplus
 }

@@ -7,6 +7,32 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 extern "C" {
 #endif
 
+typedef void (*LavPropertyChangedCallback)(struct LavObject* obj, unsigned int slot, int isFromProcessMethod);
+
+union LavPropertyValue {
+	float fval;
+	int ival;
+	double dval;
+	char* sval;
+	float f3val[3]; //vectors.
+	float f6val[6]; //orientations.
+};
+
+struct LavProperty {
+	enum Lav_PROPERTYTYPES type;
+	LavPropertyValue value, default_value, minimum_value, maximum_value;
+	char* name;
+	LavPropertyChangedCallback post_changed_callback;
+};
+
+struct LavPropertyTableEntry {
+	int slot;
+	enum Lav_PROPERTYTYPES type;
+	char* name;
+	union LavPropertyValue default_value, minimum_value, maximum_value;
+	LavPropertyChangedCallback post_changed;
+};
+
 LavProperty **makePropertyArrayFromTable(unsigned int count, LavPropertyTableEntry *table);
 
 #ifdef __cplusplus
