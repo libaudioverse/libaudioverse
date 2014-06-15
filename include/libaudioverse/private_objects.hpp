@@ -28,6 +28,9 @@ struct LavObject {
 	int has_processed; //used for optimizations of the graph algorithm.
 	int should_always_process; //if true, this node will be processed every tick regardless of if the graph algorithm finds it.
 	int is_in_processor; //set to 1 by the graph processing algorithm exactly before the process method is called, and set to 0 immediately after.
+
+	//this preventss all sorts of trouble.
+	virtual ~LavObject() {}
 };
 
 LavError initLavObject(unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, LavPropertyTableEntry* propertyTable, enum  Lav_NODETYPES type, LavDevice* device, LavObject *destination);
