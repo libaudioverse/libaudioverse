@@ -8,9 +8,9 @@ extern "C" {
 #endif
 
 //initialize the audio backend.
-Lav_PUBLIC_FUNCTION LavError initializeAudioBackend();
+LavError initializeAudioBackend();
 //any null callback gets replaced with a default implementation that "does something sensible".
-Lav_PUBLIC_FUNCTION LavError createGenericDevice(
+LavError createGenericDevice(
 	unsigned int blockSize,
 	unsigned int channels,
 	unsigned int sr,

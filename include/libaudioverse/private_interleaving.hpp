@@ -6,8 +6,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 extern "C" {
 #endif
 
-Lav_PUBLIC_FUNCTION float** uninterleaveSamplesFast(unsigned int channels, unsigned int frames, float* samples);
-Lav_PUBLIC_FUNCTION float* interleaveSamplesFast(unsigned int channels, unsigned int count, float** uninterleavedSamples);
+float** uninterleaveSamplesFast(unsigned int channels, unsigned int frames, float* samples);
+float* interleaveSamplesFast(unsigned int channels, unsigned int count, float** uninterleavedSamples);
 #ifdef __cplusplus
 }
 #endif

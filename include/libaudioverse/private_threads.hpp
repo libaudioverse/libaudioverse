@@ -10,32 +10,32 @@ extern "C" {
 
 typedef void (*LavThreadCapableFunction)(void* param);
 
-Lav_PUBLIC_FUNCTION LavError threadRun(LavThreadCapableFunction fn, void* param, void** destination);
-Lav_PUBLIC_FUNCTION LavError threadJoinAndFree(void* t);
-Lav_PUBLIC_FUNCTION LavError createMutex(void **destination);
-Lav_PUBLIC_FUNCTION LavError freeMutex(void *m);
-Lav_PUBLIC_FUNCTION LavError mutexLock(void *m);
-Lav_PUBLIC_FUNCTION LavError mutexUnlock(void *m);
+LavError threadRun(LavThreadCapableFunction fn, void* param, void** destination);
+LavError threadJoinAndFree(void* t);
+LavError createMutex(void **destination);
+LavError freeMutex(void *m);
+LavError mutexLock(void *m);
+LavError mutexUnlock(void *m);
 
 /**The following functions are threadsafe ringbuffers*/
 typedef struct LavCrossThreadRingBuffer LavCrossThreadRingBuffer;
-Lav_PUBLIC_FUNCTION LavError createCrossThreadRingBuffer(int length, int elementSize, LavCrossThreadRingBuffer **destination);
-Lav_PUBLIC_FUNCTION int CTRBGetAvailableWrites(LavCrossThreadRingBuffer* buffer);
-Lav_PUBLIC_FUNCTION int CTRBGetAvailableReads(LavCrossThreadRingBuffer *buffer);
-Lav_PUBLIC_FUNCTION void CTRBGetItems(LavCrossThreadRingBuffer *buffer, int count, void* destination);
-Lav_PUBLIC_FUNCTION void CTRBWriteItems(LavCrossThreadRingBuffer *buffer, int count, void* data);
+LavError createCrossThreadRingBuffer(int length, int elementSize, LavCrossThreadRingBuffer **destination);
+int CTRBGetAvailableWrites(LavCrossThreadRingBuffer* buffer);
+int CTRBGetAvailableReads(LavCrossThreadRingBuffer *buffer);
+void CTRBGetItems(LavCrossThreadRingBuffer *buffer, int count, void* destination);
+void CTRBWriteItems(LavCrossThreadRingBuffer *buffer, int count, void* data);
 
 /**These are utilities that operate on the current thread.*/
-Lav_PUBLIC_FUNCTION void sleepFor(unsigned int milliseconds); //sleep.
-Lav_PUBLIC_FUNCTION void yield(); //yield this thread.
+void sleepFor(unsigned int milliseconds); //sleep.
+void yield(); //yield this thread.
 
 /**An atomic flag that can be either cleared or set.
 
 The point of this is to allow for thraed killing and other such communications.  It is guaranteed to be lock-free on all architectures.*/
-Lav_PUBLIC_FUNCTION LavError createAFlag(void** destination);
-Lav_PUBLIC_FUNCTION int aFlagTestAndSet(void* flag);
-Lav_PUBLIC_FUNCTION void aFlagClear(void* flag);
-Lav_PUBLIC_FUNCTION void freeAFlag(void* flag);
+LavError createAFlag(void** destination);
+int aFlagTestAndSet(void* flag);
+void aFlagClear(void* flag);
+void freeAFlag(void* flag);
 
 #ifdef __cplusplus
 }

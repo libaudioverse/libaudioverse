@@ -6,7 +6,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 extern "C" {
 #endif
 
-Lav_PUBLIC_FUNCTION LavError initializeAudioOutput();
+LavError initializeAudioOutput();
 #ifdef __cplusplus
 }
 #endif

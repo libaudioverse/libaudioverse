@@ -16,10 +16,10 @@ struct LavHrtfData {
 };
 
 //get the appropriate coefficients for one channel.  A stereo hrtf is two calls to this function.
-Lav_PUBLIC_FUNCTION void hrtfComputeCoefficientsMono(LavHrtfData *hrtf, float elevation, float azimuth, float* out);
+void hrtfComputeCoefficientsMono(LavHrtfData *hrtf, float elevation, float azimuth, float* out);
 
 //warning: writes directly to the output destination, doesn't allocate a new one.
-Lav_PUBLIC_FUNCTION void hrtfComputeCoefficients(LavHrtfData *hrtf, float elevation, float azimuth, float* left, float* right);
+void hrtfComputeCoefficients(LavHrtfData *hrtf, float elevation, float azimuth, float* left, float* right);
 
 #ifdef __cplusplus
 }

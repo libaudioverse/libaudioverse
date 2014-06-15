@@ -6,7 +6,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #ifdef __cplusplus
 extern "C" {
 #endif
-Lav_PUBLIC_FUNCTION void sourceUpdate(LavSource *source);
+void sourceUpdate(LavSource *source);
 #ifdef __cplusplus
 }
 #endif

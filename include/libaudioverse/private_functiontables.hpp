@@ -9,7 +9,7 @@ extern "C" {
 extern float sineTable[];
 const extern unsigned int sineTableLength;
 
-Lav_PUBLIC_FUNCTION LavError initializeFunctionTables();
+LavError initializeFunctionTables();
 
 #ifdef __cplusplus
 }

@@ -7,7 +7,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 extern "C" {
 #endif
 
-Lav_PUBLIC_FUNCTION LavProperty **makePropertyArrayFromTable(unsigned int count, LavPropertyTableEntry *table);
+LavProperty **makePropertyArrayFromTable(unsigned int count, LavPropertyTableEntry *table);
 
 #ifdef __cplusplus
 }

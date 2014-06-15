@@ -9,9 +9,9 @@ extern "C" {
 
 //Apparently, C's mod is in fact not the discrete math operation.
 //This function handles that.
-Lav_PUBLIC_FUNCTION int ringmodi(int dividend, int divisor);
-Lav_PUBLIC_FUNCTION float ringmodf(float dividend, float divisor);
-Lav_PUBLIC_FUNCTION double ringmod(double dividend,double divisor);
+int ringmodi(int dividend, int divisor);
+float ringmodf(float dividend, float divisor);
+double ringmod(double dividend,double divisor);
 #ifdef __cplusplus
 }
 #endif
