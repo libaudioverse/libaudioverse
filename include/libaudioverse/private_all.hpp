@@ -7,7 +7,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "libaudioverse_properties.hpp"
 #include "private_macros.hpp"
 #include "private_constants.hpp"
-#include "private_structs.hpp"
 #include "private_threads.hpp"
 #include "private_interleaving.hpp"
 #include "private_properties.hpp"
