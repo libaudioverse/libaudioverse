@@ -8,15 +8,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 //All structs here are private.
 //Anything not exposed directly through the public api is followed by its typedef in this file.
 
-
-
-struct LavNode {
-	LavObject base;
-	double internal_time;
-	void *data; //place for node subtypes to place data.
-};
-typedef struct LavNode LavNode;
-
 struct LavCrossThreadRingBuffer {
 	int read_position, write_position, element_size, length;
 	void* lock;

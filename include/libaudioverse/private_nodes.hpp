@@ -5,4 +5,10 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "libaudioverse.h"
 #include "private_structs.hpp"
 
+struct LavNode {
+	LavObject base;
+	double internal_time;
+	void *data; //place for node subtypes to place data.
+};
+
 LavError createNode(unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, LavPropertyTableEntry* propertyTable, enum Lav_NODETYPES type, LavDevice* device, LavObject** destination);
