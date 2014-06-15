@@ -1,34 +1,34 @@
 add_library(libaudioverse SHARED
-objects.c
-nodes.c
-properties.c
-functiontables.c
-initialization.c
-interleaving.c
-hrtf.c
-dspmath.c
-memory_manager.c
+objects.cpp
+nodes.cpp
+properties.cpp
+functiontables.cpp
+initialization.cpp
+interleaving.cpp
+hrtf.cpp
+dspmath.cpp
+memory_manager.cpp
 
 #threading related functions and structures
 threading/threads.cpp
-threading/crossthread_ringbuffer.c
+threading/crossthread_ringbuffer.cpp
 
 #specific node types.
-nodes/sine.c
-nodes/file.c
-nodes/hard_limiter.c
-nodes/hrtf.c
-nodes/mixer.c
-nodes/attenuator.c
+nodes/sine.cpp
+nodes/file.cpp
+nodes/hard_limiter.cpp
+nodes/hrtf.cpp
+nodes/mixer.cpp
+nodes/attenuator.cpp
 
 #the audio backends and related functionality.
-audio_devices/device_negociation.c
-audio_devices/devices.c
-audio_devices/portaudio.c
+audio_devices/device_negociation.cpp
+audio_devices/devices.cpp
+audio_devices/portaudio.cpp
 
 #the 3D abstraction on top of libaudioverse.
-3d/world.c
-3d/sources.c
+3d/world.cpp
+3d/sources.cpp
 )
 TARGET_LINK_LIBRARIES(libaudioverse ${libaudioverse_required_libraries})
 
