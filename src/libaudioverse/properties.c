@@ -27,6 +27,7 @@ LavProperty* const prop = obj->properties[slot]\
 
 Lav_PUBLIC_FUNCTION LavError Lav_setIntProperty(LavObject *obj, unsigned int slot, int value) {
 	PROPERTY_SETTER_PREAMBLE(Lav_PROPERTYTYPE_INT);
+	ERROR_IF_TRUE(value < prop->minimum_value.ival || value > prop->maximum_value.ival, Lav_ERROR_RANGE);
 	prop->value.ival = value;
 	SAFERETURN(Lav_ERROR_NONE);
 	if(prop->post_changed_callback) {
@@ -37,6 +38,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_setIntProperty(LavObject *obj, unsigned int slo
 
 Lav_PUBLIC_FUNCTION LavError Lav_setFloatProperty(LavObject *obj, unsigned int slot, float value) {
 	PROPERTY_SETTER_PREAMBLE(Lav_PROPERTYTYPE_FLOAT);
+	ERROR_IF_TRUE(value < prop->minimum_value.fval || value > prop->maximum_value.fval, Lav_ERROR_RANGE);
 	prop->value.fval = value;
 	if(prop->post_changed_callback) {
 		prop->post_changed_callback(obj, slot, obj->is_in_processor);
@@ -47,6 +49,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_setFloatProperty(LavObject *obj, unsigned int s
 
 Lav_PUBLIC_FUNCTION LavError Lav_setDoubleProperty(LavObject *obj, unsigned int slot, double value) {
 	PROPERTY_SETTER_PREAMBLE(Lav_PROPERTYTYPE_DOUBLE);
+	ERROR_IF_TRUE(value < prop->minimum_value.dval || value > prop->maximum_value.dval, Lav_ERROR_RANGE);
 	prop->value.dval = value;
 	if(prop->post_changed_callback) {
 		prop->post_changed_callback(obj, slot, obj->is_in_processor);
