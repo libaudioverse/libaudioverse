@@ -4,9 +4,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include "private_threads.hpp"
 #include "libaudioverse.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 typedef void (*LavFreeingFunction)(void*);
 
@@ -26,7 +23,3 @@ Lav_PUBLIC_FUNCTION void mmanagerFree(void* manager, void* ptr);
 //This is incredibly useful for file handles.  File handles are the whole reason for this function.
 //it also makes internal operations easier.
 Lav_PUBLIC_FUNCTION LavError mmanagerAssociatePointer(void *manager, void* ptr, LavFreeingFunction freer);
-
-#ifdef __cplusplus
-}
-#endif

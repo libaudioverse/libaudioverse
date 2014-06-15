@@ -4,9 +4,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include "private_threads.hpp"
 #include "libaudioverse.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 struct LavInputDescriptor {
 	LavObject* parent;
@@ -36,7 +33,3 @@ struct LavObject {
 LavError initLavObject(unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, LavPropertyTableEntry* propertyTable, enum  Lav_NODETYPES type, LavDevice* device, LavObject *destination);
 LavError Lav_createObject(unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, LavPropertyTableEntry* propertyTable, enum  Lav_NODETYPES type, LavDevice* device, LavObject **destination);
 LavError objectProcessSafe(LavObject* obj);
-
-#ifdef __cplusplus
-}
-#endif

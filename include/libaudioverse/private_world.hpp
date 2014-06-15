@@ -3,11 +3,5 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #pragma once
 #include "private_structs3d.hpp"
-#ifdef __cplusplus
-extern "C" {
-#endif
-LavError worldAssociateSource(LavWorld* world, LavSource* source);
 
-#ifdef __cplusplus
-}
-#endif
+LavError worldAssociateSource(LavWorld* world, LavSource* source);

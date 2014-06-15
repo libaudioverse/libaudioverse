@@ -5,9 +5,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "libaudioverse.h"
 #include "private_structs.hpp"
 #include <transmat.h>
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 struct LavSource;
 struct LavWorld;
 /**Structs for 3d worlds.*/
@@ -29,6 +27,3 @@ struct LavWorld {
 };
 
 typedef struct LavWorld LavWorld;
-#ifdef __cplusplus
-}
-#endif

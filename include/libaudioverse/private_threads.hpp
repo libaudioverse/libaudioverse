@@ -4,10 +4,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include "libaudioverse.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 typedef void (*LavThreadCapableFunction)(void* param);
 
 LavError threadRun(LavThreadCapableFunction fn, void* param, void** destination);
@@ -36,7 +32,3 @@ LavError createAFlag(void** destination);
 int aFlagTestAndSet(void* flag);
 void aFlagClear(void* flag);
 void freeAFlag(void* flag);
-
-#ifdef __cplusplus
-}
-#endif
