@@ -4,6 +4,26 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include "private_structs.hpp"
 
+//audio devices.
+//the specific functionality of an audio device needs to be hidden behind the void* data parameter, but the three function pointers *must* be filled out.
+//furthermore, mutex *must* be set to something and block_size must be greater than 0.
+//The above assumptions are made throughout the entire library.
+struct LavDevice {
+	LavError (*get_block)(LavDevice* device, float* destination);
+	LavError (*start)(LavDevice* device);
+	LavError (*stop)(LavDevice *device);
+	LavError (*kill)(LavDevice* device);
+	//this one is optional.  Intended for simulations and the like that want a chance to do stuff every block.
+	void (*preprocessing_hook)(LavDevice* device, void* argument);
+	void* preprocessing_hook_argument;
+	unsigned int block_size, channels, mixahead;
+	float sr;
+	void* mutex, *device_specific_data;
+	struct LavObject** objects;
+	unsigned object_count, max_object_count;
+	struct LavObject* output_object;
+};
+
 //initialize the audio backend.
 LavError initializeAudioBackend();
 //any null callback gets replaced with a default implementation that "does something sensible".
