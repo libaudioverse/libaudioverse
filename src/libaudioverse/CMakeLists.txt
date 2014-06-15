@@ -7,7 +7,6 @@ initialization.cpp
 interleaving.cpp
 hrtf.cpp
 dspmath.cpp
-memory_manager.cpp
 
 #threading related functions and structures
 threading/threads.cpp
