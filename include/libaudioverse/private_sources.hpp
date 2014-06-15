@@ -4,4 +4,13 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include "private_structs3d.hpp"
 
+struct LavWorld;
+
+struct LavSource {
+	LavObject base;
+	TmVector position;
+	LavObject* data_node, *panner_node, *attenuator_node;
+	LavWorld *world;
+};
+
 void sourceUpdate(LavSource *source);
