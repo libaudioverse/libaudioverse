@@ -79,6 +79,8 @@ Lav_NODETYPE_FILE, device, (LavObject**)&node);
 	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
 	node->data = f;
 	((LavObject*)node)->process = fileNodeProcessor;
+	//set the range of the position property so that we can seek exactly to the end of the file.
+	((LavObject*)node)->properties[Lav_FILE_POSITION]->maximum_value.fval = f->frames/f->fileSr;
 	*destination = (LavObject*)node;
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
