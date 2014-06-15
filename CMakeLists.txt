@@ -15,9 +15,6 @@ INCLUDE_DIRECTORIES(${LIBSNDFILE_INCLUDE_DIR})
 LINK_DIRECTORIES(${LIBSNDFILE_LIBRARY_DIR})
 endif()
 
-#uthash
-include_directories("${CMAKE_SOURCE_DIR}/uthash/src")
-
 #more msvc specific stuff: if on windows, do special handling for portaudio.
 if(${MSVC})
 #turn off the secure crt warnings, because we're not allowed to use microsoft specific functions.
