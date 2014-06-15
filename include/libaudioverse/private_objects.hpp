@@ -8,6 +8,31 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 extern "C" {
 #endif
 
+struct LavInputDescriptor {
+	LavObject* parent;
+	unsigned int output;
+};
+
+/**Things all Libaudioverse objects have.*/
+//typedef for processing function:
+typedef LavError (*LavProcessorFunction)(LavObject* obj);
+struct LavObject {
+	LavDevice *device;
+	LavProperty **properties;
+	unsigned int num_properties;
+	float** inputs;
+	LavInputDescriptor *input_descriptors;
+	float** outputs;
+	unsigned int num_outputs;
+	unsigned int num_inputs;
+	LavProcessorFunction process; //what to call to process this node.
+	void* mutex;
+	enum Lav_NODETYPES type;
+	int has_processed; //used for optimizations of the graph algorithm.
+	int should_always_process; //if true, this node will be processed every tick regardless of if the graph algorithm finds it.
+	int is_in_processor; //set to 1 by the graph processing algorithm exactly before the process method is called, and set to 0 immediately after.
+};
+
 LavError initLavObject(unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, LavPropertyTableEntry* propertyTable, enum  Lav_NODETYPES type, LavDevice* device, LavObject *destination);
 LavError Lav_createObject(unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, LavPropertyTableEntry* propertyTable, enum  Lav_NODETYPES type, LavDevice* device, LavObject **destination);
 LavError objectProcessSafe(LavObject* obj);
