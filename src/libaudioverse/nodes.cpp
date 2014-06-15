@@ -6,7 +6,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 #include <stdlib.h>
 #include <string.h>
-#include <libaudioverse/private_all.h>
+#include <libaudioverse/private_all.hpp>
 
 
 Lav_PUBLIC_FUNCTION LavError Lav_createNode(unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, LavPropertyTableEntry* propertyTable, enum Lav_NODETYPES type, LavDevice* device, LavObject** destination) {

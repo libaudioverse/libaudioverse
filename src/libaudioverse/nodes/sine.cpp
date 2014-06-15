@@ -4,7 +4,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 #include <math.h>
 #include <stdlib.h>
-#include <libaudioverse/private_all.h>
+#include <libaudioverse/private_all.hpp>
 #include <math.h>
 
 LavError sineProcessor(LavObject *obj);

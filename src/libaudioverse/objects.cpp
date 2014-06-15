@@ -6,7 +6,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 #include <stdlib.h>
 #include <string.h>
-#include <libaudioverse/private_all.h>
+#include <libaudioverse/private_all.hpp>
 
 float zerobuffer[Lav_MAX_BLOCK_SIZE] = {0}; //this is a shared buffer for the "no parent" case.
 

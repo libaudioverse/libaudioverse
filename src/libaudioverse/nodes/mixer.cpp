@@ -4,7 +4,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 #include <math.h>
 #include <stdlib.h>
-#include <libaudioverse/private_all.h>
+#include <libaudioverse/private_all.hpp>
+
 struct LavMixerData {
 	float* accumulator_array;
 	unsigned int inputs_per_parent;

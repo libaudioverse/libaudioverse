@@ -6,7 +6,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 #include <stdlib.h>
 #include <string.h>
-#include <libaudioverse/private_all.h>
+#include <libaudioverse/private_all.hpp>
 #include <math.h>
 
 /**As a property of these tables, the last sample of the array must be the same as the first, and length must not include the last sample.

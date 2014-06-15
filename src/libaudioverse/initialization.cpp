@@ -3,7 +3,7 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 
 /**Initialize libaudioverse.*/
-#include <libaudioverse/private_all.h>
+#include <libaudioverse/private_all.hpp>
 
 typedef LavError (*initfunc_t)();
 

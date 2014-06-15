@@ -6,7 +6,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 Todo: replace this with a lock-free implementation assuming that it becomes a bottleneck.
 */
-#include <libaudioverse/private_all.h>
+#include <libaudioverse/private_all.hpp>
 #include <stdlib.h>
 #include <string.h>
 const int READ_OP = -1;

@@ -8,7 +8,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <string.h>
 #include <stdint.h>
 #include <stddef.h>
-#include <libaudioverse/private_all.h>
+#include <libaudioverse/private_all.hpp>
 #include <math.h>
 
 /**Swaps bytes to reverse endianness.*/

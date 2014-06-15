@@ -6,7 +6,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <thread>
 #include <atomic>
 #include <chrono>
-#include <libaudioverse/private_all.h>
+#include <libaudioverse/private_all.hpp>
 using namespace std;
 
 Lav_PUBLIC_FUNCTION LavError createMutex(void **destination) {
