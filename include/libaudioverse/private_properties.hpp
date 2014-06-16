@@ -11,36 +11,73 @@ union LavPropertyValue {
 	float fval;
 	int ival;
 	double dval;
-	char* sval;
 	float f3val[3]; //vectors.
 	float f6val[6]; //orientations.
 };
 
-//you're supposed to set the ranges and default via the returned references here.
-//syntactically, this was the best I could come up with without accessing member variables; and I have decided that member variable access is bad.
 class LavProperty {
 	public:
-	//int, float, and double constructors.
-	//the order is initial/default, min, max.
-	//these cannot fail.
-	void reset() {value = default_value;}
-	LavPropertyValue& getValue() {return value;}
-	void setValue(const LavPropertyValue &v) {value = v;}
-	LavPropertyValue& getMin() {return minimum_value;}
-	LavPropertyValue& getMax() {return maximum_value;}
-	LavPropertyValue& getDefault() {return default_value;}
+	LavProperty(int property_type): type(property_type) {}
+	void reset() {value = default_value; string_value = default_string_value;}
 	int getType() { return type;}
 	void setType(int t) {type = t;}
 	int isType(int t) { return type == t;} //we have to typecheck these everywhere.
-	string getName() {return name.c_str();}
+	std::string getName() {return name;}
 	void setName(string n) { name = n;}
 	int getTag() {return tag;}
 	void setTag(int t) {tag = t;}
 
+	//yes, really. This is as uggly as it looks.
+	int getIntValue() { return value.ival;}
+	void setIntValue(int v) {value.ival = v;}
+	int getIntDefault() {return default_value.ival;}
+	void setIntDefault(int d) {default_value.ival = d;}
+	int getIntMin() {return minimum_value.ival;}
+	int getIntMax() {return maximum_value.ival;}
+	void setIntRange(int a, int b) {minimum_value.ival = a; maximum_value.ival = b;}
+
+	//floats...
+	float getFloatValue() {return value.fval;}
+	void setFloatValue(float v) {value.fval = v;}
+	float getFloatDefault() {return default_value.fval;}
+	void setFloatDefault(float v) {default_value.fval = v;}
+	float getFloatMin() {return minimum_value.fval;}
+	float getFloatMax() {return maximum_value.fval;}
+	void setFloatRange(float a, float b) {minimum_value.fval = a; maximum_value.fval = b;}
+
+	//doubles...
+	double getDoubleValue() {return value.dval;}
+	void setDoubleValue(double v) {value.dval = v;}
+	double getDoubleMin() {return minimum_value.dval;}
+	double getDoubleMax() {return maximum_value.dval;}
+	void setDoubleRange(double a, double b) {minimum_value.dval = a; maximum_value.dval = b;}
+
+	//float3 vectors.
+	const float* getFloat3value() {return &value.f3val;}
+	const float* getFloat3Default() {return default_value.f3val;}
+	void setFloat3Value(const float* const v) {memcpy(value.f3val, v, sizeof(float)*3);}
+	void setFloat3Value(float v1, float v2, float v3) {value.f3val[0] = v1; value.f3val[1] = v2; value.f3val[2] = v3;}
+	void setFloat3Default(const float* const v) {memcpy(default_value.f3val, v, sizeof(float)*3);}
+	void setFloat3Default(float v1, float v2, float v3) {default_value.f3val[0] = v1; default_value.f3val[1] = v2; default_value.f3val[2] = v3;}
+
+	//float6 vectors.
+	const float* getFloat6value() {return value.f6val;}
+	const float* getFloat6Default() {return default_value.f6val;}
+	void setFloat6Value(const float* const v) {memcpy(&value.f6val, v, sizeof(float)*6);}
+	void setFloat6Value(float v1, float v2, float v3, float v4, float v5, float v6) {value.f6val[0] = v1; value.f6val[1] = v2; value.f6val[2] = v3; value.f6val[3] = v4; value.f6val[4] = v5; value.f6val[5] = v6;}
+	void setFloat6Default(const float* const v) {memcpy(default_value.f6val, v, sizeof(float)*6);}
+	void setFloat6Default(float v1, float v2, float v3, float v4, float v5, float v6) {default_value.f6val[0] = v1; default_value.f6val[1] = v2; default_value.f6val[2] = v3; default_value.f6val[3] = v4; default_value.f6val[4] = v5; default_value.f6val[5] = v6;}
+
+	//strings:
+	stringg getStringValue() { return string_value;}
+	void setStringValue(string s) { string_value = s;}
+	string getStringDefault() { returnd default_string_value;}
+	void setStringDefault(string s) { default_string_value = s;}
+
 	private:
 	int type, tag;
 	LavPropertyValue value, default_value, minimum_value, maximum_value;
-	std::string name;
+	std::string name, string_value, default_string_value;
 	LavPropertyChangedCallback post_changed_callback;
 };
 
@@ -50,3 +87,4 @@ LavProperty* makeFloatProperty(float default, float min, float max);
 LavProperty* makeDoubleProperty(float default, float min, float max);
 lavProperty* makeFloat3Property(float default[3]);
 LavProperty* makeFloat6Property(float default[6]);
+LavProperty* makeStringProperty(std::string default);
