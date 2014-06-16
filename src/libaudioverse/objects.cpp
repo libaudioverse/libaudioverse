@@ -22,62 +22,32 @@ void objectComputeInputBuffers(LavObject* obj) {
 	}
 }
 
-Lav_PUBLIC_FUNCTION LavError initLavObject(unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, LavPropertyTableEntry* propertyTable, enum  Lav_NODETYPES type, LavDevice* device, LavObject *destination) {
-	STANDARD_PREAMBLE;
-	CHECK_NOT_NULL(destination);
-	CHECK_NOT_NULL(device);
-	destination->num_inputs = numInputs;
-	destination->num_outputs = numOutputs;
-	destination->mutex = device->mutex;
+LavObject::LavObject(LavDevice* device, unsigned int numInputs, unsigned int numOutputs) {
+	num_inputs = numInputs;
+	num_outputs = numOutputs;
+	mutex = device->mutex;
 	//allocations:
 	if(numInputs > 0) {
-		destination->input_descriptors = calloc(numInputs, sizeof(LavInputDescriptor));
-		ERROR_IF_TRUE(destination->input_descriptors == NULL, Lav_ERROR_MEMORY);
-		destination->inputs = calloc(numInputs, sizeof(float*));
-		ERROR_IF_TRUE(destination->inputs == NULL, Lav_ERROR_MEMORY);
+		input_descriptors = calloc(numInputs, sizeof(LavInputDescriptor));
+		inputs = calloc(numInputs, sizeof(float*));
 	}
 
 	if(numOutputs > 0) {
-		destination->outputs = calloc(numOutputs, sizeof(float**));
-		ERROR_IF_TRUE(destination->outputs == NULL, Lav_ERROR_MEMORY);
-		for(unsigned int i = 0; i < destination->num_outputs; i++) {
-			destination->outputs[i] = calloc(device->block_size, sizeof(float));
-			ERROR_IF_TRUE(destination->outputs[i] == NULL, Lav_ERROR_MEMORY);
+		outputs = calloc(numOutputs, sizeof(float**));
+		for(unsigned int i = 0; i < num_outputs; i++) {
+			outputs[i] = calloc(device->block_size, sizeof(float));
 		}
 	}
+	deviceAssociateObject(device, destination);
+	computeInputBuffers(); //at the moment, this is going to just make them all 0, but it takes effect once parents are added.
 
-	destination->type = type;
-
-	if(numProperties > 0 && propertyTable != NULL) {
-		LavProperty** tbl = makePropertyArrayFromTable(numProperties, propertyTable);
-		ERROR_IF_TRUE(tbl == NULL, Lav_ERROR_MEMORY);
-		destination->num_properties = numProperties;
-		destination->properties = tbl;
-	}
-
-	LavError err = deviceAssociateObject(device, destination);
-	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
-	objectComputeInputBuffers(destination); //at the moment, this is going to just make them all 0, but it takes effect once parents are added.
-	SAFERETURN(Lav_ERROR_NONE);
-	STANDARD_CLEANUP_BLOCK;
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_createObject(unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, LavPropertyTableEntry *propertyTable, enum  Lav_NODETYPES type, LavDevice* device, LavObject **destination) {
-	STANDARD_PREAMBLE;
-	CHECK_NOT_NULL(device);
-	LavObject *retval = calloc(1, sizeof(LavObject));
-	ERROR_IF_TRUE(retval == NULL, Lav_ERROR_MEMORY);
-	LavError err = initLavObject(numInputs, numOutputs, numProperties, propertyTable, type, device, retval);
-	ERROR_IF_TRUE(err != Lav_ERROR_NONE, err);
-	*destination = retval;
-	SAFERETURN(Lav_ERROR_NONE);
-	STANDARD_CLEANUP_BLOCK;
-}
 
 /*Default Processing function.*/
-Lav_PUBLIC_FUNCTION LavError Lav_processDefault(LavObject* obj) {
-	for(unsigned int i = 0; i < obj->num_outputs; i++) {
-		memset(obj->outputs[i], 0, obj->device->block_size*sizeof(float));
+LavError LavObject::process() {
+	for(unsigned int i = 0; i < num_outputs; i++) {
+		memset(outputs[i], 0, obj->device->block_size*sizeof(float));
 	}
 	return Lav_ERROR_NONE;
 }
