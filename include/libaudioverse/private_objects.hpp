@@ -30,10 +30,16 @@ class LavObject {
 	int should_always_process; //if true, this node will be processed every tick regardless of if the graph algorithm finds it.
 	int is_in_processor; //set to 1 by the graph processing algorithm exactly before the process method is called, and set to 0 immediately after.
 
+	//construction.
+	//note that the default LavObject has no properties and that it is up to subclass constructors to add/configure them.
+	LavObject(LavDevice* device, unsigned int numInputs, unsigned int numOutputs);
+
 	//this preventss all sorts of trouble.
 	virtual ~LavObject() {}
+
+	//LavObjects are only to ever be created on the heap through expllicit specification of number of inputs and outputs, and any clone functionality must be explicit.  If a subclass wishes to implement copying it can, but there really isn't a reason.
+	LavObject() = delete;
+	LavObject(const LavObject&) = delete;
+	LavObject& operator=(const LavObject&) = delete;
 };
 
-LavError initLavObject(unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, LavPropertyTableEntry* propertyTable, enum  Lav_NODETYPES type, LavDevice* device, LavObject *destination);
-LavError Lav_createObject(unsigned int numInputs, unsigned int numOutputs, unsigned int numProperties, LavPropertyTableEntry* propertyTable, enum  Lav_NODETYPES type, LavDevice* device, LavObject **destination);
-LavError objectProcessSafe(LavObject* obj);
