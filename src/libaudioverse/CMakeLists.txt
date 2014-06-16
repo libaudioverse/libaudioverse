@@ -6,7 +6,7 @@ properties.cpp
 initialization.cpp
 interleaving.cpp
 #hrtf.cpp
-#dspmath.cpp
+dspmath.cpp
 
 #specific node types.
 #nodes/sine.cpp
