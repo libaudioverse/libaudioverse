@@ -8,9 +8,6 @@ properties.cpp
 #hrtf.cpp
 #dspmath.cpp
 
-#threading related functions and structures
-#threading/crossthread_ringbuffer.cpp
-
 #specific node types.
 #nodes/sine.cpp
 #nodes/file.cpp
