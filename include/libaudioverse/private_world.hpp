@@ -5,10 +5,11 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "libaudioverse.h"
 #include "private_objects.hpp"
 
-struct LavSource;
-struct LavHrtfData;
+class LavSource;
+class LavHrtfData;
 
-struct LavWorld: public LavObject {
+class LavWorld: public LavObject {
+	public:
 	LavSource **sources;
 	unsigned int num_sources, max_sources;
 	TmTransform camera_transform; //the camera transform.

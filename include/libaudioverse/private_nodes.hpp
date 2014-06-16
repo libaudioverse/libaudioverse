@@ -5,7 +5,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "libaudioverse.h"
 #include "private_objects.hpp"
 
-struct LavNode: public LavObject {
+class LavNode: public LavObject {
+	public:
 	double internal_time;
 	void *data; //place for node subtypes to place data.
 };

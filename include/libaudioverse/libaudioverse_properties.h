@@ -4,7 +4,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include "libaudioverse.h"
 #ifdef __cplusplus
-extern "C" {
+{
 #endif
 
 /**This file contains the property enums for Libaudioverse.

@@ -5,9 +5,10 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "libaudioverse.h"
 #include "private_objects.hpp"
 
-struct LavWorld;
+class LavWorld;
 
-struct LavSource: public LavObject {
+class LavSource: public LavObject {
+	public:
 	TmVector position;
 	LavObject* data_node, *panner_node, *attenuator_node;
 	LavWorld *world;

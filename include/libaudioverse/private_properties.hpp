@@ -2,9 +2,9 @@
 This file is part of Libaudioverse, a library for 3D and environmental audio simulation, and is released under the terms of the Gnu General Public License Version 3 or (at your option) any later version.
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #pragma once
-#include "private_structs.hpp"
+class LavObject;
 
-typedef void (*LavPropertyChangedCallback)(struct LavObject* obj, unsigned int slot, int isFromProcessMethod);
+typedef void (*LavPropertyChangedCallback)(LavObject* obj, unsigned int slot, int isFromProcessMethod);
 
 union LavPropertyValue {
 	float fval;
@@ -15,14 +15,16 @@ union LavPropertyValue {
 	float f6val[6]; //orientations.
 };
 
-struct LavProperty {
+class LavProperty {
+	public:
 	enum Lav_PROPERTYTYPES type;
 	LavPropertyValue value, default_value, minimum_value, maximum_value;
 	char* name;
 	LavPropertyChangedCallback post_changed_callback;
 };
 
-struct LavPropertyTableEntry {
+class LavPropertyTableEntry {
+	public:
 	int slot;
 	enum Lav_PROPERTYTYPES type;
 	char* name;

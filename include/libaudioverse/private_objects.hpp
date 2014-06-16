@@ -5,7 +5,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "private_threads.hpp"
 #include "libaudioverse.h"
 
-struct LavInputDescriptor {
+class LavInputDescriptor {
+	public:
 	LavObject* parent;
 	unsigned int output;
 };
@@ -13,7 +14,8 @@ struct LavInputDescriptor {
 /**Things all Libaudioverse objects have.*/
 //typedef for processing function:
 typedef LavError (*LavProcessorFunction)(LavObject* obj);
-struct LavObject {
+class LavObject {
+	public:
 	LavDevice *device;
 	LavProperty **properties;
 	unsigned int num_properties;

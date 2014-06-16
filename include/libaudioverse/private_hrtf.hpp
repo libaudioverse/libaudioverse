@@ -4,7 +4,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include "libaudioverse.h"
 
-struct LavHrtfData {
+class LavHrtfData {
+	public:
 	unsigned int elev_count, hrir_count, hrir_length;
 	int min_elevation, max_elevation;
 	unsigned int *azimuth_counts;

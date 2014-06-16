@@ -2,13 +2,15 @@
 This file is part of Libaudioverse, a library for 3D and environmental audio simulation, and is released under the terms of the Gnu General Public License Version 3 or (at your option) any later version.
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #pragma once
-#include "private_structs.hpp"
+
+class LavObject;
 
 //audio devices.
 //the specific functionality of an audio device needs to be hidden behind the void* data parameter, but the three function pointers *must* be filled out.
 //furthermore, mutex *must* be set to something and block_size must be greater than 0.
 //The above assumptions are made throughout the entire library.
-struct LavDevice {
+class LavDevice {
+	public:
 	LavError (*get_block)(LavDevice* device, float* destination);
 	LavError (*start)(LavDevice* device);
 	LavError (*stop)(LavDevice *device);
@@ -19,9 +21,9 @@ struct LavDevice {
 	unsigned int block_size, channels, mixahead;
 	float sr;
 	void* mutex, *device_specific_data;
-	struct LavObject** objects;
+	LavObject** objects;
 	unsigned object_count, max_object_count;
-	struct LavObject* output_object;
+	LavObject* output_object;
 };
 
 //initialize the audio backend.
