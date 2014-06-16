@@ -4,7 +4,7 @@ objects.cpp
 properties.cpp
 #functiontables.cpp
 #initialization.cpp
-#interleaving.cpp
+interleaving.cpp
 #hrtf.cpp
 #dspmath.cpp
 

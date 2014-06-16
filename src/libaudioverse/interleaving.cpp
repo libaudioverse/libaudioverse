@@ -8,10 +8,10 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <string.h>
 
 float** uninterleaveSamplesFast(unsigned int channels, unsigned int frames, float* samples) {
-	float** out = (float**)calloc(channels, sizeof(float*));
+	float** out = new float*[channels];
 	if(out == NULL) return NULL;
 	for(unsigned int i = 0; i < channels; i++) {
-		out[i] = (float*)calloc(frames, sizeof(float));
+		out[i] = new float[frames];
 		if(out[i] == NULL) return NULL;
 	}
 
@@ -23,7 +23,7 @@ float** uninterleaveSamplesFast(unsigned int channels, unsigned int frames, floa
 }
 
 float* interleaveSamplesFast(unsigned int channels, unsigned int count, float** uninterleavedSamples) {
-	float* out = (float*)calloc(count*channels, sizeof(float));
+	float* out = new float[count*channels];
 	if(out == NULL) return NULL;
 	for(unsigned int offset = 0; offset < channels; offset++) {
 		for(unsigned int i = 0; i < count; i++) out[offset+channels*i] = uninterleavedSamples[offset][i];
