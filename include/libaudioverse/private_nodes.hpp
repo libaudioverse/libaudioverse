@@ -3,10 +3,9 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #pragma once
 #include "libaudioverse.h"
-#include "private_structs.hpp"
+#include "private_objects.hpp"
 
-struct LavNode {
-	LavObject base;
+struct LavNode: public LavObject {
 	double internal_time;
 	void *data; //place for node subtypes to place data.
 };
