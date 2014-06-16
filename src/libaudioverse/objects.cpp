@@ -40,7 +40,6 @@ LavObject::LavObject(LavDevice* device, unsigned int numInputs, unsigned int num
 	}
 	deviceAssociateObject(device, destination);
 	computeInputBuffers(); //at the moment, this is going to just make them all 0, but it takes effect once parents are added.
-
 }
 
 
@@ -60,7 +59,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_setParent(LavObject *obj, LavObject*parent, uns
 	ERROR_IF_TRUE(outputSlot >= parent->num_outputs, Lav_ERROR_INVALID_SLOT);
 	obj->input_descriptors[inputSlot].parent = parent;
 	obj->input_descriptors[inputSlot].output = outputSlot;
-	objectComputeInputBuffers(obj);
+	obj->computeInputBuffers();
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
 }
@@ -85,7 +84,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_clearParent(LavObject *obj, unsigned int slot) 
 	ERROR_IF_TRUE(slot >= obj->num_inputs, Lav_ERROR_INVALID_SLOT);
 	obj->input_descriptors[slot].parent = NULL;
 	obj->input_descriptors[slot].output = 0;
-	objectComputeInputBuffers(obj);
+	obj->computeInputBuffers();
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
 }
