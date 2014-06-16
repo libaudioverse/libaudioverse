@@ -28,14 +28,14 @@ LavObject::LavObject(LavDevice* device, unsigned int numInputs, unsigned int num
 	mutex = device->mutex;
 	//allocations:
 	if(numInputs > 0) {
-		input_descriptors = (LavInputDescriptor*)calloc(numInputs, sizeof(LavInputDescriptor));
-		inputs = (float**)calloc(numInputs, sizeof(float*));
+		input_descriptors = new LavInputDescriptor[numInputs];
+		inputs = new float*[numInputs];
 	}
 
 	if(numOutputs > 0) {
-		outputs = (float**)calloc(numOutputs, sizeof(float**));
+		outputs = new float*[numOutputs];
 		for(unsigned int i = 0; i < num_outputs; i++) {
-			outputs[i] = (float*)calloc(device->block_size, sizeof(float));
+			outputs[i] = new float[device->block_size];
 		}
 	}
 	deviceAssociateObject(device, destination);
