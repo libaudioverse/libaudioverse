@@ -25,6 +25,7 @@ class LavProperty {
 	LavPropertyValue& getMax() {return maximum_value;}
 	int getType() { return type;}
 	void setType(int t) {type = t;}
+	int isType(int t) { return type == t;} //we have to typecheck these everywhere.
 	const char* getName() {return name;}
 	void setName(const char* name); //this one is not inlined.
 	int getTag() {return tag;}
