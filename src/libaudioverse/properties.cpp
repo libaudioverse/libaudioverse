@@ -5,6 +5,5 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdlib.h>
 #include <string.h>
 
-void LavProperty::setName(const char* name) {
-}
+
 
