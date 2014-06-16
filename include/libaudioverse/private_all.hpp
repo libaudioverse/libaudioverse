@@ -15,7 +15,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "private_memory.hpp"
 #include "private_functiontables.hpp"
 #include "private_objects.hpp"
-#include "private_nodes.hpp"
 #include "private_devices.hpp"
 #include "private_sources.hpp"
 #include "private_world.hpp"
