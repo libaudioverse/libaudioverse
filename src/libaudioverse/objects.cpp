@@ -42,12 +42,22 @@ LavObject::LavObject(LavDevice* device, unsigned int numInputs, unsigned int num
 	computeInputBuffers(); //at the moment, this is going to just make them all 0, but it takes effect once parents are added.
 }
 
-
 /*Default Processing function.*/
 void LavObject::process() {
 	for(unsigned int i = 0; i < num_outputs; i++) {
 		memset(outputs[i], 0, obj->device->block_size*sizeof(float));
 	}
+}
+
+void LavObject::setParent(unsigned int input, lavObject* parent, unsigned int parentOutput) {
+	input_descriptors[slot].parent = parent;
+	input_descriptors[slot].output = parentOutput;
+}
+
+LavObject* LavObject::getParentObject(unsigned int slot) {
+}
+
+unsigned int LavObject::getParentOutput(unsigned int slot) {
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_setParent(LavObject *obj, LavObject*parent, unsigned int outputSlot, unsigned int inputSlot) {
@@ -57,9 +67,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_setParent(LavObject *obj, LavObject*parent, uns
 	LOCK(obj->mutex);
 	ERROR_IF_TRUE(inputSlot >= obj->num_inputs, Lav_ERROR_INVALID_SLOT);
 	ERROR_IF_TRUE(outputSlot >= parent->num_outputs, Lav_ERROR_INVALID_SLOT);
-	obj->input_descriptors[inputSlot].parent = parent;
-	obj->input_descriptors[inputSlot].output = outputSlot;
-	obj->computeInputBuffers();
+	obj->setParent(inputSlot, parent, outputSlot);
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
 }
@@ -71,8 +79,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_getParent(LavObject *obj, unsigned int slot, La
 	CHECK_NOT_NULL(outputNumber);
 	LOCK(obj->mutex);
 	ERROR_IF_TRUE(slot < 0 || slot >= obj->num_inputs, Lav_ERROR_RANGE);
-	*parent = obj->input_descriptors[slot].parent;
-	*outputNumber = obj->input_descriptors[slot].output;
+	*parent = obj->getParent(slot);
+	*outputNumber = obj->getParentOutput(slot);
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
 }
@@ -82,9 +90,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_clearParent(LavObject *obj, unsigned int slot) 
 	CHECK_NOT_NULL(obj);
 	LOCK(obj->mutex);
 	ERROR_IF_TRUE(slot >= obj->num_inputs, Lav_ERROR_INVALID_SLOT);
-	obj->input_descriptors[slot].parent = NULL;
-	obj->input_descriptors[slot].output = 0;
-	obj->computeInputBuffers();
+	obj->clearParent(slot);
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
 }
