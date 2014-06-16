@@ -3,7 +3,6 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #pragma once
 #include <string>
-class LavObject;
 
 union LavPropertyValue {
 	float fval;
@@ -21,7 +20,7 @@ class LavProperty {
 	void setType(int t) {type = t;}
 	int isType(int t) { return type == t;} //we have to typecheck these everywhere.
 	std::string getName() {return name;}
-	void setName(string n) { name = n;}
+	void setName(std::string n) { name = n;}
 	int getTag() {return tag;}
 	void setTag(int t) {tag = t;}
 
@@ -49,9 +48,10 @@ class LavProperty {
 	double getDoubleMin() {return minimum_value.dval;}
 	double getDoubleMax() {return maximum_value.dval;}
 	void setDoubleRange(double a, double b) {minimum_value.dval = a; maximum_value.dval = b;}
+	void setDoubleDefault(double v) {default_value.dval = v;}
 
 	//float3 vectors.
-	const float* getFloat3value() {return &value.f3val;}
+	const float* getFloat3value() {return value.f3val;}
 	const float* getFloat3Default() {return default_value.f3val;}
 	void setFloat3Value(const float* const v) {memcpy(value.f3val, v, sizeof(float)*3);}
 	void setFloat3Value(float v1, float v2, float v3) {value.f3val[0] = v1; value.f3val[1] = v2; value.f3val[2] = v3;}
@@ -67,10 +67,10 @@ class LavProperty {
 	void setFloat6Default(float v1, float v2, float v3, float v4, float v5, float v6) {default_value.f6val[0] = v1; default_value.f6val[1] = v2; default_value.f6val[2] = v3; default_value.f6val[3] = v4; default_value.f6val[4] = v5; default_value.f6val[5] = v6;}
 
 	//strings:
-	stringg getStringValue() { return string_value;}
-	void setStringValue(string s) { string_value = s;}
-	string getStringDefault() { returnd default_string_value;}
-	void setStringDefault(string s) { default_string_value = s;}
+	std::string getStringValue() { return string_value;}
+	void setStringValue(std::string s) { string_value = s;}
+	std::string getStringDefault() { return default_string_value;}
+	void setStringDefault(std::string s) { default_string_value = s;}
 
 	private:
 	int type, tag;
@@ -79,9 +79,9 @@ class LavProperty {
 };
 
 //helper methods to quickly make properties.
-lavProperty* makeIntProperty(int default, int min, int max);
+LavProperty* makeIntProperty(int default, int min, int max);
 LavProperty* makeFloatProperty(float default, float min, float max);
 LavProperty* makeDoubleProperty(float default, float min, float max);
-lavProperty* makeFloat3Property(float default[3]);
+LavProperty* makeFloat3Property(float default[3]);
 LavProperty* makeFloat6Property(float default[6]);
 LavProperty* makeStringProperty(std::string default);
