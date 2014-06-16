@@ -69,36 +69,21 @@ void LavObject::clearParent(unsigned int slot) {
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_setParent(LavObject *obj, LavObject*parent, unsigned int outputSlot, unsigned int inputSlot) {
-	STANDARD_PREAMBLE;
-	CHECK_NOT_NULL(obj);
-	CHECK_NOT_NULL(parent);
-	LOCK(obj->mutex);
 	ERROR_IF_TRUE(inputSlot >= obj->num_inputs, Lav_ERROR_INVALID_SLOT);
 	ERROR_IF_TRUE(outputSlot >= parent->num_outputs, Lav_ERROR_INVALID_SLOT);
 	obj->setParent(inputSlot, parent, outputSlot);
-	SAFERETURN(Lav_ERROR_NONE);
-	STANDARD_CLEANUP_BLOCK;
+	return Lav_ERROR_NONE;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_getParent(LavObject *obj, unsigned int slot, LavObject **parent, unsigned int *outputNumber) {
-	STANDARD_PREAMBLE;
-	CHECK_NOT_NULL(obj);
-	CHECK_NOT_NULL(parent);
-	CHECK_NOT_NULL(outputNumber);
-	LOCK(obj->mutex);
 	ERROR_IF_TRUE(slot < 0 || slot >= obj->num_inputs, Lav_ERROR_RANGE);
 	*parent = obj->getParent(slot);
 	*outputNumber = obj->getParentOutput(slot);
-	SAFERETURN(Lav_ERROR_NONE);
-	STANDARD_CLEANUP_BLOCK;
+	return Lav_ERROR_NONE;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_clearParent(LavObject *obj, unsigned int slot) {
-	STANDARD_PREAMBLE;
-	CHECK_NOT_NULL(obj);
-	LOCK(obj->mutex);
 	ERROR_IF_TRUE(slot >= obj->num_inputs, Lav_ERROR_INVALID_SLOT);
 	obj->clearParent(slot);
-	SAFERETURN(Lav_ERROR_NONE);
-	STANDARD_CLEANUP_BLOCK;
+	return Lav_ERROR_NONE;
 }
