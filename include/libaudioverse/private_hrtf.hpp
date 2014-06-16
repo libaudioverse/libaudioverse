@@ -6,6 +6,13 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 class LavHrtfData {
 	public:
+	//get the appropriate coefficients for one channel.  A stereo hrtf is two calls to this function.
+	void hrtfComputeCoefficientsMono(LavHrtfData *hrtf, float elevation, float azimuth, float* out);
+
+	//warning: writes directly to the output destination, doesn't allocate a new one.
+	void hrtfComputeCoefficients(LavHrtfData *hrtf, float elevation, float azimuth, float* left, float* right);
+
+	private:
 	unsigned int elev_count, hrir_count, hrir_length;
 	int min_elevation, max_elevation;
 	unsigned int *azimuth_counts;
@@ -13,8 +20,3 @@ class LavHrtfData {
 	float ***hrirs;
 };
 
-//get the appropriate coefficients for one channel.  A stereo hrtf is two calls to this function.
-void hrtfComputeCoefficientsMono(LavHrtfData *hrtf, float elevation, float azimuth, float* out);
-
-//warning: writes directly to the output destination, doesn't allocate a new one.
-void hrtfComputeCoefficients(LavHrtfData *hrtf, float elevation, float azimuth, float* left, float* right);
