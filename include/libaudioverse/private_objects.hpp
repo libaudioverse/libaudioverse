@@ -12,8 +12,7 @@ class LavInputDescriptor {
 };
 
 /**Things all Libaudioverse objects have.*/
-//typedef for processing function:
-typedef LavError (*LavProcessorFunction)(LavObject* obj);
+
 class LavObject {
 	public:
 	LavDevice *device;
@@ -24,7 +23,7 @@ class LavObject {
 	float** outputs;
 	unsigned int num_outputs;
 	unsigned int num_inputs;
-	LavProcessorFunction process; //what to call to process this node.
+	virtual LavError process();
 	void* mutex;
 	enum Lav_NODETYPES type;
 	int has_processed; //used for optimizations of the graph algorithm.
