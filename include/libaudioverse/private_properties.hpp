@@ -15,14 +15,16 @@ union LavPropertyValue {
 	float f6val[6]; //orientations.
 };
 
+//you're supposed to set the ranges and default via the returned references here.
+//syntactically, this was the best I could come up with without accessing member variables; and I have decided that member variable access is bad.
 class LavProperty {
 	public:
 	void reset() {value = default_value;}
 	LavPropertyValue& getValue() {return value;}
-	void setValue(LavPropertyValue v) {value = v;}
-
+	void setValue(const LavPropertyValue &v) {value = v;}
 	LavPropertyValue& getMin() {return minimum_value;}
 	LavPropertyValue& getMax() {return maximum_value;}
+	LavPropertyValue& getDefault() {return default_value;}
 	int getType() { return type;}
 	void setType(int t) {type = t;}
 	int isType(int t) { return type == t;} //we have to typecheck these everywhere.
