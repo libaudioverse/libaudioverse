@@ -4,15 +4,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include "libaudioverse.h"
 
-typedef void (*LavThreadCapableFunction)(void* param);
-
-LavError threadRun(LavThreadCapableFunction fn, void* param, void** destination);
-LavError threadJoinAndFree(void* t);
-LavError createMutex(void **destination);
-LavError freeMutex(void *m);
-LavError mutexLock(void *m);
-LavError mutexUnlock(void *m);
-
 /**The following functions are threadsafe ringbuffers*/
 class LavCrossThreadRingBuffer {
 	public:

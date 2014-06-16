@@ -9,7 +9,6 @@ hrtf.cpp
 dspmath.cpp
 
 #threading related functions and structures
-threading/threads.cpp
 threading/crossthread_ringbuffer.cpp
 
 #specific node types.
