@@ -197,35 +197,3 @@ Lav_PUBLIC_FUNCTION LavError Lav_getDoublePropertyRange(LavObject* obj, unsigned
 	SAFERETURN(Lav_ERROR_NONE);
 	STANDARD_CLEANUP_BLOCK;
 }
-
-//Knows how to sort these.
-int compareLavPropertyTableEntries(const void* a, const void* b) {
-	const LavPropertyTableEntry *i1 = a, *i2 = b;
-	if(i1->slot < i2->slot) return -1;
-	if(i1->slot > i2->slot) return 1;
-	return 0;
-}
-
-Lav_PUBLIC_FUNCTION LavProperty **makePropertyArrayFromTable(unsigned int count, LavPropertyTableEntry *table) {
-	LavPropertyTableEntry *sorted_table = calloc(count, sizeof(LavPropertyTableEntry));
-	if(sorted_table == NULL) return NULL;
-	memcpy(sorted_table, table, count*sizeof(LavPropertyTableEntry));
-	qsort(sorted_table, count, sizeof(LavPropertyTableEntry), compareLavPropertyTableEntries);
-
-	//Allocate and fill out our array by iterating over the sorted table.
-	LavProperty **property_array= calloc(count, sizeof(LavProperty*));
-	if(property_array == NULL) return NULL;
-	for(unsigned int i = 0; i < count; i++) {
-		property_array[i] = calloc(1, sizeof(LavProperty));
-		if(property_array[i] == NULL) return NULL;
-		property_array[i]->type = table[i].type;
-		property_array[i]->name = table[i].name;
-		property_array[i]->value = table[i].default_value;
-		property_array[i]->default_value = table[i].default_value;
-		property_array[i]->minimum_value = table[i].minimum_value;
-		property_array[i]->maximum_value = table[i].maximum_value;
-		property_array[i]->post_changed_callback = table[i].post_changed;
-	}
-
-	return property_array;
-}

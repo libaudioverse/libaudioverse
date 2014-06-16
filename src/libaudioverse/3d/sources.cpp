@@ -7,12 +7,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdlib.h>
 #include <math.h>
 
-LavPropertyTableEntry sourceProperties[] = {
-	{Lav_SOURCE_POSITION, Lav_PROPERTYTYPE_FLOAT3, "position", {.f3val = {0.0f, 0.0f, 0.0f}}, {0}, {0}, NULL,},
-	{Lav_SOURCE_MAX_DISTANCE, Lav_PROPERTYTYPE_FLOAT, "max_distance", {.fval = 0.0f}, {.fval = 0.0f}, {.fval = INFINITY}, NULL},
-	{Lav_SOURCE_DISTANCE_MODEL, Lav_PROPERTYTYPE_INT, "distance_model", {.ival = Lav_DISTANCE_MODEL_LINEAR}, {.ival = 0}, {.ival = 2}, NULL},
-};
-
 Lav_PUBLIC_FUNCTION LavError Lav_createMonoSource(LavObject* node, LavObject* world, LavObject** destination) {
 	STANDARD_PREAMBLE;
 	CHECK_NOT_NULL(node);

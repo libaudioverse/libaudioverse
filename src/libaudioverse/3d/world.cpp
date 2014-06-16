@@ -9,11 +9,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 void worldListenerUpdateCallback(LavObject* obj, unsigned int slot, int isInProcessor);
 void worldPreprocessingHook(LavDevice* obj, void* param);
 
-LavPropertyTableEntry worldPropertyTable[] = {
-	{Lav_WORLD_LISTENER_ORIENTATION, Lav_PROPERTYTYPE_FLOAT6, "listener_orientation", {.f6val = {0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f}}, {0}, {0}, worldListenerUpdateCallback},
-	{Lav_WORLD_LISTENER_POSITION, Lav_PROPERTYTYPE_FLOAT3, "listener_position", {.f3val = {0.0f, 0.0f, 0.0f}}, {0}, {0}, worldListenerUpdateCallback},
-};
-
 Lav_PUBLIC_FUNCTION LavError Lav_createWorld(LavDevice* device, LavHrtfData *hrtf, LavObject**destination) {
 	STANDARD_PREAMBLE;
 	CHECK_NOT_NULL(device);

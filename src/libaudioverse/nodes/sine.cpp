@@ -14,11 +14,6 @@ struct sineinfo {
 	float offset;
 };
 
-
-LavPropertyTableEntry sinePropertyTable[1] = {
-	{Lav_SINE_FREQUENCY, Lav_PROPERTYTYPE_FLOAT, "frequency", {.fval = 440}, {.fval = 0.0f}, {.fval = INFINITY}, NULL},
-};
-
 Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavDevice* device, LavObject  **destination) {
 	STANDARD_PREAMBLE;
 	LavError err = Lav_ERROR_NONE;

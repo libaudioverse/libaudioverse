@@ -22,11 +22,6 @@ struct fileinfo {
 Lav_PUBLIC_FUNCTION LavError fileNodeProcessor(LavObject* obj);
 void fileNodePositionChanged(LavObject* obj, unsigned int slot, int isInProcessor);
 
-LavPropertyTableEntry filePropertyTable[] = {
-	{Lav_FILE_POSITION, Lav_PROPERTYTYPE_FLOAT, "position", {.fval = 0.0f},{.fval = 0.0f}, {.fval = 0.0f}, fileNodePositionChanged},
-	{Lav_FILE_PITCH_BEND, Lav_PROPERTYTYPE_FLOAT, "pitch_bend", {.fval = 1.0f}, {.fval = 0.0f}, {.fval = INFINITY}, NULL},
-};
-
 void file_close(void* h) {
 	sf_close(h);
 }

@@ -22,14 +22,3 @@ class LavProperty {
 	char* name;
 	LavPropertyChangedCallback post_changed_callback;
 };
-
-class LavPropertyTableEntry {
-	public:
-	int slot;
-	enum Lav_PROPERTYTYPES type;
-	char* name;
-	union LavPropertyValue default_value, minimum_value, maximum_value;
-	LavPropertyChangedCallback post_changed;
-};
-
-LavProperty **makePropertyArrayFromTable(unsigned int count, LavPropertyTableEntry *table);

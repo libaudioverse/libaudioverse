@@ -22,6 +22,7 @@ class LavObject {
 	LavObject* getParentObject(unsigned int slot);
 	unsigned int getParentOutput(unsigned int slot);
 	void clearParent(unsigned int slot);
+	virtual void process();
 
 	LavDevice *device;
 	std::map<int, LavProperty*> properties;
@@ -30,7 +31,6 @@ class LavObject {
 	float** outputs;
 	unsigned int num_outputs;
 	unsigned int num_inputs;
-	virtual void process();
 	void* mutex;
 	enum Lav_NODETYPES type;
 	int has_processed; //used for optimizations of the graph algorithm.
