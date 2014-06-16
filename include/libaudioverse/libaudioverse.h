@@ -67,16 +67,14 @@ enum Lav_ERRORS {
 /**Typedef for error codes.*/
 typedef enum Lav_ERRORS LavError;
 
-/**These are property types, either int, float, double, or string.
-
-Note that they can be ored.  This is important and intended as an extension point.  Namely, some properties in future are going to allow themselves to be either a constant or an LFO.*/
+/**These are property types, either int, float, double, vector of 3 floats, vector of 6 floats, or string.*/
 enum Lav_PROPERTYTYPES {
-	Lav_PROPERTYTYPE_INT = 0x1,
-	Lav_PROPERTYTYPE_FLOAT = 0x2,
-	Lav_PROPERTYTYPE_DOUBLE = 0x4,
-	Lav_PROPERTYTYPE_STRING = 0x8,
-	Lav_PROPERTYTYPE_FLOAT3 = 0xf,
-	Lav_PROPERTYTYPE_FLOAT6 = 0x10,
+	Lav_PROPERTYTYPE_INT = 1,
+	Lav_PROPERTYTYPE_FLOAT = 2,
+	Lav_PROPERTYTYPE_DOUBLE = 3,
+	Lav_PROPERTYTYPE_STRING = 4,
+	Lav_PROPERTYTYPE_FLOAT3 = 5,
+	Lav_PROPERTYTYPE_FLOAT6 = 6,
 };
 
 /**These are used to tag nodes with their type, so that external languages may see them.*/
