@@ -3,7 +3,7 @@ objects.cpp
 #nodes.cpp
 properties.cpp
 #functiontables.cpp
-#initialization.cpp
+initialization.cpp
 interleaving.cpp
 #hrtf.cpp
 #dspmath.cpp
