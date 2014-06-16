@@ -15,6 +15,8 @@ class LavInputDescriptor {
 
 class LavObject {
 	public:
+	void computeInputBuffers();//update what we point to due to parent changes.
+
 	LavDevice *device;
 	LavProperty **properties;
 	unsigned int num_properties;

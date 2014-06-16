@@ -10,14 +10,14 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 float zerobuffer[Lav_MAX_BLOCK_SIZE] = {0}; //this is a shared buffer for the "no parent" case.
 
-void objectComputeInputBuffers(LavObject* obj) {
+void computeInputBuffers() {
 	//point our inputs either at a zeroed buffer or the output of our parent.
-	for(unsigned int i = 0; i < obj->num_inputs; i++) {
-		if(obj->input_descriptors[i].parent != NULL) {
-			obj->inputs[i] = obj->input_descriptors[i].parent->outputs[obj->input_descriptors[i].output];
+	for(unsigned int i = 0; i < num_inputs; i++) {
+		if(input_descriptors[i].parent != NULL) {
+			inputs[i] = input_descriptors[i].parent->outputs[input_descriptors[i].output];
 		}
 		else {
-			obj->inputs[i] = zerobuffer;
+			inputs[i] = zerobuffer;
 		}
 	}
 }
