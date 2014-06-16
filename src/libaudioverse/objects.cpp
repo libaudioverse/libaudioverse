@@ -7,10 +7,11 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdlib.h>
 #include <string.h>
 #include <libaudioverse/private_objects.hpp>
+#include <libaudioverse/private_devices.hpp>
 
 float zerobuffer[Lav_MAX_BLOCK_SIZE] = {0}; //this is a shared buffer for the "no parent" case.
 
-void computeInputBuffers() {
+void LavObject::computeInputBuffers() {
 	//point our inputs either at a zeroed buffer or the output of our parent.
 	for(unsigned int i = 0; i < num_inputs; i++) {
 		if(input_descriptors[i].parent != NULL) {
@@ -38,29 +39,29 @@ LavObject::LavObject(LavDevice* device, unsigned int numInputs, unsigned int num
 			outputs[i] = new float[device->block_size];
 		}
 	}
-	deviceAssociateObject(device, destination);
+	deviceAssociateObject(device, this);
 	computeInputBuffers(); //at the moment, this is going to just make them all 0, but it takes effect once parents are added.
 }
 
 /*Default Processing function.*/
 void LavObject::process() {
 	for(unsigned int i = 0; i < num_outputs; i++) {
-		memset(outputs[i], 0, obj->device->block_size*sizeof(float));
+		memset(outputs[i], 0, device->block_size*sizeof(float));
 	}
 }
 
-void LavObject::setParent(unsigned int input, lavObject* parent, unsigned int parentOutput) {
-	input_descriptors[slot].parent = parent;
-	input_descriptors[slot].output = parentOutput;
-	recomputeInputBuffers();
+void LavObject::setParent(unsigned int input, LavObject* parent, unsigned int parentOutput) {
+	input_descriptors[input].parent = parent;
+	input_descriptors[input].output = parentOutput;
+	computeInputBuffers();
 }
 
 LavObject* LavObject::getParentObject(unsigned int slot) {
-	return obj->pinput_descriptors[slot].parent;
+	return input_descriptors[slot].parent;
 }
 
 unsigned int LavObject::getParentOutput(unsigned int slot) {
-	return obj->input_descriptors[slot].output;
+	return input_descriptors[slot].output;
 }
 
 void LavObject::clearParent(unsigned int slot) {
@@ -69,21 +70,17 @@ void LavObject::clearParent(unsigned int slot) {
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_setParent(LavObject *obj, LavObject*parent, unsigned int outputSlot, unsigned int inputSlot) {
-	ERROR_IF_TRUE(inputSlot >= obj->num_inputs, Lav_ERROR_INVALID_SLOT);
-	ERROR_IF_TRUE(outputSlot >= parent->num_outputs, Lav_ERROR_INVALID_SLOT);
 	obj->setParent(inputSlot, parent, outputSlot);
 	return Lav_ERROR_NONE;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_getParent(LavObject *obj, unsigned int slot, LavObject **parent, unsigned int *outputNumber) {
-	ERROR_IF_TRUE(slot < 0 || slot >= obj->num_inputs, Lav_ERROR_RANGE);
-	*parent = obj->getParent(slot);
+	*parent = obj->getParentObject(slot);
 	*outputNumber = obj->getParentOutput(slot);
 	return Lav_ERROR_NONE;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_clearParent(LavObject *obj, unsigned int slot) {
-	ERROR_IF_TRUE(slot >= obj->num_inputs, Lav_ERROR_INVALID_SLOT);
 	obj->clearParent(slot);
 	return Lav_ERROR_NONE;
 }

@@ -1,5 +1,5 @@
 add_library(libaudioverse SHARED
-#objects.cpp
+objects.cpp
 #nodes.cpp
 properties.cpp
 #functiontables.cpp
