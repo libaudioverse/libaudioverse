@@ -52,12 +52,20 @@ void LavObject::process() {
 void LavObject::setParent(unsigned int input, lavObject* parent, unsigned int parentOutput) {
 	input_descriptors[slot].parent = parent;
 	input_descriptors[slot].output = parentOutput;
+	recomputeInputBuffers();
 }
 
 LavObject* LavObject::getParentObject(unsigned int slot) {
+	return obj->pinput_descriptors[slot].parent;
 }
 
 unsigned int LavObject::getParentOutput(unsigned int slot) {
+	return obj->input_descriptors[slot].output;
+}
+
+void LavObject::clearParent(unsigned int slot) {
+	input_descriptors[slot].parent = nullptr;
+	input_descriptors[slot].output = 0;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_setParent(LavObject *obj, LavObject*parent, unsigned int outputSlot, unsigned int inputSlot) {

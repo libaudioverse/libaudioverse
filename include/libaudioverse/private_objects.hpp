@@ -4,6 +4,9 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include "private_threads.hpp"
 #include "libaudioverse.h"
+#include <map>
+
+class LavProperty;
 
 class LavInputDescriptor {
 	public:
@@ -12,7 +15,6 @@ class LavInputDescriptor {
 };
 
 /**Things all Libaudioverse objects have.*/
-
 class LavObject {
 	public:
 	void computeInputBuffers();//update what we point to due to parent changes.
@@ -22,8 +24,7 @@ class LavObject {
 	void clearParent(unsigned int slot);
 
 	LavDevice *device;
-	LavProperty **properties;
-	unsigned int num_properties;
+	std::map<int, LavProperty*> properties;
 	float** inputs;
 	LavInputDescriptor *input_descriptors;
 	float** outputs;
