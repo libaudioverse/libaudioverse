@@ -17,7 +17,21 @@ union LavPropertyValue {
 
 class LavProperty {
 	public:
-	enum Lav_PROPERTYTYPES type;
+	void reset() {value = default_value;}
+	LavPropertyValue& getValue() {return value;}
+	void setValue(LavPropertyValue v) {value = v;}
+
+	LavPropertyValue& getMin() {return minimum_value;}
+	LavPropertyValue& getMax() {return maximum_value;}
+	int getType() { return type;}
+	void setType(int t) {type = t;}
+	const char* getName() {return name;}
+	void setName(const char* name); //this one is not inlined.
+	int getTag() {return tag;}
+	void setTag(int t) {tag = t;}
+
+	private:
+	int type, tag;
 	LavPropertyValue value, default_value, minimum_value, maximum_value;
 	char* name;
 	LavPropertyChangedCallback post_changed_callback;

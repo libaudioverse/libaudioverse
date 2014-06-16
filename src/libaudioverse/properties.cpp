@@ -5,8 +5,11 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdlib.h>
 #include <string.h>
 
+void LavProperty::setName(const char* name) {
+}
+
 Lav_PUBLIC_FUNCTION LavError lav_resetProperty(LavObject *obj, unsigned int slot) {
-		STANDARD_PREAMBLE;
+	STANDARD_PREAMBLE;
 	CHECK_NOT_NULL(obj);
 	LOCK(obj->mutex);
 	ERROR_IF_TRUE(slot >= obj->num_properties || slot < 0, Lav_ERROR_INVALID_SLOT);
