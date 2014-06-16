@@ -5,8 +5,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <string>
 class LavObject;
 
-typedef void (*LavPropertyChangedCallback)(LavObject* obj, unsigned int slot, int isFromProcessMethod);
-
 union LavPropertyValue {
 	float fval;
 	int ival;
@@ -78,7 +76,6 @@ class LavProperty {
 	int type, tag;
 	LavPropertyValue value, default_value, minimum_value, maximum_value;
 	std::string name, string_value, default_string_value;
-	LavPropertyChangedCallback post_changed_callback;
 };
 
 //helper methods to quickly make properties.
