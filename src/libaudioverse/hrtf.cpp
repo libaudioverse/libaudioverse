@@ -8,7 +8,9 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <string.h>
 #include <stdint.h>
 #include <stddef.h>
-#include <libaudioverse/private_all.hpp>
+#include <libaudioverse/libaudioverse.h>
+#include <libaudioverse/private_hrtf.hpp>
+#include <libaudioverse/private_dspmath.hpp>
 #include <math.h>
 
 /**Swaps bytes to reverse endianness.*/
@@ -24,7 +26,7 @@ void reverse_endianness(char* buffer, unsigned int count, unsigned int window) {
 }
 
 //this makes sure that we aren't about to do something silently dangerous and tels us at compile time.
-_Static_assert(sizeof(float) == 4, "Sizeof float is not 4; cannot safely work with hrtfs");
+static_assert(sizeof(float) == 4, "Sizeof float is not 4; cannot safely work with hrtfs");
 
 LavError LavHrtfData::loadFromFile(std::string path) {
 	//first, load the file if we can.
@@ -35,7 +37,7 @@ LavError LavHrtfData::loadFromFile(std::string path) {
 	fseek(fp, 0, SEEK_SET);
 
 	//Okay, load everything.
-	char* data = mmanagerMalloc(localMemoryManager, size);
+	char* data = new char[size];
 
 	//do the read.
 	size_t read;
@@ -52,74 +54,61 @@ LavError LavHrtfData::loadFromFile(std::string path) {
 
 	//read the header information.
 	iterator += window_size;//skip the endianness marker, which is handled above.
-	int32_t samplerate = *(int32_t*)iterator;
+	samplerate = *(int32_t*)iterator;
 
 	iterator += window_size;
-	int32_t number_of_hrirs = *(int32_t*)iterator;
+	hrir_count = *(int32_t*)iterator;
 	iterator += window_size;
-	int32_t number_of_elevations = *(int32_t*)iterator;
+	elev_count = *(int32_t*)iterator;
 	iterator += window_size;
-	int32_t minimum_elevation = *(int32_t*)iterator;
+	min_elevation = *(int32_t*)iterator;
 	iterator += window_size;
-	int32_t maximum_elevation = *(int32_t*)iterator;
+	max_elevation = *(int32_t*)iterator;
 	iterator += window_size;
 
 	//this is the first "dynamic" piece of information.
-	int32_t  *azimuths_per_elevation = malloc(sizeof(int32_t)*number_of_elevations);
-	for(int i = 0; i < number_of_elevations; i++) {
-		azimuths_per_elevation[i] = *(int32_t*)iterator;
+	azimuth_counts = new unsigned int[elev_count];
+	for(unsigned int i = 0; i < elev_count; i++) {
+		azimuth_counts[i] = *(int32_t*)iterator;
 		iterator += window_size;
 	}
 
 	//sanity check: we must have as many hrirs as the sum of the above array.
 	int32_t sum_sanity_check = 0;
-	for(int i = 0; i < number_of_elevations; i++) sum_sanity_check +=azimuths_per_elevation[i];
+	for(unsigned int i = 0; i < elev_count; i++) sum_sanity_check +=azimuth_counts[i];
 
-	int32_t hrir_length = *(int32_t*)iterator;
+	hrir_length = *(int32_t*)iterator;
 	iterator += window_size;
 
 	unsigned int size_so_far = iterator-data;
 	size_t size_remaining = size-size_so_far;
 	//we must have enough remaining to be all hrir hrirs.
-	size_t hrir_size = hrir_length*number_of_hrirs*sizeof(float);
-
-	LavHrtfData *hrtf = calloc(1, sizeof(LavHrtfData));
-	hrtf->elev_count = number_of_elevations;
-	hrtf->hrir_count = number_of_hrirs;
-	hrtf->hrir_length = hrir_length;
-	hrtf->samplerate = samplerate;
-	hrtf->min_elevation = minimum_elevation;
-	hrtf->max_elevation = maximum_elevation;
-
-	hrtf->azimuth_counts = calloc(number_of_elevations, sizeof(unsigned int));
-	for(int i = 0; i < number_of_elevations; i++) {
-		hrtf->azimuth_counts[i] = azimuths_per_elevation[i];
-	}
+	size_t hrir_size = hrir_length*hrir_count*sizeof(float);
 
 	//last step.  Initialize the HRIR array.
-	hrtf->hrirs = malloc(sizeof(float**)*number_of_elevations); //elevation dimension.
-
+	hrirs = new float**[elev_count];
 	//do the azimuth dimension.
-	for(int i = 0; i < number_of_elevations; i++) {
-		hrtf->hrirs[i] = malloc(azimuths_per_elevation[i]*sizeof(float*));
+	for(unsigned int i = 0; i < elev_count; i++) {
+		hrirs[i] = new float*[azimuth_counts[i]];
 	}
 
 	//the above gives us what amounts to a 2d array.  The first dimension represents elevation.  The second dimension represents azimuth going clockwise.
 	//fill it.
-	for(int elev = 0; elev < number_of_elevations; elev++) {
-		for(int azimuth = 0; azimuth < azimuths_per_elevation[elev]; azimuth++) {
-			hrtf->hrirs[elev][azimuth] = malloc(sizeof(float)*hrir_length);
-			memcpy(hrtf->hrirs[elev][azimuth], iterator, hrir_length*sizeof(float));
+	for(unsigned int elev = 0; elev < elev_count; elev++) {
+		for(unsigned int azimuth = 0; azimuth < azimuth_counts[elev]; azimuth++) {
+			hrirs[elev][azimuth] = new float[hrir_length];
+			memcpy(hrirs[elev][azimuth], iterator, hrir_length*sizeof(float));
 			iterator+=hrir_length*sizeof(float);
 		}
 	}
+	return Lav_ERROR_NONE;
 }
 
 //a complete HRTF for stereo is two calls to this function.
-Lav_PUBLIC_FUNCTION void LavHrtfData::computeCoefficientsMono(float elevation, float azimuth, float* out) {
+void LavHrtfData::computeCoefficientsMono(float elevation, float azimuth, float* out) {
 	//clamp the elevation.
-	if(elevation < min_elevation) {elevation = (float)hrtf->min_elevation;}
-	else if(elevation > max_elevation) {elevation = (float)hrtf->max_elevation;}
+	if(elevation < min_elevation) {elevation = (float)min_elevation;}
+	else if(elevation > max_elevation) {elevation = (float)max_elevation;}
 
 	//we need to convert the elevation into an index.  First, truncate it to an integer (which rounds towards 0).
 	int truncatedElevation = (int)truncf(elevation);
@@ -127,13 +116,13 @@ Lav_PUBLIC_FUNCTION void LavHrtfData::computeCoefficientsMono(float elevation, f
 	int degreesPerElevation = 0;
 	if(min_elevation != max_elevation) { //it's not 0, it has to be something else, and the count has to be at least 2.
 		//it's the difference between min and max, dividedd by the count.  The count includes 0, however, so we have to subtract one from it.
-		degreesPerElevation = (hrtf->max_elevation-hrtf->min_elevation)/(hrtf->elev_count-1);
+		degreesPerElevation = (max_elevation-min_elevation)/(elev_count-1);
 	}
 
 	//we have a truncated elevation.  We now simply take an integer division, or assume it's 0.
 	int elevationIndex = degreesPerElevation ? truncatedElevation/degreesPerElevation : 0;
 	//this is relative to whatever index happens to be "0", that is it is an offset from the 0 index.  We have to offset it upwards so it's not negative.
-	int elevationIndexOffset = degreesPerElevation ? abs(hrtf->min_elevation)/degreesPerElevation : 0;
+	int elevationIndexOffset = degreesPerElevation ? abs(min_elevation)/degreesPerElevation : 0;
 	elevationIndex += elevationIndexOffset;
 
 	//ElevationIndex lets us get an array of azimuth coefficients.  Go ahead and pull it out now, so we can conceptually forget about all the above variables.

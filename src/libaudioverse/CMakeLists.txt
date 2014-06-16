@@ -5,7 +5,7 @@ properties.cpp
 #functiontables.cpp
 initialization.cpp
 interleaving.cpp
-#hrtf.cpp
+hrtf.cpp
 dspmath.cpp
 
 #specific node types.

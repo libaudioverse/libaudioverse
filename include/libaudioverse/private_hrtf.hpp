@@ -8,13 +8,13 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 class LavHrtfData {
 	public:
 	//get the appropriate coefficients for one channel.  A stereo hrtf is two calls to this function.
-	void hrtfComputeCoefficientsMono(LavHrtfData *hrtf, float elevation, float azimuth, float* out);
+	void computeCoefficientsMono(float elevation, float azimuth, float* out);
 
 	//warning: writes directly to the output destination, doesn't allocate a new one.
-	void hrtfComputeCoefficients(LavHrtfData *hrtf, float elevation, float azimuth, float* left, float* right);
+	void computeCoefficientsStereo(float elevation, float azimuth, float* left, float* right);
 
 	//load from a file.
-	loadFromFile(std::string path);
+	LavError loadFromFile(std::string path);
 	private:
 	unsigned int elev_count, hrir_count, hrir_length;
 	int min_elevation, max_elevation;
