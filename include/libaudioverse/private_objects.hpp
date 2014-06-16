@@ -23,7 +23,7 @@ class LavObject {
 	float** outputs;
 	unsigned int num_outputs;
 	unsigned int num_inputs;
-	virtual LavError process();
+	virtual void process();
 	void* mutex;
 	enum Lav_NODETYPES type;
 	int has_processed; //used for optimizations of the graph algorithm.

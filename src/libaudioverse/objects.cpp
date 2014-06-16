@@ -45,11 +45,10 @@ LavObject::LavObject(LavDevice* device, unsigned int numInputs, unsigned int num
 
 
 /*Default Processing function.*/
-LavError LavObject::process() {
+void LavObject::process() {
 	for(unsigned int i = 0; i < num_outputs; i++) {
 		memset(outputs[i], 0, obj->device->block_size*sizeof(float));
 	}
-	return Lav_ERROR_NONE;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_setParent(LavObject *obj, LavObject*parent, unsigned int outputSlot, unsigned int inputSlot) {
