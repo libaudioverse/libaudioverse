@@ -4,6 +4,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include <functional> //we have to use an std::function for the preprocessing hook.  There's no good way around it because worlds need to use capturing lambdas.
 #include <set>
+#include "libaudioverse.h"
 
 class LavObject;
 

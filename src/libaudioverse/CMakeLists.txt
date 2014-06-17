@@ -18,7 +18,7 @@ dspmath.cpp
 
 #the audio backends and related functionality.
 audio_devices/device_negociation.cpp
-#audio_devices/devices.cpp
+audio_devices/devices.cpp
 #audio_devices/portaudio.cpp
 
 #the 3D abstraction on top of libaudioverse.
