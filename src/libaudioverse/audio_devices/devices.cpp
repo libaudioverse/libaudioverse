@@ -12,3 +12,24 @@ LavDevice::LavDevice(unsigned int sr, unsigned int channels, unsigned int blockS
 	this->mixahead = mixahead;
 }
 
+LavError LavDevice::getBlock(float* out) {
+	return Lav_ERROR_NONE;
+}
+
+LavError LavDevice::start() {
+	return Lav_ERROR_NONE;
+}
+
+LavError LavDevice::stop() {
+return Lav_ERROR_NONE;
+}
+
+LavError LavDevice::associateObject(LavObject* obj) {
+	return Lav_ERROR_NONE;
+}
+
+
+LavError LavDevice::setOutputObject(LavObject* obj) {
+	return Lav_ERROR_NONE;
+}
+
