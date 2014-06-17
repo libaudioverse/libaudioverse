@@ -11,7 +11,7 @@ class LavObject;
 class LavDevice {
 	public:
 	LavDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead);
-	virtual ~LavDevice();
+	virtual ~LavDevice() {}
 	virtual LavError getBlock(float* out);
 	virtual LavError start();
 	virtual LavError stop();
