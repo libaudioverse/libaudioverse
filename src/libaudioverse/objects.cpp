@@ -39,7 +39,7 @@ LavObject::LavObject(LavDevice* device, unsigned int numInputs, unsigned int num
 			outputs[i] = new float[device->block_size];
 		}
 	}
-	deviceAssociateObject(device, this);
+	device->associateObject(this);
 	computeInputBuffers(); //at the moment, this is going to just make them all 0, but it takes effect once parents are added.
 }
 
