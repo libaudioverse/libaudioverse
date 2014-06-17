@@ -7,10 +7,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 class LavObject;
 
-//audio devices.
-//the specific functionality of an audio device needs to be hidden behind the void* data parameter, but the three function pointers *must* be filled out.
-//furthermore, mutex *must* be set to something and block_size must be greater than 0.
-//The above assumptions are made throughout the entire library.
 class LavDevice {
 	public:
 	virtual ~LavDevice();
