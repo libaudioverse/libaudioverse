@@ -17,7 +17,7 @@ dspmath.cpp
 #nodes/attenuator.cpp
 
 #the audio backends and related functionality.
-#audio_devices/device_negociation.cpp
+audio_devices/device_negociation.cpp
 #audio_devices/devices.cpp
 #audio_devices/portaudio.cpp
 
