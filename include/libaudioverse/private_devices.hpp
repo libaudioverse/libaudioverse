@@ -3,6 +3,7 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #pragma once
 #include <functional> //we have to use an std::function for the preprocessing hook.  There's no good way around it because worlds need to use capturing lambdas.
+#include <set>
 
 class LavObject;
 
@@ -16,18 +17,17 @@ class LavDevice {
 	virtual LavError getBlock(float* out);
 	virtual LavError start();
 	virtual LavError stop();
+	virtual LavError associateObject(LavObject* obj);
+	virtual LavError setOutputObject(LavObject* obj);
 	std::function<void(void)> preprocessing_hook;
 	unsigned int block_size, channels, mixahead;
 	float sr;
-	void* mutex, *device_specific_data;
-	LavObject** objects;
-	unsigned object_count, max_object_count;
+	void* mutex;
+	std::set<LavObject*> objects;
 	LavObject* output_object;
 };
 
 //initialize the audio backend.
 LavError initializeAudioBackend();
-//any null callback gets replaced with a default implementation that "does something sensible".
 
-LavError deviceAssociateObject(LavDevice* device, LavObject* object);
 LavDevice* createPortaudioDevice(unsigned int sr, unsigned int channels, unsigned int bufferSize, unsigned int mixahead);
