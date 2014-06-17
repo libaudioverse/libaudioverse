@@ -32,8 +32,6 @@ class LavObject {
 	unsigned int num_inputs;
 	void* mutex;
 	enum Lav_NODETYPES type;
-	int has_processed; //used for optimizations of the graph algorithm.
-	int should_always_process; //if true, this node will be processed every tick regardless of if the graph algorithm finds it.
 	//construction.
 	//note that the default LavObject has no properties and that it is up to subclass constructors to add/configure them.
 	LavObject(LavDevice* device, unsigned int numInputs, unsigned int numOutputs);
