@@ -4,3 +4,10 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_devices.hpp>
 #include <stdlib.h>
 
+LavDevice::LavDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead) {
+	this->sr = (float)sr;
+	this->channels = channels;
+	this->block_size = blockSize;
+	this->mixahead = mixahead;
+}
+
