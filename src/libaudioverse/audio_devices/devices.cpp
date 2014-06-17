@@ -4,6 +4,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/private_devices.hpp>
 #include <stdlib.h>
+#include <functional>
 
 LavDevice::LavDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead) {
 	this->sr = (float)sr;
@@ -34,4 +35,10 @@ LavError LavDevice::associateObject(LavObject* obj) {
 LavError LavDevice::setOutputObject(LavObject* obj) {
 	output_object = obj;
 	return Lav_ERROR_NONE;
+}
+
+void LavDevice::visitAllObjectsInProcessOrder(std::function<void(LavObject*)> visitor) {
+}
+
+void LavDevice::visitAllObjectsReachableFrom(LavObject* obj, std::function<void(LavObject*)> visitor) {
 }

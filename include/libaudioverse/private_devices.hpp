@@ -20,6 +20,10 @@ class LavDevice {
 	virtual LavError associateObject(LavObject* obj);
 	virtual LavError setOutputObject(LavObject* obj);
 	private:
+	//visit all objects in the order they need to be visited if we were processing the graph.
+	virtual void visitAllObjectsInProcessOrder(std::function<void(LavObject*)> visitor);
+	//visit all objecs in the order they must be visited to prepare for and process obj.
+	virtual void visitAllObjectsReachableFrom(LavObject* obj, std::function<void(LavObject*)> visitor);
 	std::function<void(void)> preprocessing_hook;
 	unsigned int block_size, channels, mixahead, is_started;
 	float sr;
