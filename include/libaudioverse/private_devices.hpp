@@ -12,13 +12,11 @@ class LavObject;
 //The above assumptions are made throughout the entire library.
 class LavDevice {
 	public:
-	virtual ~Lavdevice();
+	virtual ~LavDevice();
 	virtual LavError getBlock(float* out);
 	virtual LavError start();
 	virtual LavError stop();
-	private:
 	std::function<void(void)> preprocessing_hook;
-	private:
 	unsigned int block_size, channels, mixahead;
 	float sr;
 	void* mutex, *device_specific_data;
@@ -30,15 +28,6 @@ class LavDevice {
 //initialize the audio backend.
 LavError initializeAudioBackend();
 //any null callback gets replaced with a default implementation that "does something sensible".
-LavError createGenericDevice(
-	unsigned int blockSize,
-	unsigned int channels,
-	unsigned int sr,
-	LavError (*getBlock)(LavDevice* device, float* destination),
-	LavError (*start)(LavDevice* device),
-	LavError (*stop)(LavDevice* device),
-	LavError (*kill)(LavDevice* device),
-	LavDevice** destination);
 
 LavError deviceAssociateObject(LavDevice* device, LavObject* object);
-LavError portaudioDeviceConfigurer(LavDevice* device);
+LavDevice* createPortaudioDevice(unsigned int sr, unsigned int channels, unsigned int bufferSize, unsigned int mixahead);
