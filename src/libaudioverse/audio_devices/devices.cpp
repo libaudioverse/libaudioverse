@@ -3,6 +3,7 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/private_devices.hpp>
+#include <libaudioverse/private_objects.hpp>
 #include <stdlib.h>
 #include <functional>
 
@@ -41,4 +42,9 @@ void LavDevice::visitAllObjectsInProcessOrder(std::function<void(LavObject*)> vi
 }
 
 void LavDevice::visitAllObjectsReachableFrom(LavObject* obj, std::function<void(LavObject*)> visitor) {
+	//we call ourselves on all parents of obj, and then pass obj to visitor.  This is essentially depth-first search.
+	for(unsigned int i = 0; i < obj->getParentCount(); i++) {
+		visitAllObjectsReachableFrom(obj->getParentObject(i), visitor);
+	}
+	visitor(obj);
 }
