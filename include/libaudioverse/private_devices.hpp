@@ -17,6 +17,7 @@ class LavDevice {
 	virtual LavError stop();
 	virtual LavError associateObject(LavObject* obj);
 	virtual LavError setOutputObject(LavObject* obj);
+	private:
 	std::function<void(void)> preprocessing_hook;
 	unsigned int block_size, channels, mixahead;
 	float sr;
