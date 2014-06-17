@@ -12,6 +12,7 @@ class LavObject;
 //The above assumptions are made throughout the entire library.
 class LavDevice {
 	public:
+	virtual ~Lavdevice();
 	virtual LavError getBlock(float* out);
 	virtual LavError start();
 	virtual LavError stop();
