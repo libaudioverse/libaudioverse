@@ -6,7 +6,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 #include <stdlib.h>
 #include <string.h>
-#include <libaudioverse/private_all.hpp>
+#include <libaudioverse/private_functiontables.hpp>
 #include <math.h>
 
 /**As a property of these tables, the last sample of the array must be the same as the first, and length must not include the last sample.
@@ -23,7 +23,7 @@ Lav_PUBLIC_FUNCTION void computeSineTable() {
 	sineTable[sineTableLength] = sineTable[0]; //make sure the last sample mirrors the first.
 }
 
-Lav_PUBLIC_FUNCTION LavError initializeFunctionTables() {
+LavError initializeFunctionTables() {
 	computeSineTable();
 	return Lav_ERROR_NONE;
 }

@@ -2,7 +2,7 @@ add_library(libaudioverse SHARED
 objects.cpp
 #nodes.cpp
 properties.cpp
-#functiontables.cpp
+functiontables.cpp
 initialization.cpp
 interleaving.cpp
 hrtf.cpp
