@@ -40,6 +40,7 @@ LavObject::LavObject(LavDevice* device, unsigned int numInputs, unsigned int num
 		}
 	}
 	device->associateObject(this);
+	this->device = device;
 	computeInputBuffers(); //at the moment, this is going to just make them all 0, but it takes effect once parents are added.
 }
 
