@@ -26,7 +26,7 @@ void LavObject::computeInputBuffers() {
 LavObject::LavObject(LavDevice* device, unsigned int numInputs, unsigned int numOutputs) {
 	num_inputs = numInputs;
 	num_outputs = numOutputs;
-	mutex = device->mutex;
+	mutex = device->getMutex();
 	//allocations:
 	if(numInputs > 0) {
 		input_descriptors = new LavInputDescriptor[numInputs];
@@ -36,7 +36,7 @@ LavObject::LavObject(LavDevice* device, unsigned int numInputs, unsigned int num
 	if(numOutputs > 0) {
 		outputs = new float*[numOutputs];
 		for(unsigned int i = 0; i < num_outputs; i++) {
-			outputs[i] = new float[device->block_size];
+			outputs[i] = new float[device->getBlockSize()];
 		}
 	}
 	device->associateObject(this);
@@ -47,7 +47,7 @@ LavObject::LavObject(LavDevice* device, unsigned int numInputs, unsigned int num
 /*Default Processing function.*/
 void LavObject::process() {
 	for(unsigned int i = 0; i < num_outputs; i++) {
-		memset(outputs[i], 0, device->block_size*sizeof(float));
+		memset(outputs[i], 0, device->getBlockSize()*sizeof(float));
 	}
 }
 

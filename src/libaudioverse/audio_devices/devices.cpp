@@ -17,19 +17,21 @@ LavError LavDevice::getBlock(float* out) {
 }
 
 LavError LavDevice::start() {
+	is_started = 1;
 	return Lav_ERROR_NONE;
 }
 
 LavError LavDevice::stop() {
-return Lav_ERROR_NONE;
+	is_started = 0;
+	return Lav_ERROR_NONE;
 }
 
 LavError LavDevice::associateObject(LavObject* obj) {
+	objects.insert(obj);
 	return Lav_ERROR_NONE;
 }
-
 
 LavError LavDevice::setOutputObject(LavObject* obj) {
+	output_object = obj;
 	return Lav_ERROR_NONE;
 }
-

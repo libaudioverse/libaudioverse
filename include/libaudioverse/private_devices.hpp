@@ -13,13 +13,15 @@ class LavDevice {
 	LavDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead);
 	virtual ~LavDevice() {}
 	virtual LavError getBlock(float* out);
+	virtual unsigned int getBlockSize() { return block_size;}
+	virtual void* getMutex() {return mutex;}
 	virtual LavError start();
 	virtual LavError stop();
 	virtual LavError associateObject(LavObject* obj);
 	virtual LavError setOutputObject(LavObject* obj);
 	private:
 	std::function<void(void)> preprocessing_hook;
-	unsigned int block_size, channels, mixahead;
+	unsigned int block_size, channels, mixahead, is_started;
 	float sr;
 	void* mutex;
 	std::set<LavObject*> objects;
