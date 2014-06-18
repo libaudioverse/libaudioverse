@@ -38,9 +38,11 @@ LavError initializeAudioBackend() {
 - This thread processes buffers as fast as it possibly can.  If it sees an atomic int of 0, it assumes unprocessed and goes to sleep for a bit.
 - The callback will set the output buffer to 0 if it sees an atomic int of 0 at its current reading position.
 - If the callback sees any other value, it will copy the memory out and flip that value to 0.
+Basically, this is a one-reader one-writer lock-free ringbuffer with an additional set of flags to tell who last touched something.
 */
 void LavPortaudioDevice::audioOutputThreadFunction() {
 	int rb_index = 0; //our index into the buffers array.
+	Pa_StartStream(stream);
 	while(runningFlag.test_and_set()) {
 		if(buffer_statuses[rb_index].load()) { //we just caught up and the queue is full.
 			continue;
@@ -53,6 +55,7 @@ void LavPortaudioDevice::audioOutputThreadFunction() {
 		rb_index += 1;
 		rb_index %= mixahead;
 	}
+	Pa_StopStream(stream);
 }
 
 int portaudioOutputCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData) {
