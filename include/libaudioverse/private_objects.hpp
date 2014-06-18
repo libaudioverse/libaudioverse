@@ -24,8 +24,8 @@ class LavObject {
 	unsigned int getOutputCount();
 	void getOutputPointers(float** dest);
 	void clearParent(unsigned int slot);
-	virtual void process();
-
+	void process();
+	virtual void processor();
 	LavDevice *device;
 	std::map<int, LavProperty*> properties;
 	float** inputs;
@@ -33,6 +33,7 @@ class LavObject {
 	float** outputs;
 	unsigned int num_outputs;
 	unsigned int num_inputs;
+	int is_processing;
 	void* mutex;
 	enum Lav_NODETYPES type;
 	//construction.
