@@ -8,7 +8,7 @@ hrtf.cpp
 dspmath.cpp
 
 #specific node types.
-#nodes/sine.cpp
+nodes/sine.cpp
 #nodes/file.cpp
 #nodes/hard_limiter.cpp
 #nodes/hrtf.cpp
