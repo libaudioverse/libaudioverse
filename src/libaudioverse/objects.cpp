@@ -23,7 +23,7 @@ void LavObject::computeInputBuffers() {
 	}
 }
 
-LavObject::LavObject(LavDevice* device, unsigned int numInputs, unsigned int numOutputs) {
+void LavObject::init(LavDevice* device, unsigned int numInputs, unsigned int numOutputs) {
 	num_inputs = numInputs;
 	num_outputs = numOutputs;
 	//allocations:

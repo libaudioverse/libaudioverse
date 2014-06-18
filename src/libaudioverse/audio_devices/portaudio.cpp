@@ -13,7 +13,9 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 int portaudioOutputCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
 
 class LavPortaudioDevice: public LavDevice {
-	LavPortaudioDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead): LavDevice(sr, channels, blockSize, mixahead) {}
+	public:
+	
+	virtual void init(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead);
 	void audioOutputThreadFunction(); //the function that runs as our output thread.
 	std::thread audioOutputThread;
 	std::atomic_flag runningFlag; //when this clears, the audio thread self-terminates.
@@ -24,7 +26,6 @@ class LavPortaudioDevice: public LavDevice {
 	std::atomic<int> *buffer_statuses;
 	int callback_buffer_index; //the index the callback will go to on its next invocation.
 	friend int portaudioOutputCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
-	friend LavDevice* createPortaudioDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead);
 };
 
 LavError initializeAudioBackend() {
@@ -35,17 +36,20 @@ LavError initializeAudioBackend() {
 	return Lav_ERROR_NONE;
 }
 
-LavDevice* createPortaudioDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead) {
-	LavPortaudioDevice* retval = new LavPortaudioDevice(sr, channels, blockSize, mixahead);
-	//we must allocate mixahead+1 buffers.
-	float** bufferArray = new float*[mixahead+1];
-	for(unsigned int i = 0; i < mixahead+1; i++) bufferArray[i] = new float[blockSize];
-	retval->buffers = bufferArray;
-	retval->buffer_statuses = new std::atomic<int>[mixahead+1];
-	for(unsigned int i = 0; i < mixahead+1; i++) retval->buffer_statuses[i].store(0); //make sure they're all 0.  If not, bad things are going to happen.
-	Pa_OpenDefaultStream(&(retval->stream), 0, channels, paFloat32, sr, blockSize, portaudioOutputCallback, retval);
+void LavPortaudioDevice::init(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead) {
+	LavDevice::init(sr, channels, blockSize, mixahead);
+	buffers = new float*[mixahead+1];
+	for(unsigned int i = 0; i < mixahead+1; i++) buffers[i] = new float[blockSize];
+	buffer_statuses = new std::atomic<int>[mixahead+1];
+	for(unsigned int i = 0; i < mixahead+1; i++) buffer_statuses[i].store(0); //make sure they're all 0.  If not, bad things are going to happen.
+	Pa_OpenDefaultStream(&stream, 0, channels, paFloat32, sr, blockSize, portaudioOutputCallback, this);
 	//set the background thread on its way.
-	retval->audioOutputThread = std::thread([=] () {retval->audioOutputThreadFunction();});
+	audioOutputThread = std::thread([this] () {audioOutputThreadFunction();});
+}
+
+LavDevice* createPortaudioDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead) {
+	LavPortaudioDevice* retval = new LavPortaudioDevice();
+	retval->init(sr, channels, blockSize, mixahead);
 	return retval;
 }
 

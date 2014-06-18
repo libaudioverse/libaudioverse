@@ -9,7 +9,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <algorithm>
 #include <iterator>
 
-LavDevice::LavDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead) {
+void LavDevice::init(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead) {
 	this->sr = (float)sr;
 	this->channels = channels;
 	this->block_size = blockSize;

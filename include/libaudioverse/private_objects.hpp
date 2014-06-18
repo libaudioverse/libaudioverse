@@ -16,6 +16,7 @@ class LavInputDescriptor {
 /**Things all Libaudioverse objects have.*/
 class LavObject {
 	public:
+	virtual void init(LavDevice* device, unsigned int numInputs, unsigned int numOutputs);
 	virtual void computeInputBuffers();//update what we point to due to parent changes.
 	virtual void setParent(unsigned int input, LavObject* parent, unsigned int parentOutput);
 	virtual LavObject* getParentObject(unsigned int slot);
@@ -35,15 +36,11 @@ class LavObject {
 	unsigned int num_inputs;
 	int is_processing;
 	enum Lav_NODETYPES type;
-	//construction.
-	//note that the default LavObject has no properties and that it is up to subclass constructors to add/configure them.
-	LavObject(LavDevice* device, unsigned int numInputs, unsigned int numOutputs);
 
 	//this preventss all sorts of trouble.
 	virtual ~LavObject() {}
 
-	//LavObjects are only to ever be created on the heap through expllicit specification of number of inputs and outputs, and any clone functionality must be explicit.  If a subclass wishes to implement copying it can, but there really isn't a reason.
-	LavObject() = delete;
+	//we are never allowed to copy.
 	LavObject(const LavObject&) = delete;
 	LavObject& operator=(const LavObject&) = delete;
 };
