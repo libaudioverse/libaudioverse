@@ -6,6 +6,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_objects.hpp>
 #include <stdlib.h>
 #include <functional>
+#include <algorithm>
+#include <iterator>
 
 LavDevice::LavDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead) {
 	this->sr = (float)sr;
@@ -46,6 +48,20 @@ void LavDevice::visitAllObjectsInProcessOrder(std::function<void(LavObject*)> vi
 			seen.insert(o);
 		});
 	}
+	std::set<LavObject*> still_needed;
+	do {
+		still_needed.clear();
+		std::set_difference(seen.begin(), seen.end(), always_process.begin(), always_process.end(),
+			std::inserter(still_needed, still_needed.end()));
+	for(auto i = still_needed.begin(); i != still_needed.end(); i++) {
+			visitAllObjectsReachableFrom(*i, [&] (LavObject* o) {
+				if(seen.count(o) == 0) {
+					visitor(o);
+					seen.insert(o);
+				}
+			});
+		}
+	} while(still_needed.size());
 }
 
 void LavDevice::visitAllObjectsReachableFrom(LavObject* obj, std::function<void(LavObject*)> visitor) {

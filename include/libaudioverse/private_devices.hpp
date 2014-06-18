@@ -28,7 +28,7 @@ class LavDevice {
 	unsigned int block_size, channels, mixahead, is_started;
 	float sr;
 	void* mutex;
-	std::set<LavObject*> objects;
+	std::set<LavObject*> objects, always_process;
 	LavObject* output_object;
 };
 
