@@ -16,15 +16,15 @@ class LavInputDescriptor {
 /**Things all Libaudioverse objects have.*/
 class LavObject {
 	public:
-	void computeInputBuffers();//update what we point to due to parent changes.
-	void setParent(unsigned int input, LavObject* parent, unsigned int parentOutput);
-	LavObject* getParentObject(unsigned int slot);
-	unsigned int getParentOutput(unsigned int slot);
-	unsigned int getInputCount();
-	unsigned int getOutputCount();
-	void getOutputPointers(float** dest);
-	void clearParent(unsigned int slot);
-	void process();
+	virtual void computeInputBuffers();//update what we point to due to parent changes.
+	virtual void setParent(unsigned int input, LavObject* parent, unsigned int parentOutput);
+	virtual LavObject* getParentObject(unsigned int slot);
+	virtual unsigned int getParentOutput(unsigned int slot);
+	virtual unsigned int getInputCount();
+	virtual unsigned int getOutputCount();
+	virtual void getOutputPointers(float** dest);
+	virtual void clearParent(unsigned int slot);
+	virtual void process();
 	virtual void processor();
 	LavDevice *device;
 	std::map<int, LavProperty*> properties;
