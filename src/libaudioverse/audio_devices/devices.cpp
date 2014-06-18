@@ -17,6 +17,25 @@ LavDevice::LavDevice(unsigned int sr, unsigned int channels, unsigned int blockS
 }
 
 LavError LavDevice::getBlock(float* out) {
+	//if paused, memset 0s.
+	if(is_started == 0) {
+		memset(out, 0, sizeof(float)*channels*block_size);
+		return Lav_ERROR_NONE;
+	}
+	//okay, we're not paused.  Visit all objects, calling their process method.
+	visitAllObjectsInProcessOrder([] (LavObject* o) {o->process();});
+	//if no output object, memset 0 and bail out again.
+	if(output_object == nullptr) {
+		memset(out, 0, sizeof(float)*channels*block_size);
+		return Lav_ERROR_NONE;
+	}
+	float** outputs = new float*[output_object->getOutputCount()];
+	output_object->getOutputPointers(outputs);
+	//interweave them.
+	for(unsigned int i = 0; i < block_size*channels; i++) {
+		out[i] = i%channels < output_object->getOutputCount() ? outputs[i%channels][i/channels] : 0.0f; //i%channels is the channel this sample belongs to; i/channels is the position in the i%channelsth output.
+	}
+	delete[] outputs;
 	return Lav_ERROR_NONE;
 }
 
@@ -53,7 +72,7 @@ void LavDevice::visitAllObjectsInProcessOrder(std::function<void(LavObject*)> vi
 		still_needed.clear();
 		std::set_difference(seen.begin(), seen.end(), always_process.begin(), always_process.end(),
 			std::inserter(still_needed, still_needed.end()));
-	for(auto i = still_needed.begin(); i != still_needed.end(); i++) {
+		for(auto i = still_needed.begin(); i != still_needed.end(); i++) {
 			visitAllObjectsReachableFrom(*i, [&] (LavObject* o) {
 				if(seen.count(o) == 0) {
 					visitor(o);
@@ -66,7 +85,7 @@ void LavDevice::visitAllObjectsInProcessOrder(std::function<void(LavObject*)> vi
 
 void LavDevice::visitAllObjectsReachableFrom(LavObject* obj, std::function<void(LavObject*)> visitor) {
 	//we call ourselves on all parents of obj, and then pass obj to visitor.  This is essentially depth-first search.
-	for(unsigned int i = 0; i < obj->getParentCount(); i++) {
+	for(unsigned int i = 0; i < obj->getInputCount(); i++) {
 		visitAllObjectsReachableFrom(obj->getParentObject(i), visitor);
 	}
 	visitor(obj);

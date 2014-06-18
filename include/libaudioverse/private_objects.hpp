@@ -20,7 +20,9 @@ class LavObject {
 	void setParent(unsigned int input, LavObject* parent, unsigned int parentOutput);
 	LavObject* getParentObject(unsigned int slot);
 	unsigned int getParentOutput(unsigned int slot);
-	unsigned int getParentCount();
+	unsigned int getInputCount();
+	unsigned int getOutputCount();
+	void getOutputPointers(float** dest);
 	void clearParent(unsigned int slot);
 	virtual void process();
 
