@@ -24,7 +24,7 @@ class LavPortaudioDevice: public LavDevice {
 	std::atomic<int> *buffer_statuses;
 	int callback_buffer_index; //the index the callback will go to on its next invocation.
 	friend int portaudioOutputCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
-	friend LavPortaudioDevice* makePortaudioDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead);
+	friend LavDevice* createPortaudioDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead);
 };
 
 LavError initializeAudioBackend() {
@@ -35,7 +35,7 @@ LavError initializeAudioBackend() {
 	return Lav_ERROR_NONE;
 }
 
-LavPortaudioDevice* makePortaudioDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead) {
+LavDevice* createPortaudioDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead) {
 	LavPortaudioDevice* retval = new LavPortaudioDevice(sr, channels, blockSize, mixahead);
 	//we must allocate mixahead+1 buffers.
 	float** bufferArray = new float*[mixahead+1];
