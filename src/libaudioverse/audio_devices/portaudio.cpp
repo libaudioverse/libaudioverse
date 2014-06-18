@@ -13,13 +13,13 @@ int audioOutputCallback(const void* input, void* output, unsigned long frameCoun
 class LavPortaudioDevice: LavDevice {
 	std::thread audioOutputThread;
 	std::atomic_flag runningFlag; //when this clears, the audio thread self-terminates.
-	PaStream stream; //the portaudio stream we work with.  Started and stopped by the background thread for us.
+	PaStream *stream; //the portaudio stream we work with.  Started and stopped by the background thread for us.
 	//this is used to hand buffers to the audio callback.
 	//the audio callback simply sets it to NULL at the end.  We can use CAS on it to pass buffers in as needed.
 	std::atomic<float*> outgoing_buffer;
 };
 
-Lav_PUBLIC_FUNCTION LavError initializeAudioBackend() {
+LavError initializeAudioBackend() {
 	PaError err = Pa_Initialize();
 	if(err < 0) {
 		return Lav_ERROR_CANNOT_INIT_AUDIO;
