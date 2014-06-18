@@ -8,16 +8,19 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <string.h>
 #include <thread>
 #include <atomic>
+#include <set>
 
 int portaudioOutputCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
 
 class LavPortaudioDevice: LavDevice {
+	void audioOutputThreadFunction(); //the function that runs as our output thread.
 	std::thread audioOutputThread;
 	std::atomic_flag runningFlag; //when this clears, the audio thread self-terminates.
 	PaStream *stream; //the portaudio stream we work with.  Started and stopped by the background thread for us.
 	//this is used to hand buffers to the audio callback.
 	//the audio callback simply sets it to NULL at the end.  We can use CAS on it to pass buffers in as needed.
 	std::atomic<float*> outgoing_buffer;
+	std::set<float*> available_buffers; //the places we can put audio.
 	friend int portaudioOutputCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
 };
 
@@ -29,18 +32,10 @@ LavError initializeAudioBackend() {
 	return Lav_ERROR_NONE;
 }
 
+void LavPortaudioDevice::audioOutputThreadFunction() {
+}
 
 int portaudioOutputCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData) {
 	LavPortaudioDevice * const dev = (LavPortaudioDevice*)userData;
-	//we need to see if a buffer is ready for us.
-	const float* buff = dev->outgoing_buffer.load();
-	if(buff) {
-		memcpy(output, buff, sizeof(float)*frameCount);
-	}
-	else {
-		memset(output, 0, frameCount*sizeof(float));
-		}
-	//clear the flag, signalling that we should get the next one ASAP.
-	dev->outgoing_buffer.store(nullptr);
 	return paContinue;
 }
