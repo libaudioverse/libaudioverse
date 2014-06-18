@@ -34,7 +34,6 @@ class LavObject {
 	unsigned int num_outputs;
 	unsigned int num_inputs;
 	int is_processing;
-	void* mutex;
 	enum Lav_NODETYPES type;
 	//construction.
 	//note that the default LavObject has no properties and that it is up to subclass constructors to add/configure them.
