@@ -41,8 +41,8 @@ LavError LavDevice::setOutputObject(LavObject* obj) {
 void LavDevice::visitAllObjectsInProcessOrder(std::function<void(LavObject*)> visitor) {
 	std::set<LavObject*> seen;
 	if(output_object) {
-		visitAllObjectsReachableFrom(output_object, [&seen](LavObject* o) {
-			o->process();
+		visitAllObjectsReachableFrom(output_object, [&](LavObject* o) {
+			visitor(o);
 			seen.insert(o);
 		});
 	}
