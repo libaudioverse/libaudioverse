@@ -85,3 +85,15 @@ Lav_PUBLIC_FUNCTION LavError Lav_clearParent(LavObject *obj, unsigned int slot) 
 	obj->clearParent(slot);
 	return Lav_ERROR_NONE;
 }
+
+unsigned int LavObject::getInputCount() {
+	return num_inputs;
+}
+
+unsigned int LavObject::getOutputCount() {
+	return num_outputs;
+}
+
+void LavObject::getOutputPointers(float** dest) {
+	memcpy(dest, outputs, sizeof(float*)*num_outputs);
+}
