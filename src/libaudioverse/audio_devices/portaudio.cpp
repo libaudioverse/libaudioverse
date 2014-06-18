@@ -17,10 +17,11 @@ class LavPortaudioDevice: LavDevice {
 	std::thread audioOutputThread;
 	std::atomic_flag runningFlag; //when this clears, the audio thread self-terminates.
 	PaStream *stream; //the portaudio stream we work with.  Started and stopped by the background thread for us.
-	//this is used to hand buffers to the audio callback.
-	//the audio callback simply sets it to NULL at the end.  We can use CAS on it to pass buffers in as needed.
-	std::atomic<float*> outgoing_buffer;
-	std::set<float*> available_buffers; //the places we can put audio.
+	//a ringbuffer of dispatched buffers.
+	//the elements are protected by the atomic ints.
+	float** buffers;
+	std::atomic<int> *buffer_statuses;
+	int callback_buffer_index; //the index the callback will go to on its next invocation.
 	friend int portaudioOutputCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
 };
 
@@ -32,10 +33,38 @@ LavError initializeAudioBackend() {
 	return Lav_ERROR_NONE;
 }
 
+/**This algorithm is complex and consequently requires some explanation.
+- At the beginning, i.e. when this thread starts, all of the buffers point to valid memory locations big enough for one block.  In addition, all atomic ints are set to 0, meaning unprocessed.
+- This thread processes buffers as fast as it possibly can.  If it sees an atomic int of 0, it assumes unprocessed and goes to sleep for a bit.
+- The callback will set the output buffer to 0 if it sees an atomic int of 0 at its current reading position.
+- If the callback sees any other value, it will copy the memory out and flip that value to 0.
+*/
 void LavPortaudioDevice::audioOutputThreadFunction() {
+	int rb_index = 0; //our index into the buffers array.
+	while(runningFlag.test_and_set()) {
+		if(buffer_statuses[rb_index].load()) { //we just caught up and the queue is full.
+			continue;
+		}
+		//process into this buffer.
+		getBlock(buffers[rb_index]);
+		//mark it as safe for the audio callback.
+		buffer_statuses[rb_index].store(1);
+		//and compute the next index.
+		rb_index += 1;
+		rb_index %= mixahead;
+	}
 }
 
 int portaudioOutputCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData) {
 	LavPortaudioDevice * const dev = (LavPortaudioDevice*)userData;
+	const int haveBuffer = dev->buffer_statuses[dev->callback_buffer_index].load();
+	if(haveBuffer) {
+		memcpy(output, dev->buffers[dev->callback_buffer_index], sizeof(float)*frameCount);
+		dev->buffer_statuses[dev->callback_buffer_index].store(0);
+		dev->callback_buffer_index++;
+	}
+	else {
+		memset(output, 0, frameCount*sizeof(float));
+	}
 	return paContinue;
 }
