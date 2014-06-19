@@ -111,9 +111,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_deviceGetOutputObject(LavDevice* device, LavObj
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetBlock(LavDevice* device, float* destination);
 
 /**Parent management.*/
-Lav_PUBLIC_FUNCTION LavError Lav_getParent(LavObject *obj, unsigned int slot, LavObject** parent, unsigned int *outputNumber);
-Lav_PUBLIC_FUNCTION LavError Lav_setParent(LavObject *obj, LavObject *parent, unsigned int outputSlot, unsigned int inputSlot);
-Lav_PUBLIC_FUNCTION LavError Lav_clearParent(LavObject *obj, unsigned int slot);
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetParent(LavObject *obj, unsigned int slot, LavObject** parent, unsigned int *outputNumber);
+Lav_PUBLIC_FUNCTION LavError Lav_objectSetParent(LavObject *obj, unsigned int input, LavObject* parent, unsigned int output);
+Lav_PUBLIC_FUNCTION LavError Lav_objectClearParent(LavObject *obj, unsigned int slot);
 
 /**Resets a property to its default value, for any type.*/
 Lav_PUBLIC_FUNCTION LavError Lav_resetProperty(LavObject *obj, unsigned int slot);

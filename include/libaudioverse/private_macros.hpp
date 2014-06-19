@@ -5,4 +5,4 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <mutex>
 
 //use __LINE__ for a quick unique variable.
-#define LOCK(object) auto lock_##__LINE__((object))
+#define LOCK(object) std::lock_guard<decltype((object))> lock_##__LINE__((object))

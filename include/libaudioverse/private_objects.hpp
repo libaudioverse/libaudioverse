@@ -27,6 +27,8 @@ class LavObject {
 	virtual void clearParent(unsigned int slot);
 	virtual void process();
 	virtual void processor();
+	virtual LavDevice* getDevice();
+	protected:
 	LavDevice *device;
 	std::map<int, LavProperty*> properties;
 	float** inputs;

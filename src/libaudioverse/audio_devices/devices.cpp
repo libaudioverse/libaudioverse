@@ -99,19 +99,19 @@ void LavDevice::visitAllObjectsReachableFrom(LavObject* obj, std::function<void(
 //begin public API
 
 Lav_PUBLIC_FUNCTION LavError Lav_deviceSetOutputObject(LavDevice* device, LavObject* object) {
-	LOCK(device);
+	LOCK(*device);
 	device->setOutputObject(object);
 	return Lav_ERROR_NONE;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetOutputObject(LavDevice* device, LavObject** destination) {
-	LOCK(device);
+	LOCK(*device);
 	*destination = device->getOutputObject();
 	return Lav_ERROR_NONE;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetBlock(LavDevice* device, float* destination) {
-	LOCK(device);
+	LOCK(*device);
 	device->getBlock(destination);
 	return Lav_ERROR_NONE;
 }

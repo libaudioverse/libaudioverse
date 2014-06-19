@@ -8,6 +8,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <string.h>
 #include <libaudioverse/private_objects.hpp>
 #include <libaudioverse/private_devices.hpp>
+#include <libaudioverse/private_macros.hpp>
 
 float zerobuffer[Lav_MAX_BLOCK_SIZE] = {0}; //this is a shared buffer for the "no parent" case.
 
@@ -101,4 +102,29 @@ unsigned int LavObject::getOutputCount() {
 
 void LavObject::getOutputPointers(float** dest) {
 	memcpy(dest, outputs, sizeof(float*)*num_outputs);
+}
+
+LavDevice* LavObject::getDevice() {
+	return device;
+}
+
+//begin public api
+
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetParent(LavObject *obj, unsigned int slot, LavObject** parent, unsigned int *outputNumber) {
+	LOCK(*(obj->getDevice()));
+	*parent = obj->getParentObject(slot);
+	*outputNumber = obj->getParentOutput(slot);
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_objectSetParent(LavObject *obj, unsigned int input, LavObject* parent, unsigned int output) {
+	LOCK(*(obj->getDevice()));
+	obj->setParent(input, parent, output);
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_objectClearParent(LavObject *obj, unsigned int slot) {
+	LOCK(*(obj->getDevice()));
+	obj->clearParent(slot);
+	return Lav_ERROR_NONE;
 }
