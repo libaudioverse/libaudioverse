@@ -84,16 +84,16 @@ enum Lav_PROPERTYTYPES {
 };
 
 /**These are used to tag nodes with their type, so that external languages may see them.*/
-enum Lav_NODETYPES{
+enum Lav_OBJTYPES {
 	Lav_OBJTYPE_WORLD,
 	Lav_OBJTYPE_SOURCE_MONO,
-	Lav_NODETYPE_ZEROS,
-	Lav_NODETYPE_FILE,
-	Lav_NODETYPE_HRTF,
-	Lav_NODETYPE_SINE,
-	Lav_NODETYPE_MIXER,
-	Lav_NODETYPE_ATTENUATOR,
-	Lav_NODETYPE_HARD_LIMITER,
+	Lav_OBJTYPE_ZEROS,
+	Lav_OBJTYPE_FILE,
+	Lav_OBJTYPE_HRTF,
+	Lav_OBJTYPE_SINE,
+	Lav_OBJTYPE_MIXER,
+	Lav_OBJTYPE_ATTENUATOR,
+	Lav_OBJTYPE_HARD_LIMITER,
 };
 
 /**Initialize Libaudioverse.*/
