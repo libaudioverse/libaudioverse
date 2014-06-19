@@ -79,9 +79,9 @@ class LavProperty {
 };
 
 //helper methods to quickly make properties.
-LavProperty* makeIntProperty(int default, int min, int max);
-LavProperty* makeFloatProperty(float default, float min, float max);
-LavProperty* makeDoubleProperty(float default, float min, float max);
-LavProperty* makeFloat3Property(float default[3]);
-LavProperty* makeFloat6Property(float default[6]);
-LavProperty* makeStringProperty(std::string default);
+LavProperty* createIntProperty(int default, int min, int max);
+LavProperty* createFloatProperty(float default, float min, float max);
+LavProperty* createDoubleProperty(float default, float min, float max);
+LavProperty* createFloat3Property(float default[3]);
+LavProperty* createFloat6Property(float default[6]);
+LavProperty* createStringProperty(std::string default);

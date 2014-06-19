@@ -8,7 +8,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 /*Note: having properties be very very very fast is important, so consequently go see the header file.*/
 
-LavProperty* makeIntProperty(int default, int min, int max) {
+LavProperty* createIntProperty(int default, int min, int max) {
 	LavProperty* retval = new LavProperty(Lav_PROPERTYTYPE_INT);
 	retval->setIntDefault(default);
 	retval->setIntRange(min, max);
@@ -16,7 +16,7 @@ LavProperty* makeIntProperty(int default, int min, int max) {
 	return retval;
 }
 
-LavProperty* makeFloatProperty(float default, float min, float max) {
+LavProperty* createFloatProperty(float default, float min, float max) {
 	LavProperty* retval = new LavProperty(Lav_PROPERTYTYPE_FLOAT);
 	retval->setFloatDefault(default);
 	retval->setFloatRange(min, max);
@@ -24,7 +24,7 @@ LavProperty* makeFloatProperty(float default, float min, float max) {
 	return retval;
 }
 
-LavProperty* makeDoubleProperty(double default, double min, double max) {
+LavProperty* createDoubleProperty(double default, double min, double max) {
 	LavProperty* retval = new LavProperty(Lav_PROPERTYTYPE_DOUBLE);
 	retval->setDoubleDefault(default);
 	retval->setDoubleRange(min, max);
@@ -32,21 +32,21 @@ LavProperty* makeDoubleProperty(double default, double min, double max) {
 	return retval;
 }
 
-LavProperty* makeFloat3Property(float default[3]) {
+LavProperty* createFloat3Property(float default[3]) {
 	LavProperty* retval = new LavProperty(Lav_PROPERTYTYPE_FLOAT3);
 	retval->setFloat3Default(default);
 	retval->reset();
 	return retval;
 }
 
-LavProperty* makeFloat6Property(float v[6]) {
+LavProperty* createFloat6Property(float v[6]) {
 	LavProperty* retval = new LavProperty(Lav_PROPERTYTYPE_FLOAT6);
 	retval->setFloat6Default(v);
 	retval->reset();
 	return retval;
 }	
 
-LavProperty* makeStringProperty(std::string default) {
+LavProperty* createStringProperty(std::string default) {
 	LavProperty* retval = new LavProperty(Lav_PROPERTYTYPE_STRING);
 	retval->setStringDefault(default);
 	retval->reset();

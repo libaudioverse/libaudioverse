@@ -4,8 +4,13 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 #include <math.h>
 #include <stdlib.h>
+#include <libaudioverse/libaudioverse.h>
+#include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/private_objects.hpp>
-#include <math.h>
+#include <libaudioverse/private_devices.hpp>
+#include <libaudioverse/private_properties.hpp>
+#include <libaudioverse/private_functiontables.hpp>
+#include <limits>
 class LavSineObject: public LavObject {
 	public:
 	virtual void init(LavDevice* dev);
@@ -19,7 +24,8 @@ void LavSineObject::init(LavDevice* dev) {
 	LavObject::init(dev, 0, 1);
 	table_delta = device->getSr()/sineTableLength;
 	start = 0;
-	ofset = 0;
+	offset = 0;
+	properties[Lav_SINE_FREQUENCY] = createFloatProperty(440.0f, 0.0f, std::numeric_limits<float>::infinity());
 }
 
 void LavSineObject::process() {
