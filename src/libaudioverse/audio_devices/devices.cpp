@@ -76,7 +76,7 @@ void LavDevice::visitAllObjectsInProcessOrder(std::function<void(LavObject*)> vi
 	std::set<LavObject*> still_needed;
 	do {
 		still_needed.clear();
-		std::set_difference(seen.begin(), seen.end(), always_process.begin(), always_process.end(),
+		std::set_difference(always_process.begin(), always_process.end(), seen.begin(), seen.end(),
 			std::inserter(still_needed, still_needed.end()));
 		for(auto i = still_needed.begin(); i != still_needed.end(); i++) {
 			visitAllObjectsReachableFrom(*i, [&] (LavObject* o) {
