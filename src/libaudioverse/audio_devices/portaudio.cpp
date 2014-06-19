@@ -74,7 +74,7 @@ void LavPortaudioDevice::audioOutputThreadFunction() {
 		buffer_statuses[rb_index].store(1);
 		//and compute the next index.
 		rb_index += 1;
-		rb_index %= mixahead;
+		rb_index %= (mixahead+1);
 	}
 	Pa_StopStream(stream);
 }
