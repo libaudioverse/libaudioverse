@@ -137,9 +137,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_getIntPropertyRange(LavObject* obj, unsigned in
 Lav_PUBLIC_FUNCTION LavError Lav_getFloatPropertyRange(LavObject* obj, unsigned int slot, float* lower, float* upper);
 Lav_PUBLIC_FUNCTION LavError Lav_getDoublePropertyRange(LavObject* obj, unsigned int slot, double* lower, double* upper);
 
-/**This is a default node processing function. It simply writes 0s to all outputs, and can be useful when you need to provide audio and have nothing to do.*/
-Lav_PUBLIC_FUNCTION LavError Lav_processDefault(LavObject *obj);
-
 /**Make a sine node.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavDevice* device, LavObject **destination);
 
