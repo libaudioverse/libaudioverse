@@ -19,8 +19,8 @@ class LavProperty {
 	int getType() { return type;}
 	void setType(int t) {type = t;}
 	int isType(int t) { return type == t;} //we have to typecheck these everywhere.
-	std::string getName() {return name;}
-	void setName(std::string n) { name = n;}
+	const char* getName() {return name.c_str();}
+	void setName(const char* n) { name = std::string(n);}
 	int getTag() {return tag;}
 	void setTag(int t) {tag = t;}
 
@@ -79,9 +79,9 @@ class LavProperty {
 };
 
 //helper methods to quickly make properties.
-LavProperty* createIntProperty(int default, int min, int max);
-LavProperty* createFloatProperty(float default, float min, float max);
-LavProperty* createDoubleProperty(float default, float min, float max);
-LavProperty* createFloat3Property(float default[3]);
-LavProperty* createFloat6Property(float default[6]);
-LavProperty* createStringProperty(std::string default);
+LavProperty* createIntProperty(const char* name, int default, int min, int max);
+LavProperty* createFloatProperty(const char* name, float default, float min, float max);
+LavProperty* createDoubleProperty(const char* name, float default, float min, float max);
+LavProperty* createFloat3Property(const char* name, float default[3]);
+LavProperty* createFloat6Property(const char* name, float default[6]);
+LavProperty* createStringProperty(const char* name, const char* default);

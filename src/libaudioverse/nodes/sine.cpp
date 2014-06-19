@@ -25,7 +25,7 @@ void LavSineObject::init(LavDevice* dev) {
 	table_delta = device->getSr()/sineTableLength;
 	start = 0;
 	offset = 0;
-	properties[Lav_SINE_FREQUENCY] = createFloatProperty(440.0f, 0.0f, std::numeric_limits<float>::infinity());
+	properties[Lav_SINE_FREQUENCY] = createFloatProperty("frequency", 440.0f, 0.0f, std::numeric_limits<float>::infinity());
 }
 
 void LavSineObject::process() {

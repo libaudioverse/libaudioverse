@@ -8,47 +8,53 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 /*Note: having properties be very very very fast is important, so consequently go see the header file.*/
 
-LavProperty* createIntProperty(int default, int min, int max) {
+LavProperty* createIntProperty(const char* name, int default, int min, int max) {
 	LavProperty* retval = new LavProperty(Lav_PROPERTYTYPE_INT);
 	retval->setIntDefault(default);
 	retval->setIntRange(min, max);
+	retval->setName(name);
 	retval->reset();
 	return retval;
 }
 
-LavProperty* createFloatProperty(float default, float min, float max) {
+LavProperty* createFloatProperty(const char* name, float default, float min, float max) {
 	LavProperty* retval = new LavProperty(Lav_PROPERTYTYPE_FLOAT);
+	retval->setName(name);
 	retval->setFloatDefault(default);
 	retval->setFloatRange(min, max);
 	retval->reset();
 	return retval;
 }
 
-LavProperty* createDoubleProperty(double default, double min, double max) {
+LavProperty* createDoubleProperty(const char* name, double default, double min, double max) {
 	LavProperty* retval = new LavProperty(Lav_PROPERTYTYPE_DOUBLE);
 	retval->setDoubleDefault(default);
 	retval->setDoubleRange(min, max);
+	retval->setName(name);
 	retval->reset();
 	return retval;
 }
 
-LavProperty* createFloat3Property(float default[3]) {
+LavProperty* createFloat3Property(const char* name, float default[3]) {
 	LavProperty* retval = new LavProperty(Lav_PROPERTYTYPE_FLOAT3);
 	retval->setFloat3Default(default);
+	retval->setName(name);
 	retval->reset();
 	return retval;
 }
 
-LavProperty* createFloat6Property(float v[6]) {
+LavProperty* createFloat6Property(const char* name, float v[6]) {
 	LavProperty* retval = new LavProperty(Lav_PROPERTYTYPE_FLOAT6);
 	retval->setFloat6Default(v);
+	retval->setName(name);
 	retval->reset();
 	return retval;
 }	
 
-LavProperty* createStringProperty(std::string default) {
+LavProperty* createStringProperty(const char* name, const char* default) {
 	LavProperty* retval = new LavProperty(Lav_PROPERTYTYPE_STRING);
 	retval->setStringDefault(default);
+	retval->setName(name);
 	retval->reset();
 	return retval;
 }
