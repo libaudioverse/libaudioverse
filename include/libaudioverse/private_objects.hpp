@@ -28,6 +28,7 @@ class LavObject {
 	virtual void process();
 	virtual void processor();
 	virtual LavDevice* getDevice();
+	virtual LavProperty* getProperty(int slot);
 
 	//meet the lockable concept.
 	//Warning: these aren't virtual because they're just so that our macro works; all locking still forwards to devices.

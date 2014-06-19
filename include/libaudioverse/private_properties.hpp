@@ -51,7 +51,7 @@ class LavProperty {
 	void setDoubleDefault(double v) {default_value.dval = v;}
 
 	//float3 vectors.
-	const float* getFloat3value() {return value.f3val;}
+	const float* getFloat3Value() {return value.f3val;}
 	const float* getFloat3Default() {return default_value.f3val;}
 	void setFloat3Value(const float* const v) {memcpy(value.f3val, v, sizeof(float)*3);}
 	void setFloat3Value(float v1, float v2, float v3) {value.f3val[0] = v1; value.f3val[1] = v2; value.f3val[2] = v3;}
@@ -59,7 +59,7 @@ class LavProperty {
 	void setFloat3Default(float v1, float v2, float v3) {default_value.f3val[0] = v1; default_value.f3val[1] = v2; default_value.f3val[2] = v3;}
 
 	//float6 vectors.
-	const float* getFloat6value() {return value.f6val;}
+	const float* getFloat6Value() {return value.f6val;}
 	const float* getFloat6Default() {return default_value.f6val;}
 	void setFloat6Value(const float* const v) {memcpy(&value.f6val, v, sizeof(float)*6);}
 	void setFloat6Value(float v1, float v2, float v3, float v4, float v5, float v6) {value.f6val[0] = v1; value.f6val[1] = v2; value.f6val[2] = v3; value.f6val[3] = v4; value.f6val[4] = v5; value.f6val[5] = v6;}
@@ -67,10 +67,10 @@ class LavProperty {
 	void setFloat6Default(float v1, float v2, float v3, float v4, float v5, float v6) {default_value.f6val[0] = v1; default_value.f6val[1] = v2; default_value.f6val[2] = v3; default_value.f6val[3] = v4; default_value.f6val[4] = v5; default_value.f6val[5] = v6;}
 
 	//strings:
-	std::string getStringValue() { return string_value;}
-	void setStringValue(std::string s) { string_value = s;}
-	std::string getStringDefault() { return default_string_value;}
-	void setStringDefault(std::string s) { default_string_value = s;}
+	const char* getStringValue() { return string_value.c_str();}
+	void setStringValue(const char* s) { string_value = s;}
+	const char* getStringDefault() { return default_string_value.c_str();}
+	void setStringDefault(const char* s) { default_string_value = s;}
 
 	private:
 	int type, tag;

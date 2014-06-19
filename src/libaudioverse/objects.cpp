@@ -7,6 +7,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdlib.h>
 #include <string.h>
 #include <libaudioverse/private_objects.hpp>
+#include <libaudioverse/private_properties.hpp>
 #include <libaudioverse/private_devices.hpp>
 #include <libaudioverse/private_macros.hpp>
 
@@ -108,6 +109,11 @@ LavDevice* LavObject::getDevice() {
 	return device;
 }
 
+LavProperty* LavObject::getProperty(int slot) {
+	if(properties.count(slot) == 0) return nullptr;
+	else return properties[slot];
+}
+
 void LavObject::lock() {
 	device->lock();
 }
@@ -140,68 +146,103 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectClearParent(LavObject *obj, unsigned int 
 //this is properties.
 //this is here because properties do not "know" about objects and only objects have properties; also, it made properties.cpp ahve to "know" about devices and objects.
 
+//this works for getters and setters to lock the object and set a variable prop to be a pointer-like thing to a property.
+#define PROP_PREAMBLE(o, s, t) LOCK(*(o));\
+auto prop = (o)->getProperty((s));\
+if(prop == nullptr) {\
+return Lav_ERROR_RANGE;\
+}\
+if(prop->getType() != (t)) {\
+return Lav_ERROR_TYPE_MISMATCH;\
+}
+
+
 Lav_PUBLIC_FUNCTION LavError Lav_objectResetProperty(LavObject *obj, unsigned int slot) {
-	LOCK(*(obj->getDevice()));
+	LOCK(*obj);
+	auto prop = obj->getProperty(slot);
+	if(prop == nullptr) return Lav_ERROR_RANGE;
+	prop->reset();
 	return Lav_ERROR_NONE;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectSetIntProperty(LavObject* obj, unsigned int slot, int value) {
-	LOCK(*(obj->getDevice()));
+	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_INT);
+	prop->setIntValue(value);
 	return Lav_ERROR_NONE;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectSetFloatProperty(LavObject *obj, unsigned int slot, float value) {
-	LOCK(*(obj->getDevice()));
+	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_FLOAT);
+	prop->setFloatValue(value);
 	return Lav_ERROR_NONE;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectSetDoubleProperty(LavObject *obj, unsigned int slot, double value) {
-	LOCK(*(obj->getDevice()));
+	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_DOUBLE);
+	prop->setDoubleValue(value);
 	return Lav_ERROR_NONE;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectSetStringProperty(LavObject*obj, unsigned int slot, char* value) {
-	LOCK(*(obj->getDevice()));
+	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_STRING);
+	prop->setStringValue(value);
 	return Lav_ERROR_NONE;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectSetFloat3Property(LavObject* obj, unsigned int slot, float v1, float v2, float v3) {
-	LOCK(*(obj->getDevice()));
+	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_FLOAT3);
+	prop->setFloat3Value(v1, v2, v3);
 	return Lav_ERROR_NONE;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectSetFloat6Property(LavObject* obj, unsigned int slot, float v1, float v2, float v3, float v4, float v5, float v6) {
-	LOCK(*(obj->getDevice()));
+	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_FLOAT6);
+	prop->setFloat6Value(v1, v2, v3, v4, v5, v6);
 	return Lav_ERROR_NONE;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetIntProperty(LavObject*obj, unsigned int slot, int *destination) {
-	LOCK(*(obj->getDevice()));
+	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_INT);
+	*destination = prop->getIntValue();
 	return Lav_ERROR_NONE;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloatProperty(LavObject* obj, unsigned int slot, float *destination) {
-	LOCK(*(obj->getDevice()));
+	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_FLOAT);
+	*destination = prop->getFloatValue();
 	return Lav_ERROR_NONE;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetDoubleProperty(LavObject*obj, unsigned int slot, double *destination) {
-	LOCK(*(obj->getDevice()));
+	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_DOUBLE);
+	*destination = prop->getDoubleValue();
 	return Lav_ERROR_NONE;
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetStringProperty(LavObject* obj, unsigned int slot, char** destination) {
-	LOCK(*(obj->getDevice()));
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetStringProperty(LavObject* obj, unsigned int slot, const char** destination) {
+	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_STRING);
+	*destination = prop->getStringValue();
 	return Lav_ERROR_NONE;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloat3Property(LavObject* obj, unsigned int slot, float* v1, float* v2, float* v3) {
-	LOCK(*(obj->getDevice()));
+	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_FLOAT3);
+	auto val = prop->getFloat3Value();
+	*v1 = val[0];
+	*v2 = val[1];
+	*v3 = val[2];
 	return Lav_ERROR_NONE;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloat6Property(LavObject* obj, unsigned int slot, float* v1, float* v2, float* v3, float* v4, float* v5, float* v6) {
-	LOCK(*(obj->getDevice()));
+	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_FLOAT6);
+	auto val = prop->getFloat6Value();
+	*v1 = val[0];
+	*v2 = val[1];
+	*v3 = val[2];
+	*v4 = val[3];
+	*v5 = val[4];
+	*v6 = val[5];
 	return Lav_ERROR_NONE;
 }
 
