@@ -247,16 +247,22 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloat6Property(LavObject* obj, unsigne
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetIntPropertyRange(LavObject* obj, unsigned int slot, int* lower, int* upper) {
-	LOCK(*(obj->getDevice()));
+	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_INT);
+	*lower = prop->getIntMin();
+	*upper = prop->getIntMax();
 	return Lav_ERROR_NONE;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloatPropertyRange(LavObject* obj, unsigned int slot, float* lower, float* upper) {
-	LOCK(*(obj->getDevice()));
+	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_FLOAT);
+	*lower = prop->getFloatMin();
+	*upper = prop->getFloatMax();
 	return Lav_ERROR_NONE;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetDoublePropertyRange(LavObject* obj, unsigned int slot, double* lower, double* upper) {
-	LOCK(*(obj->getDevice()));
+	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_DOUBLE);
+	*lower = prop->getDoubleMin();
+	*upper = prop->getDoubleMax();
 	return Lav_ERROR_NONE;
 }
