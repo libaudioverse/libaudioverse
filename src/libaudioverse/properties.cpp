@@ -3,6 +3,9 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/private_properties.hpp>
+#include <libaudioverse/private_objects.hpp>
+#include <libaudioverse/private_macros.hpp>
+#include <libaudioverse/private_devices.hpp>
 #include <stdlib.h>
 #include <string.h>
 
@@ -57,4 +60,86 @@ LavProperty* createStringProperty(const char* name, const char* default) {
 	retval->setName(name);
 	retval->reset();
 	return retval;
+}
+
+//begin public api
+
+Lav_PUBLIC_FUNCTION LavError Lav_resetProperty(LavObject *obj, unsigned int slot) {
+	LOCK(*(obj->getDevice()));
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_setIntProperty(LavObject* obj, unsigned int slot, int value) {
+	LOCK(*(obj->getDevice()));
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_setFloatProperty(LavObject *obj, unsigned int slot, float value) {
+	LOCK(*(obj->getDevice()));
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_setDoubleProperty(LavObject *obj, unsigned int slot, double value) {
+	LOCK(*(obj->getDevice()));
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_setStringProperty(LavObject*obj, unsigned int slot, char* value) {
+	LOCK(*(obj->getDevice()));
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_setFloat3Property(LavObject* obj, unsigned int slot, float v1, float v2, float v3) {
+	LOCK(*(obj->getDevice()));
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_setFloat6Property(LavObject* obj, unsigned int slot, float v1, float v2, float v3, float v4, float v5, float v6) {
+	LOCK(*(obj->getDevice()));
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_getIntProperty(LavObject*obj, unsigned int slot, int *destination) {
+	LOCK(*(obj->getDevice()));
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_getFloatProperty(LavObject* obj, unsigned int slot, float *destination) {
+	LOCK(*(obj->getDevice()));
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_getDoubleProperty(LavObject*obj, unsigned int slot, double *destination) {
+	LOCK(*(obj->getDevice()));
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_getStringProperty(LavObject* obj, unsigned int slot, char** destination) {
+	LOCK(*(obj->getDevice()));
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_getFloat3Property(LavObject* obj, unsigned int slot, float* v1, float* v2, float* v3) {
+	LOCK(*(obj->getDevice()));
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_getFloat6Property(LavObject* obj, unsigned int slot, float* v1, float* v2, float* v3, float* v4, float* v5, float* v6) {
+	LOCK(*(obj->getDevice()));
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_getIntPropertyRange(LavObject* obj, unsigned int slot, int* lower, int* upper) {
+	LOCK(*(obj->getDevice()));
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_getFloatPropertyRange(LavObject* obj, unsigned int slot, float* lower, float* upper) {
+	LOCK(*(obj->getDevice()));
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_getDoublePropertyRange(LavObject* obj, unsigned int slot, double* lower, double* upper) {
+	LOCK(*(obj->getDevice()));
+	return Lav_ERROR_NONE;
 }
