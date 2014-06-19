@@ -19,6 +19,7 @@ class LavDevice {
 	virtual LavError stop();
 	virtual LavError associateObject(LavObject* obj);
 	virtual LavError setOutputObject(LavObject* obj);
+	virtual float getSr() { return sr;}
 	protected:
 	//visit all objects in the order they need to be visited if we were processing the graph.
 	virtual void visitAllObjectsInProcessOrder(std::function<void(LavObject*)> visitor);

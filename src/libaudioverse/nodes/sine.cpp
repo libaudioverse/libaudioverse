@@ -11,12 +11,15 @@ class LavSineObject: public LavObject {
 	virtual void init(LavDevice* dev);
 	virtual void process();
 	float table_delta;
-	unsigned int start;
+	unsigned int start ;
 	float offset;
 };
 
 void LavSineObject::init(LavDevice* dev) {
 	LavObject::init(dev, 0, 1);
+	table_delta = device->getSr()/sineTableLength;
+	start = 0;
+	ofset = 0;
 }
 
 void LavSineObject::process() {
