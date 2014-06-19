@@ -58,7 +58,7 @@ LavDevice* createPortaudioDevice(unsigned int sr, unsigned int channels, unsigne
 - This thread processes buffers as fast as it possibly can.  If it sees an atomic int of 0, it assumes unprocessed and goes to sleep for a bit.
 - The callback will set the output buffer to 0 if it sees an atomic int of 0 at its current reading position.
 - If the callback sees any other value, it will copy the memory out and flip that value to 0.
-Basically, this is a one-reader one-writer lock-free ringbuffer with an additional set of flags to tell who last touched something.
+Basically, this is a one-reader one-writer lock-free ringbuffer with an additional set of flags to tell who last touched something, and we don't consider the two variables buffers and buffer_statuses to be protected by our mutex.
 */
 void LavPortaudioDevice::audioOutputThreadFunction() {
 	int rb_index = 0; //our index into the buffers array.
@@ -68,7 +68,9 @@ void LavPortaudioDevice::audioOutputThreadFunction() {
 			continue;
 		}
 		//process into this buffer.
+		lock();
 		getBlock(buffers[rb_index]);
+		unlock();
 		//mark it as safe for the audio callback.
 		buffer_statuses[rb_index].store(1);
 		//and compute the next index.
