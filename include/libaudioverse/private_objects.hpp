@@ -4,6 +4,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include "libaudioverse.h"
 #include <map>
+#include <memory>
 
 class LavProperty;
 
@@ -14,7 +15,7 @@ class LavInputDescriptor {
 };
 
 /**Things all Libaudioverse objects have.*/
-class LavObject {
+class LavObject: std::enable_shared_from_this<LavObject> {
 	public:
 	LavObject() = default; //this is needed due to weirdness with deleting the copy constructor and assignment. For some reason, VS breaks when you do that and not also this.
 	virtual void init(LavDevice* device, unsigned int numInputs, unsigned int numOutputs);

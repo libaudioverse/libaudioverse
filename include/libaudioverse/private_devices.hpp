@@ -5,11 +5,12 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <functional> //we have to use an std::function for the preprocessing hook.  There's no good way around it because worlds need to use capturing lambdas.
 #include <set>
 #include <mutex>
+#include <memory>
 #include "libaudioverse.h"
 
 class LavObject;
 
-class LavDevice {
+class LavDevice: std::enable_shared_from_this<LavDevice> {
 	public:
 	void init(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead);
 	virtual ~LavDevice() {}
