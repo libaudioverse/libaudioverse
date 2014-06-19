@@ -15,6 +15,7 @@ void LavDevice::init(unsigned int sr, unsigned int channels, unsigned int blockS
 	this->channels = channels;
 	this->block_size = blockSize;
 	this->mixahead = mixahead;
+	start();
 }
 
 LavError LavDevice::getBlock(float* out) {
