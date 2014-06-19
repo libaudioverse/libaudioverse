@@ -46,7 +46,7 @@ void LavSineObject::process() {
 		const float weight2 = 1-offset;
 		outputs[0][i] = sineTable[samp1]*weight1+sineTable[samp2]*weight2;
 		offset += table_delta*freq;
-		start += floorf(offset);
+		start += (int)floorf(offset);
 		start %= sineTableLength;
 		offset = fmod(offset, 1.0f);
 	}
