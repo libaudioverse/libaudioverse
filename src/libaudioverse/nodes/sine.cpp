@@ -11,7 +11,9 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_properties.hpp>
 #include <libaudioverse/private_functiontables.hpp>
 #include <libaudioverse/private_dspmath.hpp>
+#include <libaudioverse/private_macros.hpp>
 #include <limits>
+
 class LavSineObject: public LavObject {
 	public:
 	virtual void init(LavDevice* dev);
@@ -29,6 +31,12 @@ void LavSineObject::init(LavDevice* dev) {
 	properties[Lav_SINE_FREQUENCY] = createFloatProperty("frequency", 440.0f, 0.0f, std::numeric_limits<float>::infinity());
 }
 
+LavObject* createSineObject(LavDevice* device) {
+	LavSineObject* retval = new LavSineObject();
+	retval->init(device);
+	return retval;
+}
+
 void LavSineObject::process() {
 	float freq = properties[Lav_SINE_FREQUENCY]->getFloatValue();
 	for(unsigned int i = 0; i < device->getBlockSize(); i++) {
@@ -39,4 +47,13 @@ void LavSineObject::process() {
 		outputs[0][i] = sineTable[samp1]*weight1+sineTable[samp2]*weight2;
 		offset = ringmodf(offset+table_delta, (float)sineTableLength);
 	}
+}
+
+//begin public api
+
+Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavDevice* device, LavObject **destination) {
+	LOCK(*device);
+	LavObject* retval = createSineObject(device);
+	*destination = retval;
+	return Lav_ERROR_NONE;
 }

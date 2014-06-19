@@ -16,6 +16,7 @@ class LavInputDescriptor {
 /**Things all Libaudioverse objects have.*/
 class LavObject {
 	public:
+	LavObject() = default; //this is needed due to weirdness with deleting the copy constructor and assignment. For some reason, VS breaks when you do that and not also this.
 	virtual void init(LavDevice* device, unsigned int numInputs, unsigned int numOutputs);
 	virtual void computeInputBuffers();//update what we point to due to parent changes.
 	virtual void setParent(unsigned int input, LavObject* parent, unsigned int parentOutput);
