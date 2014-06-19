@@ -18,7 +18,7 @@ const unsigned int sineTableLength = 44100;
 
 Lav_PUBLIC_FUNCTION void computeSineTable() {
 	for(unsigned int i = 0; i < sineTableLength; i++) {
-		sineTable[i] = sinf(2*PI*i/sineTableLength); //sine wave of frequency 1 for 1 second.
+		sineTable[i] = sinf((2*PI*i)/sineTableLength); //sine wave of frequency 1 for 1 second.
 	}
 	sineTable[sineTableLength] = sineTable[0]; //make sure the last sample mirrors the first.
 }

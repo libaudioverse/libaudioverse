@@ -25,7 +25,7 @@ class LavSineObject: public LavObject {
 
 void LavSineObject::init(LavDevice* dev) {
 	LavObject::init(dev, 0, 1);
-	table_delta = device->getSr()/sineTableLength;
+	table_delta = sineTableLength/device->getSr();
 	start = 0;
 	offset = 0;
 	properties[Lav_SINE_FREQUENCY] = createFloatProperty("frequency", 440.0f, 0.0f, std::numeric_limits<float>::infinity());
@@ -45,7 +45,7 @@ void LavSineObject::process() {
 		const float weight1 = offset;
 		const float weight2 = 1-offset;
 		outputs[0][i] = sineTable[samp1]*weight1+sineTable[samp2]*weight2;
-		offset = ringmodf(offset+table_delta, (float)sineTableLength);
+		offset = ringmodf(offset+table_delta*freq, (float)sineTableLength);
 	}
 }
 
