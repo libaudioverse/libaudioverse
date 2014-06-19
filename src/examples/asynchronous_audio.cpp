@@ -22,8 +22,8 @@ void main() {
 	ERRCHECK(Lav_initializeLibrary());
 	ERRCHECK(Lav_createDefaultAudioOutputDevice(&device));
 	ERRCHECK(Lav_createSineObject(device, &node));
-	ERRCHECK(Lav_deviceSetOutputObject(device, node));
 	ERRCHECK(Lav_objectSetFloatProperty(node, Lav_SINE_FREQUENCY, 0));
+	ERRCHECK(Lav_deviceSetOutputObject(device, node));
 	for(unsigned int i = 0; i < 500; i++) {
 		ERRCHECK(Lav_objectSetFloatProperty(node, Lav_SINE_FREQUENCY, (float)i));
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
