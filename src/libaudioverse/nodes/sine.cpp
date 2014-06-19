@@ -10,6 +10,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_devices.hpp>
 #include <libaudioverse/private_properties.hpp>
 #include <libaudioverse/private_functiontables.hpp>
+#include <libaudioverse/private_dspmath.hpp>
 #include <limits>
 class LavSineObject: public LavObject {
 	public:
@@ -29,4 +30,13 @@ void LavSineObject::init(LavDevice* dev) {
 }
 
 void LavSineObject::process() {
+	float freq = properties[Lav_SINE_FREQUENCY]->getFloatValue();
+	for(unsigned int i = 0; i < device->getBlockSize(); i++) {
+		const unsigned int samp1 = start;
+		const unsigned int samp2 = start+1;
+		const float weight1 = offset;
+		const float weight2 = 1-offset;
+		outputs[0][i] = sineTable[samp1]*weight1+sineTable[samp2]*weight2;
+		offset = ringmodf(offset+table_delta, (float)sineTableLength);
+	}
 }
