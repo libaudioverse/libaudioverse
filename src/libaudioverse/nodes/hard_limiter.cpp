@@ -4,42 +4,33 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 #include <math.h>
 #include <stdlib.h>
-#include <libaudioverse/private_all.hpp>
+#include <libaudioverse/libaudioverse.h>
+#include <libaudioverse/libaudioverse_properties.h>
+#include <libaudioverse/private_objects.hpp>
+#include <libaudioverse/private_devices.hpp>
 
-LavError hardLimiterProcessor(LavObject *node);
+class LavHardLimiter: public LavObject {
+	public:
+	void init(LavDevice* device, unsigned int numInputs);
+	virtual void process();
+};
 
-Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterNode(LavDevice* device, unsigned int numInputs, LavObject **destination) {
-	STANDARD_PREAMBLE;
-	LavError err = Lav_ERROR_NONE;
-	CHECK_NOT_NULL(destination);
-	CHECK_NOT_NULL(device);
-	ERROR_IF_TRUE(numInputs <= 0, Lav_ERROR_RANGE);
-	LOCK(device->mutex);
-	LavNode *retval = NULL;
-	err = Lav_createNode(numInputs, numInputs, 
-0, 0,
-Lav_NODETYPE_HARD_LIMITER, device, (LavObject**)&retval);
-	if(err != Lav_ERROR_NONE) SAFERETURN(err);
-
-	((LavObject*)retval)->process = hardLimiterProcessor;
-	*destination = (LavObject*)retval;
-	SAFERETURN(Lav_ERROR_NONE);
-	STANDARD_CLEANUP_BLOCK;
+void LavHardLimiter::init(LavDevice* device, unsigned int numInputs) {
+	LavObject::init(device, numInputs, numInputs);
 }
 
-LavError hardLimiterProcessor(LavObject *obj) {
-	for(unsigned int i = 0; i < obj->device->block_size; i++) {
-		for(unsigned int o = 0; o < obj->num_outputs; o++) {
-			if(obj->inputs[o][i] > 1.0f) {
-				obj->outputs[o][i] = 1.0f;
+void LavHardLimiter::process() {
+	for(unsigned int i = 0; i < device->getBlockSize(); i++) {
+		for(unsigned int o = 0; o < num_outputs; o++) {
+			if(inputs[o][i] > 1.0f) {
+				outputs[o][i] = 1.0f;
 				continue;
 			}
-			else if(obj->inputs[o][i] < -1.0f) {
-				obj->outputs[o][i] = -1.0f;
+			else if(inputs[o][i] < -1.0f) {
+				outputs[o][i] = -1.0f;
 				continue;
 			}
-			obj->outputs[o][i] = obj->inputs[o][i];
+			outputs[o][i] = inputs[o][i];
 		}
 	}
-	return Lav_ERROR_NONE;
 }
