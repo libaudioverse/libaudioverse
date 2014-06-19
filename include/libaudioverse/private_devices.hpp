@@ -4,6 +4,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include <functional> //we have to use an std::function for the preprocessing hook.  There's no good way around it because worlds need to use capturing lambdas.
 #include <set>
+#include <mutex>
 #include "libaudioverse.h"
 
 class LavObject;
@@ -14,12 +15,16 @@ class LavDevice {
 	virtual ~LavDevice() {}
 	virtual LavError getBlock(float* out);
 	virtual unsigned int getBlockSize() { return block_size;}
-	virtual void* getMutex() {return mutex;}
 	virtual LavError start();
 	virtual LavError stop();
 	virtual LavError associateObject(LavObject* obj);
 	virtual LavError setOutputObject(LavObject* obj);
 	virtual float getSr() { return sr;}
+
+	//these make us meet the basic lockable concept.
+	void lock() {mutex.lock();}
+	void unlock() {mutex.unlock();}
+
 	protected:
 	//visit all objects in the order they need to be visited if we were processing the graph.
 	virtual void visitAllObjectsInProcessOrder(std::function<void(LavObject*)> visitor);
@@ -28,9 +33,9 @@ class LavDevice {
 	std::function<void(void)> preprocessing_hook;
 	unsigned int block_size, channels, mixahead, is_started;
 	float sr;
-	void* mutex;
 	std::set<LavObject*> objects, always_process;
 	LavObject* output_object;
+	std::mutex mutex;
 };
 
 //initialize the audio backend.
