@@ -51,7 +51,7 @@ void LavSineObject::process() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavDevice* device, LavObject **destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createSineObject(LavDevice* device, LavObject **destination) {
 	LOCK(*device);
 	LavObject* retval = createSineObject(device);
 	*destination = retval;

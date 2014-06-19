@@ -138,7 +138,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_getFloatPropertyRange(LavObject* obj, unsigned 
 Lav_PUBLIC_FUNCTION LavError Lav_getDoublePropertyRange(LavObject* obj, unsigned int slot, double* lower, double* upper);
 
 /**Make a sine node.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavDevice* device, LavObject **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createSineObject(LavDevice* device, LavObject **destination);
 
 /**A node that plays a file.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavDevice*device, const char* path, LavObject **destination);
