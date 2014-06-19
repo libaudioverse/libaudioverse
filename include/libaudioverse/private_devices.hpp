@@ -32,10 +32,10 @@ class LavDevice {
 	//visit all objecs in the order they must be visited to prepare for and process obj.
 	virtual void visitAllObjectsReachableFrom(LavObject* obj, std::function<void(LavObject*)> visitor);
 	std::function<void(void)> preprocessing_hook;
-	unsigned int block_size, channels, mixahead, is_started;
-	float sr;
+	unsigned int block_size = 0, channels = 0, mixahead = 0, is_started = 0;
+	float sr = 0.0f;
 	std::set<LavObject*> objects, always_process;
-	LavObject* output_object;
+	LavObject* output_object = nullptr;
 	std::mutex mutex;
 };
 
