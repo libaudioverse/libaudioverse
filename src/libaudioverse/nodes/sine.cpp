@@ -4,61 +4,20 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 #include <math.h>
 #include <stdlib.h>
-#include <libaudioverse/private_all.hpp>
+#include <libaudioverse/private_objects.hpp>
 #include <math.h>
-
-LavError sineProcessor(LavObject *obj);
-struct sineinfo {
+class LavSineObject: public LavObject {
+	public:
+	virtual void init(LavDevice* dev);
+	virtual void process();
 	float table_delta;
 	unsigned int start;
 	float offset;
 };
 
-Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavDevice* device, LavObject  **destination) {
-	STANDARD_PREAMBLE;
-	LavError err = Lav_ERROR_NONE;
-
-	CHECK_NOT_NULL(destination);
-	CHECK_NOT_NULL(device);
-	LOCK(device->mutex);
-	LavNode *retval = NULL;
-	err = Lav_createNode(0, 1,
-sizeof(sinePropertyTable)/sizeof(sinePropertyTable[0]), sinePropertyTable,
-Lav_NODETYPE_SINE, device, (LavObject**)&retval);
-	if(err != Lav_ERROR_NONE) SAFERETURN(err);
-	((LavObject*)retval)->process = sineProcessor;
-
-	struct sineinfo* data = calloc(1, sizeof(struct sineinfo));
-	ERROR_IF_TRUE(data == NULL, Lav_ERROR_MEMORY);
-
-	data->table_delta = (float)sineTableLength/device->sr;
-	retval->data = data;
-
-	*destination = (LavObject*)retval;
-	SAFERETURN(Lav_ERROR_NONE);
-	STANDARD_CLEANUP_BLOCK;
+void LavSineObject::init(LavDevice* dev) {
+	LavObject::init(dev, 0, 1);
 }
 
-LavError sineProcessor(LavObject *obj) {
-	const LavNode* node = (LavNode*)obj;
-	float freq = 0;
-	float sr = ((LavObject*)node)->device->sr;
-	Lav_getFloatProperty(obj, Lav_SINE_FREQUENCY, &freq);
-	struct sineinfo *data = node->data;
-	float delta = data->table_delta*freq;
-	for(unsigned int i = 0; i < obj->device->block_size; i++) {
-		float weight1 = 1-data->offset;
-		float weight2 = data->offset;
-		unsigned int samp1 = data->start;
-		unsigned int samp2 = samp1+1;
-		float sample = sineTable[samp1]*weight1+sineTable[samp2]*weight2;
-		obj->outputs[0][i] = sample;
-		data->offset += delta;
-		while(data->offset >= 1) {
-			data->start+=1;
-			data->start %= sineTableLength;
-			data->offset -= 1.0f;
-		}
-	}
-	return Lav_ERROR_NONE;
+void LavSineObject::process() {
 }
