@@ -83,13 +83,13 @@ int portaudioOutputCallback(const void* input, void* output, unsigned long frame
 	LavPortaudioDevice * const dev = (LavPortaudioDevice*)userData;
 	const int haveBuffer = dev->buffer_statuses[dev->callback_buffer_index].load();
 	if(haveBuffer) {
-		memcpy(output, dev->buffers[dev->callback_buffer_index], sizeof(float)*frameCount);
+		memcpy(output, dev->buffers[dev->callback_buffer_index], sizeof(float)*frameCount*dev->channels);
 		dev->buffer_statuses[dev->callback_buffer_index].store(0);
 		dev->callback_buffer_index++;
 		dev->callback_buffer_index %= dev->mixahead+1;
 	}
 	else {
-		memset(output, 0, frameCount*sizeof(float));
+		memset(output, 0, dev->channels*frameCount*sizeof(float));
 	}
 	return paContinue;
 }
