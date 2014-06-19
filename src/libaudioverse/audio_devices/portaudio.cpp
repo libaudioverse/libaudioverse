@@ -14,7 +14,6 @@ int portaudioOutputCallback(const void* input, void* output, unsigned long frame
 
 class LavPortaudioDevice: public LavDevice {
 	public:
-	
 	virtual void init(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead);
 	void audioOutputThreadFunction(); //the function that runs as our output thread.
 	std::thread audioOutputThread;
@@ -22,9 +21,9 @@ class LavPortaudioDevice: public LavDevice {
 	PaStream *stream; //the portaudio stream we work with.  Started and stopped by the background thread for us.
 	//a ringbuffer of dispatched buffers.
 	//the elements are protected by the atomic ints.
-	float** buffers;
-	std::atomic<int> *buffer_statuses;
-	int callback_buffer_index; //the index the callback will go to on its next invocation.
+	float** buffers = nullptr;
+	std::atomic<int> *buffer_statuses = nullptr;
+	int callback_buffer_index = 0; //the index the callback will go to on its next invocation.
 	friend int portaudioOutputCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
 };
 
@@ -39,7 +38,7 @@ LavError initializeAudioBackend() {
 void LavPortaudioDevice::init(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead) {
 	LavDevice::init(sr, channels, blockSize, mixahead);
 	buffers = new float*[mixahead+1];
-	for(unsigned int i = 0; i < mixahead+1; i++) buffers[i] = new float[blockSize];
+	for(unsigned int i = 0; i < mixahead+1; i++) buffers[i] = new float[blockSize*channels];
 	buffer_statuses = new std::atomic<int>[mixahead+1];
 	for(unsigned int i = 0; i < mixahead+1; i++) buffer_statuses[i].store(0); //make sure they're all 0.  If not, bad things are going to happen.
 	Pa_OpenDefaultStream(&stream, 0, channels, paFloat32, sr, blockSize, portaudioOutputCallback, this);
@@ -87,6 +86,7 @@ int portaudioOutputCallback(const void* input, void* output, unsigned long frame
 		memcpy(output, dev->buffers[dev->callback_buffer_index], sizeof(float)*frameCount);
 		dev->buffer_statuses[dev->callback_buffer_index].store(0);
 		dev->callback_buffer_index++;
+		dev->callback_buffer_index %= dev->mixahead+1;
 	}
 	else {
 		memset(output, 0, frameCount*sizeof(float));
