@@ -128,3 +128,86 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectClearParent(LavObject *obj, unsigned int 
 	obj->clearParent(slot);
 	return Lav_ERROR_NONE;
 }
+
+//this is properties.
+//this is here because properties do not "know" about objects and only objects have properties; also, it made properties.cpp ahve to "know" about devices and objects.
+
+Lav_PUBLIC_FUNCTION LavError Lav_resetProperty(LavObject *obj, unsigned int slot) {
+	LOCK(*(obj->getDevice()));
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_setIntProperty(LavObject* obj, unsigned int slot, int value) {
+	LOCK(*(obj->getDevice()));
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_setFloatProperty(LavObject *obj, unsigned int slot, float value) {
+	LOCK(*(obj->getDevice()));
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_setDoubleProperty(LavObject *obj, unsigned int slot, double value) {
+	LOCK(*(obj->getDevice()));
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_setStringProperty(LavObject*obj, unsigned int slot, char* value) {
+	LOCK(*(obj->getDevice()));
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_setFloat3Property(LavObject* obj, unsigned int slot, float v1, float v2, float v3) {
+	LOCK(*(obj->getDevice()));
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_setFloat6Property(LavObject* obj, unsigned int slot, float v1, float v2, float v3, float v4, float v5, float v6) {
+	LOCK(*(obj->getDevice()));
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_getIntProperty(LavObject*obj, unsigned int slot, int *destination) {
+	LOCK(*(obj->getDevice()));
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_getFloatProperty(LavObject* obj, unsigned int slot, float *destination) {
+	LOCK(*(obj->getDevice()));
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_getDoubleProperty(LavObject*obj, unsigned int slot, double *destination) {
+	LOCK(*(obj->getDevice()));
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_getStringProperty(LavObject* obj, unsigned int slot, char** destination) {
+	LOCK(*(obj->getDevice()));
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_getFloat3Property(LavObject* obj, unsigned int slot, float* v1, float* v2, float* v3) {
+	LOCK(*(obj->getDevice()));
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_getFloat6Property(LavObject* obj, unsigned int slot, float* v1, float* v2, float* v3, float* v4, float* v5, float* v6) {
+	LOCK(*(obj->getDevice()));
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_getIntPropertyRange(LavObject* obj, unsigned int slot, int* lower, int* upper) {
+	LOCK(*(obj->getDevice()));
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_getFloatPropertyRange(LavObject* obj, unsigned int slot, float* lower, float* upper) {
+	LOCK(*(obj->getDevice()));
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_getDoublePropertyRange(LavObject* obj, unsigned int slot, double* lower, double* upper) {
+	LOCK(*(obj->getDevice()));
+	return Lav_ERROR_NONE;
+}
