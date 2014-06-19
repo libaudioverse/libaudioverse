@@ -104,7 +104,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_createDefaultAudioOutputDevice(LavDevice** dest
 
 /**This type of device is intended for apps that wish to handle audio themselves: it will not output and time will not advance for it.
 Combine it with Lav_deviceReadBlock to make use of it.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createReadDevice(unsigned int blockSize, unsigned int channels, unsigned int sr, LavDevice** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createReadDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, LavDevice** destination);
+
 Lav_PUBLIC_FUNCTION LavError Lav_deviceSetOutputObject(LavDevice* device, LavObject* object);
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetOutputObject(LavDevice* device, LavObject** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetBlock(LavDevice* device, float* destination);

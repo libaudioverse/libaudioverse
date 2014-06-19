@@ -4,6 +4,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/private_devices.hpp>
 #include <libaudioverse/private_objects.hpp>
+#include <libaudioverse/private_macros.hpp>
 #include <stdlib.h>
 #include <functional>
 #include <algorithm>
@@ -59,6 +60,10 @@ LavError LavDevice::setOutputObject(LavObject* obj) {
 	return Lav_ERROR_NONE;
 }
 
+LavObject* LavDevice::getOutputObject() {
+	return output_object;
+}
+
 void LavDevice::visitAllObjectsInProcessOrder(std::function<void(LavObject*)> visitor) {
 	std::set<LavObject*> seen;
 	if(output_object) {
@@ -89,4 +94,24 @@ void LavDevice::visitAllObjectsReachableFrom(LavObject* obj, std::function<void(
 		visitAllObjectsReachableFrom(obj->getParentObject(i), visitor);
 	}
 	visitor(obj);
+}
+
+//begin public API
+
+Lav_PUBLIC_FUNCTION LavError Lav_deviceSetOutputObject(LavDevice* device, LavObject* object) {
+	LOCK(device);
+	device->setOutputObject(object);
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_deviceGetOutputObject(LavDevice* device, LavObject** destination) {
+	LOCK(device);
+	*destination = device->getOutputObject();
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_deviceGetBlock(LavDevice* device, float* destination) {
+	LOCK(device);
+	device->getBlock(destination);
+	return Lav_ERROR_NONE;
 }

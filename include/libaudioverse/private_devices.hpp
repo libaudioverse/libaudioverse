@@ -18,6 +18,7 @@ class LavDevice {
 	virtual LavError start();
 	virtual LavError stop();
 	virtual LavError associateObject(LavObject* obj);
+	virtual LavObject* getOutputObject();
 	virtual LavError setOutputObject(LavObject* obj);
 	virtual float getSr() { return sr;}
 
