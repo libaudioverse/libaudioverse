@@ -108,6 +108,14 @@ LavDevice* LavObject::getDevice() {
 	return device;
 }
 
+void LavObject::lock() {
+	device->lock();
+}
+
+void LavObject::unlock() {
+	device->unlock();
+}
+
 //begin public api
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetParent(LavObject *obj, unsigned int slot, LavObject** parent, unsigned int *outputNumber) {

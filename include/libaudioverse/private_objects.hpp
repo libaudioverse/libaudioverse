@@ -28,6 +28,11 @@ class LavObject {
 	virtual void process();
 	virtual void processor();
 	virtual LavDevice* getDevice();
+
+	//meet the lockable concept.
+	//Warning: these aren't virtual because they're just so that our macro works; all locking still forwards to devices.
+	void lock();
+	void unlock();
 	protected:
 	LavDevice *device;
 	std::map<int, LavProperty*> properties;
