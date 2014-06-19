@@ -16,5 +16,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createDefaultAudioOutputDevice(LavDevice** dest
 	//we prefer 44100 sr, 2 channel, and block size of 1024 with mixahead 2.
 	//this gives a granularity of 23 MS between hearing property changes and about 69 MS between the app setting a property and the properety's new value being sent to the sound card.
 	retval = createPortaudioDevice(44100, 2, 1024, 2);
+	*destination = retval;
 	return Lav_ERROR_NONE;
 }
