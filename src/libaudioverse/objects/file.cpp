@@ -20,6 +20,7 @@ class LavFileObject: public LavObject {
 	unsigned int position = 0;
 	float offset = 0;
 	float delta = 0.0f;
+	friend LavObject* createFileObject(LavDevice* device, const char* path);
 };
 
 void LavFileObject::init(LavDevice* device, const char* path) {
@@ -29,6 +30,11 @@ void LavFileObject::init(LavDevice* device, const char* path) {
 	buffer = new float[file.getSampleCount()];
 	file.readAll(buffer);
 	delta = file.getSr()/device->getSr();
+}
+LavObject* createFileObject(LavDevice* device, const char* path) {
+	auto retval = new LavFileObject();
+	retval->init(device, path);
+	return retval;
 }
 
 void LavFileObject::process() {
@@ -51,4 +57,13 @@ void LavFileObject::process() {
 	position += (unsigned int)offset;
 	offset = ringmodf(offset, 1.0f);
 	}
+}
+
+//begin public api
+
+Lav_PUBLIC_FUNCTION LavError Lav_createFileObject(LavDevice* device, const char* path, LavObject** destination) {
+	LOCK(*device);
+	auto retval = createFileObject(device, path);
+	*destination = retval;
+	return Lav_ERROR_NONE;
 }
