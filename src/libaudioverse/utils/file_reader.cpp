@@ -23,7 +23,7 @@ LavError LavFileReader::close() {
 	}
 }
 
-float LavFileReader::getSampleRate() {
+float LavFileReader::getSr() {
 	return (float)info.samplerate;
 }
 

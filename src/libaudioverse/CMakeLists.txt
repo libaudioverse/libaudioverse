@@ -12,7 +12,7 @@ utils/file_reader.cpp
 
 #specific node types.
 objects/sine.cpp
-#objects/file.cpp
+objects/file.cpp
 objects/hard_limiter.cpp
 #objects/hrtf.cpp
 #objects/mixer.cpp

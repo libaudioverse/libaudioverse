@@ -10,10 +10,10 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 This can theoreticaly handle any type of file, including codec decoding, but uses Libsndfile for the moment.*/
 class LavFileReader {
 	public:
-	LavFileReader() = default;
+	LavFileReader(): info() {} //vc++ crashes if we try to do this the c++11 way.
 	LavError open(const char* path);
 	LavError close();
-	float getSampleRate();
+	float getSr();
 	unsigned int getChannelCount();
 	unsigned int getFrameCount();
 	unsigned int getSampleCount();
@@ -21,5 +21,5 @@ class LavFileReader {
 	unsigned int read(unsigned int frames, float* buffer);
 	protected:
 	SNDFILE* handle = nullptr;
-	SF_INFO info = {0};
+	SF_INFO info;
 };
