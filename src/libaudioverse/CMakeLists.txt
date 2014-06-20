@@ -7,6 +7,9 @@ interleaving.cpp
 hrtf.cpp
 dspmath.cpp
 
+#utilities: file reading, platform-specific code, etc:
+utils/file_reader.cpp
+
 #specific node types.
 objects/sine.cpp
 #objects/file.cpp
