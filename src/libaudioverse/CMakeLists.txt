@@ -8,12 +8,12 @@ hrtf.cpp
 dspmath.cpp
 
 #specific node types.
-nodes/sine.cpp
-#nodes/file.cpp
-nodes/hard_limiter.cpp
-#nodes/hrtf.cpp
-#nodes/mixer.cpp
-#nodes/attenuator.cpp
+objects/sine.cpp
+#objects/file.cpp
+objects/hard_limiter.cpp
+#objects/hrtf.cpp
+#objects/mixer.cpp
+#objects/attenuator.cpp
 
 #the audio backends and related functionality.
 audio_devices/device_negociation.cpp

@@ -62,11 +62,11 @@ enum Lav_ERRORS {
 	Lav_ERROR_HRTF_TOO_SMALL = 11,
 	Lav_ERROR_HRTF_INVALID = 12,
 
-	/**This one is odd.  It is what is thrown if you pasas a node with the wrong "shape" to a function, most notably source creation.*/
+	/**This one is odd.  It is what is thrown if you pasas a object with the wrong "shape" to a function, most notably source creation.*/
 	Lav_ERROR_SHAPE = 13,
 
 	Lav_ERROR_CANNOT_CROSS_DEVICES = 14, //an attempto either create a parent-child connect with objects from different devices or to set an output with an object from a different device.
-	Lav_ERROR_NO_OUTPUTS = 15, //we expected the node to have outputs here, but it didn't.
+	Lav_ERROR_NO_OUTPUTS = 15, //we expected the object to have outputs here, but it didn't.
 	Lav_ERROR_INTERNAL_BUG = 0xFFFF, //an easily recognized value for debugging.
 };
 
@@ -83,7 +83,7 @@ enum Lav_PROPERTYTYPES {
 	Lav_PROPERTYTYPE_FLOAT6 = 6,
 };
 
-/**These are used to tag nodes with their type, so that external languages may see them.*/
+/**These are used to tag objects with their type, so that external languages may see them.*/
 enum Lav_OBJTYPES {
 	Lav_OBJTYPE_WORLD,
 	Lav_OBJTYPE_SOURCE_MONO,
@@ -137,26 +137,26 @@ Lav_PUBLIC_FUNCTION LavError Lav_getIntPropertyRange(LavObject* obj, unsigned in
 Lav_PUBLIC_FUNCTION LavError Lav_getFloatPropertyRange(LavObject* obj, unsigned int slot, float* lower, float* upper);
 Lav_PUBLIC_FUNCTION LavError Lav_getDoublePropertyRange(LavObject* obj, unsigned int slot, double* lower, double* upper);
 
-/**Make a sine node.*/
+/**Make a sine object.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createSineObject(LavDevice* device, LavObject **destination);
 
-/**A node that plays a file.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavDevice*device, const char* path, LavObject **destination);
+/**A object that plays a file.*/
+Lav_PUBLIC_FUNCTION LavError Lav_createFileObject(LavDevice*device, const char* path, LavObject **destination);
 
-/**Load hrtf dataset from file.  This is for use with hrtf nodes.*/
+/**Load hrtf dataset from file.  This is for use with hrtf objects, and the 3D audio API.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createHrtfData(const char* path, LavHrtfData **destination);
 
-/**Make a HRTF node.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createHrtfNode(LavDevice* device, LavHrtfData* hrtf, LavObject **destination);
+/**Make a HRTF object.*/
+Lav_PUBLIC_FUNCTION LavError Lav_createHrtfObject(LavDevice* device, LavHrtfData* hrtf, LavObject **destination);
 
 /**Make a mixer.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createMixerNode(LavDevice* device, unsigned int maxParents, unsigned int inputsPerParent, LavObject **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createMixerObject(LavDevice* device, unsigned int maxParents, unsigned int inputsPerParent, LavObject **destination);
 
 /**Make an attenuator.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createAttenuatorNode(LavDevice* device, unsigned int numInputs, LavObject** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createAttenuatorObject(LavDevice* device, unsigned int numInputs, LavObject** destination);
 
 /**A hard limiter*/
-Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterNode(LavDevice* device, unsigned int numInputs, LavObject** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterObject(LavDevice* device, unsigned int numInputs, LavObject** destination);
 
 #ifdef __cplusplus
 }
