@@ -11,15 +11,15 @@ This can theoreticaly handle any type of file, including codec decoding, but use
 class LavFileReader {
 	public:
 	LavFileReader() = default;
-	LavError open();
+	LavError open(const char* path);
 	LavError close();
 	float getSampleRate();
-	unsigned int getChannels();
-	unsigned int getFrames();
-	unsigned int getLengthInSamples();
+	unsigned int getChannelCount();
+	unsigned int getFrameCount();
+	unsigned int getSampleCount();
 	unsigned int readAll(float* buffer);
 	unsigned int read(unsigned int frames, float* buffer);
 	protected:
-	SNDFILE* handle;
-	SF_INFO info;
+	SNDFILE* handle = nullptr;
+	SF_INFO info = {0};
 };

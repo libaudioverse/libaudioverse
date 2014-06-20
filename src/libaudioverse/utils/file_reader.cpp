@@ -2,3 +2,48 @@
 This file is part of Libaudioverse, a library for 3D and environmental audio simulation, and is released under the terms of the Gnu General Public License Version 3 or (at your option) any later version.
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/private_file.hpp>
+#include <libaudioverse/libaudioverse.h>
+#include <sndfile.h>
+
+LavError LavFileReader::open(const char* path) {
+	if(handle) return Lav_ERROR_FILE;
+	handle = sf_open(path, SFM_READ, &info);
+	if(handle == nullptr) return Lav_ERROR_FILE;
+	return Lav_ERROR_NONE;
+}
+
+LavError LavFileReader::close() {
+	if(handle != NULL)  {
+		sf_close(handle);
+		handle = NULL;
+		info = {0};
+		return Lav_ERROR_NONE;
+	} else {
+		return Lav_ERROR_FILE;
+	}
+}
+
+float LavFileReader::getSampleRate() {
+	return (float)info.samplerate;
+}
+
+unsigned int LavFileReader::getChannelCount() {
+	return info.channels;
+}
+
+unsigned int LavFileReader::getFrameCount() {
+	return (unsigned int)info.frames;
+}
+
+unsigned int LavFileReader::getSampleCount() {
+	return getChannelCount()*getFrameCount();
+}
+
+unsigned int LavFileReader::read(unsigned int frames, float* buffer) {
+	if(handle == NULL) return 0;
+	return (unsigned int)sf_readf_float(handle, buffer, frames);
+}
+
+unsigned int LavFileReader::readAll(float* buffer) {
+	return read(getFrameCount(), buffer);
+}
