@@ -38,7 +38,8 @@ void LavMixerObject::process() {
 //begin public api
 
 Lav_PUBLIC_FUNCTION LavError Lav_createMixerObject(LavDevice* device, unsigned int maxParents, unsigned int inputsPerParent, LavObject** destination) {
+	PUB_BEGIN
 	LavObject* retval = createMixerObject(device, maxParents, inputsPerParent);
 	*destination = retval;
-	return Lav_ERROR_NONE;
-	}
+	PUB_END
+}

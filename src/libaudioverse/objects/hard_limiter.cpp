@@ -8,6 +8,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/private_objects.hpp>
 #include <libaudioverse/private_devices.hpp>
+#include <libaudioverse/private_macros.hpp>
 
 class LavHardLimiterObject: public LavObject {
 	public:
@@ -44,7 +45,8 @@ void LavHardLimiterObject::process() {
 //begin public api
 
 Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterObject(LavDevice* device, unsigned int numChannels, LavObject** destination) {
+	PUB_BEGIN
 	auto retval = createHardLimiterObject(device, numChannels);
 	*destination = retval;
-	return Lav_ERROR_NONE;
+	PUB_END
 }

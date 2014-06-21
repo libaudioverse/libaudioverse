@@ -70,7 +70,8 @@ void LavHrtfObject::process() {
 //begin public api
 
 Lav_PUBLIC_FUNCTION LavError Lav_createHrtfObject(LavDevice* device, LavHrtfData* hrtf, LavObject** destination) {
+	PUB_BEGIN
 	auto retval = createHrtfObject(device, hrtf);
 	*destination = retval;
-	return Lav_ERROR_NONE;
+	PUB_END
 }

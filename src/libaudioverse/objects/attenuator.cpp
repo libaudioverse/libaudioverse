@@ -38,7 +38,8 @@ void LavAttenuatorObject::process() {
 //begin public api
 
 Lav_PUBLIC_FUNCTION LavError Lav_createAttenuatorObject(LavDevice* device, unsigned int numChannels, LavObject** destination) {
+	PUB_BEGIN
 	auto retval = createAttenuatorObject(device, numChannels);
 	*destination = retval;
-	return Lav_ERROR_NONE;
+	PUB_END
 }

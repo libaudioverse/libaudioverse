@@ -77,8 +77,9 @@ void LavFileObject::process() {
 //begin public api
 
 Lav_PUBLIC_FUNCTION LavError Lav_createFileObject(LavDevice* device, const char* path, LavObject** destination) {
+	PUB_BEGIN
 	LOCK(*device);
 	auto retval = createFileObject(device, path);
 	*destination = retval;
-	return Lav_ERROR_NONE;
+	PUB_END
 }

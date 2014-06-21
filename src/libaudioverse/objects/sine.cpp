@@ -55,8 +55,9 @@ void LavSineObject::process() {
 //begin public api
 
 Lav_PUBLIC_FUNCTION LavError Lav_createSineObject(LavDevice* device, LavObject **destination) {
+	PUB_BEGIN
 	LOCK(*device);
 	LavObject* retval = createSineObject(device);
 	*destination = retval;
-	return Lav_ERROR_NONE;
+	PUB_END
 }
