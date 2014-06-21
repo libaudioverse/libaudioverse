@@ -3,7 +3,8 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 
 /**Demonstrates the hrtf node.*/
-#include <libaudioverse/private_all.h>
+#include <libaudioverse/libaudioverse.h>
+#include <libaudioversse/libaudioverse_properties.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -42,9 +43,12 @@ void main(int argc, char** args) {
 		if(n == NULL) return; //makeNode prints errors already.
 		nodes[i] = n;
 	}
-	unsigned int channels = nodes[0]->num_outputs;
+	unsigned int channels;
+	Lav_objectGetOutputCount(nodes[0], &channels);
 	for(int i = 0; i < argc-1; i++) {
-		if(nodes[i]->num_outputs != channels) {
+		unsigned int outCount;
+		Lav_objectGetOutputCount(nodes[i], &outCount);
+		if(outCount != channels) {
 			printf("All files must have the same channel count.");
 			return;
 		}
@@ -54,7 +58,9 @@ void main(int argc, char** args) {
 	LavObject* mixer, *limit;
 	ERRCHECK(Lav_createMixerObject(device, argc-1, channels, &mixer));
 	ERRCHECK(Lav_createHardLimiterObject(device, channels, &limit));
-	for(unsigned int input = 0; input < mixer->num_inputs ; input++) {
+	unsigned int mixInputCount;
+	ERRCHECK(Lav_objectGetInputCount(mixer, &mixInputCount);
+	for(unsigned int input = 0; i < mixInputCount; input++) {
 		ERRCHECK(Lav_objectSetParent(mixer, nodes[input/channels], input%channels, input));
 	}
 	for(unsigned int i = 0; i < channels; i++) {
