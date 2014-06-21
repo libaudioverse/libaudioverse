@@ -153,7 +153,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createHrtfObject(LavDevice* device, LavHrtfData
 Lav_PUBLIC_FUNCTION LavError Lav_createMixerObject(LavDevice* device, unsigned int maxParents, unsigned int inputsPerParent, LavObject **destination);
 
 /**Make an attenuator.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createAttenuatorObject(LavDevice* device, unsigned int numInputs, LavObject** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createAttenuatorObject(LavDevice* device, unsigned int numChannels, LavObject** destination);
 
 /**A hard limiter*/
 Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterObject(LavDevice* device, unsigned int numInputs, LavObject** destination);
