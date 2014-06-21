@@ -97,6 +97,9 @@ class LavProperty {
 	const char* getStringDefault() { return default_string_value.c_str();}
 	void setStringDefault(const char* s) { default_string_value = s;}
 
+	//set the callback...
+	void setPostChangedCallback(std::function<void(void)> cb) {post_changed_callback = cb;}
+
 	private:
 	int type, tag;
 	LavPropertyValue value, default_value, minimum_value, maximum_value;
