@@ -10,6 +10,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/private_macros.hpp>
 #include <libaudioverse/private_dspmath.hpp>
+#include <libaudioverse/private_properties.hpp>
+#include <limits>
 
 class LavFileObject: public LavObject {
 	virtual void init(LavDevice* device, const char* path);
@@ -30,7 +32,10 @@ void LavFileObject::init(LavDevice* device, const char* path) {
 	buffer = new float[file.getSampleCount()];
 	file.readAll(buffer);
 	delta = file.getSr()/device->getSr();
+	properties[Lav_FILE_POSITION] = createFloatProperty("position", 0.0f, 0.0f, file.getFrameCount()/file.getSr());
+	properties[Lav_FILE_PITCH_BEND] = createFloatProperty("pitch_bend", 1.0f, 0.0f, std::numeric_limits<float>::infinity());
 }
+
 LavObject* createFileObject(LavDevice* device, const char* path) {
 	auto retval = new LavFileObject();
 	retval->init(device, path);
