@@ -27,7 +27,7 @@ void LavHrtfObject::init(LavDevice* device, LavHrtfData* hrtf) {
 	this->hrtf = hrtf;
 	left_response = new float[hrtf->getLength()];
 	right_response = new float[hrtf->getLength()];
-	history = new float[hrtf->getLength() + device->getBlockSize()];
+	history = new float[hrtf->getLength() + device->getBlockSize()](); //odd c++ syntax to create 0-initialized array.
 	hrtf->computeCoefficientsStereo(0.0f, 0.0f, left_response, right_response);
 	properties[Lav_HRTF_AZIMUTH] = createFloatProperty("azimuth", 0.0f, -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity());
 	properties[Lav_HRTF_ELEVATION] = createFloatProperty("elevation", 0.0f, -90.0f, 90.0f);
