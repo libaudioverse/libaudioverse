@@ -18,7 +18,8 @@ endif()
 #more msvc specific stuff: if on windows, do special handling for portaudio.
 if(${MSVC})
 #turn off the secure crt warnings, because we're not allowed to use microsoft specific functions.
-add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+#Also turn off unsafe stl warnings.  This library likes the unsafe stl.
+add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
 #This fixes portaudio.
 add_definitions(-DPA_WDMKS_NO_KSGUID_LIB)
 #build and setup portaudio:
