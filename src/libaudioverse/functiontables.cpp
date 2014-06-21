@@ -23,7 +23,6 @@ Lav_PUBLIC_FUNCTION void computeSineTable() {
 	sineTable[sineTableLength] = sineTable[0]; //make sure the last sample mirrors the first.
 }
 
-LavError initializeFunctionTables() {
+void initializeFunctionTables() {
 	computeSineTable();
-	return Lav_ERROR_NONE;
 }

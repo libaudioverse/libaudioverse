@@ -7,4 +7,4 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 extern float sineTable[];
 const extern unsigned int sineTableLength;
 
-LavError initializeFunctionTables();
+void initializeFunctionTables();

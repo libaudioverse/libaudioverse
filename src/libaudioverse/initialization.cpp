@@ -6,8 +6,9 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/private_functiontables.hpp>
 #include <libaudioverse/private_devices.hpp>
+#include <libaudioverse/private_macros.hpp>
 
-typedef LavError (*initfunc_t)();
+typedef void (*initfunc_t)();
 
 //These run in the order specified in this array with no parallelism.
 //If adding new functionality here, simply add it and follow the above typedef.
@@ -20,15 +21,13 @@ initfunc_t initializers[] = {
 unsigned int isInitialized = 0;
 
 Lav_PUBLIC_FUNCTION LavError Lav_initializeLibrary() {
+	PUB_BEGIN
 	if(isInitialized == 1) {
 		return Lav_ERROR_NONE;
 	}
 	for(int i = 0; i < sizeof(initializers)/sizeof(initializers[0]); i++) {
-		LavError err = initializers[i]();
-		if(err != Lav_ERROR_NONE) {
-			return err;
-		}
+		initializers[i]();
 	}
 	isInitialized = 1;
-	return Lav_ERROR_NONE;
+	PUB_END
 }

@@ -41,6 +41,6 @@ class LavDevice: std::enable_shared_from_this<LavDevice> {
 };
 
 //initialize the audio backend.
-LavError initializeAudioBackend();
+void initializeAudioBackend();
 
 LavDevice* createPortaudioDevice(unsigned int sr, unsigned int channels, unsigned int bufferSize, unsigned int mixahead);
