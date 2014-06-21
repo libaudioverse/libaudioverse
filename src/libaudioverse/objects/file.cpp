@@ -48,9 +48,10 @@ void LavFileObject::process() {
 			for(unsigned int j = 0; j < num_outputs; j++) {
 				outputs[j][i] = 0.0f;
 			}
+			continue;
 		}
-		unsigned int samp1 = (unsigned int)offset;
-		unsigned int samp2 = (unsigned int)offset+1;
+		unsigned int samp1 = (unsigned int)position;
+		unsigned int samp2 = (unsigned int)position+1;
 		float weight1 = 1-offset;
 		float weight2 = offset;
 		for(unsigned int j = 0; j < num_outputs; j++) {
