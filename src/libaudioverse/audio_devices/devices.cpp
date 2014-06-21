@@ -69,6 +69,7 @@ void LavDevice::visitAllObjectsInProcessOrder(std::function<void(LavObject*)> vi
 	std::set<LavObject*> seen;
 	if(output_object) {
 		visitAllObjectsReachableFrom(output_object, [&](LavObject* o) {
+			if(seen.count(o)) return;
 			visitor(o);
 			seen.insert(o);
 		});
