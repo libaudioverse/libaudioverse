@@ -11,6 +11,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/private_hrtf.hpp>
 #include <libaudioverse/private_dspmath.hpp>
+#include <libaudioverse/private_macros.hpp>
+#include <libaudioverse/private_errors.hpp>
 #include <math.h>
 
 /**Swaps bytes to reverse endianness.*/
@@ -164,8 +166,10 @@ void LavHrtfData::computeCoefficientsStereo(float elevation, float azimuth, floa
 //begin public api
 
 Lav_PUBLIC_FUNCTION LavError Lav_createHrtfData(const char* path, LavHrtfData** destination) {
+	PUB_BEGIN
 	LavHrtfData* retval = new LavHrtfData();
 	retval->loadFromFile(path);
 	*destination = retval;
 	return Lav_ERROR_NONE;
+	PUB_END
 }
