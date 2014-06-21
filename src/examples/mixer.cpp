@@ -18,7 +18,7 @@ if((x) != Lav_ERROR_NONE) {\
 LavObject* makeNode(LavDevice* device, char* file) {
 	LavError err = Lav_ERROR_NONE;
 	LavObject *retval;
-	err = Lav_createFileNode(device, file, &retval);
+	err = Lav_createFileObject(device, file, &retval);
 	if(err != Lav_ERROR_NONE) {
 		printf("Error: %i", err);
 		return NULL;
@@ -52,13 +52,13 @@ void main(int argc, char** args) {
 
 	//so far, so good. Make a mixer.
 	LavObject* mixer, *limit;
-	ERRCHECK(Lav_createMixerNode(device, argc-1, channels, &mixer));
-	ERRCHECK(Lav_createHardLimiterNode(device, channels, &limit));
+	ERRCHECK(Lav_createMixerObject(device, argc-1, channels, &mixer));
+	ERRCHECK(Lav_createHardLimiterObject(device, channels, &limit));
 	for(unsigned int input = 0; input < mixer->num_inputs ; input++) {
-		ERRCHECK(Lav_setParent(mixer, nodes[input/channels], input%channels, input));
+		ERRCHECK(Lav_objectSetParent(mixer, nodes[input/channels], input%channels, input));
 	}
 	for(unsigned int i = 0; i < channels; i++) {
-		ERRCHECK(Lav_setParent(limit, mixer, i, i));
+		ERRCHECK(Lav_objectSetParent(limit, mixer, i, i));
 	}
 	ERRCHECK(Lav_deviceSetOutputObject(device, limit));
 	int shouldContinue = 1;
