@@ -90,7 +90,10 @@ class LavProperty {
 
 	//strings:
 	const char* getStringValue() { return string_value.c_str();}
-	void setStringValue(const char* s) { string_value = s;}
+	void setStringValue(const char* s) {
+		string_value = s;
+		if(post_changed_callback) post_changed_callback();
+	}
 	const char* getStringDefault() { return default_string_value.c_str();}
 	void setStringDefault(const char* s) { default_string_value = s;}
 
