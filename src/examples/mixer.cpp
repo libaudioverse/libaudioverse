@@ -66,7 +66,7 @@ void main(int argc, char** args) {
 	for(unsigned int i = 0; i < channels; i++) {
 		ERRCHECK(Lav_objectSetParent(limit, i, mixer, i));
 	}
-	ERRCHECK(Lav_deviceSetOutputObject(device, mixer));
+	ERRCHECK(Lav_deviceSetOutputObject(device, limit));
 	int shouldContinue = 1;
 	char command[512] = "";
 	printf("Enter q to quit.");
