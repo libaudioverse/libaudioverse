@@ -85,6 +85,7 @@ enum Lav_PROPERTYTYPES {
 
 /**These are used to tag objects with their type, so that external languages may see them.*/
 enum Lav_OBJTYPES {
+	Lav_OBJTYPE_GENERIC, //this is not something you should ever see outside the library, and basically means none.
 	Lav_OBJTYPE_WORLD,
 	Lav_OBJTYPE_SOURCE_MONO,
 	Lav_OBJTYPE_ZEROS,

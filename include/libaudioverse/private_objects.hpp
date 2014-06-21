@@ -10,14 +10,16 @@ class LavProperty;
 
 class LavInputDescriptor {
 	public:
-	LavObject* parent;
-	unsigned int output;
+	LavObject* parent = nullptr;
+	unsigned int output = 0;
 };
 
 /**Things all Libaudioverse objects have.*/
 class LavObject: std::enable_shared_from_this<LavObject> {
 	public:
 	LavObject() = default; //this is needed due to weirdness with deleting the copy constructor and assignment. For some reason, VS breaks when you do that and not also this.
+	virtual ~LavObject() = default;
+
 	virtual void init(LavDevice* device, unsigned int numInputs, unsigned int numOutputs);
 	virtual void computeInputBuffers();//update what we point to due to parent changes.
 	virtual void setParent(unsigned int input, LavObject* parent, unsigned int parentOutput);
@@ -36,19 +38,17 @@ class LavObject: std::enable_shared_from_this<LavObject> {
 	//Warning: these aren't virtual because they're just so that our macro works; all locking still forwards to devices.
 	void lock();
 	void unlock();
-	protected:
-	LavDevice *device;
-	std::map<int, LavProperty*> properties;
-	float** inputs;
-	LavInputDescriptor *input_descriptors;
-	float** outputs;
-	unsigned int num_outputs;
-	unsigned int num_inputs;
-	int is_processing;
-	enum Lav_NODETYPES type;
 
-	//this preventss all sorts of trouble.
-	virtual ~LavObject() {}
+	protected:
+	LavDevice *device = nullptr;
+	std::map<int, LavProperty*> properties;
+	float** inputs = nullptr;
+	LavInputDescriptor *input_descriptors = nullptr;
+	float** outputs = nullptr;
+	unsigned int num_outputs = 0;
+	unsigned int num_inputs = 0;
+	int is_processing = 0;
+	enum Lav_OBJTYPES type = Lav_OBJTYPE_GENERIC;
 
 	//we are never allowed to copy.
 	LavObject(const LavObject&) = delete;
