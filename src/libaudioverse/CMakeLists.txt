@@ -15,7 +15,7 @@ objects/sine.cpp
 objects/file.cpp
 objects/hard_limiter.cpp
 #objects/hrtf.cpp
-#objects/mixer.cpp
+objects/mixer.cpp
 objects/attenuator.cpp
 
 #the audio backends and related functionality.
