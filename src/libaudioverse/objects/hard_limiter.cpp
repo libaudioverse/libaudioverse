@@ -9,17 +9,23 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_objects.hpp>
 #include <libaudioverse/private_devices.hpp>
 
-class LavHardLimiter: public LavObject {
+class LavHardLimiterObject: public LavObject {
 	public:
 	void init(LavDevice* device, unsigned int numInputs);
 	virtual void process();
 };
 
-void LavHardLimiter::init(LavDevice* device, unsigned int numInputs) {
+void LavHardLimiterObject::init(LavDevice* device, unsigned int numInputs) {
 	LavObject::init(device, numInputs, numInputs);
 }
 
-void LavHardLimiter::process() {
+LavObject* createHardLimiterObject(LavDevice* device, unsigned int numChannels) {
+	auto retval = new LavHardLimiterObject();
+	retval->init(device, numChannels);
+	return retval;
+}
+
+void LavHardLimiterObject::process() {
 	for(unsigned int i = 0; i < device->getBlockSize(); i++) {
 		for(unsigned int o = 0; o < num_outputs; o++) {
 			if(inputs[o][i] > 1.0f) {
@@ -33,4 +39,12 @@ void LavHardLimiter::process() {
 			outputs[o][i] = inputs[o][i];
 		}
 	}
+}
+
+//begin public api
+
+Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterObject(LavDevice* device, unsigned int numChannels, LavObject** destination) {
+	auto retval = createHardLimiterObject(device, numChannels);
+	*destination = retval;
+	return Lav_ERROR_NONE;
 }
