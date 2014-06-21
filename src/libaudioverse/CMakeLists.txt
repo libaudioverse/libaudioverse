@@ -16,7 +16,7 @@ objects/file.cpp
 objects/hard_limiter.cpp
 #objects/hrtf.cpp
 #objects/mixer.cpp
-#objects/attenuator.cpp
+objects/attenuator.cpp
 
 #the audio backends and related functionality.
 audio_devices/device_negociation.cpp
