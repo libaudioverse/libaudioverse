@@ -123,6 +123,17 @@ void LavObject::unlock() {
 }
 
 //begin public api
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetInputCount(LavObject* obj, unsigned int* destination) {
+	LOCK(*obj);
+	*destination = obj->getInputCount();
+	return Lav_ERROR_NONE;
+
+}
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetOutputCount(LavObject* obj, unsigned int* destination) {
+	LOCK(*obj);
+	*destination = obj->getOutputCount();
+	return Lav_ERROR_NONE;
+}
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetParent(LavObject *obj, unsigned int slot, LavObject** parent, unsigned int *outputNumber) {
 	LOCK(*(obj->getDevice()));
