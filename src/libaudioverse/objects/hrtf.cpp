@@ -62,6 +62,8 @@ void LavHrtfObject::process() {
 			outLeft = left_response[j]* *(start-j);
 			outRight = right_response[j]* *(start-j);
 		}
+	outputs[0][i] = outLeft;
+	outputs[1][i] = outRight;
 	}
 }
 
