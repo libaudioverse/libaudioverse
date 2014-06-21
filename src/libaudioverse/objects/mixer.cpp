@@ -30,7 +30,7 @@ void LavMixerObject::process() {
 	for(unsigned int i = 0; i < device->getBlockSize(); i++) {
 		for(unsigned int j = 0; j < num_outputs; j++) outputs[j][i] = 0.0f;
 		for(unsigned int j = 0; j < num_inputs; j++) {
-			outputs[j/inputs_per_parent][i] += inputs[j][i];
+			outputs[j%inputs_per_parent][i] += inputs[j][i];
 		}
 	}
 }
