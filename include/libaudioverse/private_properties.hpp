@@ -3,6 +3,7 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #pragma once
 #include <string>
+#include <functional>
 
 union LavPropertyValue {
 	float fval;
@@ -26,7 +27,10 @@ class LavProperty {
 
 	//yes, really. This is as uggly as it looks.
 	int getIntValue() { return value.ival;}
-	void setIntValue(int v) {value.ival = v;}
+	void setIntValue(int v) {
+		value.ival = v;
+		if(post_changed_callback) post_changed_callback();
+	}	
 	int getIntDefault() {return default_value.ival;}
 	void setIntDefault(int d) {default_value.ival = d;}
 	int getIntMin() {return minimum_value.ival;}
@@ -35,7 +39,10 @@ class LavProperty {
 
 	//floats...
 	float getFloatValue() {return value.fval;}
-	void setFloatValue(float v) {value.fval = v;}
+	void setFloatValue(float v) {
+		value.fval = v;
+		if(post_changed_callback) post_changed_callback();
+	}
 	float getFloatDefault() {return default_value.fval;}
 	void setFloatDefault(float v) {default_value.fval = v;}
 	float getFloatMin() {return minimum_value.fval;}
@@ -44,7 +51,10 @@ class LavProperty {
 
 	//doubles...
 	double getDoubleValue() {return value.dval;}
-	void setDoubleValue(double v) {value.dval = v;}
+	void setDoubleValue(double v) {
+		value.dval = v;
+		if(post_changed_callback) post_changed_callback();
+	}
 	double getDoubleMin() {return minimum_value.dval;}
 	double getDoubleMax() {return maximum_value.dval;}
 	void setDoubleRange(double a, double b) {minimum_value.dval = a; maximum_value.dval = b;}
@@ -53,16 +63,28 @@ class LavProperty {
 	//float3 vectors.
 	const float* getFloat3Value() {return value.f3val;}
 	const float* getFloat3Default() {return default_value.f3val;}
-	void setFloat3Value(const float* const v) {memcpy(value.f3val, v, sizeof(float)*3);}
-	void setFloat3Value(float v1, float v2, float v3) {value.f3val[0] = v1; value.f3val[1] = v2; value.f3val[2] = v3;}
+	void setFloat3Value(const float* const v) {
+		memcpy(value.f3val, v, sizeof(float)*3);
+		if(post_changed_callback) post_changed_callback();
+}
+	void setFloat3Value(float v1, float v2, float v3) {
+		value.f3val[0] = v1; value.f3val[1] = v2; value.f3val[2] = v3;
+		if(post_changed_callback) post_changed_callback();
+	}
 	void setFloat3Default(const float* const v) {memcpy(default_value.f3val, v, sizeof(float)*3);}
 	void setFloat3Default(float v1, float v2, float v3) {default_value.f3val[0] = v1; default_value.f3val[1] = v2; default_value.f3val[2] = v3;}
 
 	//float6 vectors.
 	const float* getFloat6Value() {return value.f6val;}
 	const float* getFloat6Default() {return default_value.f6val;}
-	void setFloat6Value(const float* const v) {memcpy(&value.f6val, v, sizeof(float)*6);}
-	void setFloat6Value(float v1, float v2, float v3, float v4, float v5, float v6) {value.f6val[0] = v1; value.f6val[1] = v2; value.f6val[2] = v3; value.f6val[3] = v4; value.f6val[4] = v5; value.f6val[5] = v6;}
+	void setFloat6Value(const float* const v) {
+		memcpy(&value.f6val, v, sizeof(float)*6);
+		if(post_changed_callback) post_changed_callback();
+	}
+	void setFloat6Value(float v1, float v2, float v3, float v4, float v5, float v6) {
+		value.f6val[0] = v1; value.f6val[1] = v2; value.f6val[2] = v3; value.f6val[3] = v4; value.f6val[4] = v5; value.f6val[5] = v6;
+		if(post_changed_callback) post_changed_callback();
+	}
 	void setFloat6Default(const float* const v) {memcpy(default_value.f6val, v, sizeof(float)*6);}
 	void setFloat6Default(float v1, float v2, float v3, float v4, float v5, float v6) {default_value.f6val[0] = v1; default_value.f6val[1] = v2; default_value.f6val[2] = v3; default_value.f6val[3] = v4; default_value.f6val[4] = v5; default_value.f6val[5] = v6;}
 
@@ -76,6 +98,7 @@ class LavProperty {
 	int type, tag;
 	LavPropertyValue value, default_value, minimum_value, maximum_value;
 	std::string name, string_value, default_string_value;
+	std::function<void(void)> post_changed_callback;
 };
 
 //helper methods to quickly make properties.
