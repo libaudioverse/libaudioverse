@@ -29,12 +29,12 @@ void main(int argc, char** args) {
 	LavDevice* device;
 	LavObject* fileNode, *hrtfNode;
 	ERRCHECK(Lav_initializeLibrary());
-	ERRCHECK(Lav_createReadDevice(blocksize, 2, 44100, &device));
-	ERRCHECK(Lav_createFileNode(device, args[1], &fileNode));
+	ERRCHECK(Lav_createReadDevice(44100, 2, blocksize, &device));
+	ERRCHECK(Lav_createFileObject(device, args[1], &fileNode));
 	LavHrtfData *hrtf = NULL;
 	ERRCHECK(Lav_createHrtfData(args[2], &hrtf));
-	ERRCHECK(Lav_createHrtfNode(device, hrtf, &hrtfNode));
-	ERRCHECK(Lav_setParent(hrtfNode, fileNode, 0, 0));
+	ERRCHECK(Lav_createHrtfObject(device, hrtf, &hrtfNode));
+	ERRCHECK(Lav_objectSetParent(hrtfNode, 0, fileNode, 0));
 	ERRCHECK(Lav_deviceSetOutputObject(device, hrtfNode));
 
 	printf("Convolving...\n");
