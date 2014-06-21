@@ -3,7 +3,7 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 
 #include <libaudioverse/libaudioverse.h>
-#include <libaudioverse/private_all.h> //our cross-platform sleep.
+#include <libaudioverse/libaudioverse_properties.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -15,10 +15,10 @@ if((x) != Lav_ERROR_NONE) {\
 }\
 } while(0)\
 
-int main(int argc, char** args) {
+void main(int argc, char** args) {
 	if(argc != 2) {
 		printf("Syntax: %s <path>");
-		return 0;
+		return;
 	}
 
 	char* path = args[1];
@@ -26,20 +26,22 @@ int main(int argc, char** args) {
 	LavDevice* device;
 	ERRCHECK(Lav_initializeLibrary());
 	ERRCHECK(Lav_createDefaultAudioOutputDevice(&device));
-	ERRCHECK(Lav_createFileNode(device, path, &node));
+	ERRCHECK(Lav_createFileObject(device, path, &node));
 	LavObject* atten, *limit, *mix;
-	ERRCHECK(Lav_createAttenuatorNode(device, node->num_outputs, &atten));
-	ERRCHECK(Lav_createHardLimiterNode(device, node->num_outputs == 1 ? 2 : node->num_outputs , &limit));
-	ERRCHECK(Lav_createMixerNode(device, 1, 2, &mix));
-	for(unsigned int i = 0; i < node->num_outputs; i++) {
-		ERRCHECK(Lav_setParent(atten, node, i, i));
-		ERRCHECK(Lav_setParent(mix, atten, i, i));
-		ERRCHECK(Lav_setParent(limit, mix, i, i));
+	unsigned int fileChannels;
+	ERRCHECK(Lav_objectGetOutputCount(node, &fileChannels));
+	ERRCHECK(Lav_createAttenuatorObject(device, fileChannels, &atten));
+	ERRCHECK(Lav_createHardLimiterObject(device, fileChannels == 1 ? 2 : fileChannels, &limit));
+	ERRCHECK(Lav_createMixerObject(device, 1, fileChannels, &mix));
+	for(unsigned int i = 0; i < fileChannels; i++) {
+		ERRCHECK(Lav_objectSetParent(atten, i, node, i));
+		ERRCHECK(Lav_objectSetParent(mix, i, atten, i));
+		ERRCHECK(Lav_objectSetParent(limit, i, mix, i));
 	}
 	//this makes mono play through both channels.
-	if(node->num_outputs == 1) {
-		ERRCHECK(Lav_setParent(mix, atten, 0, 1));
-		ERRCHECK(Lav_setParent(limit, mix, 0, 1));
+	if(fileChannels == 1) {
+		ERRCHECK(Lav_objectSetParent(mix, 1, atten, 0));
+		ERRCHECK(Lav_objectSetParent(limit, 1, mix, 0));
 	}
 	ERRCHECK(Lav_deviceSetOutputObject(device, limit));
 
@@ -54,10 +56,11 @@ int main(int argc, char** args) {
 		while(*start == ' ') start+=1; //skip spaces.
 		sscanf(start, "%f", &value);
 		switch(command[0]) {
-			case 'p': Lav_setFloatProperty(node, Lav_FILE_PITCH_BEND, value); break;
-			case 'v': Lav_setFloatProperty(atten, Lav_ATTENUATOR_MULTIPLIER, value); break;
-			case 's': Lav_setFloatProperty(node, Lav_FILE_POSITION, value); break;
+			case 'p': Lav_objectSetFloatProperty(node, Lav_FILE_PITCH_BEND, value); break;
+			case 'v': Lav_objectSetFloatProperty(atten, Lav_ATTENUATOR_MULTIPLIER, value); break;
+			case 's': Lav_objectSetFloatProperty(node, Lav_FILE_POSITION, value); break;
 			default: printf("Unrecognized command.\n"); break;
 		}
 	}
+	return;
 }
