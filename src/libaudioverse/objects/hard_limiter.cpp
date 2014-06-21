@@ -46,6 +46,7 @@ void LavHardLimiterObject::process() {
 
 Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterObject(LavDevice* device, unsigned int numChannels, LavObject** destination) {
 	PUB_BEGIN
+	LOCK(*device);
 	auto retval = createHardLimiterObject(device, numChannels);
 	*destination = retval;
 	PUB_END

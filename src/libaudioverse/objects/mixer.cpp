@@ -39,6 +39,7 @@ void LavMixerObject::process() {
 
 Lav_PUBLIC_FUNCTION LavError Lav_createMixerObject(LavDevice* device, unsigned int maxParents, unsigned int inputsPerParent, LavObject** destination) {
 	PUB_BEGIN
+	LOCK(*device);
 	LavObject* retval = createMixerObject(device, maxParents, inputsPerParent);
 	*destination = retval;
 	PUB_END

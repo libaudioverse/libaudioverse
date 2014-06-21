@@ -71,6 +71,7 @@ void LavHrtfObject::process() {
 
 Lav_PUBLIC_FUNCTION LavError Lav_createHrtfObject(LavDevice* device, LavHrtfData* hrtf, LavObject** destination) {
 	PUB_BEGIN
+	LOCK(*device);
 	auto retval = createHrtfObject(device, hrtf);
 	*destination = retval;
 	PUB_END
