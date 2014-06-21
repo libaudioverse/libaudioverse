@@ -59,8 +59,8 @@ void LavHrtfObject::process() {
 	for(unsigned int i = 0; i < device->getBlockSize(); i++, start++) {
 		float outLeft = 0, outRight = 0;
 		for(unsigned int j = 00; j < hrtf->getLength(); j++) {
-			outLeft = left_response[j]* *(start-j);
-			outRight = right_response[j]* *(start-j);
+			outLeft += left_response[j]* *(start-j);
+			outRight += right_response[j]* *(start-j);
 		}
 	outputs[0][i] = outLeft;
 	outputs[1][i] = outRight;
