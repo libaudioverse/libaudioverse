@@ -43,6 +43,7 @@ LavObject* createFileObject(LavDevice* device, const char* path) {
 }
 
 void LavFileObject::process() {
+	const float pitch_bend = properties[Lav_FILE_PITCH_BEND]->getFloatValue();
 	for(unsigned int i = 0; i < device->getBlockSize(); i++) {
 		if(offset >= file.getFrameCount()) {
 			for(unsigned int j = 0; j < num_outputs; j++) {
@@ -59,7 +60,7 @@ void LavFileObject::process() {
 			unsigned int ind2 = samp2*num_outputs+j;
 			outputs[j][i] = weight1*buffer[ind1]+weight2*buffer[ind2];
 		}		
-	offset += delta;
+	offset += delta*pitch_bend;
 	position += (unsigned int)offset;
 	offset = ringmodf(offset, 1.0f);
 	}
