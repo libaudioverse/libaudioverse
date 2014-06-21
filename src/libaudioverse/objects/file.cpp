@@ -16,6 +16,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 class LavFileObject: public LavObject {
 	virtual void init(LavDevice* device, const char* path);
 	virtual void process();
+	void seek(); //property callback.
 	protected:
 	LavFileReader file;
 	float* buffer = nullptr;
@@ -34,12 +35,19 @@ void LavFileObject::init(LavDevice* device, const char* path) {
 	delta = file.getSr()/device->getSr();
 	properties[Lav_FILE_POSITION] = createFloatProperty("position", 0.0f, 0.0f, file.getFrameCount()/file.getSr());
 	properties[Lav_FILE_PITCH_BEND] = createFloatProperty("pitch_bend", 1.0f, 0.0f, std::numeric_limits<float>::infinity());
+	properties[Lav_FILE_POSITION]->setPostChangedCallback([&] () {seek();});
 }
 
 LavObject* createFileObject(LavDevice* device, const char* path) {
 	auto retval = new LavFileObject();
 	retval->init(device, path);
 	return retval;
+}
+
+void LavFileObject::seek() {
+	float pos = properties[Lav_FILE_POSITION]->getFloatValue();
+	offset = 0.0f;
+	position = (unsigned int)(pos*file.getSr());
 }
 
 void LavFileObject::process() {
