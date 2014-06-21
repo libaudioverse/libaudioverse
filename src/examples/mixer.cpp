@@ -4,7 +4,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 /**Demonstrates the hrtf node.*/
 #include <libaudioverse/libaudioverse.h>
-#include <libaudioversse/libaudioverse_properties.h>
+#include <libaudioverse/libaudioverse_properties.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -37,7 +37,7 @@ void main(int argc, char** args) {
 	LavObject** nodes;
 	ERRCHECK(Lav_initializeLibrary());
 	ERRCHECK(Lav_createDefaultAudioOutputDevice(&device));
-	nodes = calloc(argc-1, sizeof(LavObject*));
+	nodes = new LavObject*[argc-1];
 	for(int i = 0; i < argc-1; i++) {
 		LavObject* n = makeNode(device, args[i+1]);
 		if(n == NULL) return; //makeNode prints errors already.
@@ -59,12 +59,12 @@ void main(int argc, char** args) {
 	ERRCHECK(Lav_createMixerObject(device, argc-1, channels, &mixer));
 	ERRCHECK(Lav_createHardLimiterObject(device, channels, &limit));
 	unsigned int mixInputCount;
-	ERRCHECK(Lav_objectGetInputCount(mixer, &mixInputCount);
-	for(unsigned int input = 0; i < mixInputCount; input++) {
-		ERRCHECK(Lav_objectSetParent(mixer, nodes[input/channels], input%channels, input));
+	ERRCHECK(Lav_objectGetInputCount(mixer, &mixInputCount));
+	for(unsigned int input = 0; input < mixInputCount; input++) {
+		ERRCHECK(Lav_objectSetParent(mixer, input, nodes[input/channels], input%channels));
 	}
 	for(unsigned int i = 0; i < channels; i++) {
-		ERRCHECK(Lav_objectSetParent(limit, mixer, i, i));
+		ERRCHECK(Lav_objectSetParent(limit, i, mixer, i));
 	}
 	ERRCHECK(Lav_deviceSetOutputObject(device, limit));
 	int shouldContinue = 1;
