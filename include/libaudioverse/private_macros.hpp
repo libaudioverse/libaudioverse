@@ -18,7 +18,7 @@ under no circumstances will an exception leave the public api and propagate into
 #define PUB_END } catch(LavErrorException e) {\
 return e.err; \
 } catch(std::bad_alloc e) {\
-return lav_ERROR_MEMORY;\
+return Lav_ERROR_MEMORY;\
 } catch(...) {\
 return Lav_ERROR_UNKNOWN;\
 }\

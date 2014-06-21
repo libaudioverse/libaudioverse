@@ -124,34 +124,39 @@ void LavObject::unlock() {
 
 //begin public api
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetInputCount(LavObject* obj, unsigned int* destination) {
+	PUB_BEGIN
 	LOCK(*obj);
 	*destination = obj->getInputCount();
-	return Lav_ERROR_NONE;
-
+	PUB_END
 }
+
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetOutputCount(LavObject* obj, unsigned int* destination) {
+	PUB_BEGIN
 	LOCK(*obj);
 	*destination = obj->getOutputCount();
-	return Lav_ERROR_NONE;
+	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetParent(LavObject *obj, unsigned int slot, LavObject** parent, unsigned int *outputNumber) {
+	PUB_BEGIN
 	LOCK(*(obj->getDevice()));
 	*parent = obj->getParentObject(slot);
 	*outputNumber = obj->getParentOutput(slot);
-	return Lav_ERROR_NONE;
+	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectSetParent(LavObject *obj, unsigned int input, LavObject* parent, unsigned int output) {
+	PUB_BEGIN
 	LOCK(*(obj->getDevice()));
 	obj->setParent(input, parent, output);
-	return Lav_ERROR_NONE;
+	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectClearParent(LavObject *obj, unsigned int slot) {
+	PUB_BEGIN
 	LOCK(*(obj->getDevice()));
 	obj->clearParent(slot);
-	return Lav_ERROR_NONE;
+	PUB_END
 }
 
 //this is properties.
@@ -161,91 +166,105 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectClearParent(LavObject *obj, unsigned int 
 #define PROP_PREAMBLE(o, s, t) LOCK(*(o));\
 auto prop = (o)->getProperty((s));\
 if(prop == nullptr) {\
-return Lav_ERROR_RANGE;\
+throw LavErrorException(Lav_ERROR_RANGE);\
 }\
 if(prop->getType() != (t)) {\
-return Lav_ERROR_TYPE_MISMATCH;\
+throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);\
 }
 
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectResetProperty(LavObject *obj, unsigned int slot) {
+	PUB_BEGIN
 	LOCK(*obj);
 	auto prop = obj->getProperty(slot);
-	if(prop == nullptr) return Lav_ERROR_RANGE;
+	if(prop == nullptr) throw LavErrorException(Lav_ERROR_RANGE);
 	prop->reset();
-	return Lav_ERROR_NONE;
+	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectSetIntProperty(LavObject* obj, unsigned int slot, int value) {
+	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_INT);
 	prop->setIntValue(value);
-	return Lav_ERROR_NONE;
+	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectSetFloatProperty(LavObject *obj, unsigned int slot, float value) {
+	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_FLOAT);
 	prop->setFloatValue(value);
-	return Lav_ERROR_NONE;
+	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectSetDoubleProperty(LavObject *obj, unsigned int slot, double value) {
+	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_DOUBLE);
 	prop->setDoubleValue(value);
-	return Lav_ERROR_NONE;
+	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectSetStringProperty(LavObject*obj, unsigned int slot, char* value) {
+	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_STRING);
 	prop->setStringValue(value);
-	return Lav_ERROR_NONE;
+	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectSetFloat3Property(LavObject* obj, unsigned int slot, float v1, float v2, float v3) {
+	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_FLOAT3);
 	prop->setFloat3Value(v1, v2, v3);
-	return Lav_ERROR_NONE;
+	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectSetFloat6Property(LavObject* obj, unsigned int slot, float v1, float v2, float v3, float v4, float v5, float v6) {
+	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_FLOAT6);
 	prop->setFloat6Value(v1, v2, v3, v4, v5, v6);
 	return Lav_ERROR_NONE;
+	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetIntProperty(LavObject*obj, unsigned int slot, int *destination) {
+	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_INT);
 	*destination = prop->getIntValue();
-	return Lav_ERROR_NONE;
+	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloatProperty(LavObject* obj, unsigned int slot, float *destination) {
+	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_FLOAT);
 	*destination = prop->getFloatValue();
-	return Lav_ERROR_NONE;
+	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetDoubleProperty(LavObject*obj, unsigned int slot, double *destination) {
+	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_DOUBLE);
 	*destination = prop->getDoubleValue();
-	return Lav_ERROR_NONE;
+	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetStringProperty(LavObject* obj, unsigned int slot, const char** destination) {
+	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_STRING);
 	*destination = prop->getStringValue();
-	return Lav_ERROR_NONE;
+	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloat3Property(LavObject* obj, unsigned int slot, float* v1, float* v2, float* v3) {
+	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_FLOAT3);
 	auto val = prop->getFloat3Value();
 	*v1 = val[0];
 	*v2 = val[1];
 	*v3 = val[2];
-	return Lav_ERROR_NONE;
+	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloat6Property(LavObject* obj, unsigned int slot, float* v1, float* v2, float* v3, float* v4, float* v5, float* v6) {
+	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_FLOAT6);
 	auto val = prop->getFloat6Value();
 	*v1 = val[0];
@@ -254,26 +273,29 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloat6Property(LavObject* obj, unsigne
 	*v4 = val[3];
 	*v5 = val[4];
 	*v6 = val[5];
-	return Lav_ERROR_NONE;
+	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetIntPropertyRange(LavObject* obj, unsigned int slot, int* lower, int* upper) {
+	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_INT);
 	*lower = prop->getIntMin();
 	*upper = prop->getIntMax();
-	return Lav_ERROR_NONE;
+	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloatPropertyRange(LavObject* obj, unsigned int slot, float* lower, float* upper) {
+	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_FLOAT);
 	*lower = prop->getFloatMin();
 	*upper = prop->getFloatMax();
-	return Lav_ERROR_NONE;
+	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetDoublePropertyRange(LavObject* obj, unsigned int slot, double* lower, double* upper) {
+	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_DOUBLE);
 	*lower = prop->getDoubleMin();
 	*upper = prop->getDoubleMax();
-	return Lav_ERROR_NONE;
+	PUB_END
 }
