@@ -3,7 +3,8 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 
 /**Demonstrates the hrtf node.*/
-#include <libaudioverse/private_all.h>
+#include <libaudioverse/libaudioverse.h>
+#include <libaudioverse/libaudioverse_properties.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -24,16 +25,15 @@ void main(int argc, char** args) {
 	LavObject* fileNode, *hrtfNode, *limit;
 	ERRCHECK(Lav_initializeLibrary());
 	ERRCHECK(Lav_createDefaultAudioOutputDevice(&device));
-	ERRCHECK(Lav_createFileNode(device, args[1], &fileNode));
-
+	ERRCHECK(Lav_createFileObject(device, args[1], &fileNode));
 	LavHrtfData *hrtf = NULL;
 	ERRCHECK(Lav_createHrtfData(args[2], &hrtf));
-	ERRCHECK(Lav_createHrtfNode(device, hrtf, &hrtfNode));
+	ERRCHECK(Lav_createHrtfObject(device, hrtf, &hrtfNode));
 
-	ERRCHECK(Lav_setParent(hrtfNode, fileNode, 0, 0));
-	ERRCHECK(Lav_createHardLimiterNode(device, 2, &limit));
-	ERRCHECK(Lav_setParent(limit, hrtfNode, 0, 0));
-	ERRCHECK(Lav_setParent(limit, hrtfNode, 1, 1));
+	ERRCHECK(Lav_objectSetParent(hrtfNode, 0, fileNode, 0));
+	ERRCHECK(Lav_createHardLimiterObject(device, 2, &limit));
+	ERRCHECK(Lav_objectSetParent(limit, 0, hrtfNode, 0));
+	ERRCHECK(Lav_objectSetParent(limit, 1, hrtfNode, 1));
 	ERRCHECK(Lav_deviceSetOutputObject(device, limit));
 	int shouldContinue = 1;
 	printf("Enter pairs of numbers separated by whitespace, where the first is azimuth (anything) and the second\n"
@@ -55,8 +55,8 @@ void main(int argc, char** args) {
 		}
 		else if(elevOrAz == 1) {
 			sscanf(command, "%f", &elev);
-			ERRCHECK(Lav_setFloatProperty(hrtfNode, Lav_HRTF_ELEVATION, elev));
-			ERRCHECK(Lav_setFloatProperty(hrtfNode, Lav_HRTF_AZIMUTH, az));
+			ERRCHECK(Lav_objectSetFloatProperty(hrtfNode, Lav_HRTF_ELEVATION, elev));
+			ERRCHECK(Lav_objectSetFloatProperty(hrtfNode, Lav_HRTF_AZIMUTH, az));
 			elevOrAz = 0;
 			continue;
 		}

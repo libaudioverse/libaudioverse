@@ -5,6 +5,6 @@ SET_PROPERTY(TARGET ${name} PROPERTY RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_BINARY_D
 endmacro()
 example(asynchronous_audio)
 example(file)
-#example(hrtf)
+example(hrtf)
 example(mixer)
 #example(3d)
