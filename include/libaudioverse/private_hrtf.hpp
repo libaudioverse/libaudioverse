@@ -15,11 +15,13 @@ class LavHrtfData {
 
 	//load from a file.
 	LavError loadFromFile(std::string path);
-	private:
-	unsigned int elev_count, hrir_count, hrir_length;
-	int min_elevation, max_elevation;
-	unsigned int *azimuth_counts;
-	unsigned int samplerate;
-	float ***hrirs;
-};
 
+	//get the hrir's length.
+	unsigned int getLength();
+	private:
+	unsigned int elev_count = 0, hrir_count = 0, hrir_length = 0;
+	int min_elevation = 0, max_elevation = 0;
+	unsigned int *azimuth_counts = nullptr;
+	unsigned int samplerate = 0;
+	float ***hrirs = nullptr;
+};

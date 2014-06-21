@@ -28,6 +28,10 @@ void reverse_endianness(char* buffer, unsigned int count, unsigned int window) {
 //this makes sure that we aren't about to do something silently dangerous and tels us at compile time.
 static_assert(sizeof(float) == 4, "Sizeof float is not 4; cannot safely work with hrtfs");
 
+unsigned int LavHrtfData::getLength() {
+	return hrir_length;
+}
+
 LavError LavHrtfData::loadFromFile(std::string path) {
 	//first, load the file if we can.
 	FILE *fp = fopen(path.c_str(), "rb");
