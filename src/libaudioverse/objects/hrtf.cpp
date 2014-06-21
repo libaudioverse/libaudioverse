@@ -36,6 +36,12 @@ void LavHrtfObject::init(LavDevice* device, LavHrtfData* hrtf) {
 	properties[Lav_HRTF_ELEVATION]->setPostChangedCallback(markRecompute);
 }
 
+LavObject* createHrtfObject(LavDevice* device, LavHrtfData* hrtf) {
+	auto retval = new LavHrtfObject();
+	retval->init(device, hrtf);
+	return retval;
+}
+
 void LavHrtfObject::process() {
 	//calculating the hrir is expensive, do it only if needed.
 	if(needs_hrtf_recompute) {
@@ -57,4 +63,12 @@ void LavHrtfObject::process() {
 			outRight = right_response[j]* *(start-j);
 		}
 	}
+}
+
+//begin public api
+
+Lav_PUBLIC_FUNCTION LavError Lav_createHrtfObject(LavDevice* device, LavHrtfData* hrtf, LavObject** destination) {
+	auto retval = createHrtfObject(device, hrtf);
+	*destination = retval;
+	return Lav_ERROR_NONE;
 }
