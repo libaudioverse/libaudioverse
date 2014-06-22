@@ -27,8 +27,7 @@ class LavFileObject: public LavObject {
 };
 
 void LavFileObject::init(LavDevice* device, const char* path) {
-	LavError err = file.open(path);
-	if(err != Lav_ERROR_NONE) return;
+	file.open(path);
 	LavObject::init(device, 0, file.getChannelCount());
 	buffer = new float[file.getSampleCount()];
 	file.readAll(buffer);

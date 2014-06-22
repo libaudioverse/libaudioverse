@@ -11,8 +11,8 @@ This can theoreticaly handle any type of file, including codec decoding, but use
 class LavFileReader {
 	public:
 	LavFileReader(): info() {} //vc++ crashes if we try to do this the c++11 way.
-	LavError open(const char* path);
-	LavError close();
+	void open(const char* path);
+	void close();
 	float getSr();
 	unsigned int getChannelCount();
 	unsigned int getFrameCount();

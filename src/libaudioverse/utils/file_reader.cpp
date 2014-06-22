@@ -4,22 +4,21 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_file.hpp>
 #include <libaudioverse/libaudioverse.h>
 #include <sndfile.h>
+#include <libaudioverse/private_errors.hpp>
 
-LavError LavFileReader::open(const char* path) {
-	if(handle) return Lav_ERROR_FILE;
+void LavFileReader::open(const char* path) {
+	if(handle) throw LavErrorException(Lav_ERROR_FILE);
 	handle = sf_open(path, SFM_READ, &info);
-	if(handle == nullptr) return Lav_ERROR_FILE;
-	return Lav_ERROR_NONE;
+	if(handle == nullptr) throw LavErrorException(Lav_ERROR_FILE);
 }
 
-LavError LavFileReader::close() {
+void LavFileReader::close() {
 	if(handle != NULL)  {
 		sf_close(handle);
 		handle = NULL;
 		info = {0};
-		return Lav_ERROR_NONE;
 	} else {
-		return Lav_ERROR_FILE;
+		throw LavErrorException(Lav_ERROR_FILE);
 	}
 }
 
