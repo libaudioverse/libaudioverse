@@ -4,6 +4,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include <string>
 #include <functional>
+#include "libaudioverse.h"
+#include "private_errors.hpp"
 
 union LavPropertyValue {
 	float fval;
@@ -12,6 +14,9 @@ union LavPropertyValue {
 	float f3val[3]; //vectors.
 	float f6val[6]; //orientations.
 };
+
+//quick range check helper...
+#define RC(val, fld) if(val > maximum_value.fld || val < minimum_value.fld) throw LavErrorException(Lav_ERROR_NONE)
 
 class LavProperty {
 	public:
@@ -28,6 +33,7 @@ class LavProperty {
 	//yes, really. This is as uggly as it looks.
 	int getIntValue() { return value.ival;}
 	void setIntValue(int v) {
+		RC(v, ival);
 		value.ival = v;
 		if(post_changed_callback) post_changed_callback();
 	}	
@@ -40,6 +46,7 @@ class LavProperty {
 	//floats...
 	float getFloatValue() {return value.fval;}
 	void setFloatValue(float v) {
+	RC(v, fval);
 		value.fval = v;
 		if(post_changed_callback) post_changed_callback();
 	}
@@ -52,6 +59,7 @@ class LavProperty {
 	//doubles...
 	double getDoubleValue() {return value.dval;}
 	void setDoubleValue(double v) {
+	RC(v, dval);
 		value.dval = v;
 		if(post_changed_callback) post_changed_callback();
 	}
