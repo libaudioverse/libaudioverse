@@ -14,7 +14,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 class LavHrtfObject: public LavObject {
 	public:
-	virtual void init(LavDevice* device, LavHrtfData* hrtf);
+	LavHrtfObject(LavDevice* device, LavHrtfData* hrtf);
 	virtual void process();
 	private:
 	float *history = nullptr, *left_response = nullptr, *right_response = nullptr;
@@ -22,8 +22,7 @@ class LavHrtfObject: public LavObject {
 	bool needs_hrtf_recompute;
 };
 
-void LavHrtfObject::init(LavDevice* device, LavHrtfData* hrtf) {
-	LavObject::init(device, 1, 2);
+LavHrtfObject::LavHrtfObject(LavDevice* device, LavHrtfData* hrtf): LavObject(device, 1, 2) {
 	this->hrtf = hrtf;
 	left_response = new float[hrtf->getLength()];
 	right_response = new float[hrtf->getLength()];
@@ -37,8 +36,7 @@ void LavHrtfObject::init(LavDevice* device, LavHrtfData* hrtf) {
 }
 
 LavObject* createHrtfObject(LavDevice* device, LavHrtfData* hrtf) {
-	auto retval = new LavHrtfObject();
-	retval->init(device, hrtf);
+	auto retval = new LavHrtfObject(device, hrtf);
 	return retval;
 }
 

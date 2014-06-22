@@ -11,18 +11,16 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 class LavAttenuatorObject: public LavObject {
 	public:
-	virtual void init(LavDevice* device, unsigned int numChannels);
+	LavAttenuatorObject(LavDevice* device, unsigned int numChannels);
 	virtual void process();
 };
 
-void LavAttenuatorObject::init(LavDevice* device, unsigned int numChannels) {
-	LavObject::init(device, numChannels, numChannels);
+LavAttenuatorObject::LavAttenuatorObject(LavDevice* device, unsigned int numChannels): LavObject(device, numChannels, numChannels) {
 	properties[Lav_ATTENUATOR_MULTIPLIER] = createFloatProperty("multiplier", 1.0f, -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity());
 }
 
 LavObject* createAttenuatorObject(LavDevice* device, unsigned int numChannels) {
-	auto retval = new LavAttenuatorObject();
-	retval->init(device, numChannels);
+	auto retval = new LavAttenuatorObject(device, numChannels);
 	return retval;
 }
 

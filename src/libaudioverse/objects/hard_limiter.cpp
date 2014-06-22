@@ -12,17 +12,15 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 class LavHardLimiterObject: public LavObject {
 	public:
-	void init(LavDevice* device, unsigned int numInputs);
+	LavHardLimiterObject(LavDevice* device, unsigned int numInputs);
 	virtual void process();
 };
 
-void LavHardLimiterObject::init(LavDevice* device, unsigned int numInputs) {
-	LavObject::init(device, numInputs, numInputs);
+LavHardLimiterObject::LavHardLimiterObject(LavDevice* device, unsigned int numInputs): LavObject(device, numInputs, numInputs) {
 }
 
 LavObject* createHardLimiterObject(LavDevice* device, unsigned int numChannels) {
-	auto retval = new LavHardLimiterObject();
-	retval->init(device, numChannels);
+	auto retval = new LavHardLimiterObject(device, numChannels);
 	return retval;
 }
 

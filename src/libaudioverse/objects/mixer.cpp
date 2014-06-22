@@ -9,20 +9,18 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 class LavMixerObject: public LavObject {
 	public:
-	virtual void init(LavDevice* device, unsigned int maxParents, unsigned int inputsPerParent);
+	LavMixerObject(LavDevice* device, unsigned int maxParents, unsigned int inputsPerParent);
 	virtual void process();
 	protected:
 	unsigned int inputs_per_parent;
 };
 
-void LavMixerObject::init(LavDevice* device, unsigned int maxParents, unsigned int inputsPerParent) {
-	LavObject::init(device, inputsPerParent*maxParents, inputsPerParent);
+LavMixerObject::LavMixerObject(LavDevice* device, unsigned int maxParents, unsigned int inputsPerParent): LavObject(device, inputsPerParent*maxParents, inputsPerParent) {
 	inputs_per_parent = inputsPerParent;
 }
 
 LavObject* createMixerObject(LavDevice* device, unsigned int maxParents, unsigned int inputsPerParent) {
-	auto retval = new LavMixerObject();
-	retval->init(device, maxParents, inputsPerParent);
+	auto retval = new LavMixerObject(device, maxParents, inputsPerParent);
 	return retval;
 }
 

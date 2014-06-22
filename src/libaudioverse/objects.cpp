@@ -25,7 +25,7 @@ void LavObject::computeInputBuffers() {
 	}
 }
 
-void LavObject::init(LavDevice* device, unsigned int numInputs, unsigned int numOutputs) {
+LavObject::LavObject(LavDevice* device, unsigned int numInputs, unsigned int numOutputs) {
 	num_inputs = numInputs;
 	num_outputs = numOutputs;
 	//allocations:
@@ -55,6 +55,7 @@ void LavObject::process() {
 		memset(outputs[i], 0, device->getBlockSize()*sizeof(float));
 	}
 }
+
 void LavObject::didProcess() {
 	is_processing = false;
 }

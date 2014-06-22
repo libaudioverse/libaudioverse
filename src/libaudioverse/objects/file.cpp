@@ -14,7 +14,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <limits>
 
 class LavFileObject: public LavObject {
-	virtual void init(LavDevice* device, const char* path);
+	LavFileObject(LavDevice* device, const char* path, unsigned int channels);
 	virtual void process();
 	void seek(); //property callback.
 	protected:
@@ -26,9 +26,10 @@ class LavFileObject: public LavObject {
 	friend LavObject* createFileObject(LavDevice* device, const char* path);
 };
 
-void LavFileObject::init(LavDevice* device, const char* path) {
+//the third parameter is a hint: we need to know how many channels, we only expose objects through the create functions, so the create function can find this out.
+//todo: when objects support resizing their inputs and outputs, as they will inevitably support this, rewrite to use that functionality.
+LavFileObject::LavFileObject(LavDevice* device, const char* path, unsigned int channels): LavObject(device, 0, channels) {
 	file.open(path);
-	LavObject::init(device, 0, file.getChannelCount());
 	buffer = new float[file.getSampleCount()];
 	file.readAll(buffer);
 	delta = file.getSr()/device->getSr();
@@ -38,8 +39,9 @@ void LavFileObject::init(LavDevice* device, const char* path) {
 }
 
 LavObject* createFileObject(LavDevice* device, const char* path) {
-	auto retval = new LavFileObject();
-	retval->init(device, path);
+	auto f = LavFileReader();
+	f.open(path);
+	auto retval = new LavFileObject(device, path, f.getChannelCount());
 	return retval;
 }
 
