@@ -29,8 +29,14 @@ class LavObject: std::enable_shared_from_this<LavObject> {
 	virtual unsigned int getOutputCount();
 	virtual void getOutputPointers(float** dest);
 	virtual void clearParent(unsigned int slot);
+
+	//these three methods are all involved in the processing logic: willProcess is called immediately before and didProcess immediately after the actual process method.
+	//this is a strong guarantee: no other operation shall be performed on this object between these three calls.
+	//base implementations toggle is_processing, so taht property callbacks can tell who set them-something external to this object or this object itself.
+	virtual void willProcess();
 	virtual void process();
-	virtual void processor();
+	virtual void didProcess();
+
 	virtual LavDevice* getDevice();
 	virtual LavProperty* getProperty(int slot);
 
@@ -47,7 +53,7 @@ class LavObject: std::enable_shared_from_this<LavObject> {
 	float** outputs = nullptr;
 	unsigned int num_outputs = 0;
 	unsigned int num_inputs = 0;
-	int is_processing = 0;
+	bool is_processing = false;
 	enum Lav_OBJTYPES type = Lav_OBJTYPE_GENERIC;
 
 	//we are never allowed to copy.

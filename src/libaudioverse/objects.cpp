@@ -45,17 +45,18 @@ void LavObject::init(LavDevice* device, unsigned int numInputs, unsigned int num
 	computeInputBuffers(); //at the moment, this is going to just make them all 0, but it takes effect once parents are added.
 }
 
-void LavObject::process() {
-	is_processing = 1;
-	processor();
-	is_processing = 0;
+void LavObject::willProcess() {
+	is_processing = true;
 }
 
 /*Default Processing function.*/
-void LavObject::processor() {
+void LavObject::process() {
 	for(unsigned int i = 0; i < num_outputs; i++) {
 		memset(outputs[i], 0, device->getBlockSize()*sizeof(float));
 	}
+}
+void LavObject::didProcess() {
+	is_processing = false;
 }
 
 void LavObject::setParent(unsigned int input, LavObject* parent, unsigned int parentOutput) {

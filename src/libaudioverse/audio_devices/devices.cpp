@@ -24,8 +24,12 @@ LavError LavDevice::getBlock(float* out) {
 		memset(out, 0, sizeof(float)*channels*block_size);
 		return Lav_ERROR_NONE;
 	}
-	//okay, we're not paused.  Visit all objects, calling their process method.
-	visitAllObjectsInProcessOrder([] (LavObject* o) {o->process();});
+	//okay, we're not paused.  Visit all objects, calling their (will/did/)process method.
+	visitAllObjectsInProcessOrder([] (LavObject* o) {
+		o->willProcess();
+		o->process();
+		o->didProcess();
+	});
 	//if no output object, memset 0 and bail out again.
 	if(output_object == nullptr) {
 		memset(out, 0, sizeof(float)*channels*block_size);
