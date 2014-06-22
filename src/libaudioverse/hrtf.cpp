@@ -34,9 +34,10 @@ unsigned int LavHrtfData::getLength() {
 	return hrir_length;
 }
 
-LavError LavHrtfData::loadFromFile(std::string path) {
+void LavHrtfData::loadFromFile(std::string path) {
 	//first, load the file if we can.
 	FILE *fp = fopen(path.c_str(), "rb");
+	if(fp == nullptr) throw LavErrorException(Lav_ERROR_FILE);
 	size_t size = 0;
 	fseek(fp, 0, SEEK_END);
 	size = ftell(fp);
@@ -54,6 +55,7 @@ LavError LavHrtfData::loadFromFile(std::string path) {
 	if(endianness_marker != 1) reverse_endianness(data, size, 4);
 	//read it again; if it is still not 1, something has gone badly wrong.
 	endianness_marker = *(int32_t*)data;
+	if(endianness_marker != 1) throw LavErrorException(Lav_ERROR_HRTF_INVALID);
 
 	char* iterator = data;
 	const unsigned int window_size = 4;
@@ -82,6 +84,7 @@ LavError LavHrtfData::loadFromFile(std::string path) {
 	//sanity check: we must have as many hrirs as the sum of the above array.
 	int32_t sum_sanity_check = 0;
 	for(unsigned int i = 0; i < elev_count; i++) sum_sanity_check +=azimuth_counts[i];
+	if(sum_sanity_check != hrir_count) throw LavErrorException(Lav_ERROR_HRTF_INVALID);
 
 	hrir_length = *(int32_t*)iterator;
 	iterator += window_size;
@@ -90,6 +93,7 @@ LavError LavHrtfData::loadFromFile(std::string path) {
 	size_t size_remaining = size-size_so_far;
 	//we must have enough remaining to be all hrir hrirs.
 	size_t hrir_size = hrir_length*hrir_count*sizeof(float);
+	if(hrir_size != size_remaining) throw LavErrorException(Lav_ERROR_HRTF_INVALID);
 
 	//last step.  Initialize the HRIR array.
 	hrirs = new float**[elev_count];
@@ -107,7 +111,6 @@ LavError LavHrtfData::loadFromFile(std::string path) {
 			iterator+=hrir_length*sizeof(float);
 		}
 	}
-	return Lav_ERROR_NONE;
 }
 
 //a complete HRTF for stereo is two calls to this function.

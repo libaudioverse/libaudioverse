@@ -57,16 +57,13 @@ enum Lav_ERRORS {
 	Lav_ERROR_FILE = 8, //error to do with files.
 	Lav_ERROR_FILE_NOT_FOUND = 9, //specifically, we couldn't find a file.
 
-	//these are for hrtf.
-	Lav_ERROR_HRTF_CORRUPT = 10,
-	Lav_ERROR_HRTF_TOO_SMALL = 11,
-	Lav_ERROR_HRTF_INVALID = 12,
+	Lav_ERROR_HRTF_INVALID = 10,
 
 	/**This one is odd.  It is what is thrown if you pasas a object with the wrong "shape" to a function, most notably source creation.*/
-	Lav_ERROR_SHAPE = 13,
+	Lav_ERROR_SHAPE = 11,
 
-	Lav_ERROR_CANNOT_CROSS_DEVICES = 14, //an attempto either create a parent-child connect with objects from different devices or to set an output with an object from a different device.
-	Lav_ERROR_NO_OUTPUTS = 15, //we expected the object to have outputs here, but it didn't.
+	Lav_ERROR_CANNOT_CROSS_DEVICES = 12, //an attempto either create a parent-child connect with objects from different devices or to set an output with an object from a different device.
+	Lav_ERROR_NO_OUTPUTS = 13, //we expected the object to have outputs here, but it didn't.
 	Lav_ERROR_INTERNAL_BUG = 0xFFFF, //an easily recognized value for debugging.
 };
 
