@@ -4,6 +4,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include <functional> //we have to use an std::function for the preprocessing hook.  There's no good way around it because worlds need to use capturing lambdas.
 #include <set>
+#include <vector>
 #include <mutex>
 #include <memory>
 #include "libaudioverse.h"
@@ -33,6 +34,8 @@ class LavDevice: std::enable_shared_from_this<LavDevice> {
 	//visit all objecs in the order they must be visited to prepare for and process obj.
 	virtual void visitAllObjectsReachableFrom(LavObject* obj, std::function<void(LavObject*)> visitor);
 	std::function<void(void)> preprocessing_hook;
+	//this is a reusable vector that we allow to grow, but clear every tick.  Holds nodes in the order we need to process them.
+	std::vector<LavObject*> process_order;
 	unsigned int block_size = 0, channels = 0, mixahead = 0, is_started = 0;
 	float sr = 0.0f;
 	std::set<LavObject*> objects, always_process;

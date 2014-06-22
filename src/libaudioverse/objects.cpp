@@ -59,6 +59,8 @@ void LavObject::process() {
 void LavObject::didProcess() {
 	is_processing = false;
 }
+void LavObject::willProcessParents() {
+}
 
 void LavObject::setParent(unsigned int input, LavObject* parent, unsigned int parentOutput) {
 	if(input >= num_inputs) throw LavErrorException(Lav_ERROR_RANGE);

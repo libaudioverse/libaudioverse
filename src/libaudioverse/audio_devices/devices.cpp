@@ -24,16 +24,26 @@ LavError LavDevice::getBlock(float* out) {
 		memset(out, 0, sizeof(float)*channels*block_size);
 		return Lav_ERROR_NONE;
 	}
-	//okay, we're not paused.  Visit all objects, calling their (will/did/)process method.
-	visitAllObjectsInProcessOrder([] (LavObject* o) {
-		o->willProcess();
-		o->process();
-		o->didProcess();
-	});
 	//if no output object, memset 0 and bail out again.
 	if(output_object == nullptr) {
 		memset(out, 0, sizeof(float)*channels*block_size);
 		return Lav_ERROR_NONE;
+	}
+	//okay, we're not paused.  Visit all objects in the order that they would be processed, and record it.
+	process_order.clear();
+	visitAllObjectsInProcessOrder([this] (LavObject* o) {
+		process_order.push_back(o);
+	});
+	//visit all objects in reverse order.
+	//an object to the right in the vector depends on some subset of objects to its left, but never anything to its right.
+	for(auto i = process_order.rbegin(); i != process_order.rend(); i++) {
+		(*i)->willProcessParents();
+	}
+	//visit all objects in order, and do the processing.
+	for(auto obj: process_order) {
+		obj->willProcess();
+		obj->process();
+		obj->didProcess();
 	}
 	float** outputs = new float*[output_object->getOutputCount()];
 	output_object->getOutputPointers(outputs);

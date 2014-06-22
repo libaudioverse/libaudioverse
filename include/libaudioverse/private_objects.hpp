@@ -36,6 +36,12 @@ class LavObject: std::enable_shared_from_this<LavObject> {
 	virtual void process();
 	virtual void didProcess();
 
+	//this is called at some point in the processing logic which is guaranteed to be before this object's parents are processed and after the device is locked.
+	//additionally, a parent will have its willProcessParents called after this object.
+	//that is, nothing else will touch this object but the mixer thread, and the next thing to be called (at some point in future) is willProcess.
+	//the default does nothing.
+	virtual void willProcessParents();
+
 	virtual LavDevice* getDevice();
 	virtual LavProperty* getProperty(int slot);
 
