@@ -59,38 +59,27 @@ void LavObject::processor() {
 }
 
 void LavObject::setParent(unsigned int input, LavObject* parent, unsigned int parentOutput) {
+	if(input >= num_inputs) throw LavErrorException(Lav_ERROR_RANGE);
+	if(parentOutput >= parent->getOutputCount()) throw LavErrorException(Lav_ERROR_RANGE);
 	input_descriptors[input].parent = parent;
 	input_descriptors[input].output = parentOutput;
 	computeInputBuffers();
 }
 
-LavObject* LavObject::getParentObject(unsigned int slot) {
-	return input_descriptors[slot].parent;
+LavObject* LavObject::getParentObject(unsigned int input) {
+	if(input >= num_inputs) throw LavErrorException(Lav_ERROR_RANGE);
+	return input_descriptors[input].parent;
 }
 
-unsigned int LavObject::getParentOutput(unsigned int slot) {
-	return input_descriptors[slot].output;
+unsigned int LavObject::getParentOutput(unsigned int input) {
+	if(input >= num_inputs) throw LavErrorException(Lav_ERROR_RANGE);
+	return input_descriptors[input].output;
 }
 
 void LavObject::clearParent(unsigned int slot) {
+	if(slot >= num_inputs) throw LavErrorException(Lav_ERROR_RANGE);
 	input_descriptors[slot].parent = nullptr;
 	input_descriptors[slot].output = 0;
-}
-
-Lav_PUBLIC_FUNCTION LavError Lav_setParent(LavObject *obj, LavObject*parent, unsigned int outputSlot, unsigned int inputSlot) {
-	obj->setParent(inputSlot, parent, outputSlot);
-	return Lav_ERROR_NONE;
-}
-
-Lav_PUBLIC_FUNCTION LavError Lav_getParent(LavObject *obj, unsigned int slot, LavObject **parent, unsigned int *outputNumber) {
-	*parent = obj->getParentObject(slot);
-	*outputNumber = obj->getParentOutput(slot);
-	return Lav_ERROR_NONE;
-}
-
-Lav_PUBLIC_FUNCTION LavError Lav_clearParent(LavObject *obj, unsigned int slot) {
-	obj->clearParent(slot);
-	return Lav_ERROR_NONE;
 }
 
 unsigned int LavObject::getInputCount() {
@@ -123,6 +112,23 @@ void LavObject::unlock() {
 }
 
 //begin public api
+
+Lav_PUBLIC_FUNCTION LavError Lav_setParent(LavObject *obj, LavObject*parent, unsigned int outputSlot, unsigned int inputSlot) {
+	obj->setParent(inputSlot, parent, outputSlot);
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_getParent(LavObject *obj, unsigned int slot, LavObject **parent, unsigned int *outputNumber) {
+	*parent = obj->getParentObject(slot);
+	*outputNumber = obj->getParentOutput(slot);
+	return Lav_ERROR_NONE;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_clearParent(LavObject *obj, unsigned int slot) {
+	obj->clearParent(slot);
+	return Lav_ERROR_NONE;
+}
+
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetInputCount(LavObject* obj, unsigned int* destination) {
 	PUB_BEGIN
 	LOCK(*obj);
@@ -171,7 +177,6 @@ throw LavErrorException(Lav_ERROR_RANGE);\
 if(prop->getType() != (t)) {\
 throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);\
 }
-
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectResetProperty(LavObject *obj, unsigned int slot) {
 	PUB_BEGIN
