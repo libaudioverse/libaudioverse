@@ -66,3 +66,11 @@ class LavObject: std::enable_shared_from_this<LavObject> {
 	LavObject& operator=(const LavObject&) = delete;
 };
 
+
+//this variant on object is special.  Passes inputs to corresponding outputs.
+//needed for things that wish to encapsulate and manage nodes that the public API isn't supposed to see.
+class LavPassthroughObject: public LavObject {
+	public:
+	LavPassthroughObject(LavDevice* device, unsigned int numChannels);
+	virtual void process();
+};

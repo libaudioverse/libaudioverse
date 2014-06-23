@@ -10,6 +10,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_properties.hpp>
 #include <libaudioverse/private_devices.hpp>
 #include <libaudioverse/private_macros.hpp>
+#include <algorithm>
 
 float zerobuffer[Lav_MAX_BLOCK_SIZE] = {0}; //this is a shared buffer for the "no parent" case.
 
@@ -113,6 +114,17 @@ void LavObject::lock() {
 
 void LavObject::unlock() {
 	device->unlock();
+}
+
+/**Implementation of LavPasssthroughObject.*/
+
+LavPassthroughObject::LavPassthroughObject(LavDevice* device, unsigned int numChannels): LavObject(device, numChannels, numChannels) {
+}
+
+void LavPassthroughObject::process() {
+	for(unsigned int i = 0; i < num_inputs; i++) {
+		std::copy(inputs[i], inputs[i]+device->getBlockSize(), outputs[i]);
+	}
 }
 
 //begin public api
