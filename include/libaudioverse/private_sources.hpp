@@ -9,6 +9,7 @@ class LavWorld;
 struct LavListenerInfo;
 
 class LavSource: public LavPassthroughObject {
+	public:
 	void update(LavListenerInfo* listener);
 	private:
 	float position[3];

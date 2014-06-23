@@ -21,4 +21,7 @@ LavWorld::LavWorld(LavDevice* device, LavHrtfData* hrtf): LavPassthroughObject(d
 }
 
 void LavWorld::willProcessParents() {
+	for(auto i: sources) {
+		i->update(&listener);
+	}
 }
