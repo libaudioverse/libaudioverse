@@ -18,6 +18,14 @@ LavWorld::LavWorld(LavDevice* device, LavHrtfData* hrtf): LavPassthroughObject(d
 	mixer = createMixerObject(device, 512, device->getChannels());
 	max_sources = 512;
 	limiter = createHardLimiterObject(device, device->getChannels());
+	for(int i = 0; i < device->getChannels(); i++) {
+		limiter->setParent(i, mixer, i);
+		setParent(i, limiter, i);
+	}
+	float defaultPos[] = {0.0f, 0.0f, 0.0f};
+	float defaultOrient[] = {0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f};
+	properties[Lav_3D_POSITION] = createFloat3Property("position", defaultPos);
+	properties[Lav_3D_ORIENTATION] = createFloat6Property("orientation", defaultOrient);
 }
 
 void LavWorld::willProcessParents() {
