@@ -8,9 +8,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 class LavWorld;
 
 class LavSource: public LavPassthroughObject {
-	void update(LavWorld* world);
-	//do the actual calculations of the parents.
-	virtual void willProcessParents();
+	void update(LavListenerInfo* listener);
 	private:
 	TmVector position;
 	LavObject* data_node, *panner_node, *attenuator_node;

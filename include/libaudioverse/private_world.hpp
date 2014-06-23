@@ -4,9 +4,16 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include "libaudioverse.h"
 #include "private_objects.hpp"
+#include <set>
 
 class LavSource;
 class LavHrtfData;
+
+/**This holds info on listener positions, defaults, etc.
+Anything a source needs for updating, basically.*/
+struct LavListenerInfo {
+	float x, y, z;
+};
 
 class LavWorld: public LavPassthroughObject {
 	public:
@@ -15,9 +22,10 @@ class LavWorld: public LavPassthroughObject {
 	//call update on all sources.
 	virtual void willProcessParents();
 	private:
-	std::vector<LavSource*> sources;
+	std::set<LavSource*> sources;
 	unsigned int num_sources, max_sources;
 	TmTransform camera_transform; //the camera transform.
 	LavObject* mixer = nullptr, *limiter = nullptr;
 	LavHrtfData *hrtf;
+	LavListenerInfo listener;
 };
