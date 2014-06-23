@@ -24,7 +24,7 @@ class LavWorld: public LavPassthroughObject {
 	virtual void willProcessParents();
 	private:
 	std::set<LavSource*> sources;
-	unsigned int num_sources, max_sources;
+	unsigned int max_sources;
 	LavObject* mixer = nullptr, *limiter = nullptr;
 	LavHrtfData *hrtf;
 	LavListenerInfo listener;

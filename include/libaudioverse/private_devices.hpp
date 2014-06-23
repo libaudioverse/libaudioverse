@@ -23,6 +23,7 @@ class LavDevice: std::enable_shared_from_this<LavDevice> {
 	virtual LavObject* getOutputObject();
 	virtual LavError setOutputObject(LavObject* obj);
 	virtual float getSr() { return sr;}
+	virtual int getChannels() {return channels;}
 
 	//these make us meet the basic lockable concept.
 	void lock() {mutex.lock();}
