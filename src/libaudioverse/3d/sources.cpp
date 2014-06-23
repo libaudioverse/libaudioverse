@@ -26,4 +26,5 @@ LavSource::LavSource(LavDevice* device, LavWorld* world, LavObject* sourceNode):
 }
 
 void LavSource::update(LavListenerInfo listener) {
+	listener_info = listener;
 }

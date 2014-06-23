@@ -12,5 +12,6 @@ class LavSource: public LavPassthroughObject {
 	void update(LavListenerInfo listener);
 	private:
 	LavObject* source_object, *panner_object, *attenuator_object;
+	LavListenerInfo listener_info;
 };
 
