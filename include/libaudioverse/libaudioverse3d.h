@@ -10,16 +10,15 @@ extern "C" {
 /**This is the interface to the 3d simulation of Libaudioverse, including its properties.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createWorld(LavDevice* device, LavHrtfData *hrtf, LavObject** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createMonoSource(LavObject* node, LavObject* world, LavObject** destination);
-
-enum Lav_WORLD_PROPERTIES {
-	Lav_WORLD_LISTENER_ORIENTATION = 0,
-	Lav_WORLD_LISTENER_POSITION = 1,
+///A few properties common to most objects.
+enum Lav_3D_PROPERTIES {
+	Lav_3D_ORIENTATION = 0, //float6 consisting of an at followed by an up vector.
+	Lav_3D_POSITION = 1, //float3, consisting of the position of the object.
 };
 
 enum Lav_SOURCE_PROPERTIES {
-	Lav_SOURCE_POSITION = 0,
-	Lav_SOURCE_MAX_DISTANCE = 1,
-	Lav_SOURCE_DISTANCE_MODEL = 2,
+	Lav_SOURCE_MAX_DISTANCE = 2,
+	Lav_SOURCE_DISTANCE_MODEL = 3,
 };
 
 enum Lav_DISTANCE_MODELS {
