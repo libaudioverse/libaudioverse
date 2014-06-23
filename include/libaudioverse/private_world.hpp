@@ -12,7 +12,7 @@ class LavHrtfData;
 
 /**This holds info on listener positions, defaults, etc.
 Anything a source needs for updating, basically.*/
-struct LavListenerInfo {
+struct LavEnvironment {
 	glm::mat4 world_to_listener_transform;
 };
 
@@ -28,5 +28,5 @@ class LavWorld: public LavPassthroughObject {
 	unsigned int max_sources;
 	LavObject* mixer = nullptr, *limiter = nullptr;
 	LavHrtfData *hrtf;
-	LavListenerInfo listener;
+	LavEnvironment environment;
 };

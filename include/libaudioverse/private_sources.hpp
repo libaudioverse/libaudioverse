@@ -9,9 +9,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 class LavSource: public LavPassthroughObject {
 	public:
 	LavSource(LavDevice* device, LavWorld* world, LavObject* sourceNode);
-	void update(LavListenerInfo listener);
+	void update(LavEnvironment env);
 	private:
 	LavObject* source_object, *panner_object, *attenuator_object;
-	LavListenerInfo listener_info;
+	LavEnvironment environment;
 };
-
