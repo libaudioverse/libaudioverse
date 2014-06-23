@@ -25,3 +25,7 @@ void LavWorld::willProcessParents() {
 		i->update(&listener);
 	}
 }
+
+LavObject* LavWorld::createPannerObject() {
+	return createHrtfObject(device, hrtf);
+}
