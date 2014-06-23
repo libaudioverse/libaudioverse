@@ -41,11 +41,9 @@ if(${MSVC})
 set(portaudio_name portaudio_static)
 set(libsndfile_name libsndfile-1)
 endif()
-
-#build and include transmat.
-add_subdirectory(transmat)
-include_directories("${CMAKE_SOURCE_DIR}/transmat")
+#include glm
+include_directories("${CMAKE_SOURCE_DIR}/glm")
 
 #below here is us.  First, set a variable to all the libraries we need to link with:
-SET(libaudioverse_required_libraries ${libsndfile_name} ${portaudio_name} transmat)
+SET(libaudioverse_required_libraries ${libsndfile_name} ${portaudio_name})
 add_subdirectory(src)

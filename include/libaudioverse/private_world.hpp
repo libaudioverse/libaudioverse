@@ -5,6 +5,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "libaudioverse.h"
 #include "private_objects.hpp"
 #include <set>
+#include <glm/glm.hpp>
 
 class LavSource;
 class LavHrtfData;
@@ -12,7 +13,7 @@ class LavHrtfData;
 /**This holds info on listener positions, defaults, etc.
 Anything a source needs for updating, basically.*/
 struct LavListenerInfo {
-	float x, y, z;
+	glm::mat4 world_to_listener_transform;
 };
 
 class LavWorld: public LavPassthroughObject {
