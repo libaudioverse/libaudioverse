@@ -4,11 +4,11 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include "libaudioverse.h"
 #include "private_objects.hpp"
-#include "private_world.hpp"
+#include "private_sourcemanager.hpp"
 
 class LavSource: public LavPassthroughObject {
 	public:
-	LavSource(LavDevice* device, LavWorld* world, LavObject* sourceNode);
+	LavSource(LavDevice* device, LavSourceManager* world, LavObject* sourceNode);
 	void update(LavEnvironment env);
 	private:
 	LavObject* source_object, *panner_object, *attenuator_object;

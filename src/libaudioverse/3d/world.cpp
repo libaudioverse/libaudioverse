@@ -13,7 +13,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/libaudioverse3d.h>
 #include <stdlib.h>
 
-LavWorld::LavWorld(LavDevice* device, LavHrtfData* hrtf): LavPassthroughObject(device, device->getChannels()) {
+LavWorld::LavWorld(LavDevice* device, LavHrtfData* hrtf): LavSourceManager(device, device->getChannels()) {
 	this->hrtf = hrtf;
 	mixer = createMixerObject(device, 512, device->getChannels());
 	max_sources = 512;

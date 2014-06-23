@@ -3,20 +3,13 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #pragma once
 #include "libaudioverse.h"
-#include "private_objects.hpp"
+#include "private_sourcemanager.hpp"
 #include <set>
-#include <glm/glm.hpp>
 
 class LavSource;
 class LavHrtfData;
 
-/**This holds info on listener positions, defaults, etc.
-Anything a source needs for updating, basically.*/
-struct LavEnvironment {
-	glm::mat4 world_to_listener_transform;
-};
-
-class LavWorld: public LavPassthroughObject {
+class LavWorld: public LavSourceManager {
 	public:
 	LavWorld(LavDevice* device, LavHrtfData* hrtf);
 	void associateSource(LavSource* source);

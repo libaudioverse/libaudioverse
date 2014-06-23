@@ -3,7 +3,7 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 
 #include <libaudioverse/private_sources.hpp>
-#include <libaudioverse/private_world.hpp>
+#include <libaudioverse/private_sourcemanager.hpp>
 #include <libaudioverse/private_properties.hpp>
 #include <libaudioverse/private_macros.hpp>
 #include <libaudioverse/private_devices.hpp>
@@ -14,7 +14,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_errors.hpp>
 #include <stdlib.h>
 
-LavSource::LavSource(LavDevice* device, LavWorld* world, LavObject* sourceNode): LavPassthroughObject(device, device->getChannels()) {
+LavSource::LavSource(LavDevice* device, LavSourceManager* world, LavObject* sourceNode): LavPassthroughObject(device, device->getChannels()) {
 	if(sourceNode->getOutputCount() > 1) throw LavErrorException(Lav_ERROR_SHAPE);
 	attenuator_object = createAttenuatorObject(device, 1);
 	panner_object = world->createPannerObject();
