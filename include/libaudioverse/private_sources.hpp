@@ -10,10 +10,9 @@ struct LavListenerInfo;
 
 class LavSource: public LavPassthroughObject {
 	public:
-	LavSource(LavDevice* device, LavWorld* world);
+	LavSource(LavDevice* device, LavWorld* world, LavObject* sourceNode);
 	void update(LavListenerInfo* listener);
 	private:
-	float position[3];
-	LavObject* data_node, *panner_node, *attenuator_node;
+	LavObject* source_object, *panner_object, *attenuator_object;
 };
 

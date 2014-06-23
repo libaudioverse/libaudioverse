@@ -11,9 +11,18 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/libaudioverse3d.h>
+#include <libaudioverse/private_errors.hpp>
 #include <stdlib.h>
 
-LavSource::LavSource(LavDevice* device, LavWorld* world): LavPassthroughObject(device, device->getChannels()) {
+LavSource::LavSource(LavDevice* device, LavWorld* world, LavObject* sourceNode): LavPassthroughObject(device, device->getChannels()) {
+	if(sourceNode->getOutputCount() > 1) throw LavErrorException(Lav_ERROR_SHAPE);
+	attenuator_object = createAttenuatorObject(device, 1);
+	panner_object = world->createPannerObject();
+	attenuator_object->setParent(0, source_object, 0);
+	panner_object->setParent(0, attenuator_object, 0);
+	for(unsigned int i = 0; i <num_inputs; i++) {
+		setParent(i, panner_object, i);
+	}
 }
 
 void LavSource::update(LavListenerInfo* listener) {

@@ -22,6 +22,7 @@ class LavWorld: public LavPassthroughObject {
 	void associateSource(LavSource* source);
 	//call update on all sources.
 	virtual void willProcessParents();
+	LavObject* createPannerObject();
 	private:
 	std::set<LavSource*> sources;
 	unsigned int max_sources;
