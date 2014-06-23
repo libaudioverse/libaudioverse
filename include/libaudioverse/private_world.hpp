@@ -8,7 +8,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 class LavSource;
 class LavHrtfData;
 
-class LavWorld: public LavObject {
+class LavWorld: public LavPassthroughObject {
 	public:
 	LavWorld(LavDevice* device, LavHrtfData* hrtf);
 	void associateSource(LavSource* source);
