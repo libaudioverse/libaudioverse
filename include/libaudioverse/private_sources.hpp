@@ -8,10 +8,11 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 class LavWorld;
 
 class LavSource: public LavObject {
-	public:
+	void update(LavWorld* world);
+	//do the actual calculations of the parents.
+	virtual void willProcessParents();
+	private:
 	TmVector position;
 	LavObject* data_node, *panner_node, *attenuator_node;
-	LavWorld *world;
 };
 
-void sourceUpdate(LavSource *source);

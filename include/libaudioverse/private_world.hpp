@@ -10,11 +10,14 @@ class LavHrtfData;
 
 class LavWorld: public LavObject {
 	public:
-	LavSource **sources;
+	LavWorld(LavDevice* device, LavHrtfData* hrtf);
+	void associateSource(LavSource* source);
+	//call update on all sources.
+	virtual void willProcessParents();
+	private:
+	std::vector<LavSource*> sources;
 	unsigned int num_sources, max_sources;
 	TmTransform camera_transform; //the camera transform.
-	LavObject* mixer, *limiter;
+	LavObject* mixer = nullptr, *limiter = nullptr;
 	LavHrtfData *hrtf;
 };
-
-LavError worldAssociateSource(LavWorld* world, LavSource* source);
