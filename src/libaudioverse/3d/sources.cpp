@@ -6,7 +6,15 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_world.hpp>
 #include <libaudioverse/private_properties.hpp>
 #include <libaudioverse/private_macros.hpp>
+#include <libaudioverse/private_devices.hpp>
+#include <libaudioverse/private_creators.hpp>
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/libaudioverse3d.h>
 #include <stdlib.h>
+
+LavSource::LavSource(LavDevice* device, LavWorld* world): LavPassthroughObject(device, device->getChannels()) {
+}
+
+void LavSource::update(LavListenerInfo* listener) {
+}
