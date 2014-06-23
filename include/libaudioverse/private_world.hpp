@@ -24,7 +24,6 @@ class LavWorld: public LavPassthroughObject {
 	private:
 	std::set<LavSource*> sources;
 	unsigned int num_sources, max_sources;
-	TmTransform camera_transform; //the camera transform.
 	LavObject* mixer = nullptr, *limiter = nullptr;
 	LavHrtfData *hrtf;
 	LavListenerInfo listener;

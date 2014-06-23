@@ -6,11 +6,12 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "private_objects.hpp"
 
 class LavWorld;
+struct LavListenerInfo;
 
 class LavSource: public LavPassthroughObject {
 	void update(LavListenerInfo* listener);
 	private:
-	TmVector position;
+	float position[3];
 	LavObject* data_node, *panner_node, *attenuator_node;
 };
 
