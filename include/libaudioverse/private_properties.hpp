@@ -16,7 +16,7 @@ union LavPropertyValue {
 };
 
 //quick range check helper...
-#define RC(val, fld) if(val > maximum_value.fld || val < minimum_value.fld) throw LavErrorException(Lav_ERROR_NONE)
+#define RC(val, fld) if(val > maximum_value.fld || val < minimum_value.fld) throw LavErrorException(Lav_ERROR_RANGE)
 
 class LavProperty {
 	public:

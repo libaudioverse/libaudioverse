@@ -16,6 +16,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <math.h>
 #include <stdlib.h>
 #include <glm/glm.hpp>
+#include <limits>
 
 LavSource::LavSource(LavDevice* device, LavSourceManager* manager, LavObject* sourceNode): LavPassthroughObject(device, device->getChannels()) {
 	if(sourceNode->getOutputCount() > 1) throw LavErrorException(Lav_ERROR_SHAPE);
@@ -30,6 +31,7 @@ LavSource::LavSource(LavDevice* device, LavSourceManager* manager, LavObject* so
 	float defaultPos[] = {0.0f, 0.0f, 0.0f};
 	properties[Lav_3D_POSITION] = createFloat3Property("position", defaultPos);
 	properties[Lav_SOURCE_DISTANCE_MODEL] = createIntProperty("distance_model", Lav_DISTANCE_MODEL_LINEAR, Lav_DISTANCE_MODEL_MIN, Lav_DISTANCE_MODEL_MAX);
+	properties[Lav_SOURCE_MAX_DISTANCE] = createFloatProperty("max_distance", 50.0f, 0.0f, std::numeric_limits<float>::infinity());
 	this->manager = manager;
 	manager->associateSource(this);
 }
@@ -60,21 +62,21 @@ void LavSource::willProcessParents() {
 	glm::vec4 npos = environment.world_to_listener_transform*glm::vec4(pos[0], pos[1], pos[2], 1.0f);
 	//npos is now easy to work with.
 	float distance = glm::length(npos);
-	float xy = sqrtf(npos.x*npos.x+npos.y*npos.y);
+	float xz = sqrtf(npos.x*npos.x+npos.z*npos.z);
 	//elevation and azimuth, in degrees.
-	float elevation = atan2f(npos.z, xy)/PI*180.0f;
+	float elevation = atan2f(npos.y, xz)/PI*180.0f;
 	float azimuth = atan2(npos.x, -npos.z)/PI*180.0f;
-
-	//set the panner.
-	panner_object->getProperty(Lav_HRTF_AZIMUTH)->setFloatValue(azimuth);
-	panner_object->getProperty(Lav_HRTF_ELEVATION)->setFloatValue(elevation);
+	if(elevation > 90.0f) elevation = 90.0f;
+	if(elevation < -90.0f) elevation = -90.0f;
 
 	int distanceModel = properties[Lav_SOURCE_DISTANCE_MODEL]->getIntValue();
 	float maxDistance = properties[Lav_SOURCE_MAX_DISTANCE]->getFloatValue();
 	float gain = calculateGainForDistanceModel(distanceModel, distance, maxDistance);
+
+	//set the panner and attenuator.
+	panner_object->getProperty(Lav_HRTF_AZIMUTH)->setFloatValue(azimuth);
+	panner_object->getProperty(Lav_HRTF_ELEVATION)->setFloatValue(elevation);
 	attenuator_object ->getProperty(Lav_ATTENUATOR_MULTIPLIER)->setFloatValue(gain);
-	printf("Gain:%f\n", gain);
-	printf("Azimuth=%f, elevation=%f\n", azimuth, elevation);
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_createSource(LavDevice* device, LavObject* environment, LavObject* node, LavObject** destination) {
