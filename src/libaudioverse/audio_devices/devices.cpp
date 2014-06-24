@@ -82,7 +82,7 @@ LavObject* LavDevice::getOutputObject() {
 void LavDevice::visitAllObjectsInProcessOrder(std::function<void(LavObject*)> visitor) {
 	std::set<LavObject*> seen;
 	if(output_object) {
-		visitAllObjectsReachableFrom(output_object, [&](LavObject* o) {
+		visitAllDependentsAndSelf(output_object, [&](LavObject* o) {
 			if(seen.count(o)) return;
 			visitor(o);
 			seen.insert(o);
@@ -94,7 +94,7 @@ void LavDevice::visitAllObjectsInProcessOrder(std::function<void(LavObject*)> vi
 		std::set_difference(always_process.begin(), always_process.end(), seen.begin(), seen.end(),
 			std::inserter(still_needed, still_needed.end()));
 		for(auto i = still_needed.begin(); i != still_needed.end(); i++) {
-			visitAllObjectsReachableFrom(*i, [&] (LavObject* o) {
+			visitAllDependentsAndSelf(*i, [&] (LavObject* o) {
 				if(seen.count(o) == 0) {
 					visitor(o);
 					seen.insert(o);
@@ -104,12 +104,14 @@ void LavDevice::visitAllObjectsInProcessOrder(std::function<void(LavObject*)> vi
 	} while(still_needed.size());
 }
 
-void LavDevice::visitAllObjectsReachableFrom(LavObject* obj, std::function<void(LavObject*)> visitor) {
+void LavDevice::visitAllDependentsAndSelf(LavObject* obj, std::function<void(LavObject*)> visitor) {
 	//if obj is null, bail out.  This is the base case.
 	if(obj == nullptr) return;
+	//if the object is suspended, we also bail out: this object and its parents are not needed.
+	if(obj->isSuspended()) return;
 	//we call ourselves on all parents of obj, and then pass obj to visitor.  This is essentially depth-first search.
 	for(unsigned int i = 0; i < obj->getInputCount(); i++) {
-		visitAllObjectsReachableFrom(obj->getParentObject(i), visitor);
+		visitAllDependentsAndSelf(obj->getParentObject(i), visitor);
 	}
 	visitor(obj);
 }
