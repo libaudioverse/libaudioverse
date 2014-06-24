@@ -117,6 +117,10 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetParent(LavObject *obj, unsigned int sl
 Lav_PUBLIC_FUNCTION LavError Lav_objectSetParent(LavObject *obj, unsigned int input, LavObject* parent, unsigned int output);
 Lav_PUBLIC_FUNCTION LavError Lav_objectClearParent(LavObject *obj, unsigned int slot);
 
+/**Suspend and query suspention of objects.*/
+Lav_PUBLIC_FUNCTION LavError Lav_objectIsSuspended(LavObject* obj, int* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_objectSetSuspended(LavObject* obj, int flag);
+
 /**Resets a property to its default value, for any type.*/
 Lav_PUBLIC_FUNCTION LavError Lav_objectResetProperty(LavObject *obj, unsigned int slot);
 

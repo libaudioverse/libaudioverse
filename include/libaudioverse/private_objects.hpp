@@ -29,6 +29,14 @@ class LavObject: std::enable_shared_from_this<LavObject> {
 	virtual void getOutputPointers(float** dest);
 	virtual void clearParent(unsigned int slot);
 
+	/**This requires explanation.
+The graph algorithm checks all objects it sees.  An object marked to always process will always process, but this is an internal detail of the object.
+An object marked as suspended will not process.  In addition, the graph algorithm shall ignore its parents.
+Consider an hrtf node, taking 22579200 mathematical operations plus loop overhead and a memory copy.  If it is known in some topology that the hrtf node will be receiving silent input, you can suspend it; if you wish a parent to still advance, you may mark the parent as always needing processing.*/
+	virtual bool isSuspended();
+	virtual void suspend();
+	virtual void unsuspend();
+
 	//these three methods are all involved in the processing logic: willProcess is called immediately before and didProcess immediately after the actual process method.
 	//this is a strong guarantee: no other operation shall be performed on this object between these three calls.
 	//base implementations toggle is_processing, so taht property callbacks can tell who set them-something external to this object or this object itself.
@@ -58,14 +66,13 @@ class LavObject: std::enable_shared_from_this<LavObject> {
 	float** outputs = nullptr;
 	unsigned int num_outputs = 0;
 	unsigned int num_inputs = 0;
-	bool is_processing = false;
+	bool is_processing = false, is_suspended = false;
 	enum Lav_OBJTYPES type = Lav_OBJTYPE_GENERIC;
 
 	//we are never allowed to copy.
 	LavObject(const LavObject&) = delete;
 	LavObject& operator=(const LavObject&) = delete;
 };
-
 
 //this variant on object is special.  Passes inputs to corresponding outputs.
 //needed for things that wish to encapsulate and manage nodes that the public API isn't supposed to see.

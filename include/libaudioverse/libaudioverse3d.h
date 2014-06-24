@@ -30,12 +30,6 @@ enum Lav_DISTANCE_MODELS {
 //	Lav_DISTANCE_MODEL_INVERSE_SQUARE = 2, //sounds get quieter as 1/min(distance, max_distance)^2
 };
 
-enum Lav_SOURCE_STATES {
-	Lav_SOURCE_STATE_PLAYING = 0,
-	Lav_SOURCE_STATE_PAUSED = 1,
-	Lav_SOURCE_STATE_STOPPED = 2,
-};
-
 #ifdef __cplusplus
 }
 #endif
