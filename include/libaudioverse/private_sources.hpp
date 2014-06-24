@@ -10,6 +10,7 @@ class LavSource: public LavPassthroughObject {
 	public:
 	LavSource(LavDevice* device, LavSourceManager* world, LavObject* sourceNode);
 	void update(LavEnvironment env);
+	virtual void willProcessParents();
 	private:
 	LavObject* source_object, *panner_object, *attenuator_object;
 	LavEnvironment environment;
