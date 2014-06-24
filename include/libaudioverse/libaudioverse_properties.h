@@ -12,25 +12,27 @@ extern "C" {
 It is worth keeping separate because it will grow rapidly and contain documentation comments and etc.
 
 The standard for naming is:
-Lav_NODETYPE_PROPNAME
+Lav_OBJTYPE_PROPNAME
+
+Furthermore, all libaudioverse properties are negative, save on those objects for which documentation says otherwise.  Examples of objects with positive properties include highly configurable mixers and attenuators, among others.
 */
 
 enum Lav_SINE_PROPERTIES {
-	Lav_SINE_FREQUENCY = 0,
+	Lav_SINE_FREQUENCY = -1,
 };
 
 enum Lav_FILE_PROPERTIES {
-	Lav_FILE_POSITION = 0,
-	Lav_FILE_PITCH_BEND = 1,
+	Lav_FILE_POSITION = -1,
+	Lav_FILE_PITCH_BEND = -2,
 };
 
 enum Lav_HRTF_PROPERTIES {
-	Lav_HRTF_AZIMUTH = 0,
-	Lav_HRTF_ELEVATION = 1,
+	Lav_HRTF_AZIMUTH = -1,
+	Lav_HRTF_ELEVATION = -2,
 };
 
 enum Lav_ATTENUATOR_PROPERTIES {
-	Lav_ATTENUATOR_MULTIPLIER = 0,
+	Lav_ATTENUATOR_MULTIPLIER = -1,
 };
 
 #ifdef __cplusplus

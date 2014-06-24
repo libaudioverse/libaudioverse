@@ -13,13 +13,13 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSource(LavDevice* device, LavObject* envi
 
 ///A few properties common to most objects.
 enum Lav_3D_PROPERTIES {
-	Lav_3D_ORIENTATION = 0, //float6 consisting of an at followed by an up vector.
-	Lav_3D_POSITION = 1, //float3, consisting of the position of the object.
+	Lav_3D_ORIENTATION = -1, //float6 consisting of an at followed by an up vector.
+	Lav_3D_POSITION = -2, //float3, consisting of the position of the object.
 };
 
 enum Lav_SOURCE_PROPERTIES {
-	Lav_SOURCE_MAX_DISTANCE = 2,
-	Lav_SOURCE_DISTANCE_MODEL = 3,
+	Lav_SOURCE_MAX_DISTANCE = -3,
+	Lav_SOURCE_DISTANCE_MODEL = -4,
 };
 
 enum Lav_DISTANCE_MODELS {
