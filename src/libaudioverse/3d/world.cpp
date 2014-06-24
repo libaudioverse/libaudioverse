@@ -29,8 +29,8 @@ LavWorld::LavWorld(LavDevice* device, LavHrtfData* hrtf): LavSourceManager(devic
 	properties[Lav_3D_ORIENTATION] = createFloat6Property("orientation", defaultOrient);
 	environment.world_to_listener_transform = glm::lookAt(
 		glm::vec3(0.0f, 0.0f, 0.0f),
-g	lm::vec3(0.0f, 0.0f, -1.0f),
-	glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::vec3(0.0f, 0.0f, -1.0f),
+		glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
 void LavWorld::willProcessParents() {
@@ -41,4 +41,8 @@ void LavWorld::willProcessParents() {
 
 LavObject* LavWorld::createPannerObject() {
 	return createHrtfObject(device, hrtf);
+}
+
+void LavWorld::associateSource(LavSource* source) {
+	sources.insert(source);
 }
