@@ -32,6 +32,10 @@ LavSource::LavSource(LavDevice* device, LavSourceManager* manager, LavObject* so
 	this->manager = manager;
 }
 
+LavObject* createSourceObject(LavDevice* device, LavSourceManager* manager, LavObject* sourceNode) {
+	return new LavSource(device, manager, sourceNode);
+}
+
 void LavSource::update(LavEnvironment env) {
 	environment = env;
 }
