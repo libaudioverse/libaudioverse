@@ -36,6 +36,10 @@ LavWorld::LavWorld(LavDevice* device, LavHrtfData* hrtf): LavSourceManager(devic
 		glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
+LavWorld* createWorld(LavDevice* device, LavHrtfData* hrtf) {
+	return new LavWorld(device, hrtf);
+}
+
 void LavWorld::willProcessParents() {
 	//update the matrix.
 	const float* pos = properties[Lav_3D_POSITION]->getFloat3Value();
@@ -66,4 +70,13 @@ void LavWorld::associateSource(LavSource* source) {
 	for(int i = 0; i < device->getChannels(); i++) {
 		mixer->setParent(startInput+i, source, i);
 	}
+}
+
+//begin public api
+
+Lav_PUBLIC_FUNCTION LavError Lav_createWorld(LavDevice* device, LavHrtfData *hrtf, LavObject** destination) {
+	PUB_BEGIN
+	LavObject* retval = createWorld(device, hrtf);
+	*destination = retval;
+	PUB_END
 }
