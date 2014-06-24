@@ -14,6 +14,9 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdlib.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
+#include <algorithm>
+#include <vector>
+
 LavWorld::LavWorld(LavDevice* device, LavHrtfData* hrtf): LavSourceManager(device, device->getChannels()) {
 	this->hrtf = hrtf;
 	mixer = createMixerObject(device, 512, device->getChannels());
@@ -53,5 +56,14 @@ LavObject* LavWorld::createPannerObject() {
 }
 
 void LavWorld::associateSource(LavSource* source) {
-	sources.insert(source);
+	//if this already exists, bail out.
+	int found = std::count(sources.begin(), sources.end(), source);
+	if(found) return; //it's not an error.
+	if(sources.size() == max_sources) throw LavErrorException(Lav_ERROR_LIMIT_EXCEEDED);
+	sources.push_back(source);
+	unsigned int ind = sources.size()-1;
+	unsigned int startInput = ind*device->getChannels();
+	for(int i = 0; i < device->getChannels(); i++) {
+		mixer->setParent(startInput+i, source, i);
+	}
 }

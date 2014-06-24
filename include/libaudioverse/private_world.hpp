@@ -4,7 +4,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include "libaudioverse.h"
 #include "private_sourcemanager.hpp"
-#include <set>
+#include <vector>
 
 class LavSource;
 class LavHrtfData;
@@ -17,7 +17,7 @@ class LavWorld: public LavSourceManager {
 	virtual void willProcessParents();
 	LavObject* createPannerObject();
 	private:
-	std::set<LavSource*> sources;
+	std::vector<LavSource*> sources;
 	unsigned int max_sources;
 	LavObject* mixer = nullptr, *limiter = nullptr;
 	LavHrtfData *hrtf;
