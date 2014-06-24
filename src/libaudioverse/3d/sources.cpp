@@ -72,3 +72,10 @@ void LavSource::willProcessParents() {
 	float gain = calculateGainForDistanceModel(distanceModel, distance, maxDistance);
 	attenuator_object ->getProperty(Lav_ATTENUATOR_MULTIPLIER)->setFloatValue(gain);
 }
+
+Lav_PUBLIC_FUNCTION LavError Lav_createSource(LavDevice* device, LavObject* environment, LavObject* node, LavObject** destination) {
+	PUB_BEGIN
+	LavObject* retval = createSource(device, (LavSourceManager*)environment, node);
+	*destination = retval;
+	PUB_END
+}
