@@ -204,6 +204,37 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectClearParent(LavObject *obj, unsigned int 
 	PUB_END
 }
 
+//play, stop, reset support.
+Lav_PUBLIC_FUNCTION LavError Lav_objectPlay(LavObject* obj) {
+	PUB_BEGIN
+	obj->play();
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_objectStop(LavObject* obj) {
+	PUB_BEGIN
+	obj->stop();
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_objectReset(LavObject* obj) {
+	PUB_BEGIN
+	obj->reset();
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_objectSupportsStopping(LavObject* obj, int *destination) {
+	PUB_BEGIN
+	*destination = obj->supportsStopping();
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_objectSupportsResetting(LavObject* obj, int* destination) {
+	PUB_BEGIN
+	*destination = obj->supportsResetting();
+	PUB_END
+}
+
 //this is properties.
 //this is here because properties do not "know" about objects and only objects have properties; also, it made properties.cpp ahve to "know" about devices and objects.
 

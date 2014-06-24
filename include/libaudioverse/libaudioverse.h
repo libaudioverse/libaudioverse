@@ -118,6 +118,13 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetParent(LavObject *obj, unsigned int sl
 Lav_PUBLIC_FUNCTION LavError Lav_objectSetParent(LavObject *obj, unsigned int input, LavObject* parent, unsigned int output);
 Lav_PUBLIC_FUNCTION LavError Lav_objectClearParent(LavObject *obj, unsigned int slot);
 
+/**Playing, stopping, and resetting.*/
+Lav_PUBLIC_FUNCTION LavError Lav_objectPlay(LavObject* obj);
+Lav_PUBLIC_FUNCTION LavError Lav_objectStop(LavObject* obj);
+Lav_PUBLIC_FUNCTION LavError Lav_objectReset(LavObject* obj);
+Lav_PUBLIC_FUNCTION LavError Lav_objectSupportsStopping(LavObject* obj, int *destination);
+Lav_PUBLIC_FUNCTION LavError Lav_objectSupportsResetting(LavObject* obj, int* destination);
+
 /**Resets a property to its default value, for any type.*/
 Lav_PUBLIC_FUNCTION LavError Lav_objectResetProperty(LavObject *obj, unsigned int slot);
 
