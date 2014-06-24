@@ -14,4 +14,5 @@ class LavSource: public LavPassthroughObject {
 	private:
 	LavObject* source_object, *panner_object, *attenuator_object;
 	LavEnvironment environment;
+	LavSourceManager* manager;
 };

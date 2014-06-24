@@ -27,8 +27,9 @@ LavSource::LavSource(LavDevice* device, LavSourceManager* manager, LavObject* so
 		setParent(i, panner_object, i);
 	}
 	float defaultPos[] = {0.0f, 0.0f, 0.0f};
-	properties[Lav_SOURCE_POSITION] = createFloat3Property("position", defaultPos);
+	properties[Lav_3D_POSITION] = createFloat3Property("position", defaultPos);
 	properties[Lav_SOURCE_DISTANCE_MODEL] = createIntProperty("distance_model", Lav_DISTANCE_MODEL_LINEAR, Lav_DISTANCE_MODEL_MIN, Lav_DISTANCE_MODEL_MAX);
+	this->manager = manager;
 }
 
 void LavSource::update(LavEnvironment env) {
