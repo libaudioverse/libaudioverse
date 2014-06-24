@@ -4,8 +4,9 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include "libaudioverse.h"
 #include <string>
+#include <memory>
 
-class LavHrtfData {
+class LavHrtfData: std::enable_shared_from_this<LavHrtfData> {
 	public:
 	//get the appropriate coefficients for one channel.  A stereo hrtf is two calls to this function.
 	void computeCoefficientsMono(float elevation, float azimuth, float* out);
