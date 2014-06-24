@@ -22,7 +22,9 @@ enum Lav_SOURCE_PROPERTIES {
 };
 
 enum Lav_DISTANCE_MODELS {
+	Lav_DISTANCE_MODEL_MIN = 0,
 	Lav_DISTANCE_MODEL_LINEAR = 0, //sounds get quieter as 1-(distance/max_distance).
+	Lav_DISTANCE_MODEL_MAX = 0,
 //	Lav_DISTANCE_MODEL_EXPONENTIAL = 1, //sounds get quieter as 1/min(distance, max_distance)
 //	Lav_DISTANCE_MODEL_INVERSE_SQUARE = 2, //sounds get quieter as 1/min(distance, max_distance)^2
 };
