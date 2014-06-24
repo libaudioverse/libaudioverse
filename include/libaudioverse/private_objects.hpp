@@ -42,6 +42,15 @@ class LavObject: std::enable_shared_from_this<LavObject> {
 	//the default does nothing.
 	virtual void willProcessParents();
 
+	//playing/stopping/resetting.
+	//stop and reset throw an error, play does nothing. These are override points for subclasses.
+	virtual void play();
+	virtual void stop();
+	virtual void reset();
+	virtual bool isPlaying();
+	virtual bool supportsStopping();
+	virtual bool supportsResetting();
+
 	virtual LavDevice* getDevice();
 	virtual LavProperty* getProperty(int slot);
 
@@ -60,6 +69,7 @@ class LavObject: std::enable_shared_from_this<LavObject> {
 	unsigned int num_inputs = 0;
 	bool is_processing = false;
 	enum Lav_OBJTYPES type = Lav_OBJTYPE_GENERIC;
+	bool is_playing = true, supports_stopping = false, supports_resetting = false;
 
 	//we are never allowed to copy.
 	LavObject(const LavObject&) = delete;

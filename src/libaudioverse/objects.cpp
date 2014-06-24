@@ -108,6 +108,29 @@ LavProperty* LavObject::getProperty(int slot) {
 	else return properties[slot];
 }
 
+//default implementation of the playing/stopping/resetting functionality.
+void LavObject::play() {
+}
+
+void LavObject::stop() {
+	throw LavErrorException(Lav_ERROR_OPERATION_NOT_SUPPORTED);
+}
+void LavObject::reset() {
+	throw LavErrorException(Lav_ERROR_OPERATION_NOT_SUPPORTED);
+}
+
+bool LavObject::isPlaying() {
+	return is_playing;
+}
+
+bool LavObject::supportsStopping() {
+	return supports_stopping;
+}
+
+bool LavObject::supportsResetting() {
+	return supports_resetting;
+}
+
 void LavObject::lock() {
 	device->lock();
 }
