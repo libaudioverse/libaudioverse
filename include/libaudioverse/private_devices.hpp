@@ -33,7 +33,7 @@ class LavDevice: std::enable_shared_from_this<LavDevice> {
 	//visit all objects in the order they need to be visited if we were processing the graph.
 	virtual void visitAllObjectsInProcessOrder(std::function<void(LavObject*)> visitor);
 	//visit all objects in the order they must be visited to prepare for and process obj for a block of audio.  This is not the same as all parents: this call respects suspended.
-	virtual void visitAllDependentsAndSelf(LavObject* obj, std::function<void(LavObject*)> visitor);
+	virtual void visitForProcessing(LavObject* obj, std::function<void(LavObject*)> visitor);
 	std::function<void(void)> preprocessing_hook;
 	//this is a reusable vector that we allow to grow, but clear every tick.  Holds nodes in the order we need to process them.
 	std::vector<LavObject*> process_order;
