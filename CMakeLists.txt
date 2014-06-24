@@ -15,13 +15,11 @@ INCLUDE_DIRECTORIES(${LIBSNDFILE_INCLUDE_DIR})
 LINK_DIRECTORIES(${LIBSNDFILE_LIBRARY_DIR})
 endif()
 
-#uthash
-include_directories("${CMAKE_SOURCE_DIR}/uthash/src")
-
 #more msvc specific stuff: if on windows, do special handling for portaudio.
 if(${MSVC})
 #turn off the secure crt warnings, because we're not allowed to use microsoft specific functions.
-add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+#Also turn off unsafe stl warnings.  This library likes the unsafe stl.
+add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
 #This fixes portaudio.
 add_definitions(-DPA_WDMKS_NO_KSGUID_LIB)
 #build and setup portaudio:
@@ -43,11 +41,9 @@ if(${MSVC})
 set(portaudio_name portaudio_static)
 set(libsndfile_name libsndfile-1)
 endif()
-
-#build and include transmat.
-add_subdirectory(transmat)
-include_directories("${CMAKE_SOURCE_DIR}/transmat")
+#include glm
+include_directories("${CMAKE_SOURCE_DIR}/glm")
 
 #below here is us.  First, set a variable to all the libraries we need to link with:
-SET(libaudioverse_required_libraries ${libsndfile_name} ${portaudio_name} transmat)
+SET(libaudioverse_required_libraries ${libsndfile_name} ${portaudio_name})
 add_subdirectory(src)

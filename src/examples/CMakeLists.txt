@@ -1,5 +1,5 @@
 macro(example name)
-add_executable(${name} ${name}.c)
+add_executable(${name} ${name}.cpp)
 TARGET_LINK_LIBRARIES(${name} libaudioverse)
 SET_PROPERTY(TARGET ${name} PROPERTY RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_BINARY_DIR}/examples")
 endmacro()
