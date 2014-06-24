@@ -3,7 +3,8 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 
 /**Handles functionality common to all objects: linking, allocating, and freeing, as well as parent-child relationships.*/
-
+#include <libaudioverse/libaudioverse.h>
+#include <libaudioverse/libaudioverse_properties.h>
 #include <stdlib.h>
 #include <string.h>
 #include <libaudioverse/private_objects.hpp>
@@ -17,7 +18,7 @@ float zerobuffer[Lav_MAX_BLOCK_SIZE] = {0}; //this is a shared buffer for the "n
 void LavObject::computeInputBuffers() {
 	//point our inputs either at a zeroed buffer or the output of our parent.
 	for(unsigned int i = 0; i < num_inputs; i++) {
-		if(input_descriptors[i].parent != NULL) {
+		if(input_descriptors[i].parent != NULL && input_descriptors[i].parent->isSuspended() == false) {
 			inputs[i] = input_descriptors[i].parent->outputs[input_descriptors[i].output];
 		}
 		else {
@@ -43,6 +44,10 @@ LavObject::LavObject(LavDevice* device, unsigned int numInputs, unsigned int num
 	}
 	device->associateObject(this);
 	this->device = device;
+
+	//set up the suspended property.
+	properties[Lav_OBJECT_SUSPENDED] = createIntProperty("suspended", 0, 0, 1);
+
 	computeInputBuffers(); //at the moment, this is going to just make them all 0, but it takes effect once parents are added.
 }
 
@@ -64,15 +69,15 @@ void LavObject::willProcessParents() {
 }
 
 bool LavObject::isSuspended() {
-	return is_suspended;
+	return properties[Lav_OBJECT_SUSPENDED]->getIntValue() != 0;
 }
 
 void LavObject::suspend() {
-	is_suspended = true;
+	properties[Lav_OBJECT_SUSPENDED]->setIntValue(1);
 }
 
 void LavObject::unsuspend() {
-	is_suspended = false;
+	properties[Lav_OBJECT_SUSPENDED]->setIntValue(0);
 }
 
 void LavObject::setParent(unsigned int input, LavObject* parent, unsigned int parentOutput) {
