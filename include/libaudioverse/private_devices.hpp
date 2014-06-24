@@ -41,7 +41,7 @@ class LavDevice: std::enable_shared_from_this<LavDevice> {
 	float sr = 0.0f;
 	std::set<LavObject*> objects, always_process;
 	LavObject* output_object = nullptr;
-	std::mutex mutex;
+	std::recursive_mutex mutex;
 };
 
 //initialize the audio backend.
