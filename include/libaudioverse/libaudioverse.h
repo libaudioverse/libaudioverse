@@ -15,9 +15,9 @@ class LavObject;
 class LavDevice;
 class LavHrtfData;
 #else
-typedef struct LavHrtfData LavHrtfData;
-typedef struct LavDevice LavDevice;
-typedef struct LavObject LavObject;
+typedef void LavHrtfData;
+typedef void LavDevice;
+typedef void LavObject;
 #endif
 
 /**Does whatever is appropriate on a given platform to expose a Libaudioverse function publically.*/
