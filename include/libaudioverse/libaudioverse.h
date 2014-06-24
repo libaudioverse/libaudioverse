@@ -82,16 +82,16 @@ enum Lav_PROPERTYTYPES {
 
 /**These are used to tag objects with their type, so that external languages may see them.*/
 enum Lav_OBJTYPES {
-	Lav_OBJTYPE_GENERIC, //this is not something you should ever see outside the library, and basically means none.
-	Lav_OBJTYPE_WORLD,
-	Lav_OBJTYPE_SOURCE_MONO,
-	Lav_OBJTYPE_ZEROS,
-	Lav_OBJTYPE_FILE,
-	Lav_OBJTYPE_HRTF,
-	Lav_OBJTYPE_SINE,
-	Lav_OBJTYPE_MIXER,
-	Lav_OBJTYPE_ATTENUATOR,
-	Lav_OBJTYPE_HARD_LIMITER,
+	Lav_OBJTYPE_GENERIC = 0, //this is not something you should ever see outside the library, and basically means none.
+	Lav_OBJTYPE_WORLD = 1,
+	Lav_OBJTYPE_SOURCE_MONO = 2,
+	Lav_OBJTYPE_ZEROS = 3,
+	Lav_OBJTYPE_FILE = 4,
+	Lav_OBJTYPE_HRTF = 5,
+	Lav_OBJTYPE_SINE = 6,
+	Lav_OBJTYPE_MIXER = 7,
+	Lav_OBJTYPE_ATTENUATOR = 8,
+	Lav_OBJTYPE_HARD_LIMITER = 9,
 };
 
 /**Initialize Libaudioverse.*/
