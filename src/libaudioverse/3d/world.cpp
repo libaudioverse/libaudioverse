@@ -34,6 +34,15 @@ LavWorld::LavWorld(LavDevice* device, LavHrtfData* hrtf): LavSourceManager(devic
 }
 
 void LavWorld::willProcessParents() {
+	//update the matrix.
+	const float* pos = properties[Lav_3D_POSITION]->getFloat3Value();
+	const float* atup = properties[Lav_3D_ORIENTATION]->getFloat6Value();
+	environment.world_to_listener_transform = glm::lookAt(
+		glm::vec3(pos[0], pos[1], pos[2]),
+		glm::vec3(atup[0], atup[1], atup[2]),
+		glm::vec3(atup[3], atup[4], atup[5]));
+
+	//give the new environment to the sources.
 	for(auto i: sources) {
 		i->update(environment);
 	}
