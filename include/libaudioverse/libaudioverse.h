@@ -65,7 +65,6 @@ enum Lav_ERRORS {
 	Lav_ERROR_CANNOT_CROSS_DEVICES = 12, //an attempto either create a parent-child connect with objects from different devices or to set an output with an object from a different device.
 	Lav_ERROR_NO_OUTPUTS = 13, //we expected the object to have outputs here, but it didn't.
 	Lav_ERROR_LIMIT_EXCEEDED = 14,
-	Lav_ERROR_OPERATION_NOT_SUPPORTED = 15,
 };
 
 /**Typedef for error codes.*/
