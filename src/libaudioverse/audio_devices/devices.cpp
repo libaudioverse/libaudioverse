@@ -105,6 +105,8 @@ void LavDevice::visitAllObjectsInProcessOrder(std::function<void(LavObject*)> vi
 }
 
 void LavDevice::visitAllObjectsReachableFrom(LavObject* obj, std::function<void(LavObject*)> visitor) {
+	//if obj is null, bail out.  This is the base case.
+	if(obj == nullptr) return;
 	//we call ourselves on all parents of obj, and then pass obj to visitor.  This is essentially depth-first search.
 	for(unsigned int i = 0; i < obj->getInputCount(); i++) {
 		visitAllObjectsReachableFrom(obj->getParentObject(i), visitor);

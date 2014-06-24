@@ -46,6 +46,7 @@ void main(int argc, char** args) {
 	ERRCHECK(Lav_createSource(device, world, node, &source));
 	const int resolution = 1000, length = 3000; //length in ms.
 	const float width = 30.0;
+	Lav_deviceSetOutputObject(device, world);
 	//do a square over and over.
 	int model = 0;
 	printf("Using linear distance model.\n");

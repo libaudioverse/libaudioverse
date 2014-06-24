@@ -19,6 +19,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 LavSource::LavSource(LavDevice* device, LavSourceManager* manager, LavObject* sourceNode): LavPassthroughObject(device, device->getChannels()) {
 	if(sourceNode->getOutputCount() > 1) throw LavErrorException(Lav_ERROR_SHAPE);
+	source_object = sourceNode;
 	attenuator_object = createAttenuatorObject(device, 1);
 	panner_object = manager->createPannerObject();
 	attenuator_object->setParent(0, source_object, 0);
@@ -71,6 +72,8 @@ void LavSource::willProcessParents() {
 	float maxDistance = properties[Lav_SOURCE_MAX_DISTANCE]->getFloatValue();
 	float gain = calculateGainForDistanceModel(distanceModel, distance, maxDistance);
 	attenuator_object ->getProperty(Lav_ATTENUATOR_MULTIPLIER)->setFloatValue(gain);
+	printf("Gain:%f\n", gain);
+	printf("Azimuth=%f, elevation=%f\n", azimuth, elevation);
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_createSource(LavDevice* device, LavObject* environment, LavObject* node, LavObject** destination) {
