@@ -12,7 +12,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/libaudioverse3d.h>
 #include <stdlib.h>
-
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
 LavWorld::LavWorld(LavDevice* device, LavHrtfData* hrtf): LavSourceManager(device, device->getChannels()) {
 	this->hrtf = hrtf;
 	mixer = createMixerObject(device, 512, device->getChannels());
@@ -26,6 +27,10 @@ LavWorld::LavWorld(LavDevice* device, LavHrtfData* hrtf): LavSourceManager(devic
 	float defaultOrient[] = {0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f};
 	properties[Lav_3D_POSITION] = createFloat3Property("position", defaultPos);
 	properties[Lav_3D_ORIENTATION] = createFloat6Property("orientation", defaultOrient);
+	environment.world_to_listener_transform = glm::lookAt(
+		glm::vec3(0.0f, 0.0f, 0.0f),
+g	lm::vec3(0.0f, 0.0f, -1.0f),
+	glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
 void LavWorld::willProcessParents() {
