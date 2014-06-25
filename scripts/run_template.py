@@ -77,7 +77,7 @@ for typedef in typedef_list:
 	name = typedef.name
 	base = typedef.type.type
 	if isinstance(base, IdentifierType):
-		base = base.names
+		base = " ".join(base.names)
 	elif isinstance(base, Enum):
 		base = base.name
 	indirection = 0
@@ -90,12 +90,27 @@ functions = dict()
 
 #knows how to handle unwrapping a type.
 def compute_type_info(node):
-	return None
+	global typedefs
+	indirection = 0
+	currently_examining = node.type
+	while isinstance(currently_examining, PtrDecl):
+		indirection += 1
+		currently_examining = currently_examining.type
+	#we must move it once more.  This crashes us if it's not what we expect.  Given the frigility of this script...
+	assert isinstance(currently_examining, TypeDecl)
+	currently_examining  = currently_examining.type
+	name = " ".join(currently_examining.names)
+	#first, make a TypeInfo
+	info = TypeInfo(base = name, indirection = indirection)
+	aggregate_with = typedefs.get(name, None)
+	if aggregate_with is not None:
+		info.base = aggregate_with.base
+		info.indirection += aggregate_with.indirection
 
 for function in function_list:
 	func = function.type
 	name = function.name
-	return_type = compute_type_info(func.type)
+	return_type = compute_type_info(func) #not func.type-the function expects one node above.
 	if func.args is not None:
 		types = [compute_type_info(i) for i in func.args.params]
 		names = [i.name for i in func.args.params]
