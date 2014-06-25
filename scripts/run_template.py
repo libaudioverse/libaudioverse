@@ -15,6 +15,19 @@ class TypeInfo(object):
 		self.base = base
 		self.indirection = indirection
 
+#helper class for functions: return_type, args, name. Return_type and args should be TypeInfos.
+class FunctionInfo(object):
+	def __init__(self, return_type, name, args):
+		self.return_type = return_type
+		self.name = name
+		self.args = tuple(args) #forcing this is a really good idea.
+
+#parameter.
+class ParameterInfo(object):
+	def __init__(self, type, name):
+		self.type = type
+		self.name = name
+
 #compute the input file.
 #this gives us the root directory of the repository.
 root_directory = os.path.split(os.path.split(os.path.abspath(__file__))[0])[0]
@@ -69,3 +82,25 @@ for typedef in typedef_list:
 		base = base.name
 	indirection = 0
 	typedefs[name] = TypeInfo(base, indirection)
+
+#compute a list of all top-level function nodes.
+function_list = [i for i in ast.ext if isinstance(i, Decl) and isinstance(i.type, FuncDecl)]
+
+functions = dict()
+
+#knows how to handle unwrapping a type.
+def compute_type_info(node):
+	return None
+
+for function in function_list:
+	func = function.type
+	name = function.name
+	return_type = compute_type_info(func.type)
+	if func.args is not None:
+		types = [compute_type_info(i) for i in func.args.params]
+		names = [i.name for i in func.args.params]
+		args = zip(types, names)
+		args = tuple([ParameterInfo(i[0], i[1]) for i in args])
+	else:
+		args = ()
+	functions[name] = FunctionInfo(return_type, name, args)
