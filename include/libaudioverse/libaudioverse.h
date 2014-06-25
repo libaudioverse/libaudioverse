@@ -33,8 +33,8 @@ typedef void LavObject;
 #define Lav_PUBLIC_FUNCTION extern DLL_PUBLIC_ATTR
 #endif
 
-/*This block takes effect if this header is being preprocessed for the tests, turning off whatever weird thing we need for the build.*/
-#ifdef IS_TESTING
+/*This block takes effect if this header is being preprocessed for the binding generators, turning off whatever weird thing we need for the build.*/
+#ifdef IS_BINDING
 //gets rid of macro redefinition warnings.
 #undef Lav_PUBLIC_FUNCTION
 #define Lav_PUBLIC_FUNCTION
