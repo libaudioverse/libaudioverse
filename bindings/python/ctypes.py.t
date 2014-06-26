@@ -12,7 +12,7 @@ import ctypes
 {{ctypes_string_helper(t.base, t.indirection)}}
 {%-endmacro%}
 
-libaudioverse_module = ctypes.cdll.LoadLibrary('libaudiovverse.dll')
+libaudioverse_module = ctypes.cdll.LoadLibrary('libaudioverse.dll')
 
 {%for name, val in constants.iteritems() -%}
 {{name}} = {{val}}
