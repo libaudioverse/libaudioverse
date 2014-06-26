@@ -136,9 +136,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloat3Property(LavObject* obj, int slo
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloat6Property(LavObject* obj, int slot, float* v1, float* v2, float* v3, float* v4, float* v5, float* v6);
 
 /**Query property ranges. These are set only by internal code.  Float3 and Float6 are effectively rangeless: specifically what a range is for those is very undefined and specific to the object in question.*/
-Lav_PUBLIC_FUNCTION LavError Lav_getIntPropertyRange(LavObject* obj, int slot, int* lower, int* upper);
-Lav_PUBLIC_FUNCTION LavError Lav_getFloatPropertyRange(LavObject* obj, int slot, float* lower, float* upper);
-Lav_PUBLIC_FUNCTION LavError Lav_getDoublePropertyRange(LavObject* obj, int slot, double* lower, double* upper);
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetIntPropertyRange(LavObject* obj, int slot, int* lower, int* upper);
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloatPropertyRange(LavObject* obj, int slot, float* lower, float* upper);
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetDoublePropertyRange(LavObject* obj, int slot, double* lower, double* upper);
 
 /**Make a sine object.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createSineObject(LavDevice* device, LavObject **destination);
