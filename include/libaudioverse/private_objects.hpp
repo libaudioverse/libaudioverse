@@ -5,11 +5,13 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "libaudioverse.h"
 #include <map>
 #include <memory>
+#include <vector>
 
 class LavProperty;
 
 class LavInputDescriptor {
 	public:
+	LavInputDescriptor(LavObject* p, unsigned int o): parent(p), output(o) {}
 	LavObject* parent = nullptr;
 	unsigned int output = 0;
 };
@@ -39,7 +41,7 @@ Consider an hrtf node, taking 22579200 mathematical operations plus loop overhea
 
 	//these three methods are all involved in the processing logic: willProcess is called immediately before and didProcess immediately after the actual process method.
 	//this is a strong guarantee: no other operation shall be performed on this object between these three calls.
-	//base implementations toggle is_processing, so taht property callbacks can tell who set them-something external to this object or this object itself.
+	//base implementations toggle is_processing, so that property callbacks can tell who set them-something external to this object or this object itself-and call computeInputbuffers.
 	virtual void willProcess();
 	virtual void process();
 	virtual void didProcess();
@@ -61,11 +63,9 @@ Consider an hrtf node, taking 22579200 mathematical operations plus loop overhea
 	protected:
 	LavDevice *device = nullptr;
 	std::map<int, LavProperty*> properties;
-	float** inputs = nullptr;
-	LavInputDescriptor *input_descriptors = nullptr;
-	float** outputs = nullptr;
-	unsigned int num_outputs = 0;
-	unsigned int num_inputs = 0;
+	std::vector<float*> inputs;
+	std::vector<LavInputDescriptor> input_descriptors;
+	std::vector<float*> outputs;
 	bool is_processing = false, is_suspended = false;
 	enum Lav_OBJTYPES type = Lav_OBJTYPE_GENERIC;
 

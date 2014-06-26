@@ -17,7 +17,7 @@ float zerobuffer[Lav_MAX_BLOCK_SIZE] = {0}; //this is a shared buffer for the "n
 
 void LavObject::computeInputBuffers() {
 	//point our inputs either at a zeroed buffer or the output of our parent.
-	for(unsigned int i = 0; i < num_inputs; i++) {
+	for(unsigned int i = 0; i < input_descriptors.size(); i++) {
 		if(input_descriptors[i].parent != NULL && input_descriptors[i].parent->isSuspended() == false) {
 			if(input_descriptors[i].output >= input_descriptors[i].parent->getOutputCount()) { //the parent node no longer has this output, probably due to resizing.
 				clearParent(i); //so we clear this parent.
@@ -31,20 +31,14 @@ void LavObject::computeInputBuffers() {
 }
 
 LavObject::LavObject(LavDevice* device, unsigned int numInputs, unsigned int numOutputs) {
-	num_inputs = numInputs;
-	num_outputs = numOutputs;
 	//allocations:
-	if(numInputs > 0) {
-		input_descriptors = new LavInputDescriptor[numInputs];
-		inputs = new float*[numInputs];
+	input_descriptors.resize(numInputs, LavInputDescriptor(nullptr, 0));
+	inputs.resize(numInputs, nullptr);
+	outputs.resize(numOutputs);
+	for(auto i = outputs.begin(); i != outputs.end(); i++) {
+		*i = new float[device->getBlockSize()];
 	}
 
-	if(numOutputs > 0) {
-		outputs = new float*[numOutputs];
-		for(unsigned int i = 0; i < num_outputs; i++) {
-			outputs[i] = new float[device->getBlockSize()];
-		}
-	}
 	device->associateObject(this);
 	this->device = device;
 
@@ -61,7 +55,7 @@ void LavObject::willProcess() {
 
 /*Default Processing function.*/
 void LavObject::process() {
-	for(unsigned int i = 0; i < num_outputs; i++) {
+	for(unsigned int i = 0; i < outputs.size(); i++) {
 		memset(outputs[i], 0, device->getBlockSize()*sizeof(float));
 	}
 }
@@ -69,6 +63,7 @@ void LavObject::process() {
 void LavObject::didProcess() {
 	is_processing = false;
 }
+
 void LavObject::willProcessParents() {
 }
 
@@ -85,38 +80,38 @@ void LavObject::unsuspend() {
 }
 
 void LavObject::setParent(unsigned int input, LavObject* parent, unsigned int parentOutput) {
-	if(input >= num_inputs) throw LavErrorException(Lav_ERROR_RANGE);
+	if(input >= input_descriptors.size()) throw LavErrorException(Lav_ERROR_RANGE);
 	if(parentOutput >= parent->getOutputCount()) throw LavErrorException(Lav_ERROR_RANGE);
 	input_descriptors[input].parent = parent;
 	input_descriptors[input].output = parentOutput;
 }
 
 LavObject* LavObject::getParentObject(unsigned int input) {
-	if(input >= num_inputs) throw LavErrorException(Lav_ERROR_RANGE);
+	if(input >= input_descriptors.size()) throw LavErrorException(Lav_ERROR_RANGE);
 	return input_descriptors[input].parent;
 }
 
 unsigned int LavObject::getParentOutput(unsigned int input) {
-	if(input >= num_inputs) throw LavErrorException(Lav_ERROR_RANGE);
+	if(input >= input_descriptors.size()) throw LavErrorException(Lav_ERROR_RANGE);
 	return input_descriptors[input].output;
 }
 
 void LavObject::clearParent(unsigned int slot) {
-	if(slot >= num_inputs) throw LavErrorException(Lav_ERROR_RANGE);
+	if(slot >= input_descriptors.size()) throw LavErrorException(Lav_ERROR_RANGE);
 	input_descriptors[slot].parent = nullptr;
 	input_descriptors[slot].output = 0;
 }
 
 unsigned int LavObject::getInputCount() {
-	return num_inputs;
+	return input_descriptors.size();
 }
 
 unsigned int LavObject::getOutputCount() {
-	return num_outputs;
+	return outputs.size();
 }
 
 void LavObject::getOutputPointers(float** dest) {
-	memcpy(dest, outputs, sizeof(float*)*num_outputs);
+	std::copy(outputs.begin(), outputs.end(), dest);
 }
 
 LavDevice* LavObject::getDevice() {
@@ -142,7 +137,7 @@ LavPassthroughObject::LavPassthroughObject(LavDevice* device, unsigned int numCh
 }
 
 void LavPassthroughObject::process() {
-	for(unsigned int i = 0; i < num_inputs; i++) {
+	for(unsigned int i = 0; i < inputs.size(); i++) {
 		std::copy(inputs[i], inputs[i]+device->getBlockSize(), outputs[i]);
 	}
 }

@@ -25,7 +25,7 @@ LavSource::LavSource(LavDevice* device, LavSourceManager* manager, LavObject* so
 	panner_object = manager->createPannerObject();
 	attenuator_object->setParent(0, source_object, 0);
 	panner_object->setParent(0, attenuator_object, 0);
-	for(unsigned int i = 0; i <num_inputs; i++) {
+	for(unsigned int i = 0; i <inputs.size(); i++) {
 		setParent(i, panner_object, i);
 	}
 	float defaultPos[] = {0.0f, 0.0f, 0.0f};
