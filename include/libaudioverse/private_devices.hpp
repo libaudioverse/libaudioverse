@@ -13,7 +13,7 @@ class LavObject;
 
 class LavDevice: std::enable_shared_from_this<LavDevice> {
 	public:
-	void init(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead);
+	LavDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead);
 	virtual ~LavDevice() {}
 	virtual LavError getBlock(float* out);
 	virtual unsigned int getBlockSize() { return block_size;}

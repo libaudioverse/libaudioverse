@@ -15,11 +15,11 @@ int portaudioOutputCallback(const void* input, void* output, unsigned long frame
 
 class LavPortaudioDevice: public LavDevice {
 	public:
-	virtual void init(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead);
+	LavPortaudioDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead);
 	void audioOutputThreadFunction(); //the function that runs as our output thread.
 	std::thread audioOutputThread;
 	std::atomic_flag runningFlag; //when this clears, the audio thread self-terminates.
-	PaStream *stream; //the portaudio stream we work with.  Started and stopped by the background thread for us.
+	PaStream *stream = nullptr; //the portaudio stream we work with.  Started and stopped by the background thread for us.
 	//a ringbuffer of dispatched buffers.
 	//the elements are protected by the atomic ints.
 	float** buffers = nullptr;
@@ -35,8 +35,7 @@ void initializeAudioBackend() {
 	}
 }
 
-void LavPortaudioDevice::init(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead) {
-	LavDevice::init(sr, channels, blockSize, mixahead);
+LavPortaudioDevice::LavPortaudioDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead): LavDevice(sr, channels, blockSize, mixahead) {
 	buffers = new float*[mixahead+1];
 	for(unsigned int i = 0; i < mixahead+1; i++) buffers[i] = new float[blockSize*channels];
 	buffer_statuses = new std::atomic<int>[mixahead+1];
@@ -47,8 +46,7 @@ void LavPortaudioDevice::init(unsigned int sr, unsigned int channels, unsigned i
 }
 
 LavDevice* createPortaudioDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead) {
-	LavPortaudioDevice* retval = new LavPortaudioDevice();
-	retval->init(sr, channels, blockSize, mixahead);
+	LavPortaudioDevice* retval = new LavPortaudioDevice(sr, channels, blockSize, mixahead);
 	return retval;
 }
 
@@ -80,6 +78,7 @@ void LavPortaudioDevice::audioOutputThreadFunction() {
 }
 
 int portaudioOutputCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData) {
+	printf("Portaudio callback...\n");
 	LavPortaudioDevice * const dev = (LavPortaudioDevice*)userData;
 	const int haveBuffer = dev->buffer_statuses[dev->callback_buffer_index].load();
 	if(haveBuffer) {
@@ -89,6 +88,7 @@ int portaudioOutputCallback(const void* input, void* output, unsigned long frame
 		dev->callback_buffer_index %= dev->mixahead+1;
 	}
 	else {
+		printf("Failed to get buffer.\n");
 		memset(output, 0, dev->channels*frameCount*sizeof(float));
 	}
 	return paContinue;

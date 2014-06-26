@@ -22,8 +22,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createDefaultAudioOutputDevice(LavDevice** dest
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_createReadDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, LavDevice** destination) {
-	LavDevice* retval = new LavDevice();
-	retval->init(sr, channels, blockSize, 0);
+	LavDevice* retval = new LavDevice(sr, channels, blockSize, 0);
 	*destination = retval;
 	return Lav_ERROR_NONE;
 }
