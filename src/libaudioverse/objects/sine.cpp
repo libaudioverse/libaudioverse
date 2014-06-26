@@ -16,14 +16,14 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 class LavSineObject: public LavObject {
 	public:
-	LavSineObject(LavDevice* dev);
+	LavSineObject(LavDevice* device);
 	virtual void process();
 	float table_delta;
 	unsigned int start ;
 	float offset;
 };
 
-LavSineObject::LavSineObject(LavDevice* dev): LavObject(device, 0, 1) {
+LavSineObject::LavSineObject(LavDevice* device): LavObject(device, 0, 1) {
 	table_delta = sineTableLength/device->getSr();
 	start = 0;
 	offset = 0;
