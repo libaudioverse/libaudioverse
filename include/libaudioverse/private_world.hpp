@@ -18,7 +18,6 @@ class LavWorld: public LavSourceManager {
 	LavObject* createPannerObject();
 	private:
 	std::vector<LavSource*> sources;
-	unsigned int max_sources;
 	LavObject* mixer = nullptr, *limiter = nullptr;
 	LavHrtfData *hrtf;
 	LavEnvironment environment;

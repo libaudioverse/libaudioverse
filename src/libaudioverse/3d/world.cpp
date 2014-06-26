@@ -19,8 +19,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 LavWorld::LavWorld(LavDevice* device, LavHrtfData* hrtf): LavSourceManager(device, device->getChannels()) {
 	this->hrtf = hrtf;
-	mixer = createMixerObject(device, 512, device->getChannels());
-	max_sources = 512;
+	mixer = createMixerObject(device, 1, device->getChannels());
 	limiter = createHardLimiterObject(device, device->getChannels());
 	for(int i = 0; i < device->getChannels(); i++) {
 		limiter->setParent(i, mixer, i);
@@ -63,8 +62,9 @@ void LavWorld::associateSource(LavSource* source) {
 	//if this already exists, bail out.
 	int found = std::count(sources.begin(), sources.end(), source);
 	if(found) return; //it's not an error.
-	if(sources.size() == max_sources) throw LavErrorException(Lav_ERROR_LIMIT_EXCEEDED);
 	sources.push_back(source);
+	//tell the mixer that we would like it to have more parents.
+	mixer->getProperty(Lav_MIXER_MAX_PARENTS)->setIntValue(sources.size());
 	unsigned int ind = sources.size()-1;
 	unsigned int startInput = ind*device->getChannels();
 	for(int i = 0; i < device->getChannels(); i++) {

@@ -13,7 +13,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <vector>
 
 #define SECONDS 5
-#define BLOCK_SIZE 512
+#define BLOCK_SIZE 1024
 float storage[BLOCK_SIZE*2] = {0};
 
 #define ERRCHECK(x) do {\
