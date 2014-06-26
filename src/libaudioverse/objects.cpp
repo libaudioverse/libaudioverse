@@ -51,6 +51,8 @@ LavObject::LavObject(LavDevice* device, unsigned int numInputs, unsigned int num
 void LavObject::willProcess() {
 	is_processing = true;
 	computeInputBuffers();
+	num_inputs = inputs.size();
+	num_outputs = outputs.size();
 }
 
 /*Default Processing function.*/

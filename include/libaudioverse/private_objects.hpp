@@ -41,7 +41,10 @@ Consider an hrtf node, taking 22579200 mathematical operations plus loop overhea
 
 	//these three methods are all involved in the processing logic: willProcess is called immediately before and didProcess immediately after the actual process method.
 	//this is a strong guarantee: no other operation shall be performed on this object between these three calls.
-	//base implementations toggle is_processing, so that property callbacks can tell who set them-something external to this object or this object itself-and call computeInputBuffers.
+	//This one does three things:
+	//1. Toggle on is_processing;
+	//2. Call computeInputBuffers.
+	//3. Update the convenience variables num_inputs and num_outputs to be the sizes of the input and output vectors.
 	virtual void willProcess();
 	virtual void process();
 	virtual void didProcess();
@@ -70,6 +73,7 @@ Consider an hrtf node, taking 22579200 mathematical operations plus loop overhea
 	std::vector<float*> outputs;
 	bool is_processing = false, is_suspended = false;
 	enum Lav_OBJTYPES type = Lav_OBJTYPE_GENERIC;
+	unsigned int num_inputs = 0, num_outputs = 0;
 
 	//we are never allowed to copy.
 	LavObject(const LavObject&) = delete;

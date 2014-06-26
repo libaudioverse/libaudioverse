@@ -4,14 +4,17 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 /**Given a file, produces 5 seconds of audio output at 44100 HZ.  Rather than playing it, however, this program prints how long it took and the estimated number that can be run in one thread in realtime.*/
 #include <libaudioverse/libaudioverse.h>
+#include <libaudioverse/libaudioverse_properties.h>
+#include <libaudioverse/libaudioverse3d.h>
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <vector>
 
-#define seconds 5
-#define blocksize 100
-float storage[blocksize*2] = {0};
+#define SECONDS 5
+#define BLOCK_SIZE 512
+float storage[BLOCK_SIZE*2] = {0};
 
 #define ERRCHECK(x) do {\
 if((x) != Lav_ERROR_NONE) {\
@@ -21,31 +24,52 @@ if((x) != Lav_ERROR_NONE) {\
 } while(0)\
 
 void main(int argc, char** args) {
-	if(argc != 3) {
-		printf("Usage: %s <sound file> <hrtf file>", args[0]);
+	if(argc != 2) {
+		printf("Usage: %s <hrtf file>", args[0]);
 		return;
 	}
-
 	LavDevice* device;
-	LavObject* fileNode, *hrtfNode;
-	ERRCHECK(Lav_initializeLibrary());
-	ERRCHECK(Lav_createReadDevice(44100, 2, blocksize, &device));
-	ERRCHECK(Lav_createFileObject(device, args[1], &fileNode));
-	LavHrtfData *hrtf = NULL;
-	ERRCHECK(Lav_createHrtfData(args[2], &hrtf));
-	ERRCHECK(Lav_createHrtfObject(device, hrtf, &hrtfNode));
-	ERRCHECK(Lav_objectSetParent(hrtfNode, 0, fileNode, 0));
-	ERRCHECK(Lav_deviceSetOutputObject(device, hrtfNode));
+	LavObject* world;
+	LavHrtfData *hrtfData;
+	std::vector<LavObject*> sources;
+	std::vector<LavObject*> sines;
+	unsigned int numSources = 0;
+	float timeDelta = 0.0f;
 
-	printf("Convolving...\n");
-	clock_t start;
-	start = clock();
-	for(unsigned int i = 0; i < 44100*seconds; i+= blocksize) {
-		ERRCHECK(Lav_deviceGetBlock(device, storage));
+	//some setup: create a world and a device.
+	ERRCHECK(Lav_createReadDevice(44100, 2, BLOCK_SIZE, &device));
+	ERRCHECK(Lav_createHrtfData(args[1], &hrtfData));
+	ERRCHECK(Lav_createWorld(device, hrtfData, &world));
+	ERRCHECK(Lav_deviceSetOutputObject(device, world));
+	while(timeDelta < SECONDS) {
+		numSources += 10;
+		printf("Preparing to test with %u sources...\n", numSources);
+		sources.resize(numSources, nullptr);
+		sines.resize(numSources, nullptr);
+		//anywhere there's a null pointer in either of them, replace it with a new source or sine object.
+		auto sineIter  = sines.begin();
+		auto sourceIter = sources.begin();
+		for(; sineIter != sines.end() && sourceIter != sources.end(); sineIter++, sourceIter++) {
+			auto sinePtr = *sineIter;
+			auto sourcePtr = *sourceIter;
+			if(sinePtr == nullptr) {
+				ERRCHECK(Lav_createSineObject(device, &sinePtr));
+			}
+			if(sourcePtr == nullptr) {
+				ERRCHECK(Lav_createSource(device, world, sinePtr, &sourcePtr));
+			}
+			//write them back.
+			*sineIter = sinePtr;
+			*sourceIter = sourcePtr;
+		}
+		clock_t startTime = clock();
+		printf("Beginning test...\n");
+		for(unsigned int i = 0; i < SECONDS*44100; i+=BLOCK_SIZE) {
+			Lav_deviceGetBlock(device, storage);
+		}
+		clock_t endTime = clock();
+		timeDelta = (endTime-startTime)/(float)CLOCKS_PER_SEC;
+		printf("Done.  Took %f seconds to process.\n", timeDelta);
+		if(timeDelta < 5.0f) printf("Still capable of processing in real-time; increasing sources and retesting.\n");
 	}
-	clock_t dur = clock()-start;
-	float secs = dur/(float)CLOCKS_PER_SEC;
-	printf("Done.\n");
-	printf("Convolution took %f seconds.\n", secs);
-	printf("Total number of sources possible in realtime: %f", (float)seconds/secs);
 }
