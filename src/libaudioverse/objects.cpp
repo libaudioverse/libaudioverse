@@ -56,6 +56,7 @@ LavObject::LavObject(LavDevice* device, unsigned int numInputs, unsigned int num
 
 void LavObject::willProcess() {
 	is_processing = true;
+	computeInputBuffers();
 }
 
 /*Default Processing function.*/
@@ -88,7 +89,6 @@ void LavObject::setParent(unsigned int input, LavObject* parent, unsigned int pa
 	if(parentOutput >= parent->getOutputCount()) throw LavErrorException(Lav_ERROR_RANGE);
 	input_descriptors[input].parent = parent;
 	input_descriptors[input].output = parentOutput;
-	computeInputBuffers();
 }
 
 LavObject* LavObject::getParentObject(unsigned int input) {
