@@ -4,8 +4,10 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/private_objects.hpp>
+#include <libaudioverse/private_properties.hpp>
 #include <libaudioverse/private_devices.hpp>
 #include <libaudioverse/private_macros.hpp>
+#include <limits>
 
 class LavMixerObject: public LavObject {
 	public:
@@ -17,6 +19,8 @@ class LavMixerObject: public LavObject {
 
 LavMixerObject::LavMixerObject(LavDevice* device, unsigned int maxParents, unsigned int inputsPerParent): LavObject(device, inputsPerParent*maxParents, inputsPerParent) {
 	inputs_per_parent = inputsPerParent;
+	properties[Lav_MIXER_INPUTS_PER_PARENT] = createIntProperty("inputs_per_parent", inputs_per_parent, inputs_per_parent, inputs_per_parent); //in effect, readonly.  Todo: implement readonly properties.
+	properties[Lav_MIXER_MAX_PARENTS] = createIntProperty("max_parents", maxParents, 0, std::numeric_limits<int>::max()); //yes, really, as many as you want.
 }
 
 LavObject* createMixerObject(LavDevice* device, unsigned int maxParents, unsigned int inputsPerParent) {

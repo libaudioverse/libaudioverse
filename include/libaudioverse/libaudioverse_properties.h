@@ -16,10 +16,9 @@ Lav_OBJTYPE_PROPNAME
 
 Furthermore, all libaudioverse properties are negative, save on those objects for which documentation says otherwise.  Examples of objects with positive properties include highly configurable mixers and attenuators, among others.
 */
-const int standard_property_start = -9999;
 
 enum lav_STANDARD_PROPERTIES {
-	Lav_OBJECT_SUSPENDED = standard_property_start,
+	Lav_OBJECT_SUSPENDED = -100,
 };
 
 enum Lav_SINE_PROPERTIES {
@@ -38,6 +37,11 @@ enum Lav_HRTF_PROPERTIES {
 
 enum Lav_ATTENUATOR_PROPERTIES {
 	Lav_ATTENUATOR_MULTIPLIER = -1,
+};
+
+enum Lav_MIXER_PROPERTIES {
+	Lav_MIXER_MAX_PARENTS = -1,
+	Lav_MIXER_INPUTS_PER_PARENT = -2,
 };
 
 #ifdef __cplusplus
