@@ -120,3 +120,10 @@ for function in function_list:
 	else:
 		args = ()
 	functions[name] = FunctionInfo(return_type, name, args)
+
+#export this in one dict so that we have a way to add it to parent scripts.
+all_info = {
+'functions' : functions,
+'typedefs': typedefs,
+'constants' : constants,
+}
