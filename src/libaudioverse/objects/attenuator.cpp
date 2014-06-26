@@ -26,8 +26,8 @@ LavObject* createAttenuatorObject(LavDevice* device, unsigned int numChannels) {
 
 void LavAttenuatorObject::process() {
 	const float mul = properties[Lav_ATTENUATOR_MULTIPLIER]->getFloatValue();
-	for(unsigned int i = 0; i < device->getBlockSize(); i++) {
-		for(unsigned int j = 0; j < outputs.size(); j++) {
+	for(unsigned int i = 0; i < block_size; i++) {
+		for(unsigned int j = 0; j < num_outputs; j++) {
 			outputs[j][i] = inputs[j][i]*mul;
 		}
 	}

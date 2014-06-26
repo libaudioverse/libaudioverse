@@ -50,14 +50,13 @@ void LavHrtfObject::process() {
 	}
 	float *start = history+hrtf->getLength(), *end = history+hrtf->getLength()+device->getBlockSize();
 	//get the block size.
-	const unsigned int blockSize = device->getBlockSize();
 	const unsigned int hrtfLength = hrtf->getLength();
 	//roll back the history...
 	std::copy(end-hrtf->getLength(), end, history);
 	//stick our input on the end...
-	std::copy(inputs[0], inputs[0]+blockSize, start);
+	std::copy(inputs[0], inputs[0]+block_size, start);
 	//finally, do the usual convolution loop.
-	for(unsigned int i = 0; i < blockSize; i++, start++) {
+	for(unsigned int i = 0; i < block_size; i++, start++) {
 		float outLeft = 0, outRight = 0;
 		for(unsigned int j = 0; j < hrtfLength; j++) {
 			outLeft += left_response[j]* *(start-j);

@@ -25,8 +25,8 @@ LavObject* createHardLimiterObject(LavDevice* device, unsigned int numChannels) 
 }
 
 void LavHardLimiterObject::process() {
-	for(unsigned int i = 0; i < device->getBlockSize(); i++) {
-		for(unsigned int o = 0; o < outputs.size(); o++) {
+	for(unsigned int i = 0; i < block_size; i++) {
+		for(unsigned int o = 0; o < num_outputs; o++) {
 			if(inputs[o][i] > 1.0f) {
 				outputs[o][i] = 1.0f;
 				continue;

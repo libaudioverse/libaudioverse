@@ -53,20 +53,20 @@ void LavFileObject::seek() {
 
 void LavFileObject::process() {
 	const float pitch_bend = properties[Lav_FILE_PITCH_BEND]->getFloatValue();
-	for(unsigned int i = 0; i < device->getBlockSize(); i++) {
+	for(unsigned int i = 0; i < block_size; i++) {
 		if(offset >= file.getFrameCount()) {
-			for(unsigned int j = 0; j < outputs.size(); j++) {
+			for(unsigned int j = 0; j < num_outputs; j++) {
 				outputs[j][i] = 0.0f;
 			}
 			continue;
 		}
-		unsigned int samp1 = (unsigned int)position;
-		unsigned int samp2 = (unsigned int)position+1;
-		float weight1 = 1-offset;
-		float weight2 = offset;
-		for(unsigned int j = 0; j < outputs.size(); j++) {
-			unsigned int ind1 = samp1*outputs.size()+j;
-			unsigned int ind2 = samp2*outputs.size()+j;
+		const unsigned int samp1 = (unsigned int)position;
+		const unsigned int samp2 = (unsigned int)position+1;
+		const float weight1 = 1-offset;
+		const float weight2 = offset;
+		for(unsigned int j = 0; j < num_outputs; j++) {
+			const unsigned int ind1 = samp1*num_outputs+j;
+			const unsigned int ind2 = samp2*num_outputs+j;
 			outputs[j][i] = weight1*buffer[ind1]+weight2*buffer[ind2];
 		}		
 	offset += delta*pitch_bend;
