@@ -41,7 +41,7 @@ Consider an hrtf node, taking 22579200 mathematical operations plus loop overhea
 
 	//these three methods are all involved in the processing logic: willProcess is called immediately before and didProcess immediately after the actual process method.
 	//this is a strong guarantee: no other operation shall be performed on this object between these three calls.
-	//base implementations toggle is_processing, so that property callbacks can tell who set them-something external to this object or this object itself-and call computeInputbuffers.
+	//base implementations toggle is_processing, so that property callbacks can tell who set them-something external to this object or this object itself-and call computeInputBuffers.
 	virtual void willProcess();
 	virtual void process();
 	virtual void didProcess();
@@ -61,6 +61,8 @@ Consider an hrtf node, taking 22579200 mathematical operations plus loop overhea
 	void unlock();
 
 	protected:
+	//this should definitely be protected, and should never be touched by anything that's not a subclass.
+	virtual void resize(unsigned int newInputsCount, unsigned int newOutputsCount);
 	LavDevice *device = nullptr;
 	std::map<int, LavProperty*> properties;
 	std::vector<float*> inputs;

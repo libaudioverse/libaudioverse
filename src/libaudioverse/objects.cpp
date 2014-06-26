@@ -131,6 +131,27 @@ void LavObject::unlock() {
 	device->unlock();
 }
 
+//protected resize function.
+void LavObject::resize(unsigned int newInputCount, unsigned int newOutputCount) {
+	//inputs is easy, because we didn't allocate any memory outside of the vector interface.
+	inputs.resize(newInputCount, nullptr);
+	input_descriptors.resize(newInputCount, LavInputDescriptor(nullptr, 0));
+	//but outputs has a special case.
+	unsigned int oldOutputCount = outputs.size();
+	if(newOutputCount < oldOutputCount) { //we need to free some arrays.
+		for(auto i = newOutputCount; i < oldOutputCount; i++) {
+			delete[] outputs[i];
+		}
+	}
+	//do the resize.
+	outputs.resize(newOutputCount, nullptr);
+	if(newOutputCount > oldOutputCount) { //we need to allocate some more arrays.
+		for(auto i = oldOutputCount; i < newOutputCount; i++) {
+			outputs[i] = new float[device->getBlockSize()];
+		}
+	}
+}
+
 /**Implementation of LavPasssthroughObject.*/
 
 LavPassthroughObject::LavPassthroughObject(LavDevice* device, unsigned int numChannels): LavObject(device, numChannels, numChannels) {

@@ -14,6 +14,7 @@ class LavMixerObject: public LavObject {
 	LavMixerObject(LavDevice* device, unsigned int maxParents, unsigned int inputsPerParent);
 	virtual void process();
 	protected:
+	void maxParentsChanged();
 	unsigned int inputs_per_parent;
 };
 
@@ -21,11 +22,18 @@ LavMixerObject::LavMixerObject(LavDevice* device, unsigned int maxParents, unsig
 	inputs_per_parent = inputsPerParent;
 	properties[Lav_MIXER_INPUTS_PER_PARENT] = createIntProperty("inputs_per_parent", inputs_per_parent, inputs_per_parent, inputs_per_parent); //in effect, readonly.  Todo: implement readonly properties.
 	properties[Lav_MIXER_MAX_PARENTS] = createIntProperty("max_parents", maxParents, 0, std::numeric_limits<int>::max()); //yes, really, as many as you want.
+	properties[Lav_MIXER_MAX_PARENTS]->setPostChangedCallback([this] () {maxParentsChanged();});
 }
 
 LavObject* createMixerObject(LavDevice* device, unsigned int maxParents, unsigned int inputsPerParent) {
 	auto retval = new LavMixerObject(device, maxParents, inputsPerParent);
 	return retval;
+}
+
+void LavMixerObject::maxParentsChanged() {
+	unsigned int newInputsCount = (unsigned int)(properties[Lav_MIXER_MAX_PARENTS]->getIntValue());
+	newInputsCount *= inputs_per_parent;
+	resize(newInputsCount, inputs_per_parent);
 }
 
 void LavMixerObject::process() {
