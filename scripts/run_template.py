@@ -106,6 +106,7 @@ def compute_type_info(node):
 	if aggregate_with is not None:
 		info.base = aggregate_with.base
 		info.indirection += aggregate_with.indirection
+	return info
 
 for function in function_list:
 	func = function.type
