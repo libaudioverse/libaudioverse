@@ -40,8 +40,10 @@ LavPortaudioDevice::LavPortaudioDevice(unsigned int sr, unsigned int channels, u
 	for(unsigned int i = 0; i < mixahead+1; i++) buffers[i] = new float[blockSize*channels];
 	buffer_statuses = new std::atomic<int>[mixahead+1];
 	for(unsigned int i = 0; i < mixahead+1; i++) buffer_statuses[i].store(0); //make sure they're all 0.  If not, bad things are going to happen.
-	Pa_OpenDefaultStream(&stream, 0, channels, paFloat32, sr, blockSize, portaudioOutputCallback, this);
+	PaError err = Pa_OpenDefaultStream(&stream, 0, channels, paFloat32, sr, blockSize, portaudioOutputCallback, this);
+	if(err < 0) throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
 	//set the background thread on its way.
+	runningFlag.test_and_set();
 	audioOutputThread = std::thread([this] () {audioOutputThreadFunction();});
 }
 
@@ -59,7 +61,7 @@ Basically, this is a one-reader one-writer lock-free ringbuffer with an addition
 */
 void LavPortaudioDevice::audioOutputThreadFunction() {
 	int rb_index = 0; //our index into the buffers array.
-	Pa_StartStream(stream);
+	PaError err = Pa_StartStream(stream);
 	while(runningFlag.test_and_set()) {
 		if(buffer_statuses[rb_index].load()) { //we just caught up and the queue is full.
 			continue;
@@ -78,7 +80,6 @@ void LavPortaudioDevice::audioOutputThreadFunction() {
 }
 
 int portaudioOutputCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData) {
-	printf("Portaudio callback...\n");
 	LavPortaudioDevice * const dev = (LavPortaudioDevice*)userData;
 	const int haveBuffer = dev->buffer_statuses[dev->callback_buffer_index].load();
 	if(haveBuffer) {
@@ -88,7 +89,6 @@ int portaudioOutputCallback(const void* input, void* output, unsigned long frame
 		dev->callback_buffer_index %= dev->mixahead+1;
 	}
 	else {
-		printf("Failed to get buffer.\n");
 		memset(output, 0, dev->channels*frameCount*sizeof(float));
 	}
 	return paContinue;
