@@ -19,6 +19,9 @@ void LavObject::computeInputBuffers() {
 	//point our inputs either at a zeroed buffer or the output of our parent.
 	for(unsigned int i = 0; i < num_inputs; i++) {
 		if(input_descriptors[i].parent != NULL && input_descriptors[i].parent->isSuspended() == false) {
+			if(input_descriptors[i].output >= input_descriptors[i].parent->getOutputCount()) { //the parent node no longer has this output, probably due to resizing.
+				clearParent(i); //so we clear this parent.
+			}
 			inputs[i] = input_descriptors[i].parent->outputs[input_descriptors[i].output];
 		}
 		else {
