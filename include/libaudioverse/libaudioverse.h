@@ -118,26 +118,26 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectSetParent(LavObject *obj, unsigned int in
 Lav_PUBLIC_FUNCTION LavError Lav_objectClearParent(LavObject *obj, unsigned int slot);
 
 /**Resets a property to its default value, for any type.*/
-Lav_PUBLIC_FUNCTION LavError Lav_objectResetProperty(LavObject *obj, unsigned int slot);
+Lav_PUBLIC_FUNCTION LavError Lav_objectResetProperty(LavObject *obj, int slot);
 
 /**Property getters and setters.*/
-Lav_PUBLIC_FUNCTION LavError Lav_objectSetIntProperty(LavObject* obj, unsigned int slot, int value);
-Lav_PUBLIC_FUNCTION LavError Lav_objectSetFloatProperty(LavObject *obj, unsigned int slot, float value);
-Lav_PUBLIC_FUNCTION LavError Lav_objectSetDoubleProperty(LavObject *obj, unsigned int slot, double value);
-Lav_PUBLIC_FUNCTION LavError Lav_objectSetStringProperty(LavObject*obj, unsigned int slot, char* value);
-Lav_PUBLIC_FUNCTION LavError Lav_objectSetFloat3Property(LavObject* obj, unsigned int slot, float v1, float v2, float v3);
-Lav_PUBLIC_FUNCTION LavError Lav_objectSetFloat6Property(LavObject* obj, unsigned int slot, float v1, float v2, float v3, float v4, float v5, float v6);
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetIntProperty(LavObject*obj, unsigned int slot, int *destination);
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloatProperty(LavObject* obj, unsigned int slot, float *destination);
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetDoubleProperty(LavObject*obj, unsigned int slot, double *destination);
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetStringProperty(LavObject* obj, unsigned int slot, const char** destination);
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloat3Property(LavObject* obj, unsigned int slot, float* v1, float* v2, float* v3);
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloat6Property(LavObject* obj, unsigned int slot, float* v1, float* v2, float* v3, float* v4, float* v5, float* v6);
+Lav_PUBLIC_FUNCTION LavError Lav_objectSetIntProperty(LavObject* obj, int slot, int value);
+Lav_PUBLIC_FUNCTION LavError Lav_objectSetFloatProperty(LavObject *obj, int slot, float value);
+Lav_PUBLIC_FUNCTION LavError Lav_objectSetDoubleProperty(LavObject *obj, int slot, double value);
+Lav_PUBLIC_FUNCTION LavError Lav_objectSetStringProperty(LavObject*obj, int slot, char* value);
+Lav_PUBLIC_FUNCTION LavError Lav_objectSetFloat3Property(LavObject* obj, int slot, float v1, float v2, float v3);
+Lav_PUBLIC_FUNCTION LavError Lav_objectSetFloat6Property(LavObject* obj, int slot, float v1, float v2, float v3, float v4, float v5, float v6);
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetIntProperty(LavObject*obj, int slot, int *destination);
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloatProperty(LavObject* obj, int slot, float *destination);
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetDoubleProperty(LavObject*obj, int slot, double *destination);
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetStringProperty(LavObject* obj, int slot, const char** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloat3Property(LavObject* obj, int slot, float* v1, float* v2, float* v3);
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloat6Property(LavObject* obj, int slot, float* v1, float* v2, float* v3, float* v4, float* v5, float* v6);
 
 /**Query property ranges. These are set only by internal code.  Float3 and Float6 are effectively rangeless: specifically what a range is for those is very undefined and specific to the object in question.*/
-Lav_PUBLIC_FUNCTION LavError Lav_getIntPropertyRange(LavObject* obj, unsigned int slot, int* lower, int* upper);
-Lav_PUBLIC_FUNCTION LavError Lav_getFloatPropertyRange(LavObject* obj, unsigned int slot, float* lower, float* upper);
-Lav_PUBLIC_FUNCTION LavError Lav_getDoublePropertyRange(LavObject* obj, unsigned int slot, double* lower, double* upper);
+Lav_PUBLIC_FUNCTION LavError Lav_getIntPropertyRange(LavObject* obj, int slot, int* lower, int* upper);
+Lav_PUBLIC_FUNCTION LavError Lav_getFloatPropertyRange(LavObject* obj, int slot, float* lower, float* upper);
+Lav_PUBLIC_FUNCTION LavError Lav_getDoublePropertyRange(LavObject* obj, int slot, double* lower, double* upper);
 
 /**Make a sine object.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createSineObject(LavDevice* device, LavObject **destination);
