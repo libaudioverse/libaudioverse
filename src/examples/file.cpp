@@ -30,9 +30,9 @@ void main(int argc, char** args) {
 	LavObject* atten, *limit, *mix;
 	unsigned int fileChannels;
 	ERRCHECK(Lav_objectGetOutputCount(node, &fileChannels));
-	ERRCHECK(Lav_createAttenuatorObject(device, fileChannels, &atten));
+	ERRCHECK(Lav_createAttenuatorObject(device, fileChannels == 1 ? 2 : fileChannels, &atten));
 	ERRCHECK(Lav_createHardLimiterObject(device, fileChannels == 1 ? 2 : fileChannels, &limit));
-	ERRCHECK(Lav_createMixerObject(device, 1, fileChannels, &mix));
+	ERRCHECK(Lav_createMixerObject(device, 1, fileChannels == 1 ? 2 : fileChannels, &mix));
 	for(unsigned int i = 0; i < fileChannels; i++) {
 		ERRCHECK(Lav_objectSetParent(atten, i, node, i));
 		ERRCHECK(Lav_objectSetParent(mix, i, atten, i));
