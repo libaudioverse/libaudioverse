@@ -8,8 +8,7 @@ extern "C" {
 
 /**The public interface to Libaudioverse.*/
 
-/*Forward-declares all Libaudioverse types.
-Enums can't go here. Everything else can.*/
+/*Forward-declares all Libaudioverse types.*/
 #ifdef __cplusplus
 class LavObject;
 class LavDevice;
@@ -19,6 +18,12 @@ typedef void LavHrtfData;
 typedef void LavDevice;
 typedef void LavObject;
 #endif
+/**Make sure that we are marshalling enums as integers in the public API for both c and c++.
+Note that, internally, it's safe to use enums directly.  But marshalling out to some languages with the enum type is potentially dangerous: the standard does not designate what an enum is internally represented as, so we rely on the implicit conversion.*/
+typedef int LavError;
+typedef int LavLimits;
+typedef int LavPropertyType;
+typedef int LavObjectType;
 
 /**Does whatever is appropriate on a given platform to expose a Libaudioverse function publically.*/
 #ifdef _MSC_VER
@@ -43,7 +48,6 @@ typedef void LavObject;
 enum Lav_LIMITS {
 	Lav_MAX_BLOCK_SIZE = 1024,
 };
-typedef enum Lav_LIMITS LavLimits;
 
 enum Lav_ERRORS {
 	Lav_ERROR_NONE = 0, //everything is OK.
@@ -66,9 +70,6 @@ enum Lav_ERRORS {
 	Lav_ERROR_NO_OUTPUTS = 13, //we expected the object to have outputs here, but it didn't.
 	Lav_ERROR_LIMIT_EXCEEDED = 14,
 };
-
-/**Typedef for error codes.*/
-typedef enum Lav_ERRORS LavError;
 
 /**These are property types, either int, float, double, vector of 3 floats, vector of 6 floats, or string.*/
 enum Lav_PROPERTYTYPES {
