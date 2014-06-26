@@ -1,4 +1,3 @@
-from .. import get_info
 import jinja2
 ctypes_map = {
 'int' : 'c_int',
@@ -7,11 +6,11 @@ ctypes_map = {
 'double' : 'c_double',
 }
 
-def make_python():
+def make_python(info):
 	context = dict()
-	context.update(get_info.all_info)
+	context.update(info)
 	context['ctypes_map'] = ctypes_map
 	env = jinja2.Environment(loader = jinja2.PackageLoader(__package__, ""), undefined = jinja2.StrictUndefined)
-	template = env.get_template('ctypes.py.t')
+	template = env.get_template('_libaudioverse.py.t')
 	ct = template.render(context)
-	return {'ctypes.py' : ct}
+	return {'_libaudioverse.py' : ct}

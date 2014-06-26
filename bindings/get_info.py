@@ -56,6 +56,7 @@ enum_list = [i.type for i in ast.ext if isinstance(i, Decl) and isinstance(i.typ
 #name = e.name, values are in e.values as e.values[index].value and names in e.values[index]name
 #ironically, we actually only care about the values of the enums.
 #note that minimal interpretation is needed so that we can have negated constants-pycparser is for interpreters, not this, and so represents them as a unary minus in the ast.
+#also, we don't support enums with implicitly defined constants.
 constants = dict()
 
 for enum in enum_list:
