@@ -53,6 +53,7 @@ void LavObject::willProcess() {
 	computeInputBuffers();
 	num_inputs = inputs.size();
 	num_outputs = outputs.size();
+	block_size = device->getBlockSize();
 }
 
 /*Default Processing function.*/

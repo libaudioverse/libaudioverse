@@ -73,7 +73,7 @@ Consider an hrtf node, taking 22579200 mathematical operations plus loop overhea
 	std::vector<float*> outputs;
 	bool is_processing = false, is_suspended = false;
 	enum Lav_OBJTYPES type = Lav_OBJTYPE_GENERIC;
-	unsigned int num_inputs = 0, num_outputs = 0;
+	unsigned int num_inputs = 0, num_outputs = 0, block_size = 0;
 
 	//we are never allowed to copy.
 	LavObject(const LavObject&) = delete;
