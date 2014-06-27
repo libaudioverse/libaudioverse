@@ -57,6 +57,7 @@ Consider an hrtf node, taking 22579200 mathematical operations plus loop overhea
 
 	virtual LavDevice* getDevice();
 	virtual LavProperty* getProperty(int slot);
+	virtual std::vector<int> getStaticPropertyIndices();
 
 	//meet the lockable concept.
 	//Warning: these aren't virtual because they're just so that our macro works; all locking still forwards to devices.

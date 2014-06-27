@@ -126,6 +126,14 @@ LavProperty* LavObject::getProperty(int slot) {
 	else return properties[slot];
 }
 
+std::vector<int> LavObject::getStaticPropertyIndices() {
+	std::vector<int> res;
+	for(auto i = properties.begin(); i != properties.end(); i++) {
+		if(i->first < 0) res.push_back(i->first);
+	}
+	return res;
+}
+
 void LavObject::lock() {
 	device->lock();
 }
@@ -357,5 +365,28 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetDoublePropertyRange(LavObject* obj, in
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_DOUBLE);
 	*lower = prop->getDoubleMin();
 	*upper = prop->getDoubleMax();
+	PUB_END
+}
+
+
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyIndices(LavObject* obj, int** destination) {
+	PUB_BEGIN
+	LOCK(*obj);
+	std::vector<int> indices = obj->getStaticPropertyIndices();
+	int* result = new int[indices.size()+1]; //so we can terminate with 0.
+	std::copy(indices.begin(), indices.end(), result);
+	result[indices.size()] = 0;
+	*destination = result;
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyName(LavObject* obj, int slot, char** destination) {
+	PUB_BEGIN
+	LOCK(*obj);
+	auto prop = obj->getProperty(slot);
+	const char* n = prop->getName();
+	char* dest = new char[strlen(n)+1]; //+1 for extra NULL.
+	strcpy(dest, n);
+	*destination = dest;
 	PUB_END
 }
