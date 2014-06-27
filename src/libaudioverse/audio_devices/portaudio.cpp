@@ -10,6 +10,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <thread>
 #include <atomic>
 #include <set>
+#include <chrono>
 
 int portaudioOutputCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
 
@@ -64,6 +65,7 @@ void LavPortaudioDevice::audioOutputThreadFunction() {
 	PaError err = Pa_StartStream(stream);
 	while(runningFlag.test_and_set()) {
 		if(buffer_statuses[rb_index].load()) { //we just caught up and the queue is full.
+			std::this_thread::sleep_for(std::chrono::milliseconds((block_size*1000)/(int)sr));
 			continue;
 		}
 		//process into this buffer.
