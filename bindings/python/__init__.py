@@ -34,5 +34,6 @@ def make_python(info):
 	env = jinja2.Environment(loader = jinja2.PackageLoader(__package__, ""), undefined = jinja2.StrictUndefined)
 	return {
 		'_lav.py' : env.get_template('_lav.py.t').render(context),
-		'_libaudioverse.py' : env.get_template('_libaudioverse.py.t').render(context)
+		'_libaudioverse.py' : env.get_template('_libaudioverse.py.t').render(context),
+		'libaudioverse.py': env.get_template('libaudioverse.py.t').render(context)
 	}
