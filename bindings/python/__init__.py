@@ -22,6 +22,6 @@ def make_python(info):
 	context['friendly_functions'] = friendly_functions
 	env = jinja2.Environment(loader = jinja2.PackageLoader(__package__, ""), undefined = jinja2.StrictUndefined)
 	return {
-		'_libaudioverse.py' : env.get_template('_libaudioverse.py.t').render(context),
-		'_lav.py' : env.get_template('_lav.py.t').render(context)
+		'_lav.py' : env.get_template('_lav.py.t').render(context),
+		'_libaudioverse.py' : env.get_template('_libaudioverse.py.t').render(context)
 	}
