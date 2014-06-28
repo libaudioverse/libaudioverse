@@ -22,6 +22,8 @@ class FunctionInfo(object):
 		self.return_type = return_type
 		self.name = name
 		self.args = tuple(args) #forcing this is a really good idea.
+		self.input_args = tuple([i for i in args if 'destination' not in i.name])
+		self.output_args = tuple([i for i in args if 'destination' in i.name])
 
 #parameter.
 class ParameterInfo(object):
