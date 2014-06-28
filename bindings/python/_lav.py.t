@@ -4,7 +4,8 @@
 
 import _libaudioverse
 
-{%for func_name, func_info in friendly_functions.iteritems()%}
-def {{func_name}}({{func_info.args|map(attribute='name')|join(', ')}}):
+{%for func_name, friendly_name in friendly_functions.iteritems()%}
+{%-set func_info = functions[func_name]-%}
+def {{friendly_name}}({{func_info.args|map(attribute='name')|join(', ')}}):
 	pass
 {%endfor%}

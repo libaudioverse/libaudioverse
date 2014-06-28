@@ -18,7 +18,7 @@ def make_python(info):
 	for name, function_info in info['functions'].iteritems():
 		without_lav = name[4:] #strip the Lav_.
 		friendly_name =  re.sub('[A-Z]', lambda x: '_' + x.group(0).lower(), without_lav)
-		friendly_functions[friendly_name] = function_info
+		friendly_functions[name] = friendly_name
 	context['friendly_functions'] = friendly_functions
 	env = jinja2.Environment(loader = jinja2.PackageLoader(__package__, ""), undefined = jinja2.StrictUndefined)
 	return {
