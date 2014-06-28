@@ -22,8 +22,10 @@ class GenericObject(object):
 
 #All of these get expanded by __init__ in the generic object to include the necessary properties.
 {%-for object_name, friendly_name in friendly_objects.iteritems()%}
+{%set constructor_arg_names = object_constructor_info[object_name].input_args|map(attribute='name')|list-%}
 class {{friendly_name}}(GenericObject):
-	pas
+	def __init__(self{%if constructor_arg_names|length > 0%}, {%endif%}{{constructor_arg_names|join(', ')}}):
+		super({{friendly_name}}, self).__init__(_lav.{{object_constructors[object_name]}}({{constructor_arg_names|join(', ')}}))
 {%endfor%}
 
 #initialize libaudioverse.  This is per-app and implies no context settings, etc.
