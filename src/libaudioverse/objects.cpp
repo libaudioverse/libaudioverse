@@ -350,27 +350,27 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloat6Property(LavObject* obj, int slo
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetIntPropertyRange(LavObject* obj, int slot, int* lower, int* upper) {
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetIntPropertyRange(LavObject* obj, int slot, int* destination_lower, int* destination_upper) {
 	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_INT);
-	*lower = prop->getIntMin();
-	*upper = prop->getIntMax();
+	*destination_lower = prop->getIntMin();
+	*destination_upper = prop->getIntMax();
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloatPropertyRange(LavObject* obj, int slot, float* lower, float* upper) {
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloatPropertyRange(LavObject* obj, int slot, float* destination_lower, float* destination_upper) {
 	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_FLOAT);
-	*lower = prop->getFloatMin();
-	*upper = prop->getFloatMax();
+	*destination_lower = prop->getFloatMin();
+	*destination_upper = prop->getFloatMax();
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetDoublePropertyRange(LavObject* obj, int slot, double* lower, double* upper) {
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetDoublePropertyRange(LavObject* obj, int slot, double* destination_lower, double* destination_upper) {
 	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_DOUBLE);
-	*lower = prop->getDoubleMin();
-	*upper = prop->getDoubleMax();
+	*destination_lower = prop->getDoubleMin();
+	*destination_upper = prop->getDoubleMax();
 	PUB_END
 }
 
