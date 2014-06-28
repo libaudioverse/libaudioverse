@@ -9,3 +9,7 @@
 {%-macro ctypes_string(t)-%}
 {{ctypes_string_helper(t.base, t.indirection)}}
 {%-endmacro%}
+
+{%-macro destination_string(t)-%}
+{{ctypes_string_helper(t.base, t.indirection-1)}}
+{%-endmacro-%}
