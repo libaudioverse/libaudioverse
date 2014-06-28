@@ -206,11 +206,17 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetOutputCount(LavObject* obj, unsigned i
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetParent(LavObject *obj, unsigned int slot, LavObject** parent, unsigned int *outputNumber) {
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetParentObject(LavObject *obj, unsigned int slot, LavObject** destination) {
 	PUB_BEGIN
 	LOCK(*(obj->getDevice()));
-	*parent = obj->getParentObject(slot);
-	*outputNumber = obj->getParentOutput(slot);
+	*destination = obj->getParentObject(slot);
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetParentOutput(LavObject* obj, unsigned int slot, unsigned int* destination) {
+	PUB_BEGIN
+	LOCK(*obj);
+	*destination = obj->getParentOutput(slot);
 	PUB_END
 }
 
