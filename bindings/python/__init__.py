@@ -19,7 +19,9 @@ def make_python(info):
 		without_lav = name[4:] #strip the Lav_.
 		friendly_name =  re.sub('[A-Z]', lambda x: '_' + x.group(0).lower(), without_lav)
 		friendly_functions[friendly_name] = function_info
+	context['friendly_functions'] = friendly_functions
 	env = jinja2.Environment(loader = jinja2.PackageLoader(__package__, ""), undefined = jinja2.StrictUndefined)
-	template = env.get_template('_libaudioverse.py.t')
-	ct = template.render(context)
-	return {'_libaudioverse.py' : ct}
+	return {
+		'_libaudioverse.py' : env.get_template('_libaudioverse.py.t').render(context),
+		'_lav.py' : env.get_template('_lav.py.t').render(context)
+	}
