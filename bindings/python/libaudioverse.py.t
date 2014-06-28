@@ -12,5 +12,17 @@ class {{friendly_name}}(GenericError):
 _lav.bindings_register_exception(_libaudioverse.{{error_name}}, {{friendly_name}})
 {%endfor%}
 
+#This is the class hierarchy.
+#GenericObject is at the bottom, and we should never see one; and GenericObject should hold most implementation.
+class GenericObject(object):
+		"""A Libaudioverse object."""
+	pass
+
+#All of these get expanded by __init__ in the generic object to include the necessary properties.
+{%-for object_name, friendly_name in friendly_objects.iteritems()%}
+class {{friendly_name}}(GenericObject):
+	pas
+{%endfor%}
+
 #initialize libaudioverse.  This is per-app and implies no context settings, etc.
 _lav.initialize_library()
