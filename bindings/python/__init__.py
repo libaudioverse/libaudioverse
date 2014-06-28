@@ -31,6 +31,16 @@ def make_python(info):
 		friendly_name += 'Error' #tag the end of it for the class names.
 		friendly_errors[i] = friendly_name
 	context['friendly_errors']  = friendly_errors
+	#we also do something for the objtype enum along the same lines.
+	friendly_objects = OrderedDict()
+	for i in [j for j in info['constants'].iterkeys() if j.startswith('Lav_OBJTYPE_')]:
+		if i == 'Lav_OBJTYPE_GENERIC':
+			continue #generic objects are the base of the hierarchy, and are implemented by BaseObject class.
+		friendly_name = i.lower()
+		friendly_name = re.sub('_([a-z])', lambda x: x.group(1).upper(), friendly_name)
+		friendly_name = friendly_name[len('lavObjtype'):]
+		friendly_objects[i] = friendly_name
+	context['friendly_objects'] = friendly_objects
 	env = jinja2.Environment(loader = jinja2.PackageLoader(__package__, ""), undefined = jinja2.StrictUndefined)
 	return {
 		'_lav.py' : env.get_template('_lav.py.t').render(context),
