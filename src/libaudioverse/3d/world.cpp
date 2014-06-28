@@ -17,7 +17,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <algorithm>
 #include <vector>
 
-LavWorld::LavWorld(LavDevice* device, LavHrtfData* hrtf): LavSourceManager(device, device->getChannels()) {
+LavWorldObject::LavWorldObject(LavDevice* device, LavHrtfData* hrtf): LavSourceManager(device, device->getChannels()) {
 	type = Lav_OBJTYPE_WORLD;
 	this->hrtf = hrtf;
 	mixer = createMixerObject(device, 1, device->getChannels());
@@ -36,11 +36,11 @@ LavWorld::LavWorld(LavDevice* device, LavHrtfData* hrtf): LavSourceManager(devic
 		glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
-LavWorld* createWorld(LavDevice* device, LavHrtfData* hrtf) {
-	return new LavWorld(device, hrtf);
+LavWorldObject* createWorldObject(LavDevice* device, LavHrtfData* hrtf) {
+	return new LavWorldObject(device, hrtf);
 }
 
-void LavWorld::willProcessParents() {
+void LavWorldObject::willProcessParents() {
 	//update the matrix.
 	const float* pos = properties[Lav_3D_POSITION]->getFloat3Value();
 	const float* atup = properties[Lav_3D_ORIENTATION]->getFloat6Value();
@@ -55,11 +55,11 @@ void LavWorld::willProcessParents() {
 	}
 }
 
-LavObject* LavWorld::createPannerObject() {
+LavObject* LavWorldObject::createPannerObject() {
 	return createHrtfObject(device, hrtf);
 }
 
-void LavWorld::associateSource(LavSource* source) {
+void LavWorldObject::associateSource(LavSourceObject* source) {
 	//if this already exists, bail out.
 	int found = std::count(sources.begin(), sources.end(), source);
 	if(found) return; //it's not an error.
@@ -77,7 +77,7 @@ void LavWorld::associateSource(LavSource* source) {
 
 Lav_PUBLIC_FUNCTION LavError Lav_createWorldObject(LavDevice* device, LavHrtfData *hrtf, LavObject** destination) {
 	PUB_BEGIN
-	LavObject* retval = createWorld(device, hrtf);
+	LavObject* retval = createWorldObject(device, hrtf);
 	*destination = retval;
 	PUB_END
 }

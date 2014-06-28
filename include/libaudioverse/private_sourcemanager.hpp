@@ -8,7 +8,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 /**This is an abstract class and helper struct that is the minimum a source needs to associate to an object.*/
 
-class LavSource;
+class LavSourceObject;
 
 /**This holds info on listener positions, defaults, etc.
 Anything a source needs for updating, basically.*/
@@ -19,7 +19,7 @@ struct LavEnvironment {
 class LavSourceManager: public LavPassthroughObject {
 	public:
 	LavSourceManager(LavDevice* device, unsigned int numChannels): LavPassthroughObject(device, numChannels) {}
-	virtual void associateSource(LavSource* source) = 0;
+	virtual void associateSource(LavSourceObject* source) = 0;
 	//must return an appropriate panner object for this environment.
 	virtual LavObject* createPannerObject() = 0;
 };

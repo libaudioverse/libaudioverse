@@ -18,7 +18,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <glm/glm.hpp>
 #include <limits>
 
-LavSource::LavSource(LavDevice* device, LavSourceManager* manager, LavObject* sourceNode): LavPassthroughObject(device, device->getChannels()) {
+LavSourceObject::LavSourceObject(LavDevice* device, LavSourceManager* manager, LavObject* sourceNode): LavPassthroughObject(device, device->getChannels()) {
 	type = Lav_OBJTYPE_SOURCE;
 	if(sourceNode->getOutputCount() > 1) throw LavErrorException(Lav_ERROR_SHAPE);
 	source_object = sourceNode;
@@ -37,11 +37,11 @@ LavSource::LavSource(LavDevice* device, LavSourceManager* manager, LavObject* so
 	manager->associateSource(this);
 }
 
-LavObject* createSource(LavDevice* device, LavSourceManager* manager, LavObject* sourceNode) {
-	return new LavSource(device, manager, sourceNode);
+LavObject* createSourceObject(LavDevice* device, LavSourceManager* manager, LavObject* sourceNode) {
+	return new LavSourceObject(device, manager, sourceNode);
 }
 
-void LavSource::update(LavEnvironment env) {
+void LavSourceObject::update(LavEnvironment env) {
 	environment = env;
 }
 
@@ -57,7 +57,7 @@ float calculateGainForDistanceModel(int model, float distance, float maxDistance
 	return retval;
 }
 
-void LavSource::willProcessParents() {
+void LavSourceObject::willProcessParents() {
 	//first, extract the vector of our position.
 	const float* pos = properties[Lav_3D_POSITION]->getFloat3Value();
 	glm::vec4 npos = environment.world_to_listener_transform*glm::vec4(pos[0], pos[1], pos[2], 1.0f);
@@ -82,7 +82,7 @@ void LavSource::willProcessParents() {
 
 Lav_PUBLIC_FUNCTION LavError Lav_createSourceObject(LavDevice* device, LavObject* environment, LavObject* node, LavObject** destination) {
 	PUB_BEGIN
-	LavObject* retval = createSource(device, (LavSourceManager*)environment, node);
+	LavObject* retval = createSourceObject(device, (LavSourceManager*)environment, node);
 	*destination = retval;
 	PUB_END
 }

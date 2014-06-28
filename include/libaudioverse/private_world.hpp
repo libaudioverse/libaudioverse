@@ -6,18 +6,18 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "private_sourcemanager.hpp"
 #include <vector>
 
-class LavSource;
+class LavSourceObject;
 class LavHrtfData;
 
-class LavWorld: public LavSourceManager {
+class LavWorldObject: public LavSourceManager {
 	public:
-	LavWorld(LavDevice* device, LavHrtfData* hrtf);
-	void associateSource(LavSource* source);
+	LavWorldObject(LavDevice* device, LavHrtfData* hrtf);
+	void associateSource(LavSourceObject* source);
 	//call update on all sources.
 	virtual void willProcessParents();
 	LavObject* createPannerObject();
 	private:
-	std::vector<LavSource*> sources;
+	std::vector<LavSourceObject*> sources;
 	LavObject* mixer = nullptr, *limiter = nullptr;
 	LavHrtfData *hrtf;
 	LavEnvironment environment;

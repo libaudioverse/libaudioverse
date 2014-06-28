@@ -6,9 +6,9 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "private_objects.hpp"
 #include "private_sourcemanager.hpp"
 
-class LavSource: public LavPassthroughObject {
+class LavSourceObject: public LavPassthroughObject {
 	public:
-	LavSource(LavDevice* device, LavSourceManager* world, LavObject* sourceNode);
+	LavSourceObject(LavDevice* device, LavSourceManager* world, LavObject* sourceNode);
 	void update(LavEnvironment env);
 	virtual void willProcessParents();
 	private:
