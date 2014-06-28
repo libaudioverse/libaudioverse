@@ -16,7 +16,9 @@ _lav.bindings_register_exception(_libaudioverse.{{error_name}}, {{friendly_name}
 #GenericObject is at the bottom, and we should never see one; and GenericObject should hold most implementation.
 class GenericObject(object):
 		"""A Libaudioverse object."""
-	pass
+
+	def __init__(self, handle):
+		self.handle = handle
 
 #All of these get expanded by __init__ in the generic object to include the necessary properties.
 {%-for object_name, friendly_name in friendly_objects.iteritems()%}
