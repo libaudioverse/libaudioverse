@@ -6,6 +6,7 @@ from pycparser.c_ast import *
 import subprocess
 import sys
 import os.path
+from collections import OrderedDict
 
 #this is a helper class representing a type.
 #base is int, etc.
@@ -57,7 +58,7 @@ enum_list = [i.type for i in ast.ext if isinstance(i, Decl) and isinstance(i.typ
 #ironically, we actually only care about the values of the enums.
 #note that minimal interpretation is needed so that we can have negated constants-pycparser is for interpreters, not this, and so represents them as a unary minus in the ast.
 #also, we don't support enums with implicitly defined constants.
-constants = dict()
+constants = OrderedDict()
 
 for enum in enum_list:
 	for enum_value in enum.values.enumerators:
@@ -72,7 +73,7 @@ for enum in enum_list:
 #the primary use of this is a bit later, when we build function objects-we aggregate typedefs when possible.
 #at the moment, we typedef everything to void. This is not likely to change, so the following block basically works.
 typedef_list = [i for i in ast.ext if isinstance(i, Typedef)]
-typedefs = dict()
+typedefs = OrderedDict()
 
 for typedef in typedef_list:
 	name = typedef.name
@@ -87,7 +88,7 @@ for typedef in typedef_list:
 #compute a list of all top-level function nodes.
 function_list = [i for i in ast.ext if isinstance(i, Decl) and isinstance(i.type, FuncDecl)]
 
-functions = dict()
+functions = OrderedDict()
 
 #knows how to handle unwrapping a type.
 def compute_type_info(node):
