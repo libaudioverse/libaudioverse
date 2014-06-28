@@ -19,6 +19,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <limits>
 
 LavSource::LavSource(LavDevice* device, LavSourceManager* manager, LavObject* sourceNode): LavPassthroughObject(device, device->getChannels()) {
+	type = Lav_OBJTYPE_SOURCE;
 	if(sourceNode->getOutputCount() > 1) throw LavErrorException(Lav_ERROR_SHAPE);
 	source_object = sourceNode;
 	attenuator_object = createAttenuatorObject(device, 1);

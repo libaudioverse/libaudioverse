@@ -85,7 +85,7 @@ enum Lav_PROPERTYTYPES {
 enum Lav_OBJTYPES {
 	Lav_OBJTYPE_GENERIC = 0, //this is not something you should ever see outside the library, and basically means none.
 	Lav_OBJTYPE_WORLD = 1,
-	Lav_OBJTYPE_SOURCE_MONO = 2,
+	Lav_OBJTYPE_SOURCE = 2,
 	Lav_OBJTYPE_ZEROS = 3,
 	Lav_OBJTYPE_FILE = 4,
 	Lav_OBJTYPE_HRTF = 5,

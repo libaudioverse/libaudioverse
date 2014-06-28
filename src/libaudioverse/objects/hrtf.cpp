@@ -23,6 +23,7 @@ class LavHrtfObject: public LavObject {
 };
 
 LavHrtfObject::LavHrtfObject(LavDevice* device, LavHrtfData* hrtf): LavObject(device, 1, 2) {
+	type = Lav_OBJTYPE_HRTF;
 	this->hrtf = hrtf;
 	left_response = new float[hrtf->getLength()];
 	right_response = new float[hrtf->getLength()];

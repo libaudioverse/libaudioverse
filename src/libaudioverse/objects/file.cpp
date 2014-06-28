@@ -29,6 +29,7 @@ class LavFileObject: public LavObject {
 //the third parameter is a hint: we need to know how many channels, we only expose objects through the create functions, so the create function can find this out.
 //todo: when objects support resizing their inputs and outputs, as they will inevitably support this, rewrite to use that functionality.
 LavFileObject::LavFileObject(LavDevice* device, const char* path, unsigned int channels): LavObject(device, 0, channels) {
+	type = Lav_OBJTYPE_FILE;
 	file.open(path);
 	buffer = new float[file.getSampleCount()];
 	file.readAll(buffer);
