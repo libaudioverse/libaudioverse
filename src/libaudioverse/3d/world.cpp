@@ -75,7 +75,7 @@ void LavWorld::associateSource(LavSource* source) {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createWorld(LavDevice* device, LavHrtfData *hrtf, LavObject** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createWorldObject(LavDevice* device, LavHrtfData *hrtf, LavObject** destination) {
 	PUB_BEGIN
 	LavObject* retval = createWorld(device, hrtf);
 	*destination = retval;

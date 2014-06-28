@@ -80,7 +80,7 @@ void LavSource::willProcessParents() {
 	attenuator_object ->getProperty(Lav_ATTENUATOR_MULTIPLIER)->setFloatValue(gain);
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_createSource(LavDevice* device, LavObject* environment, LavObject* node, LavObject** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createSourceObject(LavDevice* device, LavObject* environment, LavObject* node, LavObject** destination) {
 	PUB_BEGIN
 	LavObject* retval = createSource(device, (LavSourceManager*)environment, node);
 	*destination = retval;

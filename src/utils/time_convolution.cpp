@@ -39,7 +39,7 @@ void main(int argc, char** args) {
 	//some setup: create a world and a device.
 	ERRCHECK(Lav_createReadDevice(44100, 2, BLOCK_SIZE, &device));
 	ERRCHECK(Lav_createHrtfData(args[1], &hrtfData));
-	ERRCHECK(Lav_createWorld(device, hrtfData, &world));
+	ERRCHECK(Lav_createWorldObject(device, hrtfData, &world));
 	ERRCHECK(Lav_deviceSetOutputObject(device, world));
 	while(timeDelta < SECONDS) {
 		numSources += 10;
@@ -56,7 +56,7 @@ void main(int argc, char** args) {
 				ERRCHECK(Lav_createSineObject(device, &sinePtr));
 			}
 			if(sourcePtr == nullptr) {
-				ERRCHECK(Lav_createSource(device, world, sinePtr, &sourcePtr));
+				ERRCHECK(Lav_createSourceObject(device, world, sinePtr, &sourcePtr));
 			}
 			//write them back.
 			*sineIter = sinePtr;
