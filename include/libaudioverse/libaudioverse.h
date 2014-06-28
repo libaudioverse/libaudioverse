@@ -86,13 +86,12 @@ enum Lav_OBJTYPES {
 	Lav_OBJTYPE_GENERIC = 0, //this is not something you should ever see outside the library, and basically means none.
 	Lav_OBJTYPE_WORLD = 1,
 	Lav_OBJTYPE_SOURCE = 2,
-	Lav_OBJTYPE_ZEROS = 3,
-	Lav_OBJTYPE_FILE = 4,
-	Lav_OBJTYPE_HRTF = 5,
-	Lav_OBJTYPE_SINE = 6,
-	Lav_OBJTYPE_MIXER = 7,
-	Lav_OBJTYPE_ATTENUATOR = 8,
-	Lav_OBJTYPE_HARD_LIMITER = 9,
+	Lav_OBJTYPE_FILE = 3,
+	Lav_OBJTYPE_HRTF = 4,
+	Lav_OBJTYPE_SINE = 5,
+	Lav_OBJTYPE_MIXER = 6,
+	Lav_OBJTYPE_ATTENUATOR = 7,
+	Lav_OBJTYPE_HARD_LIMITER = 8,
 };
 
 /**Initialize Libaudioverse.*/
