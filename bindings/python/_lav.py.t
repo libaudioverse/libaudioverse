@@ -4,6 +4,21 @@
 import ctypes
 import _libaudioverse
 
+#These are not from libaudioverse.
+#Implement a method by which the public libaudioverse module may register its exception classes for error code translation.
+class PythonBindingsCouldNotTranslateErrorCodeError(object):
+	"""An exception representing failure to translate a libaudioverse error code into a python exception.  If you see this, report it as a bug with Libaudioverse because something has gone very badly wrong."""
+	pass
+
+errors_to_exceptions = dict()
+
+def bindings_register_exception(code, cls):
+	errors_to_exceptions[code] = cls
+
+def make_error_from_code(err):
+	"""Internal use.  Translates libaudioverse error codes into exceptions."""
+	return errors_to_exceptions.get(err, PythonBindingsCouldNotTranslateErrorCodeError)()
+
 {%for func_name, friendly_name in friendly_functions.iteritems()%}
 {%-set func_info = functions[func_name]-%}
 {%-set input_arg_names = func_info.input_args|map(attribute='name')|list-%}
