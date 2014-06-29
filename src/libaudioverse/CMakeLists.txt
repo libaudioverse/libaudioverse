@@ -1,3 +1,8 @@
+add_custom_command(
+OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/metadata/metadata.cpp"
+COMMAND python "${CMAKE_CURRENT_SOURCE_DIR}/metadata/metadata.py" "${CMAKE_CURRENT_BINARY_DIR}/metadata/metadata.cpp"
+DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/metadata/metadata.t" "${CMAKE_CURRENT_SOURCE_DIR}/metadata/metadata.py" "${CMAKE_CURRENT_SOURCE_DIR}/metadata/metadata.y")
+
 add_library(libaudioverse SHARED
 objects.cpp
 properties.cpp
@@ -9,6 +14,9 @@ dspmath.cpp
 
 #utilities: file reading, platform-specific code, etc:
 utils/file_reader.cpp
+
+#the metadata store
+metadata/metadata.cpp
 
 #specific node types.
 objects/sine.cpp

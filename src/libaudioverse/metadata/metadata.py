@@ -1,6 +1,13 @@
 import yaml
 import os.path
+import os
 import jinja2
+import sys
+if len(sys.argv) != 2:
+	print"Invalid usage: do not have destination"
+	sys.exit(1)
+
+print "Generating", sys.argv[1]
 
 #generates metadata.cpp from metadata.y and metadata.t, which must be in the same directory as this script.
 
@@ -49,3 +56,18 @@ for propkey, propinfo in property_map.iteritems():
 	elif propinfo['type'] in {'float3', 'float6'}:
 		for i, j in enumerate(list(propinfo.get('default', [0, 0, 0] if propinfo['type'] == 'float3' else [0, 0, 0, 0, 0, 0]))):
 			propinfo['default'][i] = string_from_number(j, propinfo['type'])
+
+
+#do the render, and write to the file specified on the command line.
+context = {
+'properties' : property_map
+}
+
+template = environment.get_template('metadata.t')
+result = template.render(context)
+
+if not os.path.exists(os.path.split(os.path.abspath(sys.argv[1]))[0]):
+	os.makedirs(os.path.split(os.path.abspath(sys.argv[1]))[0])
+
+with file(sys.argv[1], 'w') as f:
+	f.write(result)
