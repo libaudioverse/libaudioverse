@@ -20,6 +20,7 @@ union LavPropertyValue {
 
 class LavProperty {
 	public:
+	LavProperty() = default;
 	LavProperty(int property_type): type(property_type) {}
 	void reset() {value = default_value; string_value = default_string_value;}
 	int getType() { return type;}

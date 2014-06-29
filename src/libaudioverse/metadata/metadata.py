@@ -18,7 +18,8 @@ with file(os.path.join(directory, 'metadata.y')) as f:
 environment = jinja2.Environment(
 variable_start_string = '<%', variable_end_string = '%>',
 loader = jinja2.FileSystemLoader(directory),
-undefined = jinja2.StrictUndefined)
+undefined = jinja2.StrictUndefined,
+extensions = ['jinja2.ext.loopcontrols'])
 
 #we have to do some sanitizing for the template.
 #the map we have here is actually very verbose, and can be flattened into something easily iterable.
