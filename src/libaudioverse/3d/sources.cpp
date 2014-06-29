@@ -31,7 +31,7 @@ LavSourceObject::LavSourceObject(LavDevice* device, LavSourceManager* manager, L
 	}
 	float defaultPos[] = {0.0f, 0.0f, 0.0f};
 	properties[Lav_3D_POSITION] = createFloat3Property("position", defaultPos);
-	properties[Lav_SOURCE_DISTANCE_MODEL] = createIntProperty("distance_model", Lav_DISTANCE_MODEL_LINEAR, Lav_DISTANCE_MODEL_MIN, Lav_DISTANCE_MODEL_MAX);
+	properties[Lav_SOURCE_DISTANCE_MODEL] = createIntProperty("distance_model", 0, 0, 0);
 	properties[Lav_SOURCE_MAX_DISTANCE] = createFloatProperty("max_distance", 50.0f, 0.0f, std::numeric_limits<float>::infinity());
 	this->manager = manager;
 	manager->associateSource(this);
