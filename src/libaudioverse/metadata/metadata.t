@@ -57,4 +57,23 @@ void initializeMetadata() {
 	(*properties_by_object_type)[<%objid%>].insert(<%propid%>);
 	}
 	{%endfor%}
+
+	//generic properties common to all objects.
+	for(auto i = properties_by_object_type->begin(); i != properties_by_object_type->end(); i++) {
+		{%for objid, propid in properties.iterkeys()-%}
+		{%if objid == 'Lav_OBJTYPE_GENERIC'-%}
+		i->second.insert(<%propid%>);
+		{%-endif-%}
+		{%endfor%}
+	}
+}
+
+
+std::map<int, LavProperty> buildPropertyTable(int objtype) {
+	auto needed = (*properties_by_object_type)[objtype];
+	std::map<int, LavProperty> retval;
+	for(auto index: needed) {
+		retval[index] = (*default_property_instances)[std::tuple<int, int>(objtype, index)];
+	}
+	return retval;
 }
