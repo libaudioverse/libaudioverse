@@ -239,7 +239,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectClearParent(LavObject *obj, unsigned int 
 
 //this works for getters and setters to lock the object and set a variable prop to be a pointer-like thing to a property.
 #define PROP_PREAMBLE(o, s, t) LOCK(*(o));\
-auto prop = (o)->getProperty((s));\
+auto &prop = (o)->getProperty((s));\
 if(prop.getType() != (t)) {\
 throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);\
 }
