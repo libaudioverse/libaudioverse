@@ -36,7 +36,6 @@ LavObject* createSineObject(LavDevice* device) {
 
 void LavSineObject::process() {
 	float freq = getProperty(Lav_SINE_FREQUENCY).getFloatValue();
-	printf("%f\n", freq);
 	for(unsigned int i = 0; i< block_size; i++) {
 		const unsigned int samp1 = start;
 		const unsigned int samp2 = start+1;

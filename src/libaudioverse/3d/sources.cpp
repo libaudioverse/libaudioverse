@@ -18,7 +18,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <glm/glm.hpp>
 #include <limits>
 
-LavSourceObject::LavSourceObject(LavDevice* device, LavSourceManager* manager, LavObject* sourceNode): LavPassthroughObject(Lav_OBJTYPE_WORLD, device, device->getChannels()) {
+LavSourceObject::LavSourceObject(LavDevice* device, LavSourceManager* manager, LavObject* sourceNode): LavPassthroughObject(Lav_OBJTYPE_SOURCE, device, device->getChannels()) {
 	if(sourceNode->getOutputCount() > 1) throw LavErrorException(Lav_ERROR_SHAPE);
 	source_object = sourceNode;
 	attenuator_object = createAttenuatorObject(device, 1);

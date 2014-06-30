@@ -70,6 +70,7 @@ void LavObject::willProcessParents() {
 }
 
 bool LavObject::isSuspended() {
+	return false;
 	return getProperty(Lav_OBJECT_SUSPENDED).getIntValue() != 0;
 }
 
