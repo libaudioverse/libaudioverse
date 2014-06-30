@@ -24,6 +24,7 @@ if((x) != Lav_ERROR_NONE) {\
 } while(0)\
 
 void main(int argc, char** args) {
+	ERRCHECK(Lav_initializeLibrary());
 	if(argc != 2) {
 		printf("Usage: %s <hrtf file>", args[0]);
 		return;

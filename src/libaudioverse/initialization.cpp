@@ -7,6 +7,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_functiontables.hpp>
 #include <libaudioverse/private_devices.hpp>
 #include <libaudioverse/private_macros.hpp>
+#include <libaudioverse/private_metadata.hpp>
 
 typedef void (*initfunc_t)();
 
@@ -17,6 +18,7 @@ typedef void (*initfunc_t)();
 initfunc_t initializers[] = {
 	initializeFunctionTables,
 	initializeAudioBackend,
+	initializeMetadata,
 };
 unsigned int isInitialized = 0;
 
