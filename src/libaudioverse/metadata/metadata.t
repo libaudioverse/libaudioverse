@@ -69,7 +69,7 @@ void initializeMetadata() {
 }
 
 
-std::map<int, LavProperty> buildPropertyTable(int objtype) {
+std::map<int, LavProperty> makePropertyTable(int objtype) {
 	auto needed = (*properties_by_object_type)[objtype];
 	std::map<int, LavProperty> retval;
 	for(auto index: needed) {

@@ -11,6 +11,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_properties.hpp>
 #include <libaudioverse/private_devices.hpp>
 #include <libaudioverse/private_macros.hpp>
+#include <libaudioverse/private_metadata.hpp>
 #include <algorithm>
 
 float zerobuffer[Lav_MAX_BLOCK_SIZE] = {0}; //this is a shared buffer for the "no parent" case.
@@ -41,6 +42,8 @@ LavObject::LavObject(int type, LavDevice* device, unsigned int numInputs, unsign
 
 	device->associateObject(this);
 	this->device = device;
+	//request properties from the metadata module.
+	properties = makePropertyTable(type);
 	computeInputBuffers(); //at the moment, this is going to just make them all 0, but it takes effect once parents are added.
 }
 
