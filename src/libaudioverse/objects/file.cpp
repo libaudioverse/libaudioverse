@@ -33,6 +33,8 @@ LavFileObject::LavFileObject(LavDevice* device, const char* path, unsigned int c
 	buffer = new float[file.getSampleCount()];
 	file.readAll(buffer);
 	delta = file.getSr()/device->getSr();
+	getProperty(Lav_FILE_POSITION).setPostChangedCallback([this] () {seek();});
+	getProperty(Lav_FILE_POSITION).setFloatRange(0.0f, file.getFrameCount()/(float)file.getSr());
 }
 
 LavObject* createFileObject(LavDevice* device, const char* path) {
