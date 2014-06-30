@@ -30,6 +30,8 @@ LavHrtfObject::LavHrtfObject(LavDevice* device, LavHrtfData* hrtf): LavObject(La
 	history = new float[hrtf->getLength() + device->getBlockSize()](); //odd c++ syntax to create 0-initialized array.
 	hrtf->computeCoefficientsStereo(0.0f, 0.0f, left_response, right_response);
 	auto markRecompute = [this](){needs_hrtf_recompute = true;};
+	getProperty(Lav_HRTF_AZIMUTH).setPostChangedCallback(markRecompute);
+	getProperty(Lav_HRTF_ELEVATION).setPostChangedCallback(markRecompute);
 }
 
 LavObject* createHrtfObject(LavDevice* device, LavHrtfData* hrtf) {
