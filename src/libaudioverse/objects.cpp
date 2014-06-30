@@ -30,7 +30,7 @@ void LavObject::computeInputBuffers() {
 	}
 }
 
-LavObject::LavObject(LavDevice* device, unsigned int numInputs, unsigned int numOutputs) {
+LavObject::LavObject(int type, LavDevice* device, unsigned int numInputs, unsigned int numOutputs): type(type) {
 	//allocations:
 	input_descriptors.resize(numInputs, LavInputDescriptor(nullptr, 0));
 	inputs.resize(numInputs, nullptr);
@@ -161,7 +161,7 @@ void LavObject::resize(unsigned int newInputCount, unsigned int newOutputCount) 
 
 /**Implementation of LavPasssthroughObject.*/
 
-LavPassthroughObject::LavPassthroughObject(LavDevice* device, unsigned int numChannels): LavObject(device, numChannels, numChannels) {
+LavPassthroughObject::LavPassthroughObject(int type, LavDevice* device, unsigned int numChannels): LavObject(type, device, numChannels, numChannels) {
 }
 
 void LavPassthroughObject::process() {

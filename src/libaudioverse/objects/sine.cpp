@@ -23,7 +23,7 @@ class LavSineObject: public LavObject {
 	float offset;
 };
 
-LavSineObject::LavSineObject(LavDevice* device): LavObject(device, 0, 1) {
+LavSineObject::LavSineObject(LavDevice* device): LavObject(Lav_OBJTYPE_SINE, device, 0, 1) {
 	table_delta = sineTableLength/device->getSr();
 	start = 0;
 	offset = 0;

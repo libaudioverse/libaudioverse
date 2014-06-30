@@ -22,7 +22,7 @@ class LavHrtfObject: public LavObject {
 	bool needs_hrtf_recompute;
 };
 
-LavHrtfObject::LavHrtfObject(LavDevice* device, LavHrtfData* hrtf): LavObject(device, 1, 2) {
+LavHrtfObject::LavHrtfObject(LavDevice* device, LavHrtfData* hrtf): LavObject(Lav_OBJTYPE_HRTF, device, 1, 2) {
 	type = Lav_OBJTYPE_HRTF;
 	this->hrtf = hrtf;
 	left_response = new float[hrtf->getLength()];

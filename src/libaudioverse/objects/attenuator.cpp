@@ -15,7 +15,7 @@ class LavAttenuatorObject: public LavObject {
 	virtual void process();
 };
 
-LavAttenuatorObject::LavAttenuatorObject(LavDevice* device, unsigned int numChannels): LavObject(device, numChannels, numChannels) {
+LavAttenuatorObject::LavAttenuatorObject(LavDevice* device, unsigned int numChannels): LavObject(Lav_OBJTYPE_ATTENUATOR, device, numChannels, numChannels) {
 }
 
 LavObject* createAttenuatorObject(LavDevice* device, unsigned int numChannels) {

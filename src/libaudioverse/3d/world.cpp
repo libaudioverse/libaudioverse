@@ -17,7 +17,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <algorithm>
 #include <vector>
 
-LavWorldObject::LavWorldObject(LavDevice* device, LavHrtfData* hrtf): LavSourceManager(device, device->getChannels()) {
+LavWorldObject::LavWorldObject(LavDevice* device, LavHrtfData* hrtf): LavSourceManager(Lav_OBJTYPE_WORLD, device, device->getChannels()) {
 	this->hrtf = hrtf;
 	mixer = createMixerObject(device, 1, device->getChannels());
 	limiter = createHardLimiterObject(device, device->getChannels());

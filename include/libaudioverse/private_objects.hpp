@@ -20,7 +20,7 @@ class LavInputDescriptor {
 /**Things all Libaudioverse objects have.*/
 class LavObject: std::enable_shared_from_this<LavObject> {
 	public:
-	LavObject(LavDevice* device, unsigned int numInputs, unsigned int numOutputs);
+	LavObject(int type, LavDevice* device, unsigned int numInputs, unsigned int numOutputs);
 	virtual ~LavObject() = default;
 
 	virtual void computeInputBuffers();//update what we point to due to parent changes.
@@ -74,7 +74,7 @@ Consider an hrtf node, taking 22579200 mathematical operations plus loop overhea
 	std::vector<LavInputDescriptor> input_descriptors;
 	std::vector<float*> outputs;
 	bool is_processing = false, is_suspended = false;
-	enum Lav_OBJTYPES type = Lav_OBJTYPE_GENERIC;
+	int type = Lav_OBJTYPE_GENERIC;
 	unsigned int num_inputs = 0, num_outputs = 0, block_size = 0;
 
 	//we are never allowed to copy.
@@ -86,6 +86,6 @@ Consider an hrtf node, taking 22579200 mathematical operations plus loop overhea
 //needed for things that wish to encapsulate and manage nodes that the public API isn't supposed to see.
 class LavPassthroughObject: public LavObject {
 	public:
-	LavPassthroughObject(LavDevice* device, unsigned int numChannels);
+	LavPassthroughObject(int type, LavDevice* device, unsigned int numChannels);
 	virtual void process();
 };

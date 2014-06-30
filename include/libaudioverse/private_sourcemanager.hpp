@@ -18,7 +18,7 @@ struct LavEnvironment {
 
 class LavSourceManager: public LavPassthroughObject {
 	public:
-	LavSourceManager(LavDevice* device, unsigned int numChannels): LavPassthroughObject(device, numChannels) {}
+	LavSourceManager(int type, LavDevice* device, unsigned int numChannels): LavPassthroughObject(type, device, numChannels) {}
 	virtual void associateSource(LavSourceObject* source) = 0;
 	//must return an appropriate panner object for this environment.
 	virtual LavObject* createPannerObject() = 0;

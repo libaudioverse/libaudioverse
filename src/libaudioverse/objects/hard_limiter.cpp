@@ -16,7 +16,7 @@ class LavHardLimiterObject: public LavObject {
 	virtual void process();
 };
 
-LavHardLimiterObject::LavHardLimiterObject(LavDevice* device, unsigned int numInputs): LavObject(device, numInputs, numInputs) {
+LavHardLimiterObject::LavHardLimiterObject(LavDevice* device, unsigned int numInputs): LavObject(Lav_OBJTYPE_HARD_LIMITER, device, numInputs, numInputs) {
 }
 
 LavObject* createHardLimiterObject(LavDevice* device, unsigned int numChannels) {
