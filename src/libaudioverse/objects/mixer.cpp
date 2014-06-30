@@ -21,7 +21,7 @@ class LavMixerObject: public LavObject {
 LavMixerObject::LavMixerObject(LavDevice* device, unsigned int maxParents, unsigned int inputsPerParent): LavObject(device, inputsPerParent*maxParents, inputsPerParent) {
 	type = Lav_OBJTYPE_MIXER;
 	inputs_per_parent = inputsPerParent;
-//	properties[Lav_MIXER_MAX_PARENTS]->setPostChangedCallback([this] () {maxParentsChanged();});
+	getProperty(Lav_MIXER_MAX_PARENTS).setPostChangedCallback([this] () {maxParentsChanged();});
 }
 
 LavObject* createMixerObject(LavDevice* device, unsigned int maxParents, unsigned int inputsPerParent) {
@@ -30,7 +30,7 @@ LavObject* createMixerObject(LavDevice* device, unsigned int maxParents, unsigne
 }
 
 void LavMixerObject::maxParentsChanged() {
-	unsigned int newInputsCount = (unsigned int)(properties[Lav_MIXER_MAX_PARENTS]->getIntValue());
+	unsigned int newInputsCount = (unsigned int)(getProperty(Lav_MIXER_MAX_PARENTS).getIntValue());
 	newInputsCount *= inputs_per_parent;
 	resize(newInputsCount, inputs_per_parent);
 }

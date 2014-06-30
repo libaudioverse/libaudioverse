@@ -43,13 +43,13 @@ LavObject* createFileObject(LavDevice* device, const char* path) {
 }
 
 void LavFileObject::seek() {
-	float pos = properties[Lav_FILE_POSITION]->getFloatValue();
+	float pos = getProperty(Lav_FILE_POSITION).getFloatValue();
 	offset = 0.0f;
 	position = (unsigned int)(pos*file.getSr());
 }
 
 void LavFileObject::process() {
-	const float pitch_bend = properties[Lav_FILE_PITCH_BEND]->getFloatValue();
+	const float pitch_bend = getProperty(Lav_FILE_PITCH_BEND).getFloatValue();
 	for(unsigned int i = 0; i < block_size; i++) {
 		if(offset >= file.getFrameCount()) {
 			for(unsigned int j = 0; j < num_outputs; j++) {

@@ -41,10 +41,6 @@ LavObject::LavObject(LavDevice* device, unsigned int numInputs, unsigned int num
 
 	device->associateObject(this);
 	this->device = device;
-
-	//set up the suspended property.
-	properties[Lav_OBJECT_SUSPENDED] = createIntProperty("suspended", 0, 0, 1);
-
 	computeInputBuffers(); //at the moment, this is going to just make them all 0, but it takes effect once parents are added.
 }
 
@@ -71,15 +67,15 @@ void LavObject::willProcessParents() {
 }
 
 bool LavObject::isSuspended() {
-	return properties[Lav_OBJECT_SUSPENDED]->getIntValue() != 0;
+	return getProperty(Lav_OBJECT_SUSPENDED).getIntValue() != 0;
 }
 
 void LavObject::suspend() {
-	properties[Lav_OBJECT_SUSPENDED]->setIntValue(1);
+	getProperty(Lav_OBJECT_SUSPENDED).setIntValue(1);
 }
 
 void LavObject::unsuspend() {
-	properties[Lav_OBJECT_SUSPENDED]->setIntValue(0);
+	getProperty(Lav_OBJECT_SUSPENDED).setIntValue(0);
 }
 
 void LavObject::setParent(unsigned int input, LavObject* parent, unsigned int parentOutput) {
@@ -121,8 +117,8 @@ LavDevice* LavObject::getDevice() {
 	return device;
 }
 
-LavProperty* LavObject::getProperty(int slot) {
-	if(properties.count(slot) == 0) return nullptr;
+LavProperty& LavObject::getProperty(int slot) {
+	if(properties.count(slot) == 0) throw LavErrorException(Lav_ERROR_RANGE);
 	else return properties[slot];
 }
 
@@ -240,10 +236,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectClearParent(LavObject *obj, unsigned int 
 //this works for getters and setters to lock the object and set a variable prop to be a pointer-like thing to a property.
 #define PROP_PREAMBLE(o, s, t) LOCK(*(o));\
 auto prop = (o)->getProperty((s));\
-if(prop == nullptr) {\
-throw LavErrorException(Lav_ERROR_RANGE);\
-}\
-if(prop->getType() != (t)) {\
+if(prop.getType() != (t)) {\
 throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);\
 }
 
@@ -251,50 +244,49 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectResetProperty(LavObject *obj, int slot) {
 	PUB_BEGIN
 	LOCK(*obj);
 	auto prop = obj->getProperty(slot);
-	if(prop == nullptr) throw LavErrorException(Lav_ERROR_RANGE);
-	prop->reset();
+	prop.reset();
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectSetIntProperty(LavObject* obj, int slot, int value) {
 	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_INT);
-	prop->setIntValue(value);
+	prop.setIntValue(value);
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectSetFloatProperty(LavObject *obj, int slot, float value) {
 	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_FLOAT);
-	prop->setFloatValue(value);
+	prop.setFloatValue(value);
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectSetDoubleProperty(LavObject *obj, int slot, double value) {
 	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_DOUBLE);
-	prop->setDoubleValue(value);
+	prop.setDoubleValue(value);
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectSetStringProperty(LavObject*obj, int slot, char* value) {
 	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_STRING);
-	prop->setStringValue(value);
+	prop.setStringValue(value);
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectSetFloat3Property(LavObject* obj, int slot, float v1, float v2, float v3) {
 	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_FLOAT3);
-	prop->setFloat3Value(v1, v2, v3);
+	prop.setFloat3Value(v1, v2, v3);
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectSetFloat6Property(LavObject* obj, int slot, float v1, float v2, float v3, float v4, float v5, float v6) {
 	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_FLOAT6);
-	prop->setFloat6Value(v1, v2, v3, v4, v5, v6);
+	prop.setFloat6Value(v1, v2, v3, v4, v5, v6);
 	return Lav_ERROR_NONE;
 	PUB_END
 }
@@ -302,35 +294,35 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectSetFloat6Property(LavObject* obj, int slo
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetIntProperty(LavObject*obj, int slot, int *destination) {
 	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_INT);
-	*destination = prop->getIntValue();
+	*destination = prop.getIntValue();
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloatProperty(LavObject* obj, int slot, float *destination) {
 	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_FLOAT);
-	*destination = prop->getFloatValue();
+	*destination = prop.getFloatValue();
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetDoubleProperty(LavObject*obj, int slot, double *destination) {
 	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_DOUBLE);
-	*destination = prop->getDoubleValue();
+	*destination = prop.getDoubleValue();
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetStringProperty(LavObject* obj, int slot, const char** destination) {
 	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_STRING);
-	*destination = prop->getStringValue();
+	*destination = prop.getStringValue();
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloat3Property(LavObject* obj, int slot, float* v1, float* v2, float* v3) {
 	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_FLOAT3);
-	auto val = prop->getFloat3Value();
+	auto val = prop.getFloat3Value();
 	*v1 = val[0];
 	*v2 = val[1];
 	*v3 = val[2];
@@ -340,7 +332,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloat3Property(LavObject* obj, int slo
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloat6Property(LavObject* obj, int slot, float* v1, float* v2, float* v3, float* v4, float* v5, float* v6) {
 	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_FLOAT6);
-	auto val = prop->getFloat6Value();
+	auto val = prop.getFloat6Value();
 	*v1 = val[0];
 	*v2 = val[1];
 	*v3 = val[2];
@@ -353,24 +345,24 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloat6Property(LavObject* obj, int slo
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetIntPropertyRange(LavObject* obj, int slot, int* destination_lower, int* destination_upper) {
 	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_INT);
-	*destination_lower = prop->getIntMin();
-	*destination_upper = prop->getIntMax();
+	*destination_lower = prop.getIntMin();
+	*destination_upper = prop.getIntMax();
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloatPropertyRange(LavObject* obj, int slot, float* destination_lower, float* destination_upper) {
 	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_FLOAT);
-	*destination_lower = prop->getFloatMin();
-	*destination_upper = prop->getFloatMax();
+	*destination_lower = prop.getFloatMin();
+	*destination_upper = prop.getFloatMax();
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetDoublePropertyRange(LavObject* obj, int slot, double* destination_lower, double* destination_upper) {
 	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_DOUBLE);
-	*destination_lower = prop->getDoubleMin();
-	*destination_upper = prop->getDoubleMax();
+	*destination_lower = prop.getDoubleMin();
+	*destination_upper = prop.getDoubleMax();
 	PUB_END
 }
 
@@ -390,7 +382,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyName(LavObject* obj, int slot,
 	PUB_BEGIN
 	LOCK(*obj);
 	auto prop = obj->getProperty(slot);
-	const char* n = prop->getName();
+	const char* n = prop.getName();
 	char* dest = new char[strlen(n)+1]; //+1 for extra NULL.
 	strcpy(dest, n);
 	*destination = dest;

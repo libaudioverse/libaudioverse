@@ -40,8 +40,8 @@ LavObject* createHrtfObject(LavDevice* device, LavHrtfData* hrtf) {
 void LavHrtfObject::process() {
 	//calculating the hrir is expensive, do it only if needed.
 	if(needs_hrtf_recompute) {
-		const float elev = properties[Lav_HRTF_ELEVATION]->getFloatValue();
-		const float az = properties[Lav_HRTF_AZIMUTH]->getFloatValue();
+		const float elev = getProperty(Lav_HRTF_ELEVATION).getFloatValue();
+		const float az = getProperty(Lav_HRTF_AZIMUTH).getFloatValue();
 		hrtf->computeCoefficientsStereo(elev, az, left_response, right_response);
 		needs_hrtf_recompute = false;
 	}

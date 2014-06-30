@@ -38,8 +38,8 @@ LavWorldObject* createWorldObject(LavDevice* device, LavHrtfData* hrtf) {
 
 void LavWorldObject::willProcessParents() {
 	//update the matrix.
-	const float* pos = properties[Lav_3D_POSITION]->getFloat3Value();
-	const float* atup = properties[Lav_3D_ORIENTATION]->getFloat6Value();
+	const float* pos = getProperty(Lav_3D_POSITION).getFloat3Value();
+	const float* atup = getProperty(Lav_3D_ORIENTATION).getFloat6Value();
 	environment.world_to_listener_transform = glm::lookAt(
 		glm::vec3(pos[0], pos[1], pos[2]),
 		glm::vec3(atup[0], atup[1], atup[2]),
@@ -61,7 +61,7 @@ void LavWorldObject::associateSource(LavSourceObject* source) {
 	if(found) return; //it's not an error.
 	sources.push_back(source);
 	//tell the mixer that we would like it to have more parents.
-	mixer->getProperty(Lav_MIXER_MAX_PARENTS)->setIntValue(sources.size());
+	mixer->getProperty(Lav_MIXER_MAX_PARENTS).setIntValue(sources.size());
 	unsigned int ind = sources.size()-1;
 	unsigned int startInput = ind*device->getChannels();
 	for(int i = 0; i < device->getChannels(); i++) {

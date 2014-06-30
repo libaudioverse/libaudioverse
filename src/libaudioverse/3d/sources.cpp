@@ -54,7 +54,7 @@ float calculateGainForDistanceModel(int model, float distance, float maxDistance
 
 void LavSourceObject::willProcessParents() {
 	//first, extract the vector of our position.
-	const float* pos = properties[Lav_3D_POSITION]->getFloat3Value();
+	const float* pos = getProperty(Lav_3D_POSITION).getFloat3Value();
 	glm::vec4 npos = environment.world_to_listener_transform*glm::vec4(pos[0], pos[1], pos[2], 1.0f);
 	//npos is now easy to work with.
 	float distance = glm::length(npos);
@@ -65,14 +65,14 @@ void LavSourceObject::willProcessParents() {
 	if(elevation > 90.0f) elevation = 90.0f;
 	if(elevation < -90.0f) elevation = -90.0f;
 
-	int distanceModel = properties[Lav_SOURCE_DISTANCE_MODEL]->getIntValue();
-	float maxDistance = properties[Lav_SOURCE_MAX_DISTANCE]->getFloatValue();
+	int distanceModel = getProperty(Lav_SOURCE_DISTANCE_MODEL).getIntValue();
+	float maxDistance = getProperty(Lav_SOURCE_MAX_DISTANCE).getFloatValue();
 	float gain = calculateGainForDistanceModel(distanceModel, distance, maxDistance);
 
 	//set the panner and attenuator.
-	panner_object->getProperty(Lav_HRTF_AZIMUTH)->setFloatValue(azimuth);
-	panner_object->getProperty(Lav_HRTF_ELEVATION)->setFloatValue(elevation);
-	attenuator_object ->getProperty(Lav_ATTENUATOR_MULTIPLIER)->setFloatValue(gain);
+	panner_object->getProperty(Lav_HRTF_AZIMUTH).setFloatValue(azimuth);
+	panner_object->getProperty(Lav_HRTF_ELEVATION).setFloatValue(elevation);
+	attenuator_object ->getProperty(Lav_ATTENUATOR_MULTIPLIER).setFloatValue(gain);
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_createSourceObject(LavDevice* device, LavObject* environment, LavObject* node, LavObject** destination) {
