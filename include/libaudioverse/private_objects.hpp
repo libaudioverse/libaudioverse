@@ -56,7 +56,7 @@ Consider an hrtf node, taking 22579200 mathematical operations plus loop overhea
 	virtual void willProcessParents();
 
 	virtual LavDevice* getDevice();
-	virtual LavProperty* getProperty(int slot);
+	virtual LavProperty& getProperty(int slot);
 	virtual std::vector<int> getStaticPropertyIndices();
 
 	//meet the lockable concept.
@@ -68,7 +68,7 @@ Consider an hrtf node, taking 22579200 mathematical operations plus loop overhea
 	//this should definitely be protected, and should never be touched by anything that's not a subclass.
 	virtual void resize(unsigned int newInputsCount, unsigned int newOutputsCount);
 	LavDevice *device = nullptr;
-	std::map<int, LavProperty*> properties;
+	std::map<int, LavProperty> properties;
 	std::vector<float*> inputs;
 	std::vector<LavInputDescriptor> input_descriptors;
 	std::vector<float*> outputs;
