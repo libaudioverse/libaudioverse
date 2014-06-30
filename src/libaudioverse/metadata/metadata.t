@@ -34,12 +34,14 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 //we're also leaning heavily on the default copy constructor of properties, which is safe for the moment.
 std::map<std::tuple<int, int>, LavProperty> *default_property_instances = nullptr;
 std::map<int, std::set<int>> *properties_by_object_type;
+std::set<int> *common_properties = nullptr;
 
 void initializeMetadata() {
 	properties_by_object_type = new std::map<int, std::set<int>>();
 	default_property_instances = new std::map<std::tuple<int, int>, LavProperty>();
+	common_properties = new std::set<int>();
 	LavProperty* tempProp= nullptr; //a temporary that we use a bunch of times.
-	{%for objid, propid in properties%}
+	{%for objid, propid in properties.iterkeys()%}
 	{%set prop = properties[(objid, propid)]-%}
 	//<%prop['name']%> on <%objid%>
 	{
@@ -62,7 +64,7 @@ void initializeMetadata() {
 	for(auto i = properties_by_object_type->begin(); i != properties_by_object_type->end(); i++) {
 		{%for objid, propid in properties.iterkeys()-%}
 		{%if objid == 'Lav_OBJTYPE_GENERIC'-%}
-		i->second.insert(<%propid%>);
+		common_properties->insert(<%propid%>);
 		{%-endif-%}
 		{%endfor%}
 	}
@@ -74,6 +76,9 @@ std::map<int, LavProperty> makePropertyTable(int objtype) {
 	std::map<int, LavProperty> retval;
 	for(auto index: needed) {
 		retval[index] = (*default_property_instances)[std::tuple<int, int>(objtype, index)];
+	}
+	for(auto index: *common_properties) {
+		retval[index] = (*default_property_instances)[std::tuple<int, int>(Lav_OBJTYPE_GENERIC, index)];
 	}
 	return retval;
 }
