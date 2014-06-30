@@ -44,7 +44,7 @@ void LavSourceObject::update(LavEnvironment env) {
 float calculateGainForDistanceModel(int model, float distance, float maxDistance) {
 	float retval = 1.0f;
 	switch(model) {
-		case Lav_DISTANCE_MODEL_LINEAR: retval = 1.0f-(distance/maxDistance);
+		case Lav_DISTANCE_MODEL_LINEAR: retval = 1.0f-(distance/maxDistance); break;
 	}
 
 	//safety clamping.  Some of the equations above will go negative after max_distance.
