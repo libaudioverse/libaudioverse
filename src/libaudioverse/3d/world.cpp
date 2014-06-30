@@ -18,7 +18,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <vector>
 
 LavWorldObject::LavWorldObject(LavDevice* device, LavHrtfData* hrtf): LavSourceManager(device, device->getChannels()) {
-	type = Lav_OBJTYPE_WORLD;
 	this->hrtf = hrtf;
 	mixer = createMixerObject(device, 1, device->getChannels());
 	limiter = createHardLimiterObject(device, device->getChannels());
@@ -26,10 +25,7 @@ LavWorldObject::LavWorldObject(LavDevice* device, LavHrtfData* hrtf): LavSourceM
 		limiter->setParent(i, mixer, i);
 		setParent(i, limiter, i);
 	}
-	float defaultPos[] = {0.0f, 0.0f, 0.0f};
-	float defaultOrient[] = {0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f};
-	properties[Lav_3D_POSITION] = createFloat3Property("position", defaultPos);
-	properties[Lav_3D_ORIENTATION] = createFloat6Property("orientation", defaultOrient);
+
 	environment.world_to_listener_transform = glm::lookAt(
 		glm::vec3(0.0f, 0.0f, 0.0f),
 		glm::vec3(0.0f, 0.0f, -1.0f),

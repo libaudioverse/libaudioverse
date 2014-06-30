@@ -16,8 +16,6 @@ class LavAttenuatorObject: public LavObject {
 };
 
 LavAttenuatorObject::LavAttenuatorObject(LavDevice* device, unsigned int numChannels): LavObject(device, numChannels, numChannels) {
-	type = Lav_OBJTYPE_ATTENUATOR;
-	properties[Lav_ATTENUATOR_MULTIPLIER] = createFloatProperty("multiplier", 1.0f, -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity());
 }
 
 LavObject* createAttenuatorObject(LavDevice* device, unsigned int numChannels) {

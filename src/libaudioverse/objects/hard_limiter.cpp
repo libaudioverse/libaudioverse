@@ -17,7 +17,6 @@ class LavHardLimiterObject: public LavObject {
 };
 
 LavHardLimiterObject::LavHardLimiterObject(LavDevice* device, unsigned int numInputs): LavObject(device, numInputs, numInputs) {
-	type = Lav_OBJTYPE_HARD_LIMITER;
 }
 
 LavObject* createHardLimiterObject(LavDevice* device, unsigned int numChannels) {

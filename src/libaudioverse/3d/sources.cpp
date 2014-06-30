@@ -19,7 +19,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <limits>
 
 LavSourceObject::LavSourceObject(LavDevice* device, LavSourceManager* manager, LavObject* sourceNode): LavPassthroughObject(device, device->getChannels()) {
-	type = Lav_OBJTYPE_SOURCE;
 	if(sourceNode->getOutputCount() > 1) throw LavErrorException(Lav_ERROR_SHAPE);
 	source_object = sourceNode;
 	attenuator_object = createAttenuatorObject(device, 1);
@@ -29,10 +28,6 @@ LavSourceObject::LavSourceObject(LavDevice* device, LavSourceManager* manager, L
 	for(unsigned int i = 0; i <inputs.size(); i++) {
 		setParent(i, panner_object, i);
 	}
-	float defaultPos[] = {0.0f, 0.0f, 0.0f};
-	properties[Lav_3D_POSITION] = createFloat3Property("position", defaultPos);
-	properties[Lav_SOURCE_DISTANCE_MODEL] = createIntProperty("distance_model", 0, 0, 0);
-	properties[Lav_SOURCE_MAX_DISTANCE] = createFloatProperty("max_distance", 50.0f, 0.0f, std::numeric_limits<float>::infinity());
 	this->manager = manager;
 	manager->associateSource(this);
 }

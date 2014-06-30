@@ -24,11 +24,9 @@ class LavSineObject: public LavObject {
 };
 
 LavSineObject::LavSineObject(LavDevice* device): LavObject(device, 0, 1) {
-	type = Lav_OBJTYPE_SINE;
 	table_delta = sineTableLength/device->getSr();
 	start = 0;
 	offset = 0;
-	properties[Lav_SINE_FREQUENCY] = createFloatProperty("frequency", 440.0f, 0.0f, std::numeric_limits<float>::infinity());
 }
 
 LavObject* createSineObject(LavDevice* device) {

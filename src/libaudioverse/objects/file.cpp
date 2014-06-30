@@ -29,14 +29,10 @@ class LavFileObject: public LavObject {
 //the third parameter is a hint: we need to know how many channels, we only expose objects through the create functions, so the create function can find this out.
 //todo: when objects support resizing their inputs and outputs, as they will inevitably support this, rewrite to use that functionality.
 LavFileObject::LavFileObject(LavDevice* device, const char* path, unsigned int channels): LavObject(device, 0, channels) {
-	type = Lav_OBJTYPE_FILE;
 	file.open(path);
 	buffer = new float[file.getSampleCount()];
 	file.readAll(buffer);
 	delta = file.getSr()/device->getSr();
-	properties[Lav_FILE_POSITION] = createFloatProperty("position", 0.0f, 0.0f, file.getFrameCount()/file.getSr());
-	properties[Lav_FILE_PITCH_BEND] = createFloatProperty("pitch_bend", 1.0f, 0.0f, std::numeric_limits<float>::infinity());
-	properties[Lav_FILE_POSITION]->setPostChangedCallback([&] () {seek();});
 }
 
 LavObject* createFileObject(LavDevice* device, const char* path) {
