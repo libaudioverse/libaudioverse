@@ -24,6 +24,7 @@ class LavObject: std::enable_shared_from_this<LavObject> {
 	virtual ~LavObject() = default;
 
 	virtual void computeInputBuffers();//update what we point to due to parent changes.
+	virtual int getType();
 	virtual void setParent(unsigned int input, LavObject* parent, unsigned int parentOutput);
 	virtual LavObject* getParentObject(unsigned int slot);
 	virtual unsigned int getParentOutput(unsigned int slot);

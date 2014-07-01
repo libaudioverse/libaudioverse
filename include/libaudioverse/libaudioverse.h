@@ -108,6 +108,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_deviceSetOutputObject(LavDevice* device, LavObj
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetOutputObject(LavDevice* device, LavObject** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetBlock(LavDevice* device, float* buffer);
 
+/**Query object type.*/
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetType(LavObject* obj, int* destination);
+
 /**Query maximum number of inputs and outputs.*/
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetInputCount(LavObject* obj, unsigned int* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetOutputCount(LavObject* obj, unsigned int* destination);

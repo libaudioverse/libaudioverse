@@ -69,6 +69,10 @@ void LavObject::didProcess() {
 void LavObject::willProcessParents() {
 }
 
+int LavObject::getType() {
+	return type;
+}
+
 bool LavObject::isSuspended() {
 	return getProperty(Lav_OBJECT_SUSPENDED).getIntValue() != 0;
 }
@@ -174,6 +178,11 @@ void LavPassthroughObject::process() {
 }
 
 //begin public api
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetType(LavObject* obj, int* destination) {
+	PUB_BEGIN
+	*destination = obj->getType();
+	PUB_END
+}
 
 Lav_PUBLIC_FUNCTION LavError Lav_setParent(LavObject *obj, LavObject*parent, unsigned int outputSlot, unsigned int inputSlot) {
 	obj->setParent(inputSlot, parent, outputSlot);
