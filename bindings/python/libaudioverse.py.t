@@ -15,17 +15,35 @@ _lav.bindings_register_exception(_libaudioverse.{{error_name}}, {{friendly_name}
 #This is the class hierarchy.
 #GenericObject is at the bottom, and we should never see one; and GenericObject should hold most implementation.
 class GenericObject(object):
-		"""A Libaudioverse object."""
+	"""A Libaudioverse object."""
 
 	def __init__(self, handle):
 		self.handle = handle
 
-#All of these get expanded by __init__ in the generic object to include the necessary properties.
+{%for enumerant, prop in properties['Lav_OBJTYPE_GENERIC'].iteritems()%}
+	@property
+	def {{prop['name']}}(self):
+		pass
+
+	@{{prop['name']}}.setter
+	def {{prop['name']}}(self, val):
+		pass
+{%endfor%}
+
 {%-for object_name, friendly_name in friendly_objects.iteritems()%}
 {%set constructor_arg_names = object_constructor_info[object_name].input_args|map(attribute='name')|list-%}
 class {{friendly_name}}(GenericObject):
 	def __init__(self{%if constructor_arg_names|length > 0%}, {%endif%}{{constructor_arg_names|join(', ')}}):
 		super({{friendly_name}}, self).__init__(_lav.{{object_constructors[object_name]}}({{constructor_arg_names|join(', ')}}))
+{%for enumerant, prop in properties.get(object_name, dict()).iteritems()%}
+	@property
+	def {{prop['name']}}(self):
+		pass
+
+	@{{prop['name']}}.setter
+	def {{prop['name']}}(self, val):
+		pass
+{%endfor%}
 {%endfor%}
 
 #initialize libaudioverse.  This is per-app and implies no context settings, etc.
