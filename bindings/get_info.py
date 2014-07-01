@@ -7,6 +7,7 @@ import subprocess
 import sys
 import os.path
 from collections import OrderedDict
+import yaml
 
 #this is a helper class representing a type.
 #base is int, etc.
@@ -131,3 +132,8 @@ all_info = {
 'typedefs': typedefs,
 'constants' : constants,
 }
+
+#update this dict with the keys from metadata.yml.
+with file(os.path.join(root_directory, 'src', 'libaudioverse', 'metadata', 'metadata.y')) as f:
+	metadata = yaml.load(f)
+	all_info.update(metadata)
