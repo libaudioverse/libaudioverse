@@ -37,6 +37,6 @@ def {{friendly_name}}({{input_arg_names|join(', ')}}):
 		{%for i in output_arg_names%}ctypes.byref({{i}}){%if not loop.last%}, {%endif%}{%endfor%})
 	if err != _libaudioverse.Lav_ERROR_NONE:
 		raise make_error_from_code(err)
-	return {{output_arg_names|join(', ')}}
+	return {{output_arg_names|join('.value, ')}}.value{#we need to do this because we're seriously circumventing ctypes automatic conversions here#}
 {%endif%}
 {%endfor%}

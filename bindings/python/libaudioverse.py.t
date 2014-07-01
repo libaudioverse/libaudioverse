@@ -2,6 +2,30 @@
 import _lav
 import _libaudioverse
 
+{%macro implement_property(enumerant, prop)%}
+	@property
+	def {{prop['name']}}(self):
+		return _lav.object_get_{{prop['type']}}_property(self.handle, _libaudioverse.{{enumerant}})
+
+	@{{prop['name']}}.setter
+	def {{prop['name']}}(self, val):
+{%if prop['type'] == 'int'%}
+		_lav.object_set_int_property(self.handle, _libaudioverse.{{enumerant}}, int(val))
+{%elif prop['type'] == 'float' or prop['type'] == 'double'%}
+		_lav.object_set_{{prop['type']}}_property(self.handle, _libaudioverse.{{enumerant}}, float(val))
+{%elif prop['type'] == 'float3'%}
+		arg_tuple = tuple(val)
+		if len(arg_tuple) != 3:
+			raise  ValueError('Expected a list or list-like object of 3 floats')
+		_lav.object_set_float3_property(self.handle, _libaudioverse.{{enumerant}}, *(float(i) for i in arg_tuple))
+{%elif prop['type'] == 'float6'%}
+		arg_tuple = tuple(val)
+		if len(arg_tuple) != 6:
+			raise ValueError('Expected a list or list-like object of 6 floats')
+		_lav.object_set_float6_property(self.handle, _libaudioverse.{{enumerant}}, *(float(i) for i in arg_tuple))
+{%endif%}
+{%endmacro%}
+
 #build and register all the error classes.
 class GenericError(object):
 	"""Base for all libaudioverse errors."""
@@ -21,13 +45,7 @@ class GenericObject(object):
 		self.handle = handle
 
 {%for enumerant, prop in properties['Lav_OBJTYPE_GENERIC'].iteritems()%}
-	@property
-	def {{prop['name']}}(self):
-		pass
-
-	@{{prop['name']}}.setter
-	def {{prop['name']}}(self, val):
-		pass
+{{implement_property(enumerant, prop)}}
 {%endfor%}
 
 {%-for object_name, friendly_name in friendly_objects.iteritems()%}
@@ -36,13 +54,7 @@ class {{friendly_name}}(GenericObject):
 	def __init__(self{%if constructor_arg_names|length > 0%}, {%endif%}{{constructor_arg_names|join(', ')}}):
 		super({{friendly_name}}, self).__init__(_lav.{{object_constructors[object_name]}}({{constructor_arg_names|join(', ')}}))
 {%for enumerant, prop in properties.get(object_name, dict()).iteritems()%}
-	@property
-	def {{prop['name']}}(self):
-		pass
-
-	@{{prop['name']}}.setter
-	def {{prop['name']}}(self, val):
-		pass
+{{implement_property(enumerant, prop)}}
 {%endfor%}
 {%endfor%}
 
