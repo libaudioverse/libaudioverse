@@ -165,14 +165,3 @@ void LavHrtfData::computeCoefficientsStereo(float elevation, float azimuth, floa
 	azimuth = ringmodf(360-azimuth, 360.0f);
 	computeCoefficientsMono(elevation, azimuth, left);
 }
-
-//begin public api
-
-Lav_PUBLIC_FUNCTION LavError Lav_createHrtfData(const char* path, LavHrtfData** destination) {
-	PUB_BEGIN
-	LavHrtfData* retval = new LavHrtfData();
-	retval->loadFromFile(path);
-	*destination = retval;
-	return Lav_ERROR_NONE;
-	PUB_END
-}

@@ -31,7 +31,6 @@ void main(int argc, char** args) {
 	}
 	LavDevice* device;
 	LavObject* world;
-	LavHrtfData *hrtfData;
 	std::vector<LavObject*> sources;
 	std::vector<LavObject*> sines;
 	unsigned int numSources = 0;
@@ -39,8 +38,7 @@ void main(int argc, char** args) {
 
 	//some setup: create a world and a device.
 	ERRCHECK(Lav_createReadDevice(44100, 2, BLOCK_SIZE, &device));
-	ERRCHECK(Lav_createHrtfData(args[1], &hrtfData));
-	ERRCHECK(Lav_createWorldObject(device, hrtfData, &world));
+	ERRCHECK(Lav_createWorldObject(device, args[1], &world));
 	ERRCHECK(Lav_deviceSetOutputObject(device, world));
 	while(timeDelta < SECONDS) {
 		numSources += 10;

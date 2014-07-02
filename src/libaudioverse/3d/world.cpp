@@ -8,6 +8,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_macros.hpp>
 #include <libaudioverse/private_creators.hpp>
 #include <libaudioverse/private_devices.hpp>
+#include <libaudioverse/private_hrtf.hpp>
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/libaudioverse3d.h>
@@ -71,8 +72,10 @@ void LavWorldObject::associateSource(LavSourceObject* source) {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createWorldObject(LavDevice* device, LavHrtfData *hrtf, LavObject** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createWorldObject(LavDevice* device, const char*hrtfPath, LavObject** destination) {
 	PUB_BEGIN
+	auto hrtf = new LavHrtfData();
+	hrtf->loadFromFile(hrtfPath);
 	LavObject* retval = createWorldObject(device, hrtf);
 	*destination = retval;
 	PUB_END

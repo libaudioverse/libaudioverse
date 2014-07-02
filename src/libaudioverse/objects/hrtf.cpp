@@ -68,8 +68,10 @@ void LavHrtfObject::process() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createHrtfObject(LavDevice* device, LavHrtfData* hrtf, LavObject** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createHrtfObject(LavDevice* device, const char* hrtfPath, LavObject** destination) {
 	PUB_BEGIN
+	auto hrtf = new LavHrtfData();
+	hrtf->loadFromFile(hrtfPath);
 	LOCK(*device);
 	auto retval = createHrtfObject(device, hrtf);
 	*destination = retval;

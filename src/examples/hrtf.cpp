@@ -26,9 +26,7 @@ void main(int argc, char** args) {
 	ERRCHECK(Lav_initializeLibrary());
 	ERRCHECK(Lav_createDefaultAudioOutputDevice(&device));
 	ERRCHECK(Lav_createFileObject(device, args[1], &fileNode));
-	LavHrtfData *hrtf = NULL;
-	ERRCHECK(Lav_createHrtfData(args[2], &hrtf));
-	ERRCHECK(Lav_createHrtfObject(device, hrtf, &hrtfNode));
+	ERRCHECK(Lav_createHrtfObject(device, args[2], &hrtfNode));
 
 	ERRCHECK(Lav_objectSetParent(hrtfNode, 0, fileNode, 0));
 	ERRCHECK(Lav_createHardLimiterObject(device, 2, &limit));
