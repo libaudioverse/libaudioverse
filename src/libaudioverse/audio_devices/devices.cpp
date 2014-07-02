@@ -142,3 +142,17 @@ Lav_PUBLIC_FUNCTION LavError Lav_deviceGetBlockSize(LavDevice* dev, int* destina
 	*destination = dev->getBlockSize();
 	PUB_END
 }
+
+Lav_PUBLIC_FUNCTION LavError Lav_deviceGetSr(LavDevice* device, int* destination) {
+	PUB_BEGIN
+	LOCK(*device);
+	*destination = (int)device->getSr();
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_deviceGetChannels(LavDevice* device, int* destination) {
+	PUB_BEGIN
+	LOCK(*device);
+	*destination = device->getChannels();
+	PUB_END
+}

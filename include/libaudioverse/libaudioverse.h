@@ -108,6 +108,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_deviceSetOutputObject(LavDevice* device, LavObj
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetOutputObject(LavDevice* device, LavObject** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetBlockSize(LavDevice* dev, int* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetBlock(LavDevice* device, float* buffer);
+Lav_PUBLIC_FUNCTION LavError Lav_deviceGetSr(LavDevice* device, int* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_deviceGetChannels(LavDevice* device, int* destination);
 
 /**Query object type.*/
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetType(LavObject* obj, int* destination);
