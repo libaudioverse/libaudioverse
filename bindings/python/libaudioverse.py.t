@@ -153,6 +153,7 @@ _types_to_classes[_libaudioverse.Lav_OBJTYPE_GENERIC] = GenericObject
 {%set constructor_arg_names = object_constructor_info[object_name].input_args|map(attribute='name')|list-%}
 class {{friendly_name}}(GenericObject):
 	def __init__(self{%if constructor_arg_names|length > 0%}, {%endif%}{{constructor_arg_names|join(', ')}}):
+		{{constructor_arg_names[0]}} = {{constructor_arg_names[0]}}.handle
 		super({{friendly_name}}, self).__init__(_lav.{{object_constructors[object_name]}}({{constructor_arg_names|join(', ')}}))
 {%for enumerant, prop in properties.get(object_name, dict()).iteritems()%}
 {{implement_property(enumerant, prop)}}
