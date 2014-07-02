@@ -3,6 +3,7 @@ import _lav
 import _libaudioverse
 import weakref
 import collections
+import ctypes
 
 {%macro implement_property(enumerant, prop)%}
 	@property
@@ -113,7 +114,10 @@ Don't instantiate this class directly.  Use one of the create_ classmethods."""
 	def get_block(self):
 		"""Returns a block of data.
 Calling this on an audio output device will cause the audio thread to skip ahead a block, so don't do that."""
-		return _lav.device_get_block(self.handle)
+		length = _lav.device_get_block_size(self.handle)
+		buff = (ctypes.c_float*length)()
+		_lav.device_get_block(self.handle, buff)
+		return list(buff)
 
 	@property
 	def output_object(self):
