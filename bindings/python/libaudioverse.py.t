@@ -41,6 +41,8 @@ _handles_to_objects = weakref.WeakValueDictionary()
 
 def _wrap(handle):
 	"""For private use only. Do not touch."""
+	if handle is None or handle == 0:
+		return None #handle null pointers.
 	val = _handles_to_objects.get(handle, None)
 	if val is not None:
 		return val
