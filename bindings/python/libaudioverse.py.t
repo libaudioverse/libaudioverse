@@ -115,6 +115,7 @@ Calling this on an audio output device will cause the audio thread to skip ahead
 
 	@property
 	def output_object(self):
+		""The object assigned to this property is the object which will play through the device."""
 		return _wrap(_lav.device_get_output_object(self.handle))
 
 	@output_object.setter
