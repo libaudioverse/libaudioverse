@@ -12,9 +12,7 @@ extern "C" {
 #ifdef __cplusplus
 class LavObject;
 class LavDevice;
-class LavHrtfData;
 #else
-typedef void LavHrtfData;
 typedef void LavDevice;
 typedef void LavObject;
 #endif
@@ -157,11 +155,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSineObject(LavDevice* device, LavObject *
 /**A object that plays a file.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createFileObject(LavDevice*device, const char* path, LavObject **destination);
 
-/**Load hrtf dataset from file.  This is for use with hrtf objects, and the 3D audio API.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createHrtfData(const char* path, LavHrtfData **destination);
-
 /**Make a HRTF object.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createHrtfObject(LavDevice* device, LavHrtfData* hrtf, LavObject **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createHrtfObject(LavDevice* device, const char* hrtfPath, LavObject **destination);
 
 /**Make a mixer.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createMixerObject(LavDevice* device, unsigned int maxParents, unsigned int inputsPerParent, LavObject **destination);
