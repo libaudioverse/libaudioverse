@@ -72,7 +72,10 @@ Note that these objects are always up to date with their associated libaudiovers
 		self.for_object = for_object	
 
 	def __len__(self):
-		return _lav.object_get_input_count(self.for_object.handle)
+		handle = _lav.object_get_input_count(self.for_object.handle)
+		if handle is None or handle == 0:
+			return None
+		return _wrap(handle)
 
 	def __getitem__(self, val):
 		return (_lav.object_get_parent_object(obj.handle), _lav.get_parent_output(obj.handle))
