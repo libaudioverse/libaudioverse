@@ -119,7 +119,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetOutputCount(LavObject* obj, unsigned i
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetParentObject(LavObject *obj, unsigned int slot, LavObject** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetParentOutput(LavObject* obj, unsigned int slot, unsigned int* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_objectSetParent(LavObject *obj, unsigned int input, LavObject* parent, unsigned int output);
-Lav_PUBLIC_FUNCTION LavError Lav_objectClearParent(LavObject *obj, unsigned int slot);
 
 /**Resets a property to its default value, for any type.*/
 Lav_PUBLIC_FUNCTION LavError Lav_objectResetProperty(LavObject *obj, int slot);

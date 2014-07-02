@@ -195,11 +195,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_getParent(LavObject *obj, unsigned int slot, La
 	return Lav_ERROR_NONE;
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_clearParent(LavObject *obj, unsigned int slot) {
-	obj->clearParent(slot);
-	return Lav_ERROR_NONE;
-}
-
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetInputCount(LavObject* obj, unsigned int* destination) {
 	PUB_BEGIN
 	LOCK(*obj);
