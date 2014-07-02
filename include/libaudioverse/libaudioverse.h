@@ -106,6 +106,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createReadDevice(unsigned int sr, unsigned int 
 
 Lav_PUBLIC_FUNCTION LavError Lav_deviceSetOutputObject(LavDevice* device, LavObject* object);
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetOutputObject(LavDevice* device, LavObject** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_deviceGetBlockSize(LavDevice* dev, int* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetBlock(LavDevice* device, float* buffer);
 
 /**Query object type.*/

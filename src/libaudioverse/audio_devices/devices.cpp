@@ -135,3 +135,10 @@ Lav_PUBLIC_FUNCTION LavError Lav_deviceGetBlock(LavDevice* device, float* destin
 	device->getBlock(destination);
 	return Lav_ERROR_NONE;
 }
+
+Lav_PUBLIC_FUNCTION LavError Lav_deviceGetBlockSize(LavDevice* dev, int* destination) {
+	PUB_BEGIN
+	LOCK(*dev);
+	*destination = dev->getBlockSize();
+	PUB_END
+}
