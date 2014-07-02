@@ -108,7 +108,7 @@ Don't instantiate this class directly.  Use one of the create_ classmethods."""
 	@classmethod
 	def create_read_device(cls, sr, channels, block_size):
 		"""Returns a device with no audio output.  Time does not advance for a read device automatically.  You can get one block of data from it by caling get_block."""
-		return cls(_lav.create_read_device())
+		return cls(_lav.create_read_device(sr, channels, block_size))
 
 	def get_block(self):
 		"""Returns a block of data.
@@ -117,7 +117,7 @@ Calling this on an audio output device will cause the audio thread to skip ahead
 
 	@property
 	def output_object(self):
-		""The object assigned to this property is the object which will play through the device."""
+		"""The object assigned to this property is the object which will play through the device."""
 		return _wrap(_lav.device_get_output_object(self.handle))
 
 	@output_object.setter
