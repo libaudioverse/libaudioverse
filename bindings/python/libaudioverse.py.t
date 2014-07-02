@@ -122,9 +122,9 @@ Calling this on an audio output device will cause the audio thread to skip ahead
 
 	@output_object.setter
 	def output_object(self, val):
-		if not isinstance(val, GenericObject):
+		if not (isinstance(val, GenericObject) or val is None):
 			raise TypeError("Expected subclass of Libaudioverse.GenericObject")
-		_lav.device_set_output_object(self.handle, val.handle)
+		_lav.device_set_output_object(self.handle, val.handle if val is not None else val)
 
 #This is the class hierarchy.
 #GenericObject is at the bottom, and we should never see one; and GenericObject should hold most implementation.
