@@ -114,7 +114,7 @@ Don't instantiate this class directly.  Use one of the create_ classmethods."""
 	def get_block(self):
 		"""Returns a block of data.
 Calling this on an audio output device will cause the audio thread to skip ahead a block, so don't do that."""
-		length = _lav.device_get_block_size(self.handle)
+		length = _lav.device_get_block_size(self.handle)*_lav.device_get_channels(self.handle)
 		buff = (ctypes.c_float*length)()
 		_lav.device_get_block(self.handle, buff)
 		return list(buff)
