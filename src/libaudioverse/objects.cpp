@@ -21,7 +21,7 @@ void LavObject::computeInputBuffers() {
 	for(unsigned int i = 0; i < input_descriptors.size(); i++) {
 		if(input_descriptors[i].parent != NULL && input_descriptors[i].parent->isSuspended() == false) {
 			if(input_descriptors[i].output >= input_descriptors[i].parent->getOutputCount()) { //the parent node no longer has this output, probably due to resizing.
-				clearParent(i); //so we clear this parent.
+				setParent(i, nullptr, 0); //so we clear this parent.
 			}
 			inputs[i] = input_descriptors[i].parent->outputs[input_descriptors[i].output];
 		}
@@ -87,7 +87,7 @@ void LavObject::unsuspend() {
 
 void LavObject::setParent(unsigned int input, LavObject* parent, unsigned int parentOutput) {
 	if(input >= input_descriptors.size()) throw LavErrorException(Lav_ERROR_RANGE);
-	if(parentOutput >= parent->getOutputCount()) throw LavErrorException(Lav_ERROR_RANGE);
+	if(parent != nullptr && parentOutput >= parent->getOutputCount()) throw LavErrorException(Lav_ERROR_RANGE);
 	input_descriptors[input].parent = parent;
 	input_descriptors[input].output = parentOutput;
 }
@@ -100,12 +100,6 @@ LavObject* LavObject::getParentObject(unsigned int input) {
 unsigned int LavObject::getParentOutput(unsigned int input) {
 	if(input >= input_descriptors.size()) throw LavErrorException(Lav_ERROR_RANGE);
 	return input_descriptors[input].output;
-}
-
-void LavObject::clearParent(unsigned int slot) {
-	if(slot >= input_descriptors.size()) throw LavErrorException(Lav_ERROR_RANGE);
-	input_descriptors[slot].parent = nullptr;
-	input_descriptors[slot].output = 0;
 }
 
 unsigned int LavObject::getInputCount() {
@@ -227,13 +221,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectSetParent(LavObject *obj, unsigned int in
 	PUB_BEGIN
 	LOCK(*(obj->getDevice()));
 	obj->setParent(input, parent, output);
-	PUB_END
-}
-
-Lav_PUBLIC_FUNCTION LavError Lav_objectClearParent(LavObject *obj, unsigned int slot) {
-	PUB_BEGIN
-	LOCK(*(obj->getDevice()));
-	obj->clearParent(slot);
 	PUB_END
 }
 

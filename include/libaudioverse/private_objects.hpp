@@ -31,7 +31,6 @@ class LavObject: std::enable_shared_from_this<LavObject> {
 	virtual unsigned int getInputCount();
 	virtual unsigned int getOutputCount();
 	virtual void getOutputPointers(float** dest);
-	virtual void clearParent(unsigned int slot);
 
 	/**This requires explanation.
 The graph algorithm checks all objects it sees.  An object marked to always process will always process, but this is an internal detail of the object.
