@@ -60,32 +60,38 @@ _lav.bindings_register_exception(_libaudioverse.{{error_name}}, {{friendly_name}
 {%endfor%}
 
 #A list-like thing that knows how to manipulate parents.
-class ParentProxy(collections.MutableSequence):
+class ParentProxy(collections.Sequence):
 	"""Manipulate parents for some specific object.
-This works exactly like a python list, save that concatenation is not allowed.  The elements of this list are tuples: (parent, output).
+This works exactly like a python list, save that concatenation is not allowed.  The elements are tuples: (parent, output) or, should no parent be set for a slot, None.
 
 To link a parent to an output using this object, use  obj.parents[num] = (myparent, output).
+To clear a parent, assign None.
 
-Note that these objects are always up to date with their associated libaudioverse object but that iterators to them will become outdated if anything changes the graph."""
+Note that these objects are always up to date with their associated libaudioverse object but that iterators to them will become outdated if anything changes the graph.
+
+Note also that we are not inheriting from MutableSequence because we cannot support __del__ and insert, but that the above advertised functionality still works anyway."""
 
 	def __init__(self, for_object):
 		self.for_object = for_object	
 
 	def __len__(self):
-		handle = _lav.object_get_input_count(self.for_object.handle)
-		if handle is None or handle == 0:
-			return None
-		return _wrap(handle)
+		return _lav.object_get_input_count(self.for_object.handle)
 
-	def __getitem__(self, val):
-		return (_lav.object_get_parent_object(obj.handle), _lav.get_parent_output(obj.handle))
+	def __getitem__(self, key):
+		par, out = _lav.object_get_parent_object(self.for_object.handle, key), _lav.object_get_parent_output(self.for_object.handle, key)
+		if par is None:
+			return None
+		return par, out
 
 	def __setitem__(self, key, val):
-		if len(val) != 2:
-			raise TypeError("Expected list of length 2.")
+		if len(val) != 2 and val is not None:
+			raise TypeError("Expected list of length 2 or None.")
 		if not isinstance(val[0], GenericObject):
 			raise TypeError("val[0]: is not a Libaudioverse object.")
-		_lav.object_set_parent(self.for_object.handle, val[0].handle, val[1])
+		if val is not None:
+			_lav.object_set_parent(self.for_object.handle, key, val[0].handle, val[1])
+		else:
+			_lav.object_clear_parent(self.for_object.handle, key)
 
 #This is the class hierarchy.
 #GenericObject is at the bottom, and we should never see one; and GenericObject should hold most implementation.
@@ -98,6 +104,11 @@ class GenericObject(object):
 {%for enumerant, prop in properties['Lav_OBJTYPE_GENERIC'].iteritems()%}
 {{implement_property(enumerant, prop)}}
 {%endfor%}
+
+	@property
+	def parents(self):
+		"""Returns a ParentProxy, an object that acts like a list of tuples.  The first item of each tuple is the parent object and the second item is the ooutput to which we are connected."""
+		return ParentProxy(self)
 
 _types_to_classes[_libaudioverse.Lav_OBJTYPE_GENERIC] = GenericObject
 
