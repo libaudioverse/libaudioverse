@@ -88,10 +88,7 @@ Note also that we are not inheriting from MutableSequence because we cannot supp
 			raise TypeError("Expected list of length 2 or None.")
 		if not isinstance(val[0], GenericObject):
 			raise TypeError("val[0]: is not a Libaudioverse object.")
-		if val is not None:
-			_lav.object_set_parent(self.for_object.handle, key, val[0].handle, val[1])
-		else:
-			_lav.object_clear_parent(self.for_object.handle, key)
+		_lav.object_set_parent(self.for_object.handle, key, val[0].handle if val is not None else None, val[1] if val is not None else 0)
 
 class Device(object):
 	"""Represents output, either to an audio card or otherwise.  A device is required by all other Libaudioverse objects.
