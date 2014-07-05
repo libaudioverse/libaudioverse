@@ -48,9 +48,8 @@ LavPortaudioDevice::LavPortaudioDevice(unsigned int sr, unsigned int channels, u
 	audioOutputThread = std::thread([this] () {audioOutputThreadFunction();});
 }
 
-LavDevice* createPortaudioDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead) {
-	LavPortaudioDevice* retval = new LavPortaudioDevice(sr, channels, blockSize, mixahead);
-	return retval;
+std::shared_ptr<LavDevice> createPortaudioDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead) {
+	return std::make_shared<LavPortaudioDevice>(sr, channels, blockSize, mixahead);
 }
 
 /**This algorithm is complex and consequently requires some explanation.
