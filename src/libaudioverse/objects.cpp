@@ -5,8 +5,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 /**Handles functionality common to all objects: linking, allocating, and freeing, as well as parent-child relationships.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
-#include <stdlib.h>
-#include <string.h>
+#include <libaudioverse/private_memory.hpp>
+
 #include <libaudioverse/private_objects.hpp>
 #include <libaudioverse/private_properties.hpp>
 #include <libaudioverse/private_devices.hpp>
@@ -14,6 +14,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_metadata.hpp>
 #include <algorithm>
 #include <memory>
+#include <stdlib.h>
+#include <string.h>
 
 float zerobuffer[Lav_MAX_BLOCK_SIZE] = {0}; //this is a shared buffer for the "no parent" case.
 
@@ -202,7 +204,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetOutputCount(LavObject* obj, unsigned i
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetParentObject(LavObject *obj, unsigned int slot, LavObject** destination) {
 	PUB_BEGIN
 	LOCK(*obj);
-	*destination = obj->getParentObject(slot).get();
+	*destination = outgoingPointer<LavObject>(obj->getParentObject(slot));
 	PUB_END
 }
 
@@ -216,7 +218,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetParentOutput(LavObject* obj, unsigned 
 Lav_PUBLIC_FUNCTION LavError Lav_objectSetParent(LavObject *obj, unsigned int input, LavObject* parent, unsigned int output) {
 	PUB_BEGIN
 	LOCK(*obj);
-	obj->setParent(input, parent ? parent->shared_from_this() : nullptr, output);
+	obj->setParent(input, parent ? incomingPointer<LavObject>(parent) : nullptr, output);
 	PUB_END
 }
 

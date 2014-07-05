@@ -26,7 +26,7 @@ t* outgoingPointer(std::shared_ptr<t> ptr) {
 	t* out = ptr.get();
 	if(out == nullptr) return nullptr;
 	if(external_ptrs->count(out) == 1) return out;
-	external_ptrs[out] = ptr;
+	(*external_ptrs)[out] = ptr;
 	return out;
 }
 

@@ -18,7 +18,7 @@ class LavInputDescriptor {
 };
 
 /**Things all Libaudioverse objects have.*/
-class LavObject: {
+class LavObject {
 	public:
 	LavObject(int type, std::shared_ptr<LavDevice> device, unsigned int numInputs, unsigned int numOutputs);
 	virtual ~LavObject();
