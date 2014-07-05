@@ -7,7 +7,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 /**This is a standalone component that knows how to hold onto smart pointers, avoid accidentally duplicating entries, and cast the entries before giving them to us.
 
-Asking for an entry that is not present crashes.
+Asking for an entry that is not present gives a null pointer.
 
 the reason that this is not a class is because there can only ever be one.  This serves the explicit purpose of allowing us to give pointers to and receive pointers from things outside Libaudioverse; therefore, it's a global and some helper functions.
 
@@ -28,6 +28,6 @@ t* outgoingPointer(std::shared_ptr<t> ptr) {
 	if(external_ptrs->count(out) == 1) return out;
 	external_ptrs[out] = ptr;
 	return out;
-	}
+}
 
 void initializeMemoryModule();

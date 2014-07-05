@@ -8,6 +8,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_devices.hpp>
 #include <libaudioverse/private_macros.hpp>
 #include <libaudioverse/private_metadata.hpp>
+#include <libaudioverse/private_memory.hpp>
 
 typedef void (*initfunc_t)();
 
@@ -16,6 +17,7 @@ typedef void (*initfunc_t)();
 //Errors will be returned as appropriate.
 //Initialization stops at the first failed function and does not continue.
 initfunc_t initializers[] = {
+	initializeMemoryModule,
 	initializeFunctionTables,
 	initializeAudioBackend,
 	initializeMetadata,
