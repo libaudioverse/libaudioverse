@@ -9,6 +9,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_objects.hpp>
 #include <libaudioverse/private_devices.hpp>
 #include <libaudioverse/private_macros.hpp>
+#include <libaudioverse/private_memory.hpp>
+#include <memory>
 
 class LavHardLimiterObject: public LavObject {
 	public:
@@ -16,11 +18,12 @@ class LavHardLimiterObject: public LavObject {
 	virtual void process();
 };
 
-LavHardLimiterObject::LavHardLimiterObject(LavDevice* device, unsigned int numInputs): LavObject(Lav_OBJTYPE_HARD_LIMITER, device, numInputs, numInputs) {
+LavHardLimiterObject::LavHardLimiterObject(std::shared_ptr<LavDevice> device, unsigned int numInputs): LavObject(Lav_OBJTYPE_HARD_LIMITER, device, numInputs, numInputs) {
 }
 
-LavObject* createHardLimiterObject(LavDevice* device, unsigned int numChannels) {
-	auto retval = new LavHardLimiterObject(device, numChannels);
+std::shared_ptr<LavObject>createHardLimiterObject(LavDevice* device, unsigned int numChannels) {
+	auto retval = std::make_shared<LavHardLimiterObject>(device, numChannels);
+	device->associateObject(retval);
 	return retval;
 }
 
@@ -46,6 +49,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterObject(LavDevice* device, unsi
 	PUB_BEGIN
 	LOCK(*device);
 	auto retval = createHardLimiterObject(device, numChannels);
-	*destination = retval;
+	*destination = outgoingPointer<LavObject>(retval);
 	PUB_END
 }
