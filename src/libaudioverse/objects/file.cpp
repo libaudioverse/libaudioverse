@@ -11,7 +11,9 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_macros.hpp>
 #include <libaudioverse/private_dspmath.hpp>
 #include <libaudioverse/private_properties.hpp>
+#include <libaudioverse/private_memory.hpp>
 #include <limits>
+#include <memory>
 
 class LavFileObject: public LavObject {
 	LavFileObject(LavDevice* device, const char* path, unsigned int channels);
@@ -28,7 +30,7 @@ class LavFileObject: public LavObject {
 
 //the third parameter is a hint: we need to know how many channels, we only expose objects through the create functions, so the create function can find this out.
 //todo: when objects support resizing their inputs and outputs, as they will inevitably support this, rewrite to use that functionality.
-LavFileObject::LavFileObject(LavDevice* device, const char* path, unsigned int channels): LavObject(Lav_OBJTYPE_FILE, device, 0, channels) {
+LavFileObject::LavFileObject(std::shared_ptr<LavDevice> device, const char* path, unsigned int channels): LavObject(Lav_OBJTYPE_FILE, device, 0, channels) {
 	file.open(path);
 	buffer = new float[file.getSampleCount()];
 	file.readAll(buffer);
@@ -37,10 +39,11 @@ LavFileObject::LavFileObject(LavDevice* device, const char* path, unsigned int c
 	getProperty(Lav_FILE_POSITION).setFloatRange(0.0f, file.getFrameCount()/(float)file.getSr());
 }
 
-LavObject* createFileObject(LavDevice* device, const char* path) {
+std::shared_ptr<LavObject>createFileObject(std::shared_ptr<LavDevice> device, const char* path) {
 	auto f = LavFileReader();
 	f.open(path);
-	auto retval = new LavFileObject(device, path, f.getChannelCount());
+	auto retval = std::make_shared<LavFileObject>(device, path, f.getChannelCount());
+	device->associateObject(retval);
 	return retval;
 }
 
@@ -80,6 +83,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createFileObject(LavDevice* device, const char*
 	PUB_BEGIN
 	LOCK(*device);
 	auto retval = createFileObject(device, path);
-	*destination = retval;
+	*destination = outgoingPointer<LavObject>(retval);
 	PUB_END
 }
