@@ -13,6 +13,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_macros.hpp>
 #include <libaudioverse/private_metadata.hpp>
 #include <algorithm>
+#include <memory>
 
 float zerobuffer[Lav_MAX_BLOCK_SIZE] = {0}; //this is a shared buffer for the "no parent" case.
 
@@ -31,7 +32,7 @@ void LavObject::computeInputBuffers() {
 	}
 }
 
-LavObject::LavObject(int type, LavDevice* device, unsigned int numInputs, unsigned int numOutputs): type(type) {
+LavObject::LavObject(int type, std::shared_ptr<LavDevice> device, unsigned int numInputs, unsigned int numOutputs): type(type) {
 	//allocations:
 	input_descriptors.resize(numInputs, LavInputDescriptor(nullptr, 0));
 	inputs.resize(numInputs, nullptr);
@@ -91,14 +92,14 @@ void LavObject::unsuspend() {
 	getProperty(Lav_OBJECT_SUSPENDED).setIntValue(0);
 }
 
-void LavObject::setParent(unsigned int input, LavObject* parent, unsigned int parentOutput) {
+void LavObject::setParent(unsigned int input, std::shared_ptr<LavObject> parent, unsigned int parentOutput) {
 	if(input >= input_descriptors.size()) throw LavErrorException(Lav_ERROR_RANGE);
 	if(parent != nullptr && parentOutput >= parent->getOutputCount()) throw LavErrorException(Lav_ERROR_RANGE);
 	input_descriptors[input].parent = parent;
 	input_descriptors[input].output = parentOutput;
 }
 
-LavObject* LavObject::getParentObject(unsigned int input) {
+std::shared_ptr<LavObject> LavObject::getParentObject(unsigned int input) {
 	if(input >= input_descriptors.size()) throw LavErrorException(Lav_ERROR_RANGE);
 	return input_descriptors[input].parent;
 }
@@ -120,7 +121,7 @@ void LavObject::getOutputPointers(float** dest) {
 	std::copy(outputs.begin(), outputs.end(), dest);
 }
 
-LavDevice* LavObject::getDevice() {
+std::shared_ptr<LavDevice> LavObject::getDevice() {
 	return device;
 }
 
@@ -168,7 +169,7 @@ void LavObject::resize(unsigned int newInputCount, unsigned int newOutputCount) 
 
 /**Implementation of LavPasssthroughObject.*/
 
-LavPassthroughObject::LavPassthroughObject(int type, LavDevice* device, unsigned int numChannels): LavObject(type, device, numChannels, numChannels) {
+LavPassthroughObject::LavPassthroughObject(int type, std::shared_ptr<LavDevice> device, unsigned int numChannels): LavObject(type, device, numChannels, numChannels) {
 }
 
 void LavPassthroughObject::process() {
@@ -182,17 +183,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetType(LavObject* obj, int* destination)
 	PUB_BEGIN
 	*destination = obj->getType();
 	PUB_END
-}
-
-Lav_PUBLIC_FUNCTION LavError Lav_setParent(LavObject *obj, LavObject*parent, unsigned int outputSlot, unsigned int inputSlot) {
-	obj->setParent(inputSlot, parent, outputSlot);
-	return Lav_ERROR_NONE;
-}
-
-Lav_PUBLIC_FUNCTION LavError Lav_getParent(LavObject *obj, unsigned int slot, LavObject **parent, unsigned int *outputNumber) {
-	*parent = obj->getParentObject(slot);
-	*outputNumber = obj->getParentOutput(slot);
-	return Lav_ERROR_NONE;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetInputCount(LavObject* obj, unsigned int* destination) {
@@ -211,8 +201,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetOutputCount(LavObject* obj, unsigned i
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetParentObject(LavObject *obj, unsigned int slot, LavObject** destination) {
 	PUB_BEGIN
-	LOCK(*(obj->getDevice()));
-	*destination = obj->getParentObject(slot);
+	LOCK(*obj);
+	*destination = obj->getParentObject(slot).get();
 	PUB_END
 }
 
@@ -225,8 +215,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetParentOutput(LavObject* obj, unsigned 
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectSetParent(LavObject *obj, unsigned int input, LavObject* parent, unsigned int output) {
 	PUB_BEGIN
-	LOCK(*(obj->getDevice()));
-	obj->setParent(input, parent, output);
+	LOCK(*obj);
+	obj->setParent(input, parent ? parent->shared_from_this() : nullptr, output);
 	PUB_END
 }
 

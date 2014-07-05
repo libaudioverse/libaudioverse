@@ -1,4 +1,4 @@
-add_custom_command(
+	add_custom_command(
 OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/metadata/metadata.cpp"
 COMMAND python "${CMAKE_CURRENT_SOURCE_DIR}/metadata/metadata.py" "${CMAKE_CURRENT_BINARY_DIR}/metadata/metadata.cpp"
 DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/metadata/metadata.t" "${CMAKE_CURRENT_SOURCE_DIR}/metadata/metadata.py" "${CMAKE_CURRENT_SOURCE_DIR}/metadata/metadata.y")
@@ -19,12 +19,12 @@ utils/file_reader.cpp
 metadata/metadata.cpp
 
 #specific node types.
-objects/sine.cpp
-objects/file.cpp
-objects/hard_limiter.cpp
-objects/hrtf.cpp
-objects/mixer.cpp
-objects/attenuator.cpp
+#objects/sine.cpp
+#objects/file.cpp
+#objects/hard_limiter.cpp
+#objects/hrtf.cpp
+#objects/mixer.cpp
+#objects/attenuator.cpp
 
 #the audio backends and related functionality.
 audio_devices/device_negociation.cpp
@@ -32,8 +32,8 @@ audio_devices/devices.cpp
 audio_devices/portaudio.cpp
 
 #the 3D abstraction on top of libaudioverse.
-3d/world.cpp
-3d/sources.cpp
+#3d/world.cpp
+#3d/sources.cpp
 )
 TARGET_LINK_LIBRARIES(libaudioverse ${libaudioverse_required_libraries})
 
