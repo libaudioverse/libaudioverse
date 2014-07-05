@@ -11,7 +11,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 class LavObject;
 
-class LavDevice: std::enable_shared_from_this<LavDevice> {
+class LavDevice {
 	public:
 	LavDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead);
 	virtual ~LavDevice() {}
