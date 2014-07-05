@@ -43,7 +43,6 @@ LavObject::LavObject(int type, std::shared_ptr<LavDevice> device, unsigned int n
 		*i = new float[device->getBlockSize()];
 	}
 
-	device->associateObject(this);
 	this->device = device;
 	//request properties from the metadata module.
 	properties = makePropertyTable(type);
