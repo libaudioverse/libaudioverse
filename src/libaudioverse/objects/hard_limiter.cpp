@@ -14,14 +14,14 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 class LavHardLimiterObject: public LavObject {
 	public:
-	LavHardLimiterObject(LavDevice* device, unsigned int numInputs);
+	LavHardLimiterObject(std::shared_ptr<LavDevice> device, unsigned int numInputs);
 	virtual void process();
 };
 
 LavHardLimiterObject::LavHardLimiterObject(std::shared_ptr<LavDevice> device, unsigned int numInputs): LavObject(Lav_OBJTYPE_HARD_LIMITER, device, numInputs, numInputs) {
 }
 
-std::shared_ptr<LavObject>createHardLimiterObject(LavDevice* device, unsigned int numChannels) {
+std::shared_ptr<LavObject>createHardLimiterObject(std::shared_ptr<LavDevice> device, unsigned int numChannels) {
 	auto retval = std::make_shared<LavHardLimiterObject>(device, numChannels);
 	device->associateObject(retval);
 	return retval;
@@ -48,7 +48,7 @@ void LavHardLimiterObject::process() {
 Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterObject(LavDevice* device, unsigned int numChannels, LavObject** destination) {
 	PUB_BEGIN
 	LOCK(*device);
-	auto retval = createHardLimiterObject(device, numChannels);
+	auto retval = createHardLimiterObject(incomingPointer<LavDevice>(device), numChannels);
 	*destination = outgoingPointer<LavObject>(retval);
 	PUB_END
 }

@@ -40,7 +40,7 @@ void LavAttenuatorObject::process() {
 Lav_PUBLIC_FUNCTION LavError Lav_createAttenuatorObject(LavDevice* device, unsigned int numChannels, LavObject** destination) {
 	PUB_BEGIN
 	LOCK(*device);
-	auto retval = createAttenuatorObject(device, numChannels);
+	auto retval = createAttenuatorObject(incomingPointer<LavDevice>(device), numChannels);
 	*destination = outgoingPointer<LavObject>(retval);
 	PUB_END
 }

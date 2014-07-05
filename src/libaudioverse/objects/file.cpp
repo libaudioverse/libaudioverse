@@ -16,7 +16,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <memory>
 
 class LavFileObject: public LavObject {
-	LavFileObject(LavDevice* device, const char* path, unsigned int channels);
+	public:
+	LavFileObject(std::shared_ptr<LavDevice> device, const char* path, unsigned int channels);
 	virtual void process();
 	void seek(); //property callback.
 	protected:
@@ -25,7 +26,6 @@ class LavFileObject: public LavObject {
 	unsigned int position = 0;
 	float offset = 0;
 	float delta = 0.0f;
-	friend LavObject* createFileObject(LavDevice* device, const char* path);
 };
 
 //the third parameter is a hint: we need to know how many channels, we only expose objects through the create functions, so the create function can find this out.
@@ -39,7 +39,7 @@ LavFileObject::LavFileObject(std::shared_ptr<LavDevice> device, const char* path
 	getProperty(Lav_FILE_POSITION).setFloatRange(0.0f, file.getFrameCount()/(float)file.getSr());
 }
 
-std::shared_ptr<LavObject>createFileObject(std::shared_ptr<LavDevice> device, const char* path) {
+std::shared_ptr<LavObject> createFileObject(std::shared_ptr<LavDevice> device, const char* path) {
 	auto f = LavFileReader();
 	f.open(path);
 	auto retval = std::make_shared<LavFileObject>(device, path, f.getChannelCount());
@@ -82,7 +82,7 @@ void LavFileObject::process() {
 Lav_PUBLIC_FUNCTION LavError Lav_createFileObject(LavDevice* device, const char* path, LavObject** destination) {
 	PUB_BEGIN
 	LOCK(*device);
-	auto retval = createFileObject(device, path);
+	auto retval = createFileObject(incomingPointer<LavDevice>(device), path);
 	*destination = outgoingPointer<LavObject>(retval);
 	PUB_END
 }

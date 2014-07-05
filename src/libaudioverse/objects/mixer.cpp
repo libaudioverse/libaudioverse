@@ -13,7 +13,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 class LavMixerObject: public LavObject {
 	public:
-	LavMixerObject(LavDevice* device, unsigned int maxParents, unsigned int inputsPerParent);
+	LavMixerObject(std::shared_ptr<LavDevice> device, unsigned int maxParents, unsigned int inputsPerParent);
 	virtual void process();
 	protected:
 	void maxParentsChanged();
@@ -26,7 +26,7 @@ LavMixerObject::LavMixerObject(std::shared_ptr<LavDevice> device, unsigned int m
 	getProperty(Lav_MIXER_MAX_PARENTS).setPostChangedCallback([this] () {maxParentsChanged();});
 }
 
-std::shared_ptr<LavObject> createMixerObject(std:;shared_ptr<LavDevice> device, unsigned int maxParents, unsigned int inputsPerParent) {
+std::shared_ptr<LavObject> createMixerObject(std::shared_ptr<LavDevice> device, unsigned int maxParents, unsigned int inputsPerParent) {
 	auto retval = std::make_shared<LavMixerObject>(device, maxParents, inputsPerParent);
 	device->associateObject(retval);
 	return retval;
@@ -52,7 +52,7 @@ void LavMixerObject::process() {
 Lav_PUBLIC_FUNCTION LavError Lav_createMixerObject(LavDevice* device, unsigned int maxParents, unsigned int inputsPerParent, LavObject** destination) {
 	PUB_BEGIN
 	LOCK(*device);
-	auto retval = createMixerObject(device, maxParents, inputsPerParent);
+	auto retval = createMixerObject(incomingPointer<LavDevice>(device), maxParents, inputsPerParent);
 	*destination = outgoingPointer<LavObject>(retval);
 	PUB_END
 }
