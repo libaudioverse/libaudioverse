@@ -21,7 +21,7 @@ class LavInputDescriptor {
 class LavObject: std::enable_shared_from_this<LavObject> {
 	public:
 	LavObject(int type, LavDevice* device, unsigned int numInputs, unsigned int numOutputs);
-	virtual ~LavObject() = default;
+	virtual ~LavObject();
 
 	virtual void computeInputBuffers();//update what we point to due to parent changes.
 	virtual int getType();

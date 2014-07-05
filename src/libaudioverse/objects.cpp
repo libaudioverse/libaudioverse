@@ -47,6 +47,12 @@ LavObject::LavObject(int type, LavDevice* device, unsigned int numInputs, unsign
 	computeInputBuffers(); //at the moment, this is going to just make them all 0, but it takes effect once parents are added.
 }
 
+LavObject::~LavObject() {
+	for(auto i: outputs) {
+		delete[] i;
+	}
+}
+
 void LavObject::willProcess() {
 	is_processing = true;
 	computeInputBuffers();
