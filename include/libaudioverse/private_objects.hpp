@@ -12,24 +12,25 @@ class LavProperty;
 
 class LavInputDescriptor {
 	public:
-	LavInputDescriptor(LavObject* p, unsigned int o): parent(p), output(o) {}
-	LavObject* parent = nullptr;
+	LavInputDescriptor(std::shared_ptr<LavObject> p, unsigned int o): parent(p), output(o) {}
+	std::shared_ptr<LavObject> parent = nullptr;
 	unsigned int output = 0;
 };
 
 /**Things all Libaudioverse objects have.*/
 class LavObject: std::enable_shared_from_this<LavObject> {
 	public:
-	LavObject(int type, LavDevice* device, unsigned int numInputs, unsigned int numOutputs);
+	LavObject(int type, std::shared_ptr<LavDevice> device, unsigned int numInputs, unsigned int numOutputs);
 	virtual ~LavObject();
 
 	virtual void computeInputBuffers();//update what we point to due to parent changes.
 	virtual int getType();
-	virtual void setParent(unsigned int input, LavObject* parent, unsigned int parentOutput);
-	virtual LavObject* getParentObject(unsigned int slot);
+	virtual void setParent(unsigned int input, std::shared_ptr<LavObject> parent, unsigned int parentOutput);
+	virtual std::shared_ptr<LavObject> getParentObject(unsigned int slot);
 	virtual unsigned int getParentOutput(unsigned int slot);
 	virtual unsigned int getInputCount();
 	virtual unsigned int getOutputCount();
+	//Note that this isn't shared ptr.  The output pointers for an object are managed by the object itself and we need to be able to allocate/deallocate them for SSE, as well as work with arrays.  Don't hold on to output pointers.
 	virtual void getOutputPointers(float** dest);
 
 	/**This requires explanation.
@@ -56,7 +57,7 @@ Consider an hrtf node, taking 22579200 mathematical operations plus loop overhea
 	//the default does nothing.
 	virtual void willProcessParents();
 
-	virtual LavDevice* getDevice();
+	virtual std::shared_ptr<LavDevice> getDevice();
 	virtual LavProperty& getProperty(int slot);
 	virtual std::vector<int> getStaticPropertyIndices();
 
@@ -68,7 +69,7 @@ Consider an hrtf node, taking 22579200 mathematical operations plus loop overhea
 	protected:
 	//this should definitely be protected, and should never be touched by anything that's not a subclass.
 	virtual void resize(unsigned int newInputsCount, unsigned int newOutputsCount);
-	LavDevice *device = nullptr;
+	std::shared_ptr<LavDevice> device = nullptr;
 	std::map<int, LavProperty> properties;
 	std::vector<float*> inputs;
 	std::vector<LavInputDescriptor> input_descriptors;
@@ -86,6 +87,6 @@ Consider an hrtf node, taking 22579200 mathematical operations plus loop overhea
 //needed for things that wish to encapsulate and manage nodes that the public API isn't supposed to see.
 class LavPassthroughObject: public LavObject {
 	public:
-	LavPassthroughObject(int type, LavDevice* device, unsigned int numChannels);
+	LavPassthroughObject(int type, std::shared_ptr<LavDevice> device, unsigned int numChannels);
 	virtual void process();
 };
