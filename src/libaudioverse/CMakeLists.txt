@@ -21,11 +21,11 @@ metadata/metadata.cpp
 
 #specific node types.
 objects/sine.cpp
-#objects/file.cpp
-#objects/hard_limiter.cpp
+objects/file.cpp
+objects/hard_limiter.cpp
 #objects/hrtf.cpp
-#objects/mixer.cpp
-#objects/attenuator.cpp
+objects/mixer.cpp
+objects/attenuator.cpp
 
 #the audio backends and related functionality.
 audio_devices/device_negociation.cpp
