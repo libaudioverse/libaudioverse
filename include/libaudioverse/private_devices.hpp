@@ -19,9 +19,9 @@ class LavDevice {
 	virtual unsigned int getBlockSize() { return block_size;}
 	virtual LavError start();
 	virtual LavError stop();
-	virtual LavError associateObject(LavObject* obj);
-	virtual LavObject* getOutputObject();
-	virtual LavError setOutputObject(LavObject* obj);
+	virtual LavError associateObject(std::shared_ptr<LavObject> obj);
+	virtual std::shared_ptr<LavObject> getOutputObject();
+	virtual LavError setOutputObject(std::shared_ptr<LavObject> obj);
 	virtual float getSr() { return sr;}
 	virtual int getChannels() {return channels;}
 
@@ -31,20 +31,21 @@ class LavDevice {
 
 	protected:
 	//visit all objects in the order they need to be visited if we were processing the graph.
-	virtual void visitAllObjectsInProcessOrder(std::function<void(LavObject*)> visitor);
+	virtual void visitAllObjectsInProcessOrder(std::function<void(std::shared_ptr<LavObject>)> visitor);
 	//visit all objects in the order they must be visited to prepare for and process obj for a block of audio.  This is not the same as all parents: this call respects suspended.
-	virtual void visitForProcessing(LavObject* obj, std::function<void(LavObject*)> visitor);
+	virtual void visitForProcessing(std::shared_ptr<LavObject> obj, std::function<void(std::shared_ptr<LavObject>)> visitor);
 	std::function<void(void)> preprocessing_hook;
 	//this is a reusable vector that we allow to grow, but clear every tick.  Holds nodes in the order we need to process them.
-	std::vector<LavObject*> process_order;
+	std::vector<std::shared_ptr<LavObject>> process_order;
 	unsigned int block_size = 0, channels = 0, mixahead = 0, is_started = 0;
 	float sr = 0.0f;
-	std::set<LavObject*> objects, always_process;
-	LavObject* output_object = nullptr;
+	//if objects die, they automatically need to be removed.  We can do said removal on next process.
+	std::set<std::weak_ptr<LavObject>, std::owner_less<std::weak_ptr<LavObject>>> objects, always_process;
+	std::shared_ptr<LavObject> output_object = nullptr;
 	std::recursive_mutex mutex;
 };
 
 //initialize the audio backend.
 void initializeAudioBackend();
 
-LavDevice* createPortaudioDevice(unsigned int sr, unsigned int channels, unsigned int bufferSize, unsigned int mixahead);
+std::shared_ptr<LavDevice> createPortaudioDevice(unsigned int sr, unsigned int channels, unsigned int bufferSize, unsigned int mixahead);
