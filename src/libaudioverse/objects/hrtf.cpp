@@ -8,13 +8,15 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_properties.hpp>
 #include <libaudioverse/private_macros.hpp>
 #include <libaudioverse/private_hrtf.hpp>
+#include <libaudioverse/private_memory.hpp>
 #include <limits>
 #include <functional>
 #include <algorithm>
+#include <memory>
 
 class LavHrtfObject: public LavObject {
 	public:
-	LavHrtfObject(LavDevice* device, LavHrtfData* hrtf);
+	LavHrtfObject(std::shared_ptr<LavDevice> device, LavHrtfData* hrtf);
 	virtual void process();
 	private:
 	float *history = nullptr, *left_response = nullptr, *right_response = nullptr;
@@ -22,7 +24,7 @@ class LavHrtfObject: public LavObject {
 	bool needs_hrtf_recompute;
 };
 
-LavHrtfObject::LavHrtfObject(LavDevice* device, LavHrtfData* hrtf): LavObject(Lav_OBJTYPE_HRTF, device, 1, 2) {
+LavHrtfObject::LavHrtfObject(std::shared_ptr<LavDevice> device, LavHrtfData* hrtf): LavObject(Lav_OBJTYPE_HRTF, device, 1, 2) {
 	type = Lav_OBJTYPE_HRTF;
 	this->hrtf = hrtf;
 	left_response = new float[hrtf->getLength()];
@@ -34,8 +36,9 @@ LavHrtfObject::LavHrtfObject(LavDevice* device, LavHrtfData* hrtf): LavObject(La
 	getProperty(Lav_HRTF_ELEVATION).setPostChangedCallback(markRecompute);
 }
 
-LavObject* createHrtfObject(LavDevice* device, LavHrtfData* hrtf) {
-	auto retval = new LavHrtfObject(device, hrtf);
+std::shared_ptr<LavObject>createHrtfObject(std::shared_ptr<LavDevice>device, LavHrtfData* hrtf) {
+	auto retval = std::make_shared<LavHrtfObject>(device, hrtf);
+	device->associateObject(retval);
 	return retval;
 }
 
@@ -73,7 +76,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createHrtfObject(LavDevice* device, const char*
 	auto hrtf = new LavHrtfData();
 	hrtf->loadFromFile(hrtfPath);
 	LOCK(*device);
-	auto retval = createHrtfObject(device, hrtf);
-	*destination = retval;
+	auto retval = createHrtfObject(incomingPointer<LavDevice>(device), hrtf);
+	*destination = outgoingPointer<LavObject>(retval);
 	PUB_END
 }

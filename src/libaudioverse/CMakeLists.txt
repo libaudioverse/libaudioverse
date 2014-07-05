@@ -23,7 +23,7 @@ metadata/metadata.cpp
 objects/sine.cpp
 objects/file.cpp
 objects/hard_limiter.cpp
-#objects/hrtf.cpp
+objects/hrtf.cpp
 objects/mixer.cpp
 objects/attenuator.cpp
 
