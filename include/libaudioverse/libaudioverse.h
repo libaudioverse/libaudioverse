@@ -95,6 +95,11 @@ enum Lav_OBJTYPES {
 /**Initialize Libaudioverse.*/
 Lav_PUBLIC_FUNCTION LavError Lav_initializeLibrary();
 
+/**Free any pointer that libaudioverse gives you.  If something goes wrong, namely that the pointer isn't from Libaudioverse in the first place, this tries to fail gracefully, but usually can't.
+
+important: The object is not actually freed at this point.  Libaudioverse objects are only freed when nothing, including libaudioverse parent-child relationships references them.  If you delete a parent without breaking the relationship, you can very definitely see this pointer again, and it will continue playing.*/
+Lav_PUBLIC_FUNCTION LavError Lav_free(void* obj);
+
 //devices...
 Lav_PUBLIC_FUNCTION LavError Lav_createDefaultAudioOutputDevice(LavDevice** destination);
 
