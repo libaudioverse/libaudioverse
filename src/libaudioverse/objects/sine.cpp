@@ -12,25 +12,27 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_functiontables.hpp>
 #include <libaudioverse/private_dspmath.hpp>
 #include <libaudioverse/private_macros.hpp>
+#include <libaudioverse/private_memory.hpp>
 #include <limits>
 
 class LavSineObject: public LavObject {
 	public:
-	LavSineObject(LavDevice* device);
+	LavSineObject(std::shared_ptr<LavDevice> device);
 	virtual void process();
 	float table_delta;
 	unsigned int start ;
 	float offset;
 };
 
-LavSineObject::LavSineObject(LavDevice* device): LavObject(Lav_OBJTYPE_SINE, device, 0, 1) {
+LavSineObject::LavSineObject(std::shared_ptr<LavDevice> device): LavObject(Lav_OBJTYPE_SINE, device, 0, 1) {
 	table_delta = sineTableLength/device->getSr();
 	start = 0;
 	offset = 0;
 }
 
-LavObject* createSineObject(LavDevice* device) {
-	LavSineObject* retval = new LavSineObject(device);
+std::shared_ptr<LavObject> createSineObject(std::shared_ptr<LavDevice> device) {
+	std::shared_ptr<LavSineObject> retval = std::make_shared<LavSineObject>(device);
+	device->associateObject(retval);
 	return retval;
 }
 
@@ -54,7 +56,7 @@ void LavSineObject::process() {
 Lav_PUBLIC_FUNCTION LavError Lav_createSineObject(LavDevice* device, LavObject **destination) {
 	PUB_BEGIN
 	LOCK(*device);
-	LavObject* retval = createSineObject(device);
-	*destination = retval;
+	auto retval = createSineObject(incomingPointer<LavDevice>(device));
+	*destination = outgoingPointer<LavObject>(retval);
 	PUB_END
 }

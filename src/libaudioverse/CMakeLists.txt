@@ -20,7 +20,7 @@ utils/file_reader.cpp
 metadata/metadata.cpp
 
 #specific node types.
-#objects/sine.cpp
+objects/sine.cpp
 #objects/file.cpp
 #objects/hard_limiter.cpp
 #objects/hrtf.cpp
