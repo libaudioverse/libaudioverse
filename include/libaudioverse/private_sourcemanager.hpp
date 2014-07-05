@@ -5,6 +5,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "libaudioverse.h"
 #include "private_objects.hpp"
 #include <glm/glm.hpp>
+#include <memory>
 
 /**This is an abstract class and helper struct that is the minimum a source needs to associate to an object.*/
 
@@ -18,8 +19,8 @@ struct LavEnvironment {
 
 class LavSourceManager: public LavPassthroughObject {
 	public:
-	LavSourceManager(int type, LavDevice* device, unsigned int numChannels): LavPassthroughObject(type, device, numChannels) {}
-	virtual void associateSource(LavSourceObject* source) = 0;
+	LavSourceManager(int type, std::device<LavDevice> device, unsigned int numChannels): LavPassthroughObject(type, device, numChannels) {}
+	virtual void associateSource(std::shared_ptr<LavSourceObject> source) = 0;
 	//must return an appropriate panner object for this environment.
 	virtual LavObject* createPannerObject() = 0;
 };
