@@ -5,6 +5,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_devices.hpp>
 #include <libaudioverse/private_objects.hpp>
 #include <libaudioverse/private_macros.hpp>
+#include <libaudioverse/private_memory.hpp>
 #include <stdlib.h>
 #include <functional>
 #include <algorithm>
@@ -31,7 +32,7 @@ LavError LavDevice::getBlock(float* out) {
 	}
 	//okay, we're not paused.  Visit all objects in the order that they would be processed, and record it.
 	process_order.clear();
-	visitAllObjectsInProcessOrder([this] (LavObject* o) {
+	visitAllObjectsInProcessOrder([this] (std::shared_ptr<LavObject> o) {
 		process_order.push_back(o);
 	});
 	//visit all objects in reverse order.
@@ -65,36 +66,41 @@ LavError LavDevice::stop() {
 	return Lav_ERROR_NONE;
 }
 
-LavError LavDevice::associateObject(LavObject* obj) {
-	objects.insert(obj);
+LavError LavDevice::associateObject(std::shared_ptr<LavObject> obj) {
+	objects.insert(std::weak_ptr<LavObject>(obj));
 	return Lav_ERROR_NONE;
 }
 
-LavError LavDevice::setOutputObject(LavObject* obj) {
+LavError LavDevice::setOutputObject(std::shared_ptr<LavObject> obj) {
 	output_object = obj;
 	return Lav_ERROR_NONE;
 }
 
-LavObject* LavDevice::getOutputObject() {
+std::shared_ptr<LavObject> LavDevice::getOutputObject() {
 	return output_object;
 }
 
-void LavDevice::visitAllObjectsInProcessOrder(std::function<void(LavObject*)> visitor) {
-	std::set<LavObject*> seen;
+void LavDevice::visitAllObjectsInProcessOrder(std::function<void(std::shared_ptr<LavObject>)> visitor) {
+	std::set<std::shared_ptr<LavObject>> seen;
 	if(output_object) {
-		visitForProcessing(output_object, [&](LavObject* o) {
+		visitForProcessing(output_object, [&](std::shared_ptr<LavObject> o) {
 			if(seen.count(o)) return;
 			visitor(o);
 			seen.insert(o);
 		});
 	}
-	std::set<LavObject*> still_needed;
+	std::set<std::shared_ptr<LavObject>> still_needed, always_process_shared;
+	for(auto i: always_process) {
+		auto tmp = i.lock();
+		if(tmp == nullptr) continue;
+		always_process_shared.insert(tmp);
+	}
 	do {
 		still_needed.clear();
-		std::set_difference(always_process.begin(), always_process.end(), seen.begin(), seen.end(),
+		std::set_difference(always_process_shared.begin(), always_process_shared.end(), seen.begin(), seen.end(),
 			std::inserter(still_needed, still_needed.end()));
 		for(auto i = still_needed.begin(); i != still_needed.end(); i++) {
-			visitForProcessing(*i, [&] (LavObject* o) {
+			visitForProcessing(*i, [&] (std::shared_ptr<LavObject> o) {
 				if(seen.count(o) == 0) {
 					visitor(o);
 					seen.insert(o);
@@ -102,9 +108,15 @@ void LavDevice::visitAllObjectsInProcessOrder(std::function<void(LavObject*)> vi
 			});
 		}
 	} while(still_needed.size());
+	always_process.clear();
+	//this keeps us from building up control blocks, etc.
+	//may be premature optimization, but doesn't hurt.
+	for(auto i: always_process_shared) {
+		always_process.insert(i);
+	}
 }
 
-void LavDevice::visitForProcessing(LavObject* obj, std::function<void(LavObject*)> visitor) {
+void LavDevice::visitForProcessing(std::shared_ptr<LavObject> obj, std::function<void(std::shared_ptr<LavObject>)> visitor) {
 	//if obj is null, bail out.  This is the base case.
 	if(obj == nullptr) return;
 	//if the object is suspended, we also bail out: this object and its parents are not needed.
@@ -120,13 +132,13 @@ void LavDevice::visitForProcessing(LavObject* obj, std::function<void(LavObject*
 
 Lav_PUBLIC_FUNCTION LavError Lav_deviceSetOutputObject(LavDevice* device, LavObject* object) {
 	LOCK(*device);
-	device->setOutputObject(object);
+	device->setOutputObject(incomingPointer<LavObject>(object));
 	return Lav_ERROR_NONE;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetOutputObject(LavDevice* device, LavObject** destination) {
 	LOCK(*device);
-	*destination = device->getOutputObject();
+	*destination = outgoingPointer<LavObject>(device->getOutputObject());
 	return Lav_ERROR_NONE;
 }
 
