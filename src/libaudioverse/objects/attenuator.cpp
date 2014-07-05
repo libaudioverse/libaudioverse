@@ -7,19 +7,22 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_objects.hpp>
 #include <libaudioverse/private_properties.hpp>
 #include <libaudioverse/private_macros.hpp>
+#include <libaudioverse/private_memory.hpp>
 #include <limits>
+#include <memory>
 
 class LavAttenuatorObject: public LavObject {
 	public:
-	LavAttenuatorObject(LavDevice* device, unsigned int numChannels);
+	LavAttenuatorObject(std::shared_ptr<LavDevice> device, unsigned int numChannels);
 	virtual void process();
 };
 
-LavAttenuatorObject::LavAttenuatorObject(LavDevice* device, unsigned int numChannels): LavObject(Lav_OBJTYPE_ATTENUATOR, device, numChannels, numChannels) {
+LavAttenuatorObject::LavAttenuatorObject(std::shared_ptr<LavDevice> device, unsigned int numChannels): LavObject(Lav_OBJTYPE_ATTENUATOR, device, numChannels, numChannels) {
 }
 
-LavObject* createAttenuatorObject(LavDevice* device, unsigned int numChannels) {
-	auto retval = new LavAttenuatorObject(device, numChannels);
+std::shared_ptr<LavObject>createAttenuatorObject(std::shared_ptr<LavDevice> device, unsigned int numChannels) {
+	auto retval = std::make_shared<LavAttenuatorObject>(device, numChannels);
+	device->associateObject(retval);
 	return retval;
 }
 
@@ -38,6 +41,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createAttenuatorObject(LavDevice* device, unsig
 	PUB_BEGIN
 	LOCK(*device);
 	auto retval = createAttenuatorObject(device, numChannels);
-	*destination = retval;
+	*destination = outgoingPointer<LavObject>(retval);
 	PUB_END
 }
