@@ -47,9 +47,9 @@ def _wrap(handle):
 	val = _handles_to_objects.get(handle, None)
 	if val is not None:
 		return val
-	val = GenericObject(handle) #the GenericObject simply wraps, doesn't actually construct.
-	#this is magic that does work and is apparently used by pickle.
-	val.__class__ = _types_to_classes[_lav.object_get_type(handle)]
+	val = _types_to_classes[_lav.object_get_type(handle)].__new__(cls) #We need to avoid the call to __init__.
+	#all classes which wrap libaudioverse objects have only a .handle attribute at this time, and are otherwise uniform; consequently, we can fill it in here.
+	val.handle = handle
 	return val
 
 #build and register all the error classes.
