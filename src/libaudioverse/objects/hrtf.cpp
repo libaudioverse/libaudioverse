@@ -17,6 +17,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 class LavHrtfObject: public LavObject {
 	public:
 	LavHrtfObject(std::shared_ptr<LavDevice> device, std::shared_ptr<LavHrtfData> hrtf);
+	~LavHrtfObject();
 	virtual void process();
 	private:
 	float *history = nullptr, *left_response = nullptr, *right_response = nullptr;
@@ -34,6 +35,12 @@ LavHrtfObject::LavHrtfObject(std::shared_ptr<LavDevice> device, std::shared_ptr<
 	auto markRecompute = [this](){needs_hrtf_recompute = true;};
 	getProperty(Lav_HRTF_AZIMUTH).setPostChangedCallback(markRecompute);
 	getProperty(Lav_HRTF_ELEVATION).setPostChangedCallback(markRecompute);
+}
+
+LavHrtfObject::~LavHrtfObject() {
+	delete[] history;
+	delete[] left_response;
+	delete[] right_response;
 }
 
 std::shared_ptr<LavObject>createHrtfObject(std::shared_ptr<LavDevice>device, std::shared_ptr<LavHrtfData> hrtf) {
