@@ -142,6 +142,11 @@ class GenericObject(object):
 {{implement_property(enumerant, prop)}}
 {%endfor%}
 
+	def __del__(self):
+		if self.handle is not None:
+			_lav.free(self.handle)
+		self.handle = None
+
 	@property
 	def parents(self):
 		"""Returns a ParentProxy, an object that acts like a list of tuples.  The first item of each tuple is the parent object and the second item is the ooutput to which we are connected."""
