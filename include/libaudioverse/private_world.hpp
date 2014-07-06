@@ -5,6 +5,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "libaudioverse.h"
 #include "private_sourcemanager.hpp"
 #include <vector>
+#include <set>
 #include <memory>
 
 class LavSourceObject;
@@ -20,7 +21,7 @@ class LavWorldObject: public LavSourceManager {
 	private:
 	//while these may be parents (through virtue of the panners we give out), they also have to hold a reference to us-and that reference must be strong.
 	//the world is more capable of handling a source that dies than a source a world that dies.
-	std::set<std::weak_ptr<LavSourceObject>, std::owner_less> sources;
+	std::set<std::weak_ptr<LavSourceObject>, std::owner_less<std::weak_ptr<LavSourceObject>>> sources;
 	//these are parents of us, so this doesn't create cyclic behavior.  We give a new one out and connect it through our mixer for each source.
 	std::vector<std::shared_ptr<LavObject>> panners;
 	std::shared_ptr<LavObject> mixer = nullptr, limiter = nullptr;

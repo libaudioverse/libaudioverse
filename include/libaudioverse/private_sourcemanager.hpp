@@ -19,7 +19,7 @@ struct LavEnvironment {
 
 class LavSourceManager: public LavPassthroughObject {
 	public:
-	LavSourceManager(int type, std::device<LavDevice> device, unsigned int numChannels): LavPassthroughObject(type, device, numChannels) {}
+	LavSourceManager(int type, std::shared_ptr<LavDevice> device, unsigned int numChannels): LavPassthroughObject(type, device, numChannels) {}
 	//Register a source for updates.  Subclasses should only hold a weak_ptr to the source and should allow it to die.
 	virtual void registerSourceForUpdates(std::shared_ptr<LavSourceObject> source) = 0;
 	//must return an appropriate panner object for this environment.

@@ -35,7 +35,7 @@ LavWorldObject::LavWorldObject(std::shared_ptr<LavDevice> device, std::shared_pt
 }
 
 std::shared_ptr<LavWorldObject> createWorldObject(std::shared_ptr<LavDevice> device, std::shared_ptr<LavHrtfData> hrtf) {
-	return std::make_shared<LavWorldObject>LavWorldObject(device, hrtf);
+	return std::make_shared<LavWorldObject>(device, hrtf);
 }
 
 void LavWorldObject::willProcessParents() {
@@ -50,8 +50,9 @@ void LavWorldObject::willProcessParents() {
 	//todo: the following needs to clean up dead sources.
 	//give the new environment to the sources.
 	for(auto i: sources) {
-		if(i.expired()) contiue;
-		i->update(environment);
+		auto tmp = i.lock();
+		if(tmp == nullptr) continue;
+		tmp->update(environment);
 	}
 }
 
@@ -61,9 +62,10 @@ std::shared_ptr<LavObject> LavWorldObject::createPannerObject() {
 	panners.push_back(pan);
 	//todo: assumes stereo implicitly, this is bad.
 	//expand the mixer by one parent.
-	mixer.getProperty(Lav_MIXER_MAX_PARENTS).setIntValue(panners.size());
-	mixer.setParent(slot*2, pan, 0);
-	mixer.setParent(slot*2+1, pan, 1);
+	mixer->getProperty(Lav_MIXER_MAX_PARENTS).setIntValue(panners.size());
+	mixer->setParent(slot*2, pan, 0);
+	mixer->setParent(slot*2+1, pan, 1);
+	return pan;
 }
 
 void LavWorldObject::registerSourceForUpdates(std::shared_ptr<LavSourceObject> source) {
@@ -76,7 +78,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createWorldObject(LavDevice* device, const char
 	PUB_BEGIN
 	auto hrtf = std::make_shared<LavHrtfData>();
 	hrtf->loadFromFile(hrtfPath);
-	auto retval = createWorldObject(device, hrtf);
+	auto retval = createWorldObject(incomingPointer<LavDevice>(device), hrtf);
 	*destination = outgoingPointer<LavObject>(retval);
 	PUB_END
 }

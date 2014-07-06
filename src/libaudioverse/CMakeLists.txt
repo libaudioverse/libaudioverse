@@ -33,8 +33,8 @@ audio_devices/devices.cpp
 audio_devices/portaudio.cpp
 
 #the 3D abstraction on top of libaudioverse.
-#3d/world.cpp
-#3d/sources.cpp
+3d/world.cpp
+3d/sources.cpp
 )
 TARGET_LINK_LIBRARIES(libaudioverse ${libaudioverse_required_libraries})
 
