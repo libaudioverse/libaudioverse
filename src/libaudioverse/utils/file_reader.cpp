@@ -6,6 +6,10 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <sndfile.h>
 #include <libaudioverse/private_errors.hpp>
 
+LavFileReader::~LavFileReader() {
+	if(handle) close(); //make sure the file gets closed behind us.
+}
+
 void LavFileReader::open(const char* path) {
 	if(handle) throw LavErrorException(Lav_ERROR_FILE);
 	handle = sf_open(path, SFM_READ, &info);

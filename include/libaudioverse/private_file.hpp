@@ -12,6 +12,7 @@ This can theoreticaly handle any type of file, including codec decoding, but use
 class LavFileReader: std::enable_shared_from_this<LavFileReader>  {
 	public:
 	LavFileReader(): info() {} //vc++ crashes if we try to do this the c++11 way.
+	~LavFileReader();
 	void open(const char* path);
 	void close();
 	float getSr();
