@@ -8,6 +8,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 class LavHrtfData {
 	public:
+	~LavHrtfData();
 	//get the appropriate coefficients for one channel.  A stereo hrtf is two calls to this function.
 	void computeCoefficientsMono(float elevation, float azimuth, float* out);
 

@@ -30,6 +30,14 @@ void reverse_endianness(char* buffer, unsigned int count, unsigned int window) {
 //this makes sure that we aren't about to do something silently dangerous and tels us at compile time.
 static_assert(sizeof(float) == 4, "Sizeof float is not 4; cannot safely work with hrtfs");
 
+LavHrtfData::~LavHrtfData() {
+	for(unsigned int i = 0; i < elev_count; i++) {
+		delete[] hrirs[i];
+	}
+	delete[] hrirs;
+	delete[] azimuth_counts;
+}
+
 unsigned int LavHrtfData::getLength() {
 	return hrir_length;
 }
