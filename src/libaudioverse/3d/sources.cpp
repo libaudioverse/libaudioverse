@@ -9,6 +9,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_constants.hpp>
 #include <libaudioverse/private_devices.hpp>
 #include <libaudioverse/private_creators.hpp>
+#include <libaudioverse/private_memory.hpp>
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/libaudioverse3d.h>
@@ -30,9 +31,10 @@ LavSourceObject::LavSourceObject(std::shared_ptr<LavDevice> device, std::shared_
 	this->manager = manager;
 }
 
-std::shared_ptr<LavObject> createSourceObject(std::shared_ptr<LavDevice> device, std:;shared_ptr<LavSourceManager> manager, std::shared_ptr<LavObject> sourceNode) {
-	auto temp -= std::make_shared<LavSourceObject>(device, manager, sourceNode);
+std::shared_ptr<LavObject> createSourceObject(std::shared_ptr<LavDevice> device, std::shared_ptr<LavSourceManager> manager, std::shared_ptr<LavObject> sourceNode) {
+	auto temp = std::make_shared<LavSourceObject>(device, manager, sourceNode);
 	manager->registerSourceForUpdates(temp);
+	return temp;
 }
 
 //helper function: calculates gains given distance models.
