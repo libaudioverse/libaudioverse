@@ -18,6 +18,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 class LavFileObject: public LavObject {
 	public:
 	LavFileObject(std::shared_ptr<LavDevice> device, const char* path, unsigned int channels);
+	~LavFileObject();
 	virtual void process();
 	void seek(); //property callback.
 	protected:
@@ -37,6 +38,10 @@ LavFileObject::LavFileObject(std::shared_ptr<LavDevice> device, const char* path
 	delta = file.getSr()/device->getSr();
 	getProperty(Lav_FILE_POSITION).setPostChangedCallback([this] () {seek();});
 	getProperty(Lav_FILE_POSITION).setFloatRange(0.0f, file.getFrameCount()/(float)file.getSr());
+}
+
+LavFileObject::~LavFileObject() {
+	delete[] buffer;
 }
 
 std::shared_ptr<LavObject> createFileObject(std::shared_ptr<LavDevice> device, const char* path) {
