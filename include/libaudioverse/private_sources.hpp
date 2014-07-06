@@ -7,13 +7,12 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "private_sourcemanager.hpp"
 #include <memory>
 
-class LavSourceObject: public LavPassthroughObject {
+class LavSourceObject: public LavObject {
 	public:
 	LavSourceObject(std::shared_ptr<LavDevice> device, std::shared_ptr<LavSourceManager> world, std::shared_ptr<LavObject> sourceNode);
 	void update(LavEnvironment env);
 	virtual void willProcessParents();
 	private:
 	std::shared_ptr<LavObject> source_object, panner_object, attenuator_object;
-	LavEnvironment environment;
 	std::shared_ptr<LavSourceManager> manager;
 };

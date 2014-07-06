@@ -17,27 +17,22 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdlib.h>
 #include <glm/glm.hpp>
 #include <limits>
+#include <memory>
 
-LavSourceObject::LavSourceObject(LavDevice* device, LavSourceManager* manager, LavObject* sourceNode): LavPassthroughObject(Lav_OBJTYPE_SOURCE, device, device->getChannels()) {
+
+LavSourceObject::LavSourceObject(std::shared_ptr<LavDevice> device, std::shared_ptr<LavSourceManager> manager, std::shared_ptr<LavObject> sourceNode): LavObject(Lav_OBJTYPE_SOURCE, device, 1, 0) {
 	if(sourceNode->getOutputCount() > 1) throw LavErrorException(Lav_ERROR_SHAPE);
 	source_object = sourceNode;
 	attenuator_object = createAttenuatorObject(device, 1);
 	panner_object = manager->createPannerObject();
 	attenuator_object->setParent(0, source_object, 0);
 	panner_object->setParent(0, attenuator_object, 0);
-	for(unsigned int i = 0; i <inputs.size(); i++) {
-		setParent(i, panner_object, i);
-	}
 	this->manager = manager;
-	manager->associateSource(this);
 }
 
-LavObject* createSourceObject(LavDevice* device, LavSourceManager* manager, LavObject* sourceNode) {
-	return new LavSourceObject(device, manager, sourceNode);
-}
-
-void LavSourceObject::update(LavEnvironment env) {
-	environment = env;
+std::shared_ptr<LavObject> createSourceObject(std::shared_ptr<LavDevice> device, std:;shared_ptr<LavSourceManager> manager, std::shared_ptr<LavObject> sourceNode) {
+	auto temp -= std::make_shared<LavSourceObject>(device, manager, sourceNode);
+	manager->registerSourceForUpdates(temp);
 }
 
 //helper function: calculates gains given distance models.
@@ -52,7 +47,7 @@ float calculateGainForDistanceModel(int model, float distance, float maxDistance
 	return retval;
 }
 
-void LavSourceObject::willProcessParents() {
+	void LavSourceObject::update(LavEnvironment environment) {
 	//first, extract the vector of our position.
 	const float* pos = getProperty(Lav_3D_POSITION).getFloat3Value();
 	glm::vec4 npos = environment.world_to_listener_transform*glm::vec4(pos[0], pos[1], pos[2], 1.0f);
@@ -77,7 +72,7 @@ void LavSourceObject::willProcessParents() {
 
 Lav_PUBLIC_FUNCTION LavError Lav_createSourceObject(LavDevice* device, LavObject* environment, LavObject* node, LavObject** destination) {
 	PUB_BEGIN
-	LavObject* retval = createSourceObject(device, (LavSourceManager*)environment, node);
-	*destination = retval;
+	auto retval = createSourceObject(incomingPointer<LavDevice>(device), incomingPointer<LavSourceManager>(environment), incomingPointer<LavObject>(node));
+	*destination = outgoingPointer<LavObject>(retval);
 	PUB_END
 }
