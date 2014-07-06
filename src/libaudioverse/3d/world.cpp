@@ -8,6 +8,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_macros.hpp>
 #include <libaudioverse/private_creators.hpp>
 #include <libaudioverse/private_devices.hpp>
+#include <libaudioverse/private_memory.hpp>
 #include <libaudioverse/private_hrtf.hpp>
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
@@ -18,7 +19,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <algorithm>
 #include <vector>
 
-LavWorldObject::LavWorldObject(LavDevice* device, LavHrtfData* hrtf): LavSourceManager(Lav_OBJTYPE_WORLD, device, device->getChannels()) {
+LavWorldObject::LavWorldObject(std::shared_ptr<LavDevice> device, std::shared_ptr<LavHrtfData> hrtf): LavSourceManager(Lav_OBJTYPE_WORLD, device, device->getChannels()) {
 	this->hrtf = hrtf;
 	mixer = createMixerObject(device, 1, device->getChannels());
 	limiter = createHardLimiterObject(device, device->getChannels());
@@ -33,8 +34,8 @@ LavWorldObject::LavWorldObject(LavDevice* device, LavHrtfData* hrtf): LavSourceM
 		glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
-LavWorldObject* createWorldObject(LavDevice* device, LavHrtfData* hrtf) {
-	return new LavWorldObject(device, hrtf);
+std::shared_ptr<LavWorldObject> createWorldObject(std::shared_ptr<LavDevice> device, std::shared_ptr<LavHrtfData> hrtf) {
+	return std::make_shared<LavWorldObject>LavWorldObject(device, hrtf);
 }
 
 void LavWorldObject::willProcessParents() {
@@ -46,37 +47,36 @@ void LavWorldObject::willProcessParents() {
 		glm::vec3(atup[0], atup[1], atup[2]),
 		glm::vec3(atup[3], atup[4], atup[5]));
 
+	//todo: the following needs to clean up dead sources.
 	//give the new environment to the sources.
 	for(auto i: sources) {
+		if(i.expired()) contiue;
 		i->update(environment);
 	}
 }
 
-LavObject* LavWorldObject::createPannerObject() {
-	return createHrtfObject(device, hrtf);
+std::shared_ptr<LavObject> LavWorldObject::createPannerObject() {
+	auto pan = createHrtfObject(device, hrtf);
+	unsigned int slot = panners.size();
+	panners.push_back(pan);
+	//todo: assumes stereo implicitly, this is bad.
+	//expand the mixer by one parent.
+	mixer.getProperty(Lav_MIXER_MAX_PARENTS).setIntValue(panners.size());
+	mixer.setParent(slot*2, pan, 0);
+	mixer.setParent(slot*2+1, pan, 1);
 }
 
-void LavWorldObject::associateSource(LavSourceObject* source) {
-	//if this already exists, bail out.
-	int found = std::count(sources.begin(), sources.end(), source);
-	if(found) return; //it's not an error.
-	sources.push_back(source);
-	//tell the mixer that we would like it to have more parents.
-	mixer->getProperty(Lav_MIXER_MAX_PARENTS).setIntValue(sources.size());
-	unsigned int ind = sources.size()-1;
-	unsigned int startInput = ind*device->getChannels();
-	for(int i = 0; i < device->getChannels(); i++) {
-		mixer->setParent(startInput+i, source, i);
-	}
+void LavWorldObject::registerSourceForUpdates(std::shared_ptr<LavSourceObject> source) {
+	sources.insert(source);
 }
 
 //begin public api
 
 Lav_PUBLIC_FUNCTION LavError Lav_createWorldObject(LavDevice* device, const char*hrtfPath, LavObject** destination) {
 	PUB_BEGIN
-	auto hrtf = new LavHrtfData();
+	auto hrtf = std::make_shared<LavHrtfData>();
 	hrtf->loadFromFile(hrtfPath);
-	LavObject* retval = createWorldObject(device, hrtf);
-	*destination = retval;
+	auto retval = createWorldObject(device, hrtf);
+	*destination = outgoingPointer<LavObject>(retval);
 	PUB_END
 }

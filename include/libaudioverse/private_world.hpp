@@ -13,12 +13,16 @@ class LavHrtfData;
 class LavWorldObject: public LavSourceManager {
 	public:
 	LavWorldObject(std::shared_ptr<LavDevice> device, std::shared_ptr<LavHrtfData> hrtf);
-	void associateSource(std::shared_ptr<LavSourceObject> source);
+	void registerSourceForUpdates(std::shared_ptr<LavSourceObject> source);
 	//call update on all sources.
 	virtual void willProcessParents();
 	std::shared_ptr<LavObject> createPannerObject();
 	private:
-	std::vector<std::shared_ptr<LavSourceObject>> sources;
+	//while these may be parents (through virtue of the panners we give out), they also have to hold a reference to us-and that reference must be strong.
+	//the world is more capable of handling a source that dies than a source a world that dies.
+	std::set<std::weak_ptr<LavSourceObject>, std::owner_less> sources;
+	//these are parents of us, so this doesn't create cyclic behavior.  We give a new one out and connect it through our mixer for each source.
+	std::vector<std::shared_ptr<LavObject>> panners;
 	std::shared_ptr<LavObject> mixer = nullptr, limiter = nullptr;
 	std::shared_ptr<LavHrtfData > hrtf;
 	LavEnvironment environment;
