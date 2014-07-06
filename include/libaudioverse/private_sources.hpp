@@ -11,7 +11,6 @@ class LavSourceObject: public LavObject {
 	public:
 	LavSourceObject(std::shared_ptr<LavDevice> device, std::shared_ptr<LavSourceManager> world, std::shared_ptr<LavObject> sourceNode);
 	void update(LavEnvironment env);
-	virtual void willProcessParents();
 	private:
 	std::shared_ptr<LavObject> source_object, panner_object, attenuator_object;
 	std::shared_ptr<LavSourceManager> manager;

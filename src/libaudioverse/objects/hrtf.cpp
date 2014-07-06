@@ -16,15 +16,15 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 class LavHrtfObject: public LavObject {
 	public:
-	LavHrtfObject(std::shared_ptr<LavDevice> device, LavHrtfData* hrtf);
+	LavHrtfObject(std::shared_ptr<LavDevice> device, std::shared_ptr<LavHrtfData> hrtf);
 	virtual void process();
 	private:
 	float *history = nullptr, *left_response = nullptr, *right_response = nullptr;
-	LavHrtfData* hrtf = nullptr;
+	std::shared_ptr<LavHrtfData> hrtf = nullptr;
 	bool needs_hrtf_recompute;
 };
 
-LavHrtfObject::LavHrtfObject(std::shared_ptr<LavDevice> device, LavHrtfData* hrtf): LavObject(Lav_OBJTYPE_HRTF, device, 1, 2) {
+LavHrtfObject::LavHrtfObject(std::shared_ptr<LavDevice> device, std::shared_ptr<LavHrtfData> hrtf): LavObject(Lav_OBJTYPE_HRTF, device, 1, 2) {
 	type = Lav_OBJTYPE_HRTF;
 	this->hrtf = hrtf;
 	left_response = new float[hrtf->getLength()];
@@ -36,7 +36,7 @@ LavHrtfObject::LavHrtfObject(std::shared_ptr<LavDevice> device, LavHrtfData* hrt
 	getProperty(Lav_HRTF_ELEVATION).setPostChangedCallback(markRecompute);
 }
 
-std::shared_ptr<LavObject>createHrtfObject(std::shared_ptr<LavDevice>device, LavHrtfData* hrtf) {
+std::shared_ptr<LavObject>createHrtfObject(std::shared_ptr<LavDevice>device, std::shared_ptr<LavHrtfData> hrtf) {
 	auto retval = std::make_shared<LavHrtfObject>(device, hrtf);
 	device->associateObject(retval);
 	return retval;
@@ -73,7 +73,7 @@ void LavHrtfObject::process() {
 
 Lav_PUBLIC_FUNCTION LavError Lav_createHrtfObject(LavDevice* device, const char* hrtfPath, LavObject** destination) {
 	PUB_BEGIN
-	auto hrtf = new LavHrtfData();
+	auto hrtf = std::make_shared<LavHrtfData>();
 	hrtf->loadFromFile(hrtfPath);
 	LOCK(*device);
 	auto retval = createHrtfObject(incomingPointer<LavDevice>(device), hrtf);
