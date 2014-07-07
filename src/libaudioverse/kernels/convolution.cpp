@@ -24,7 +24,7 @@ void crossfadeConvolutionKernel(float* input, unsigned int outputSampleCount, fl
 		float weight2 = i*delta;
 		float samp = 0.0f;
 		for(unsigned int j = 0; j < responseLength; j++) {
-			samp += input[i + j] * (weight1*from[responseLength=j-1] + to[responseLength-j-1]);
+			samp += input[i + j] * (weight1*from[responseLength-j-1] + weight2*to[responseLength-j-1]);
 		}
 	output[i] = samp;
 	}

@@ -21,7 +21,7 @@ class LavHrtfObject: public LavObject {
 	~LavHrtfObject();
 	virtual void process();
 	private:
-	float *history = nullptr, *left_response = nullptr, *right_response = nullptr;
+	float *history = nullptr, *left_response = nullptr, *right_response = nullptr, *old_left_response = nullptr, *old_right_response = nullptr;
 	std::shared_ptr<LavHrtfData> hrtf = nullptr;
 	bool needs_hrtf_recompute;
 };
@@ -31,6 +31,9 @@ LavHrtfObject::LavHrtfObject(std::shared_ptr<LavDevice> device, std::shared_ptr<
 	this->hrtf = hrtf;
 	left_response = new float[hrtf->getLength()];
 	right_response = new float[hrtf->getLength()];
+	//used for moving objects.
+	old_left_response = new float[hrtf->getLength()];
+	old_right_response = new float[hrtf->getLength()];
 	history = new float[hrtf->getLength() + device->getBlockSize()](); //odd c++ syntax to create 0-initialized array.
 	hrtf->computeCoefficientsStereo(0.0f, 0.0f, left_response, right_response);
 	auto markRecompute = [this](){needs_hrtf_recompute = true;};
@@ -52,11 +55,15 @@ std::shared_ptr<LavObject>createHrtfObject(std::shared_ptr<LavDevice>device, std
 
 void LavHrtfObject::process() {
 	//calculating the hrir is expensive, do it only if needed.
+	bool didRecompute = false;
 	if(needs_hrtf_recompute) {
 		const float elev = getProperty(Lav_HRTF_ELEVATION).getFloatValue();
 		const float az = getProperty(Lav_HRTF_AZIMUTH).getFloatValue();
+		std::copy(left_response, left_response+hrtf->getLength(), old_left_response);
+		std::copy(right_response, right_response+hrtf->getLength(), old_right_response);
 		hrtf->computeCoefficientsStereo(elev, az, left_response, right_response);
 		needs_hrtf_recompute = false;
+		didRecompute = true;
 	}
 	float *start = history+hrtf->getLength(), *end = history+hrtf->getLength()+device->getBlockSize();
 	//get the block size.
@@ -66,8 +73,14 @@ void LavHrtfObject::process() {
 	//stick our input on the end...
 	std::copy(inputs[0], inputs[0]+block_size, start);
 	//finally, do the usual convolution loop.
-	convolutionKernel(history, block_size, outputs[0], hrtf->getLength(), left_response);
-	convolutionKernel(history, block_size, outputs[1], hrtf->getLength(), right_response);
+	if(didRecompute) { //very, very slow.
+		crossfadeConvolutionKernel(history, block_size, outputs[0], hrtf->getLength(), old_left_response, left_response);
+		crossfadeConvolutionKernel(history, block_size, outputs[1], hrtf->getLength(), old_right_response, right_response);
+	}
+	else {
+		convolutionKernel(history, block_size, outputs[0], hrtf->getLength(), left_response);
+		convolutionKernel(history, block_size, outputs[1], hrtf->getLength(), right_response);
+	}
 }
 
 //begin public api
