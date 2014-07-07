@@ -15,3 +15,17 @@ void convolutionKernel(float* input, unsigned int outputSampleCount, float* outp
 		output[i] = samp;
 	}
 }
+
+
+void crossfadeConvolutionKernel(float* input, unsigned int outputSampleCount, float* output, unsigned int responseLength, float* from, float* to) {
+	float delta = 1.0f/outputSampleCount;
+	for(unsigned int i = 0; i < outputSampleCount; i++) {
+		float weight1 = 1.0f-delta*i;
+		float weight2 = i*delta;
+		float samp = 0.0f;
+		for(unsigned int j = 0; j < responseLength; j++) {
+			samp += input[i + j] * (weight1*from[responseLength=j-1] + to[responseLength-j-1]);
+		}
+	output[i] = samp;
+	}
+}
