@@ -8,13 +8,13 @@ objects.cpp
 properties.cpp
 functiontables.cpp
 initialization.cpp
-interleaving.cpp
-hrtf.cpp
-dspmath.cpp
 memory.cpp
 
 #utilities: file reading, platform-specific code, etc:
 utils/file_reader.cpp
+utils/interleaving.cpp
+utils/hrtf.cpp
+utils/dspmath.cpp
 
 #the metadata store
 metadata/metadata.cpp
