@@ -143,7 +143,7 @@ class GenericObject(object):
 {%endfor%}
 
 	def __del__(self):
-		if self.handle is not None:
+		if getattr(self, 'handle', None) is not None:
 			_lav.free(self.handle)
 		self.handle = None
 
