@@ -9,6 +9,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_macros.hpp>
 #include <libaudioverse/private_hrtf.hpp>
 #include <libaudioverse/private_memory.hpp>
+#include <libaudioverse/private_kernels.hpp>
 #include <limits>
 #include <functional>
 #include <algorithm>
@@ -65,15 +66,8 @@ void LavHrtfObject::process() {
 	//stick our input on the end...
 	std::copy(inputs[0], inputs[0]+block_size, start);
 	//finally, do the usual convolution loop.
-	for(unsigned int i = 0; i < block_size; i++, start++) {
-		float outLeft = 0, outRight = 0;
-		for(unsigned int j = 0; j < hrtfLength; j++) {
-			outLeft += left_response[j]* *(start-j);
-			outRight += right_response[j]* *(start-j);
-		}
-	outputs[0][i] = outLeft;
-	outputs[1][i] = outRight;
-	}
+	convolutionKernel(history, block_size, outputs[0], hrtf->getLength(), left_response);
+	convolutionKernel(history, block_size, outputs[1], hrtf->getLength(), right_response);
 }
 
 //begin public api

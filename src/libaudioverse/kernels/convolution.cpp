@@ -10,7 +10,7 @@ void convolutionKernel(float* input, unsigned int outputSampleCount, float* outp
 	for(unsigned int i = 0; i < outputSampleCount; i++) {
 		float samp = 0.0f;
 		for(unsigned int j = 0; j < responseLength; j++) {
-			samp += input[i+j]*response[responseLength-j];
+			samp += input[i+j]*response[responseLength-j-1];
 		}
 		output[i] = samp;
 	}
