@@ -19,6 +19,9 @@ utils/dspmath.cpp
 #the metadata store
 metadata/metadata.cpp
 
+#mathematical kernels for common dsp operations.
+kernels/convolution.cpp
+
 #specific node types.
 objects/sine.cpp
 objects/file.cpp
