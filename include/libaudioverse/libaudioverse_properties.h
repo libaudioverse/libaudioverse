@@ -44,6 +44,12 @@ enum Lav_MIXER_PROPERTIES {
 	Lav_MIXER_INPUTS_PER_PARENT = -2,
 };
 
+enum Lav_DELAY_PROPERTIES {
+	Lav_DELAY_DELAY = -1,
+	Lav_DELAY_DELAY_MAX = -2,
+	Lav_DELAY_FEEDBACK = -3,
+};
+
 #ifdef __cplusplus
 }
 #endif

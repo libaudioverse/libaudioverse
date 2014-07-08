@@ -90,6 +90,7 @@ enum Lav_OBJTYPES {
 	Lav_OBJTYPE_MIXER = 6,
 	Lav_OBJTYPE_ATTENUATOR = 7,
 	Lav_OBJTYPE_HARD_LIMITER = 8,
+	Lav_OBJTYPE_DELAY = 9,
 };
 
 /**Initialize Libaudioverse.*/
