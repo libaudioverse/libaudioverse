@@ -14,3 +14,4 @@ std::shared_ptr<LavObject> createHardLimiterObject(std::shared_ptr<LavDevice> de
 std::shared_ptr<LavObject> createHrtfObject(std::shared_ptr<LavDevice> device, std::shared_ptr<LavHrtfData> hrtf);
 std::shared_ptr<LavObject> createMixerObject(std::shared_ptr<LavDevice> device, unsigned int maxParents, unsigned int inputsPerParent);
 std::shared_ptr<LavObject> createSineObject(std::shared_ptr<LavDevice> device);
+std::shared_ptr<LavObject> createDelayObject(std::shared_ptr<LavDevice> device, unsigned int lines);

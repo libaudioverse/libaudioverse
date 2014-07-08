@@ -12,6 +12,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <memory>
 
 class LavDelay: public LavObject {
+	public:
 	LavDelay(std::shared_ptr<LavDevice> device, unsigned int lines);
 	~LavDelay();
 	void process();
@@ -25,6 +26,12 @@ LavDelay::LavDelay(std::shared_ptr<LavDevice> device, unsigned int lines): LavOb
 	if(lines == 0) throw LavErrorException(Lav_ERROR_RANGE);
 	getProperty(Lav_DELAY_DELAY_MAX).setPostChangedCallback([this] () {maxDelayChanged();});
 	maxDelayChanged(); //delegate the allocation.
+}
+
+std::shared_ptr<LavObject> createDelayObject(std::shared_ptr<LavDevice> device, unsigned int lines) {
+	auto tmp = std::make_shared<LavDelay>(device, lines);
+	device->associateObject(tmp);
+	return tmp;
 }
 
 LavDelay::~LavDelay() {
@@ -71,4 +78,13 @@ void LavDelay::process() {
 			outputs[output][i] = weight1*delay_lines[output][samp1]+weight2*delay_lines[output][samp2];
 		}
 	}
+}
+
+//begin public api
+
+Lav_PUBLIC_FUNCTION LavError Lav_createDelayObject(LavDevice* device, unsigned int lines, LavObject** destination) {
+	PUB_BEGIN
+	auto d = createDelayObject(incomingPointer<LavDevice>(device), lines);
+	*destination = outgoingPointer(d);
+	PUB_END
 }

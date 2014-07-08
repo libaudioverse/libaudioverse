@@ -173,6 +173,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_createAttenuatorObject(LavDevice* device, unsig
 /**A hard limiter*/
 Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterObject(LavDevice* device, unsigned int numInputs, LavObject** destination);
 
+/**Delay line.*/
+Lav_PUBLIC_FUNCTION LavError Lav_createDelayObject(LavDevice* device, unsigned int lines, LavObject** destination);
+
 #ifdef __cplusplus
 }
 #endif
