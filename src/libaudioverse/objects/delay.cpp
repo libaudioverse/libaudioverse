@@ -65,7 +65,7 @@ void LavDelay::maxDelayChanged() {
 }
 
 void LavDelay::process() {
-	float delay = getProperty(Lav_DELAY_DELAY).getFloatValue();
+	float delay = getProperty(Lav_DELAY_DELAY).getFloatValue()*device->getSr();
 	int readOffset = (unsigned int)floorf(delay);
 	float offset = delay-floorf(delay);
 	//this prevents us from actually trying to read the future.
