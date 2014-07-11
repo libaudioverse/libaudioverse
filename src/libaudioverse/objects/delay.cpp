@@ -22,6 +22,7 @@ class LavDelay: public LavObject {
 	std::vector<float*> delay_lines;
 	int delay_line_length = 0;
 	int write_pos = 0, line_count = 0;
+	float current_delay_pos = 0;
 };
 
 LavDelay::LavDelay(std::shared_ptr<LavDevice> device, unsigned int lines): LavObject(Lav_OBJTYPE_DELAY, device, lines, lines) {
@@ -65,19 +66,22 @@ void LavDelay::maxDelayChanged() {
 }
 
 void LavDelay::process() {
-	float delay = getProperty(Lav_DELAY_DELAY).getFloatValue()*device->getSr();
-	int readOffset = (unsigned int)floorf(delay);
-	float offset = delay-floorf(delay);
-	//this prevents us from actually trying to read the future.
-	if(readOffset >= delay_line_length) {
-		readOffset = delay_line_length-1;
-	}
+	float targetDelay = getProperty(Lav_DELAY_DELAY).getFloatValue();
+	float interpolationTime = getProperty(Lav_DELAY_INTERPOLATION_TIME).getFloatValue();
+	float delta = interpolationTime == 0.0f ? 0.0f : 1/interpolationTime/device->getSr(); //each tick is 1/sr of a second, so we have to modify delta appropriately
+	if(delta == 0.0f) current_delay_pos = targetDelay; //impossible to move, so we just jump.
 	for(unsigned int i = 0; i < block_size; i++) {
-		int samp1 = -readOffset, samp2 = -(readOffset+1);
-		samp1 = ringmodi(samp1+write_pos, delay_line_length);
-		samp2 = ringmodi(samp2+write_pos, delay_line_length);
-		float weight1 = 1.0f-offset;
+		while(abs(current_delay_pos-targetDelay) <= delta && delta > (1/device->getSr())) {
+			delta = delta/1.01f; //we can't just cut it off.
+		}	
+		current_delay_pos += copysignf(delta, targetDelay-current_delay_pos); //this makes sure we always move "toward" the target and does nothing if delta is 0.
+		int pos = (int)floorf(current_delay_pos*device->getSr());
+		float offset = current_delay_pos*device->getSr()-(float)pos;
+		float weight1 = 1-offset;
 		float weight2 = offset;
+		if(pos == delay_line_length) pos--;
+		int samp1 = ringmodi(write_pos-pos, delay_line_length);
+		int samp2 = ringmodi(write_pos-(pos+1), delay_line_length);
 		for(unsigned int output = 0; output < num_outputs; output++) {
 			delay_lines[output][write_pos] = inputs[output][i];
 			outputs[output][i] = weight1*delay_lines[output][samp1]+weight2*delay_lines[output][samp2];

@@ -48,6 +48,7 @@ enum Lav_DELAY_PROPERTIES {
 	Lav_DELAY_DELAY = -1,
 	Lav_DELAY_DELAY_MAX = -2,
 	Lav_DELAY_FEEDBACK = -3,
+	Lav_DELAY_INTERPOLATION_TIME = -4,
 };
 
 #ifdef __cplusplus
