@@ -12,10 +12,10 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <limits>
 #include <memory>
 
-class LavDelay: public LavObject {
+class LavDelayObject: public LavObject {
 	public:
-	LavDelay(std::shared_ptr<LavDevice> device, unsigned int lines);
-	~LavDelay();
+	LavDelayObject(std::shared_ptr<LavDevice> device, unsigned int lines);
+	~LavDelayObject();
 	void process();
 	void maxDelayChanged();
 	protected:
@@ -25,7 +25,7 @@ class LavDelay: public LavObject {
 	float current_delay_pos = 0;
 };
 
-LavDelay::LavDelay(std::shared_ptr<LavDevice> device, unsigned int lines): LavObject(Lav_OBJTYPE_DELAY, device, lines, lines) {
+LavDelayObject::LavDelayObject(std::shared_ptr<LavDevice> device, unsigned int lines): LavObject(Lav_OBJTYPE_DELAY, device, lines, lines) {
 	line_count = lines;
 	if(lines == 0) throw LavErrorException(Lav_ERROR_RANGE);
 	getProperty(Lav_DELAY_DELAY_MAX).setPostChangedCallback([this] () {maxDelayChanged();});
@@ -33,18 +33,18 @@ LavDelay::LavDelay(std::shared_ptr<LavDevice> device, unsigned int lines): LavOb
 }
 
 std::shared_ptr<LavObject> createDelayObject(std::shared_ptr<LavDevice> device, unsigned int lines) {
-	auto tmp = std::make_shared<LavDelay>(device, lines);
+	auto tmp = std::make_shared<LavDelayObject>(device, lines);
 	device->associateObject(tmp);
 	return tmp;
 }
 
-LavDelay::~LavDelay() {
+LavDelayObject::~LavDelayObject() {
 	for(auto i: delay_lines) {
 		delete[] i;
 	}
 }
 
-void LavDelay::maxDelayChanged() {
+void LavDelayObject::maxDelayChanged() {
 	for(auto i: delay_lines) {
 		delete[] i;
 	}
@@ -65,7 +65,7 @@ void LavDelay::maxDelayChanged() {
 	}
 }
 
-void LavDelay::process() {
+void LavDelayObject::process() {
 	float targetDelay = getProperty(Lav_DELAY_DELAY).getFloatValue();
 	float interpolationTime = getProperty(Lav_DELAY_INTERPOLATION_TIME).getFloatValue();
 	float delta = interpolationTime == 0.0f ? 0.0f : 1/interpolationTime/device->getSr(); //each tick is 1/sr of a second, so we have to modify delta appropriately
