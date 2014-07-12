@@ -17,19 +17,30 @@ class LavDelayObject: public LavObject {
 	LavDelayObject(std::shared_ptr<LavDevice> device, unsigned int lines);
 	~LavDelayObject();
 	void process();
-	void maxDelayChanged();
 	protected:
+	void maxDelayChanged();
+	void beginInterpolation();
+	void endInterpolation();
+	void recomputeDelta();
+	float computeSample(float pos, unsigned int line);
+	//advance the line by one sample.
+	void advance(unsigned int offset);
 	std::vector<float*> delay_lines;
 	int delay_line_length = 0;
 	int write_pos = 0, line_count = 0;
-	float current_delay_pos = 0;
+	//these variables are needed for interpolation.
+	float current_delay_pos = 0, target_delay_pos = 0, delta = 0, current_delay_pos_weight= 1.0f, target_delay_pos_weight = 0.0f;
+	bool is_interpolating = false;
 };
 
 LavDelayObject::LavDelayObject(std::shared_ptr<LavDevice> device, unsigned int lines): LavObject(Lav_OBJTYPE_DELAY, device, lines, lines) {
 	line_count = lines;
 	if(lines == 0) throw LavErrorException(Lav_ERROR_RANGE);
 	getProperty(Lav_DELAY_DELAY_MAX).setPostChangedCallback([this] () {maxDelayChanged();});
+	getProperty(Lav_DELAY_INTERPOLATION_TIME).setPostChangedCallback([this] () {recomputeDelta();});
+	getProperty(Lav_DELAY_DELAY).setPostChangedCallback([this] () {beginInterpolation();});
 	maxDelayChanged(); //delegate the allocation.
+	recomputeDelta(); //get delta set for the first time.
 }
 
 std::shared_ptr<LavObject> createDelayObject(std::shared_ptr<LavDevice> device, unsigned int lines) {
@@ -56,6 +67,12 @@ void LavDelayObject::maxDelayChanged() {
 		getProperty(Lav_DELAY_DELAY).setFloatValue(delay);
 	}
 	getProperty(Lav_DELAY_DELAY).setFloatRange(0.0f, maxDelay);
+	if(current_delay_pos > maxDelay) {
+		current_delay_pos = maxDelay;
+	}
+	if(target_delay_pos > maxDelay) {
+		target_delay_pos = maxDelay;
+	}
 	unsigned int delayLineLength = (unsigned int)(maxDelay*device->getSr());
 	delay_line_length = delayLineLength;
 	//reallocate the lines.
@@ -65,28 +82,69 @@ void LavDelayObject::maxDelayChanged() {
 	}
 }
 
+void LavDelayObject::recomputeDelta() {
+	delta = (1.0f/getProperty(Lav_DELAY_INTERPOLATION_TIME).getFloatValue())/device->getSr();
+}
+
+void LavDelayObject::beginInterpolation() {
+	endInterpolation();
+	is_interpolating = true;
+	target_delay_pos = getProperty(Lav_DELAY_DELAY).getFloatValue();
+}
+
+void LavDelayObject::endInterpolation() {
+	is_interpolating = false;
+	current_delay_pos = target_delay_pos;
+	current_delay_pos_weight = 1.0f;
+	target_delay_pos_weight = 0.0f;
+}
+
+float LavDelayObject::computeSample(float pos, unsigned int line) {
+	int position = (int)floorf(pos*device->getSr());
+	float offset = pos*device->getSr()-(float)position;
+	//if this is not going to leave enough room to interpolate two samples, we have to fix it.
+	//this can happen sometimes when delay is close to the max and floating point inaccuracies add up.
+	if(position >= delay_line_length) {
+		position = delay_line_length-2;
+	}
+	int samp1 = ringmodi(write_pos-position, delay_line_length);
+	int samp2 = ringmodi(write_pos-(position+1), delay_line_length);
+	float weight1 = 1-offset, weight2 = offset;
+	return weight1*delay_lines[line][samp1]+weight2*delay_lines[line][samp2];
+}
+
+void LavDelayObject::advance(unsigned int offset) {
+	for(unsigned int output = 0; output < num_outputs; output++) {
+		delay_lines[output][write_pos] = inputs[output][offset];
+	}
+	write_pos = ringmodi(write_pos+1, delay_line_length);
+}
+
 void LavDelayObject::process() {
-	float targetDelay = getProperty(Lav_DELAY_DELAY).getFloatValue();
-	float interpolationTime = getProperty(Lav_DELAY_INTERPOLATION_TIME).getFloatValue();
-	float delta = interpolationTime == 0.0f ? 0.0f : 1/interpolationTime/device->getSr(); //each tick is 1/sr of a second, so we have to modify delta appropriately
-	if(delta == 0.0f) current_delay_pos = targetDelay; //impossible to move, so we just jump.
 	for(unsigned int i = 0; i < block_size; i++) {
-		while(abs(current_delay_pos-targetDelay) <= delta && delta > (1/device->getSr())) {
-			delta = delta/1.01f; //we can't just cut it off.
-		}	
-		current_delay_pos += copysignf(delta, targetDelay-current_delay_pos); //this makes sure we always move "toward" the target and does nothing if delta is 0.
-		int pos = (int)floorf(current_delay_pos*device->getSr());
-		float offset = current_delay_pos*device->getSr()-(float)pos;
-		float weight1 = 1-offset;
-		float weight2 = offset;
-		if(pos == delay_line_length) pos--;
-		int samp1 = ringmodi(write_pos-pos, delay_line_length);
-		int samp2 = ringmodi(write_pos-(pos+1), delay_line_length);
-		for(unsigned int output = 0; output < num_outputs; output++) {
-			delay_lines[output][write_pos] = inputs[output][i];
-			outputs[output][i] = weight1*delay_lines[output][samp1]+weight2*delay_lines[output][samp2];
+		if(is_interpolating) {
+			for(unsigned int output = 0; output < num_outputs; output++) {
+				float samp1 = current_delay_pos_weight*computeSample(current_delay_pos, output);
+				float samp2 = target_delay_pos_weight*computeSample(target_delay_pos, output);
+				float samp = samp1+samp2;
+				outputs[output][i] = samp;
+			}
+			//Note the extra check.  For very very small delta, the condition on weight1 may trigger before the condition on weight2.
+			if(current_delay_pos_weight-delta < 0.0f || target_delay_pos_weight+delta > 1.0f) {
+				endInterpolation();
+				advance(i);
+				continue;
+			}
+			current_delay_pos_weight-= delta;
+			target_delay_pos_weight += delta;
 		}
-		write_pos = ringmodi(write_pos+1, delay_line_length);
+		else {
+			for(unsigned int output = 0; output < num_outputs; output++) {
+				float samp = computeSample(current_delay_pos, output);
+				outputs[output][i] = samp;
+			}
+		}
+	advance(i);
 	}
 }
 
