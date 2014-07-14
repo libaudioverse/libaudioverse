@@ -22,6 +22,7 @@ def camelcase_to_underscores(s):
 	"""Converts camelcase identifiers to have underscores and be all lowercase."""
 	what = s[0].lower()+s[1:]
 	what =  re.sub('[A-Z]', lambda x: '_' + x.group(0).lower(), what)
+	return what
 
 def prefix_filter(l, prefix):
 	"""Expects l, an iterable of strings, and a prefix.  Returns a list consisting of all strings in l that begin with prefix."""
