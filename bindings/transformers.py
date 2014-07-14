@@ -24,4 +24,7 @@ def camelcase_to_underscores(s):
 	what =  re.sub('[A-Z]', lambda x: '_' + x.group(0).lower(), what)
 
 def get_jinja2_filters():
-	return {'without_lav': without_lav}
+	return {'without_lav': without_lav,
+		'camelcase_to_underscores': camelcase_to_underscores,
+		'underscores_to_camelcase': underscores_to_camelcase,
+	}
