@@ -11,12 +11,15 @@ ctypes_map = {
 'double' : 'c_double',
 }
 
-def ctypes_string(typeinfo):
-	"""Convert a type to a ctypes string."""
-	if typeinfo.indirection == 1 and typeinfo.name == 'void':
+def ctypes_string(typeinfo, offset = 0):
+	"""Convert a type to a ctypes string.  Offset is used by the template _lav.py.t to make output argument strings."""
+	if offset != 0:
+		assert typeinfo.indirection-offset >= 0
+		return ctypes_string(get_info.TypeInfo(typeinfo.base, typeinfo.indirection-offset))
+	if typeinfo.indirection == 1 and typeinfo.base == 'void':
 		return "ctypes.c_void_p"
 	elif typeinfo.indirection == 0:
-		return "ctypes." + ctypes_string[typeinfo.base]
+		return "ctypes." + ctypes_map[typeinfo.base]
 	else:
 		return "ctypes.POINTER(" + ctypes_string(get_info.TypeInfo(typeinfo.base, typeinfo.indirection-1)) + ")"
 
