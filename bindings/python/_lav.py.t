@@ -6,7 +6,7 @@ import _libaudioverse
 
 #These are not from libaudioverse.
 #Implement a method by which the public libaudioverse module may register its exception classes for error code translation.
-class PythonBindingsCouldNotTranslateErrorCodeError(object):
+class PythonBindingsCouldNotTranslateErrorCodeError(Exception):
 	"""An exception representing failure to translate a libaudioverse error code into a python exception.  If you see this, report it as a bug with Libaudioverse because something has gone very badly wrong."""
 	pass
 
@@ -19,8 +19,8 @@ def make_error_from_code(err):
 	"""Internal use.  Translates libaudioverse error codes into exceptions."""
 	return errors_to_exceptions.get(err, PythonBindingsCouldNotTranslateErrorCodeError)()
 
-{%for func_name, friendly_name in friendly_functions.iteritems()%}
-{%-set func_info = functions[func_name]-%}
+{%for func_name, func_info in functions.iteritems()%}
+{%set friendly_name = func_name|without_lav|camelcase_to_underscores%}
 {%-set input_arg_names = func_info.input_args|map(attribute='name')|list-%}
 {%-set output_arg_names = func_info.output_args|map(attribute='name')|list-%}
 {%-if func_info.output_args|length == 0-%}
@@ -28,7 +28,7 @@ def {{friendly_name}}({{input_arg_names|join(', ')}}):
 	err = _libaudioverse.{{func_name}}({{input_arg_names|join(', ')}})
 	if err != _libaudioverse.Lav_ERROR_NONE:
 		raise make_error_from_code(err)
-{%else-%}
+{%else%}
 def {{friendly_name}}({{input_arg_names|join(', ')}}):
 	{%-for i in func_info.output_args%}
 	{{i.name}} = {{i.type|ctypes_string(-1)}}()

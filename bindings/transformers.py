@@ -20,7 +20,7 @@ def underscores_to_camelcase(s, capitalize_first = False):
 
 def camelcase_to_underscores(s):
 	"""Converts camelcase identifiers to have underscores and be all lowercase."""
-	what = s[0].llower()+what[1:]
+	what = s[0].lower()+s[1:]
 	what =  re.sub('[A-Z]', lambda x: '_' + x.group(0).lower(), what)
 
 def prefix_filter(l, prefix):
@@ -29,11 +29,17 @@ def prefix_filter(l, prefix):
 
 def remove_filter(l, item):
 	"""Returns l without all instances of item."""
-	return filter(lambda x: x == item, l)
+	return filter(lambda x: x != item, l)
+
+def strip_prefix(s, prefix):
+	assert s.startswith(prefix)
+	return s[len(prefix):]
+
 def get_jinja2_filters():
 	return {'without_lav': without_lav,
 		'camelcase_to_underscores': camelcase_to_underscores,
 		'underscores_to_camelcase': underscores_to_camelcase,
 		'remove_filter': remove_filter,
 		'prefix_filter': prefix_filter,
+		'strip_prefix': strip_prefix,
 	}

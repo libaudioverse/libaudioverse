@@ -53,18 +53,19 @@ def _wrap(handle):
 	return val
 
 #build and register all the error classes.
-class GenericError(object):
+class GenericError(Exception):
 	"""Base for all libaudioverse errors."""
 	pass
-{%for error_name, friendly_name in friendly_errors.iteritems()%}
-class {{friendly_name}}(GenericError):
+{%for error_name in constants.iterkeys()|prefix_filter("Lav_ERROR_")|remove_filter("Lav_ERROR_NONE")%}
+{%set friendly_name = error_name|strip_prefix("Lav_ERROR_")|lower|underscores_to_camelcase(True)%}
+class {{friendly_name}}Error(GenericError):
 	pass
-_lav.bindings_register_exception(_libaudioverse.{{error_name}}, {{friendly_name}})
+_lav.bindings_register_exception(_libaudioverse.{{error_name}}, {{friendly_name}}Error)
 {%endfor%}
 
-#A list-like thing that knows how to manipulate parents.
+#A list-like thing that knows how to manipulate inputs.
 class ParentProxy(collections.Sequence):
-	"""Manipulate parents for some specific object.
+	"""Manipulate inputs for some specific object.
 This works exactly like a python list, save that concatenation is not allowed.  The elements are tuples: (parent, output) or, should no parent be set for a slot, None.
 
 To link a parent to an output using this object, use  obj.parents[num] = (myparent, output).
@@ -154,12 +155,14 @@ class GenericObject(object):
 
 _types_to_classes[_libaudioverse.Lav_OBJTYPE_GENERIC] = GenericObject
 
-{%-for object_name, friendly_name in friendly_objects.iteritems()%}
-{%set constructor_arg_names = object_constructor_info[object_name].input_args|map(attribute='name')|list-%}
+{%-for object_name in constants.iterkeys()|prefix_filter("Lav_OBJTYPE_")|remove_filter("Lav_OBJTYPE_GENERIC")%}
+{%set friendly_name = object_name|strip_prefix("Lav_OBJTYPE_")|lower|underscores_to_camelcase(True) + "Object"%}
+{%set constructor_name = "Lav_create" + friendly_name%}
+{%set constructor_arg_names = functions[constructor_name].input_args|map(attribute='name')|list-%}
 class {{friendly_name}}(GenericObject):
 	def __init__(self{%if constructor_arg_names|length > 0%}, {%endif%}{{constructor_arg_names|join(', ')}}):
 		{{constructor_arg_names[0]}} = {{constructor_arg_names[0]}}.handle
-		super({{friendly_name}}, self).__init__(_lav.{{object_constructors[object_name]}}({{constructor_arg_names|join(', ')}}))
+		super({{friendly_name}}, self).__init__(_lav.{{constructor_name}}({{constructor_arg_names|join(', ')}}))
 {%for enumerant, prop in properties.get(object_name, dict()).iteritems()%}
 {{implement_property(enumerant, prop)}}
 

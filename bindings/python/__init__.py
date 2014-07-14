@@ -13,21 +13,27 @@ ctypes_map = {
 
 def ctypes_string(typeinfo, offset = 0):
 	"""Convert a type to a ctypes string.  Offset is used by the template _lav.py.t to make output argument strings."""
+	global typedefs
 	if offset != 0:
 		assert typeinfo.indirection-offset >= 0
 		return ctypes_string(get_info.TypeInfo(typeinfo.base, typeinfo.indirection-offset))
+	if typeinfo.base in typedefs:
+		return ctypes_string(get_info.TypeInfo(typedefs[typeinfo.base].base, typedefs[typeinfo.base].indirection+typeinfo.indirection))
 	if typeinfo.indirection == 1 and typeinfo.base == 'void':
 		return "ctypes.c_void_p"
+	elif typeinfo.indirection == 1 and typeinfo.base == 'char':
+		return "ctypes.c_char_p"
 	elif typeinfo.indirection == 0:
 		return "ctypes." + ctypes_map[typeinfo.base]
 	else:
 		return "ctypes.POINTER(" + ctypes_string(get_info.TypeInfo(typeinfo.base, typeinfo.indirection-1)) + ")"
 
 def make_python(info):
+	#we have to inject into the global namespace: the templates should not have to move typedef info around for us.
+	global typedefs
+	typedefs = info['typedefs']
 	context = dict()
 	context.update(info)
-	context['object_constructors'] = object_constructors
-	context['object_constructor_info'] = object_constructor_info
 	env = jinja2.Environment(loader = jinja2.PackageLoader(__package__, ""), undefined = jinja2.StrictUndefined, trim_blocks = True)
 	env.filters.update(transformers.get_jinja2_filters())
 	env.filters['ctypes_string'] = ctypes_string
