@@ -39,7 +39,7 @@ input_file = os.path.join(root_directory, 'include', 'libaudioverse', 'binding.h
 
 if sys.platform == 'win32':
 	command = 'cl'
-	args = '/EP ' + input_file
+	args = '/nologo /EP ' + input_file
 else:
 	command  = 'cpp'
 	args = input_file
@@ -52,48 +52,45 @@ text = text.replace('\r\n', '\n')
 parser = c_parser.CParser()
 ast = parser.parse(text)
 
-#do the low-hanging fruit first: enums are simple enough.
-#we don't allow declaring nested types, so we know that all enums are at the top level-that is, they are to be found in ast.ext.
-enum_list = [i.type for i in ast.ext if isinstance(i, Decl) and isinstance(i.type, Enum)]
+def extract_enums():
+	"""Returns a dict of enum constant names to their values as integers."""
+	global ast
+	#we don't allow declaring nested types, so we know that all enums are at the top level-that is, they are to be found in ast.ext.
+	enum_list = [i.type for i in ast.ext if isinstance(i, Decl) and isinstance(i.type, Enum)]
+	#now, we note that we can find--for a specific enum e--:
+	#name = e.name, values are in e.values as e.values[index].value and names in e.values[index]name
+	#ironically, we actually only care about the values of the enums.
+	#note that minimal interpretation is needed so that we can have negated constants-pycparser is for interpreters, not this, and so represents them as a unary minus in the ast.
+	#also, we don't support enums with implicitly defined constants.
+	constants = OrderedDict()
+	for enum in enum_list:
+		for enum_value in enum.values.enumerators:
+			val = enum_value.value
+			if isinstance(val, Constant):
+				constants[enum_value.name] = int(enum_value.value.value)
+			elif isinstance(val, UnaryOp) and val.op == '-':
+				constants[enum_value.name] = int('-' + val.expr.value)
+	return constants
 
-#now, we note that we can find--for a specific enum e--:
-#name = e.name, values are in e.values as e.values[index].value and names in e.values[index]name
-#ironically, we actually only care about the values of the enums.
-#note that minimal interpretation is needed so that we can have negated constants-pycparser is for interpreters, not this, and so represents them as a unary minus in the ast.
-#also, we don't support enums with implicitly defined constants.
-constants = OrderedDict()
+def extract_typedefs():
+	"""Returns a dict of typedefs.  Keys are names, values are TypeInfos describing the type."""
+	global ast
+	#again, we expect them at the top levle--if they're not, we'll miss them.
+	#the primary use of this is a bit later, when we build function objects-we aggregate typedefs when possible.
+	#at the moment, we typedef everything to void. This is not likely to change, so the following block basically works.
+	typedef_list = [i for i in ast.ext if isinstance(i, Typedef)]
+	typedefs = OrderedDict()
+	for typedef in typedef_list:
+		name = typedef.name
+		base = typedef.type.type
+		if isinstance(base, IdentifierType):
+			base = " ".join(base.names)
+		elif isinstance(base, Enum):
+			base = base.name
+		indirection = 0
+		typedefs[name] = TypeInfo(base, indirection)
+	return typedefs
 
-for enum in enum_list:
-	for enum_value in enum.values.enumerators:
-		val = enum_value.value
-		if isinstance(val, Constant):
-			constants[enum_value.name] = int(enum_value.value.value)
-		elif isinstance(val, UnaryOp) and val.op == '-':
-			constants[enum_value.name] = int('-' + val.expr.value)
-
-#pull out typedefs.
-#again, we expect them at the top levle--if they're not, we'll miss them.
-#the primary use of this is a bit later, when we build function objects-we aggregate typedefs when possible.
-#at the moment, we typedef everything to void. This is not likely to change, so the following block basically works.
-typedef_list = [i for i in ast.ext if isinstance(i, Typedef)]
-typedefs = OrderedDict()
-
-for typedef in typedef_list:
-	name = typedef.name
-	base = typedef.type.type
-	if isinstance(base, IdentifierType):
-		base = " ".join(base.names)
-	elif isinstance(base, Enum):
-		base = base.name
-	indirection = 0
-	typedefs[name] = TypeInfo(base, indirection)
-
-#compute a list of all top-level function nodes.
-function_list = [i for i in ast.ext if isinstance(i, Decl) and isinstance(i.type, FuncDecl)]
-
-functions = OrderedDict()
-
-#knows how to handle unwrapping a type.
 def compute_type_info(node):
 	global typedefs
 	indirection = 0
@@ -107,30 +104,31 @@ def compute_type_info(node):
 	name = " ".join(currently_examining.names)
 	#first, make a TypeInfo
 	info = TypeInfo(base = name, indirection = indirection)
-	aggregate_with = typedefs.get(name, None)
-	if aggregate_with is not None:
-		info.base = aggregate_with.base
-		info.indirection += aggregate_with.indirection
 	return info
 
-for function in function_list:
-	func = function.type
-	name = function.name
-	return_type = compute_type_info(func) #not func.type-the function expects one node above.
-	if func.args is not None:
-		types = [compute_type_info(i) for i in func.args.params]
-		names = [i.name for i in func.args.params]
-		args = zip(types, names)
-		args = tuple([ParameterInfo(i[0], i[1]) for i in args])
-	else:
-		args = ()
-	functions[name] = FunctionInfo(return_type, name, args)
+def extract_functions():
+	global ast
+	function_list = [i for i in ast.ext if isinstance(i, Decl) and isinstance(i.type, FuncDecl)]
+	functions = OrderedDict()
+	for function in function_list:
+		func = function.type
+		name = function.name
+		return_type = compute_type_info(func) #not func.type-the function expects one node above.
+		if func.args is not None:
+			types = [compute_type_info(i) for i in func.args.params]
+			names = [i.name for i in func.args.params]
+			args = zip(types, names)
+			args = tuple([ParameterInfo(i[0], i[1]) for i in args])
+		else:
+			args = ()
+		functions[name] = FunctionInfo(return_type, name, args)
+	return functions
 
 #export this in one dict so that we have a way to add it to parent scripts.
 all_info = {
-'functions' : functions,
-'typedefs': typedefs,
-'constants' : constants,
+'functions' : extract_functions(),
+'typedefs': extract_typedefs(),
+'constants' : extract_enums(),
 }
 
 #update this dict with the keys from metadata.yml.
