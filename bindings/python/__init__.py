@@ -2,6 +2,7 @@ import jinja2
 from collections import OrderedDict
 import re
 from .. import transformers
+from .. import get_info
 
 ctypes_map = {
 'int' : 'c_int',
@@ -9,6 +10,15 @@ ctypes_map = {
 'float' : 'c_float',
 'double' : 'c_double',
 }
+
+def ctypes_string(typeinfo):
+	"""Convert a type to a ctypes string."""
+	if typeinfo.indirection == 1 and typeinfo.name == 'void':
+		return "ctypes.c_void_p"
+	elif typeinfo.indirection == 0:
+		return "ctypes." + ctypes_string[typeinfo.base]
+	else:
+		return "ctypes.POINTER(" + ctypes_string(get_info.TypeInfo(typeinfo.base, typeinfo.indirection-1)) + ")"
 
 def make_python(info):
 	context = dict()
@@ -54,6 +64,7 @@ def make_python(info):
 	context['object_constructor_info'] = object_constructor_info
 	env = jinja2.Environment(loader = jinja2.PackageLoader(__package__, ""), undefined = jinja2.StrictUndefined)
 	env.filters.update(transformers.get_jinja2_filters())
+	env.filters['ctypes_string'] = ctypes_string
 	return {
 		'_lav.py' : env.get_template('_lav.py.t').render(context),
 		'_libaudioverse.py' : env.get_template('_libaudioverse.py.t').render(context),
