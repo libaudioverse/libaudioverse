@@ -23,8 +23,17 @@ def camelcase_to_underscores(s):
 	what = s[0].llower()+what[1:]
 	what =  re.sub('[A-Z]', lambda x: '_' + x.group(0).lower(), what)
 
+def prefix_filter(l, prefix):
+	"""Expects l, an iterable of strings, and a prefix.  Returns a list consisting of all strings in l that begin with prefix."""
+	return filter(lambda x: x.startswith(prefix), l)
+
+def remove_filter(l, item):
+	"""Returns l without all instances of item."""
+	return filter(lambda x: x == item, l)
 def get_jinja2_filters():
 	return {'without_lav': without_lav,
 		'camelcase_to_underscores': camelcase_to_underscores,
 		'underscores_to_camelcase': underscores_to_camelcase,
+		'remove_filter': remove_filter,
+		'prefix_filter': prefix_filter,
 	}
