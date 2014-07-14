@@ -12,7 +12,7 @@ ctypes_map = {
 }
 
 def ctypes_string(typeinfo, offset = 0):
-	"""Convert a type to a ctypes string.  Offset is used by the template _lav.py.t to make output argument strings."""
+	"""Convert a type to a ctypes string.  Offset is used by the template _lav.py.t to make output argument strings and is subtracted from the levels of indirection."""
 	global typedefs
 	if offset != 0:
 		assert typeinfo.indirection-offset >= 0

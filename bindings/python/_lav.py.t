@@ -31,7 +31,7 @@ def {{friendly_name}}({{input_arg_names|join(', ')}}):
 {%else%}
 def {{friendly_name}}({{input_arg_names|join(', ')}}):
 {%for i in func_info.output_args%}
-	{{i.name}} = {{i.type|ctypes_string(-1)}}()
+	{{i.name}} = {{i.type|ctypes_string(1)}}()
 {%endfor%}
 	err = _libaudioverse.{{func_name}}({{input_arg_names|join(', ')}}{%if input_arg_names|length > 0%}, {%endif%}
 		{%for i in output_arg_names%}ctypes.byref({{i}}){%if not loop.last%}, {%endif%}{%endfor%})

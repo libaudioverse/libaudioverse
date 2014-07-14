@@ -56,11 +56,13 @@ def _wrap(handle):
 class GenericError(Exception):
 	"""Base for all libaudioverse errors."""
 	pass
+
 {%for error_name in constants.iterkeys()|prefix_filter("Lav_ERROR_")|remove_filter("Lav_ERROR_NONE")%}
 {%set friendly_name = error_name|strip_prefix("Lav_ERROR_")|lower|underscores_to_camelcase(True)%}
 class {{friendly_name}}Error(GenericError):
 	pass
 _lav.bindings_register_exception(_libaudioverse.{{error_name}}, {{friendly_name}}Error)
+
 {%endfor%}
 
 #A list-like thing that knows how to manipulate inputs.
@@ -139,8 +141,10 @@ class GenericObject(object):
 	def __init__(self, handle):
 		self.handle = handle
 		_handles_to_objects[handle] = self
+
 {%for enumerant, prop in properties['Lav_OBJTYPE_GENERIC'].iteritems()%}
 {{implement_property(enumerant, prop)}}
+
 {%endfor%}
 
 	def __del__(self):
@@ -155,18 +159,20 @@ class GenericObject(object):
 
 _types_to_classes[_libaudioverse.Lav_OBJTYPE_GENERIC] = GenericObject
 
-{%-for object_name in constants.iterkeys()|prefix_filter("Lav_OBJTYPE_")|remove_filter("Lav_OBJTYPE_GENERIC")%}
+{%for object_name in constants.iterkeys()|prefix_filter("Lav_OBJTYPE_")|remove_filter("Lav_OBJTYPE_GENERIC")%}
 {%set friendly_name = object_name|strip_prefix("Lav_OBJTYPE_")|lower|underscores_to_camelcase(True) + "Object"%}
 {%set constructor_name = "Lav_create" + friendly_name%}
 {%set constructor_arg_names = functions[constructor_name].input_args|map(attribute='name')|list-%}
 class {{friendly_name}}(GenericObject):
 	def __init__(self{%if constructor_arg_names|length > 0%}, {%endif%}{{constructor_arg_names|join(', ')}}):
 		{{constructor_arg_names[0]}} = {{constructor_arg_names[0]}}.handle
-		super({{friendly_name}}, self).__init__(_lav.{{constructor_name}}({{constructor_arg_names|join(', ')}}))
+		super({{friendly_name}}, self).__init__(_lav.{{constructor_name|without_lav|camelcase_to_underscores}}({{constructor_arg_names|join(', ')}}))
+
 {%for enumerant, prop in properties.get(object_name, dict()).iteritems()%}
 {{implement_property(enumerant, prop)}}
 
 {%endfor%}
 _types_to_classes[_libaudioverse.{{object_name}}] = {{friendly_name}}
+
 {%endfor%}
 
