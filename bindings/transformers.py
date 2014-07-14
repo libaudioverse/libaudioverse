@@ -18,5 +18,10 @@ def camelize(s, capitalize_first = False):
 		what = what[0].upper() + what[1:]
 	return what
 
+def camel_to_underscores(s):
+	"""Converts camelcase identifiers to have underscores and be all lowercase."""
+	what = s[0].llower()+what[1:]
+	what =  re.sub('[A-Z]', lambda x: '_' + x.group(0).lower(), what)
+
 def get_jinja2_filters():
 	return {'without_lav': without_lav}
