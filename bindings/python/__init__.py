@@ -28,7 +28,7 @@ def make_python(info):
 	context.update(info)
 	context['object_constructors'] = object_constructors
 	context['object_constructor_info'] = object_constructor_info
-	env = jinja2.Environment(loader = jinja2.PackageLoader(__package__, ""), undefined = jinja2.StrictUndefined)
+	env = jinja2.Environment(loader = jinja2.PackageLoader(__package__, ""), undefined = jinja2.StrictUndefined, trim_blocks = True)
 	env.filters.update(transformers.get_jinja2_filters())
 	env.filters['ctypes_string'] = ctypes_string
 	return {
