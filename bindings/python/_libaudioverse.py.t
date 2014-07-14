@@ -8,10 +8,10 @@ libaudioverse_module = ctypes.cdll.LoadLibrary('libaudioverse.dll')
 {%endfor%}
 
 {%for name, info in functions.iteritems()-%}
-{{name}} = ctypes.CFUNCTYPE({{macros.ctypes_string(info.return_type)}}
+{{name}} = ctypes.CFUNCTYPE({{info.return_type|ctypes_string}}
 {%-if info.args|length > 0%}, {%endif%}{#some functions don't have arguments; if it doesn't, we must avoid the first comma#}
 {%-for arg in info.args-%}
-{{macros.ctypes_string(arg.type)}}
+{{arg.type|ctuypes_string}}
 {%-if not loop.last%}, {%endif-%}{#put in a comma and space if needed#}
 {%-endfor-%}
 )(('{{name}}', libaudioverse_module))
