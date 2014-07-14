@@ -148,6 +148,9 @@ class GenericObject(object):
 {%endfor%}
 
 	def __del__(self):
+		if _lav is None:
+			#undocumented python thing: if __del__ is called at process exit, globals of this module are None.
+			return
 		if getattr(self, 'handle', None) is not None:
 			_lav.free(self.handle)
 		self.handle = None
