@@ -1,6 +1,7 @@
 import jinja2
 from collections import OrderedDict
 import re
+from .. import transformers
 
 ctypes_map = {
 'int' : 'c_int',
@@ -52,6 +53,7 @@ def make_python(info):
 	context['object_constructors'] = object_constructors
 	context['object_constructor_info'] = object_constructor_info
 	env = jinja2.Environment(loader = jinja2.PackageLoader(__package__, ""), undefined = jinja2.StrictUndefined)
+	env.filters.update(transformers.get_jinja2_filters())
 	return {
 		'_lav.py' : env.get_template('_lav.py.t').render(context),
 		'_libaudioverse.py' : env.get_template('_libaudioverse.py.t').render(context),
