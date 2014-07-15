@@ -16,9 +16,8 @@ Read device creation is also here, because putting all the public device creatio
 Lav_PUBLIC_FUNCTION LavError Lav_createDefaultAudioOutputDevice(LavDevice** destination) {
 	//create a device if possible, giving it our desired settings, and then pass it to the portaudio thread builder, which redirects callbacks on the device as appropriate.
 	LavDevice* retval;
-	//we prefer 44100 sr, 2 channel, and block size of 1024 with mixahead 1.
-	//this gives a granularity of 23 MS between hearing property changes and about 69 MS between the app setting a property and the properety's new value being sent to the sound card.
-	retval = outgoingPointer<LavDevice>(createPortaudioDevice(44100, 2, 1024, 1));
+	//we prefer 44100 sr, 2 channel, and block size of 256 with mixahead 5.
+	retval = outgoingPointer<LavDevice>(createPortaudioDevice(44100, 2, 256, 5));
 	*destination = retval;
 	return Lav_ERROR_NONE;
 }
