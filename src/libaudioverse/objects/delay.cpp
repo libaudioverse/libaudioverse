@@ -121,6 +121,7 @@ void LavDelayObject::advance(unsigned int offset) {
 	write_pos = ringmodi(write_pos+1, delay_line_length);
 }
 
+//todo:redo this whole algorithm.  We can fall to the nearest sample instead of interpolating.
 void LavDelayObject::process() {
 	for(unsigned int i = 0; i < block_size; i++) {
 		if(is_interpolating) {
