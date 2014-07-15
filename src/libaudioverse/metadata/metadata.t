@@ -41,11 +41,10 @@ void initializeMetadata() {
 	default_property_instances = new std::map<std::tuple<int, int>, LavProperty>();
 	common_properties = new std::set<int>();
 	LavProperty* tempProp= nullptr; //a temporary that we use a bunch of times.
-	{%for objid, propid in properties.iterkeys()%}
-	{%set prop = properties[(objid, propid)]-%}
+	{%for objid, propid, prop in joined_properties%}
 	//<%prop['name']%> on <%objid%>
 	{
-	{%if properties[(objid, propid)]['type'] == 'int'-%}
+	{%if prop['type'] == 'int'-%}
 	tempProp = createIntProperty("<%prop['name']%>", <%prop['default']%>, <%prop['range'][0]%>, <%prop['range'][1]%>);
 	{%elif prop['type'] == 'float'-%}
 	tempProp = createFloatProperty("<%prop['name']%>", <%prop['default']%>, <%prop['range'][0]%>, <%prop['range'][1]%>);
@@ -53,21 +52,12 @@ void initializeMetadata() {
 	float default[] = {<%prop['default']|join(', ')%>};
 	tempProp = create<%prop['type']|capitalize%>Property("<%prop['name']%>", default);
 	{%endif-%}
-	{#Use the copy constructor to put this into the defautl instances##}
+	{#Use the copy constructor to put this into the default instances##}
 	(*default_property_instances)[std::tuple<int, int>(<%objid%>, <%propid%>)] = *tempProp;
 	delete tempProp;
 	(*properties_by_object_type)[<%objid%>].insert(<%propid%>);
 	}
 	{%endfor%}
-
-	//generic properties common to all objects.
-	for(auto i = properties_by_object_type->begin(); i != properties_by_object_type->end(); i++) {
-		{%for objid, propid in properties.iterkeys()-%}
-		{%if objid == 'Lav_OBJTYPE_GENERIC'-%}
-		common_properties->insert(<%propid%>);
-		{%-endif-%}
-		{%endfor%}
-	}
 }
 
 
