@@ -142,7 +142,7 @@ class GenericObject(object):
 		self.handle = handle
 		_handles_to_objects[handle] = self
 
-{%for enumerant, prop in properties['Lav_OBJTYPE_GENERIC'].iteritems()%}
+{%for enumerant, prop in metadata['Lav_OBJTYPE_GENERIC']['properties'].iteritems()%}
 {{implement_property(enumerant, prop)}}
 
 {%endfor%}
@@ -171,7 +171,7 @@ class {{friendly_name}}(GenericObject):
 		{{constructor_arg_names[0]}} = {{constructor_arg_names[0]}}.handle
 		super({{friendly_name}}, self).__init__(_lav.{{constructor_name|without_lav|camelcase_to_underscores}}({{constructor_arg_names|join(', ')}}))
 
-{%for enumerant, prop in properties.get(object_name, dict()).iteritems()%}
+{%for enumerant, prop in metadata.get(object_name, dict()).get('properties', dict()).iteritems()%}
 {{implement_property(enumerant, prop)}}
 
 {%endfor%}

@@ -134,4 +134,4 @@ all_info = {
 #update this dict with the keys from metadata.yml.
 with file(os.path.join(root_directory, 'src', 'libaudioverse', 'metadata', 'metadata.y')) as f:
 	metadata = yaml.load(f)
-	all_info.update(metadata)
+	all_info['metadata'] = metadata
