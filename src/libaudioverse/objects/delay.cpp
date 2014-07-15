@@ -66,7 +66,7 @@ void LavDelayObject::maxDelayChanged() {
 		delay = maxDelay;
 		getProperty(Lav_DELAY_DELAY).setFloatValue(delay);
 	}
-	getProperty(Lav_DELAY_DELAY).setFloatRange(0.0f, maxDelay);
+	getProperty(Lav_DELAY_DELAY).setFloatRange(0.001f, maxDelay);
 	if(current_delay_pos > maxDelay) {
 		current_delay_pos = maxDelay;
 	}
@@ -80,6 +80,7 @@ void LavDelayObject::maxDelayChanged() {
 		float* tmp = new float[delay_line_length]();
 		delay_lines.push_back(tmp);
 	}
+	write_pos = 0;
 }
 
 void LavDelayObject::recomputeDelta() {
