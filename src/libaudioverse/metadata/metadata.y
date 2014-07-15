@@ -1,4 +1,5 @@
 Lav_OBJTYPE_GENERIC:
+ suppress_implied_inherit: true
  properties:
   Lav_OBJECT_SUSPENDED: {name: suspended, type: int, default: 0, range: [0, 1]}
  Lav_OBJTYPE_SINE:

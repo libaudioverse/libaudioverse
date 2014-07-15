@@ -3,13 +3,14 @@ import os.path
 import os
 import jinja2
 import sys
+sys.path = [os.path.join(os.path.dirname(__file__), '../../../')] + sys.path
+import bindings.get_info
+
 if len(sys.argv) != 2:
 	print"Invalid usage: do not have destination"
 	sys.exit(1)
 
 print "Generating", sys.argv[1]
-
-#generates metadata.cpp from metadata.y and metadata.t, which must be in the same directory as this script.
 
 directory = os.path.split(os.path.abspath(__file__))[0]
 with file(os.path.join(directory, 'metadata.y')) as f:
@@ -24,10 +25,15 @@ extensions = ['jinja2.ext.loopcontrols'])
 #we have to do some sanitizing for the template.
 #the map we have here is actually very verbose, and can be flattened into something easily iterable.
 #we can then take advantage of either std::pair or std::tuple as the keys.
-property_map = dict()
-for objkey, properties in metadata['properties'].iteritems():
-	for propkey, propinfo in properties.iteritems():
-		property_map[(objkey, propkey)] = propinfo
+joined_properties = []
+for objkey, objinfo in [(i, metadata.get(i, dict())) for i in bindings.get_info.extract_enums().iterkeys() if i.startswith("Lav_OBJTYPE")]:
+	#add everything from the object itself.
+	for propkey, propinfo in objinfo.get('properties', dict()).iteritems():
+		joined_properties.append((objkey, propkey, propinfo))
+	#if we're not suppressing inheritence, we follow this up with everything from lav_OBJTYPE_GENERIC.
+	if not objinfo.get('suppress_implied_inherit', False):
+		for propkey, propinfo in metadata['Lav_OBJTYPE_GENERIC']['properties'].iteritems():
+			joined_properties.append((objkey, propkey, propinfo))
 
 #the template will convert the types into enums via judicious use of if statements-we use it like augmented c, and prefer to do refactoring only there when possible.
 #each property will be crammed into a property descriptor, but some of the ranges here are currently potentially unfriendly, most notably float3 and float6.
@@ -44,11 +50,11 @@ def string_from_number(val, type):
 		print "Returning val unchanged."
 		return val
 
-for propkey, propinfo in property_map.iteritems():
+for propkey, propid, propinfo in joined_properties:
 	for i, j in enumerate(list(propinfo.get('range', []))): #if we don't have a range, this will do nothing.
 		if isinstance(j, basestring):
 			continue #it's either MIN_INT, MAX_INT, INFINITY, -INFINITY, or another special identifier.  Pass through unchanged.
-		#we're not worried about float3 or float6 logic, because those aren't allowed to have traditional ranges at the omoment-so this is it:
+		#we're not worried about float3 or float6 logic, because those aren't allowed to have traditional ranges at the moment-so this is it:
 		propinfo['range'][i] = string_from_number(j, propinfo['type'])
 	#Default handling logic.  If we don't have one and are int, float, or double we make it 0.
 	if propinfo['type'] in {'int', 'float', 'double'}:
@@ -61,7 +67,7 @@ for propkey, propinfo in property_map.iteritems():
 
 #do the render, and write to the file specified on the command line.
 context = {
-'properties' : property_map
+'joined_properties': joined_properties,
 }
 
 template = environment.get_template('metadata.t')
