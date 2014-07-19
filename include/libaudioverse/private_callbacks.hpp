@@ -5,19 +5,23 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "libaudioverse.h"
 #include <utility>
 #include <memory>
+#include <string>
 
 class LavDevice;
 
 class LavCallback {
 	public:
-	void setHandler(LavEventCallback *cb);
+	void setHandler(LavEventCallback cb);
 	LavEventCallback getHandler();
 	void fire();
-	void associateDevice(std::shared_ptr<LavDevice>);
+	void associateDevice(std::shared_ptr<LavDevice> dev);
+	void associateObject(LavObject* obj);
 	const char* getName();
 	void setName(const char* n);
 	private:
 	std::shared_ptr<LavDevice> associated_device = nullptr;
 	LavEventCallback handler = nullptr;
 	std::string name;
+	LavObject* associated_object;
+	void* user_data;
 };
