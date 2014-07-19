@@ -2,6 +2,7 @@ cmake_MINIMUM_REQUIRED(VERSION 2.8)
 
 project(Libaudioverse)
 include_directories("${CMAKE_SOURCE_DIR}/include")
+include_directories("${CMAKE_SOURCE_DIR}/lambdatask/include")
 
 #This is LibSNDFile for windows.
 #if you've got them somewhere else, you need to change these lines.
