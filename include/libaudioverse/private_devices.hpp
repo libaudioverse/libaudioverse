@@ -2,6 +2,7 @@
 This file is part of Libaudioverse, a library for 3D and environmental audio simulation, and is released under the terms of the Gnu General Public License Version 3 or (at your option) any later version.
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #pragma once
+#include <lambdatask/threadsafe_queue.hpp>
 #include <functional> //we have to use an std::function for the preprocessing hook.  There's no good way around it because worlds need to use capturing lambdas.
 #include <set>
 #include <vector>
@@ -28,6 +29,7 @@ class LavDevice {
 	//these make us meet the basic lockable concept.
 	void lock() {mutex.lock();}
 	void unlock() {mutex.unlock();}
+	void enqueueCallback(std::function<void(void)>);
 
 	protected:
 	//visit all objects in the order they need to be visited if we were processing the graph.
@@ -43,6 +45,10 @@ class LavDevice {
 	std::set<std::weak_ptr<LavObject>, std::owner_less<std::weak_ptr<LavObject>>> objects, always_process;
 	std::shared_ptr<LavObject> output_object = nullptr;
 	std::recursive_mutex mutex;
+
+	//Support fields for callback infrastructure.
+	void doCallbacks();
+	lambdatask::ThreadsafeQueue<std::function<void(void)>>  callbacks;
 };
 
 //initialize the audio backend.
