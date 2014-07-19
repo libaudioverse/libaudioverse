@@ -139,6 +139,11 @@ std::vector<int> LavObject::getStaticPropertyIndices() {
 	return res;
 }
 
+LavCallback& LavObject::getCallback(int which) {
+	if(callbacks.count(which)) throw LavErrorException(Lav_ERROR_RANGE);
+	return callbacks[which];
+}
+
 void LavObject::lock() {
 	device->lock();
 }

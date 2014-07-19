@@ -4,6 +4,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include "libaudioverse.h"
 #include "private_properties.hpp"
+#include "private_callbacks.hpp"
 #include <map>
 #include <memory>
 #include <vector>
@@ -61,6 +62,9 @@ Consider an hrtf node, taking 22579200 mathematical operations plus loop overhea
 	virtual LavProperty& getProperty(int slot);
 	virtual std::vector<int> getStaticPropertyIndices();
 
+	//callback helper methods.
+	LavCallback& getCallback(int which);
+
 	//meet the lockable concept.
 	//Warning: these aren't virtual because they're just so that our macro works; all locking still forwards to devices.
 	void lock();
@@ -71,6 +75,7 @@ Consider an hrtf node, taking 22579200 mathematical operations plus loop overhea
 	virtual void resize(unsigned int newInputsCount, unsigned int newOutputsCount);
 	std::shared_ptr<LavDevice> device = nullptr;
 	std::map<int, LavProperty> properties;
+	std::map<int, LavCallback> callbacks;
 	std::vector<float*> inputs;
 	std::vector<LavInputDescriptor> input_descriptors;
 	std::vector<float*> outputs;
