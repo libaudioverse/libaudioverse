@@ -46,6 +46,12 @@ LavObject::LavObject(int type, std::shared_ptr<LavDevice> device, unsigned int n
 	this->device = device;
 	//request properties from the metadata module.
 	properties = makePropertyTable(type);
+
+	//Loop through callbacks, associating them with our device.
+	for(auto i: callbacks) {
+		i.second.associateDevice(device);
+	}
+
 	computeInputBuffers(); //at the moment, this is going to just make them all 0, but it takes effect once parents are added.
 }
 
