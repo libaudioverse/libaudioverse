@@ -53,6 +53,8 @@ LavError LavDevice::getBlock(float* out) {
 		out[i] = i%channels < output_object->getOutputCount() ? outputs[i%channels][i/channels] : 0.0f; //i%channels is the channel this sample belongs to; i/channels is the position in the i%channelsth output.
 	}
 	delete[] outputs;
+	//before returning, call doCallbacks so that we make sure to execute these synchronously if needed.
+	doCallbacks();
 	return Lav_ERROR_NONE;
 }
 
@@ -78,6 +80,10 @@ LavError LavDevice::setOutputObject(std::shared_ptr<LavObject> obj) {
 
 std::shared_ptr<LavObject> LavDevice::getOutputObject() {
 	return output_object;
+}
+
+void LavDevice::enqueueCallback(std::function<void(void)> cb) {
+	callbacks.enqueue(cb);
 }
 
 void LavDevice::visitAllObjectsInProcessOrder(std::function<void(std::shared_ptr<LavObject>)> visitor) {
@@ -126,6 +132,14 @@ void LavDevice::visitForProcessing(std::shared_ptr<LavObject> obj, std::function
 		visitForProcessing(obj->getParentObject(i), visitor);
 	}
 	visitor(obj);
+}
+
+//default callback implementation: executes everything in the queue synchronously.
+void LavDevice::doCallbacks() {
+	while(callbacks.empty()) {
+		auto cb = callbacks.dequeue();
+		cb();
+	}
 }
 
 //begin public API
