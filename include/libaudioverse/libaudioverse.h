@@ -155,6 +155,10 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyIndices(LavObject* obj, int** 
 /**Get the name of a property.  Again, allocates memory.*/
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyName(LavObject* obj, int slot, char** destination);
 
+/**Callbacks (events).
+Some objects go further and define specialized methods that have different signatures, but these are few and very far between.*/
+typedef void (*LavEventCallback)(LavObject* cause, void* userdata);
+
 /**Make a sine object.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createSineObject(LavDevice* device, LavObject **destination);
 
