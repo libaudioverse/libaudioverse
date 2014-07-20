@@ -52,9 +52,10 @@ void initializeMetadata() {
 	{
 	{%if prop['type'] == 'int'-%}
 	tempProp = createIntProperty("<%prop['name']%>", <%prop['default']%>, <%prop['range'][0]%>, <%prop['range'][1]%>);
-	{%elif prop['type'] == 'float'-%}
-	tempProp = createFloatProperty("<%prop['name']%>", <%prop['default']%>, <%prop['range'][0]%>, <%prop['range'][1]%>);
+	{%elif prop['type'] == 'float' or prop['type'] == 'double'-%}
+	tempProp = create<%prop['type']|capitalize%>Property("<%prop['name']%>", <%prop['default']%>, <%prop['range'][0]%>, <%prop['range'][1]%>);
 	{%elif prop['type'] == 'float3' or prop['type'] == 'float6'-%}
+	
 	float default[] = {<%prop['default']|join(', ')%>};
 	tempProp = create<%prop['type']|capitalize%>Property("<%prop['name']%>", default);
 	{%endif-%}

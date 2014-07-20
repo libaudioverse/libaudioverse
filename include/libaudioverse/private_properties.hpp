@@ -61,7 +61,7 @@ class LavProperty {
 	//doubles...
 	double getDoubleValue() {return value.dval;}
 	void setDoubleValue(double v) {
-	RC(v, dval);
+		RC(v, dval);
 		value.dval = v;
 		if(post_changed_callback) post_changed_callback();
 	}
@@ -120,7 +120,7 @@ class LavProperty {
 //helper methods to quickly make properties.
 LavProperty* createIntProperty(const char* name, int default, int min, int max);
 LavProperty* createFloatProperty(const char* name, float default, float min, float max);
-LavProperty* createDoubleProperty(const char* name, float default, float min, float max);
+LavProperty* createDoubleProperty(const char* name, double default, double min, double max);
 LavProperty* createFloat3Property(const char* name, float default[3]);
 LavProperty* createFloat6Property(const char* name, float default[6]);
 LavProperty* createStringProperty(const char* name, const char* default);

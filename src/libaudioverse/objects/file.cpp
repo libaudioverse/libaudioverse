@@ -14,6 +14,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_memory.hpp>
 #include <limits>
 #include <memory>
+#include <math.h>
 
 class LavFileObject: public LavObject {
 	public:
@@ -24,9 +25,10 @@ class LavFileObject: public LavObject {
 	protected:
 	LavFileReader file;
 	float* buffer = nullptr;
-	unsigned int position = 0;
+	unsigned int position = 0, frame_count = 0;
 	float offset = 0;
 	float delta = 0.0f;
+	double max_position = 0.0f; //save us querying it.
 };
 
 //the third parameter is a hint: we need to know how many channels, we only expose objects through the create functions, so the create function can find this out.
@@ -37,7 +39,9 @@ LavFileObject::LavFileObject(std::shared_ptr<LavDevice> device, const char* path
 	file.readAll(buffer);
 	delta = file.getSr()/device->getSr();
 	getProperty(Lav_FILE_POSITION).setPostChangedCallback([this] () {seek();});
-	getProperty(Lav_FILE_POSITION).setFloatRange(0.0f, file.getFrameCount()/(float)file.getSr());
+	max_position = file.getFrameCount()/(float)file.getSr();
+	getProperty(Lav_FILE_POSITION).setDoubleRange(0.0f, max_position);
+	frame_count = file.getFrameCount();
 }
 
 LavFileObject::~LavFileObject() {
@@ -53,7 +57,8 @@ std::shared_ptr<LavObject> createFileObject(std::shared_ptr<LavDevice> device, c
 }
 
 void LavFileObject::seek() {
-	float pos = getProperty(Lav_FILE_POSITION).getFloatValue();
+	if(is_processing) return;
+	double pos = getProperty(Lav_FILE_POSITION).getDoubleValue();
 	offset = 0.0f;
 	position = (unsigned int)(pos*file.getSr());
 }
@@ -61,14 +66,15 @@ void LavFileObject::seek() {
 void LavFileObject::process() {
 	const float pitch_bend = getProperty(Lav_FILE_PITCH_BEND).getFloatValue();
 	for(unsigned int i = 0; i < block_size; i++) {
-		if(offset >= file.getFrameCount()) {
+		if(position >= frame_count) {
 			for(unsigned int j = 0; j < num_outputs; j++) {
 				outputs[j][i] = 0.0f;
 			}
 			continue;
 		}
-		const unsigned int samp1 = (unsigned int)position;
-		const unsigned int samp2 = (unsigned int)position+1;
+		unsigned int samp1 = (unsigned int)position;
+		unsigned int samp2 = (unsigned int)position+1;
+		if(samp2 >= frame_count) samp2--;
 		const float weight1 = 1-offset;
 		const float weight2 = offset;
 		for(unsigned int j = 0; j < num_outputs; j++) {
@@ -80,6 +86,9 @@ void LavFileObject::process() {
 	position += (unsigned int)offset;
 	offset = ringmodf(offset, 1.0f);
 	}
+	double newpos = ((double)position+offset)/(double)device->getSr();
+	newpos = fmax(newpos, max_position);
+	getProperty(Lav_FILE_POSITION).setDoubleValue(newpos);
 }
 
 //begin public api
