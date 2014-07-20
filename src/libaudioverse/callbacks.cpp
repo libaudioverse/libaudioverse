@@ -4,6 +4,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/private_callbacks.hpp>
 #include <libaudioverse/private_devices.hpp>
+#include <libaudioverse/private_objects.hpp>
 #include <string>
 #include <memory>
 
@@ -18,12 +19,12 @@ LavEventCallback LavCallback::getHandler() {
 
 void LavCallback::fire() {
 	//we need to hold local copies of both the object and data in case they are changed between firing and processing by the device.
-	LavObject* obj = associated_object;
+	auto obj = associated_object->shared_from_this();
 	void* userdata = user_data;
 	LavEventCallback cb = handler;
 	//fire a lambda that uses these by copy.
 	associated_device->enqueueTask([=]() {
-		cb(obj, userdata);
+		cb(obj.get(), userdata);
 	});
 }
 
