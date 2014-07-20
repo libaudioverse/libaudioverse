@@ -13,8 +13,12 @@ It is worth keeping separate because it will grow rapidly and contain documentat
 
 The standard for naming is:
 Lav_OBJTYPE_PROPNAME
+or
+Lav_OBJTYPE_callbackname_CALLBACK
 
 Furthermore, all libaudioverse properties are negative, save on those objects for which documentation says otherwise.  Examples of objects with positive properties include highly configurable mixers and attenuators, among others.
+
+Values below -100 are reserved for standard callbacks and properties on all objects.
 */
 
 enum lav_STANDARD_PROPERTIES {
@@ -28,6 +32,9 @@ enum Lav_SINE_PROPERTIES {
 enum Lav_FILE_PROPERTIES {
 	Lav_FILE_POSITION = -1,
 	Lav_FILE_PITCH_BEND = -2,
+
+	//callbacks
+	Lav_FILE_END_CALLBACK = -1,
 };
 
 enum Lav_HRTF_PROPERTIES {

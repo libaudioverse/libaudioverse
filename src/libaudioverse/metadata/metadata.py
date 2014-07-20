@@ -35,6 +35,17 @@ for objkey, objinfo in [(i, metadata.get(i, dict())) for i in bindings.get_info.
 		for propkey, propinfo in metadata['Lav_OBJTYPE_GENERIC']['properties'].iteritems():
 			joined_properties.append((objkey, propkey, propinfo))
 
+#this is the same logic, but for callbacks.
+joined_callbacks = []
+for objkey, objinfo in [(i, metadata.get(i, dict())) for i in bindings.get_info.extract_enums().iterkeys() if i.startswith("Lav_OBJTYPE")]:
+	#add everything from the object itself.
+	for callkey, callinfo in objinfo.get('callbacks', dict()).iteritems():
+		joined_callbacks.append((objkey, callkey, callinfo))
+	#if we're not suppressing inheritence, we follow this up with everything from lav_OBJTYPE_GENERIC.
+	if not objinfo.get('suppress_implied_inherit', False):
+		for callkey, callinfo in metadata['Lav_OBJTYPE_GENERIC'].get('callbacks', dict()).iteritems():
+			joined_callbacks.append((objkey, callkey, callinfo))
+
 #the template will convert the types into enums via judicious use of if statements-we use it like augmented c, and prefer to do refactoring only there when possible.
 #each property will be crammed into a property descriptor, but some of the ranges here are currently potentially unfriendly, most notably float3 and float6.
 #we are going to convert all numbers into strings, and make them valid c identifiers.  Skip anything that is already a string.
@@ -68,6 +79,7 @@ for propkey, propid, propinfo in joined_properties:
 #do the render, and write to the file specified on the command line.
 context = {
 'joined_properties': joined_properties,
+'joined_callbacks': joined_callbacks,
 }
 
 template = environment.get_template('metadata.t')
