@@ -18,6 +18,7 @@ LavEventCallback LavCallback::getHandler() {
 }
 
 void LavCallback::fire() {
+	if(handler == nullptr) return; //nothing to do.
 	//we need to hold local copies of both the object and data in case they are changed between firing and processing by the device.
 	auto obj = associated_object->shared_from_this();
 	void* userdata = user_data;
