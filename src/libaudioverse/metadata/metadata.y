@@ -9,6 +9,8 @@ Lav_OBJTYPE_FILE:
  properties:
   Lav_FILE_POSITION: {name: position, type: float, default: 0.0, range: [0.0, 0.0]}
   Lav_FILE_PITCH_BEND: {name: pitch_bend, type: float, default: 1.0, range: [0, INFINITY]}
+ callbacks:
+  lav_FILE_END_CALLBACK: {name: end_callback}
 Lav_OBJTYPE_HRTF:
  properties:
   Lav_HRTF_AZIMUTH: {name: azimuth, type: float, default: 0.0, range: [-INFINITY, INFINITY]}
