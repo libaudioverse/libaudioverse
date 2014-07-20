@@ -29,6 +29,7 @@ class LavFileObject: public LavObject {
 	float offset = 0;
 	float delta = 0.0f;
 	double max_position = 0.0f; //save us querying it.
+	bool has_ended = false;
 };
 
 //the third parameter is a hint: we need to know how many channels, we only expose objects through the create functions, so the create function can find this out.
@@ -61,15 +62,22 @@ void LavFileObject::seek() {
 	double pos = getProperty(Lav_FILE_POSITION).getDoubleValue();
 	offset = 0.0f;
 	position = (unsigned int)(pos*file.getSr());
+	has_ended = false;
 }
 
 void LavFileObject::process() {
+	if(has_ended) {
+		LavObject::process();
+		return;
+	}
+	bool switch_to_ended = false;
 	const float pitch_bend = getProperty(Lav_FILE_PITCH_BEND).getFloatValue();
 	for(unsigned int i = 0; i < block_size; i++) {
 		if(position >= frame_count) {
 			for(unsigned int j = 0; j < num_outputs; j++) {
 				outputs[j][i] = 0.0f;
 			}
+			switch_to_ended = true;
 			continue;
 		}
 		unsigned int samp1 = (unsigned int)position;
@@ -89,6 +97,10 @@ void LavFileObject::process() {
 	double newpos = ((double)position+offset)/(double)device->getSr();
 	newpos = fmax(newpos, max_position);
 	getProperty(Lav_FILE_POSITION).setDoubleValue(newpos);
+	if(switch_to_ended) {
+		has_ended = true;
+		getCallback(Lav_FILE_END_CALLBACK).fire();
+		}
 }
 
 //begin public api
