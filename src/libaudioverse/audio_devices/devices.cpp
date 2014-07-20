@@ -10,13 +10,22 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <functional>
 #include <algorithm>
 #include <iterator>
+#include <thread>
 
 LavDevice::LavDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead) {
 	this->sr = (float)sr;
 	this->channels = channels;
 	this->block_size = blockSize;
 	this->mixahead = mixahead;
+	//fire up the background thread.
+	backgroundTaskThread = std::thread([this]() {backgroundTaskThreadFunction();});
 	start();
+}
+
+LavDevice::~LavDevice() {
+	//enqueue a task which will stop the background thread.
+	enqueueTask([]() {throw LavThreadTerminationException();});
+	backgroundTaskThread.join();
 }
 
 LavError LavDevice::getBlock(float* out) {
@@ -53,8 +62,6 @@ LavError LavDevice::getBlock(float* out) {
 		out[i] = i%channels < output_object->getOutputCount() ? outputs[i%channels][i/channels] : 0.0f; //i%channels is the channel this sample belongs to; i/channels is the position in the i%channelsth output.
 	}
 	delete[] outputs;
-	//before returning, call doCallbacks so that we make sure to execute these synchronously if needed.
-	doCallbacks();
 	return Lav_ERROR_NONE;
 }
 
@@ -82,8 +89,8 @@ std::shared_ptr<LavObject> LavDevice::getOutputObject() {
 	return output_object;
 }
 
-void LavDevice::enqueueCallback(std::function<void(void)> cb) {
-	callbacks.enqueue(cb);
+void LavDevice::enqueueTask(std::function<void(void)> cb) {
+	tasks.enqueue(cb);
 }
 
 void LavDevice::visitAllObjectsInProcessOrder(std::function<void(std::shared_ptr<LavObject>)> visitor) {
@@ -134,11 +141,16 @@ void LavDevice::visitForProcessing(std::shared_ptr<LavObject> obj, std::function
 	visitor(obj);
 }
 
-//default callback implementation: executes everything in the queue synchronously.
-void LavDevice::doCallbacks() {
-	while(callbacks.empty()) {
-		auto cb = callbacks.dequeue();
-		cb();
+//Default callback implementation.
+void LavDevice::backgroundTaskThreadFunction() {
+	try {
+		for(;;) {
+			auto task = tasks.dequeue();
+			task();
+		}
+	}
+	catch(LavThreadTerminationException) {
+		return;
 	}
 }
 

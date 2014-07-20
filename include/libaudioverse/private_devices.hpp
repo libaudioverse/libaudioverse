@@ -8,14 +8,19 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <vector>
 #include <mutex>
 #include <memory>
+#include <thread>
 #include "libaudioverse.h"
 
 class LavObject;
 
+/*When thrown on the background thread, terminates it.*/
+class LavThreadTerminationException {
+};
+
 class LavDevice {
 	public:
 	LavDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead);
-	virtual ~LavDevice() {}
+	virtual ~LavDevice();
 	virtual LavError getBlock(float* out);
 	virtual unsigned int getBlockSize() { return block_size;}
 	virtual LavError start();
@@ -29,7 +34,7 @@ class LavDevice {
 	//these make us meet the basic lockable concept.
 	void lock() {mutex.lock();}
 	void unlock() {mutex.unlock();}
-	void enqueueCallback(std::function<void(void)>);
+	void enqueueTask(std::function<void(void)>);
 
 	protected:
 	//visit all objects in the order they need to be visited if we were processing the graph.
@@ -46,9 +51,9 @@ class LavDevice {
 	std::shared_ptr<LavObject> output_object = nullptr;
 	std::recursive_mutex mutex;
 
-	//Support fields for callback infrastructure.
-	void doCallbacks();
-	lambdatask::ThreadsafeQueue<std::function<void(void)>>  callbacks;
+	lambdatask::ThreadsafeQueue<std::function<void(void)>>  tasks;
+	std::thread backgroundTaskThread;
+	void backgroundTaskThreadFunction();
 };
 
 //initialize the audio backend.

@@ -22,7 +22,7 @@ void LavCallback::fire() {
 	void* userdata = user_data;
 	LavEventCallback cb = handler;
 	//fire a lambda that uses these by copy.
-	associated_device->enqueueCallback([=]() {
+	associated_device->enqueueTask([=]() {
 		cb(obj, userdata);
 	});
 }
