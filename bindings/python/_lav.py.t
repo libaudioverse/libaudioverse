@@ -37,7 +37,11 @@ def {{friendly_name}}({{input_arg_names|join(', ')}}):
 		{%for i in output_arg_names%}ctypes.byref({{i}}){%if not loop.last%}, {%endif%}{%endfor%})
 	if err != _libaudioverse.Lav_ERROR_NONE:
 		raise make_error_from_code(err)
-	return {{output_arg_names|join('.value, ')}}.value{#we need to do this because we're seriously circumventing ctypes automatic conversions here#}
+	retval = []
+{%for i in output_arg_names%}
+	retval.append(getattr({{i}}, 'value', {{i}}))
+{%endfor%}
+	return tuple(retval) if len(retval) > 1 else retval[0]
 {%endif%}
 
 {%endfor%}

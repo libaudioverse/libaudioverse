@@ -77,18 +77,11 @@ def extract_typedefs():
 	global ast
 	#again, we expect them at the top levle--if they're not, we'll miss them.
 	#the primary use of this is a bit later, when we build function objects-we aggregate typedefs when possible.
-	#at the moment, we typedef everything to void. This is not likely to change, so the following block basically works.
 	typedef_list = [i for i in ast.ext if isinstance(i, Typedef)]
 	typedefs = OrderedDict()
 	for typedef in typedef_list:
 		name = typedef.name
-		base = typedef.type.type
-		if isinstance(base, IdentifierType):
-			base = " ".join(base.names)
-		elif isinstance(base, Enum):
-			base = base.name
-		indirection = 0
-		typedefs[name] = TypeInfo(base, indirection)
+		typedefs[name] = compute_type_info(typedef)
 	return typedefs
 
 def compute_type_info(node):
@@ -98,30 +91,34 @@ def compute_type_info(node):
 	while isinstance(currently_examining, PtrDecl):
 		indirection += 1
 		currently_examining = currently_examining.type
-	#we must move it once more.  This crashes us if it's not what we expect.  Given the frigility of this script...
-	assert isinstance(currently_examining, TypeDecl)
-	currently_examining  = currently_examining.type
-	name = " ".join(currently_examining.names)
-	#first, make a TypeInfo
-	info = TypeInfo(base = name, indirection = indirection)
-	return info
+	if isinstance(currently_examining, TypeDecl):
+		currently_examining  = currently_examining.type
+		name = " ".join(currently_examining.names)
+		#first, make a TypeInfo
+		info = TypeInfo(base = name, indirection = indirection)
+		return info
+	elif isinstance(currently_examining, FuncDecl):
+		base = compute_function_info(currently_examining)
+		return TypeInfo(base = base, indirection = indirection)
+
+def compute_function_info(func, name = ""):
+	return_type = compute_type_info(func) #not func.type-the function expects one node above.
+	if func.args is not None:
+		types = [compute_type_info(i) for i in func.args.params]
+		names = [i.name for i in func.args.params]
+		args = zip(types, names)
+		args = tuple([ParameterInfo(i[0], i[1]) for i in args])
+	else:
+		args = ()
+	return FunctionInfo(return_type, name, args)
 
 def extract_functions():
 	global ast
 	function_list = [i for i in ast.ext if isinstance(i, Decl) and isinstance(i.type, FuncDecl)]
 	functions = OrderedDict()
 	for function in function_list:
-		func = function.type
 		name = function.name
-		return_type = compute_type_info(func) #not func.type-the function expects one node above.
-		if func.args is not None:
-			types = [compute_type_info(i) for i in func.args.params]
-			names = [i.name for i in func.args.params]
-			args = zip(types, names)
-			args = tuple([ParameterInfo(i[0], i[1]) for i in args])
-		else:
-			args = ()
-		functions[name] = FunctionInfo(return_type, name, args)
+		functions[name] = compute_function_info(function.type, name)
 	return functions
 
 #export this in one dict so that we have a way to add it to parent scripts.

@@ -5,10 +5,11 @@ from .. import transformers
 from .. import get_info
 
 ctypes_map = {
-'int' : 'c_int',
-'unsigned int' : 'c_uint',
-'float' : 'c_float',
-'double' : 'c_double',
+'int' : 'ctypes.c_int',
+'unsigned int' : 'ctypes.c_uint',
+'float' : 'ctypes.c_float',
+'double' : 'ctypes.c_double',
+'void': 'None',
 }
 
 def ctypes_string(typeinfo, offset = 0):
@@ -23,10 +24,17 @@ def ctypes_string(typeinfo, offset = 0):
 		return "ctypes.c_void_p"
 	elif typeinfo.indirection == 1 and typeinfo.base == 'char':
 		return "ctypes.c_char_p"
+	elif typeinfo.indirection == 1 and isinstance(typeinfo.base, get_info.FunctionInfo):
+		return ctypes_function_helper(typeinfo.base)
 	elif typeinfo.indirection == 0:
-		return "ctypes." + ctypes_map[typeinfo.base]
+		return ctypes_map[typeinfo.base]
 	else:
 		return "ctypes.POINTER(" + ctypes_string(get_info.TypeInfo(typeinfo.base, typeinfo.indirection-1)) + ")"
+
+def ctypes_function_helper(func):
+	retstr = ctypes_string(func.return_type)
+	argstr = ", ".join([retstr] + [ctypes_string(i.type) for i in func.args])
+	return "ctypes.CFUNCTYPE(" + argstr + ")"
 
 def make_python(info):
 	#we have to inject into the global namespace: the templates should not have to move typedef info around for us.

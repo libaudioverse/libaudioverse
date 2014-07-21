@@ -32,8 +32,10 @@ typedef int LavObjectType;
 #endif
 #ifdef __cplusplus
 #define Lav_PUBLIC_FUNCTION extern "C" DLL_PUBLIC_ATTR
+#define EXTERN_FUNCTION extern "C"
 #else
 #define Lav_PUBLIC_FUNCTION extern DLL_PUBLIC_ATTR
+#define EXTERN_FUNCTION
 #endif
 
 /*This block takes effect if this header is being preprocessed for the binding generators, turning off whatever weird thing we need for the build.*/
@@ -41,6 +43,8 @@ typedef int LavObjectType;
 //gets rid of macro redefinition warnings.
 #undef Lav_PUBLIC_FUNCTION
 #define Lav_PUBLIC_FUNCTION
+#undef EXTERN_FUNCTION
+#define EXTERN_FUNCTION
 #endif
 
 enum Lav_LIMITS {
@@ -157,7 +161,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyName(LavObject* obj, int slot,
 
 /**Callbacks (events).
 Some objects go further and define specialized methods that have different signatures, but these are few and very far between.*/
-extern "C" typedef void (*LavEventCallback)(LavObject* cause, void* userdata);
+EXTERN_FUNCTION typedef void (*LavEventCallback)(LavObject* cause, void* userdata);
 Lav_PUBLIC_FUNCTION LavError Lav_getCallbackHandler(LavObject* obj, int callback, LavEventCallback *destination);
 Lav_PUBLIC_FUNCTION LavError Lav_getCallbackUserDataPointer(LavObject* obj, int callback, void** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_setCallback(LavObject* obj, int callback, LavEventCallback handler, void* userData);
