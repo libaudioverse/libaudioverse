@@ -15,6 +15,10 @@ if((x) != Lav_ERROR_NONE) {\
 }\
 } while(0)\
 
+void endOfFileCallback(LavObject* ignoredObject, void* ignored) {
+	printf("End of file reached.\n");
+}
+
 void main(int argc, char** args) {
 	if(argc != 2) {
 		printf("Syntax: %s <path>");
@@ -43,6 +47,7 @@ void main(int argc, char** args) {
 		ERRCHECK(Lav_objectSetParent(mix, 1, atten, 0));
 		ERRCHECK(Lav_objectSetParent(limit, 1, mix, 0));
 	}
+	Lav_setCallback(node, Lav_FILE_END_CALLBACK, endOfFileCallback, nullptr);
 	ERRCHECK(Lav_deviceSetOutputObject(device, limit));
 
 	//enter the transducer loop.

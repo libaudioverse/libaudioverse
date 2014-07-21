@@ -50,8 +50,10 @@ LavObject::LavObject(int type, std::shared_ptr<LavDevice> device, unsigned int n
 	callbacks = makeCallbackTable(type);
 
 	//Loop through callbacks, associating them with our device.
+	//map iterators dont' give references, only operator[].
 	for(auto i: callbacks) {
-		i.second.associateDevice(device);
+		callbacks[i.first].associateDevice(device);
+		callbacks[i.first].associateObject(this);
 	}
 
 	computeInputBuffers(); //at the moment, this is going to just make them all 0, but it takes effect once parents are added.

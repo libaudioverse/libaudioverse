@@ -157,7 +157,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyName(LavObject* obj, int slot,
 
 /**Callbacks (events).
 Some objects go further and define specialized methods that have different signatures, but these are few and very far between.*/
-typedef void (*LavEventCallback)(LavObject* cause, void* userdata);
+extern "C" typedef void (*LavEventCallback)(LavObject* cause, void* userdata);
 Lav_PUBLIC_FUNCTION LavError Lav_getCallbackHandler(LavObject* obj, int callback, LavEventCallback *destination);
 Lav_PUBLIC_FUNCTION LavError Lav_getCallbackUserDataPointer(LavObject* obj, int callback, void** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_setCallback(LavObject* obj, int callback, LavEventCallback handler, void* userData);
