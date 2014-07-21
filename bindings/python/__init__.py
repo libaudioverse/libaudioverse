@@ -18,14 +18,14 @@ def ctypes_string(typeinfo, offset = 0):
 	if offset != 0:
 		assert typeinfo.indirection-offset >= 0
 		return ctypes_string(get_info.TypeInfo(typeinfo.base, typeinfo.indirection-offset))
-	if typeinfo.base in typedefs:
-		return ctypes_string(get_info.TypeInfo(typedefs[typeinfo.base].base, typedefs[typeinfo.base].indirection+typeinfo.indirection))
 	if typeinfo.indirection == 1 and typeinfo.base == 'void':
 		return "ctypes.c_void_p"
 	elif typeinfo.indirection == 1 and typeinfo.base == 'char':
 		return "ctypes.c_char_p"
 	elif typeinfo.indirection == 1 and isinstance(typeinfo.base, get_info.FunctionInfo):
 		return ctypes_function_helper(typeinfo.base)
+	elif typeinfo.indirection == 0 and typeinfo.base in typedefs:
+		return typeinfo.base
 	elif typeinfo.indirection == 0:
 		return ctypes_map[typeinfo.base]
 	else:
