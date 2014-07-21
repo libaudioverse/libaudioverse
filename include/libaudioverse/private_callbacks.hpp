@@ -18,6 +18,8 @@ class LavCallback {
 	void associateObject(LavObject* obj);
 	const char* getName();
 	void setName(const char* n);
+	void* getUserData();
+	void setUserData(void* data);
 	private:
 	std::shared_ptr<LavDevice> associated_device = nullptr;
 	LavEventCallback handler = nullptr;

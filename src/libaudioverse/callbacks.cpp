@@ -44,3 +44,11 @@ const char* LavCallback::getName() {
 void LavCallback::setName(const char* n) {
 	name = std::string(n);
 }
+
+void* LavCallback::getUserData() {
+	return user_data;
+}
+
+void LavCallback::setUserData(void* data) {
+	user_data = data;
+}

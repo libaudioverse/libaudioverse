@@ -100,7 +100,7 @@ void LavFileObject::process() {
 	if(switch_to_ended) {
 		has_ended = true;
 		getCallback(Lav_FILE_END_CALLBACK).fire();
-		}
+	}
 }
 
 //begin public api

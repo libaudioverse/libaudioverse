@@ -48,6 +48,7 @@ LavObject::LavObject(int type, std::shared_ptr<LavDevice> device, unsigned int n
 	properties = makePropertyTable(type);
 	//and callbacks.
 	callbacks = makeCallbackTable(type);
+
 	//Loop through callbacks, associating them with our device.
 	for(auto i: callbacks) {
 		i.second.associateDevice(device);
@@ -147,7 +148,7 @@ std::vector<int> LavObject::getStaticPropertyIndices() {
 }
 
 LavCallback& LavObject::getCallback(int which) {
-	if(callbacks.count(which)) throw LavErrorException(Lav_ERROR_RANGE);
+	if(callbacks.count(which) == 0) throw LavErrorException(Lav_ERROR_RANGE);
 	return callbacks[which];
 }
 
@@ -389,5 +390,32 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyName(LavObject* obj, int slot,
 	char* dest = new char[strlen(n)+1]; //+1 for extra NULL.
 	strcpy(dest, n);
 	*destination = dest;
+	PUB_END
+}
+
+
+//callback setup/configure/retrieval.
+
+Lav_PUBLIC_FUNCTION LavError Lav_getCallbackHandler(LavObject* obj, int callback, LavEventCallback *destination) {
+	PUB_BEGIN
+	auto ptr = incomingPointer<LavObject>(obj);
+	LOCK(*obj);
+	*destination = obj->getCallback(callback).getHandler();
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_getCallbackUserDataPointer(LavObject* obj, int callback, void** destination) {
+	PUB_BEGIN
+	auto ptr = incomingPointer<LavObject>(obj);
+	LOCK(*obj);
+	*destination = obj->getCallback(callback).getUserData();
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_setCallback(LavObject* obj, int callback, LavEventCallback handler, void* userData) {
+	PUB_BEGIN
+	auto ptr = incomingPointer<LavObject>(obj);
+	obj->getCallback(callback).setHandler(handler);
+	obj->getCallback(callback).setUserData(userData);
 	PUB_END
 }
