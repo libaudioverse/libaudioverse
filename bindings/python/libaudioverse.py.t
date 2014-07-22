@@ -32,9 +32,6 @@ import ctypes
 #initialize libaudioverse.  This is per-app and implies no context settings, etc.
 _lav.initialize_library()
 
-#This exists only for callbacks.
-_handles_to_objects = weakref.WeakValueDictionary()
-
 #this makes sure that callback objects do not die.
 _callbacks = set()
 
@@ -143,7 +140,6 @@ class GenericObject(object):
 
 	def __init__(self, handle):
 		self.handle = handle
-		_handles_to_objects[handle] = self
 		self._parents = [(None, 0)]*_lav.object_get_parent_count(handle)
 
 {%for enumerant, prop in metadata['Lav_OBJTYPE_GENERIC']['properties'].iteritems()%}
