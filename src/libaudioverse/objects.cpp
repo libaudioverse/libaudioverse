@@ -412,7 +412,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyName(LavObject* obj, int slot,
 
 //callback setup/configure/retrieval.
 
-Lav_PUBLIC_FUNCTION LavError Lav_getCallbackHandler(LavObject* obj, int callback, LavEventCallback *destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetCallbackHandler(LavObject* obj, int callback, LavEventCallback *destination) {
 	PUB_BEGIN
 	auto ptr = incomingPointer<LavObject>(obj);
 	LOCK(*obj);
@@ -420,7 +420,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_getCallbackHandler(LavObject* obj, int callback
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_getCallbackUserDataPointer(LavObject* obj, int callback, void** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetCallbackUserDataPointer(LavObject* obj, int callback, void** destination) {
 	PUB_BEGIN
 	auto ptr = incomingPointer<LavObject>(obj);
 	LOCK(*obj);
@@ -428,7 +428,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_getCallbackUserDataPointer(LavObject* obj, int 
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_setCallback(LavObject* obj, int callback, LavEventCallback handler, void* userData) {
+Lav_PUBLIC_FUNCTION LavError Lav_objectSetCallback(LavObject* obj, int callback, LavEventCallback handler, void* userData) {
 	PUB_BEGIN
 	auto ptr = incomingPointer<LavObject>(obj);
 	obj->getCallback(callback).setHandler(handler);

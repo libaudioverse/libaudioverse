@@ -47,7 +47,7 @@ void main(int argc, char** args) {
 		ERRCHECK(Lav_objectSetParent(mix, 1, atten, 0));
 		ERRCHECK(Lav_objectSetParent(limit, 1, mix, 0));
 	}
-	Lav_setCallback(node, Lav_FILE_END_CALLBACK, endOfFileCallback, nullptr);
+	Lav_objectSetCallback(node, Lav_FILE_END_CALLBACK, endOfFileCallback, nullptr);
 	ERRCHECK(Lav_deviceSetOutputObject(device, limit));
 
 	//enter the transducer loop.

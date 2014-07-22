@@ -162,9 +162,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyName(LavObject* obj, int slot,
 /**Callbacks (events).
 Some objects go further and define specialized methods that have different signatures, but these are few and very far between.*/
 EXTERN_FUNCTION typedef void (*LavEventCallback)(LavObject* cause, void* userdata);
-Lav_PUBLIC_FUNCTION LavError Lav_getCallbackHandler(LavObject* obj, int callback, LavEventCallback *destination);
-Lav_PUBLIC_FUNCTION LavError Lav_getCallbackUserDataPointer(LavObject* obj, int callback, void** destination);
-Lav_PUBLIC_FUNCTION LavError Lav_setCallback(LavObject* obj, int callback, LavEventCallback handler, void* userData);
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetCallbackHandler(LavObject* obj, int callback, LavEventCallback *destination);
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetCallbackUserDataPointer(LavObject* obj, int callback, void** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_objectSetCallback(LavObject* obj, int callback, LavEventCallback handler, void* userData);
 
 /**Make a sine object.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createSineObject(LavDevice* device, LavObject **destination);

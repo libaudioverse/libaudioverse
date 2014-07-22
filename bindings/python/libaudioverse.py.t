@@ -35,6 +35,9 @@ _lav.initialize_library()
 #This exists only for callbacks.
 _handles_to_objects = weakref.WeakValueDictionary()
 
+#this makes sure that callback objects do not die.
+_callbacks = set()
+
 #build and register all the error classes.
 class GenericError(Exception):
 	"""Base for all libaudioverse errors."""
@@ -78,6 +81,23 @@ Note also that we are not inheriting from MutableSequence because we cannot supp
 		if not isinstance(val[0], GenericObject):
 			raise TypeError("val[0]: is not a Libaudioverse object.")
 		self.for_object._set_parent(key, val[0] if val is not None else None, val[1] if val is not None else 0)
+
+class _EventCallbackWrapper(object):
+	"""Wraps callbacks into something sane.  Do not use externally."""
+
+	def __init__(self, for_object, slot, callback, additional_args):
+		self.obj_weakref = weakref.ref(for_object)
+		self.additional_arguments = additional_args
+		self.slot = slot
+		self.callback = callback
+		self.fptr = _libaudioverse.LavEventCallback(self)
+		_lav.object_set_callback(for_object.handle, slot, self.fptr, None)
+
+	def __call__(self, obj, userdata):
+		actual_object = self.obj_weakref()
+		if actual_object is None:
+			return
+		self.callback(actual_object, *self.additional_arguments)
 
 class Device(object):
 	"""Represents output, either to an audio card or otherwise.  A device is required by all other Libaudioverse objects.
