@@ -29,11 +29,31 @@ import ctypes
 {%endif%}
 {%endmacro%}
 
+{%macro implement_callback(name, index)%}
+	@property
+	def {{name}}_callback(self):
+		cb = self._callbacks.get({{iondex}}, None)
+		if cb is None:
+			return
+		return (cb.callback, cb.extra_arguments)
+
+	@{{name}}_callback.setter
+	def {{name}}_callback(self, val):
+		global _global_callbacks
+		val_tuple = tuple(val)
+		if len(val_tuple) == 1:
+			val_tuple = (val, ())
+		cb, extra_args = val_tuple
+		callback_obj = _EventCallbackWrapper(self, {{index}}, cb, extra_args)
+		self._callbacks[index] = callback_obj
+		_global_callbacks[self.handle].add(callback)
+{%endmacro%}
+
 #initialize libaudioverse.  This is per-app and implies no context settings, etc.
 _lav.initialize_library()
 
 #this makes sure that callback objects do not die.
-_callbacks = set()
+_global_callbacks = collections.defaultdict(set)
 
 #build and register all the error classes.
 class GenericError(Exception):
@@ -141,6 +161,7 @@ class GenericObject(object):
 	def __init__(self, handle):
 		self.handle = handle
 		self._parents = [(None, 0)]*_lav.object_get_parent_count(handle)
+		self._callbacks = dict()
 
 {%for enumerant, prop in metadata['Lav_OBJTYPE_GENERIC']['properties'].iteritems()%}
 {{implement_property(enumerant, prop)}}
