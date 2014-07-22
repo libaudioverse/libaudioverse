@@ -32,9 +32,6 @@ import ctypes
 #initialize libaudioverse.  This is per-app and implies no context settings, etc.
 _lav.initialize_library()
 
-#This dict maps type codes to classes so that we can revive objects from handles, etc.
-_types_to_classes = dict()
-
 #This exists only for callbacks.
 _handles_to_objects = weakref.WeakValueDictionary()
 
@@ -127,7 +124,7 @@ class GenericObject(object):
 	def __init__(self, handle):
 		self.handle = handle
 		_handles_to_objects[handle] = self
-		self.parents_list = [(None, 0)]*_lav.object_get_parent_count(handle)
+		self._parents = [(None, 0)]*_lav.object_get_parent_count(handle)
 
 {%for enumerant, prop in metadata['Lav_OBJTYPE_GENERIC']['properties'].iteritems()%}
 {{implement_property(enumerant, prop)}}
@@ -145,18 +142,29 @@ class GenericObject(object):
 	@property
 	def parents(self):
 		"""Returns a ParentProxy, an object that acts like a list of tuples.  The first item of each tuple is the parent object and the second item is the output to which we are connected."""
+		self._check_parent_resize()
 		return ParentProxy(self)
 
+	def _check_parent_resize(self):
+		new_parent_count = _lav.object_get_parent_count(self.handle)
+		new_parent_list = self._parents
+		if new_parent_count < len(self._parents):
+			new_parent_list = self._parents[0:new_parents_count]
+		elif new_parent_count > len(self._parents):
+			additional_parents = [(None, 0)]*(new_parent_count-len(self._parents))
+			new_parent_list = new_parent_list + additional_parents
+		self._parents = new_parent_list
+
 	def _get_parent(self, key):
-		return self.parents[key]
+		return self._parents[key]
 
 	def _set_parent(self, key, obj, inp):
 		if obj is None:
 			_lav.object_set_parent(self.handle, key, None, 0)
-			self.parents[key] = (None, 0)
+			self._parents[key] = (None, 0)
 		else:
-			_lav.object_set_parent(self.handle, key, obj, inp)
-			parents[key] = (obj, inp)
+			_lav.object_set_parent(self.handle, key, obj.handle, inp)
+			self._parents[key] = (obj, inp)
 
 {%for object_name in constants.iterkeys()|prefix_filter("Lav_OBJTYPE_")|remove_filter("Lav_OBJTYPE_GENERIC")%}
 {%set friendly_name = object_name|strip_prefix("Lav_OBJTYPE_")|lower|underscores_to_camelcase(True) + "Object"%}
@@ -171,7 +179,5 @@ class {{friendly_name}}(GenericObject):
 {{implement_property(enumerant, prop)}}
 
 {%endfor%}
-_types_to_classes[_libaudioverse.{{object_name}}] = {{friendly_name}}
-
 {%endfor%}
 
