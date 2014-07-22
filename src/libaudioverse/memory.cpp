@@ -6,15 +6,18 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_macros.hpp>
 #include <map>
 #include <memory>
+#include <mutex>
 
 std::map<void*, std::shared_ptr<void>> *external_ptrs;
-
+std::mutex *memory_lock;
 void initializeMemoryModule() {
 	external_ptrs = new std::map<void*, std::shared_ptr<void>>();
+	memory_lock = new std::mutex();
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_free(void* ptr) {
 	PUB_BEGIN
+	auto guard = std::lock_guard<std::mutex>(*memory_lock);
 	if(external_ptrs->count(ptr)) external_ptrs->erase(ptr);
 	PUB_END
 }
