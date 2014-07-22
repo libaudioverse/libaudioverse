@@ -22,11 +22,13 @@ float zerobuffer[Lav_MAX_BLOCK_SIZE] = {0}; //this is a shared buffer for the "n
 void LavObject::computeInputBuffers() {
 	//point our inputs either at a zeroed buffer or the output of our parent.
 	for(unsigned int i = 0; i < input_descriptors.size(); i++) {
-		if(input_descriptors[i].parent != NULL && input_descriptors[i].parent->isSuspended() == false) {
-			if(input_descriptors[i].output >= input_descriptors[i].parent->getOutputCount()) { //the parent node no longer has this output, probably due to resizing.
+		auto parent = input_descriptors[i].parent.lock();
+		auto output = input_descriptors[i].output;
+		if(parent != nullptr && parent->isSuspended() == false) {
+			if(output >= parent->getOutputCount()) { //the parent node no longer has this output, probably due to resizing.
 				setParent(i, nullptr, 0); //so we clear this parent.
 			}
-			inputs[i] = input_descriptors[i].parent->outputs[input_descriptors[i].output];
+			inputs[i] = parent->outputs[output];
 		}
 		else {
 			inputs[i] = zerobuffer;
@@ -112,15 +114,16 @@ void LavObject::setParent(unsigned int input, std::shared_ptr<LavObject> parent,
 
 std::shared_ptr<LavObject> LavObject::getParentObject(unsigned int input) {
 	if(input >= input_descriptors.size()) throw LavErrorException(Lav_ERROR_RANGE);
-	return input_descriptors[input].parent;
+	return input_descriptors[input].parent.lock();
 }
 
 unsigned int LavObject::getParentOutput(unsigned int input) {
 	if(input >= input_descriptors.size()) throw LavErrorException(Lav_ERROR_RANGE);
-	return input_descriptors[input].output;
+	auto parent = input_descriptors[input].parent.lock();
+	return parent != nullptr ? input_descriptors[input].output : 0;
 }
 
-unsigned int LavObject::getInputCount() {
+unsigned int LavObject::getParentCount() {
 	return input_descriptors.size();
 }
 
@@ -197,19 +200,23 @@ void LavPassthroughObject::process() {
 //begin public api
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetType(LavObject* obj, int* destination) {
 	PUB_BEGIN
+	auto obj_ptr = incomingPointer<LavObject>(obj);
+	LOCK(*obj);
 	*destination = obj->getType();
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetInputCount(LavObject* obj, unsigned int* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetParentCount(LavObject* obj, unsigned int* destination) {
 	PUB_BEGIN
+	auto obj_ptr = incomingPointer<LavObject>(obj);
 	LOCK(*obj);
-	*destination = obj->getInputCount();
+	*destination = obj->getParentCount();
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetOutputCount(LavObject* obj, unsigned int* destination) {
 	PUB_BEGIN
+	auto obj_ptr = incomingPointer<LavObject>(obj);
 	LOCK(*obj);
 	*destination = obj->getOutputCount();
 	PUB_END
@@ -217,6 +224,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetOutputCount(LavObject* obj, unsigned i
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetParentObject(LavObject *obj, unsigned int slot, LavObject** destination) {
 	PUB_BEGIN
+	auto obj_ptr = incomingPointer<LavObject>(obj);
 	LOCK(*obj);
 	*destination = outgoingPointer<LavObject>(obj->getParentObject(slot));
 	PUB_END
@@ -224,6 +232,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetParentObject(LavObject *obj, unsigned 
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetParentOutput(LavObject* obj, unsigned int slot, unsigned int* destination) {
 	PUB_BEGIN
+	auto obj_ptr = incomingPointer<LavObject>(obj);
 	LOCK(*obj);
 	*destination = obj->getParentOutput(slot);
 	PUB_END
@@ -231,6 +240,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetParentOutput(LavObject* obj, unsigned 
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectSetParent(LavObject *obj, unsigned int input, LavObject* parent, unsigned int output) {
 	PUB_BEGIN
+	auto obj_ptr = incomingPointer<LavObject>(obj);
 	LOCK(*obj);
 	obj->setParent(input, parent ? incomingPointer<LavObject>(parent) : nullptr, output);
 	PUB_END
@@ -240,7 +250,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectSetParent(LavObject *obj, unsigned int in
 //this is here because properties do not "know" about objects and only objects have properties; also, it made properties.cpp ahve to "know" about devices and objects.
 
 //this works for getters and setters to lock the object and set a variable prop to be a pointer-like thing to a property.
-#define PROP_PREAMBLE(o, s, t) LOCK(*(o));\
+#define PROP_PREAMBLE(o, s, t) auto obj_ptr = incomingPointer<LavObject>(obj);\
+LOCK(*(o));\
 auto &prop = (o)->getProperty((s));\
 if(prop.getType() != (t)) {\
 throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);\
@@ -248,6 +259,7 @@ throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);\
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectResetProperty(LavObject *obj, int slot) {
 	PUB_BEGIN
+	auto obj_ptr = incomingPointer<LavObject>(obj);
 	LOCK(*obj);
 	auto prop = obj->getProperty(slot);
 	prop.reset();
@@ -375,6 +387,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetDoublePropertyRange(LavObject* obj, in
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyIndices(LavObject* obj, int** destination) {
 	PUB_BEGIN
+	auto obj_ptr = incomingPointer<LavObject>(obj);
 	LOCK(*obj);
 	std::vector<int> indices = obj->getStaticPropertyIndices();
 	int* result = new int[indices.size()+1]; //so we can terminate with 0.
@@ -386,6 +399,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyIndices(LavObject* obj, int** 
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyName(LavObject* obj, int slot, char** destination) {
 	PUB_BEGIN
+	auto obj_ptr = incomingPointer<LavObject>(obj);
 	LOCK(*obj);
 	auto prop = obj->getProperty(slot);
 	const char* n = prop.getName();

@@ -14,7 +14,7 @@ class LavProperty;
 class LavInputDescriptor {
 	public:
 	LavInputDescriptor(std::shared_ptr<LavObject> p, unsigned int o): parent(p), output(o) {}
-	std::shared_ptr<LavObject> parent = nullptr;
+	std::weak_ptr<LavObject> parent;
 	unsigned int output = 0;
 };
 
@@ -29,7 +29,7 @@ class LavObject: public std::enable_shared_from_this<LavObject> { //enable_share
 	virtual void setParent(unsigned int input, std::shared_ptr<LavObject> parent, unsigned int parentOutput);
 	virtual std::shared_ptr<LavObject> getParentObject(unsigned int slot);
 	virtual unsigned int getParentOutput(unsigned int slot);
-	virtual unsigned int getInputCount();
+	virtual unsigned int getParentCount();
 	virtual unsigned int getOutputCount();
 	//Note that this isn't shared ptr.  The output pointers for an object are managed by the object itself and we need to be able to allocate/deallocate them for SSE, as well as work with arrays.  Don't hold on to output pointers.
 	virtual void getOutputPointers(float** dest);

@@ -135,7 +135,7 @@ void LavDevice::visitForProcessing(std::shared_ptr<LavObject> obj, std::function
 	//if the object is suspended, we also bail out: this object and its parents are not needed.
 	if(obj->isSuspended()) return;
 	//we call ourselves on all parents of obj, and then pass obj to visitor.  This is essentially depth-first search.
-	for(unsigned int i = 0; i < obj->getInputCount(); i++) {
+	for(unsigned int i = 0; i < obj->getParentCount(); i++) {
 		visitForProcessing(obj->getParentObject(i), visitor);
 	}
 	visitor(obj);

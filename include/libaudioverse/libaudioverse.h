@@ -123,7 +123,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_deviceGetChannels(LavDevice* device, int* desti
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetType(LavObject* obj, int* destination);
 
 /**Query maximum number of inputs and outputs.*/
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetInputCount(LavObject* obj, unsigned int* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetParentCount(LavObject* obj, unsigned int* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetOutputCount(LavObject* obj, unsigned int* destination);
 
 /**Parent management.*/
