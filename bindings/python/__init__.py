@@ -12,28 +12,31 @@ ctypes_map = {
 'void': 'None',
 }
 
-def ctypes_string(typeinfo, offset = 0):
+def ctypes_string(typeinfo, offset = 0, typedef_prefix = None):
 	"""Convert a type to a ctypes string.  Offset is used by the template _lav.py.t to make output argument strings and is subtracted from the levels of indirection."""
 	global typedefs
 	if offset != 0:
 		assert typeinfo.indirection-offset >= 0
-		return ctypes_string(get_info.TypeInfo(typeinfo.base, typeinfo.indirection-offset))
+		return ctypes_string(get_info.TypeInfo(typeinfo.base, typeinfo.indirection-offset), 0, typedef_prefix)
 	if typeinfo.indirection == 1 and typeinfo.base == 'void':
 		return "ctypes.c_void_p"
 	elif typeinfo.indirection == 1 and typeinfo.base == 'char':
 		return "ctypes.c_char_p"
 	elif typeinfo.indirection == 1 and isinstance(typeinfo.base, get_info.FunctionInfo):
-		return ctypes_function_helper(typeinfo.base)
+		return ctypes_function_helper(typeinfo.base, typedef_prefix)
 	elif typeinfo.indirection == 0 and typeinfo.base in typedefs:
-		return typeinfo.base
+		if typedef_prefix is None:
+			return typeinfo.base
+		else:
+			return typedef_prefix + typeinfo.base
 	elif typeinfo.indirection == 0:
 		return ctypes_map[typeinfo.base]
 	else:
-		return "ctypes.POINTER(" + ctypes_string(get_info.TypeInfo(typeinfo.base, typeinfo.indirection-1)) + ")"
+		return "ctypes.POINTER(" + ctypes_string(get_info.TypeInfo(typeinfo.base, typeinfo.indirection-1), 0, typedef_prefix) + ")"
 
-def ctypes_function_helper(func):
-	retstr = ctypes_string(func.return_type)
-	argstr = ", ".join([retstr] + [ctypes_string(i.type) for i in func.args])
+def ctypes_function_helper(func, typedef_prefix):
+	retstr = ctypes_string(func.return_type, 0, typedef_prefix)
+	argstr = ", ".join([retstr] + [ctypes_string(i.type, 0, typedef_prefix) for i in func.args])
 	return "ctypes.CFUNCTYPE(" + argstr + ")"
 
 def make_python(info):
@@ -42,6 +45,7 @@ def make_python(info):
 	typedefs = info['typedefs']
 	context = dict()
 	context.update(info)
+	context['ctypes_string_func'] = ctypes_string #ugly workaround for what appears to be a bug in jinja2.
 	env = jinja2.Environment(loader = jinja2.PackageLoader(__package__, ""), undefined = jinja2.StrictUndefined, trim_blocks = True)
 	env.filters.update(transformers.get_jinja2_filters())
 	env.filters['ctypes_string'] = ctypes_string
