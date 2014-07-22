@@ -20,12 +20,14 @@ LavEventCallback LavCallback::getHandler() {
 void LavCallback::fire() {
 	if(handler == nullptr) return; //nothing to do.
 	//we need to hold local copies of both the object and data in case they are changed between firing and processing by the device.
-	auto obj = associated_object->shared_from_this();
+	auto obj = std::weak_ptr<LavObject>(associated_object->shared_from_this());
 	void* userdata = user_data;
 	LavEventCallback cb = handler;
 	//fire a lambda that uses these by copy.
 	associated_device->enqueueTask([=]() {
-		cb(obj.get(), userdata);
+		auto shared_obj = obj.lock();
+		if(shared_obj == nullptr) return;	
+		cb(shared_obj.get(), userdata);
 	});
 }
 
