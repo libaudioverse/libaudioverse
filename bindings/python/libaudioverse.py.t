@@ -35,22 +35,8 @@ _lav.initialize_library()
 #This dict maps type codes to classes so that we can revive objects from handles, etc.
 _types_to_classes = dict()
 
-#Sometimes, it is possible for the C library to give us a handle without it being implicitly associated with us constructing a type.  In these cases, we have to do something.
-#When possible, we want to return an object that already exists.
-#otherwise, we need to use some magic to make a new object.
+#This exists only for callbacks.
 _handles_to_objects = weakref.WeakValueDictionary()
-
-def _wrap(handle):
-	"""For private use only. Do not touch."""
-	if handle is None or handle == 0:
-		return None #handle null pointers.
-	val = _handles_to_objects.get(handle, None)
-	if val is not None:
-		return val
-	val = _types_to_classes[_lav.object_get_type(handle)].__new__(cls) #We need to avoid the call to __init__.
-	#all classes which wrap libaudioverse objects have only a .handle attribute at this time, and are otherwise uniform; consequently, we can fill it in here.
-	val.handle = handle
-	return val
 
 #build and register all the error classes.
 class GenericError(Exception):
@@ -81,10 +67,10 @@ Note also that we are not inheriting from MutableSequence because we cannot supp
 		self.for_object = for_object	
 
 	def __len__(self):
-		return _lav.object_get_input_count(self.for_object.handle)
+		return _lav.object_get_parent_count(self.for_object.handle)
 
 	def __getitem__(self, key):
-		par, out = _lav.object_get_parent_object(self.for_object.handle, key), _lav.object_get_parent_output(self.for_object.handle, key)
+		par, out = self.for_object._get_parent(key)
 		if par is None:
 			return None
 		return par, out
@@ -94,7 +80,7 @@ Note also that we are not inheriting from MutableSequence because we cannot supp
 			raise TypeError("Expected list of length 2 or None.")
 		if not isinstance(val[0], GenericObject):
 			raise TypeError("val[0]: is not a Libaudioverse object.")
-		_lav.object_set_parent(self.for_object.handle, key, val[0].handle if val is not None else None, val[1] if val is not None else 0)
+		self.for_object._set_parent(key, val[0] if val is not None else None, val[1] if val is not None else 0)
 
 class Device(object):
 	"""Represents output, either to an audio card or otherwise.  A device is required by all other Libaudioverse objects.
@@ -141,6 +127,7 @@ class GenericObject(object):
 	def __init__(self, handle):
 		self.handle = handle
 		_handles_to_objects[handle] = self
+		self.parents_list = [(None, 0)]*_lav.object_get_parent_count(handle)
 
 {%for enumerant, prop in metadata['Lav_OBJTYPE_GENERIC']['properties'].iteritems()%}
 {{implement_property(enumerant, prop)}}
@@ -157,10 +144,19 @@ class GenericObject(object):
 
 	@property
 	def parents(self):
-		"""Returns a ParentProxy, an object that acts like a list of tuples.  The first item of each tuple is the parent object and the second item is the ooutput to which we are connected."""
+		"""Returns a ParentProxy, an object that acts like a list of tuples.  The first item of each tuple is the parent object and the second item is the output to which we are connected."""
 		return ParentProxy(self)
 
-_types_to_classes[_libaudioverse.Lav_OBJTYPE_GENERIC] = GenericObject
+	def _get_parent(self, key):
+		return self.parents[key]
+
+	def _set_parent(self, key, obj, inp):
+		if obj is None:
+			_lav.object_set_parent(self.handle, key, None, 0)
+			self.parents[key] = (None, 0)
+		else:
+			_lav.object_set_parent(self.handle, key, obj, inp)
+			parents[key] = (obj, inp)
 
 {%for object_name in constants.iterkeys()|prefix_filter("Lav_OBJTYPE_")|remove_filter("Lav_OBJTYPE_GENERIC")%}
 {%set friendly_name = object_name|strip_prefix("Lav_OBJTYPE_")|lower|underscores_to_camelcase(True) + "Object"%}
