@@ -10,3 +10,10 @@ void convolutionKernel(float* input, unsigned int outputSampleCount, float* outp
 
 /**Same as convolutionKernel, but will crossfade from the first response to the second smoothly over the interval outputSampleCount.*/
 void crossfadeConvolutionKernel(float* input, unsigned int outputSampleCount, float* output, unsigned int responseLength, float* from, float* to);
+
+/**The panning kernels.  All arguments are self-explanatory.
+The channel order must be the angles of all channels, specified clockwise where 0 is "in front" of the listener and angles proceed clockwise (this is to match HRTF; note that it is not standard trig).
+Angles are in radians.
+*/
+
+void amplitudePanningKenrel(float azimuth, 
