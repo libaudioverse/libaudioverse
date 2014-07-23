@@ -32,6 +32,7 @@ objects/hrtf.cpp
 objects/mixer.cpp
 objects/attenuator.cpp
 objects/delay.cpp
+objects/amplitude_panner.cpp
 
 #the audio backends and related functionality.
 audio_devices/device_negotiation.cpp

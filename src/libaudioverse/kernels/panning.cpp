@@ -15,7 +15,7 @@ The degenerate case is one speaker; in this case, just memcpy.
 For all other cases, find the two speakers which azimuth lies between and use them.
 */
 
-void amplitudePanningKernel(float azimuth, float elevation, unsigned int inputLength, float* input, unsigned int numChannels, float** outputs, float* channelMap) {
+void amplitudePanKernel(float azimuth, float elevation, unsigned int inputLength, float* input, unsigned int numChannels, float** outputs, float* channelMap) {
 	if(numChannels == 1) {
 		std::copy(input, input+inputLength, outputs[0]);
 		return;
