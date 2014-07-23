@@ -32,7 +32,7 @@ import ctypes
 {%macro implement_callback(name, index)%}
 	@property
 	def {{name}}_callback(self):
-		cb = self._callbacks.get({{iondex}}, None)
+		cb = self._callbacks.get({{index}}, None)
 		if cb is None:
 			return
 		return (cb.callback, cb.extra_arguments)
@@ -40,13 +40,13 @@ import ctypes
 	@{{name}}_callback.setter
 	def {{name}}_callback(self, val):
 		global _global_callbacks
-		val_tuple = tuple(val)
+		val_tuple = tuple(val) if isinstance(val, collections.Iterable) else (val, )
 		if len(val_tuple) == 1:
 			val_tuple = (val, ())
 		cb, extra_args = val_tuple
 		callback_obj = _EventCallbackWrapper(self, {{index}}, cb, extra_args)
-		self._callbacks[index] = callback_obj
-		_global_callbacks[self.handle].add(callback)
+		self._callbacks[{{index}}] = callback_obj
+		_global_callbacks[self.handle].add(callback_obj)
 {%endmacro%}
 
 #initialize libaudioverse.  This is per-app and implies no context settings, etc.
@@ -165,7 +165,9 @@ class GenericObject(object):
 
 {%for enumerant, prop in metadata['Lav_OBJTYPE_GENERIC']['properties'].iteritems()%}
 {{implement_property(enumerant, prop)}}
-
+{%endfor%}
+{%for enumerant, info in metadata['Lav_OBJTYPE_GENERIC'].get('callbacks', dict()).iteritems()%}
+{{implement_callback(info['name'], "_libaudioverse." + enumerant)}}
 {%endfor%}
 
 	def __del__(self):
@@ -214,6 +216,10 @@ class {{friendly_name}}(GenericObject):
 
 {%for enumerant, prop in metadata.get(object_name, dict()).get('properties', dict()).iteritems()%}
 {{implement_property(enumerant, prop)}}
+
+{%endfor%}
+{%for enumerant, info in metadata.get(object_name, dict()).get('callbacks', dict()).iteritems()%}
+{{implement_callback(info['name'], "_libaudioverse." + enumerant)}}
 
 {%endfor%}
 {%endfor%}
