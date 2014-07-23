@@ -16,4 +16,4 @@ The channel order must be the angles of all channels, specified clockwise where 
 Angles are in radians.
 */
 
-void amplitudePanningKenrel(float azimuth, 
+void amplitudePanningKernel(float azimuth, float elevation, unsigned int inputLength, float* input, unsigned int numChannels, float** outputs, float* channelMap);
