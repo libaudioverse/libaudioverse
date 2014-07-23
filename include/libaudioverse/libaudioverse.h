@@ -190,7 +190,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createDelayObject(LavDevice* device, unsigned i
 
 /**Amplitude panner.
 
-The channelMap argument is a list of channels, sorted in clockwise order.  The array is numChannels elements long and specifies the position of each channel on a circle around the listener.  Specify these angles in radians.
+The channelMap argument is a list of channels, sorted in clockwise order.  The array is numChannels elements long and specifies the position of each channel on a circle around the listener.  Specify these angles in degrees.
 */
 Lav_PUBLIC_FUNCTION LavError Lav_createAmplitudePannerObject(LavDevice* device, int numChannels, float* channelMap, LavObject** destination);
 
