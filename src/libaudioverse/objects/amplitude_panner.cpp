@@ -36,6 +36,8 @@ std::shared_ptr<LavObject>createAmplitudePannerObject(std::shared_ptr<LavDevice>
 }
 
 void LavAmplitudePannerObject::process() {
+	//has the effect of zeroing the inputs.
+LavObject::process();
 	float azimuth = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
 	float elevation = getProperty(Lav_PANNER_ELEVATION).getFloatValue();
 	amplitudePanKernel(azimuth, elevation, block_size, inputs[0], num_outputs, &outputs[0], channel_map);
