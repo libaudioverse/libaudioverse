@@ -23,20 +23,22 @@ void amplitudePanKernel(float azimuth, float elevation, unsigned int inputLength
 
 	//compute a1i and a2i, the indices of the two angles of interest.
 	int a1i = 0, a2i = 0;
+	float midAngle = ringmodf(azimuth, 360.0f);
 	for(unsigned int i = 0; i < numChannels; i++) {
 		a1i = i-1;
-		if(channelMap[i] > azimuth) break;
+		if(channelMap[i] > midAngle) break;
 	}
 	a2i = a1i+1;
 	a1i = ringmodi(a1i, numChannels);
 	a2i = ringmodi(a2i, numChannels);
-	float midAngle = ringmodf(azimuth, 360.0f);
+
 	float leftAngle = channelMap[a1i];
 	float rightAngle = channelMap[a2i];
+
 	///there is a point in front of the listener where leftAngle>midAngle>rightAngle.
 	//this fixes that case, such that the following algebra works.
 	if(leftAngle > midAngle) {
-		leftAngle = 360.0f-leftAngle;
+		leftAngle = -(360.0f-leftAngle);
 	}
 
 	//find a valuee between 0 and 1, representing the offset of the sound relative to the left speaker.
