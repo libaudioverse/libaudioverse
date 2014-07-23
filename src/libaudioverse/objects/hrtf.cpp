@@ -37,8 +37,8 @@ LavHrtfObject::LavHrtfObject(std::shared_ptr<LavDevice> device, std::shared_ptr<
 	old_right_response = new float[hrtf->getLength()];
 	history = new float[hrtf->getLength() + device->getBlockSize()](); //odd c++ syntax to create 0-initialized array.
 	hrtf->computeCoefficientsStereo(0.0f, 0.0f, left_response, right_response);
-	prev_azimuth = getProperty(Lav_HRTF_AZIMUTH).getFloatValue();
-	prev_elevation = getProperty(Lav_HRTF_ELEVATION).getFloatValue();
+	prev_azimuth = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
+	prev_elevation = getProperty(Lav_PANNER_ELEVATION).getFloatValue();
 }
 
 LavHrtfObject::~LavHrtfObject() {
@@ -56,8 +56,8 @@ std::shared_ptr<LavObject>createHrtfObject(std::shared_ptr<LavDevice>device, std
 void LavHrtfObject::process() {
 	//calculating the hrir is expensive, do it only if needed.
 	bool didRecompute = false;
-	float current_azimuth = getProperty(Lav_HRTF_AZIMUTH).getFloatValue();
-	float current_elevation = getProperty(Lav_HRTF_ELEVATION).getFloatValue();
+	float current_azimuth = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
+	float current_elevation = getProperty(Lav_PANNER_ELEVATION).getFloatValue();
 	if(fabs(current_elevation-prev_elevation) > 2.0f || fabs(current_azimuth-prev_azimuth) > 2.0f) {
 		std::copy(left_response, left_response+hrtf->getLength(), old_left_response);
 		std::copy(right_response, right_response+hrtf->getLength(), old_right_response);

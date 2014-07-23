@@ -13,8 +13,12 @@ Lav_OBJTYPE_FILE:
   Lav_FILE_END_CALLBACK: {name: end}
 Lav_OBJTYPE_HRTF:
  properties:
-  Lav_HRTF_AZIMUTH: {name: azimuth, type: float, default: 0.0, range: [-INFINITY, INFINITY]}
-  Lav_HRTF_ELEVATION: {name: elevation, type: float, default: 0.0, range: [-90.0, 90.0]}
+  Lav_PANNER_AZIMUTH: {name: azimuth, type: float, default: 0.0, range: [-INFINITY, INFINITY]}
+  Lav_PANNER_ELEVATION: {name: elevation, type: float, default: 0.0, range: [-90.0, 90.0]}
+Lav_OBJTYPE_AMPLITUDE_PANNER:
+ properties:
+  Lav_PANNER_AZIMUTH: {name: azimuth, type: float, default: 0.0, range: [-INFINITY, INFINITY]}
+  Lav_PANNER_ELEVATION: {name: elevation, type: float, default: 0.0, range: [-90.0, 90.0]}
 Lav_OBJTYPE_ATTENUATOR:
  properties:
   Lav_ATTENUATOR_MULTIPLIER: {name: multiplier, type: float, default: 1.0, range: [0.0, INFINITY]}

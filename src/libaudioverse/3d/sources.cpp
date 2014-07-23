@@ -67,8 +67,8 @@ float calculateGainForDistanceModel(int model, float distance, float maxDistance
 	float gain = calculateGainForDistanceModel(distanceModel, distance, maxDistance);
 
 	//set the panner and attenuator.
-	panner_object->getProperty(Lav_HRTF_AZIMUTH).setFloatValue(azimuth);
-	panner_object->getProperty(Lav_HRTF_ELEVATION).setFloatValue(elevation);
+	panner_object->getProperty(Lav_PANNER_AZIMUTH).setFloatValue(azimuth);
+	panner_object->getProperty(Lav_PANNER_ELEVATION).setFloatValue(elevation);
 	attenuator_object ->getProperty(Lav_ATTENUATOR_MULTIPLIER).setFloatValue(gain);
 }
 

@@ -53,8 +53,8 @@ void main(int argc, char** args) {
 		}
 		else if(elevOrAz == 1) {
 			sscanf(command, "%f", &elev);
-			ERRCHECK(Lav_objectSetFloatProperty(hrtfNode, Lav_HRTF_ELEVATION, elev));
-			ERRCHECK(Lav_objectSetFloatProperty(hrtfNode, Lav_HRTF_AZIMUTH, az));
+			ERRCHECK(Lav_objectSetFloatProperty(hrtfNode, Lav_PANNER_ELEVATION, elev));
+			ERRCHECK(Lav_objectSetFloatProperty(hrtfNode, Lav_PANNER_AZIMUTH, az));
 			elevOrAz = 0;
 			continue;
 		}
