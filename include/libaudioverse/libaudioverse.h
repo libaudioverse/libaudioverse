@@ -188,6 +188,13 @@ Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterObject(LavDevice* device, unsi
 /**Delay line.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createDelayObject(LavDevice* device, unsigned int lines, LavObject** destination);
 
+/**Amplitude panner.
+
+The channelMap argument is a list of channels, sorted in clockwise order.  The array is numChannels elements long and specifies the position of each channel on a circle around the listener.  Specify these angles in radians.
+*/
+Lav_PUBLIC_FUNCTION LavError Lav_createAmplitudePannerObject(LavDevice* device, int numChannels, float* channelMap, LavObject** destination);
+
+
 #ifdef __cplusplus
 }
 #endif

@@ -43,7 +43,7 @@ void LavAmplitudePannerObject::process() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createAmplitudePannerObject(LavDevice* device, unsigned int numChannels, float* channelMap, LavObject** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createAmplitudePannerObject(LavDevice* device, int numChannels, float* channelMap, LavObject** destination) {
 	PUB_BEGIN
 	LOCK(*device);
 	float* newChannelMap = new float[numChannels];
