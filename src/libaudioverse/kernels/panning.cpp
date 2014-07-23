@@ -30,7 +30,7 @@ void amplitudePanKernel(float azimuth, float elevation, unsigned int inputLength
 	a2i = a1i+1;
 	a1i = ringmodi(a1i, numChannels);
 	a2i = ringmodi(a2i, numChannels);
-	float midAngle = ringmodf(azimuth, 2*PI);
+	float midAngle = ringmodf(azimuth, 360.0f);
 	float leftAngle = channelMap[a1i];
 	float rightAngle = channelMap[a2i];
 	///there is a point in front of the listener where leftAngle>midAngle>rightAngle.
