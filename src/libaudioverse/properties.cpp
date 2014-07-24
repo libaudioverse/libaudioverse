@@ -59,3 +59,27 @@ LavProperty* createStringProperty(const char* name, const char* default) {
 	retval->reset();
 	return retval;
 }
+
+LavProperty* createIntArrayProperty(const char* name, unsigned int minLength, unsigned int maxLength, unsigned int defaultLength, int* defaultData) {
+	auto prop = new LavProperty(Lav_PROPERTYTYPE_INT_ARRAY);
+	prop->setArrayLengthRange(minLength, maxLength);
+	std::vector<int> new_default;
+	new_default.resize(defaultLength);
+	std::copy(defaultData, defaultData+defaultLength, new_default.begin());
+	prop->setIntArrayDefault(new_default);
+	prop->setName(name);
+	prop->reset();	
+	return prop;
+}
+
+LavProperty* createFloatArrayProperty(const char* name, unsigned int minLength, unsigned int maxLength, unsigned int defaultLength, float* defaultData) {
+	auto prop = new LavProperty(Lav_PROPERTYTYPE_FLOAT_ARRAY);
+	prop->setArrayLengthRange(minLength, maxLength);
+	std::vector<float> new_default;
+	new_default.resize(defaultLength);
+	std::copy(defaultData, defaultData+defaultLength, new_default.begin());
+	prop->setFloatArrayDefault(new_default);
+	prop->setName(name);
+	prop->reset();	
+	return prop;
+}

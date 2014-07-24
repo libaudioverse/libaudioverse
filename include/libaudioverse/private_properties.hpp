@@ -190,3 +190,5 @@ LavProperty* createDoubleProperty(const char* name, double default, double min, 
 LavProperty* createFloat3Property(const char* name, float default[3]);
 LavProperty* createFloat6Property(const char* name, float default[6]);
 LavProperty* createStringProperty(const char* name, const char* default);
+LavProperty* createIntArrayProperty(const char* name, unsigned int minLength, unsigned int maxLength, unsigned int defaultLength, int* defaultData);
+LavProperty* createFloatArrayProperty(const char* name, unsigned int minLength, unsigned int maxLength, unsigned int defaultLength, float* defaultData);
