@@ -55,10 +55,20 @@ void initializeMetadata() {
 	{%elif prop['type'] == 'float' or prop['type'] == 'double'-%}
 	tempProp = create<%prop['type']|capitalize%>Property("<%prop['name']%>", <%prop['default']%>, <%prop['range'][0]%>, <%prop['range'][1]%>);
 	{%elif prop['type'] == 'float3' or prop['type'] == 'float6'-%}
-	
 	float default[] = {<%prop['default']|join(', ')%>};
 	tempProp = create<%prop['type']|capitalize%>Property("<%prop['name']%>", default);
-	{%endif-%}
+	{%if prop['type'] == 'int_array' or prop['type'] == 'float_array'%}
+	unsigned int minLength = <%prop['min_length']%>
+	unsigned int maxLength = <%prop['max_length']%>
+	unsigned int defaultLength = <%prop['default']|length%>
+	%{if prop['type'] == 'int_array'%}
+	int defaultData[] = {<%prop['default']|join(', ')%>};
+	tempProp = createIntArrayProperty("<%prop['name']%>", minLength, maxLength, defaultLength, defaultData);
+	{%elif prop['type'] == 'float_array'%}
+	float default_data[] = {<%prop['default'] | join(', ')%>}
+	tempProp = createFloatArrayProperty("<%prop['name']%>", minLength, maxLength, defaultLength, defaultData);
+	{%endif%}
+	{%endif%}
 	{#Use the copy constructor to put this into the default instances##}
 	(*default_property_instances)[std::tuple<int, int>(<%objid%>, <%propid%>)] = *tempProp;
 	delete tempProp;
