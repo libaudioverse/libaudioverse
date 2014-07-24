@@ -4,6 +4,9 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include <string>
 #include <functional>
+#include <vector>
+#include <limits>
+#include <algorithm>
 #include "libaudioverse.h"
 #include "private_errors.hpp"
 
@@ -23,7 +26,7 @@ class LavProperty {
 	LavProperty() = default;
 	LavProperty(const LavProperty&) = default;
 	explicit LavProperty(int property_type): type(property_type) {}
-	void reset() {value = default_value; string_value = default_string_value;}
+	void reset() {value = default_value; string_value = default_string_value; farray_value = default_farray_value; iarray_value = default_iarray_value;}
 	int getType() { return type;}
 	void setType(int t) {type = t;}
 	int isType(int t) { return type == t;} //we have to typecheck these everywhere.
@@ -98,6 +101,60 @@ class LavProperty {
 	void setFloat6Default(const float* const v) {memcpy(default_value.f6val, v, sizeof(float)*6);}
 	void setFloat6Default(float v1, float v2, float v3, float v4, float v5, float v6) {default_value.f6val[0] = v1; default_value.f6val[1] = v2; default_value.f6val[2] = v3; default_value.f6val[3] = v4; default_value.f6val[4] = v5; default_value.f6val[5] = v6;}
 
+	//applies to both array properties.
+	void setArrayLengthRange(unsigned int lower, unsigned int upper) { min_array_length = lower; max_array_length = upper;}
+	void getArraylengthRange(unsigned int* min, unsigned int* max) {*min = min_array_length; *max = max_array_length;}
+
+	//the float arrays.
+	float readFloatArray(unsigned int index) {
+		if(index >= farray_value.size()) throw LavErrorException(Lav_ERROR_RANGE);
+		return farray_value[index];
+	}
+	void writeFloatArray(unsigned int start, unsigned int stop, float* values) {
+		if(start >= farray_value.size() || stop > farray_value.size()) throw LavErrorException(Lav_ERROR_RANGE);
+		for(unsigned int i = start; i < stop; i++) {
+			farray_value[start] = values[i];
+		}
+		if(post_changed_callback) post_changed_callback();
+	}
+	void replaceFloatArray(unsigned int length, float* values) {
+		if(length < min_array_length || length > max_array_length) throw LavErrorException(Lav_ERROR_RANGE);
+		farray_value.resize(length);
+		std::copy(values, values+length, farray_value.begin());
+		if(post_changed_callback) post_changed_callback();
+	}
+	std::vector<float> getFloatArrayDefault() {
+		return default_farray_value;
+	}
+	void setFloatArrayDefault(std::vector<float> d) {
+		default_farray_value = d;
+	}
+	
+	//the int arrays.
+	int readIntArray(unsigned int index) {
+		if(index >= iarray_value.size()) throw LavErrorException(Lav_ERROR_RANGE);
+		return iarray_value[index];
+	}
+	void writeIntArray(unsigned int start, unsigned int stop, int* values) {
+		if(start >= iarray_value.size() || stop > iarray_value.size()) throw LavErrorException(Lav_ERROR_RANGE);
+		for(unsigned int i = start; i < stop; i++) {
+			iarray_value[start] = values[i];
+		}
+		if(post_changed_callback) post_changed_callback();
+	}
+	void replaceIntArray(unsigned int length, int* values) {
+		if(length < min_array_length || length > max_array_length) throw LavErrorException(Lav_ERROR_RANGE);
+		iarray_value.resize(length);
+		std::copy(values, values+length, iarray_value.begin());
+		if(post_changed_callback) post_changed_callback();
+	}
+	std::vector<int> getIntArrayDefault() {
+		return default_iarray_value;
+	}
+	void setIntArrayDefault(std::vector<int> d) {
+		default_iarray_value = d;
+	}
+
 	//strings:
 	const char* getStringValue() { return string_value.c_str();}
 	void setStringValue(const char* s) {
@@ -114,6 +171,9 @@ class LavProperty {
 	int type, tag;
 	LavPropertyValue value, default_value, minimum_value, maximum_value;
 	std::string name, string_value, default_string_value;
+	std::vector<float> farray_value, default_farray_value;
+	std::vector<int> iarray_value, default_iarray_value;
+	unsigned int min_array_length = 0, max_array_length = std::numeric_limits<unsigned int>::max();
 	std::function<void(void)> post_changed_callback;
 };
 

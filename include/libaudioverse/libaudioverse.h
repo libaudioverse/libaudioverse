@@ -73,7 +73,7 @@ enum Lav_ERRORS {
 	Lav_ERROR_LIMIT_EXCEEDED = 14,
 };
 
-/**These are property types, either int, float, double, vector of 3 floats, vector of 6 floats, or string.*/
+/**These are property types, either int, float, double, vector of 3 floats, vector of 6 floats, string, or int/float array of any length.*/
 enum Lav_PROPERTYTYPES {
 	Lav_PROPERTYTYPE_INT = 1,
 	Lav_PROPERTYTYPE_FLOAT = 2,
@@ -81,6 +81,8 @@ enum Lav_PROPERTYTYPES {
 	Lav_PROPERTYTYPE_STRING = 4,
 	Lav_PROPERTYTYPE_FLOAT3 = 5,
 	Lav_PROPERTYTYPE_FLOAT6 = 6,
+	Lav_PROPERTYTYPE_FLOAT_ARRAY = 7,
+	Lav_PROPERTYTYPE_INT_ARRAY = 8,
 };
 
 /**These are used to tag objects with their type, so that external languages may see them.*/
@@ -190,10 +192,10 @@ Lav_PUBLIC_FUNCTION LavError Lav_createDelayObject(LavDevice* device, unsigned i
 
 /**Amplitude panner.
 
-The channelMap argument is a list of channels, sorted in clockwise order.  The array is numChannels elements long and specifies the position of each channel on a circle around the listener.  Specify these angles in degrees.
+The channelAngles argument is a list of channels, sorted in clockwise order.  The array is numChannels elements long and specifies the position of each channel on a circle around the listener.  Specify these angles in degrees.
+the channelIndices argument specifies which channels the angles actually go with.
 */
-Lav_PUBLIC_FUNCTION LavError Lav_createAmplitudePannerObject(LavDevice* device, int numChannels, float* channelMap, LavObject** destination);
-
+Lav_PUBLIC_FUNCTION LavError Lav_createAmplitudePannerObject(LavDevice* device, int numChannels, float* channelAngles, int* channelIndices, LavObject** destination);
 
 #ifdef __cplusplus
 }

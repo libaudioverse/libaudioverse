@@ -14,6 +14,8 @@ void crossfadeConvolutionKernel(float* input, unsigned int outputSampleCount, fl
 /**The panning kernels.  All arguments are self-explanatory.
 The channel order must be the angles of all channels, specified clockwise where 0 is "in front" of the listener and angles proceed clockwise (this is to match HRTF; note that it is not standard trig).
 Angles are in degrees, as this matches the hrtf algorithms and provides a better experience for exploring, etc.
+The channel indices specify which angle goes with which channel; channelAngles[0] will write to channelIndices[0], etc.
+Note: this writes to exactly and only 2 outputs.  Zero the others first.
 */
 
-void amplitudePanKernel(float azimuth, float elevation, unsigned int inputLength, float* input, unsigned int numChannels, float** outputs, float* channelMap);
+void amplitudePanKernel(float azimuth, float elevation, unsigned int inputLength, float* input, unsigned int numChannels, float** outputs, float* channelAngles, int* channelIndices);
