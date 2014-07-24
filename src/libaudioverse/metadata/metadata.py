@@ -50,11 +50,11 @@ for objkey, objinfo in [(i, metadata.get(i, dict())) for i in bindings.get_info.
 #each property will be crammed into a property descriptor, but some of the ranges here are currently potentially unfriendly, most notably float3 and float6.
 #we are going to convert all numbers into strings, and make them valid c identifiers.  Skip anything that is already a string.
 def string_from_number(val, type):
-	if type in {'float', 'float3', 'float6'}:
+	if type in {'float', 'float3', 'float6', 'float_array'}:
 		return str(float(val))+'f'
 	elif type == 'double':
 		return str(float(val))
-	elif type == 'int':
+	elif type in {'int', 'int_array'}:
 		return str(int(val))	
 	else:
 		print "Warning: Unrecognized type or value with type", type, "and value", val
@@ -70,11 +70,13 @@ for propkey, propid, propinfo in joined_properties:
 	#Default handling logic.  If we don't have one and are int, float, or double we make it 0.
 	if propinfo['type'] in {'int', 'float', 'double'}:
 		propinfo['default'] = string_from_number(propinfo.get('default', 0), propinfo['type'])
-	#otherwise, if we're float3 or float6, we do a loop for the same behavior.
+	#otherwise, if we're one of the array types, we do a loop for the same behavior.
 	elif propinfo['type'] in {'float3', 'float6'}:
 		for i, j in enumerate(list(propinfo.get('default', [0, 0, 0] if propinfo['type'] == 'float3' else [0, 0, 0, 0, 0, 0]))):
 			propinfo['default'][i] = string_from_number(j, propinfo['type'])
-
+	elif propinfo['type'] in {'int_array', 'float_array'}:
+		for i, j in enumerate(list(propinfo.get('default', []))):
+			propinfo['default'][i] = string_from_number(j, propinfo['type'])
 
 #do the render, and write to the file specified on the command line.
 context = {
