@@ -409,6 +409,109 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyName(LavObject* obj, int slot,
 	PUB_END
 }
 
+//array properties.
+
+Lav_PUBLIC_FUNCTION LavError Lav_objectReplaceFloatArrayProperty(LavObject* obj, int slot, unsigned int length, float* values) {
+	PUB_BEGIN
+	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_FLOAT_ARRAY);
+	prop.replaceFloatArray(length, values);
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_objectReadFloatArrayProperty(LavObject* obj, int slot, unsigned int index, float* destination) {
+	PUB_BEGIN
+	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_FLOAT_ARRAY);
+	*destination = prop.readFloatArray(index);
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError  Lav_objectWriteFloatArrayProperty(LavObject* obj, int slot, unsigned int start, unsigned int stop, float* values) {
+	PUB_BEGIN
+	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_FLOAT_ARRAY);
+	prop.writeFloatArray(start, stop, values);
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloatArrayPropertyDefault(LavObject* obj, int slot, unsigned int* destinationLength, float** destinationArray) {
+	PUB_BEGIN
+	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_FLOAT_ARRAY);
+	auto def = prop.getFloatArrayDefault();
+	if(def.size() == 0) {
+		*destinationLength = 0;
+		*destinationArray = nullptr;
+		return Lav_ERROR_NONE;
+	}
+	float* buff = new float[def.size()];
+	std::copy(def.begin(), def.end(), buff);
+	auto del = [](float* what){delete[] what;};
+	auto outgoing_buff = std::shared_ptr<float>(buff, del);
+	*destinationLength = def.size();
+	*destinationArray = outgoingPointer<float>(outgoing_buff);
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloatPropertyArrayLength(LavObject* obj, int slot, unsigned int* destination) {
+	PUB_BEGIN
+	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_FLOAT_ARRAY);
+	*destination = prop.getFloatArrayLength();
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_objectReplaceIntArrayProperty(LavObject* obj, int slot, unsigned int length, int* values) {
+	PUB_BEGIN
+	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_INT_ARRAY);
+	prop.replaceIntArray(length, values);
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_objectReadIntArrayProperty(LavObject* obj, int slot, unsigned int index, int* destination) {
+	PUB_BEGIN
+	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_INT_ARRAY);
+	*destination = prop.readIntArray(index);
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError  Lav_objectWriteIntArrayProperty(LavObject* obj, int slot, unsigned int start, unsigned int stop, int* values) {
+	PUB_BEGIN
+	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_INT_ARRAY);
+	prop.writeIntArray(start, stop, values);
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetIntArrayPropertyDefault(LavObject* obj, int slot, unsigned int* destinationLength, int** destinationArray) {
+	PUB_BEGIN
+	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_INT_ARRAY);
+	auto def = prop.getIntArrayDefault();
+	if(def.size() == 0) {
+		*destinationLength = 0;
+		*destinationArray = nullptr;
+		return Lav_ERROR_NONE;
+	}
+	int* buff = new int[def.size()];
+	std::copy(def.begin(), def.end(), buff);
+	auto del = [](int* what){delete[] what;};
+	auto outgoing_buff = std::shared_ptr<int>(buff, del);
+	*destinationLength = def.size();
+	*destinationArray = outgoingPointer<int>(outgoing_buff);
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetIntPropertyLength(LavObject* obj, int slot, int* destination) {
+	PUB_BEGIN
+	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_INT_ARRAY);
+	*destination = prop.getIntArrayLength();
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetArrayPropertyLengthRange(LavObject* obj, int slot, unsigned int* destinationMin, unsigned int* destinationMax) {
+	PUB_BEGIN
+	auto ptr = incomingPointer<LavObject>(obj);
+	LOCK(*obj);
+	auto &prop = obj->getProperty(slot);
+	int type = prop.getType();
+	if(type != Lav_PROPERTYTYPE_FLOAT_ARRAY || type != Lav_PROPERTYTYPE_INT_ARRAY) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
+	PUB_END
+}
 
 //callback setup/configure/retrieval.
 

@@ -162,6 +162,25 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyIndices(LavObject* obj, int** 
 /**Get the name of a property.  Again, allocates memory.*/
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyName(LavObject* obj, int slot, char** destination);
 
+/**Array properties.
+An array property does not have a range. Instead, it has a minimum and maximum supported length.
+Note that these provide functions for setting parts of the array: the property can store any size of 1-dimensional array.
+
+In order to make reading sane, you can only read one value at a time. Since Libaudioverse never exposes internal memory to the public user, reading multiple values would require wasting huge amounts of ram.
+*/
+Lav_PUBLIC_FUNCTION LavError Lav_objectReplaceFloatArrayProperty(LavObject* obj, int slot, unsigned int length, float* values);
+Lav_PUBLIC_FUNCTION LavError Lav_objectReadFloatArrayProperty(LavObject* obj, int slot, unsigned int index, float* destination);
+Lav_PUBLIC_FUNCTION LavError  Lav_objectWriteFloatArrayProperty(LavObject* obj, int slot, unsigned int start, unsigned int stop, float* values);
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloatArrayPropertyDefault(LavObject* obj, int slot, unsigned int* destinationLength, float** destinationArray);
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloatPropertyArrayLength(LavObject* obj, int slot, unsigned int* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_objectReplaceIntArrayProperty(LavObject* obj, int slot, unsigned int length, int* values);
+Lav_PUBLIC_FUNCTION LavError Lav_objectReadIntArrayProperty(LavObject* obj, int slot, unsigned int index, int* destination);
+Lav_PUBLIC_FUNCTION LavError  Lav_objectWriteIntArrayProperty(LavObject* obj, int slot, unsigned int start, unsigned int stop, int* values);
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetIntArrayPropertyDefault(LavObject* obj, int slot, unsigned int* destinationLength, int** destinationArray);
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetIntPropertyLength(LavObject* obj, int slot, int* destination);
+//applies to eather array type.
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetArrayPropertyLengthRange(LavObject* obj, int slot, unsigned int* destinationMin, unsigned int* destinationMax);
+
 /**Callbacks (events).
 Some objects go further and define specialized methods that have different signatures, but these are few and very far between.*/
 EXTERN_FUNCTION typedef void (*LavEventCallback)(LavObject* cause, void* userdata);

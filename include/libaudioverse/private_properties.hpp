@@ -123,6 +123,9 @@ class LavProperty {
 		std::copy(values, values+length, farray_value.begin());
 		if(post_changed_callback) post_changed_callback();
 	}
+	unsigned int getFloatArrayLength() {
+		return farray_value.size();
+	}
 	std::vector<float> getFloatArrayDefault() {
 		return default_farray_value;
 	}
@@ -147,6 +150,9 @@ class LavProperty {
 		iarray_value.resize(length);
 		std::copy(values, values+length, iarray_value.begin());
 		if(post_changed_callback) post_changed_callback();
+	}
+	unsigned int getIntArrayLength() {
+		return iarray_value.size();
 	}
 	std::vector<int> getIntArrayDefault() {
 		return default_iarray_value;
