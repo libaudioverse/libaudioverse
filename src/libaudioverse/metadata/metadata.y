@@ -19,7 +19,7 @@ Lav_OBJTYPE_AMPLITUDE_PANNER:
  properties:
   Lav_PANNER_AZIMUTH: {name: azimuth, type: float, default: 0.0, range: [-INFINITY, INFINITY]}
   Lav_PANNER_ELEVATION: {name: elevation, type: float, default: 0.0, range: [-90.0, 90.0]}
-  Lav_PANNER_SPEAKER_MAP: {name: speaker_map, type: float_array, min_length: 2, max_length: MAX_INT, default: [-90, 90]}
+  Lav_PANNER_CHANNEL_MAP: {name: channel_map, type: float_array, min_length: 2, max_length: MAX_INT, default: [-90, 90]}
 Lav_OBJTYPE_ATTENUATOR:
  properties:
   Lav_ATTENUATOR_MULTIPLIER: {name: multiplier, type: float, default: 1.0, range: [0.0, INFINITY]}

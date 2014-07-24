@@ -214,7 +214,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createDelayObject(LavDevice* device, unsigned i
 The channelAngles argument is a list of channels, sorted in clockwise order.  The array is numChannels elements long and specifies the position of each channel on a circle around the listener.  Specify these angles in degrees.
 the channelIndices argument specifies which channels the angles actually go with.
 */
-Lav_PUBLIC_FUNCTION LavError Lav_createAmplitudePannerObject(LavDevice* device, int numChannels, float* channelAngles, int* channelIndices, LavObject** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createAmplitudePannerObject(LavDevice* device, LavObject** destination);
 
 #ifdef __cplusplus
 }

@@ -26,9 +26,9 @@ void main(int argc, char** args) {
 	ERRCHECK(Lav_initializeLibrary());
 	ERRCHECK(Lav_createDefaultAudioOutputDevice(&device));
 	ERRCHECK(Lav_createFileObject(device, args[1], &fileNode));
-	float map[] = {90.0f, 270.0f};
-	int map_indices[] = {1, 0};
-	ERRCHECK(Lav_createAmplitudePannerObject(device, 2, map, map_indices, &panNode));
+	float map[] = {270.0f, 90.0f};
+	ERRCHECK(Lav_createAmplitudePannerObject(device, &panNode));
+	ERRCHECK(Lav_objectReplaceFloatArrayProperty(panNode, Lav_PANNER_CHANNEL_MAP, 2, map));
 
 	ERRCHECK(Lav_objectSetParent(panNode, 0, fileNode, 0));
 	ERRCHECK(Lav_createHardLimiterObject(device, 2, &limit));

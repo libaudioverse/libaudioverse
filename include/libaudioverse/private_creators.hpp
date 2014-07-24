@@ -15,4 +15,4 @@ std::shared_ptr<LavObject> createHrtfObject(std::shared_ptr<LavDevice> device, s
 std::shared_ptr<LavObject> createMixerObject(std::shared_ptr<LavDevice> device, unsigned int maxParents, unsigned int inputsPerParent);
 std::shared_ptr<LavObject> createSineObject(std::shared_ptr<LavDevice> device);
 std::shared_ptr<LavObject> createDelayObject(std::shared_ptr<LavDevice> device, unsigned int lines);
-std::shared_ptr<LavObject>createAmplitudePannerObject(std::shared_ptr<LavDevice> device, unsigned int numChannels, float* channelMap);
+std::shared_ptr<LavObject>createAmplitudePannerObject(std::shared_ptr<LavDevice> device);

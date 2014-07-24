@@ -11,29 +11,57 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_kernels.hpp>
 #include <limits>
 #include <memory>
+#include <algorithm>
+#include <utility>
+#include <vector>
 
 class LavAmplitudePannerObject: public LavObject {
 	public:
-	LavAmplitudePannerObject(std::shared_ptr<LavDevice> device, unsigned int numChannels, float* channelAngles, int* channelIndices);
+	LavAmplitudePannerObject(std::shared_ptr<LavDevice> device);
 	~LavAmplitudePannerObject();
 	virtual void process();
 	private:
-	float* channel_angles;
-	int* channel_indices;
+	void recomputeChannelMap();
+	float* channel_angles = nullptr;
+	int* channel_indices = nullptr;
 };
 
-LavAmplitudePannerObject::LavAmplitudePannerObject(std::shared_ptr<LavDevice> device, unsigned int numChannels, float* channelAngles, int* channelIndices): LavObject(Lav_OBJTYPE_AMPLITUDE_PANNER, device, 1, numChannels) {
-	channel_angles = channelAngles;
-	channel_indices = channelIndices;
+LavAmplitudePannerObject::LavAmplitudePannerObject(std::shared_ptr<LavDevice> device): LavObject(Lav_OBJTYPE_AMPLITUDE_PANNER, device, 1, 0) {
+	getProperty(Lav_PANNER_CHANNEL_MAP).setPostChangedCallback([this](){recomputeChannelMap();});
+	recomputeChannelMap();
 }
 
 LavAmplitudePannerObject::~LavAmplitudePannerObject() {
-	delete[] channel_angles;
-	delete[] channel_indices;
+	if(channel_angles) delete[] channel_angles;
+	if(channel_indices) delete[] channel_indices;
 }
 
-std::shared_ptr<LavObject>createAmplitudePannerObject(std::shared_ptr<LavDevice> device, unsigned int numChannels, float* channelAngles, int* channelIndices) {
-	auto retval = std::make_shared<LavAmplitudePannerObject>(device, numChannels, channelAngles, channelIndices);
+void LavAmplitudePannerObject::recomputeChannelMap() {
+	auto &prop = getProperty(Lav_PANNER_CHANNEL_MAP);
+	int l = (int)prop.getFloatArrayLength();
+	std::vector<std::tuple<float, int>> map;
+	for(int i = 0; i < l; i++) {
+		map.emplace_back(prop.readFloatArray(i), i);
+	}
+	//sort it.
+	auto cmp = [](std::tuple<float, int> a, std::tuple<float, int> b) {
+		return std::get<0>(a) < std::get<0>(b);
+	};
+	std::sort(map.begin(), map.end(), cmp);
+	//copy these off.
+	if(channel_angles != nullptr) delete[] channel_angles;
+	if(channel_indices != nullptr) delete[] channel_indices;
+	channel_angles = new float[l]();
+	channel_indices = new int[l]();
+	for(int i = 0; i < l; i++) {
+		channel_angles[i] = std::get<0>(map[i]);
+		channel_indices[i] = std::get<1>(map[i]);
+	}
+	resize(1, l);
+}
+
+std::shared_ptr<LavObject>createAmplitudePannerObject(std::shared_ptr<LavDevice> device) {
+	auto retval = std::make_shared<LavAmplitudePannerObject>(device);
 	device->associateObject(retval);
 	return retval;
 }
@@ -48,14 +76,10 @@ LavObject::process();
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createAmplitudePannerObject(LavDevice* device, int numChannels, float* channelAngles, int* channelIndices, LavObject** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createAmplitudePannerObject(LavDevice* device, LavObject** destination) {
 	PUB_BEGIN
 	LOCK(*device);
-	float* newChannelAngles = new float[numChannels];
-	std::copy(channelAngles, channelAngles+numChannels, newChannelAngles);
-	int* newChannelIndices = new int[numChannels];
-	std::copy(channelIndices, channelIndices+numChannels, newChannelIndices);
-	auto retval = createAmplitudePannerObject(incomingPointer<LavDevice>(device), numChannels, newChannelAngles, newChannelIndices);
+	auto retval = createAmplitudePannerObject(incomingPointer<LavDevice>(device));
 	*destination = outgoingPointer<LavObject>(retval);
 	PUB_END
 }
