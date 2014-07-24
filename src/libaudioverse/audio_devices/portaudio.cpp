@@ -11,12 +11,14 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <atomic>
 #include <set>
 #include <chrono>
+#include <utility>
 
 int portaudioOutputCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
 
 class LavPortaudioDevice: public LavDevice {
 	public:
 	LavPortaudioDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead);
+	void doPortaudioNegotiation(unsigned int sr, unsigned int channels, unsigned int blockSize, PaStream** stream);
 	void audioOutputThreadFunction(); //the function that runs as our output thread.
 	std::thread audioOutputThread;
 	std::atomic_flag runningFlag; //when this clears, the audio thread self-terminates.
@@ -36,13 +38,47 @@ void initializeAudioBackend() {
 	}
 }
 
+void LavPortaudioDevice::doPortaudioNegotiation(unsigned int sr, unsigned int channels, unsigned int blockSize, PaStream** stream) {
+	/**We need to find the default devices for all APIs.*/
+	std::vector<std::tuple<const PaDeviceIndex, const PaDeviceInfo*>> candidates;
+	PaHostApiIndex maxApi = Pa_GetHostApiCount();
+	for(PaHostApiIndex i = 0; i < maxApi; i++) {
+		const PaHostApiInfo* info = Pa_GetHostApiInfo(i);
+		PaDeviceIndex ind = info->defaultOutputDevice;
+		const PaDeviceInfo* devinfo = Pa_GetDeviceInfo(ind);
+		candidates.emplace_back(ind, devinfo);
+	}
+	//we need to eliminate any devices that don't support the requested format.
+	//note: this needs to be replaced.
+	std::vector<PaStreamParameters> actual_candidates;
+	for(auto i: candidates) {
+		PaStreamParameters outParams;
+		outParams.device = std::get<00>(i);
+		outParams.channelCount = channels;
+		outParams.sampleFormat = paFloat32;
+		outParams.suggestedLatency = std::get<1>(i)->defaultLowInputLatency;
+		outParams.hostApiSpecificStreamInfo = nullptr;
+		PaError err = Pa_IsFormatSupported(nullptr, &outParams, (double)sr);
+		if(err == paFormatIsSupported) {
+			actual_candidates.push_back(outParams);
+		}
+	}
+	//sort it.
+	std::sort(actual_candidates.begin(), actual_candidates.end(), [](const PaStreamParameters &a, const PaStreamParameters& b){return a.suggestedLatency < b.suggestedLatency;});
+	if(actual_candidates.size() == 0) {
+		throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
+	}
+	PaStreamParameters* needed = &actual_candidates[0];
+	PaError err = Pa_OpenStream(stream, nullptr, needed, (double)sr, blockSize, paPrimeOutputBuffersUsingStreamCallback, portaudioOutputCallback, this);
+	if(err < 0) throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
+}
+
 LavPortaudioDevice::LavPortaudioDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead): LavDevice(sr, channels, blockSize, mixahead) {
+	doPortaudioNegotiation(sr, channels, blockSize, &stream);
 	buffers = new float*[mixahead+1];
 	for(unsigned int i = 0; i < mixahead+1; i++) buffers[i] = new float[blockSize*channels];
 	buffer_statuses = new std::atomic<int>[mixahead+1];
 	for(unsigned int i = 0; i < mixahead+1; i++) buffer_statuses[i].store(0); //make sure they're all 0.  If not, bad things are going to happen.
-	PaError err = Pa_OpenDefaultStream(&stream, 0, channels, paFloat32, sr, blockSize, portaudioOutputCallback, this);
-	if(err < 0) throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
 	//set the background thread on its way.
 	runningFlag.test_and_set();
 	audioOutputThread = std::thread([this] () {audioOutputThreadFunction();});
