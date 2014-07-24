@@ -7,6 +7,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <vector>
 #include <limits>
 #include <algorithm>
+#include <utility>
 #include "libaudioverse.h"
 
 /**A resampler.
@@ -15,4 +16,16 @@ This is a class because it, unlike the kernels, needs specific initialization.
 It is the last piece in the pipeline, responsible for moving the Libaudioverse simulation sampling rate to the device's sampling rate.*/
 
 class LavResampler {
+	public:
+	LavResampler(int sourceSr, int targetSr, std::function<std::tuple<int, float*>(void)> getFromCallback);
+	float getNext();
+	void read(int count, float* dest);
+	private:
+	int source_sr, target_sr;
+	float delta = 0.0f;
+	std::function<std::tuple<int, float*>(void)> get_from_callback;
+	std::tuple<int, float*> current_pair = std::tuple<int, float*>(0, nullptr);
+	int current_pos;
+	float current_offset;
+	float last_sample;
 };
