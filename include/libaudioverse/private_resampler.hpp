@@ -18,15 +18,15 @@ It is the last piece in the pipeline, responsible for moving the Libaudioverse s
 /**Input buffer size must be even.*/
 class LavResampler {
 	public:
-	LavResampler(int inputBufferLength, int inputSr, int outputSr);
-	int getOutputBufferLength();
+	LavResampler(int inputBufferLength, int inputChannels, int inputSr, int outputSr);
+	int getOutputSampleCount();
 	void tick(float* input, float* output);
 	private:
-	float computeSingleSample(float* input);
+	void writeFrame(float* input, float* dest);
 	float last_sample = 0;
 	float current_offset = 0;
 	int current_pos = -1;//special sentinal value.
 	bool no_op = false;
 	float delta = 0.0f;
-	int input_buffer_length, input_sr, output_sr;
+	int input_buffer_length, input_channels, input_sr, output_sr;
 };
