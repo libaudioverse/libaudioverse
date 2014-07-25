@@ -59,4 +59,4 @@ class LavDevice {
 //initialize the audio backend.
 void initializeAudioBackend();
 
-std::shared_ptr<LavDevice> createPortaudioDevice(unsigned int sr, unsigned int channels, unsigned int bufferSize, unsigned int mixahead);
+std::shared_ptr<LavDevice> createDefaultPortaudioDevice(unsigned int sr, unsigned int bufferSize, unsigned int mixahead);

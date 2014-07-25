@@ -17,6 +17,7 @@ It is the last piece in the pipeline, responsible for moving the Libaudioverse s
 
 /**Input buffer size must be even.*/
 class LavResampler {
+	public:
 	LavResampler(int inputBufferLength, int inputSr, int outputSr);
 	int getOutputBufferLength();
 	void tick(float* input, float* output);
