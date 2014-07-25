@@ -18,7 +18,7 @@ int portaudioOutputCallback(const void* input, void* output, unsigned long frame
 class LavPortaudioDevice: public LavDevice {
 	public:
 	LavPortaudioDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead);
-	void doPortaudioNegotiation(unsigned int sr, unsigned int channels, unsigned int blockSize, PaStream** stream);
+	void doPortaudioNegotiation(unsigned int sr, unsigned int channels, unsigned int blockSize);
 	void audioOutputThreadFunction(); //the function that runs as our output thread.
 	std::thread audioOutputThread;
 	std::atomic_flag runningFlag; //when this clears, the audio thread self-terminates.
@@ -38,7 +38,7 @@ void initializeAudioBackend() {
 	}
 }
 
-void LavPortaudioDevice::doPortaudioNegotiation(unsigned int sr, unsigned int channels, unsigned int blockSize, PaStream** stream) {
+void LavPortaudioDevice::doPortaudioNegotiation(unsigned int sr, unsigned int channels, unsigned int blockSize) {
 	/**We need to find the default devices for all APIs.*/
 	std::vector<std::tuple<const PaDeviceIndex, const PaDeviceInfo*>> candidates;
 	PaHostApiIndex maxApi = Pa_GetHostApiCount();
@@ -69,12 +69,12 @@ void LavPortaudioDevice::doPortaudioNegotiation(unsigned int sr, unsigned int ch
 		throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
 	}
 	PaStreamParameters* needed = &actual_candidates[0];
-	PaError err = Pa_OpenStream(stream, nullptr, needed, (double)sr, blockSize, paPrimeOutputBuffersUsingStreamCallback, portaudioOutputCallback, this);
+	PaError err = Pa_OpenStream(&stream, nullptr, needed, (double)sr, blockSize, paPrimeOutputBuffersUsingStreamCallback, portaudioOutputCallback, this);
 	if(err < 0) throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
 }
 
 LavPortaudioDevice::LavPortaudioDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead): LavDevice(sr, channels, blockSize, mixahead) {
-	doPortaudioNegotiation(sr, channels, blockSize, &stream);
+	doPortaudioNegotiation(sr, channels, blockSize);
 	buffers = new float*[mixahead+1];
 	for(unsigned int i = 0; i < mixahead+1; i++) buffers[i] = new float[blockSize*channels];
 	buffer_statuses = new std::atomic<int>[mixahead+1];
