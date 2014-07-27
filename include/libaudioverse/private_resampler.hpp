@@ -14,19 +14,18 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 This is a class because it, unlike the kernels, needs specific initialization.
 It is the last piece in the pipeline, responsible for moving the Libaudioverse simulation sampling rate to the device's sampling rate.*/
-
-/**Input buffer size must be even.*/
 class LavResampler {
 	public:
-	LavResampler(int inputBufferLength, int inputChannels, int inputSr, int outputSr);
-	int getOutputSampleCount();
+	LavResampler(int inputFrameCount, int inputChannels, int inputSr, int outputSr);
+	int getOutputFrameCount();
 	void tick(float* input, float* output);
 	private:
 	void writeFrame(float* input, float* dest);
-	float last_sample = 0;
+	float *last_frame = nullptr;
+	float *frame1 = nullptr, *frame2 = nullptr;
 	float current_offset = 0;
 	int current_pos = -1;//special sentinal value.
 	bool no_op = false;
 	float delta = 0.0f;
-	int input_buffer_length, input_channels, input_sr, output_sr;
+	int input_frame_count, input_channels, input_sr, output_sr;
 };

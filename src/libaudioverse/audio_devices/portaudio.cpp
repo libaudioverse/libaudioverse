@@ -70,9 +70,9 @@ void LavPortaudioDevice::doPortaudioDefaultDeviceNegotiation(unsigned int sr, un
 	outParams.hostApiSpecificStreamInfo = nullptr;
 	double neededSr = neededInfo->defaultSampleRate;
 	for(auto i = 0; i < outParams.channelCount; i++) {
-		resamplers.emplace_back(blockSize, sr, (int)neededSr);
+		resamplers.emplace_back(blockSize, outParams.channelCount, sr, (int)neededSr);
 	}
-	unsigned int neededBlockSize = resamplers[0].getOutputBufferLength();
+	unsigned int neededBlockSize = resamplers[0].getOutputFrameCount();
 	PaError err = Pa_OpenStream(&stream, nullptr, &outParams, (double)neededSr, neededBlockSize, paPrimeOutputBuffersUsingStreamCallback, portaudioOutputCallback, this);
 	if(err < 0) throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
 	channels = outParams.channelCount;
