@@ -29,7 +29,6 @@ class LavPortaudioDevice: public LavDevice {
 	float** buffers = nullptr;
 	std::atomic<int> *buffer_statuses = nullptr;
 	int callback_buffer_index = 0; //the index the callback will go to on its next invocation.
-	std::vector<LavResampler> resamplers;
 	LavResampler *resampler = nullptr;
 	unsigned int output_block_size = 0; //the block size after resampling.
 	friend int portaudioOutputCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
@@ -69,10 +68,8 @@ void LavPortaudioDevice::doPortaudioDefaultDeviceNegotiation(unsigned int sr, un
 	outParams.suggestedLatency = neededInfo->defaultLowOutputLatency;
 	outParams.hostApiSpecificStreamInfo = nullptr;
 	double neededSr = neededInfo->defaultSampleRate;
-	for(auto i = 0; i < outParams.channelCount; i++) {
-		resamplers.emplace_back(blockSize, outParams.channelCount, sr, (int)neededSr);
-	}
-	unsigned int neededBlockSize = resamplers[0].getOutputFrameCount();
+	resampler = new LavResampler(blockSize, outParams.channelCount, sr, (int)neededSr);
+	unsigned int neededBlockSize = resampler->getOutputFrameCount();
 	PaError err = Pa_OpenStream(&stream, nullptr, &outParams, (double)neededSr, neededBlockSize, paPrimeOutputBuffersUsingStreamCallback, portaudioOutputCallback, this);
 	if(err < 0) throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
 	channels = outParams.channelCount;
@@ -85,6 +82,9 @@ LavPortaudioDevice::LavPortaudioDevice(unsigned int sr, unsigned int blockSize, 
 	for(unsigned int i = 0; i < mixahead+1; i++) buffers[i] = new float[output_block_size*channels];
 	buffer_statuses = new std::atomic<int>[mixahead+1];
 	for(unsigned int i = 0; i < mixahead+1; i++) buffer_statuses[i].store(0); //make sure they're all 0.  If not, bad things are going to happen.
+	this->block_size = blockSize;
+	this->sr = (float)sr;
+	this->mixahead = mixahead;
 	//set the background thread on its way.
 	runningFlag.test_and_set();
 	audioOutputThread = std::thread([this] () {audioOutputThreadFunction();});
