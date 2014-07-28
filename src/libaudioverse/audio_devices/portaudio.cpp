@@ -122,7 +122,7 @@ void LavPortaudioDevice::audioOutputThreadFunction() {
 		getBlock(tempBuffer);
 		unlock();
 		//tick our resampler.
-		resampler->tick(tempBuffer, buffers[rb_index]);
+//		resampler->tick(tempBuffer, buffers[rb_index]);
 		//mark it as safe for the audio callback.
 		buffer_statuses[rb_index].store(1);
 		//and compute the next index.
