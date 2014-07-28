@@ -4,6 +4,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_devices.hpp>
 #include <libaudioverse/private_errors.hpp>
 #include <portaudio.h>
+#include <libaudioverse/private_resampler.hpp>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,12 +12,14 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <atomic>
 #include <set>
 #include <chrono>
+#include <utility>
 
 int portaudioOutputCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
 
 class LavPortaudioDevice: public LavDevice {
 	public:
-	LavPortaudioDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead);
+	LavPortaudioDevice(unsigned int sr, unsigned int blockSize, unsigned int mixahead);
+	void doPortaudioDefaultDeviceNegotiation(unsigned int sr, unsigned int blockSize);
 	void audioOutputThreadFunction(); //the function that runs as our output thread.
 	std::thread audioOutputThread;
 	std::atomic_flag runningFlag; //when this clears, the audio thread self-terminates.
@@ -26,6 +29,8 @@ class LavPortaudioDevice: public LavDevice {
 	float** buffers = nullptr;
 	std::atomic<int> *buffer_statuses = nullptr;
 	int callback_buffer_index = 0; //the index the callback will go to on its next invocation.
+	LavResampler *resampler = nullptr;
+	unsigned int output_block_size = 0; //the block size after resampling.
 	friend int portaudioOutputCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
 };
 
@@ -36,20 +41,57 @@ void initializeAudioBackend() {
 	}
 }
 
-LavPortaudioDevice::LavPortaudioDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead): LavDevice(sr, channels, blockSize, mixahead) {
+void LavPortaudioDevice::doPortaudioDefaultDeviceNegotiation(unsigned int sr, unsigned int blockSize) {
+	/**We need to find the default devices for all APIs.*/
+	std::vector<std::tuple<PaDeviceIndex, PaDeviceInfo*>> candidates;
+	PaHostApiIndex maxApi = Pa_GetHostApiCount();
+	for(PaHostApiIndex i = 0; i < maxApi; i++) {
+		const PaHostApiInfo* info = Pa_GetHostApiInfo(i);
+		PaDeviceIndex ind = info->defaultOutputDevice;
+		const PaDeviceInfo* devinfo = Pa_GetDeviceInfo(ind);
+		candidates.emplace_back(ind, const_cast<PaDeviceInfo*>(devinfo));
+	}
+	//sort by suggested latency.
+	std::sort(candidates.begin(), candidates.end(), [](decltype(candidates)::value_type a, decltype(candidates)::value_type b) {
+		return std::get<1>(a)->defaultLowOutputLatency < std::get<1>(b)->defaultLowOutputLatency;
+	});
+	if(candidates.size() == 0) {
+		throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
+	}
+	auto &needed = candidates[0];
+	const PaDeviceInfo *neededInfo = std::get<1>(needed);
+	const PaDeviceIndex neededIndex = std::get<0>(needed);
+	PaStreamParameters outParams;
+	outParams.device = neededIndex;
+	outParams.channelCount = neededInfo->maxOutputChannels;
+	outParams.sampleFormat = paFloat32;
+	outParams.suggestedLatency = neededInfo->defaultLowOutputLatency;
+	outParams.hostApiSpecificStreamInfo = nullptr;
+	double neededSr = neededInfo->defaultSampleRate;
+	resampler = new LavResampler(blockSize, outParams.channelCount, sr, (int)neededSr);
+	unsigned int neededBlockSize = (unsigned int)(blockSize*neededSr/sr);
+	PaError err = Pa_OpenStream(&stream, nullptr, &outParams, (double)neededSr, neededBlockSize, 0, portaudioOutputCallback, this);
+	if(err < 0) throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
+	channels = outParams.channelCount;
+	output_block_size = neededBlockSize;
+}
+
+LavPortaudioDevice::LavPortaudioDevice(unsigned int sr, unsigned int blockSize, unsigned int mixahead): LavDevice(0, 0, 0, 0) { //todo: this is a hack to get around a deficiency.
+	doPortaudioDefaultDeviceNegotiation(sr, blockSize);
 	buffers = new float*[mixahead+1];
-	for(unsigned int i = 0; i < mixahead+1; i++) buffers[i] = new float[blockSize*channels];
+	for(unsigned int i = 0; i < mixahead+1; i++) buffers[i] = new float[output_block_size*channels];
 	buffer_statuses = new std::atomic<int>[mixahead+1];
 	for(unsigned int i = 0; i < mixahead+1; i++) buffer_statuses[i].store(0); //make sure they're all 0.  If not, bad things are going to happen.
-	PaError err = Pa_OpenDefaultStream(&stream, 0, channels, paFloat32, sr, blockSize, portaudioOutputCallback, this);
-	if(err < 0) throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
+	this->block_size = blockSize;
+	this->sr = (float)sr;
+	this->mixahead = mixahead;
 	//set the background thread on its way.
 	runningFlag.test_and_set();
 	audioOutputThread = std::thread([this] () {audioOutputThreadFunction();});
 }
 
-std::shared_ptr<LavDevice> createPortaudioDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead) {
-	return std::make_shared<LavPortaudioDevice>(sr, channels, blockSize, mixahead);
+std::shared_ptr<LavDevice> createDefaultPortaudioDevice(unsigned int sr, unsigned int blockSize, unsigned int mixahead) {
+	return std::make_shared<LavPortaudioDevice>(sr, blockSize, mixahead);
 }
 
 /**This algorithm is complex and consequently requires some explanation.
@@ -61,6 +103,7 @@ Basically, this is a one-reader one-writer lock-free ringbuffer with an addition
 */
 void LavPortaudioDevice::audioOutputThreadFunction() {
 	int rb_index = 0; //our index into the buffers array.
+	float* tempBuffer  = new float[block_size*channels];
 	PaError err = Pa_StartStream(stream);
 	while(runningFlag.test_and_set()) {
 		if(buffer_statuses[rb_index].load()) { //we just caught up and the queue is full.
@@ -69,7 +112,12 @@ void LavPortaudioDevice::audioOutputThreadFunction() {
 		}
 		//process into this buffer.
 		lock();
-		getBlock(buffers[rb_index]);
+		unsigned int got = 0;
+		while(got < output_block_size) {
+			getBlock(tempBuffer);
+			resampler->read(tempBuffer);
+			got += resampler->write(buffers[rb_index]+got*channels, output_block_size-got);
+		}
 		unlock();
 		//mark it as safe for the audio callback.
 		buffer_statuses[rb_index].store(1);
