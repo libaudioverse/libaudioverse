@@ -41,7 +41,7 @@ void LavResampler::writeFrame(float* input, float* dest) {
 		std::copy(input, input+input_channels, frame2);
 	}
 	else {
-		std::copy(input+current_pos*input_channels, input+(current_pos+1)*input_channels, frame2);
+		std::copy(input+current_pos*input_channels, input+(current_pos+1)*input_channels, frame1);
 		std::copy(input+(current_pos+1)*input_channels, input+(current_pos+2)*input_channels, frame2);
 	}
 	for(int i = 0; i < input_channels; i++) {
@@ -57,7 +57,8 @@ void LavResampler::tick(float* input, float* output) {
 	//have to get this loop right.
 	//for loop is a bit complicated and unclear. This while loop alternative is probably, for once, better.
 	while(current_pos < input_frame_count -1) {
-		writeFrame(input, output+(current_pos*input_channels));
+		writeFrame(input, output);
+		output += input_channels;
 		current_offset+=delta;
 		current_pos += (int)floorf(current_offset);	
 		current_offset = current_offset-floorf(current_offset);
