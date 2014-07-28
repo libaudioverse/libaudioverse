@@ -27,6 +27,7 @@ add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
 add_definitions(-DPA_WDMKS_NO_KSGUID_LIB)
 #next, disable wasapi, which is apparently very very fragile.
 set(PA_USE_WASAPI OFF CACHE BOOL "Note: WASAPI is broken. Leave as off")
+set(PA_USE_WDMKS OFF CACHE BOOL "WDMKS is majorly deprecated. Leave as off")
 #build and setup portaudio:
 add_subdirectory(portaudio)
 include_directories("${portaudio_SOURCE_DIR}/include")
