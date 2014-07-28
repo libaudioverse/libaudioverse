@@ -4,7 +4,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include <string>
 #include <functional>
-#include <vector>
+#include <list>
 #include <limits>
 #include <algorithm>
 #include <utility>
@@ -17,8 +17,8 @@ It is the last piece in the pipeline, responsible for moving the Libaudioverse s
 class LavResampler {
 	public:
 	LavResampler(int inputFrameCount, int inputChannels, int inputSr, int outputSr);
-	int getOutputFrameCount();
-	void tick(float* input, float* output);
+	int write(float* dest, int maxFrameCount);
+	void read(float* source);
 	private:
 	void writeFrame(float* input, float* dest);
 	float *last_frame = nullptr;
@@ -27,5 +27,6 @@ class LavResampler {
 	int current_pos = -1;//special sentinal value.
 	bool no_op = false;
 	float delta = 0.0f;
+	std::list<float*> queue, done_queue;
 	int input_frame_count, input_channels, input_sr, output_sr;
 };

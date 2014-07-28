@@ -28,10 +28,6 @@ LavResampler::LavResampler(int inputFrameCount, int inputChannels, int inputSr, 
 	printf("Predicted output size: %i", (int)floorf(input_frame_count/delta));
 }
 
-int LavResampler::getOutputFrameCount() {
-	return (int)floorf(input_frame_count/delta);
-}
-
 void LavResampler::writeFrame(float* input, float* dest) {
 	//weights are easy.
 	float w1 = 1-current_offset;
@@ -49,20 +45,43 @@ void LavResampler::writeFrame(float* input, float* dest) {
 	}
 }
 
-void LavResampler::tick(float* input, float* output) {
-	if(no_op) {
-		std::copy(input, input+input_frame_count*input_channels, output);
-		return;
+void LavResampler::read(float* source) {
+	float* buff;
+	if(done_queue.empty()) {
+		buff = new float[input_frame_count*input_channels];
 	}
-	//have to get this loop right.
-	//for loop is a bit complicated and unclear. This while loop alternative is probably, for once, better.
-	while(current_pos < input_frame_count -1) {
-		writeFrame(input, output);
-		output += input_channels;
-		current_offset+=delta;
-		current_pos += (int)floorf(current_offset);	
-		current_offset = current_offset-floorf(current_offset);
+	else {
+		buff = done_queue.front();
+		done_queue.pop_front();
 	}
-	current_pos = -1;
-	std::copy(input+(input_frame_count-1)*input_channels, input+input_frame_count*input_channels, last_frame);
+	std::copy(source, source+input_channels*input_frame_count, buff);
+	queue.push_back(buff);
+}
+
+int LavResampler::write(float* dest, int maxFrameCount) {
+	if(queue.empty()) {
+		return 0;
+	}
+	int count = 0;
+	float* buff;
+	while(count < maxFrameCount) {
+		if(queue.empty()) break;
+		buff = queue.front();
+		while(current_pos < input_frame_count-1 && count < maxFrameCount) {
+			writeFrame(buff, dest);
+			dest += input_channels;
+			count ++;
+			current_offset += delta;
+			current_pos += (int)floorf(current_offset);
+			current_offset -= floorf(current_offset);
+		}
+		//this might be rollover.  If it is, we need to copy the last frame and put buff in done because we're about to replace buff.
+		if(current_pos == input_frame_count-1) {
+			std::copy(buff+(input_frame_count-1)*input_channels, buff+input_frame_count*input_channels, last_frame);
+			queue.pop_front();
+			done_queue.push_front(buff);
+			current_pos = -1;
+		}
+	}
+	return count;
 }

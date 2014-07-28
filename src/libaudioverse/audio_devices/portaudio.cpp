@@ -69,7 +69,7 @@ void LavPortaudioDevice::doPortaudioDefaultDeviceNegotiation(unsigned int sr, un
 	outParams.hostApiSpecificStreamInfo = nullptr;
 	double neededSr = neededInfo->defaultSampleRate;
 	resampler = new LavResampler(blockSize, outParams.channelCount, sr, (int)neededSr);
-	unsigned int neededBlockSize = resampler->getOutputFrameCount();
+	unsigned int neededBlockSize = (unsigned int)(blockSize*neededSr/sr);
 	printf("Needed block size:%i\n", neededBlockSize);
 	printf("Needed samplerate:%f", neededSr);
 	printf("API and device indices: %i, %i\n", std::get<1>(needed)->hostApi, outParams.device);
@@ -119,10 +119,13 @@ void LavPortaudioDevice::audioOutputThreadFunction() {
 		}
 		//process into this buffer.
 		lock();
-		getBlock(tempBuffer);
+		unsigned int got = 0;
+		while(got < output_block_size) {
+			getBlock(tempBuffer);
+			resampler->read(tempBuffer);
+			got += resampler->write(buffers[rb_index]+got*channels, output_block_size-got);
+		}
 		unlock();
-		//tick our resampler.
-//		resampler->tick(tempBuffer, buffers[rb_index]);
 		//mark it as safe for the audio callback.
 		buffer_statuses[rb_index].store(1);
 		//and compute the next index.
