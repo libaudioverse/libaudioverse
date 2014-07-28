@@ -13,10 +13,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_dspmath.hpp>
 
 LavResampler::LavResampler(int inputFrameCount, int inputChannels, int inputSr, int outputSr): input_frame_count(inputFrameCount), input_channels(inputChannels), input_sr(inputSr), output_sr(outputSr) {
-	printf("Creating resampler.\n");
-	printf("isr = %i, osr = %i\n", inputSr, outputSr);
-	printf("Channels: %i\n", inputChannels);
-	printf("Input frame count: %i\n", inputFrameCount);
 	if(inputSr == outputSr) {
 		no_op = true;
 	}
@@ -24,8 +20,6 @@ LavResampler::LavResampler(int inputFrameCount, int inputChannels, int inputSr, 
 	last_frame = new float[inputChannels]();
 	frame1 = new float[inputChannels];
 	frame2 = new float[inputChannels];
-	printf("No-op status: %i\n", no_op);
-	printf("Predicted output size: %i", (int)floorf(input_frame_count/delta));
 }
 
 void LavResampler::writeFrame(float* input, float* dest) {
