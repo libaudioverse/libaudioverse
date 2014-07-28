@@ -70,7 +70,12 @@ void LavPortaudioDevice::doPortaudioDefaultDeviceNegotiation(unsigned int sr, un
 	double neededSr = neededInfo->defaultSampleRate;
 	resampler = new LavResampler(blockSize, outParams.channelCount, sr, (int)neededSr);
 	unsigned int neededBlockSize = resampler->getOutputFrameCount();
-	PaError err = Pa_OpenStream(&stream, nullptr, &outParams, (double)neededSr, neededBlockSize, paPrimeOutputBuffersUsingStreamCallback, portaudioOutputCallback, this);
+	printf("Needed block size:%i\n", neededBlockSize);
+	printf("Needed samplerate:%f", neededSr);
+	printf("API and device indices: %i, %i\n", std::get<1>(needed)->hostApi, outParams.device);
+	printf("Device name: %s\n", std::get<1>(needed)->name);
+	printf("API name: %s\n", Pa_GetHostApiInfo(std::get<1>(needed)->hostApi)->name);
+	PaError err = Pa_OpenStream(&stream, nullptr, &outParams, (double)neededSr, neededBlockSize, 0, portaudioOutputCallback, this);
 	if(err < 0) throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
 	channels = outParams.channelCount;
 	output_block_size = neededBlockSize;
@@ -105,6 +110,8 @@ void LavPortaudioDevice::audioOutputThreadFunction() {
 	int rb_index = 0; //our index into the buffers array.
 	float* tempBuffer  = new float[block_size*channels];
 	PaError err = Pa_StartStream(stream);
+	printf("Initializing stream: %i\n", (int)err);
+	printf("Last error text: %s", Pa_GetLastHostErrorInfo()->errorText);
 	while(runningFlag.test_and_set()) {
 		if(buffer_statuses[rb_index].load()) { //we just caught up and the queue is full.
 			std::this_thread::sleep_for(std::chrono::milliseconds((block_size*1000)/(int)sr));
@@ -126,6 +133,7 @@ void LavPortaudioDevice::audioOutputThreadFunction() {
 }
 
 int portaudioOutputCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData) {
+	printf("portaudio callback\n");
 	LavPortaudioDevice * const dev = (LavPortaudioDevice*)userData;
 	const int haveBuffer = dev->buffer_statuses[dev->callback_buffer_index].load();
 	if(haveBuffer) {

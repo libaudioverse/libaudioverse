@@ -13,6 +13,10 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_dspmath.hpp>
 
 LavResampler::LavResampler(int inputFrameCount, int inputChannels, int inputSr, int outputSr): input_frame_count(inputFrameCount), input_channels(inputChannels), input_sr(inputSr), output_sr(outputSr) {
+	printf("Creating resampler.\n");
+	printf("isr = %i, osr = %i\n", inputSr, outputSr);
+	printf("Channels: %i\n", inputChannels);
+	printf("Input frame count: %i\n", inputFrameCount);
 	if(inputSr == outputSr) {
 		no_op = true;
 	}
@@ -20,10 +24,12 @@ LavResampler::LavResampler(int inputFrameCount, int inputChannels, int inputSr, 
 	last_frame = new float[inputChannels]();
 	frame1 = new float[inputChannels];
 	frame2 = new float[inputChannels];
+	printf("No-op status: %i\n", no_op);
+	printf("Predicted output size: %i", (int)floorf(input_frame_count/delta));
 }
 
 int LavResampler::getOutputFrameCount() {
-	return (int)floorf(delta*input_frame_count);
+	return (int)floorf(input_frame_count/delta);
 }
 
 void LavResampler::writeFrame(float* input, float* dest) {
@@ -31,6 +37,7 @@ void LavResampler::writeFrame(float* input, float* dest) {
 	float w1 = 1-current_offset;
 	float w2 = current_offset;
 	if(current_pos == -1) { //special case.
+		printf("Copy from: %p to: %p\n", input, input+input_frame_count*input_channels);
 		std::copy(last_frame, last_frame+input_channels, frame1);
 		std::copy(input, input+input_channels, frame2);
 	}
