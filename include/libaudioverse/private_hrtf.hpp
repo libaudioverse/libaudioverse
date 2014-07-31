@@ -16,7 +16,7 @@ class LavHrtfData {
 	void computeCoefficientsStereo(float elevation, float azimuth, float* left, float* right);
 
 	//load from a file.
-	void loadFromFile(std::string path);
+	void loadFromFile(std::string path, int forSr);
 
 	//get the hrir's length.
 	unsigned int getLength();

@@ -13,7 +13,9 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_dspmath.hpp>
 #include <libaudioverse/private_macros.hpp>
 #include <libaudioverse/private_errors.hpp>
+#include <libaudioverse/private_kernels.hpp>
 #include <math.h>
+#include <memory>
 
 /**Swaps bytes to reverse endianness.*/
 void reverse_endianness(char* buffer, unsigned int count, unsigned int window) {
@@ -42,7 +44,7 @@ unsigned int LavHrtfData::getLength() {
 	return hrir_length;
 }
 
-void LavHrtfData::loadFromFile(std::string path) {
+void LavHrtfData::loadFromFile(std::string path, int forSr) {
 	//first, load the file if we can.
 	FILE *fp = fopen(path.c_str(), "rb");
 	if(fp == nullptr) throw LavErrorException(Lav_ERROR_FILE);
