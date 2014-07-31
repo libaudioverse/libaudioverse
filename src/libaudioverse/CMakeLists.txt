@@ -24,6 +24,7 @@ metadata/metadata.cpp
 #mathematical kernels for common dsp operations.
 kernels/convolution.cpp
 kernels/panning.cpp
+kernels/resamplers.cpp
 
 #specific node types.
 objects/sine.cpp
