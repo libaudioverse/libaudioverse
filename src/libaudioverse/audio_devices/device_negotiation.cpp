@@ -16,7 +16,7 @@ Read device creation is also here, because putting all the public device creatio
 Lav_PUBLIC_FUNCTION LavError Lav_createDefaultAudioOutputDevice(LavDevice** destination) {
 	//create a device if possible, giving it our desired settings, and then pass it to the portaudio thread builder, which redirects callbacks on the device as appropriate.
 	LavDevice* retval;
-	retval = outgoingPointer<LavDevice>(createDefaultPortaudioDevice(100000, 1024, 1));
+	retval = outgoingPointer<LavDevice>(createDefaultPortaudioDevice(22050, 1024, 1));
 	*destination = retval;
 	return Lav_ERROR_NONE;
 }
