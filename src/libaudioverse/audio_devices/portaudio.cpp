@@ -69,7 +69,7 @@ void LavPortaudioDevice::doPortaudioDefaultDeviceNegotiation(unsigned int sr, un
 	outParams.hostApiSpecificStreamInfo = nullptr;
 	double neededSr = neededInfo->defaultSampleRate;
 	resampler = new LavResampler(blockSize, outParams.channelCount, sr, (int)neededSr);
-	unsigned int neededBlockSize = (unsigned int)(blockSize*neededSr/sr);
+	unsigned int neededBlockSize = (unsigned int)(blockSize/(neededSr/sr));
 	PaError err = Pa_OpenStream(&stream, nullptr, &outParams, (double)neededSr, neededBlockSize, 0, portaudioOutputCallback, this);
 	if(err < 0) throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
 	channels = outParams.channelCount;

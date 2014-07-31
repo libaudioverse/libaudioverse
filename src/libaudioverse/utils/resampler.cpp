@@ -67,7 +67,7 @@ int LavResampler::write(float* dest, int maxFrameCount) {
 			current_offset -= floorf(current_offset);
 		}
 		//this might be rollover.  If it is, we need to copy the last frame and put buff in done because we're about to replace buff.
-		if(current_pos == input_frame_count-1) {
+		if(current_pos >= input_frame_count-1) {
 			std::copy(buff+(input_frame_count-1)*input_channels, buff+input_frame_count*input_channels, last_frame);
 			queue.pop_front();
 			done_queue.push_front(buff);
