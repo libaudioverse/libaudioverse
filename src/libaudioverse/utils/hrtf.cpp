@@ -33,7 +33,9 @@ void reverse_endianness(char* buffer, unsigned int count, unsigned int window) {
 static_assert(sizeof(float) == 4, "Sizeof float is not 4; cannot safely work with hrtfs");
 
 LavHrtfData::~LavHrtfData() {
+	if(hrirs == nullptr) return; //we never loaded one.
 	for(unsigned int i = 0; i < elev_count; i++) {
+		for(unsigned int j = 0; j < azimuth_counts[i]; j++) delete[] hrirs[i][j];
 		delete[] hrirs[i];
 	}
 	delete[] hrirs;
@@ -96,13 +98,13 @@ void LavHrtfData::loadFromFile(std::string path, int forSr) {
 	for(unsigned int i = 0; i < elev_count; i++) sum_sanity_check +=azimuth_counts[i];
 	if(sum_sanity_check != hrir_count) throw LavErrorException(Lav_ERROR_HRTF_INVALID);
 
-	hrir_length = *(int32_t*)iterator;
+	int before_hrir_length = *(int32_t*)iterator;
 	iterator += window_size;
 
 	unsigned int size_so_far = iterator-data;
 	size_t size_remaining = size-size_so_far;
 	//we must have enough remaining to be all hrir hrirs.
-	size_t hrir_size = hrir_length*hrir_count*sizeof(float);
+	size_t hrir_size = before_hrir_length*hrir_count*sizeof(float);
 	if(hrir_size != size_remaining) throw LavErrorException(Lav_ERROR_HRTF_INVALID);
 
 	//last step.  Initialize the HRIR array.
@@ -114,13 +116,15 @@ void LavHrtfData::loadFromFile(std::string path, int forSr) {
 
 	//the above gives us what amounts to a 2d array.  The first dimension represents elevation.  The second dimension represents azimuth going clockwise.
 	//fill it.
+	int final_hrir_length = 0;
 	for(unsigned int elev = 0; elev < elev_count; elev++) {
 		for(unsigned int azimuth = 0; azimuth < azimuth_counts[elev]; azimuth++) {
-			hrirs[elev][azimuth] = new float[hrir_length];
-			memcpy(hrirs[elev][azimuth], iterator, hrir_length*sizeof(float));
-			iterator+=hrir_length*sizeof(float);
+			staticResamplerKernel(samplerate, forSr, before_hrir_length, (float*)iterator, &final_hrir_length, &hrirs[elev][azimuth]);
+			iterator+=before_hrir_length*sizeof(float);
 		}
 	}
+	hrir_length = final_hrir_length;
+	samplerate = forSr;
 }
 
 //a complete HRTF for stereo is two calls to this function.
