@@ -89,7 +89,7 @@ void LavHrtfObject::process() {
 Lav_PUBLIC_FUNCTION LavError Lav_createHrtfObject(LavDevice* device, const char* hrtfPath, LavObject** destination) {
 	PUB_BEGIN
 	auto hrtf = std::make_shared<LavHrtfData>();
-	hrtf->loadFromFile(hrtfPath);
+	hrtf->loadFromFile(hrtfPath, device->getSr());
 	LOCK(*device);
 	auto retval = createHrtfObject(incomingPointer<LavDevice>(device), hrtf);
 	*destination = outgoingPointer<LavObject>(retval);

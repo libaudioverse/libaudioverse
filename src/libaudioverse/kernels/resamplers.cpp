@@ -10,7 +10,16 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <math.h>
 
 void staticResamplerKernel(int inputSr, int outputSr, int inputLength, float* input, int* outputLengthDestination, float** outputDestination, bool makeMultipleOfFour) {
-	float delta = (float)outputSr/(float)inputSr;
+	if(inputSr == outputSr) { //just a copy.
+		int neededLength = inputLength;
+		if(neededLength%4 != 0 && makeMultipleOfFour) neededLength = 4*(neededLength/4+1);
+		float* output = new float[neededLength]();
+		std::copy(input, input+inputLength, output);
+		*outputLengthDestination = neededLength;
+		*outputDestination = output;
+	}
+	//we have to resample.
+		float delta = (float)inputSr/outputSr;
 	int pos = 0;
 	float offset = 0;
 	int neededLength = inputLength/delta;

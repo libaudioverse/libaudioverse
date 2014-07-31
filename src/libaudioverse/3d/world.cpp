@@ -77,7 +77,7 @@ void LavWorldObject::registerSourceForUpdates(std::shared_ptr<LavSourceObject> s
 Lav_PUBLIC_FUNCTION LavError Lav_createWorldObject(LavDevice* device, const char*hrtfPath, LavObject** destination) {
 	PUB_BEGIN
 	auto hrtf = std::make_shared<LavHrtfData>();
-	hrtf->loadFromFile(hrtfPath);
+	hrtf->loadFromFile(hrtfPath, device->getSr());
 	auto retval = createWorldObject(incomingPointer<LavDevice>(device), hrtf);
 	*destination = outgoingPointer<LavObject>(retval);
 	PUB_END
