@@ -25,7 +25,6 @@ class LavResampler {
 	float *frame1 = nullptr, *frame2 = nullptr;
 	float current_offset = 0;
 	int current_pos = -1;//special sentinal value.
-	bool no_op = false;
 	float delta = 0.0f;
 	std::list<float*> queue, done_queue;
 	int input_frame_count, input_channels, input_sr, output_sr;
