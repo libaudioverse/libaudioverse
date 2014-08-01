@@ -125,6 +125,24 @@ void LavHrtfData::loadFromFile(std::string path, int forSr) {
 	}
 	hrir_length = final_hrir_length;
 	samplerate = forSr;
+
+	//this final loop cleans up the impulse responses a bit.
+	float maxOutput = 0.0f;
+	for(unsigned int elev = 0; elev < elev_count; elev++) {
+		for(unsigned int az = 0; az < azimuth_counts[elev]; az++) {
+			float sum = 0.0f;
+			for(int j = 0; j < hrir_length; j++) sum+= fabs(hrirs[elev][az][j]);
+			if(sum > maxOutput) maxOutput = sum;
+		}
+	}
+	//go over it all one more time, and normalize.
+	for(unsigned int elev = 0; elev < elev_count; elev++) {
+		for(unsigned int az = 0; az < azimuth_counts[elev]; az++) {
+			for(unsigned int j = 0; j < hrir_length; j++) {
+//				hrirs[elev][az][j] /= maxOutput;
+			}
+		}
+	}
 }
 
 //a complete HRTF for stereo is two calls to this function.
