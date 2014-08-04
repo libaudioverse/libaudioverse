@@ -7,14 +7,24 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <vector>
 #include <set>
 #include <memory>
+#include <utility>
 
 /**A physical output.*/
 class LavPhysicalOutput {
 	public:
-private:
+	private:
+	std::function<void(LavPhysicalOutput*, float*)> get_audio_callback;
 };
 
 class LavPhysicalOutputFactory {
 	public:
+	LavPhysicalOutputFactory() = delete;
+	virtual ~LavPhysicalOutputFactory() {}
+	virtual std::vector<std::string> getOutputNames() = 0;
+	virtual std::vector<float> getOutputLatencies() = 0;
+	virtual std::vector<int> getOutputMaxChannels() = 0;
 	private:
 };
+
+bool portaudioBackendAvailable();
+LavPhysicalOutputFactory* createPortaudioPhysicalOutputFactory();
