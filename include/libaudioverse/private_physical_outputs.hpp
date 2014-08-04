@@ -8,12 +8,18 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <set>
 #include <memory>
 #include <utility>
+#include <atomic>
 
 /**A physical output.*/
 class LavPhysicalOutput {
 	public:
+	void setCallback(std::function<void(LavPhysicalOutput*, float*)> what);
+	unsigned int getBufferSize();
 	private:
-	std::function<void(LavPhysicalOutput*, float*)> get_audio_callback;
+	LavPhysicalOutput(unsigned int bufferSize, unsigned int mixAhead);
+	std::function<void(LavPhysicalOutput*, float*)> audio_callback;
+	unsigned int buffer_size = 0, mix_ahead = 0;
+	friend class LavPhysicalOutputFactory;
 };
 
 class LavPhysicalOutputFactory {
@@ -23,7 +29,7 @@ class LavPhysicalOutputFactory {
 	virtual std::vector<std::string> getOutputNames() = 0;
 	virtual std::vector<float> getOutputLatencies() = 0;
 	virtual std::vector<int> getOutputMaxChannels() = 0;
-	private:
+	virtual void rescan();
 };
 
 bool portaudioBackendAvailable();

@@ -10,3 +10,14 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <utility>
 
 /**Code common to all backends, i.e. enumeration.*/
+
+LavPhysicalOutput::LavPhysicalOutput(unsigned int bufferSize, unsigned int mixAhead): buffer_size(bufferSize), mix_ahead(mixAhead) {
+}
+
+void LavPhysicalOutput::setCallback(std::function<void(LavPhysicalOutput*, float*)> what) {
+	audio_callback = what;
+};
+
+unsigned int LavPhysicalOutput::getBufferSize() {
+	return buffer_size;
+}
