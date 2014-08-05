@@ -34,11 +34,7 @@ LavPhysicalOutput::~LavPhysicalOutput() {
 	delete[] buffer_statuses;
 }
 
-void LavPhysicalOutput::configureCallbakcs(std::function<void(void)> initializingCallback, std::function<void(float*)> writingCallback, std::function<void(void)> shutdownCallback) {
-	initializing_callback = initializingCallback;
-	writing_callback = writingCallback;
-	shutdown_callback = shutdownCallback;
-}
+
 
 void LavPhysicalOutput::zeroOrNextBuffer(float* where) {
 	if(buffer_statuses[next_output_buffer].load() == 1) {

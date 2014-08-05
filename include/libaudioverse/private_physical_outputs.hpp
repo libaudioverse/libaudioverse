@@ -16,10 +16,7 @@ class LavPhysicalOutput {
 	protected:
 	LavPhysicalOutput(unsigned int bufferSize, unsigned int mixAhead);
 	virtual ~LavPhysicalOutput();
-	void configureCallbakcs(std::function<void(void)> initializingCallback, std::function<void(float*)> writingCallback, std::function<void(void)> shutdownCallback);
-	void zeroOrNextBuffer(float* where);
-	std::function<void(void)> initializing_callback, shutdown_callback;
-	std::function<void(float*)> writing_callback;
+	virtual void zeroOrNextBuffer(float* where);
 	unsigned int buffer_size = 0, mix_ahead = 0;
 	unsigned int next_output_buffer = 0;
 	float** buffers = nullptr;
