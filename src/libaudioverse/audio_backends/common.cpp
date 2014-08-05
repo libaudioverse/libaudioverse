@@ -34,22 +34,21 @@ LavPhysicalOutput::~LavPhysicalOutput() {
 	delete[] buffer_statuses;
 }
 
-void LavPhysicalOutput::setCallback(std::function<void(LavPhysicalOutput*, float*)> what) {
-	audio_callback = what;
-};
-
-unsigned int LavPhysicalOutput::getBufferSize() {
-	return buffer_size;
+void LavPhysicalOutput::configureCallbakcs(std::function<void(void)> initializingCallback, std::function<void(float*)> writingCallback, std::function<void(void)> shutdownCallback) {
+	initializing_callback = initializingCallback;
+	writing_callback = writingCallback;
+	shutdown_callback = shutdownCallback;
 }
 
 void LavPhysicalOutput::zeroOrNextBuffer(float* where) {
-	if(buffer_statuses[next_buffer].load() == 1) {
-		std::copy(buffers[next_buffer], buffers[next_buffer]+buffer_size, where);
-		buffer_statuses[next_buffer].store(0);
+	if(buffer_statuses[next_output_buffer].load() == 1) {
+		std::copy(buffers[next_output_buffer], buffers[next_output_buffer]+buffer_size, where);
+		buffer_statuses[next_output_buffer].store(0);
 	}
 	else {
 		memset(where, 0, sizeof(float)*buffer_size);
 	}
-	next_buffer += 1;
-	next_buffer %= mix_ahead+1;
+	next_output_buffer += 1;
+	next_output_buffer %= mix_ahead+1;
 }
+

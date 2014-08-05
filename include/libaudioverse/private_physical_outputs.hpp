@@ -13,16 +13,15 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 /**A physical output.*/
 class LavPhysicalOutput {
-	public:
-	void setCallback(std::function<void(LavPhysicalOutput*, float*)> what);
-	unsigned int getBufferSize();
 	protected:
 	LavPhysicalOutput(unsigned int bufferSize, unsigned int mixAhead);
 	virtual ~LavPhysicalOutput();
+	void configureCallbakcs(std::function<void(void)> initializingCallback, std::function<void(float*)> writingCallback, std::function<void(void)> shutdownCallback);
 	void zeroOrNextBuffer(float* where);
-	std::function<void(LavPhysicalOutput*, float*)> audio_callback;
+	std::function<void(void)> initializing_callback, shutdown_callback;
+	std::function<void(float*)> writing_callback;
 	unsigned int buffer_size = 0, mix_ahead = 0;
-	unsigned int next_buffer = 0; //for the zeroOrNextBuffer only. background threads need their own so don't use this one.
+	unsigned int next_output_buffer = 0;
 	float** buffers = nullptr;
 	std::atomic<int>* buffer_statuses = nullptr;
 	friend class LavPhysicalOutputFactory;
