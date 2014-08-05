@@ -8,6 +8,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <string>
 #include <memory>
 #include <utility>
+#include <mutex>
 
 /**Code common to all backends, i.e. enumeration.*/
 
@@ -18,9 +19,12 @@ LavPhysicalOutput::LavPhysicalOutput(unsigned int bufferSize, unsigned int mixAh
 		buffers[i] = new float[bufferSize];
 		buffer_statuses[i].store(0);
 	}	
+	background_thread_continue.test_and_set();
 }
 
 LavPhysicalOutput::~LavPhysicalOutput() {
+	background_thread_continue.clear();
+	auto ensure_stopped = std::lock_guard<std::mutex>(ensure_stopped_mutex);
 	for(unsigned int i = 0; i < mix_ahead+1; i++) {
 		delete[] buffers[i];
 	}

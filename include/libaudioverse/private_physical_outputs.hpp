@@ -9,6 +9,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <memory>
 #include <utility>
 #include <atomic>
+#include <mutex>
 
 /**A physical output.*/
 class LavPhysicalOutput {
@@ -21,8 +22,10 @@ class LavPhysicalOutput {
 	std::function<void(LavPhysicalOutput*, float*)> audio_callback;
 	unsigned int buffer_size = 0, mix_ahead = 0;
 	float** buffers = nullptr;
-	std::atomic<int>* buffer_statuses;
+	std::atomic<int>* buffer_statuses = nullptr;
 	friend class LavPhysicalOutputFactory;
+	std::atomic_flag background_thread_continue;
+	std::mutex ensure_stopped_mutex; //held by the background thread as long as that thread is running.
 };
 
 class LavPhysicalOutputFactory {
