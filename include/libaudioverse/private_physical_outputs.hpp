@@ -15,10 +15,13 @@ class LavPhysicalOutput {
 	public:
 	void setCallback(std::function<void(LavPhysicalOutput*, float*)> what);
 	unsigned int getBufferSize();
-	private:
+	protected:
 	LavPhysicalOutput(unsigned int bufferSize, unsigned int mixAhead);
+	virtual ~LavPhysicalOutput();
 	std::function<void(LavPhysicalOutput*, float*)> audio_callback;
 	unsigned int buffer_size = 0, mix_ahead = 0;
+	float** buffers = nullptr;
+	std::atomic<int>* buffer_statuses;
 	friend class LavPhysicalOutputFactory;
 };
 

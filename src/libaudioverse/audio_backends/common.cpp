@@ -12,6 +12,20 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 /**Code common to all backends, i.e. enumeration.*/
 
 LavPhysicalOutput::LavPhysicalOutput(unsigned int bufferSize, unsigned int mixAhead): buffer_size(bufferSize), mix_ahead(mixAhead) {
+	buffers = new float*[mixAhead+1];
+	buffer_statuses = new std::atomic<int>[mixAhead+1];
+	for(unsigned int i = 0; i < mixAhead+1; i++) {
+		buffers[i] = new float[bufferSize];
+		buffer_statuses[i].store(0);
+	}	
+}
+
+LavPhysicalOutput::~LavPhysicalOutput() {
+	for(unsigned int i = 0; i < mix_ahead+1; i++) {
+		delete[] buffers[i];
+	}
+	delete[] buffers;
+	delete[] buffer_statuses;
 }
 
 void LavPhysicalOutput::setCallback(std::function<void(LavPhysicalOutput*, float*)> what) {
