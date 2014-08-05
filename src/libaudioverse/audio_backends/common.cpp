@@ -9,6 +9,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <memory>
 #include <utility>
 #include <mutex>
+#include <string.h>
+#include <algorithm>
 
 /**Code common to all backends, i.e. enumeration.*/
 
@@ -38,4 +40,16 @@ void LavPhysicalOutput::setCallback(std::function<void(LavPhysicalOutput*, float
 
 unsigned int LavPhysicalOutput::getBufferSize() {
 	return buffer_size;
+}
+
+void LavPhysicalOutput::zeroOrNextBuffer(float* where) {
+	if(buffer_statuses[next_buffer].load() == 1) {
+		std::copy(buffers[next_buffer], buffers[next_buffer]+buffer_size, where);
+		buffer_statuses[next_buffer].store(0);
+	}
+	else {
+		memset(where, 0, sizeof(float)*buffer_size);
+	}
+	next_buffer += 1;
+	next_buffer %= mix_ahead+1;
 }
