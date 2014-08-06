@@ -27,12 +27,14 @@ LavPhysicalOutput::LavPhysicalOutput(std::shared_ptr<LavDevice> dev, unsigned in
 void LavPhysicalOutput::init(unsigned int targetSr) {
 	target_sr = targetSr;
 	//compute an estimated "good" size for the buffers, given the device's blockSize and channels.
-	unsigned int goodBufferSize = device->getChannels()*device->getBlockSize();
-	goodBufferSize = (unsigned int)(goodBufferSize*(double)device->getSr()/target_sr);
+	output_buffer_size = (unsigned int)device->getBlockSize();
+	output_buffer_size = (unsigned int)(output_buffer_size*(double)device->getSr()/targetSr);
+	//always go for the multiples of 4.  This doesn't hurt anything, and some backends may be faster because of it.
+	if(output_buffer_size%4) output_buffer_size = output_buffer_size+(4-output_buffer_size%4);
+	unsigned int goodBufferSize = output_buffer_size*channels;
 	for(unsigned int i = 0; i < mix_ahead+1; i++) {
 		buffers[i] = new float[goodBufferSize];
 	}
-	output_buffer_size = goodBufferSize;
 }
 
 void LavPhysicalOutput::start() {
@@ -51,8 +53,7 @@ LavPhysicalOutput::~LavPhysicalOutput() {
 
 void LavPhysicalOutput::stop() {
 	mixing_thread_continue.clear();
-	ensure_stopped_mutex.lock();
-	ensure_stopped_mutex.unlock();
+	mixing_thread.join();
 }
 
 void LavPhysicalOutput::zeroOrNextBuffer(float* where) {
@@ -68,7 +69,6 @@ void LavPhysicalOutput::zeroOrNextBuffer(float* where) {
 }
 
 void LavPhysicalOutput::mixingThreadFunction() {
-	auto keep_from_destructing_guard = std::lock_guard<std::mutex>(ensure_stopped_mutex);
 	unsigned int sourceSr = (unsigned int)device->getSr();
 	LavResampler resampler((unsigned int)device->getBlockSize(), device->getChannels(), sourceSr, target_sr);
 	unsigned int currentBuffer = 0;
