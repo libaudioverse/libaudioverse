@@ -56,4 +56,8 @@ void LavPhysicalOutput::zeroOrNextBuffer(float* where) {
 }
 
 void LavPhysicalOutput::mixingThreadFunction() {
+	auto keep_from_destructing_guard = std::lock_guard<std::mutex>(ensure_stopped_mutex);
+	while(mixing_thread_continue.test_and_set()) {
+
+	}
 }
