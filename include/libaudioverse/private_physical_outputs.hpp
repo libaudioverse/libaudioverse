@@ -22,15 +22,16 @@ class LavPhysicalOutput {
 	virtual ~LavPhysicalOutput();
 	virtual void zeroOrNextBuffer(float* where);
 	virtual void mixingThreadFunction();
-	unsigned int buffer_size = 0, mix_ahead = 0;
+	unsigned int output_buffer_size = 0, mix_ahead = 0, channels = 0;
 	unsigned int next_output_buffer = 0;
+	unsigned int target_sr = 0;
 	float** buffers = nullptr;
 	std::atomic<int>* buffer_statuses = nullptr;
-	friend class LavPhysicalOutputFactory;
 	std::atomic_flag mixing_thread_continue;
 	std::mutex ensure_stopped_mutex; //held by the background thread as long as that thread is running.
 	std::shared_ptr<LavDevice> device = nullptr;
 	std::thread mixing_thread;
+	friend class LavPhysicalOutputFactory;
 };
 
 class LavPhysicalOutputFactory {
