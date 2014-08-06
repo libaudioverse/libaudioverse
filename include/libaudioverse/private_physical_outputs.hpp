@@ -27,7 +27,7 @@ class LavPhysicalOutput {
 	float** buffers = nullptr;
 	std::atomic<int>* buffer_statuses = nullptr;
 	friend class LavPhysicalOutputFactory;
-	std::atomic_flag background_thread_continue;
+	std::atomic_flag mixing_thread_continue;
 	std::mutex ensure_stopped_mutex; //held by the background thread as long as that thread is running.
 	std::shared_ptr<LavDevice> device = nullptr;
 	std::thread mixing_thread;

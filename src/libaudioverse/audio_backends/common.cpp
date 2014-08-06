@@ -18,7 +18,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 LavPhysicalOutput::LavPhysicalOutput(std::shared_ptr<LavDevice> dev, unsigned int mixAhead): mix_ahead(mixAhead), device(device) {
 	buffers = new float*[mixAhead+1];
 	buffer_statuses = new std::atomic<int>[mixAhead+1];
-	background_thread_continue.test_and_set();
 }
 
 //these are the next two steps in initialization, and are consequently put before the destructor.
@@ -26,10 +25,12 @@ void LavPhysicalOutput::init(unsigned int targetSr) {
 }
 
 void LavPhysicalOutput::start() {
+	mixing_thread_continue.test_and_set();
+	mixing_thread = std::thread([this] () {mixingThreadFunction();});
 }
+
 LavPhysicalOutput::~LavPhysicalOutput() {
-	background_thread_continue.clear();
-	auto ensure_stopped = std::lock_guard<std::mutex>(ensure_stopped_mutex);
+	stop();
 	for(unsigned int i = 0; i < mix_ahead+1; i++) {
 		delete[] buffers[i];
 	}
@@ -38,6 +39,8 @@ LavPhysicalOutput::~LavPhysicalOutput() {
 }
 
 void LavPhysicalOutput::stop() {
+	mixing_thread_continue.clear();
+	auto ensure_stopped = std::lock_guard<std::mutex>(ensure_stopped_mutex);
 }
 
 void LavPhysicalOutput::zeroOrNextBuffer(float* where) {
