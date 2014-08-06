@@ -3,6 +3,7 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/private_physical_outputs.hpp>
+#include <libaudioverse/private_devices.hpp>
 #include <string>
 #include <vector>
 #include <string>
@@ -14,16 +15,18 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 /**Code common to all backends, i.e. enumeration.*/
 
-LavPhysicalOutput::LavPhysicalOutput(unsigned int bufferSize, unsigned int mixAhead): buffer_size(bufferSize), mix_ahead(mixAhead) {
+LavPhysicalOutput::LavPhysicalOutput(std::shared_ptr<LavDevice> dev, unsigned int mixAhead): mix_ahead(mixAhead), device(device) {
 	buffers = new float*[mixAhead+1];
 	buffer_statuses = new std::atomic<int>[mixAhead+1];
-	for(unsigned int i = 0; i < mixAhead+1; i++) {
-		buffers[i] = new float[bufferSize];
-		buffer_statuses[i].store(0);
-	}	
 	background_thread_continue.test_and_set();
 }
 
+//these are the next two steps in initialization, and are consequently put before the destructor.
+void LavPhysicalOutput::init(unsigned int targetSr) {
+}
+
+void LavPhysicalOutput::start() {
+}
 LavPhysicalOutput::~LavPhysicalOutput() {
 	background_thread_continue.clear();
 	auto ensure_stopped = std::lock_guard<std::mutex>(ensure_stopped_mutex);
@@ -34,7 +37,8 @@ LavPhysicalOutput::~LavPhysicalOutput() {
 	delete[] buffer_statuses;
 }
 
-
+void LavPhysicalOutput::stop() {
+}
 
 void LavPhysicalOutput::zeroOrNextBuffer(float* where) {
 	if(buffer_statuses[next_output_buffer].load() == 1) {
@@ -48,3 +52,5 @@ void LavPhysicalOutput::zeroOrNextBuffer(float* where) {
 	next_output_buffer %= mix_ahead+1;
 }
 
+void LavPhysicalOutput::mixingThreadFunction() {
+}
