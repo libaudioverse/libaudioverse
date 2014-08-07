@@ -96,5 +96,6 @@ void LavPhysicalOutput::mixingThreadFunction() {
 		}
 		buffer_statuses[currentBuffer].store(1); //mark it as ready.
 		currentBuffer ++;
+		currentBuffer %= mix_ahead+1;
 	}
 }
