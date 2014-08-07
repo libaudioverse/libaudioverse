@@ -5,6 +5,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_physical_outputs.hpp>
 #include <libaudioverse/private_devices.hpp>
 #include <libaudioverse/private_resampler.hpp>
+#include <libaudioverse/private_errors.hpp>
 #include <string>
 #include <vector>
 #include <string>
@@ -24,16 +25,30 @@ class LavPortaudioPhysicalOutput: public  LavPhysicalOutput {
 	virtual void startup_hook();
 	virtual void shutdown_hook();
 	LavPortaudioPhysicalOutput(std::shared_ptr<LavDevice> dev, unsigned int mixAhead, PaDeviceIndex which);
+	PaStream* stream = nullptr;
 	friend int portaudioOutputCallbackB(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
 };
 
 LavPortaudioPhysicalOutput::LavPortaudioPhysicalOutput(std::shared_ptr<LavDevice> dev, unsigned int mixAhead, PaDeviceIndex which):  LavPhysicalOutput(dev, mixAhead) {
+	const PaDeviceInfo* devinfo = Pa_GetDeviceInfo(which);
+	PaStreamParameters params;
+	params.channelCount = dev->getChannels();
+	params.device = which;
+	params.hostApiSpecificStreamInfo = nullptr;
+	params.sampleFormat = paFloat32;
+	params.suggestedLatency = devinfo->defaultLowOutputLatency;
+	double sr = devinfo->defaultSampleRate;
+	PaError err = Pa_OpenStream(&stream, nullptr, &params, sr, dev->getBlockSize(), 0, portaudioOutputCallbackB, this);
+	if(err != paNoError) throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
+	init((unsigned int)sr);
 }
 
 void LavPortaudioPhysicalOutput::startup_hook() {
+	Pa_StartStream(stream);
 }
 
 void LavPortaudioPhysicalOutput::shutdown_hook() {
+	Pa_StopStream(stream);
 }
 
 int portaudioOutputCallbackB(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData) {
