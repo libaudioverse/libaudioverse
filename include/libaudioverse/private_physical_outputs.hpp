@@ -27,6 +27,7 @@ class LavPhysicalOutput {
 	virtual void mixingThreadFunction();
 	unsigned int output_buffer_size = 0, mix_ahead = 0, channels = 0;
 	unsigned int next_output_buffer = 0;
+	unsigned int callback_buffer_index = 0;
 	unsigned int target_sr = 0;
 	float** buffers = nullptr;
 	std::atomic<int>* buffer_statuses = nullptr;

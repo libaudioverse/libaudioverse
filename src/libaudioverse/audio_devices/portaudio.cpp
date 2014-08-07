@@ -129,7 +129,7 @@ void LavPortaudioDevice::audioOutputThreadFunction() {
 }
 
 int portaudioOutputCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData) {
-	LavPortaudioDevice * const dev = (LavPortaudioDevice*)userData;
+	LavPortaudioDevice* const dev = (LavPortaudioDevice*)userData;
 	const int haveBuffer = dev->buffer_statuses[dev->callback_buffer_index].load();
 	if(haveBuffer) {
 		memcpy(output, dev->buffers[dev->callback_buffer_index], sizeof(float)*frameCount*dev->channels);

@@ -17,17 +17,36 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <chrono>
 #include <portaudio.h>
 
+int portaudioOutputCallbackB(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
+
 class LavPortaudioPhysicalOutput: public  LavPhysicalOutput {
 	public:
 	virtual void startup_hook();
 	virtual void shutdown_hook();
 	LavPortaudioPhysicalOutput(std::shared_ptr<LavDevice> dev, unsigned int mixAhead, PaDeviceIndex which);
+	friend int portaudioOutputCallbackB(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
 };
 
 LavPortaudioPhysicalOutput::LavPortaudioPhysicalOutput(std::shared_ptr<LavDevice> dev, unsigned int mixAhead, PaDeviceIndex which):  LavPhysicalOutput(dev, mixAhead) {
 }
+
 void LavPortaudioPhysicalOutput::startup_hook() {
 }
 
 void LavPortaudioPhysicalOutput::shutdown_hook() {
+}
+
+int portaudioOutputCallbackB(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData) {
+	LavPortaudioPhysicalOutput * const out = (LavPortaudioPhysicalOutput*)userData;
+	const int haveBuffer = out->buffer_statuses[out->callback_buffer_index].load();
+	if(haveBuffer) {
+		memcpy(output, out->buffers[out->callback_buffer_index], sizeof(float)*frameCount*out->channels);
+		out->buffer_statuses[out->callback_buffer_index].store(0);
+		out->callback_buffer_index++;
+		out->callback_buffer_index %= out->mix_ahead+1;
+	}
+	else {
+		memset(output, 0, out->channels*frameCount*sizeof(float));
+	}
+	return paContinue;
 }
