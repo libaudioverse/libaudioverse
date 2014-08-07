@@ -35,6 +35,10 @@ class LavPortaudioPhysicalOutputFactory: public LavPhysicalOutputFactory {
 	virtual std::vector<std::string> getOutputNames();
 	virtual std::vector<float> getOutputLatencies();
 	virtual std::vector<int> getOutputMaxChannels();
+	private:
+	std::vector<float> latencies;
+	std::vector<std::string> names;
+	std::vector<int> max_channels;	
 };
 
 LavPortaudioPhysicalOutput::LavPortaudioPhysicalOutput(std::shared_ptr<LavDevice> dev, unsigned int mixAhead, PaDeviceIndex which):  LavPhysicalOutput(dev, mixAhead) {
@@ -75,16 +79,23 @@ int portaudioOutputCallbackB(const void* input, void* output, unsigned long fram
 }
 
 LavPortaudioPhysicalOutputFactory::LavPortaudioPhysicalOutputFactory() {
+	//recall that portaudio doesn't rescan, so we do all our scanning here.
+	for(PaDeviceIndex i = 0; i < Pa_GetDeviceCount()-1; i++) {
+		const PaDeviceInfo* info = Pa_GetDeviceInfo(i);
+		names.emplace_back(info->name);
+		latencies.emplace_back((float)info->defaultLowOutputLatency);
+		max_channels.emplace_back(info->maxOutputChannels);
+	}
 }
 
 std::vector<std::string> LavPortaudioPhysicalOutputFactory::getOutputNames() {
-	return std::vector<std::string>();
+	return names;
 }
 
 std::vector<float> LavPortaudioPhysicalOutputFactory::getOutputLatencies() {
-	return std::vector<float>();
+	return latencies;
 }
 
 std::vector<int> LavPortaudioPhysicalOutputFactory::getOutputMaxChannels() {
-	return std::vector<int>();
+	return max_channels;
 }
