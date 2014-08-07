@@ -38,6 +38,7 @@ objects/amplitude_panner.cpp
 
 #physical outputs, etc.
 audio_backends/common.cpp
+audio_backends/portaudio.cpp
 
 #the audio backends and related functionality.
 audio_devices/device_negotiation.cpp
