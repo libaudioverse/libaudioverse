@@ -29,6 +29,14 @@ class LavPortaudioPhysicalOutput: public  LavPhysicalOutput {
 	friend int portaudioOutputCallbackB(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
 };
 
+class LavPortaudioPhysicalOutputFactory: public LavPhysicalOutputFactory {
+	public:
+	LavPortaudioPhysicalOutputFactory();
+	virtual std::vector<std::string> getOutputNames();
+	virtual std::vector<float> getOutputLatencies();
+	virtual std::vector<int> getOutputMaxChannels();
+};
+
 LavPortaudioPhysicalOutput::LavPortaudioPhysicalOutput(std::shared_ptr<LavDevice> dev, unsigned int mixAhead, PaDeviceIndex which):  LavPhysicalOutput(dev, mixAhead) {
 	const PaDeviceInfo* devinfo = Pa_GetDeviceInfo(which);
 	PaStreamParameters params;
@@ -64,4 +72,19 @@ int portaudioOutputCallbackB(const void* input, void* output, unsigned long fram
 		memset(output, 0, out->channels*frameCount*sizeof(float));
 	}
 	return paContinue;
+}
+
+LavPortaudioPhysicalOutputFactory::LavPortaudioPhysicalOutputFactory() {
+}
+
+std::vector<std::string> LavPortaudioPhysicalOutputFactory::getOutputNames() {
+	return std::vector<std::string>();
+}
+
+std::vector<float> LavPortaudioPhysicalOutputFactory::getOutputLatencies() {
+	return std::vector<float>();
+}
+
+std::vector<int> LavPortaudioPhysicalOutputFactory::getOutputMaxChannels() {
+	return std::vector<int>();
 }

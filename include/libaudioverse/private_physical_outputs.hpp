@@ -38,7 +38,7 @@ class LavPhysicalOutput {
 
 class LavPhysicalOutputFactory {
 	public:
-	LavPhysicalOutputFactory() = delete;
+	LavPhysicalOutputFactory();
 	virtual ~LavPhysicalOutputFactory() {}
 	virtual std::vector<std::string> getOutputNames() = 0;
 	virtual std::vector<float> getOutputLatencies() = 0;
