@@ -68,7 +68,14 @@ void LavPhysicalOutput::zeroOrNextBuffer(float* where) {
 	next_output_buffer %= mix_ahead+1;
 }
 
+void LavPhysicalOutput::startup_hook() {
+}
+
+void LavPhysicalOutput::shutdown_hook() {
+}
+
 void LavPhysicalOutput::mixingThreadFunction() {
+	startup_hook();
 	unsigned int sourceSr = (unsigned int)device->getSr();
 	LavResampler resampler((unsigned int)device->getBlockSize(), device->getChannels(), sourceSr, target_sr);
 	unsigned int currentBuffer = 0;
@@ -98,4 +105,5 @@ void LavPhysicalOutput::mixingThreadFunction() {
 		currentBuffer ++;
 		currentBuffer %= mix_ahead+1;
 	}
+	shutdown_hook();
 }
