@@ -12,6 +12,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "libaudioverse.h"
 
 class LavObject;
+class LavPhysicalOutput;
 
 /*When thrown on the background thread, terminates it.*/
 class LavThreadTerminationException {
@@ -36,6 +37,9 @@ class LavDevice {
 	void unlock() {mutex.unlock();}
 	void enqueueTask(std::function<void(void)>);
 
+	//makes this device hold a shared pointer to its output.
+	void associateOutput(std::shared_ptr<LavPhysicalOutput> what);
+
 	protected:
 	//visit all objects in the order they need to be visited if we were processing the graph.
 	virtual void visitAllObjectsInProcessOrder(std::function<void(std::shared_ptr<LavObject>)> visitor);
@@ -54,6 +58,9 @@ class LavDevice {
 	lambdatask::ThreadsafeQueue<std::function<void(void)>>  tasks;
 	std::thread backgroundTaskThread;
 	void backgroundTaskThreadFunction();
+
+	//our output, if any.
+	std::shared_ptr<LavPhysicalOutput> output = nullptr;
 };
 
 //initialize the audio backend.

@@ -35,10 +35,11 @@ class LavPortaudioPhysicalOutputFactory: public LavPhysicalOutputFactory {
 	virtual std::vector<std::string> getOutputNames();
 	virtual std::vector<float> getOutputLatencies();
 	virtual std::vector<int> getOutputMaxChannels();
+	virtual std::shared_ptr<LavDevice> createDevice(int index, unsigned int sr, unsigned int blockSize, unsigned int mixAhead);
 	private:
 	std::vector<float> latencies;
 	std::vector<std::string> names;
-	std::vector<int> max_channels;	
+	std::vector<int> max_channels;
 };
 
 LavPortaudioPhysicalOutput::LavPortaudioPhysicalOutput(std::shared_ptr<LavDevice> dev, unsigned int mixAhead, PaDeviceIndex which):  LavPhysicalOutput(dev, mixAhead) {
@@ -98,4 +99,18 @@ std::vector<float> LavPortaudioPhysicalOutputFactory::getOutputLatencies() {
 
 std::vector<int> LavPortaudioPhysicalOutputFactory::getOutputMaxChannels() {
 	return max_channels;
+}
+
+std::shared_ptr<LavDevice> LavPortaudioPhysicalOutputFactory::createDevice(int index, unsigned int sr, unsigned int blockSize, unsigned int mixAhead) {
+	if(index != -1 || index >= (int)names.size()) throw LavErrorException(Lav_ERROR_RANGE);
+	//if it's not -1, then we can cast it to a PaDeviceIndex.  Otherwise, we use Pa_GetDefaultOutputDevice();
+	PaDeviceIndex needed;
+	if(index == -1) needed = Pa_GetDefaultOutputDevice();
+	else needed = (PaDeviceIndex)index;
+	//we create a device, first.
+	std::shared_ptr<LavDevice> retval = std::make_shared<LavDevice>(sr, index != -1 ? max_channels[index] : 2, blockSize, mixAhead);
+	//create the output.
+	std::shared_ptr<LavPortaudioPhysicalOutput> output = std::make_shared<LavPortaudioPhysicalOutput>(retval, mixAhead, needed);
+	retval->associateOutput(output);
+	return retval;
 }

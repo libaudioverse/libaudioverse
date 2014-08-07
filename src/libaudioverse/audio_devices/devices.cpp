@@ -6,6 +6,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_objects.hpp>
 #include <libaudioverse/private_macros.hpp>
 #include <libaudioverse/private_memory.hpp>
+#include <libaudioverse/private_physical_outputs.hpp>
 #include <stdlib.h>
 #include <functional>
 #include <algorithm>
@@ -91,6 +92,10 @@ std::shared_ptr<LavObject> LavDevice::getOutputObject() {
 
 void LavDevice::enqueueTask(std::function<void(void)> cb) {
 	tasks.enqueue(cb);
+}
+
+void LavDevice::associateOutput(std::shared_ptr<LavPhysicalOutput> what) {
+	output = what;
 }
 
 void LavDevice::visitAllObjectsInProcessOrder(std::function<void(std::shared_ptr<LavObject>)> visitor) {
