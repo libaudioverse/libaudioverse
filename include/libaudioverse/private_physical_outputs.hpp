@@ -33,7 +33,6 @@ class LavPhysicalOutput {
 	std::atomic_flag mixing_thread_continue;
 	std::shared_ptr<LavDevice> device = nullptr;
 	std::thread mixing_thread;
-	friend class LavPhysicalOutputFactory;
 };
 
 class LavPhysicalOutputFactory {
