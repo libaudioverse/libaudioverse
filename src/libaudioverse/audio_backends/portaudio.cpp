@@ -53,9 +53,9 @@ LavPortaudioPhysicalOutput::LavPortaudioPhysicalOutput(std::shared_ptr<LavDevice
 	params.sampleFormat = paFloat32;
 	params.suggestedLatency = devinfo->defaultLowOutputLatency;
 	double sr = devinfo->defaultSampleRate;
-	PaError err = Pa_OpenStream(&stream, nullptr, &params, sr, dev->getBlockSize(), 0, portaudioOutputCallbackB, this);
-	if(err != paNoError) throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
 	init((unsigned int)sr);
+	PaError err = Pa_OpenStream(&stream, nullptr, &params, sr, output_buffer_size, 0, portaudioOutputCallbackB, this);
+	if(err != paNoError) throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
 	start();
 }
 

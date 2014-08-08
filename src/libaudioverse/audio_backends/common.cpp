@@ -28,9 +28,11 @@ void LavPhysicalOutput::init(unsigned int targetSr) {
 	target_sr = targetSr;
 	//compute an estimated "good" size for the buffers, given the device's blockSize and channels.
 	output_buffer_size = (unsigned int)device->getBlockSize();
-	output_buffer_size = (unsigned int)(output_buffer_size*(double)device->getSr()/targetSr);
-	//always go for the multiples of 4.  This doesn't hurt anything, and some backends may be faster because of it.
-	if(output_buffer_size%4) output_buffer_size = output_buffer_size+(4-output_buffer_size%4);
+	if(targetSr != device->getSr()) {
+		output_buffer_size = (unsigned int)(output_buffer_size*(double)targetSr/device->getSr());
+		//always go for the multiples of 4.  This doesn't hurt anything, and some backends may be faster because of it.
+		if(output_buffer_size%4) output_buffer_size = output_buffer_size+(4-output_buffer_size%4);
+	}
 	unsigned int goodBufferSize = output_buffer_size*channels;
 	for(unsigned int i = 0; i < mix_ahead+1; i++) {
 		buffers[i] = new float[goodBufferSize];
@@ -67,7 +69,6 @@ void LavPhysicalOutput::zeroOrNextBuffer(float* where) {
 	next_output_buffer += 1;
 	next_output_buffer %= mix_ahead+1;
 }
-
 
 void LavPhysicalOutput::startup_hook() {
 }
