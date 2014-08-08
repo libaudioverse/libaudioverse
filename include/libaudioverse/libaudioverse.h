@@ -122,7 +122,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_getPhysicalOutputCount(unsigned int* destinatio
 Lav_PUBLIC_FUNCTION LavError Lav_getPhysicalOutputLatency(unsigned int index, float* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_getPhysicalOutputName(unsigned int index, char** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_getPhysicalOutputChannels(unsigned int index, unsigned int* destination);
-Lav_PUBLIC_FUNCTION LavError lav_createDeviceForOutput(int index, unsigned int sr, unsigned int blockSize, unsigned int mixAhead, LavDevice** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createDeviceForPhysicalOutput(int index, unsigned int sr, unsigned int blockSize, unsigned int mixAhead, LavDevice** destination);
 
 /**This type of device is intended for apps that wish to handle audio themselves: it will not output and time will not advance for it.
 Combine it with Lav_deviceReadBlock to make use of it.*/

@@ -77,7 +77,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_getPhysicalOutputChannels(unsigned int index, u
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError lav_createDeviceForOutput(int index, unsigned int sr, unsigned int blockSize, unsigned int mixAhead, LavDevice** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createDeviceForPhysicalOutput(int index, unsigned int sr, unsigned int blockSize, unsigned int mixAhead, LavDevice** destination) {
 	PUB_BEGIN
 	auto dev = chosen_factory->createDevice(index, sr, blockSize, mixAhead);
 	*destination = outgoingPointer<LavDevice>(dev);

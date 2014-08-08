@@ -17,10 +17,10 @@ if((x) != Lav_ERROR_NONE) {\
 } while(0)\
 
 void main() {
-		LavDevice* device;
+	LavDevice* device;
 	LavObject* node;
 	ERRCHECK(Lav_initializeLibrary());
-	ERRCHECK(Lav_createDefaultAudioOutputDevice(&device));
+	ERRCHECK(Lav_createDeviceForPhysicalOutput(-1, 44100, 1024, 2, &device));
 	ERRCHECK(Lav_createSineObject(device, &node));
 	ERRCHECK(Lav_objectSetFloatProperty(node, Lav_SINE_FREQUENCY, 0));
 	ERRCHECK(Lav_deviceSetOutputObject(device, node));
