@@ -49,7 +49,7 @@ float calculateGainForDistanceModel(int model, float distance, float maxDistance
 	return retval;
 }
 
-	void LavSourceObject::update(LavEnvironment environment) {
+void LavSourceObject::update(LavEnvironment environment) {
 	//first, extract the vector of our position.
 	const float* pos = getProperty(Lav_3D_POSITION).getFloat3Value();
 	glm::vec4 npos = environment.world_to_listener_transform*glm::vec4(pos[0], pos[1], pos[2], 1.0f);
@@ -61,7 +61,6 @@ float calculateGainForDistanceModel(int model, float distance, float maxDistance
 	float azimuth = atan2(npos.x, -npos.z)/PI*180.0f;
 	if(elevation > 90.0f) elevation = 90.0f;
 	if(elevation < -90.0f) elevation = -90.0f;
-
 	int distanceModel = getProperty(Lav_SOURCE_DISTANCE_MODEL).getIntValue();
 	float maxDistance = getProperty(Lav_SOURCE_MAX_DISTANCE).getFloatValue();
 	float gain = calculateGainForDistanceModel(distanceModel, distance, maxDistance);
