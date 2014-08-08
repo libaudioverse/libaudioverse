@@ -49,5 +49,8 @@ class LavPhysicalOutputFactory {
 	int output_count = 0;
 };
 
-bool portaudioBackendAvailable();
 LavPhysicalOutputFactory* createPortaudioPhysicalOutputFactory();
+typedef LavPhysicalOutputFactory* (*LavPhysicalOutputFactoryCreationFunction)();
+
+//finally, the function that initializes all of this.
+void initializePhysicalOutputFactory();
