@@ -109,6 +109,6 @@ void LavPhysicalOutput::mixingThreadFunction() {
 	shutdown_hook();
 }
 
-unsigned int LavPhysicalOutputFactory::getDeviceCount() {
-	return (unsigned int)device_count;
+unsigned int LavPhysicalOutputFactory::getOutputCount() {
+	return (unsigned int)output_count;
 }

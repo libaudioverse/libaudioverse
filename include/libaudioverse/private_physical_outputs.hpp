@@ -44,9 +44,9 @@ class LavPhysicalOutputFactory {
 	virtual std::vector<float> getOutputLatencies() = 0;
 	virtual std::vector<int> getOutputMaxChannels() = 0;
 	virtual std::shared_ptr<LavDevice> createDevice(int index, unsigned int sr, unsigned int blockSize, unsigned int mixAhead) = 0;
-	virtual unsigned int getDeviceCount();
+	virtual unsigned int getOutputCount();
 	protected:
-	unsigned int device_count = 0;
+	int output_count = 0;
 };
 
 bool portaudioBackendAvailable();
