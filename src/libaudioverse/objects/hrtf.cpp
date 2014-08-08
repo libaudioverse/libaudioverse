@@ -75,13 +75,14 @@ void LavHrtfObject::process() {
 	if(didRecompute) { //very, very slow.
 		crossfadeConvolutionKernel(history, block_size, outputs[0], hrtfLength, old_left_response, left_response);
 		crossfadeConvolutionKernel(history, block_size, outputs[1], hrtfLength, old_right_response, right_response);
+		//note: putting these anywhere in the didnt-recompute path causes things to never move.
+		prev_elevation = current_elevation;
+		prev_azimuth = current_azimuth;
 	}
 	else {
 		convolutionKernel(history, block_size, outputs[0], hrtf->getLength(), left_response);
 		convolutionKernel(history, block_size, outputs[1], hrtf->getLength(), right_response);
 	}
-	prev_elevation = current_elevation;
-	prev_azimuth = current_azimuth;
 }
 
 //begin public api
