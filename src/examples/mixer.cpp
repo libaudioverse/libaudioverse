@@ -36,7 +36,7 @@ void main(int argc, char** args) {
 	LavDevice* device;
 	LavObject** nodes;
 	ERRCHECK(Lav_initializeLibrary());
-	ERRCHECK(Lav_createDefaultAudioOutputDevice(&device));
+	ERRCHECK(Lav_createDeviceForPhysicalOutput(-1, 44100, 1024, 2, &device));
 	nodes = new LavObject*[argc-1];
 	for(int i = 0; i < argc-1; i++) {
 		LavObject* n = makeNode(device, args[i+1]);

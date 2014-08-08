@@ -29,7 +29,7 @@ void main(int argc, char** args) {
 	LavObject *node;
 	LavDevice* device;
 	ERRCHECK(Lav_initializeLibrary());
-	ERRCHECK(Lav_createDefaultAudioOutputDevice(&device));
+	ERRCHECK(Lav_createDeviceForPhysicalOutput(-1, 44100, 1024, 2, &device));
 	ERRCHECK(Lav_createFileObject(device, path, &node));
 	LavObject* atten, *limit, *mix;
 	unsigned int fileChannels;

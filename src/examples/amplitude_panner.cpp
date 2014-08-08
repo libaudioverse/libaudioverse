@@ -24,7 +24,7 @@ void main(int argc, char** args) {
 	LavDevice* device;
 	LavObject* fileNode, *panNode, *limit;
 	ERRCHECK(Lav_initializeLibrary());
-	ERRCHECK(Lav_createDefaultAudioOutputDevice(&device));
+	ERRCHECK(Lav_createDeviceForPhysicalOutput(-1, 44100, 1024, 2, &device));
 	ERRCHECK(Lav_createFileObject(device, args[1], &fileNode));
 	float map[] = {270.0f, 90.0f};
 	ERRCHECK(Lav_createAmplitudePannerObject(device, &panNode));
