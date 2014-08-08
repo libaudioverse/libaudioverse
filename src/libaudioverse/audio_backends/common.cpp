@@ -68,6 +68,7 @@ void LavPhysicalOutput::zeroOrNextBuffer(float* where) {
 	next_output_buffer %= mix_ahead+1;
 }
 
+
 void LavPhysicalOutput::startup_hook() {
 }
 
@@ -106,4 +107,8 @@ void LavPhysicalOutput::mixingThreadFunction() {
 		currentBuffer %= mix_ahead+1;
 	}
 	shutdown_hook();
+}
+
+unsigned int LavPhysicalOutputFactory::getDeviceCount() {
+	return (unsigned int)device_count;
 }

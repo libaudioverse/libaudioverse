@@ -87,6 +87,7 @@ LavPortaudioPhysicalOutputFactory::LavPortaudioPhysicalOutputFactory() {
 		latencies.emplace_back((float)info->defaultLowOutputLatency);
 		max_channels.emplace_back(info->maxOutputChannels);
 	}
+	device_count = names.size();
 }
 
 std::vector<std::string> LavPortaudioPhysicalOutputFactory::getOutputNames() {
@@ -102,7 +103,7 @@ std::vector<int> LavPortaudioPhysicalOutputFactory::getOutputMaxChannels() {
 }
 
 std::shared_ptr<LavDevice> LavPortaudioPhysicalOutputFactory::createDevice(int index, unsigned int sr, unsigned int blockSize, unsigned int mixAhead) {
-	if(index != -1 || index >= (int)names.size()) throw LavErrorException(Lav_ERROR_RANGE);
+	if(index != -1 || index >= device_count) throw LavErrorException(Lav_ERROR_RANGE);
 	//if it's not -1, then we can cast it to a PaDeviceIndex.  Otherwise, we use Pa_GetDefaultOutputDevice();
 	PaDeviceIndex needed;
 	if(index == -1) needed = Pa_GetDefaultOutputDevice();
