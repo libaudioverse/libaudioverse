@@ -61,8 +61,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_getPhysicalOutputName(unsigned int index, char*
 	auto n = chosen_factory->getOutputNames();
 	if(index >= n.size()) throw LavErrorException(Lav_ERROR_RANGE);
 	auto s = n[index];
-	char* outgoingStr = new char[s.size()];
+	char* outgoingStr = new char[s.size()+1];
 	std::copy(s.c_str(), s.c_str()+s.size(), outgoingStr);
+	outgoingStr[s.size()] = '\0';
 	std::shared_ptr<char> outgoing(outgoingStr, [](char* what){delete[] what;});
 	*destination = outgoingPointer<char>(outgoing);
 	PUB_END
