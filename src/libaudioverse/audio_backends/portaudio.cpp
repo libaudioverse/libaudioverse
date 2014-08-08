@@ -12,6 +12,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <memory>
 #include <utility>
 #include <mutex>
+#include <map>
 #include <string.h>
 #include <algorithm>
 #include <thread>
@@ -37,6 +38,7 @@ class LavPortaudioPhysicalOutputFactory: public LavPhysicalOutputFactory {
 	virtual std::vector<int> getOutputMaxChannels();
 	virtual std::shared_ptr<LavDevice> createDevice(int index, unsigned int sr, unsigned int blockSize, unsigned int mixAhead);
 	private:
+	std::map<unsigned int, PaDeviceIndex> output_indices_map;
 	std::vector<float> latencies;
 	std::vector<std::string> names;
 	std::vector<int> max_channels;
@@ -81,11 +83,15 @@ int portaudioOutputCallbackB(const void* input, void* output, unsigned long fram
 
 LavPortaudioPhysicalOutputFactory::LavPortaudioPhysicalOutputFactory() {
 	//recall that portaudio doesn't rescan, so we do all our scanning here.
+	unsigned int index = 0;
 	for(PaDeviceIndex i = 0; i < Pa_GetDeviceCount()-1; i++) {
 		const PaDeviceInfo* info = Pa_GetDeviceInfo(i);
+		if(info->maxOutputChannels == 0) continue;
 		names.emplace_back(info->name);
 		latencies.emplace_back((float)info->defaultLowOutputLatency);
 		max_channels.emplace_back(info->maxOutputChannels);
+		output_indices_map[index] = i;
+		index++;
 	}
 	output_count = names.size();
 }
@@ -107,7 +113,7 @@ std::shared_ptr<LavDevice> LavPortaudioPhysicalOutputFactory::createDevice(int i
 	//if it's not -1, then we can cast it to a PaDeviceIndex.  Otherwise, we use Pa_GetDefaultOutputDevice();
 	PaDeviceIndex needed;
 	if(index == -1) needed = Pa_GetDefaultOutputDevice();
-	else needed = (PaDeviceIndex)index;
+	else needed = output_indices_map[index];
 	//we create a device, first.
 	std::shared_ptr<LavDevice> retval = std::make_shared<LavDevice>(sr, index != -1 ? max_channels[index] : 2, blockSize, mixAhead);
 	//create the output.
