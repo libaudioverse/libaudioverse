@@ -18,7 +18,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 /**Code common to all backends, i.e. enumeration.*/
 
-LavPhysicalOutput::LavPhysicalOutput(std::shared_ptr<LavDevice> dev, unsigned int mixAhead): mix_ahead(mixAhead), device(device), channels(device->getChannels()) {
+LavPhysicalOutput::LavPhysicalOutput(std::shared_ptr<LavDevice> dev, unsigned int mixAhead): mix_ahead(mixAhead), device(dev), channels(dev->getChannels()) {
 	buffers = new float*[mixAhead+1];
 	buffer_statuses = new std::atomic<int>[mixAhead+1];
 }

@@ -44,7 +44,7 @@ class LavPortaudioPhysicalOutputFactory: public LavPhysicalOutputFactory {
 	std::vector<int> max_channels;
 };
 
-LavPortaudioPhysicalOutput::LavPortaudioPhysicalOutput(std::shared_ptr<LavDevice> dev, unsigned int mixAhead, PaDeviceIndex which):  LavPhysicalOutput(dev, mixAhead) {
+LavPortaudioPhysicalOutput::LavPortaudioPhysicalOutput(std::shared_ptr<LavDevice> dev, unsigned int mixAhead, PaDeviceIndex which): LavPhysicalOutput(dev, mixAhead) {
 	const PaDeviceInfo* devinfo = Pa_GetDeviceInfo(which);
 	PaStreamParameters params;
 	params.channelCount = dev->getChannels();
@@ -56,6 +56,7 @@ LavPortaudioPhysicalOutput::LavPortaudioPhysicalOutput(std::shared_ptr<LavDevice
 	PaError err = Pa_OpenStream(&stream, nullptr, &params, sr, dev->getBlockSize(), 0, portaudioOutputCallbackB, this);
 	if(err != paNoError) throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
 	init((unsigned int)sr);
+	start();
 }
 
 void LavPortaudioPhysicalOutput::startup_hook() {
