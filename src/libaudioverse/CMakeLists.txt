@@ -4,12 +4,14 @@ COMMAND python "${CMAKE_CURRENT_SOURCE_DIR}/metadata/metadata.py" "${CMAKE_CURRE
 DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/metadata/metadata.t" "${CMAKE_CURRENT_SOURCE_DIR}/metadata/metadata.py" "${CMAKE_CURRENT_SOURCE_DIR}/metadata/metadata.y")
 
 add_library(libaudioverse SHARED
+#the core infrastructure.
 objects.cpp
 properties.cpp
 functiontables.cpp
 initialization.cpp
 memory.cpp
 callbacks.cpp
+devices.cpp
 
 #utilities: file reading, platform-specific code, etc:
 utils/file_reader.cpp
@@ -40,11 +42,6 @@ objects/amplitude_panner.cpp
 audio_backends/common.cpp
 audio_backends/public.cpp
 audio_backends/portaudio.cpp
-
-#the audio backends and related functionality.
-audio_devices/device_negotiation.cpp
-audio_devices/devices.cpp
-audio_devices/portaudio.cpp
 
 #the 3D abstraction on top of libaudioverse.
 3d/world.cpp

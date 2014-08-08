@@ -20,7 +20,6 @@ typedef void (*initfunc_t)();
 initfunc_t initializers[] = {
 	initializeMemoryModule,
 	initializeFunctionTables,
-	initializeAudioBackend,
 	initializePhysicalOutputFactory,
 	initializeMetadata,
 };

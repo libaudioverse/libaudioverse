@@ -124,5 +124,6 @@ std::shared_ptr<LavDevice> LavPortaudioPhysicalOutputFactory::createDevice(int i
 }
 
 LavPhysicalOutputFactory* createPortaudioPhysicalOutputFactory() {
+	Pa_Initialize();
 	return new LavPortaudioPhysicalOutputFactory();
 }

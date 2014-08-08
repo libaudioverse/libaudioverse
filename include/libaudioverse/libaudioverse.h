@@ -109,11 +109,7 @@ important: The object is not actually freed at this point.  Libaudioverse object
 Lav_PUBLIC_FUNCTION LavError Lav_free(void* obj);
 
 //devices...
-//todo: remove this functiona after the transfer to the new interface.
-Lav_PUBLIC_FUNCTION LavError Lav_createDefaultAudioOutputDevice(LavDevice** destination);
-
-/*new interface, allowing for name, latency, and channel  query.
-
+/**
 Index -1 is special.  Any attempts to query about index -1 will fail.  Index -1 is always 2 channels.
 Opening a device on index -1 requests that the default system audio device be used.  In addition, however, index -1 will follow the default system audio device when the backend supports it.
 It is constrained to two channels because there is no graceful way to handle moving to a device with less channels, and it is assumed apps looking for this functionality will not mind the loss.  This may/will probably be changed in future.

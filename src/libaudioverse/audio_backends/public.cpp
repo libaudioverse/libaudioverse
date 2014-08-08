@@ -83,3 +83,11 @@ Lav_PUBLIC_FUNCTION LavError Lav_createDeviceForPhysicalOutput(int index, unsign
 	*destination = outgoingPointer<LavDevice>(dev);
 	PUB_END
 }
+
+//the special case of a device without an output.
+Lav_PUBLIC_FUNCTION LavError Lav_createReadDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, LavDevice** destination) {
+	PUB_BEGIN
+	auto shared = std::make_shared<LavDevice>(sr, channels, blockSize, 0);
+	*destination = outgoingPointer(shared);
+	PUB_END
+}
