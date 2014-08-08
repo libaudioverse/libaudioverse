@@ -109,7 +109,20 @@ important: The object is not actually freed at this point.  Libaudioverse object
 Lav_PUBLIC_FUNCTION LavError Lav_free(void* obj);
 
 //devices...
+//todo: remove this functiona after the transfer to the new interface.
 Lav_PUBLIC_FUNCTION LavError Lav_createDefaultAudioOutputDevice(LavDevice** destination);
+
+/*new interface, allowing for name, latency, and channel  query.
+
+Index -1 is special.  Any attempts to query about index -1 will fail.  Index -1 is always 2 channels.
+Opening a device on index -1 requests that the default system audio device be used.  In addition, however, index -1 will follow the default system audio device when the backend supports it.
+It is constrained to two channels because there is no graceful way to handle moving to a device with less channels, and it is assumed apps looking for this functionality will not mind the loss.  This may/will probably be changed in future.
+*/
+Lav_PUBLIC_FUNCTION LavError Lav_getPhysicalOutputCount(unsigned int* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_getPhysicalOutputLatency(unsigned int index, float* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_getPhysicalOutputName(unsigned int index, char** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_getPhysicalOutputChannels(unsigned int index, unsigned int* destination);
+Lav_PUBLIC_FUNCTION LavError lav_createDeviceForOutput(int index, unsigned int sr, unsigned int blockSize, unsigned int mixAhead, LavDevice** destination);
 
 /**This type of device is intended for apps that wish to handle audio themselves: it will not output and time will not advance for it.
 Combine it with Lav_deviceReadBlock to make use of it.*/
@@ -209,11 +222,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterObject(LavDevice* device, unsi
 /**Delay line.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createDelayObject(LavDevice* device, unsigned int lines, LavObject** destination);
 
-/**Amplitude panner.
-
-The channelAngles argument is a list of channels, sorted in clockwise order.  The array is numChannels elements long and specifies the position of each channel on a circle around the listener.  Specify these angles in degrees.
-the channelIndices argument specifies which channels the angles actually go with.
-*/
+/**Amplitude panner.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createAmplitudePannerObject(LavDevice* device, LavObject** destination);
 
 #ifdef __cplusplus

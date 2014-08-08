@@ -5,6 +5,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_physical_outputs.hpp>
 #include <libaudioverse/private_devices.hpp>
 #include <libaudioverse/private_resampler.hpp>
+#include <libaudioverse/private_macros.hpp>
+#include <libaudioverse/private_memory.hpp>
 #include <libaudioverse/private_errors.hpp>
 #include <string>
 #include <vector>
@@ -38,3 +40,45 @@ void initializePhysicalOutputFactory() {
 	throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
 }
 
+//begin public api.
+
+Lav_PUBLIC_FUNCTION LavError Lav_getPhysicalOutputCount(unsigned int* destination) {
+	PUB_BEGIN
+	*destination = chosen_factory->getOutputCount();
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_getPhysicalOutputLatency(unsigned int index, float* destination) {
+	PUB_BEGIN
+	auto l = chosen_factory->getOutputLatencies();
+	if(index >= l.size()) throw LavErrorException(Lav_ERROR_RANGE);
+	*destination = l[index];
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_getPhysicalOutputName(unsigned int index, char** destination) {
+	PUB_BEGIN
+	auto n = chosen_factory->getOutputNames();
+	if(index >= n.size()) throw LavErrorException(Lav_ERROR_RANGE);
+	auto s = n[index];
+	char* outgoingStr = new char[s.size()];
+	std::copy(s.c_str(), s.c_str()+s.size(), outgoingStr);
+	std::shared_ptr<char> outgoing(outgoingStr, [](char* what){delete[] what;});
+	*destination = outgoingPointer<char>(outgoing);
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_getPhysicalOutputChannels(unsigned int index, unsigned int* destination) {
+	PUB_BEGIN
+	auto c = chosen_factory->getOutputMaxChannels();
+	if(index >= c.size()) throw LavErrorException(Lav_ERROR_RANGE);
+	*destination = c[index];
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError lav_createDeviceForOutput(int index, unsigned int sr, unsigned int blockSize, unsigned int mixAhead, LavDevice** destination) {
+	PUB_BEGIN
+	auto dev = chosen_factory->createDevice(index, sr, blockSize, mixAhead);
+	*destination = outgoingPointer<LavDevice>(dev);
+	PUB_END
+}
