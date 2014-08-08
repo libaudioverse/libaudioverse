@@ -26,7 +26,7 @@ void main(int argc, char** args) {
 	LavDevice* device;
 	LavObject* node, *world, *source;
 	ERRCHECK(Lav_initializeLibrary());
-	ERRCHECK(Lav_createDefaultAudioOutputDevice(&device));
+	ERRCHECK(Lav_createDeviceForPhysicalOutput(-1, 44100, 512, 2, &device));
 	ERRCHECK(Lav_createWorldObject(device, hrtfFile, &world));
 	ERRCHECK(Lav_createFileObject(device, soundFile, &node));
 	ERRCHECK(Lav_createSourceObject(device, world, node, &source));
