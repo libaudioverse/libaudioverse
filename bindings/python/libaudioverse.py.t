@@ -186,7 +186,22 @@ class Device(object):
 	"""Represents an output, either to an audio card or otherwise.  A device is required by all other Libaudioverse objects."""
 
 
-	def __init__(self, handle):
+	def __init__(self, sample_rate = 44100, block_size = 1024, mix_ahead = 1, channels = 2, physical_output_index = None):
+		"""Create a device, required before any other functionality can be used.
+
+See get_physical_outputs, a static method on this class, for the possible values of physical_output_index and other output information.
+
+There are two ways to initialize a device.
+
+If physical_output_index is None, sample_rate, buffer_size, and channels are used to give a device that doesn't actually output.  In this case, use the get_block method yourself to retrieve blocks of 32-bit floating point audio data.
+
+Alternatively, if physical_output_index is an integer, a device is created which feeds the specified output.  In this case, sample_rate, block_size, and mix_ahead are respected; channels is determined by the physical output in question.
+
+One special value is not included in get_physical_outputs; this is -1.  -1 is the default system audio device plus the functionality required to follow the default if the user changes it, i.e. by unplugging headphones.  In this case, the returned device is always 2 channels."""
+		if physical_output_index is not None:
+			handle = _lav.create_device_for_physical_output(physical_output_index, sample_rate, block_size, mix_ahead)
+		else:
+			handle = _lav.create_read_device(sample_rate, channels, block_size)
 		self.handle = handle
 
 	def get_block(self):
