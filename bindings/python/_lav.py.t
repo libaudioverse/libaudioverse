@@ -2,6 +2,7 @@
 #implements lifting the raw ctypes-basedd api into something markedly pallatable.
 #among other things, the implementation heree enables calling functions with keyword arguments and raises exceptions on error, rather than dealing with ctypes directly.
 import ctypes
+import collections
 import _libaudioverse
 
 #These are not from libaudioverse.
@@ -22,8 +23,8 @@ def make_error_from_code(err):
 {%macro autopointerize(arglist)%}
 {%for arg in arglist%}
 {%if arg.type.indirection == 1%}
-	if isinstance({{arg.name}}, collections.Size):
-		{{arg.name}} = ({{arg.type|ctypes_string(-1)}}*len({{arg.name}}))(*{{arg.name}})
+	if isinstance({{arg.name}}, collections.Sized):
+		{{arg.name}} = ({{arg.type|ctypes_string(1)}}*len({{arg.name}}))(*{{arg.name}})
 {%endif%}
 {%endfor%}
 {%endmacro%}

@@ -9,6 +9,7 @@ ctypes_map = {
 'unsigned int' : 'ctypes.c_uint',
 'float' : 'ctypes.c_float',
 'double' : 'ctypes.c_double',
+'char': 'ctypes.c_char',
 'void': 'None',
 }
 
