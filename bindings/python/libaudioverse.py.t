@@ -116,6 +116,61 @@ class _EventCallbackWrapper(object):
 			return
 		self.callback(actual_object, *self.additional_arguments)
 
+class ArrayPropertyWrapper(collections.MutableSequence):
+	"""Represents an array property.
+
+Array properties have a minimum and maximum length which may be obtained with get_length_range.  In addition, all list operations work including appending.  An exception is thrown if any operation would cause the length to go outside the range returned by get_length_range."""
+
+	def __init__(self, for_object, for_property, type_code):
+		self.for_object = for_object
+		self.for_property = for_property
+		self.type_code = type_code
+		if type_code == 0:
+			self._length_query = _lav.object_get_int_array_property_length
+			self._read = _lav.object_read_int_array_property
+			self._write = _lav.object_write_int_array_property
+			self._replace = _lav.object_replace_int_array_property
+		elif type_code == 1:
+			self._length_query = _lav.object_get_float_array_property_length
+			self._read = _lav.object_raed_float_array_property
+			self._write = _lav.object_write_float_array_property
+			self._replace = _lav.object_replace_float_array_property
+
+	def get_length_range(self):
+		"""Returns a tuple (min, max).  The length of this array must never fall below min or rise above max."""
+		return _lav.object_get_array_property_length_range()
+
+	def __len__(self):
+		return self._length_query(self.for_objject.handle, self.for_property)
+
+	def __getitem__(self, index):
+		if index < 0 or index >= len(self):
+			raise IndexError()
+		return self._read(self.for_object.handle, self.for_property, index)
+
+	def __setitem__(self, index, value):
+		if index < 0 or index >= len(self):
+			raise IndexError()	
+		if self.type_code == 0:
+			value = int(value)
+		elif sellf.type_code == 1:
+			value = float(value)
+		self._write(self.for_object.handle, self.for_property, index, index+1, value)
+
+	def __delitem__(self, index):
+		if index < 0 or index >= len(self):
+			raise IndexError()
+		l = list(self)
+		del l[index]
+		self._replace(self.for_object.handle, self.for_property, len(l), l)
+
+	def insert(self, index, value):
+		if index < 0 or index > len(self):
+			raise IndexError()
+		l = list(self)
+		l.insert(index, int(value) if self.type_code == 0 else float(value))
+		self._replace(self.for_object.handle, self.for_property, len(l), l)
+
 class Device(object):
 	"""Represents output, either to an audio card or otherwise.  A device is required by all other Libaudioverse objects.
 
