@@ -172,22 +172,10 @@ Array properties have a minimum and maximum length which may be obtained with ge
 		self._replace(self.for_object.handle, self.for_property, len(l), l)
 
 class Device(object):
-	"""Represents output, either to an audio card or otherwise.  A device is required by all other Libaudioverse objects.
-
-Don't instantiate this class directly.  Use one of the create_ classmethods."""
+	"""Represents output, either to an audio card or otherwise.  A device is required by all other Libaudioverse objects."""
 
 	def __init__(self, handle):
 		self.handle = handle
-
-	@classmethod
-	def create_default_audio_output_device(cls):
-		"""Returns a device that represents the default soundcard with whatever Libaudioverse determines are the best settings."""
-		return cls(_lav.create_default_audio_output_device())
-
-	@classmethod
-	def create_read_device(cls, sr, channels, block_size):
-		"""Returns a device with no audio output.  Time does not advance for a read device automatically.  You can get one block of data from it by caling get_block."""
-		return cls(_lav.create_read_device(sr, channels, block_size))
 
 	def get_block(self):
 		"""Returns a block of data.
