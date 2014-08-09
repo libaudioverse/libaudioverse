@@ -26,6 +26,8 @@ import ctypes
 		if len(arg_tuple) != 6:
 			raise ValueError('Expected a list or list-like object of 6 floats')
 		_lav.object_set_float6_property(self.handle, _libaudioverse.{{enumerant}}, *(float(i) for i in arg_tuple))
+{%else%}
+		pass
 {%endif%}
 {%endmacro%}
 
@@ -171,8 +173,18 @@ Array properties have a minimum and maximum length which may be obtained with ge
 		l.insert(index, int(value) if self.type_code == 0 else float(value))
 		self._replace(self.for_object.handle, self.for_property, len(l), l)
 
+class PhysicalOutput(object):
+	"""Represents info on a physical output."""
+
+	def __init__(self, latency, channels, name, index):
+		self.latency = latency
+		self.channels = channels
+		self.name = name
+		self.index = index
+
 class Device(object):
-	"""Represents output, either to an audio card or otherwise.  A device is required by all other Libaudioverse objects."""
+	"""Represents an output, either to an audio card or otherwise.  A device is required by all other Libaudioverse objects."""
+
 
 	def __init__(self, handle):
 		self.handle = handle
@@ -184,6 +196,18 @@ Calling this on an audio output device will cause the audio thread to skip ahead
 		buff = (ctypes.c_float*length)()
 		_lav.device_get_block(self.handle, buff)
 		return list(buff)
+
+	@staticmethod
+	def get_physical_outputs():
+		max_index = _lav.get_physical_output_count()
+		outputs = []
+		for i in xrange(max_index):
+			info = PhysicalOutput(index = i,
+			latency = _lav.get_physical_output_latency(i),
+			channels = _lav.get_physical_output_channels(i),
+			name = _lav.get_physical_output_name(i))
+			outputs.append(info)
+		return outputs
 
 	@property
 	def output_object(self):
