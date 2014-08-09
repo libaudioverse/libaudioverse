@@ -19,17 +19,28 @@ def make_error_from_code(err):
 	"""Internal use.  Translates libaudioverse error codes into exceptions."""
 	return errors_to_exceptions.get(err, PythonBindingsCouldNotTranslateErrorCodeError)()
 
+{%macro autopointerize(arglist)%}
+{%for arg in arglist%}
+{%if arg.type.indirection == 1%}
+	if isinstance({{arg.name}}, collections.Size):
+		{{arg.name}} = ({{arg.type|ctypes_string(-1)}}*len({{arg.name}}))(*{{arg.name}})
+{%endif%}
+{%endfor%}
+{%endmacro%}
+
 {%for func_name, func_info in functions.iteritems()%}
 {%set friendly_name = func_name|without_lav|camelcase_to_underscores%}
 {%set input_arg_names = func_info.input_args|map(attribute='name')|list%}
 {%set output_arg_names = func_info.output_args|map(attribute='name')|list%}
 {%if func_info.output_args|length == 0%}
 def {{friendly_name}}({{input_arg_names|join(', ')}}):
+{{autopointerize(func_info.input_args)}}
 	err = _libaudioverse.{{func_name}}({{input_arg_names|join(', ')}})
 	if err != _libaudioverse.Lav_ERROR_NONE:
 		raise make_error_from_code(err)
 {%else%}
 def {{friendly_name}}({{input_arg_names|join(', ')}}):
+{{autopointerize(func_info.input_args)}}
 {%for i in func_info.output_args%}
 	{{i.name}} = {{i.type|ctypes_string(1, '_libaudioverse.')}}()
 {%endfor%}
