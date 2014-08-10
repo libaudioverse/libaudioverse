@@ -59,18 +59,18 @@ def extract_enums():
 	enum_list = [i.type for i in ast.ext if isinstance(i, Decl) and isinstance(i.type, Enum)]
 	#now, we note that we can find--for a specific enum e--:
 	#name = e.name, values are in e.values as e.values[index].value and names in e.values[index]name
-	#ironically, we actually only care about the values of the enums.
 	#note that minimal interpretation is needed so that we can have negated constants-pycparser is for interpreters, not this, and so represents them as a unary minus in the ast.
 	#also, we don't support enums with implicitly defined constants.
-	constants = OrderedDict()
+	constants_by_enum = OrderedDict()
 	for enum in enum_list:
+		constants_by_enum[enum.name] = dict()
 		for enum_value in enum.values.enumerators:
 			val = enum_value.value
 			if isinstance(val, Constant):
-				constants[enum_value.name] = int(enum_value.value.value)
+				constants_by_enum[enum.name][enum_value.name] = int(enum_value.value.value)
 			elif isinstance(val, UnaryOp) and val.op == '-':
-				constants[enum_value.name] = int('-' + val.expr.value)
-	return constants
+				constants_by_enum[enum.name][enum_value.name] = int('-' + val.expr.value)
+	return constants_by_enum
 
 def extract_typedefs():
 	"""Returns a dict of typedefs.  Keys are names, values are TypeInfos describing the type."""
@@ -121,11 +121,17 @@ def extract_functions():
 		functions[name] = compute_function_info(function.type, name)
 	return functions
 
+constants_by_enum = extract_enums()
+constants = dict()
+for i in constants_by_enum.values():
+	constants.update(i)
+
 #export this in one dict so that we have a way to add it to parent scripts.
 all_info = {
 'functions' : extract_functions(),
 'typedefs': extract_typedefs(),
-'constants' : extract_enums(),
+'constants' : constants,
+'constants_by_enum': constants_by_enum
 }
 
 #update this dict with the keys from metadata.yml.
