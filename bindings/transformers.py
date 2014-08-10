@@ -2,6 +2,7 @@
 
 These are then made available to templates."""
 import re
+import os.path
 
 def without_lav(s):
 	"""Remove the lav_ prefix from a Libaudioverse identifier."""
@@ -36,6 +37,9 @@ def strip_prefix(s, prefix):
 	assert s.startswith(prefix)
 	return s[len(prefix):]
 
+def common_prefix(l):
+	return os.path.commonprefix(l)
+
 def get_jinja2_filters():
 	return {'without_lav': without_lav,
 		'camelcase_to_underscores': camelcase_to_underscores,
@@ -43,4 +47,9 @@ def get_jinja2_filters():
 		'remove_filter': remove_filter,
 		'prefix_filter': prefix_filter,
 		'strip_prefix': strip_prefix,
+	}
+
+def get_jinja2_functions():
+	return {
+		'common_prefix': common_prefix,
 	}

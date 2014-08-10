@@ -126,6 +126,13 @@ constants = dict()
 for i in constants_by_enum.values():
 	constants.update(i)
 
+#remove anything that ends in _MAX from constants_by_enum at this point.
+#rationale: the _MAX constants are needed in very specific places, but not by code that auto-binds enums.
+for i in constants_by_enum.itervalues():
+	for j in dict(i).iterkeys():
+			if j.endswith('_MAX'):
+				del i[j]
+
 #export this in one dict so that we have a way to add it to parent scripts.
 all_info = {
 'functions' : extract_functions(),

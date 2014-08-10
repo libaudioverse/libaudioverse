@@ -199,6 +199,16 @@ Calling this on an audio output device will cause the audio thread to skip ahead
 			raise TypeError("Expected subclass of Libaudioverse.GenericObject")
 		_lav.device_set_output_object(self.handle, val.handle if val is not None else val)
 
+#These are the enums which are needed publicly, i.e. distance model, etc.
+{%for name in important_enums%}
+{%set constants = constants_by_enum[name]%}
+{%set constants_prefix = common_prefix(constants.keys())%}
+class {{name|without_lav|underscores_to_camelcase(True)}}(enum.IntEnum):
+{%for i, j in constants.iteritems()%}
+	{{i|strip_prefix(constants_prefix)|underscores_to_camelcase}} = {{j}}
+{%endfor%}
+{%endfor%}
+
 #This is the class hierarchy.
 #GenericObject is at the bottom, and we should never see one; and GenericObject should hold most implementation.
 class GenericObject(object):

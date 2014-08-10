@@ -46,6 +46,7 @@ def make_python(info):
 	typedefs = info['typedefs']
 	context = dict()
 	context.update(info)
+	context.update(transformers.get_jinja2_functions())
 	context['ctypes_string_func'] = ctypes_string #ugly workaround for what appears to be a bug in jinja2.
 	env = jinja2.Environment(loader = jinja2.PackageLoader(__package__, ""), undefined = jinja2.StrictUndefined, trim_blocks = True)
 	env.filters.update(transformers.get_jinja2_filters())
