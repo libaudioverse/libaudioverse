@@ -181,12 +181,12 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectReplaceFloatArrayProperty(LavObject* obj,
 Lav_PUBLIC_FUNCTION LavError Lav_objectReadFloatArrayProperty(LavObject* obj, int slot, unsigned int index, float* destination);
 Lav_PUBLIC_FUNCTION LavError  Lav_objectWriteFloatArrayProperty(LavObject* obj, int slot, unsigned int start, unsigned int stop, float* values);
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloatArrayPropertyDefault(LavObject* obj, int slot, unsigned int* destinationLength, float** destinationArray);
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloatPropertyArrayLength(LavObject* obj, int slot, unsigned int* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloatArrayPropertyLength(LavObject* obj, int slot, unsigned int* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_objectReplaceIntArrayProperty(LavObject* obj, int slot, unsigned int length, int* values);
 Lav_PUBLIC_FUNCTION LavError Lav_objectReadIntArrayProperty(LavObject* obj, int slot, unsigned int index, int* destination);
 Lav_PUBLIC_FUNCTION LavError  Lav_objectWriteIntArrayProperty(LavObject* obj, int slot, unsigned int start, unsigned int stop, int* values);
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetIntArrayPropertyDefault(LavObject* obj, int slot, unsigned int* destinationLength, int** destinationArray);
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetIntPropertyLength(LavObject* obj, int slot, int* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetIntArrayPropertyLength(LavObject* obj, int slot, int* destination);
 //applies to eather array type.
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetArrayPropertyLengthRange(LavObject* obj, int slot, unsigned int* destinationMin, unsigned int* destinationMax);
 

@@ -450,7 +450,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloatArrayPropertyDefault(LavObject* o
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloatPropertyArrayLength(LavObject* obj, int slot, unsigned int* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloatArrayPropertyLength(LavObject* obj, int slot, unsigned int* destination) {
 	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_FLOAT_ARRAY);
 	*destination = prop.getFloatArrayLength();
@@ -496,7 +496,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetIntArrayPropertyDefault(LavObject* obj
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetIntPropertyLength(LavObject* obj, int slot, int* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetIntArrayPropertyLength(LavObject* obj, int slot, int* destination) {
 	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_INT_ARRAY);
 	*destination = prop.getIntArrayLength();

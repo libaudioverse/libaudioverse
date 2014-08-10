@@ -8,7 +8,19 @@ import ctypes
 {%macro implement_property(enumerant, prop)%}
 	@property
 	def {{prop['name']}}(self):
+{%if 'array' not in prop['type']%}
 		return _lav.object_get_{{prop['type']}}_property(self.handle, _libaudioverse.{{enumerant}})
+{%elif prop['type'] == 'float_array'%}
+		retval = []
+		for i in xrange(_lav.object_get_float_array_property_length(self.handle, _libaudioverse.{{enumerant}})):
+			retval.append(_lav.object_read_float_array_property(self.handle, _libaudioverse.{{enumerant}}, i))
+		return tuple(retval)
+{%elif prop['type'] == 'int_array'%}
+		retval = []
+		for i in xrange(_lav.object_get_int_array_property_length(self.handle, _libaudioverse.{{enumerant}})):
+			retval.append(_lav.object_read_int_array_property(self.handle, _libaudioverse.{{enumerant}}, i))
+		return tuple(retval)
+{%endif%}
 
 	@{{prop['name']}}.setter
 	def {{prop['name']}}(self, val):
@@ -26,8 +38,14 @@ import ctypes
 		if len(arg_tuple) != 6:
 			raise ValueError('Expected a list or list-like object of 6 floats')
 		_lav.object_set_float6_property(self.handle, _libaudioverse.{{enumerant}}, *(float(i) for i in arg_tuple))
-{%else%}
-		pass
+{%elif prop['type'] == 'float_array'%}
+		if not isinstance(val, collections.Sized):
+			raise ValueError('expected an iterable with known size')
+		_lav.object_replace_float_array_property(self.handle, _libaudioverse.{{enumerant}}, len(val), val)
+{%elif prop['type'] == 'int_array'%}
+		if not isinstance(val, collections.Sized):
+			raise ValueError('expected an iterable with known size')
+		_lav.object_replace.Int_array_property(self.handle, _libaudioverse.{{enumerant}}, len(val), val)
 {%endif%}
 {%endmacro%}
 
