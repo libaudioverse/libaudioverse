@@ -9,7 +9,10 @@ import enum
 {%macro implement_property(enumerant, prop)%}
 	@property
 	def {{prop['name']}}(self):
-{%if 'array' not in prop['type']%}
+{%if prop['type'] == 'int' and 'value_enum' in prop%}
+		val = _lav.object_get_int_property(self.handle, _libaudioverse.{{enumerant}})
+		return {{prop['value_enum']|without_lav|underscores_to_camelcase(True)}}(val)
+{%elif 'array' not in prop['type']%}
 		return _lav.object_get_{{prop['type']}}_property(self.handle, _libaudioverse.{{enumerant}})
 {%elif prop['type'] == 'float_array'%}
 		retval = []
@@ -25,6 +28,12 @@ import enum
 
 	@{{prop['name']}}.setter
 	def {{prop['name']}}(self, val):
+{%if 'value_enum' in prop%}
+		if not isinstance(val, {{prop['value_enum']|without_lav|underscores_to_camelcase(True)}}) and isinstance(val, enum.IntEnum):
+			raise valueError('Attemptn to use wrong enum to set property. Expected instance of {{prop['value_enum']|without_lav|underscores_to_camelcase(True)}}')
+		if isinstance(val, enum.IntEnum):
+			val = val.value
+{%endif%}
 {%if prop['type'] == 'int'%}
 		_lav.object_set_int_property(self.handle, _libaudioverse.{{enumerant}}, int(val))
 {%elif prop['type'] == 'float' or prop['type'] == 'double'%}
