@@ -36,7 +36,7 @@ Lav_OBJTYPE_SOURCE:
   Lav_3D_POSITION: {name: position, type: float3, default: [0.0, 0.0, 0.0]}
   Lav_3D_ORIENTATION: {name: orientation, type: float6, default: [0.0, 0.0, -1.0, 0.0, 1.0, 0.0]}
   Lav_SOURCE_MAX_DISTANCE: {name: max_distance, type: float, default: 50.0, range: [0.0, INFINITY]}
-  Lav_SOURCE_DISTANCE_MODEL: {name: distance_model, type: int, default: 0, range: [0, 0]}
+  Lav_SOURCE_DISTANCE_MODEL: {name: distance_model, type: int, default: 0, range: [0, 0], value_enum: Lav_DISTANCE_MODELS}
 Lav_OBJTYPE_DELAY:
  properties:
   Lav_DELAY_DELAY: {name: delay, type: float, default: 0.001, range: [0.0, 0.0]}

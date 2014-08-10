@@ -4,6 +4,7 @@ import _libaudioverse
 import weakref
 import collections
 import ctypes
+import enum
 
 {%macro implement_property(enumerant, prop)%}
 	@property

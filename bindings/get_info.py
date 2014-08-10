@@ -138,3 +138,11 @@ all_info = {
 with file(os.path.join(root_directory, 'src', 'libaudioverse', 'metadata', 'metadata.y')) as f:
 	metadata = yaml.load(f)
 	all_info['metadata'] = metadata
+
+#We can extract the "important" enums by looking for all properties with a value_enum key and grabbing its value.
+important_enums = []
+for i in metadata.values():
+	for j in i['properties'].values():
+			if 'value_enum' in j:
+				important_enums.append(j['value_enum'])
+all_info['important_enums'] = important_enums
