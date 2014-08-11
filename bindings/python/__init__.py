@@ -3,6 +3,7 @@ from collections import OrderedDict
 import re
 from .. import transformers
 from .. import get_info
+import os.path
 
 ctypes_map = {
 'int' : 'ctypes.c_int',
@@ -41,6 +42,8 @@ def ctypes_function_helper(func, typedef_prefix):
 	return "ctypes.CFUNCTYPE(" + argstr + ")"
 
 def make_python(info):
+	#get our directory.
+	source_dir = os.path.split(__file__)[0]
 	#we have to inject into the global namespace: the templates should not have to move typedef info around for us.
 	global typedefs
 	typedefs = info['typedefs']
@@ -52,7 +55,9 @@ def make_python(info):
 	env.filters.update(transformers.get_jinja2_filters())
 	env.filters['ctypes_string'] = ctypes_string
 	return {
-		'_lav.py' : env.get_template('_lav.py.t').render(context),
-		'_libaudioverse.py' : env.get_template('_libaudioverse.py.t').render(context),
-		'libaudioverse.py': env.get_template('libaudioverse.py.t').render(context)
+		'libaudioverse/_lav.py' : env.get_template('libaudioverse/_lav.py.t').render(context),
+		'libaudioverse/_libaudioverse.py' : env.get_template('libaudioverse/_libaudioverse.py.t').render(context),
+		'libaudioverse/__init__.py': env.get_template('libaudioverse/__init__.py.t').render(context),
+		'setup.py': file(os.path.join(source_dir, 'setup.py.t')).read(),
+		'dll_location': 'libaudioverse/libaudioverse.dll'
 	}

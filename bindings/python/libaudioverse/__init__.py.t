@@ -180,6 +180,7 @@ One special value is not included in get_physical_outputs; this is -1.  -1 is th
 		else:
 			handle = _lav.create_read_device(sample_rate, channels, block_size)
 		self.handle = handle
+		self._output_object = None
 
 	def get_block(self):
 		"""Returns a block of data.
@@ -204,13 +205,14 @@ Calling this on an audio output device will cause the audio thread to skip ahead
 	@property
 	def output_object(self):
 		"""The object assigned to this property is the object which will play through the device."""
-		return _wrap(_lav.device_get_output_object(self.handle))
+		return self._output_object
 
 	@output_object.setter
 	def output_object(self, val):
 		if not (isinstance(val, GenericObject) or val is None):
 			raise TypeError("Expected subclass of Libaudioverse.GenericObject")
 		_lav.device_set_output_object(self.handle, val.handle if val is not None else val)
+		self._output_object = val
 
 #These are the enums which are needed publicly, i.e. distance model, etc.
 {%for name in important_enums%}

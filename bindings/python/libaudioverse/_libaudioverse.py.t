@@ -1,7 +1,8 @@
 {%import 'macros.t' as macros with context%}
 import ctypes
+import os.path
 
-libaudioverse_module = ctypes.cdll.LoadLibrary('libaudioverse.dll')
+libaudioverse_module = ctypes.cdll.LoadLibrary(os.path.join(os.path.split(__file__)[0], 'libaudioverse.dll'))
 
 {%for name, val in constants.iteritems() -%}
 {{name}} = {{val}}
