@@ -12,6 +12,8 @@ import enum
 {%if prop['type'] == 'int' and 'value_enum' in prop%}
 		val = _lav.object_get_int_property(self.handle, _libaudioverse.{{enumerant}})
 		return {{prop['value_enum']|without_lav|underscores_to_camelcase(True)}}(val)
+{%elif prop['type'] == 'boolean'%}
+		return bool(_lav.object_get_int_property(self.handle, _libaudioverse.{{enumerant}}))
 {%elif 'array' not in prop['type']%}
 		return _lav.object_get_{{prop['type']}}_property(self.handle, _libaudioverse.{{enumerant}})
 {%elif prop['type'] == 'float_array'%}
@@ -36,6 +38,8 @@ import enum
 {%endif%}
 {%if prop['type'] == 'int'%}
 		_lav.object_set_int_property(self.handle, _libaudioverse.{{enumerant}}, int(val))
+{%elif prop['type'] == 'boolean'%}
+		_lav.object_set_int_property(self.handle, _libaudioverse.{{enumerant}}, int(bool(val)))
 {%elif prop['type'] == 'float' or prop['type'] == 'double'%}
 		_lav.object_set_{{prop['type']}}_property(self.handle, _libaudioverse.{{enumerant}}, float(val))
 {%elif prop['type'] == 'float3'%}

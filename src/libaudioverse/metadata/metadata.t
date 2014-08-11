@@ -50,7 +50,7 @@ void initializeMetadata() {
 	{%for objid, propid, prop in joined_properties%}
 	//<%prop['name']%> on <%objid%>
 	{
-	{%if prop['type'] == 'int'-%}
+	{%if prop['type'] == 'int' or prop['type'] == 'boolean'-%}
 	tempProp = createIntProperty("<%prop['name']%>", <%prop['default']%>, <%prop['range'][0]%>, <%prop['range'][1]%>);
 	{%elif prop['type'] == 'float' or prop['type'] == 'double'-%}
 	tempProp = create<%prop['type']|capitalize%>Property("<%prop['name']%>", <%prop['default']%>, <%prop['range'][0]%>, <%prop['range'][1]%>);

@@ -26,7 +26,7 @@ extensions = ['jinja2.ext.loopcontrols'])
 #the map we have here is actually very verbose, and can be flattened into something easily iterable.
 #we can then take advantage of either std::pair or std::tuple as the keys.
 joined_properties = []
-for objkey, objinfo in [(i, metadata.get(i, dict())) for i in bindings.get_info.extract_enums().iterkeys() if i.startswith("Lav_OBJTYPE")]:
+for objkey, objinfo in [(i, metadata.get(i, dict())) for i in bindings.get_info.constants.iterkeys() if i.startswith("Lav_OBJTYPE")]:
 	#add everything from the object itself.
 	for propkey, propinfo in objinfo.get('properties', dict()).iteritems():
 		joined_properties.append((objkey, propkey, propinfo))
@@ -54,7 +54,7 @@ def string_from_number(val, type):
 		return str(float(val))+'f'
 	elif type == 'double':
 		return str(float(val))
-	elif type in {'int', 'int_array'}:
+	elif type in {'int', 'int_array', 'boolean'}:
 		return str(int(val))	
 	else:
 		print "Warning: Unrecognized type or value with type", type, "and value", val
@@ -62,6 +62,8 @@ def string_from_number(val, type):
 		return val
 
 for propkey, propid, propinfo in joined_properties:
+	if propinfo['type'] == 'boolean':
+		propinfo['range'] = [0, 1]
 	for i, j in enumerate(list(propinfo.get('range', []))): #if we don't have a range, this will do nothing.
 		if isinstance(j, basestring):
 			continue #it's either MIN_INT, MAX_INT, INFINITY, -INFINITY, or another special identifier.  Pass through unchanged.
