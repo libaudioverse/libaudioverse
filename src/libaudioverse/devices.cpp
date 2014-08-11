@@ -56,6 +56,10 @@ LavError LavDevice::getBlock(float* out) {
 		obj->process();
 		obj->didProcess();
 	}
+	if(output_object->isSuspended()) { //fast path, just zero.
+		memset(out, 0, sizeof(float)*block_size*channels);
+		return Lav_ERROR_NONE;
+	}
 	float** outputs = new float*[output_object->getOutputCount()];
 	output_object->getOutputPointers(outputs);
 	//interweave them.
