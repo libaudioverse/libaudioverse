@@ -53,3 +53,9 @@ include_directories("${CMAKE_SOURCE_DIR}/glm")
 #below here is us.  First, set a variable to all the libraries we need to link with:
 SET(libaudioverse_required_libraries ${libsndfile_name} ${portaudio_name})
 add_subdirectory(src)
+
+#this makes the bindings generation step always run after a Libaudioverse build.
+ADD_CUSTOM_TARGET(libaudioverse_bindings ALL
+COMMAND python "\"${CMAKE_CURRENT_SOURCE_DIR}/scripts/build_bindings.py\""
+DEPENDS libaudioverse
+)
