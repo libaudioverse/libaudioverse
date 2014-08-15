@@ -37,7 +37,7 @@ for objkey, objinfo in [(i, metadata.get(i, dict())) for i in bindings.get_info.
 
 #this is the same logic, but for callbacks.
 joined_callbacks = []
-for objkey, objinfo in [(i, metadata.get(i, dict())) for i in bindings.get_info.extract_enums().iterkeys() if i.startswith("Lav_OBJTYPE")]:
+for objkey, objinfo in [(i, metadata.get(i, dict())) for i in bindings.get_info.constants.iterkeys() if i.startswith("Lav_OBJTYPE")]:
 	#add everything from the object itself.
 	for callkey, callinfo in objinfo.get('callbacks', dict()).iteritems():
 		joined_callbacks.append((objkey, callkey, callinfo))
@@ -45,7 +45,7 @@ for objkey, objinfo in [(i, metadata.get(i, dict())) for i in bindings.get_info.
 	if not objinfo.get('suppress_implied_inherit', False):
 		for callkey, callinfo in metadata['Lav_OBJTYPE_GENERIC'].get('callbacks', dict()).iteritems():
 			joined_callbacks.append((objkey, callkey, callinfo))
-
+print joined_callbacks
 #the template will convert the types into enums via judicious use of if statements-we use it like augmented c, and prefer to do refactoring only there when possible.
 #each property will be crammed into a property descriptor, but some of the ranges here are currently potentially unfriendly, most notably float3 and float6.
 #we are going to convert all numbers into strings, and make them valid c identifiers.  Skip anything that is already a string.

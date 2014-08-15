@@ -602,6 +602,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetCallbackUserDataPointer(LavObject* obj
 Lav_PUBLIC_FUNCTION LavError Lav_objectSetCallback(LavObject* obj, int callback, LavEventCallback handler, void* userData) {
 	PUB_BEGIN
 	auto ptr = incomingPointer<LavObject>(obj);
+	LOCK(*ptr);
 	obj->getCallback(callback).setHandler(handler);
 	obj->getCallback(callback).setUserData(userData);
 	PUB_END
