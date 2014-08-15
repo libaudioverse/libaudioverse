@@ -105,9 +105,22 @@ class LavSubgraphObject: public LavObject {
 	public:
 	LavSubgraphObject(int type, std::shared_ptr<LavDevice> device, unsigned int numChannels);
 	virtual void process();
+	//we do no processing and forward onto another object.  Therefore, we do not compute input buffers.
+	virtual void computeInputBuffers();
+	//these overrides allow us to "step aside" and always say that the output of this subgraph is our parent.
+	virtual unsigned int getParentCount();
+	virtual std::shared_ptr<LavObject> getParentObject(unsigned int par);
+	virtual unsigned int getParentOutput(unsigned int par);
+	//and this one crashes us if anything tries to set the parent.
+	//the purpose will become clearer once logging is introduced.
+	virtual void setParent(unsigned int par, std::shared_ptr<LavObject> obj, unsigned int input);
+
+	virtual unsigned int getOutputCount();
 	virtual void getOutputPointers(float** dest);
 	virtual void setInput(unsigned int input, std::shared_ptr<LavObject> object, unsigned int output);
 	virtual std::shared_ptr<LavObject> getInputObject(unsigned int input);
 	virtual unsigned int getInputOutput(unsigned int input);
 	virtual unsigned int getInputCount();
+	protected:
+	std::shared_ptr<LavObject> subgraph_input, subgraph_output;
 };

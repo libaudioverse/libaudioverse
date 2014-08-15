@@ -207,26 +207,55 @@ void LavObject::resize(unsigned int newInputCount, unsigned int newOutputCount) 
 LavSubgraphObject::LavSubgraphObject(int type, std::shared_ptr<LavDevice> device, unsigned int numChannels): LavObject(type, device, numChannels, numChannels) {
 }
 
+void LavSubgraphObject::computeInputBuffers() {
+}
+
 void LavSubgraphObject::process() {
 //empty because we can forward onto the output object.
+}
+
+void LavSubgraphObject::setParent(unsigned int par, std::shared_ptr<LavObject> obj, unsigned int output) {
+	throw LavErrorException(Lav_ERROR_INTERNAL);
+}
+
+std::shared_ptr<LavObject> LavSubgraphObject::getParentObject(unsigned int par) {
+	if(par >= getParentCount()) throw LavErrorException(Lav_ERROR_RANGE);
+	return subgraph_output;
+}
+
+unsigned int LavSubgraphObject::getParentOutput(unsigned int par) {
+	if(par >= getParentCount()) throw LavErrorException(Lav_ERROR_RANGE);
+	return par; //it's a one-for-one correspondance.
+}
+
+unsigned int LavSubgraphObject::getParentCount() {
+	return subgraph_output ? subgraph_output->getParentCount() : 0;
 }
 
 void LavSubgraphObject::setInput(unsigned int input, std::shared_ptr<LavObject> object, unsigned int output) {
 }
 
 std::shared_ptr<LavObject> LavSubgraphObject::getInputObject(unsigned int input) {
-	return nullptr;
+	if(input >= getInputCount()) throw LavErrorException(Lav_ERROR_RANGE);
+	return subgraph_input->getInputObject(input);
 }
 
 unsigned int LavSubgraphObject::getInputOutput(unsigned int input) {
-	return 0;
+	if(input >= getInputCount()) throw LavErrorException(Lav_ERROR_RANGE);
+	return subgraph_input->getInputOutput(input);
 }
 
 unsigned int LavSubgraphObject::getInputCount() {
-	return 0;
+	if(subgraph_input == nullptr) return 0;
+	return subgraph_input->getInputCount();
 }
 
+unsigned int LavSubgraphObject::getOutputCount() {
+	if(subgraph_output) return subgraph_output->getOutputCount();
+	else return 0;
+}
 void LavSubgraphObject::getOutputPointers(float** dest) {
+	if(subgraph_output) subgraph_output->getOutputPointers(dest);
 }
 
 //begin public api
