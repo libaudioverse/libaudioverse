@@ -207,6 +207,12 @@ void LavObject::resize(unsigned int newInputCount, unsigned int newOutputCount) 
 LavSubgraphObject::LavSubgraphObject(int type, std::shared_ptr<LavDevice> device, unsigned int numChannels): LavObject(type, device, numChannels, numChannels) {
 }
 
+void LavSubgraphObject::configureSubgraph(std::shared_ptr<LavObject> input, std::shared_ptr<LavObject> output) {
+	subgraph_input = input;
+	subgraph_output = output;
+	resize(subgraph_input->getInputCount(), subgraph_output->getOutputCount());
+}
+
 void LavSubgraphObject::computeInputBuffers() {
 }
 

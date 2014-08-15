@@ -121,6 +121,7 @@ class LavSubgraphObject: public LavObject {
 	virtual std::shared_ptr<LavObject> getInputObject(unsigned int input);
 	virtual unsigned int getInputOutput(unsigned int input);
 	virtual unsigned int getInputCount();
+	virtual void configureSubgraph(std::shared_ptr<LavObject> input, std::shared_ptr<LavObject> output);
 	protected:
 	std::shared_ptr<LavObject> subgraph_input, subgraph_output;
 };
