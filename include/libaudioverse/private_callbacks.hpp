@@ -24,6 +24,6 @@ class LavCallback {
 	std::shared_ptr<LavDevice> associated_device = nullptr;
 	LavEventCallback handler = nullptr;
 	std::string name;
-	LavObject* associated_object;
-	void* user_data;
+	LavObject* associated_object = nullptr;
+	void* user_data = nullptr;
 };

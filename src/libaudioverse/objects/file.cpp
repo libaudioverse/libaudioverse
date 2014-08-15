@@ -95,7 +95,7 @@ void LavFileObject::process() {
 	offset = ringmodf(offset, 1.0f);
 	}
 	double newpos = ((double)position+offset)/(double)device->getSr();
-	newpos = fmax(newpos, max_position);
+	newpos = fmin(newpos, max_position);
 	getProperty(Lav_FILE_POSITION).setDoubleValue(newpos);
 	if(switch_to_ended) {
 		has_ended = true;
