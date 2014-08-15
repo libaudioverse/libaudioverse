@@ -238,6 +238,8 @@ unsigned int LavSubgraphObject::getParentCount() {
 }
 
 void LavSubgraphObject::setInput(unsigned int input, std::shared_ptr<LavObject> object, unsigned int output) {
+	if(input >= getInputCount()) throw LavErrorException(Lav_ERROR_RANGE);
+	subgraph_input->setInput(input, object, output);
 }
 
 std::shared_ptr<LavObject> LavSubgraphObject::getInputObject(unsigned int input) {
