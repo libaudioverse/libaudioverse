@@ -103,7 +103,7 @@ _lav.bindings_register_exception(_libaudioverse.{{error_name}}, {{friendly_name}
 {%endfor%}
 
 #A list-like thing that knows how to manipulate inputs.
-class ParentProxy(collections.Sequence):
+class InputProxy(collections.Sequence):
 	"""Manipulate inputs for some specific object.
 This works exactly like a python list, save that concatenation is not allowed.  The elements are tuples: (parent, output) or, should no parent be set for a slot, None.
 
@@ -118,10 +118,10 @@ Note also that we are not inheriting from MutableSequence because we cannot supp
 		self.for_object = for_object	
 
 	def __len__(self):
-		return _lav.object_get_parent_count(self.for_object.handle)
+		return _lav.object_get_input_count(self.for_object.handle)
 
 	def __getitem__(self, key):
-		par, out = self.for_object._get_parent(key)
+		par, out = self.for_object._get_input(key)
 		if par is None:
 			return None
 		return par, out
@@ -131,7 +131,7 @@ Note also that we are not inheriting from MutableSequence because we cannot supp
 			raise TypeError("Expected list of length 2 or None.")
 		if not isinstance(val[0], GenericObject):
 			raise TypeError("val[0]: is not a Libaudioverse object.")
-		self.for_object._set_parent(key, val[0] if val is not None else None, val[1] if val is not None else 0)
+		self.for_object._set_input(key, val[0] if val is not None else None, val[1] if val is not None else 0)
 
 class _EventCallbackWrapper(object):
 	"""Wraps callbacks into something sane.  Do not use externally."""
@@ -231,7 +231,7 @@ class GenericObject(object):
 
 	def __init__(self, handle):
 		self.handle = handle
-		self._parents = [(None, 0)]*_lav.object_get_parent_count(handle)
+		self._inputs = [(None, 0)]*_lav.object_get_input_count(handle)
 		self._callbacks = dict()
 
 {%for enumerant, prop in metadata['Lav_OBJTYPE_GENERIC']['properties'].iteritems()%}
@@ -250,31 +250,31 @@ class GenericObject(object):
 		self.handle = None
 
 	@property
-	def parents(self):
-		"""Returns a ParentProxy, an object that acts like a list of tuples.  The first item of each tuple is the parent object and the second item is the output to which we are connected."""
-		self._check_parent_resize()
-		return ParentProxy(self)
+	def inputs(self):
+		"""Returns an InputProxy, an object that acts like a list of tuples.  The first item of each tuple is the parent object and the second item is the output to which we are connected."""
+		self._check_input_resize()
+		return InputProxy(self)
 
-	def _check_parent_resize(self):
-		new_parent_count = _lav.object_get_parent_count(self.handle)
-		new_parent_list = self._parents
-		if new_parent_count < len(self._parents):
-			new_parent_list = self._parents[0:new_parents_count]
-		elif new_parent_count > len(self._parents):
-			additional_parents = [(None, 0)]*(new_parent_count-len(self._parents))
-			new_parent_list = new_parent_list + additional_parents
-		self._parents = new_parent_list
+	def _check_input_resize(self):
+		new_input_count = _lav.object_get_input_count(self.handle)
+		new_input_list = self._inputs
+		if new_input_count < len(self._inputs):
+			new_input_list = self._inputs[0:new_parents_count]
+		elif new_input_count > len(self._inputs):
+			additional_inputs = [(None, 0)]*(new_input_count-len(self._inputs))
+			new_input_list = new_input_list + additional_inputs
+		self._inputs = new_input_list
 
-	def _get_parent(self, key):
-		return self._parents[key]
+	def _get_input(self, key):
+		return self._inputs[key]
 
-	def _set_parent(self, key, obj, inp):
+	def _set_input(self, key, obj, inp):
 		if obj is None:
-			_lav.object_set_parent(self.handle, key, None, 0)
-			self._parents[key] = (None, 0)
+			_lav.object_set_input(self.handle, key, None, 0)
+			self._inputs[key] = (None, 0)
 		else:
-			_lav.object_set_parent(self.handle, key, obj.handle, inp)
-			self._parents[key] = (obj, inp)
+			_lav.object_set_input(self.handle, key, obj.handle, inp)
+			self._inputs[key] = (obj, inp)
 
 {%for object_name in constants.iterkeys()|prefix_filter("Lav_OBJTYPE_")|remove_filter("Lav_OBJTYPE_GENERIC")%}
 {%set friendly_name = object_name|strip_prefix("Lav_OBJTYPE_")|lower|underscores_to_camelcase(True) + "Object"%}
