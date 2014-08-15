@@ -13,7 +13,9 @@ LavFileReader::~LavFileReader() {
 void LavFileReader::open(const char* path) {
 	if(handle) throw LavErrorException(Lav_ERROR_FILE);
 	handle = sf_open(path, SFM_READ, &info);
-	if(handle == nullptr) throw LavErrorException(Lav_ERROR_FILE);
+	if(handle == nullptr) {
+		throw LavErrorException(Lav_ERROR_FILE);
+	}
 }
 
 void LavFileReader::close() {
