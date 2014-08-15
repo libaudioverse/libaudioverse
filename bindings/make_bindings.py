@@ -3,13 +3,17 @@ from .python import make_python
 import os.path
 import os
 import shutil
+if os.name == 'nt':
+	libsndfile_path = r"C:\Program Files (x86)\Mega-Nerd\libsndfile\bin"
+else:
+	libsndfile_path = None
 
 generators = {
 'python' : make_python,
 }
 
 def write_files(files, source_dir, dest_dir):
-	special_keys = ['dll_location', 'additional_directories']
+	special_keys = ['dll_location', 'additional_directories', 'libsndfile_location']
 	if os.path.exists(dest_dir):
 		shutil.rmtree(dest_dir)
 	for name, contents in files.iteritems():
@@ -22,12 +26,17 @@ def write_files(files, source_dir, dest_dir):
 		with file(fullpath, 'w') as f:
 			f.write(contents)
 	#handle the dll's copying.
-	dll_target = files.get('dll_location', 'libaudioverse.dll')
+	dll_target = files.get('dll_location', '')
 	path = os.path.join(dest_dir, dll_target)
-	dir = os.path.split(path)[0]
-	if not os.path.exists(dir):
-		os.makedirs(dir)
-	shutil.copy(os.path.join(get_info.root_directory, 'build', 'libaudioverse.dll'), path)
+	if not os.path.exists(path):
+		os.makedirs(path)
+	shutil.copy(os.path.join(get_info.root_directory, 'build', 'libaudioverse.dll'), os.path.join(path, 'libaudioverse.dll'))
+	#copy libsndfile
+	if libsndfile_path is not None:
+		path = os.path.join(dest_dir, files.get('libsndfile_location', ''))
+		if not os.path.exists(path):
+			os.makedirs(path)
+		shutil.copy(os.path.join(libsndfile_path, 'libsndfile-1.dll'), os.path.join(path, 'libsndfile-1.dll'))
 	#copy additional directories
 	for i in files.get('additional_directories', []):
 		shutil.copytree(os.path.join(source_dir, i), os.path.join(dest_dir, i))

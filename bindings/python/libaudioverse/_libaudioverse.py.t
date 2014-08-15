@@ -1,8 +1,12 @@
 {%import 'macros.t' as macros with context%}
 import ctypes
 import os.path
+import os
 
-libaudioverse_module = ctypes.cdll.LoadLibrary(os.path.join(os.path.split(__file__)[0], 'libaudioverse.dll'))
+#this is a windows hack.
+#we want it to find out libsndfile before the system one, so we do this.
+libsndfile_module = ctypes.cdll.LoadLibrary(os.path.join(os.path.split(os.path.abspath(__file__))[0], 'libsndfile-1.dll'))
+libaudioverse_module = ctypes.cdll.LoadLibrary(os.path.join(os.path.split(os.path.abspath(__file__))[0], 'libaudioverse.dll'))
 
 {%for name, val in constants.iteritems() -%}
 {{name}} = {{val}}

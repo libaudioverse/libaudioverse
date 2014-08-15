@@ -59,7 +59,8 @@ def make_python(info):
 		'libaudioverse/_libaudioverse.py' : env.get_template('libaudioverse/_libaudioverse.py.t').render(context),
 		'libaudioverse/__init__.py': env.get_template('libaudioverse/__init__.py.t').render(context),
 		'setup.py': file(os.path.join(source_dir, 'setup.py.t')).read(),
-		'dll_location': 'libaudioverse/libaudioverse.dll',
+		'dll_location': 'libaudioverse',
+		'libsndfile_location': 'libaudioverse',
 		'additional_directories': [
 			'examples'
 		]
