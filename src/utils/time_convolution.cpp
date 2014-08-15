@@ -55,7 +55,8 @@ void main(int argc, char** args) {
 				ERRCHECK(Lav_createSineObject(device, &sinePtr));
 			}
 			if(sourcePtr == nullptr) {
-				ERRCHECK(Lav_createSourceObject(device, world, sinePtr, &sourcePtr));
+				ERRCHECK(Lav_createSourceObject(device, world, &sourcePtr));
+				ERRCHECK(Lav_objectSetInput(sourcePtr, 0, sinePtr, 0));
 			}
 			//write them back.
 			*sineIter = sinePtr;

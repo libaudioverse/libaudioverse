@@ -19,19 +19,20 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <algorithm>
 #include <vector>
 
-LavWorldObject::LavWorldObject(std::shared_ptr<LavDevice> device, std::shared_ptr<LavHrtfData> hrtf): LavSourceManager(Lav_OBJTYPE_WORLD, device, device->getChannels()) {
+LavWorldObject::LavWorldObject(std::shared_ptr<LavDevice> device, std::shared_ptr<LavHrtfData> hrtf): LavSourceManager(Lav_OBJTYPE_WORLD, device) {
 	this->hrtf = hrtf;
 	mixer = createMixerObject(device, 1, device->getChannels());
 	limiter = createHardLimiterObject(device, device->getChannels());
 	for(int i = 0; i < device->getChannels(); i++) {
-		limiter->setParent(i, mixer, i);
-		setParent(i, limiter, i);
+		limiter->setInput(i, mixer, i);
 	}
 
 	environment.world_to_listener_transform = glm::lookAt(
 		glm::vec3(0.0f, 0.0f, 0.0f),
 		glm::vec3(0.0f, 0.0f, -1.0f),
 		glm::vec3(0.0f, 1.0f, 0.0f));
+
+	configureSubgraph(nullptr, limiter);
 }
 
 std::shared_ptr<LavWorldObject> createWorldObject(std::shared_ptr<LavDevice> device, std::shared_ptr<LavHrtfData> hrtf) {
@@ -63,8 +64,8 @@ std::shared_ptr<LavObject> LavWorldObject::createPannerObject() {
 	//todo: assumes stereo implicitly, this is bad.
 	//expand the mixer by one parent.
 	mixer->getProperty(Lav_MIXER_MAX_PARENTS).setIntValue(panners.size());
-	mixer->setParent(slot*2, pan, 0);
-	mixer->setParent(slot*2+1, pan, 1);
+	mixer->setInput(slot*2, pan, 0);
+	mixer->setInput(slot*2+1, pan, 1);
 	return pan;
 }
 
