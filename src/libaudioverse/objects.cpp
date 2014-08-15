@@ -210,7 +210,6 @@ LavSubgraphObject::LavSubgraphObject(int type, std::shared_ptr<LavDevice> device
 void LavSubgraphObject::configureSubgraph(std::shared_ptr<LavObject> input, std::shared_ptr<LavObject> output) {
 	subgraph_input = input;
 	subgraph_output = output;
-	resize(subgraph_input->getInputCount(), subgraph_output->getOutputCount());
 }
 
 void LavSubgraphObject::computeInputBuffers() {
