@@ -17,9 +17,9 @@ struct LavEnvironment {
 	glm::mat4 world_to_listener_transform;
 };
 
-class LavSourceManager: public LavPassthroughObject {
+class LavSourceManager: public LavSubgraphObject {
 	public:
-	LavSourceManager(int type, std::shared_ptr<LavDevice> device, unsigned int numChannels): LavPassthroughObject(type, device, numChannels) {}
+	LavSourceManager(int type, std::shared_ptr<LavDevice> device, unsigned int numChannels): LavSubgraphObject(type, device, numChannels) {}
 	//Register a source for updates.  Subclasses should only hold a weak_ptr to the source and should allow it to die.
 	virtual void registerSourceForUpdates(std::shared_ptr<LavSourceObject> source) = 0;
 	//must return an appropriate panner object for this environment.

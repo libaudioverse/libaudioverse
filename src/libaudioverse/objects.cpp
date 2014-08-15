@@ -204,13 +204,29 @@ void LavObject::resize(unsigned int newInputCount, unsigned int newOutputCount) 
 
 /**Implementation of LavPasssthroughObject.*/
 
-LavPassthroughObject::LavPassthroughObject(int type, std::shared_ptr<LavDevice> device, unsigned int numChannels): LavObject(type, device, numChannels, numChannels) {
+LavSubgraphObject::LavSubgraphObject(int type, std::shared_ptr<LavDevice> device, unsigned int numChannels): LavObject(type, device, numChannels, numChannels) {
 }
 
-void LavPassthroughObject::process() {
-	for(unsigned int i = 0; i < inputs.size(); i++) {
-		std::copy(inputs[i], inputs[i]+device->getBlockSize(), outputs[i]);
-	}
+void LavSubgraphObject::process() {
+//empty because we can forward onto the output object.
+}
+
+void LavSubgraphObject::setInput(unsigned int input, std::shared_ptr<LavObject> object, unsigned int output) {
+}
+
+std::shared_ptr<LavObject> LavSubgraphObject::getInputObject(unsigned int input) {
+	return nullptr;
+}
+
+unsigned int LavSubgraphObject::getInputOutput(unsigned int input) {
+	return 0;
+}
+
+unsigned int LavSubgraphObject::getInputCount() {
+	return 0;
+}
+
+void LavSubgraphObject::getOutputPointers(float** dest) {
 }
 
 //begin public api

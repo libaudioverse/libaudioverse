@@ -100,10 +100,14 @@ Consider an hrtf node, taking 22579200 mathematical operations plus loop overhea
 	LavObject& operator=(const LavObject&) = delete;
 };
 
-//this variant on object is special.  Passes inputs to corresponding outputs.
 //needed for things that wish to encapsulate and manage nodes that the public API isn't supposed to see.
-class LavPassthroughObject: public LavObject {
+class LavSubgraphObject: public LavObject {
 	public:
-	LavPassthroughObject(int type, std::shared_ptr<LavDevice> device, unsigned int numChannels);
+	LavSubgraphObject(int type, std::shared_ptr<LavDevice> device, unsigned int numChannels);
 	virtual void process();
+	virtual void getOutputPointers(float** dest);
+	virtual void setInput(unsigned int input, std::shared_ptr<LavObject> object, unsigned int output);
+	virtual std::shared_ptr<LavObject> getInputObject(unsigned int input);
+	virtual unsigned int getInputOutput(unsigned int input);
+	virtual unsigned int getInputCount();
 };
