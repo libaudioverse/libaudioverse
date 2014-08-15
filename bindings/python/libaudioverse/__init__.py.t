@@ -279,7 +279,7 @@ class GenericObject(object):
 {%for object_name in constants.iterkeys()|prefix_filter("Lav_OBJTYPE_")|remove_filter("Lav_OBJTYPE_GENERIC")%}
 {%set friendly_name = object_name|strip_prefix("Lav_OBJTYPE_")|lower|underscores_to_camelcase(True) + "Object"%}
 {%set constructor_name = "Lav_create" + friendly_name%}
-{%set constructor_arg_names = functions[constructor_name].input_args|map(attribute='name')|list-%}
+{%set constructor_arg_names = functions[constructor_name].input_args|map(attribute='name')|map('camelcase_to_underscores')|list-%}
 class {{friendly_name}}(GenericObject):
 	def __init__(self{%if constructor_arg_names|length > 0%}, {%endif%}{{constructor_arg_names|join(', ')}}):
 		{{constructor_arg_names[0]}} = {{constructor_arg_names[0]}}.handle
