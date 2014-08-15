@@ -272,11 +272,11 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetType(LavObject* obj, int* destination)
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetParentCount(LavObject* obj, unsigned int* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetInputCount(LavObject* obj, unsigned int* destination) {
 	PUB_BEGIN
 	auto obj_ptr = incomingPointer<LavObject>(obj);
 	LOCK(*obj);
-	*destination = obj->getParentCount();
+	*destination = obj->getInputCount();
 	PUB_END
 }
 
@@ -288,27 +288,27 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetOutputCount(LavObject* obj, unsigned i
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetParentObject(LavObject *obj, unsigned int slot, LavObject** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetInputObject(LavObject *obj, unsigned int slot, LavObject** destination) {
 	PUB_BEGIN
 	auto obj_ptr = incomingPointer<LavObject>(obj);
 	LOCK(*obj);
-	*destination = outgoingPointer<LavObject>(obj->getParentObject(slot));
+	*destination = outgoingPointer<LavObject>(obj->getInputObject(slot));
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetParentOutput(LavObject* obj, unsigned int slot, unsigned int* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetInputOutput(LavObject* obj, unsigned int slot, unsigned int* destination) {
 	PUB_BEGIN
 	auto obj_ptr = incomingPointer<LavObject>(obj);
 	LOCK(*obj);
-	*destination = obj->getParentOutput(slot);
+	*destination = obj->getInputOutput(slot);
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_objectSetParent(LavObject *obj, unsigned int input, LavObject* parent, unsigned int output) {
+Lav_PUBLIC_FUNCTION LavError Lav_objectSetInput(LavObject *obj, unsigned int input, LavObject* parent, unsigned int output) {
 	PUB_BEGIN
 	auto obj_ptr = incomingPointer<LavObject>(obj);
 	LOCK(*obj);
-	obj->setParent(input, parent ? incomingPointer<LavObject>(parent) : nullptr, output);
+	obj->setInput(input, parent ? incomingPointer<LavObject>(parent) : nullptr, output);
 	PUB_END
 }
 

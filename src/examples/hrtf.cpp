@@ -28,10 +28,10 @@ void main(int argc, char** args) {
 	ERRCHECK(Lav_createFileObject(device, args[1], &fileNode));
 	ERRCHECK(Lav_createHrtfObject(device, args[2], &hrtfNode));
 
-	ERRCHECK(Lav_objectSetParent(hrtfNode, 0, fileNode, 0));
+	ERRCHECK(Lav_objectSetInput(hrtfNode, 0, fileNode, 0));
 	ERRCHECK(Lav_createHardLimiterObject(device, 2, &limit));
-	ERRCHECK(Lav_objectSetParent(limit, 0, hrtfNode, 0));
-	ERRCHECK(Lav_objectSetParent(limit, 1, hrtfNode, 1));
+	ERRCHECK(Lav_objectSetInput(limit, 0, hrtfNode, 0));
+	ERRCHECK(Lav_objectSetInput(limit, 1, hrtfNode, 1));
 	ERRCHECK(Lav_deviceSetOutputObject(device, limit));
 	int shouldContinue = 1;
 	printf("Enter pairs of numbers separated by whitespace, where the first is azimuth (anything) and the second\n"

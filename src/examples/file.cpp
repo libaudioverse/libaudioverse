@@ -38,14 +38,14 @@ void main(int argc, char** args) {
 	ERRCHECK(Lav_createHardLimiterObject(device, fileChannels == 1 ? 2 : fileChannels, &limit));
 	ERRCHECK(Lav_createMixerObject(device, 1, fileChannels == 1 ? 2 : fileChannels, &mix));
 	for(unsigned int i = 0; i < fileChannels; i++) {
-		ERRCHECK(Lav_objectSetParent(atten, i, node, i));
-		ERRCHECK(Lav_objectSetParent(mix, i, atten, i));
-		ERRCHECK(Lav_objectSetParent(limit, i, mix, i));
+		ERRCHECK(Lav_objectSetInput(atten, i, node, i));
+		ERRCHECK(Lav_objectSetInput(mix, i, atten, i));
+		ERRCHECK(Lav_objectSetInput(limit, i, mix, i));
 	}
 	//this makes mono play through both channels.
 	if(fileChannels == 1) {
-		ERRCHECK(Lav_objectSetParent(mix, 1, atten, 0));
-		ERRCHECK(Lav_objectSetParent(limit, 1, mix, 0));
+		ERRCHECK(Lav_objectSetInput(mix, 1, atten, 0));
+		ERRCHECK(Lav_objectSetInput(limit, 1, mix, 0));
 	}
 	Lav_objectSetCallback(node, Lav_FILE_END_CALLBACK, endOfFileCallback, nullptr);
 	ERRCHECK(Lav_deviceSetOutputObject(device, limit));

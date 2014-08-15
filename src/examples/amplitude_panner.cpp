@@ -30,10 +30,10 @@ void main(int argc, char** args) {
 	ERRCHECK(Lav_createAmplitudePannerObject(device, &panNode));
 	ERRCHECK(Lav_objectReplaceFloatArrayProperty(panNode, Lav_PANNER_CHANNEL_MAP, 2, map));
 
-	ERRCHECK(Lav_objectSetParent(panNode, 0, fileNode, 0));
+	ERRCHECK(Lav_objectSetInput(panNode, 0, fileNode, 0));
 	ERRCHECK(Lav_createHardLimiterObject(device, 2, &limit));
-	ERRCHECK(Lav_objectSetParent(limit, 0, panNode, 0));
-	ERRCHECK(Lav_objectSetParent(limit, 1, panNode, 1));
+	ERRCHECK(Lav_objectSetInput(limit, 0, panNode, 0));
+	ERRCHECK(Lav_objectSetInput(limit, 1, panNode, 1));
 	ERRCHECK(Lav_deviceSetOutputObject(device, limit));
 	int shouldContinue = 1;
 	printf("Enter pairs of numbers separated by whitespace, where the first is azimuth (anything) and the second\n"

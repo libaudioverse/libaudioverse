@@ -104,9 +104,7 @@ enum Lav_OBJTYPES {
 /**Initialize Libaudioverse.*/
 Lav_PUBLIC_FUNCTION LavError Lav_initializeLibrary();
 
-/**Free any pointer that libaudioverse gives you.  If something goes wrong, namely that the pointer isn't from Libaudioverse in the first place, this tries to fail gracefully, but usually can't.
-
-important: The object is not actually freed at this point.  Libaudioverse objects are only freed when nothing, including libaudioverse parent-child relationships references them.  If you delete a parent without breaking the relationship, you can very definitely see this pointer again, and it will continue playing.*/
+/**Free any pointer that libaudioverse gives you.  If something goes wrong, namely that the pointer isn't from Libaudioverse in the first place, this tries to fail gracefully, but usually can't.*/
 Lav_PUBLIC_FUNCTION LavError Lav_free(void* obj);
 
 //devices...
@@ -136,13 +134,13 @@ Lav_PUBLIC_FUNCTION LavError Lav_deviceGetChannels(LavDevice* device, int* desti
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetType(LavObject* obj, int* destination);
 
 /**Query maximum number of inputs and outputs.*/
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetParentCount(LavObject* obj, unsigned int* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetInputCount(LavObject* obj, unsigned int* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetOutputCount(LavObject* obj, unsigned int* destination);
 
-/**Parent management.*/
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetParentObject(LavObject *obj, unsigned int slot, LavObject** destination);
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetParentOutput(LavObject* obj, unsigned int slot, unsigned int* destination);
-Lav_PUBLIC_FUNCTION LavError Lav_objectSetParent(LavObject *obj, unsigned int input, LavObject* parent, unsigned int output);
+/**Input management.*/
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetInputObject(LavObject *obj, unsigned int slot, LavObject** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetInputOutput(LavObject* obj, unsigned int slot, unsigned int* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_objectSetInput(LavObject *obj, unsigned int input, LavObject* parent, unsigned int output);
 
 /**Resets a property to its default value, for any type.*/
 Lav_PUBLIC_FUNCTION LavError Lav_objectResetProperty(LavObject *obj, int slot);

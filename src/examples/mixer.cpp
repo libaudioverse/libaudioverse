@@ -59,12 +59,12 @@ void main(int argc, char** args) {
 	ERRCHECK(Lav_createMixerObject(device, argc-1, channels, &mixer));
 	ERRCHECK(Lav_createHardLimiterObject(device, channels, &limit));
 	unsigned int mixInputCount;
-	ERRCHECK(Lav_objectGetParentCount(mixer, &mixInputCount));
+	ERRCHECK(Lav_objectGetInputCount(mixer, &mixInputCount));
 	for(unsigned int input = 0; input < mixInputCount; input++) {
-		ERRCHECK(Lav_objectSetParent(mixer, input, nodes[input/channels], input%channels));
+		ERRCHECK(Lav_objectSetInput(mixer, input, nodes[input/channels], input%channels));
 	}
 	for(unsigned int i = 0; i < channels; i++) {
-		ERRCHECK(Lav_objectSetParent(limit, i, mixer, i));
+		ERRCHECK(Lav_objectSetInput(limit, i, mixer, i));
 	}
 	ERRCHECK(Lav_deviceSetOutputObject(device, limit));
 	int shouldContinue = 1;
