@@ -22,6 +22,9 @@ def make_error_from_code(err):
 
 {%macro autopointerize(arglist)%}
 {%for arg in arglist%}
+{%if arg.type.indirection > 0%}
+	{{arg.name}} = getattr({{arg.name}}, 'handle', {{arg.name}})
+{%endif%}
 {%if arg.type.indirection == 1 and not arg.type.base == 'char'%}
 	if isinstance({{arg.name}}, collections.Sized):
 		{{arg.name}} = ({{arg.type|ctypes_string(1)}}*len({{arg.name}}))(*{{arg.name}})
