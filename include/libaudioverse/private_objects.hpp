@@ -103,7 +103,7 @@ Consider an hrtf node, taking 22579200 mathematical operations plus loop overhea
 //needed for things that wish to encapsulate and manage nodes that the public API isn't supposed to see.
 class LavSubgraphObject: public LavObject {
 	public:
-	LavSubgraphObject(int type, std::shared_ptr<LavDevice> device, unsigned int numChannels);
+	LavSubgraphObject(int type, std::shared_ptr<LavDevice> device);
 	virtual void process();
 	//we do no processing and forward onto another object.  Therefore, we do not compute input buffers.
 	virtual void computeInputBuffers();

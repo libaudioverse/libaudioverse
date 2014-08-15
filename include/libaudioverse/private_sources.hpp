@@ -7,11 +7,11 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "private_sourcemanager.hpp"
 #include <memory>
 
-class LavSourceObject: public LavObject {
+class LavSourceObject: public LavSubgraphObject {
 	public:
-	LavSourceObject(std::shared_ptr<LavDevice> device, std::shared_ptr<LavSourceManager> world, std::shared_ptr<LavObject> sourceNode);
+	LavSourceObject(std::shared_ptr<LavDevice> device, std::shared_ptr<LavSourceManager> world);
 	void update(LavEnvironment env);
 	private:
-	std::shared_ptr<LavObject> source_object, panner_object, attenuator_object;
+	std::shared_ptr<LavObject> panner_object, attenuator_object;
 	std::shared_ptr<LavSourceManager> manager;
 };

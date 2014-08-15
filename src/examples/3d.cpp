@@ -29,7 +29,8 @@ void main(int argc, char** args) {
 	ERRCHECK(Lav_createDeviceForPhysicalOutput(-1, 44100, 512, 2, &device));
 	ERRCHECK(Lav_createWorldObject(device, hrtfFile, &world));
 	ERRCHECK(Lav_createFileObject(device, soundFile, &node));
-	ERRCHECK(Lav_createSourceObject(device, world, node, &source));
+	ERRCHECK(Lav_createSourceObject(device, world, &source));
+	ERRCHECK(Lav_objectSetInput(source, 0, node, 0));
 	const int resolution = 1000, length = 3000; //length in ms.
 	const float width = 30.0;
 	Lav_deviceSetOutputObject(device, world);
