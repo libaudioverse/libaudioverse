@@ -9,7 +9,7 @@ generators = {
 }
 
 def write_files(files, source_dir, dest_dir):
-	special_keys = ['dll_location', 'additional_dirs']
+	special_keys = ['dll_location', 'additional_directories']
 	if os.path.exists(dest_dir):
 		shutil.rmtree(dest_dir)
 	for name, contents in files.iteritems():
