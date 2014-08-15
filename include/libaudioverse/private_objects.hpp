@@ -26,10 +26,22 @@ class LavObject: public std::enable_shared_from_this<LavObject> { //enable_share
 
 	virtual void computeInputBuffers();//update what we point to due to parent changes.
 	virtual int getType();
+	//The private version of inputs.
+	//For most objects, inputs are parents.  There are a few special cases, mostly involving subgraphs.
+	//This has a semantic meaning to the graph processor, but not necessarily to use code.  See setInput and getInput for the external versions.
+	//parents are dependency links.  Inputs are user-facing dependency links intended to hide library-internal objects where necessary.
 	virtual void setParent(unsigned int input, std::shared_ptr<LavObject> parent, unsigned int parentOutput);
 	virtual std::shared_ptr<LavObject> getParentObject(unsigned int slot);
 	virtual unsigned int getParentOutput(unsigned int slot);
 	virtual unsigned int getParentCount();
+
+	//these are what is exposed to the public user.
+	//Most of them (including default implementations) forward to a get/set parent function.
+	virtual void setInput(unsigned int input, std::shared_ptr<LavObject> object, unsigned int output);
+	virtual std::shared_ptr<LavObject> getInputObject(unsigned int input);
+	virtual unsigned int getInputOutput(unsigned int input);
+	virtual unsigned int getInputCount();
+
 	virtual unsigned int getOutputCount();
 	//Note that this isn't shared ptr.  The output pointers for an object are managed by the object itself and we need to be able to allocate/deallocate them for SSE, as well as work with arrays.  Don't hold on to output pointers.
 	virtual void getOutputPointers(float** dest);

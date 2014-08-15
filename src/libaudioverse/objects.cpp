@@ -127,6 +127,22 @@ unsigned int LavObject::getParentCount() {
 	return input_descriptors.size();
 }
 
+void LavObject::setInput(unsigned int input, std::shared_ptr<LavObject> object, unsigned int output) {
+	setParent(input, object, output);
+}
+
+std::shared_ptr<LavObject> LavObject::getInputObject(unsigned int input) {
+	return getParentObject(input);
+}
+
+unsigned int LavObject::getInputOutput(unsigned int input) {
+	return getParentOutput(input);
+}
+
+unsigned int LavObject::getInputCount() {
+	return getParentCount();
+}
+
 unsigned int LavObject::getOutputCount() {
 	return outputs.size();
 }
