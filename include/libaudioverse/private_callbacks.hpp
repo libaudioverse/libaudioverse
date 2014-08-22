@@ -7,21 +7,21 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <memory>
 #include <string>
 
-class LavDevice;
+class LavSimulation;
 
 class LavCallback {
 	public:
 	void setHandler(LavEventCallback cb);
 	LavEventCallback getHandler();
 	void fire();
-	void associateDevice(std::shared_ptr<LavDevice> dev);
+	void associateSimulation(std::shared_ptr<LavSimulation> sim);
 	void associateObject(LavObject* obj);
 	const char* getName();
 	void setName(const char* n);
 	void* getUserData();
 	void setUserData(void* data);
 	private:
-	std::shared_ptr<LavDevice> associated_device = nullptr;
+	std::shared_ptr<LavSimulation> associated_simulation = nullptr;
 	LavEventCallback handler = nullptr;
 	std::string name;
 	LavObject* associated_object = nullptr;

@@ -21,7 +21,7 @@ class LavInputDescriptor {
 /**Things all Libaudioverse objects have.*/
 class LavObject: public std::enable_shared_from_this<LavObject> { //enable_shared_from_this is for callback infrastructure.
 	public:
-	LavObject(int type, std::shared_ptr<LavDevice> device, unsigned int numInputs, unsigned int numOutputs);
+	LavObject(int type, std::shared_ptr<LavSimulation> simulation, unsigned int numInputs, unsigned int numOutputs);
 	virtual ~LavObject();
 
 	virtual void computeInputBuffers();//update what we point to due to parent changes.
@@ -70,7 +70,7 @@ Consider an hrtf node, taking 22579200 mathematical operations plus loop overhea
 	//the default does nothing.
 	virtual void willProcessParents();
 
-	virtual std::shared_ptr<LavDevice> getDevice();
+	virtual std::shared_ptr<LavSimulation> getSimulation();
 	virtual LavProperty& getProperty(int slot);
 	virtual std::vector<int> getStaticPropertyIndices();
 
@@ -85,7 +85,7 @@ Consider an hrtf node, taking 22579200 mathematical operations plus loop overhea
 	protected:
 	//this should definitely be protected, and should never be touched by anything that's not a subclass.
 	virtual void resize(unsigned int newInputsCount, unsigned int newOutputsCount);
-	std::shared_ptr<LavDevice> device = nullptr;
+	std::shared_ptr<LavSimulation> simulation = nullptr;
 	std::map<int, LavProperty> properties;
 	std::map<int, LavCallback> callbacks;
 	std::vector<float*> inputs;
@@ -103,7 +103,7 @@ Consider an hrtf node, taking 22579200 mathematical operations plus loop overhea
 //needed for things that wish to encapsulate and manage nodes that the public API isn't supposed to see.
 class LavSubgraphObject: public LavObject {
 	public:
-	LavSubgraphObject(int type, std::shared_ptr<LavDevice> device);
+	LavSubgraphObject(int type, std::shared_ptr<LavSimulation> simulation);
 	virtual void process();
 	//we do no processing and forward onto another object.  Therefore, we do not compute input buffers.
 	virtual void computeInputBuffers();

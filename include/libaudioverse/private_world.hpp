@@ -13,7 +13,7 @@ class LavHrtfData;
 
 class LavWorldObject: public LavSourceManager {
 	public:
-	LavWorldObject(std::shared_ptr<LavDevice> device, std::shared_ptr<LavHrtfData> hrtf);
+	LavWorldObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf);
 	void registerSourceForUpdates(std::shared_ptr<LavSourceObject> source);
 	//call update on all sources.
 	virtual void willProcessParents();

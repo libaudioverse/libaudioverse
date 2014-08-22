@@ -9,7 +9,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 class LavSourceObject: public LavSubgraphObject {
 	public:
-	LavSourceObject(std::shared_ptr<LavDevice> device, std::shared_ptr<LavSourceManager> world);
+	LavSourceObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavSourceManager> world);
 	void update(LavEnvironment env);
 	private:
 	std::shared_ptr<LavObject> panner_object, attenuator_object;

@@ -12,16 +12,16 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "libaudioverse.h"
 
 class LavObject;
-class LavPhysicalOutput;
+class LavDevice;
 
 /*When thrown on the background thread, terminates it.*/
 class LavThreadTerminationException {
 };
 
-class LavDevice {
+class LavSimulation {
 	public:
-	LavDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead);
-	virtual ~LavDevice();
+	LavSimulation(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead);
+	virtual ~LavSimulation();
 	virtual LavError getBlock(float* out);
 	virtual unsigned int getBlockSize() { return block_size;}
 	virtual LavError start();
@@ -35,10 +35,12 @@ class LavDevice {
 	//these make us meet the basic lockable concept.
 	void lock() {mutex.lock();}
 	void unlock() {mutex.unlock();}
+
+	//Tasks that need to run in the background.
 	void enqueueTask(std::function<void(void)>);
 
 	//makes this device hold a shared pointer to its output.
-	void associateOutput(std::shared_ptr<LavPhysicalOutput> what);
+	void associateDevice(std::shared_ptr<LavDevice> what);
 
 	protected:
 	//visit all objects in the order they need to be visited if we were processing the graph.
@@ -60,10 +62,8 @@ class LavDevice {
 	void backgroundTaskThreadFunction();
 
 	//our output, if any.
-	std::shared_ptr<LavPhysicalOutput> output = nullptr;
+	std::shared_ptr<LavDevice> output = nullptr;
 };
 
 //initialize the audio backend.
 void initializeAudioBackend();
-
-std::shared_ptr<LavDevice> createDefaultPortaudioDevice(unsigned int sr, unsigned int bufferSize, unsigned int mixahead);

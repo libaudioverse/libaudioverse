@@ -5,14 +5,14 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <memory>
 
 class LavObject;
-class LavDevice;
+class LavSimulation;
 class LavHrtfData;
 
-std::shared_ptr<LavObject> createAttenuatorObject(std::shared_ptr<LavDevice> device, unsigned int numChannels);
-std::shared_ptr<LavObject> createFileObject(std::shared_ptr<LavDevice> device, const char* path);
-std::shared_ptr<LavObject> createHardLimiterObject(std::shared_ptr<LavDevice> device, unsigned int numChannels);
-std::shared_ptr<LavObject> createHrtfObject(std::shared_ptr<LavDevice> device, std::shared_ptr<LavHrtfData> hrtf);
-std::shared_ptr<LavObject> createMixerObject(std::shared_ptr<LavDevice> device, unsigned int maxParents, unsigned int inputsPerParent);
-std::shared_ptr<LavObject> createSineObject(std::shared_ptr<LavDevice> device);
-std::shared_ptr<LavObject> createDelayObject(std::shared_ptr<LavDevice> device, unsigned int lines);
-std::shared_ptr<LavObject>createAmplitudePannerObject(std::shared_ptr<LavDevice> device);
+std::shared_ptr<LavObject> createAttenuatorObject(std::shared_ptr<LavSimulation> simulation, unsigned int numChannels);
+std::shared_ptr<LavObject> createFileObject(std::shared_ptr<LavSimulation> simulation, const char* path);
+std::shared_ptr<LavObject> createHardLimiterObject(std::shared_ptr<LavSimulation> simulation, unsigned int numChannels);
+std::shared_ptr<LavObject> createHrtfObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf);
+std::shared_ptr<LavObject> createMixerObject(std::shared_ptr<LavSimulation> simulation, unsigned int maxParents, unsigned int inputsPerParent);
+std::shared_ptr<LavObject> createSineObject(std::shared_ptr<LavSimulation> Simulation);
+std::shared_ptr<LavObject> createDelayObject(std::shared_ptr<LavSimulation> simulation, unsigned int lines);
+std::shared_ptr<LavObject>createAmplitudePannerObject(std::shared_ptr<LavSimulation> Simulation);

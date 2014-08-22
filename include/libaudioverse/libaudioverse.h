@@ -11,9 +11,9 @@ extern "C" {
 /*Forward-declares all Libaudioverse types.*/
 #ifdef __cplusplus
 class LavObject;
-class LavDevice;
+class LavSimulation;
 #else
-typedef void LavDevice;
+typedef void LavSimulation;
 typedef void LavObject;
 #endif
 /**Make sure that we are marshalling enums as integers in the public API for both c and c++.
@@ -113,22 +113,22 @@ Index -1 is special.  Any attempts to query about index -1 will fail.  Index -1 
 Opening a device on index -1 requests that the default system audio device be used.  In addition, however, index -1 will follow the default system audio device when the backend supports it.
 It is constrained to two channels because there is no graceful way to handle moving to a device with less channels, and it is assumed apps looking for this functionality will not mind the loss.  This may/will probably be changed in future.
 */
-Lav_PUBLIC_FUNCTION LavError Lav_getPhysicalOutputCount(unsigned int* destination);
-Lav_PUBLIC_FUNCTION LavError Lav_getPhysicalOutputLatency(unsigned int index, float* destination);
-Lav_PUBLIC_FUNCTION LavError Lav_getPhysicalOutputName(unsigned int index, char** destination);
-Lav_PUBLIC_FUNCTION LavError Lav_getPhysicalOutputChannels(unsigned int index, unsigned int* destination);
-Lav_PUBLIC_FUNCTION LavError Lav_createDeviceForPhysicalOutput(int index, unsigned int sr, unsigned int blockSize, unsigned int mixAhead, LavDevice** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_getDeviceCount(unsigned int* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_getDeviceLatency(unsigned int index, float* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_getDeviceName(unsigned int index, char** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_getDeviceChannels(unsigned int index, unsigned int* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createSimulationForPhysicalOutput(int index, unsigned int sr, unsigned int blockSize, unsigned int mixAhead, LavDevice** destination);
 
-/**This type of device is intended for apps that wish to handle audio themselves: it will not output and time will not advance for it.
-Combine it with Lav_deviceReadBlock to make use of it.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createReadDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, LavDevice** destination);
+/**This type of simulation is intended for apps that wish to handle audio themselves: it will not output and time will not advance for it.
+Combine it with Lav_simulationReadBlock to make use of it.*/
+Lav_PUBLIC_FUNCTION LavError Lav_createReadSimulation(unsigned int sr, unsigned int channels, unsigned int blockSize, LavDevice** destination);
 
-Lav_PUBLIC_FUNCTION LavError Lav_deviceSetOutputObject(LavDevice* device, LavObject* object);
-Lav_PUBLIC_FUNCTION LavError Lav_deviceGetOutputObject(LavDevice* device, LavObject** destination);
-Lav_PUBLIC_FUNCTION LavError Lav_deviceGetBlockSize(LavDevice* dev, int* destination);
-Lav_PUBLIC_FUNCTION LavError Lav_deviceGetBlock(LavDevice* device, float* buffer);
-Lav_PUBLIC_FUNCTION LavError Lav_deviceGetSr(LavDevice* device, int* destination);
-Lav_PUBLIC_FUNCTION LavError Lav_deviceGetChannels(LavDevice* device, int* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_simulationSetOutputObject(LavDevice* device, LavObject* object);
+Lav_PUBLIC_FUNCTION LavError Lav_simulationGetOutputObject(LavDevice* device, LavObject** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlockSize(LavDevice* dev, int* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlock(LavDevice* device, float* buffer);
+Lav_PUBLIC_FUNCTION LavError Lav_simulationGetSr(LavDevice* device, int* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_simulationGetChannels(LavDevice* device, int* destination);
 
 /**Query object type.*/
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetType(LavObject* obj, int* destination);
@@ -196,29 +196,16 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetCallbackHandler(LavObject* obj, int ca
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetCallbackUserDataPointer(LavObject* obj, int callback, void** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_objectSetCallback(LavObject* obj, int callback, LavEventCallback handler, void* userData);
 
-/**Make a sine object.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createSineObject(LavDevice* device, LavObject **destination);
-
-/**A object that plays a file.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createFileObject(LavDevice*device, const char* path, LavObject **destination);
-
-/**Make a HRTF object.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createHrtfObject(LavDevice* device, const char* hrtfPath, LavObject **destination);
-
-/**Make a mixer.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createMixerObject(LavDevice* device, unsigned int maxParents, unsigned int inputsPerParent, LavObject **destination);
-
-/**Make an attenuator.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createAttenuatorObject(LavDevice* device, unsigned int numChannels, LavObject** destination);
-
-/**A hard limiter*/
-Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterObject(LavDevice* device, unsigned int numInputs, LavObject** destination);
-
-/**Delay line.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createDelayObject(LavDevice* device, unsigned int lines, LavObject** destination);
-
-/**Amplitude panner.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createAmplitudePannerObject(LavDevice* device, LavObject** destination);
+//creators for different objject types.
+//also see libaudioverse3d.h.
+Lav_PUBLIC_FUNCTION LavError Lav_createSineObject(LavSimulation* sim, LavObject **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createFileObject(LavSimulation *sim, const char* path, LavObject **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createHrtfObject(LavSimulation sim, const char* hrtfPath, LavObject **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createMixerObject(LavSimulation* sim, unsigned int maxParents, unsigned int inputsPerParent, LavObject **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createAttenuatorObject(LavSimulation *sim, unsigned int numChannels, LavObject** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterObject(LavSimulation* sim, unsigned int numInputs, LavObject** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createDelayObject(LavSimulation* sim, unsigned int lines, LavObject** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createAmplitudePannerObject(LavSimulation* sim, LavObject** destination);
 
 #ifdef __cplusplus
 }
