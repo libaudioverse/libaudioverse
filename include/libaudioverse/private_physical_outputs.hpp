@@ -36,10 +36,10 @@ class LavDevice {
 	std::thread mixing_thread;
 };
 
-class LavDeviceFactory {
+class LavSimulationFactory {
 	public:
-	LavDeviceFactory() = default;
-	virtual ~LavDeviceFactory() {}
+	LavSimulationFactory() = default;
+	virtual ~LavSimulationFactory() {}
 	virtual std::vector<std::string> getOutputNames() = 0;
 	virtual std::vector<float> getOutputLatencies() = 0;
 	virtual std::vector<int> getOutputMaxChannels() = 0;
@@ -49,8 +49,8 @@ class LavDeviceFactory {
 	int output_count = 0;
 };
 
-LavDeviceFactory* createPortaudioDeviceFactory();
-typedef LavDeviceFactory* (*LavDeviceFactoryCreationFunction)();
+LavSimulationFactory* createPortaudioSimulationFactory();
+typedef LavSimulationFactory* (*LavSimulationFactoryCreationFunction)();
 
 //finally, the function that initializes all of this.
-void initializeDeviceFactory();
+void initializeSimulationFactory();

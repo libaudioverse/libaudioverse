@@ -20,7 +20,7 @@ typedef void (*initfunc_t)();
 initfunc_t initializers[] = {
 	initializeMemoryModule,
 	initializeFunctionTables,
-	initializeDeviceFactory,
+	initializeSimulationFactory,
 	initializeMetadata,
 };
 unsigned int isInitialized = 0;

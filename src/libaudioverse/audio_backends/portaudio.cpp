@@ -3,7 +3,7 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/private_physical_outputs.hpp>
-#include <libaudioverse/private_devices.hpp>
+#include <libaudioverse/private_simulation.hpp>
 #include <libaudioverse/private_resampler.hpp>
 #include <libaudioverse/private_errors.hpp>
 #include <string>
@@ -19,24 +19,24 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <chrono>
 #include <portaudio.h>
 
-int portaudioOutputCallbackB(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
+int portaudioOutputCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
 
-class LavPortaudioPhysicalOutput: public  LavPhysicalOutput {
+class LavPortaudioDevice: public  LavDevice {
 	public:
 	virtual void startup_hook();
 	virtual void shutdown_hook();
-	LavPortaudioPhysicalOutput(std::shared_ptr<LavDevice> dev, unsigned int mixAhead, PaDeviceIndex which);
+	LavPortaudioDevice(std::shared_ptr<LavSimulation> sim, unsigned int mixAhead, PaDeviceIndex which);
 	PaStream* stream = nullptr;
-	friend int portaudioOutputCallbackB(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
+	friend int portaudioOutputCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
 };
 
-class LavPortaudioPhysicalOutputFactory: public LavPhysicalOutputFactory {
+class LavPortaudioSimulationFactory: public LavDeviceFactory {
 	public:
-	LavPortaudioPhysicalOutputFactory();
+	LavPortaudioSimulationFactory();
 	virtual std::vector<std::string> getOutputNames();
 	virtual std::vector<float> getOutputLatencies();
 	virtual std::vector<int> getOutputMaxChannels();
-	virtual std::shared_ptr<LavDevice> createDevice(int index, unsigned int sr, unsigned int blockSize, unsigned int mixAhead);
+	virtual std::shared_ptr<LavSimulation> createSimulation(int index, unsigned int sr, unsigned int blockSize, unsigned int mixAhead);
 	private:
 	std::map<unsigned int, PaDeviceIndex> output_indices_map;
 	std::vector<float> latencies;
@@ -44,10 +44,10 @@ class LavPortaudioPhysicalOutputFactory: public LavPhysicalOutputFactory {
 	std::vector<int> max_channels;
 };
 
-LavPortaudioPhysicalOutput::LavPortaudioPhysicalOutput(std::shared_ptr<LavDevice> dev, unsigned int mixAhead, PaDeviceIndex which): LavPhysicalOutput(dev, mixAhead) {
+LavPortaudioDevice::LavPortaudioDevice(std::shared_ptr<LavSimulation> sim, unsigned int mixAhead, PaDeviceIndex which): LavDevice(sim, mixAhead) {
 	const PaDeviceInfo* devinfo = Pa_GetDeviceInfo(which);
 	PaStreamParameters params;
-	params.channelCount = dev->getChannels();
+	params.channelCount = sim->getChannels();
 	params.device = which;
 	params.hostApiSpecificStreamInfo = nullptr;
 	params.sampleFormat = paFloat32;
@@ -59,16 +59,16 @@ LavPortaudioPhysicalOutput::LavPortaudioPhysicalOutput(std::shared_ptr<LavDevice
 	start();
 }
 
-void LavPortaudioPhysicalOutput::startup_hook() {
+void LavPortaudioDevice::startup_hook() {
 	Pa_StartStream(stream);
 }
 
-void LavPortaudioPhysicalOutput::shutdown_hook() {
+void LavPortaudioDevice::shutdown_hook() {
 	Pa_StopStream(stream);
 }
 
-int portaudioOutputCallbackB(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData) {
-	LavPortaudioPhysicalOutput * const out = (LavPortaudioPhysicalOutput*)userData;
+int portaudioOutputCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData) {
+	LavPortaudioDevice * const out = (LavPortaudioDevice*)userData;
 	const int haveBuffer = out->buffer_statuses[out->callback_buffer_index].load();
 	if(haveBuffer) {
 		memcpy(output, out->buffers[out->callback_buffer_index], sizeof(float)*frameCount*out->channels);
@@ -82,7 +82,7 @@ int portaudioOutputCallbackB(const void* input, void* output, unsigned long fram
 	return paContinue;
 }
 
-LavPortaudioPhysicalOutputFactory::LavPortaudioPhysicalOutputFactory() {
+LavPortaudioSimulationFactory::LavPortaudioSimulationFactory() {
 	//recall that portaudio doesn't rescan, so we do all our scanning here.
 	unsigned int index = 0;
 	for(PaDeviceIndex i = 0; i < Pa_GetDeviceCount()-1; i++) {
@@ -97,19 +97,19 @@ LavPortaudioPhysicalOutputFactory::LavPortaudioPhysicalOutputFactory() {
 	output_count = names.size();
 }
 
-std::vector<std::string> LavPortaudioPhysicalOutputFactory::getOutputNames() {
+std::vector<std::string> LavPortaudioSimulationFactory::getOutputNames() {
 	return names;
 }
 
-std::vector<float> LavPortaudioPhysicalOutputFactory::getOutputLatencies() {
+std::vector<float> LavPortaudioSimulationFactory::getOutputLatencies() {
 	return latencies;
 }
 
-std::vector<int> LavPortaudioPhysicalOutputFactory::getOutputMaxChannels() {
+std::vector<int> LavPortaudioSimulationFactory::getOutputMaxChannels() {
 	return max_channels;
 }
 
-std::shared_ptr<LavDevice> LavPortaudioPhysicalOutputFactory::createDevice(int index, unsigned int sr, unsigned int blockSize, unsigned int mixAhead) {
+std::shared_ptr<LavSimulation> LavPortaudioSimulationFactory::createSimulation(int index, unsigned int sr, unsigned int blockSize, unsigned int mixAhead) {
 	if(index != -1 || index >= output_count) throw LavErrorException(Lav_ERROR_RANGE);
 	//if it's not -1, then we can cast it to a PaDeviceIndex.  Otherwise, we use Pa_GetDefaultOutputDevice();
 	PaDeviceIndex needed;
@@ -118,12 +118,12 @@ std::shared_ptr<LavDevice> LavPortaudioPhysicalOutputFactory::createDevice(int i
 	//we create a device, first.
 	std::shared_ptr<LavDevice> retval = std::make_shared<LavDevice>(sr, index != -1 ? max_channels[index] : 2, blockSize, mixAhead);
 	//create the output.
-	std::shared_ptr<LavPortaudioPhysicalOutput> output = std::make_shared<LavPortaudioPhysicalOutput>(retval, mixAhead, needed);
+	std::shared_ptr<LavPortaudioDevice> output = std::make_shared<LavPortaudioDevice>(retval, mixAhead, needed);
 	retval->associateOutput(output);
 	return retval;
 }
 
-LavPhysicalOutputFactory* createPortaudioPhysicalOutputFactory() {
+LavSimulationFactory* createPortaudioSimulationFactory() {
 	Pa_Initialize();
-	return new LavPortaudioPhysicalOutputFactory();
+	return new LavPortaudioSimulationFactory();
 }
