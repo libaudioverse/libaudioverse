@@ -9,7 +9,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_macros.hpp>
 #include <libaudioverse/private_metadata.hpp>
 #include <libaudioverse/private_memory.hpp>
-#include <libaudioverse/private_physical_outputs.hpp>
+#include <libaudioverse/private_audio_devices.hpp>
 
 typedef void (*initfunc_t)();
 
