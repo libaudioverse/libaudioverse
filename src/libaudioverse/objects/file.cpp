@@ -3,7 +3,7 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 
 /**Reads an entire file into memory and plays it with support for dopler and seeking.*/
-#include <libaudioverse/private_devices.hpp>
+#include <libaudioverse/private_simulation.hpp>
 #include <libaudioverse/private_objects.hpp>
 #include <libaudioverse/private_file.hpp>
 #include <libaudioverse/libaudioverse.h>
@@ -18,7 +18,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 class LavFileObject: public LavObject {
 	public:
-	LavFileObject(std::shared_ptr<LavDevice> device, const char* path, unsigned int channels);
+	LavFileObject(std::shared_ptr<LavSimulation> simulation, const char* path, unsigned int channels);
 	~LavFileObject();
 	virtual void process();
 	void seek(); //property callback.
@@ -34,11 +34,11 @@ class LavFileObject: public LavObject {
 
 //the third parameter is a hint: we need to know how many channels, we only expose objects through the create functions, so the create function can find this out.
 //todo: when objects support resizing their inputs and outputs, as they will inevitably support this, rewrite to use that functionality.
-LavFileObject::LavFileObject(std::shared_ptr<LavDevice> device, const char* path, unsigned int channels): LavObject(Lav_OBJTYPE_FILE, device, 0, channels) {
+LavFileObject::LavFileObject(std::shared_ptr<LavSimulation> simulation, const char* path, unsigned int channels): LavObject(Lav_OBJTYPE_FILE, simulation, 0, channels) {
 	file.open(path);
 	buffer = new float[file.getSampleCount()];
 	file.readAll(buffer);
-	delta = file.getSr()/device->getSr();
+	delta = file.getSr()/simulation->getSr();
 	getProperty(Lav_FILE_POSITION).setPostChangedCallback([this] () {seek();});
 	max_position = file.getFrameCount()/(float)file.getSr();
 	getProperty(Lav_FILE_POSITION).setDoubleRange(0.0f, max_position);
@@ -49,11 +49,11 @@ LavFileObject::~LavFileObject() {
 	delete[] buffer;
 }
 
-std::shared_ptr<LavObject> createFileObject(std::shared_ptr<LavDevice> device, const char* path) {
+std::shared_ptr<LavObject> createFileObject(std::shared_ptr<LavSimulation> simulation, const char* path) {
 	auto f = LavFileReader();
 	f.open(path);
-	auto retval = std::make_shared<LavFileObject>(device, path, f.getChannelCount());
-	device->associateObject(retval);
+	auto retval = std::make_shared<LavFileObject>(simulation, path, f.getChannelCount());
+	simulation->associateObject(retval);
 	return retval;
 }
 
@@ -94,7 +94,7 @@ void LavFileObject::process() {
 	position += (unsigned int)offset;
 	offset = ringmodf(offset, 1.0f);
 	}
-	double newpos = ((double)position+offset)/(double)device->getSr();
+	double newpos = ((double)position+offset)/(double)simulation->getSr();
 	newpos = fmin(newpos, max_position);
 	getProperty(Lav_FILE_POSITION).setDoubleValue(newpos);
 	if(switch_to_ended) {
@@ -105,10 +105,10 @@ void LavFileObject::process() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createFileObject(LavDevice* device, const char* path, LavObject** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createFileObject(LavSimulation* simulation, const char* path, LavObject** destination) {
 	PUB_BEGIN
-	LOCK(*device);
-	auto retval = createFileObject(incomingPointer<LavDevice>(device), path);
+	LOCK(*simulation);
+	auto retval = createFileObject(incomingPointer<LavSimulation>(simulation), path);
 	*destination = outgoingPointer<LavObject>(retval);
 	PUB_END
 }

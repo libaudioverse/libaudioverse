@@ -5,7 +5,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/private_objects.hpp>
 #include <libaudioverse/private_properties.hpp>
-#include <libaudioverse/private_devices.hpp>
+#include <libaudioverse/private_simulation.hpp>
 #include <libaudioverse/private_macros.hpp>
 #include <libaudioverse/private_memory.hpp>
 #include <limits>
@@ -13,22 +13,22 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 class LavMixerObject: public LavObject {
 	public:
-	LavMixerObject(std::shared_ptr<LavDevice> device, unsigned int maxParents, unsigned int inputsPerParent);
+	LavMixerObject(std::shared_ptr<LavSimulation> simulation, unsigned int maxParents, unsigned int inputsPerParent);
 	virtual void process();
 	protected:
 	void maxParentsChanged();
 	unsigned int inputs_per_parent;
 };
 
-LavMixerObject::LavMixerObject(std::shared_ptr<LavDevice> device, unsigned int maxParents, unsigned int inputsPerParent): LavObject(Lav_OBJTYPE_MIXER, device, inputsPerParent*maxParents, inputsPerParent) {
+LavMixerObject::LavMixerObject(std::shared_ptr<LavSimulation> simulation, unsigned int maxParents, unsigned int inputsPerParent): LavObject(Lav_OBJTYPE_MIXER, simulation, inputsPerParent*maxParents, inputsPerParent) {
 	type = Lav_OBJTYPE_MIXER;
 	inputs_per_parent = inputsPerParent;
 	getProperty(Lav_MIXER_MAX_PARENTS).setPostChangedCallback([this] () {maxParentsChanged();});
 }
 
-std::shared_ptr<LavObject> createMixerObject(std::shared_ptr<LavDevice> device, unsigned int maxParents, unsigned int inputsPerParent) {
-	auto retval = std::make_shared<LavMixerObject>(device, maxParents, inputsPerParent);
-	device->associateObject(retval);
+std::shared_ptr<LavObject> createMixerObject(std::shared_ptr<LavSimulation> simulation, unsigned int maxParents, unsigned int inputsPerParent) {
+	auto retval = std::make_shared<LavMixerObject>(simulation, maxParents, inputsPerParent);
+	simulation->associateObject(retval);
 	return retval;
 }
 
@@ -49,10 +49,10 @@ void LavMixerObject::process() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createMixerObject(LavDevice* device, unsigned int maxParents, unsigned int inputsPerParent, LavObject** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createMixerObject(LavSimulation* simulation, unsigned int maxParents, unsigned int inputsPerParent, LavObject** destination) {
 	PUB_BEGIN
-	LOCK(*device);
-	auto retval = createMixerObject(incomingPointer<LavDevice>(device), maxParents, inputsPerParent);
+	LOCK(*simulation);
+	auto retval = createMixerObject(incomingPointer<LavSimulation>(simulation), maxParents, inputsPerParent);
 	*destination = outgoingPointer<LavObject>(retval);
 	PUB_END
 }

@@ -7,7 +7,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/private_objects.hpp>
-#include <libaudioverse/private_devices.hpp>
+#include <libaudioverse/private_simulation.hpp>
 #include <libaudioverse/private_properties.hpp>
 #include <libaudioverse/private_functiontables.hpp>
 #include <libaudioverse/private_dspmath.hpp>
@@ -17,22 +17,22 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 class LavSineObject: public LavObject {
 	public:
-	LavSineObject(std::shared_ptr<LavDevice> device);
+	LavSineObject(std::shared_ptr<LavSimulation> simulation);
 	virtual void process();
 	float table_delta;
 	unsigned int start ;
 	float offset;
 };
 
-LavSineObject::LavSineObject(std::shared_ptr<LavDevice> device): LavObject(Lav_OBJTYPE_SINE, device, 0, 1) {
-	table_delta = sineTableLength/device->getSr();
+LavSineObject::LavSineObject(std::shared_ptr<LavSimulation> simulation): LavObject(Lav_OBJTYPE_SINE, simulation, 0, 1) {
+	table_delta = sineTableLength/simulation->getSr();
 	start = 0;
 	offset = 0;
 }
 
-std::shared_ptr<LavObject> createSineObject(std::shared_ptr<LavDevice> device) {
-	std::shared_ptr<LavSineObject> retval = std::make_shared<LavSineObject>(device);
-	device->associateObject(retval);
+std::shared_ptr<LavObject> createSineObject(std::shared_ptr<LavSimulation> simulation) {
+	std::shared_ptr<LavSineObject> retval = std::make_shared<LavSineObject>(simulation);
+	simulation->associateObject(retval);
 	return retval;
 }
 
@@ -53,10 +53,10 @@ void LavSineObject::process() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createSineObject(LavDevice* device, LavObject **destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createSineObject(LavSimulation* simulation, LavObject **destination) {
 	PUB_BEGIN
-	LOCK(*device);
-	auto retval = createSineObject(incomingPointer<LavDevice>(device));
+	LOCK(*simulation);
+	auto retval = createSineObject(incomingPointer<LavSimulation>(simulation));
 	*destination = outgoingPointer<LavObject>(retval);
 	PUB_END
 }

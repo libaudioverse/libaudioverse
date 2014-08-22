@@ -200,7 +200,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectSetCallback(LavObject* obj, int callback,
 //also see libaudioverse3d.h.
 Lav_PUBLIC_FUNCTION LavError Lav_createSineObject(LavSimulation* sim, LavObject **destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createFileObject(LavSimulation *sim, const char* path, LavObject **destination);
-Lav_PUBLIC_FUNCTION LavError Lav_createHrtfObject(LavSimulation sim, const char* hrtfPath, LavObject **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createHrtfObject(LavSimulation *simulation, const char* hrtfPath, LavObject **destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createMixerObject(LavSimulation* sim, unsigned int maxParents, unsigned int inputsPerParent, LavObject **destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createAttenuatorObject(LavSimulation *sim, unsigned int numChannels, LavObject** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterObject(LavSimulation* sim, unsigned int numInputs, LavObject** destination);

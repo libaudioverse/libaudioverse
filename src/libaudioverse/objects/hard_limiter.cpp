@@ -7,23 +7,23 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/private_objects.hpp>
-#include <libaudioverse/private_devices.hpp>
+#include <libaudioverse/private_simulation.hpp>
 #include <libaudioverse/private_macros.hpp>
 #include <libaudioverse/private_memory.hpp>
 #include <memory>
 
 class LavHardLimiterObject: public LavObject {
 	public:
-	LavHardLimiterObject(std::shared_ptr<LavDevice> device, unsigned int numInputs);
+	LavHardLimiterObject(std::shared_ptr<LavSimulation> simulation, unsigned int numInputs);
 	virtual void process();
 };
 
-LavHardLimiterObject::LavHardLimiterObject(std::shared_ptr<LavDevice> device, unsigned int numInputs): LavObject(Lav_OBJTYPE_HARD_LIMITER, device, numInputs, numInputs) {
+LavHardLimiterObject::LavHardLimiterObject(std::shared_ptr<LavSimulation> simulation, unsigned int numInputs): LavObject(Lav_OBJTYPE_HARD_LIMITER, simulation, numInputs, numInputs) {
 }
 
-std::shared_ptr<LavObject>createHardLimiterObject(std::shared_ptr<LavDevice> device, unsigned int numChannels) {
-	auto retval = std::make_shared<LavHardLimiterObject>(device, numChannels);
-	device->associateObject(retval);
+std::shared_ptr<LavObject>createHardLimiterObject(std::shared_ptr<LavSimulation> simulation, unsigned int numChannels) {
+	auto retval = std::make_shared<LavHardLimiterObject>(simulation, numChannels);
+	simulation->associateObject(retval);
 	return retval;
 }
 
@@ -45,10 +45,10 @@ void LavHardLimiterObject::process() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterObject(LavDevice* device, unsigned int numChannels, LavObject** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterObject(LavSimulation* simulation, unsigned int numChannels, LavObject** destination) {
 	PUB_BEGIN
-	LOCK(*device);
-	auto retval = createHardLimiterObject(incomingPointer<LavDevice>(device), numChannels);
+	LOCK(*simulation);
+	auto retval = createHardLimiterObject(incomingPointer<LavSimulation>(simulation), numChannels);
 	*destination = outgoingPointer<LavObject>(retval);
 	PUB_END
 }

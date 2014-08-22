@@ -3,7 +3,7 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
-#include <libaudioverse/private_devices.hpp>
+#include <libaudioverse/private_simulation.hpp>
 #include <libaudioverse/private_objects.hpp>
 #include <libaudioverse/private_properties.hpp>
 #include <libaudioverse/private_macros.hpp>
@@ -17,7 +17,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 class LavAmplitudePannerObject: public LavObject {
 	public:
-	LavAmplitudePannerObject(std::shared_ptr<LavDevice> device);
+	LavAmplitudePannerObject(std::shared_ptr<LavSimulation> device);
 	~LavAmplitudePannerObject();
 	virtual void process();
 	private:
@@ -26,7 +26,7 @@ class LavAmplitudePannerObject: public LavObject {
 	int* channel_indices = nullptr;
 };
 
-LavAmplitudePannerObject::LavAmplitudePannerObject(std::shared_ptr<LavDevice> device): LavObject(Lav_OBJTYPE_AMPLITUDE_PANNER, device, 1, 0) {
+LavAmplitudePannerObject::LavAmplitudePannerObject(std::shared_ptr<LavSimulation> device): LavObject(Lav_OBJTYPE_AMPLITUDE_PANNER, simulation, 1, 0) {
 	getProperty(Lav_PANNER_CHANNEL_MAP).setPostChangedCallback([this](){recomputeChannelMap();});
 	recomputeChannelMap();
 }
@@ -60,9 +60,9 @@ void LavAmplitudePannerObject::recomputeChannelMap() {
 	resize(1, l);
 }
 
-std::shared_ptr<LavObject>createAmplitudePannerObject(std::shared_ptr<LavDevice> device) {
-	auto retval = std::make_shared<LavAmplitudePannerObject>(device);
-	device->associateObject(retval);
+std::shared_ptr<LavObject>createAmplitudePannerObject(std::shared_ptr<LavSimulation> simulation) {
+	auto retval = std::make_shared<LavAmplitudePannerObject>(simulation);
+	simulation->associateObject(retval);
 	return retval;
 }
 
@@ -76,10 +76,10 @@ LavObject::process();
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createAmplitudePannerObject(LavDevice* device, LavObject** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createAmplitudePannerObject(LavSimulation* simulation, LavObject** destination) {
 	PUB_BEGIN
-	LOCK(*device);
-	auto retval = createAmplitudePannerObject(incomingPointer<LavDevice>(device));
+	LOCK(*simulation);
+	auto retval = createAmplitudePannerObject(incomingPointer<LavSimulation>(simulation));
 	*destination = outgoingPointer<LavObject>(retval);
 	PUB_END
 }

@@ -3,7 +3,7 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
-#include <libaudioverse/private_devices.hpp>
+#include <libaudioverse/private_simulation.hpp>
 #include <libaudioverse/private_objects.hpp>
 #include <libaudioverse/private_properties.hpp>
 #include <libaudioverse/private_macros.hpp>
@@ -18,7 +18,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 class LavHrtfObject: public LavObject {
 	public:
-	LavHrtfObject(std::shared_ptr<LavDevice> device, std::shared_ptr<LavHrtfData> hrtf);
+	LavHrtfObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf);
 	~LavHrtfObject();
 	virtual void process();
 	private:
@@ -27,7 +27,7 @@ class LavHrtfObject: public LavObject {
 	float prev_azimuth = 0.0f, prev_elevation = 0.0f;
 };
 
-LavHrtfObject::LavHrtfObject(std::shared_ptr<LavDevice> device, std::shared_ptr<LavHrtfData> hrtf): LavObject(Lav_OBJTYPE_HRTF, device, 1, 2) {
+LavHrtfObject::LavHrtfObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf): LavObject(Lav_OBJTYPE_HRTF, simulation, 1, 2) {
 	type = Lav_OBJTYPE_HRTF;
 	this->hrtf = hrtf;
 	left_response = new float[hrtf->getLength()];
@@ -35,7 +35,7 @@ LavHrtfObject::LavHrtfObject(std::shared_ptr<LavDevice> device, std::shared_ptr<
 	//used for moving objects.
 	old_left_response = new float[hrtf->getLength()];
 	old_right_response = new float[hrtf->getLength()];
-	history = new float[hrtf->getLength() + device->getBlockSize()](); //odd c++ syntax to create 0-initialized array.
+	history = new float[hrtf->getLength() + simulation->getBlockSize()](); //odd c++ syntax to create 0-initialized array.
 	hrtf->computeCoefficientsStereo(0.0f, 0.0f, left_response, right_response);
 	prev_azimuth = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
 	prev_elevation = getProperty(Lav_PANNER_ELEVATION).getFloatValue();
@@ -47,9 +47,9 @@ LavHrtfObject::~LavHrtfObject() {
 	delete[] right_response;
 }
 
-std::shared_ptr<LavObject>createHrtfObject(std::shared_ptr<LavDevice>device, std::shared_ptr<LavHrtfData> hrtf) {
-	auto retval = std::make_shared<LavHrtfObject>(device, hrtf);
-	device->associateObject(retval);
+std::shared_ptr<LavObject>createHrtfObject(std::shared_ptr<LavSimulation>simulation, std::shared_ptr<LavHrtfData> hrtf) {
+	auto retval = std::make_shared<LavHrtfObject>(simulation, hrtf);
+	simulation->associateObject(retval);
 	return retval;
 }
 
@@ -64,7 +64,7 @@ void LavHrtfObject::process() {
 		hrtf->computeCoefficientsStereo(current_elevation, current_azimuth, left_response, right_response);
 		didRecompute = true;
 	}
-	float *start = history+hrtf->getLength(), *end = history+hrtf->getLength()+device->getBlockSize();
+	float *start = history+hrtf->getLength(), *end = history+hrtf->getLength()+simulation->getBlockSize();
 	//get the block size.
 	const unsigned int hrtfLength = hrtf->getLength();
 	//roll back the history...
@@ -87,12 +87,12 @@ void LavHrtfObject::process() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createHrtfObject(LavDevice* device, const char* hrtfPath, LavObject** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createHrtfObject(LavSimulation* simulation, const char* hrtfPath, LavObject** destination) {
 	PUB_BEGIN
 	auto hrtf = std::make_shared<LavHrtfData>();
-	hrtf->loadFromFile(hrtfPath, device->getSr());
-	LOCK(*device);
-	auto retval = createHrtfObject(incomingPointer<LavDevice>(device), hrtf);
+	hrtf->loadFromFile(hrtfPath, simulation->getSr());
+	LOCK(*simulation);
+	auto retval = createHrtfObject(incomingPointer<LavSimulation>(simulation), hrtf);
 	*destination = outgoingPointer<LavObject>(retval);
 	PUB_END
 }

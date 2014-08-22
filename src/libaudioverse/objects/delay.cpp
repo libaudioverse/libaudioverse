@@ -3,7 +3,7 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
-#include <libaudioverse/private_devices.hpp>
+#include <libaudioverse/private_simulation.hpp>
 #include <libaudioverse/private_objects.hpp>
 #include <libaudioverse/private_properties.hpp>
 #include <libaudioverse/private_macros.hpp>
@@ -14,7 +14,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 class LavDelayObject: public LavObject {
 	public:
-	LavDelayObject(std::shared_ptr<LavDevice> device, unsigned int lines);
+	LavDelayObject(std::shared_ptr<LavSimulation> simulation, unsigned int lines);
 	~LavDelayObject();
 	void process();
 	protected:
@@ -33,7 +33,7 @@ class LavDelayObject: public LavObject {
 	bool is_interpolating = false;
 };
 
-LavDelayObject::LavDelayObject(std::shared_ptr<LavDevice> device, unsigned int lines): LavObject(Lav_OBJTYPE_DELAY, device, lines, lines) {
+LavDelayObject::LavDelayObject(std::shared_ptr<LavSimulation> simulation, unsigned int lines): LavObject(Lav_OBJTYPE_DELAY, simulation, lines, lines) {
 	line_count = lines;
 	if(lines == 0) throw LavErrorException(Lav_ERROR_RANGE);
 	getProperty(Lav_DELAY_DELAY_MAX).setPostChangedCallback([this] () {maxDelayChanged();});
@@ -43,9 +43,9 @@ LavDelayObject::LavDelayObject(std::shared_ptr<LavDevice> device, unsigned int l
 	recomputeDelta(); //get delta set for the first time.
 }
 
-std::shared_ptr<LavObject> createDelayObject(std::shared_ptr<LavDevice> device, unsigned int lines) {
-	auto tmp = std::make_shared<LavDelayObject>(device, lines);
-	device->associateObject(tmp);
+std::shared_ptr<LavObject> createDelayObject(std::shared_ptr<LavSimulation> simulation, unsigned int lines) {
+	auto tmp = std::make_shared<LavDelayObject>(simulation, lines);
+	simulation->associateObject(tmp);
 	return tmp;
 }
 
@@ -73,7 +73,7 @@ void LavDelayObject::maxDelayChanged() {
 	if(target_delay_pos > maxDelay) {
 		target_delay_pos = maxDelay;
 	}
-	unsigned int delayLineLength = (unsigned int)(maxDelay*device->getSr());
+	unsigned int delayLineLength = (unsigned int)(maxDelay*simulation->getSr());
 	delay_line_length = delayLineLength;
 	//reallocate the lines.
 	for(int i = 0; i < line_count; i++) {
@@ -84,7 +84,7 @@ void LavDelayObject::maxDelayChanged() {
 }
 
 void LavDelayObject::recomputeDelta() {
-	delta = (1.0f/getProperty(Lav_DELAY_INTERPOLATION_TIME).getFloatValue())/device->getSr();
+	delta = (1.0f/getProperty(Lav_DELAY_INTERPOLATION_TIME).getFloatValue())/simulation->getSr();
 }
 
 void LavDelayObject::beginInterpolation() {
@@ -101,8 +101,8 @@ void LavDelayObject::endInterpolation() {
 }
 
 float LavDelayObject::computeSample(float pos, unsigned int line) {
-	int position = (int)floorf(pos*device->getSr());
-	float offset = pos*device->getSr()-(float)position;
+	int position = (int)floorf(pos*simulation->getSr());
+	float offset = pos*simulation->getSr()-(float)position;
 	//if this is not going to leave enough room to interpolate two samples, we have to fix it.
 	//this can happen sometimes when delay is close to the max and floating point inaccuracies add up.
 	if(position >= delay_line_length) {
@@ -152,9 +152,9 @@ void LavDelayObject::process() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createDelayObject(LavDevice* device, unsigned int lines, LavObject** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createDelayObject(LavSimulation* simulation, unsigned int lines, LavObject** destination) {
 	PUB_BEGIN
-	auto d = createDelayObject(incomingPointer<LavDevice>(device), lines);
+	auto d = createDelayObject(incomingPointer<LavSimulation>(simulation), lines);
 	*destination = outgoingPointer(d);
 	PUB_END
 }
