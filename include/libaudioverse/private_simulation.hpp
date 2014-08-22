@@ -62,7 +62,7 @@ class LavSimulation {
 	void backgroundTaskThreadFunction();
 
 	//our output, if any.
-	std::shared_ptr<LavDevice> output = nullptr;
+	std::shared_ptr<LavDevice> device = nullptr;
 };
 
 //initialize the audio backend.

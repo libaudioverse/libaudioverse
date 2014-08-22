@@ -11,7 +11,7 @@ functiontables.cpp
 initialization.cpp
 memory.cpp
 callbacks.cpp
-devices.cpp
+simulation.cpp
 
 #utilities: file reading, platform-specific code, etc:
 utils/file_reader.cpp

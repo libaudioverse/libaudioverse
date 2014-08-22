@@ -2,7 +2,7 @@
 This file is part of Libaudioverse, a library for 3D and environmental audio simulation, and is released under the terms of the Gnu General Public License Version 3 or (at your option) any later version.
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
-#include <libaudioverse/private_devices.hpp>
+#include <libaudioverse/private_simulation.hpp>
 #include <libaudioverse/private_objects.hpp>
 #include <libaudioverse/private_macros.hpp>
 #include <libaudioverse/private_memory.hpp>
@@ -13,7 +13,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <iterator>
 #include <thread>
 
-LavDevice::LavDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead) {
+LavSimulation::LavSimulation(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead) {
 	this->sr = (float)sr;
 	this->channels = channels;
 	this->block_size = blockSize;
@@ -23,13 +23,13 @@ LavDevice::LavDevice(unsigned int sr, unsigned int channels, unsigned int blockS
 	start();
 }
 
-LavDevice::~LavDevice() {
+LavSimulation::~LavSimulation() {
 	//enqueue a task which will stop the background thread.
 	enqueueTask([]() {throw LavThreadTerminationException();});
 	backgroundTaskThread.join();
 }
 
-LavError LavDevice::getBlock(float* out) {
+LavError LavSimulation::getBlock(float* out) {
 	//if paused, memset 0s.
 	if(is_started == 0) {
 		memset(out, 0, sizeof(float)*channels*block_size);
@@ -70,39 +70,39 @@ LavError LavDevice::getBlock(float* out) {
 	return Lav_ERROR_NONE;
 }
 
-LavError LavDevice::start() {
+LavError LavSimulation::start() {
 	is_started = 1;
 	return Lav_ERROR_NONE;
 }
 
-LavError LavDevice::stop() {
+LavError LavSimulation::stop() {
 	is_started = 0;
 	return Lav_ERROR_NONE;
 }
 
-LavError LavDevice::associateObject(std::shared_ptr<LavObject> obj) {
+LavError LavSimulation::associateObject(std::shared_ptr<LavObject> obj) {
 	objects.insert(std::weak_ptr<LavObject>(obj));
 	return Lav_ERROR_NONE;
 }
 
-LavError LavDevice::setOutputObject(std::shared_ptr<LavObject> obj) {
+LavError LavSimulation::setOutputObject(std::shared_ptr<LavObject> obj) {
 	output_object = obj;
 	return Lav_ERROR_NONE;
 }
 
-std::shared_ptr<LavObject> LavDevice::getOutputObject() {
+std::shared_ptr<LavObject> LavSimulation::getOutputObject() {
 	return output_object;
 }
 
-void LavDevice::enqueueTask(std::function<void(void)> cb) {
+void LavSimulation::enqueueTask(std::function<void(void)> cb) {
 	tasks.enqueue(cb);
 }
 
-void LavDevice::associateOutput(std::shared_ptr<LavPhysicalOutput> what) {
-	output = what;
+void LavSimulation::associateDevice(std::shared_ptr<LavDevice> what) {
+	device = what;
 }
 
-void LavDevice::visitAllObjectsInProcessOrder(std::function<void(std::shared_ptr<LavObject>)> visitor) {
+void LavSimulation::visitAllObjectsInProcessOrder(std::function<void(std::shared_ptr<LavObject>)> visitor) {
 	std::set<std::shared_ptr<LavObject>> seen;
 	if(output_object) {
 		visitForProcessing(output_object, [&](std::shared_ptr<LavObject> o) {
@@ -138,7 +138,7 @@ void LavDevice::visitAllObjectsInProcessOrder(std::function<void(std::shared_ptr
 	}
 }
 
-void LavDevice::visitForProcessing(std::shared_ptr<LavObject> obj, std::function<void(std::shared_ptr<LavObject>)> visitor) {
+void LavSimulation::visitForProcessing(std::shared_ptr<LavObject> obj, std::function<void(std::shared_ptr<LavObject>)> visitor) {
 	//if obj is null, bail out.  This is the base case.
 	if(obj == nullptr) return;
 	//if the object is suspended, we also bail out: this object and its parents are not needed.
@@ -151,7 +151,7 @@ void LavDevice::visitForProcessing(std::shared_ptr<LavObject> obj, std::function
 }
 
 //Default callback implementation.
-void LavDevice::backgroundTaskThreadFunction() {
+void LavSimulation::backgroundTaskThreadFunction() {
 	try {
 		for(;;) {
 			auto task = tasks.dequeue();
@@ -165,41 +165,44 @@ void LavDevice::backgroundTaskThreadFunction() {
 
 //begin public API
 
-Lav_PUBLIC_FUNCTION LavError Lav_deviceSetOutputObject(LavDevice* device, LavObject* object) {
-	LOCK(*device);
-	device->setOutputObject(incomingPointer<LavObject>(object));
-	return Lav_ERROR_NONE;
-}
-
-Lav_PUBLIC_FUNCTION LavError Lav_deviceGetOutputObject(LavDevice* device, LavObject** destination) {
-	LOCK(*device);
-	*destination = outgoingPointer<LavObject>(device->getOutputObject());
-	return Lav_ERROR_NONE;
-}
-
-Lav_PUBLIC_FUNCTION LavError Lav_deviceGetBlock(LavDevice* device, float* destination) {
-	LOCK(*device);
-	device->getBlock(destination);
-	return Lav_ERROR_NONE;
-}
-
-Lav_PUBLIC_FUNCTION LavError Lav_deviceGetBlockSize(LavDevice* dev, int* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_simulationSetOutputObject(LavSimulation* simulation, LavObject* object) {
 	PUB_BEGIN
-	LOCK(*dev);
-	*destination = dev->getBlockSize();
+	LOCK(*simulation);
+	simulation->setOutputObject(incomingPointer<LavObject>(object));
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_deviceGetSr(LavDevice* device, int* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_simulationGetOutputObject(LavSimulation* simulation, LavObject** destination) {
 	PUB_BEGIN
-	LOCK(*device);
-	*destination = (int)device->getSr();
+	LOCK(*simulation);
+	*destination = outgoingPointer<LavObject>(simulation->getOutputObject());
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_deviceGetChannels(LavDevice* device, int* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlock(LavSimulation* simulation, float* destination) {
 	PUB_BEGIN
-	LOCK(*device);
-	*destination = device->getChannels();
+	LOCK(*simulation);
+	simulation->getBlock(destination);
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlockSize(LavSimulation* simulation, int* destination) {
+	PUB_BEGIN
+	LOCK(*simulation);
+	*destination = simulation->getBlockSize();
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_simulationGetSr(LavSimulation* simulation, int* destination) {
+	PUB_BEGIN
+	LOCK(*simulation);
+	*destination = (int)simulation->getSr();
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_simulationGetChannels(LavSimulation* simulation, int* destination) {
+	PUB_BEGIN
+	LOCK(*simulation);
+	*destination = simulation->getChannels();
 	PUB_END
 }
