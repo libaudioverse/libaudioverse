@@ -7,7 +7,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_properties.hpp>
 #include <libaudioverse/private_macros.hpp>
 #include <libaudioverse/private_constants.hpp>
-#include <libaudioverse/private_devices.hpp>
+#include <libaudioverse/private_simulation.hpp>
 #include <libaudioverse/private_creators.hpp>
 #include <libaudioverse/private_memory.hpp>
 #include <libaudioverse/libaudioverse.h>
@@ -21,16 +21,16 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <memory>
 
 
-LavSourceObject::LavSourceObject(std::shared_ptr<LavDevice> device, std::shared_ptr<LavSourceManager> manager): LavSubgraphObject(Lav_OBJTYPE_SOURCE, device) {
-	attenuator_object = createAttenuatorObject(device, 1);
+LavSourceObject::LavSourceObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavSourceManager> manager): LavSubgraphObject(Lav_OBJTYPE_SOURCE, simulation) {
+	attenuator_object = createAttenuatorObject(simulation, 1);
 	panner_object = manager->createPannerObject();
 	panner_object->setInput(0, attenuator_object, 0);
 	configureSubgraph(attenuator_object, nullptr); //we input to the attenuator, and output to nothing (because the manager grabs hold of the panner directly).
 	this->manager = manager;
 }
 
-std::shared_ptr<LavObject> createSourceObject(std::shared_ptr<LavDevice> device, std::shared_ptr<LavSourceManager> manager) {
-	auto temp = std::make_shared<LavSourceObject>(device, manager);
+std::shared_ptr<LavObject> createSourceObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavSourceManager> manager) {
+	auto temp = std::make_shared<LavSourceObject>(simulation, manager);
 	manager->registerSourceForUpdates(temp);
 	return temp;
 }
@@ -69,9 +69,10 @@ void LavSourceObject::update(LavEnvironment environment) {
 	attenuator_object ->getProperty(Lav_ATTENUATOR_MULTIPLIER).setFloatValue(gain);
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_createSourceObject(LavDevice* device, LavObject* environment, LavObject** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createSourceObject(LavSimulation* simulation, LavObject* environment, LavObject** destination) {
 	PUB_BEGIN
-	auto retval = createSourceObject(incomingPointer<LavDevice>(device), incomingPointer<LavSourceManager>(environment));
+	LOCK(*simulation);
+	auto retval = createSourceObject(incomingPointer<LavSimulation>(simulation), incomingPointer<LavSourceManager>(environment));
 	*destination = outgoingPointer<LavObject>(retval);
 	PUB_END
 }

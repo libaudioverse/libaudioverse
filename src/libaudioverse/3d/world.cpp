@@ -7,7 +7,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_properties.hpp>
 #include <libaudioverse/private_macros.hpp>
 #include <libaudioverse/private_creators.hpp>
-#include <libaudioverse/private_devices.hpp>
+#include <libaudioverse/private_simulation.hpp>
 #include <libaudioverse/private_memory.hpp>
 #include <libaudioverse/private_hrtf.hpp>
 #include <libaudioverse/libaudioverse.h>
@@ -19,11 +19,11 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <algorithm>
 #include <vector>
 
-LavWorldObject::LavWorldObject(std::shared_ptr<LavDevice> device, std::shared_ptr<LavHrtfData> hrtf): LavSourceManager(Lav_OBJTYPE_WORLD, device) {
+LavWorldObject::LavWorldObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf): LavSourceManager(Lav_OBJTYPE_WORLD, simulation) {
 	this->hrtf = hrtf;
-	mixer = createMixerObject(device, 1, device->getChannels());
-	limiter = createHardLimiterObject(device, device->getChannels());
-	for(int i = 0; i < device->getChannels(); i++) {
+	mixer = createMixerObject(simulation, 1, simulation->getChannels());
+	limiter = createHardLimiterObject(simulation, simulation->getChannels());
+	for(int i = 0; i < simulation->getChannels(); i++) {
 		limiter->setInput(i, mixer, i);
 	}
 
@@ -35,8 +35,8 @@ LavWorldObject::LavWorldObject(std::shared_ptr<LavDevice> device, std::shared_pt
 	configureSubgraph(nullptr, limiter);
 }
 
-std::shared_ptr<LavWorldObject> createWorldObject(std::shared_ptr<LavDevice> device, std::shared_ptr<LavHrtfData> hrtf) {
-	return std::make_shared<LavWorldObject>(device, hrtf);
+std::shared_ptr<LavWorldObject> createWorldObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf) {
+	return std::make_shared<LavWorldObject>(simulation, hrtf);
 }
 
 void LavWorldObject::willProcessParents() {
@@ -58,7 +58,7 @@ void LavWorldObject::willProcessParents() {
 }
 
 std::shared_ptr<LavObject> LavWorldObject::createPannerObject() {
-	auto pan = createHrtfObject(device, hrtf);
+	auto pan = createHrtfObject(simulation, hrtf);
 	unsigned int slot = panners.size();
 	panners.push_back(pan);
 	//todo: assumes stereo implicitly, this is bad.
@@ -75,11 +75,12 @@ void LavWorldObject::registerSourceForUpdates(std::shared_ptr<LavSourceObject> s
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createWorldObject(LavDevice* device, const char*hrtfPath, LavObject** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createWorldObject(LavSimulation* simulation, const char*hrtfPath, LavObject** destination) {
 	PUB_BEGIN
+	LOCK(*simulation);
 	auto hrtf = std::make_shared<LavHrtfData>();
-	hrtf->loadFromFile(hrtfPath, device->getSr());
-	auto retval = createWorldObject(incomingPointer<LavDevice>(device), hrtf);
+	hrtf->loadFromFile(hrtfPath, simulation->getSr());
+	auto retval = createWorldObject(incomingPointer<LavSimulation>(simulation), hrtf);
 	*destination = outgoingPointer<LavObject>(retval);
 	PUB_END
 }
