@@ -5,7 +5,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 /**Initialize libaudioverse.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/private_functiontables.hpp>
-#include <libaudioverse/private_devices.hpp>
+#include <libaudioverse/private_simulation.hpp>
 #include <libaudioverse/private_macros.hpp>
 #include <libaudioverse/private_metadata.hpp>
 #include <libaudioverse/private_memory.hpp>
@@ -20,7 +20,7 @@ typedef void (*initfunc_t)();
 initfunc_t initializers[] = {
 	initializeMemoryModule,
 	initializeFunctionTables,
-	initializePhysicalOutputFactory,
+	initializeDeviceFactory,
 	initializeMetadata,
 };
 unsigned int isInitialized = 0;

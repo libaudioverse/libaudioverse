@@ -15,14 +15,14 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 /**A physical output.*/
 class LavDevice {
 	protected:
-	LavPhysicalOutput(std::shared_ptr<LavSimulation> simulation, unsigned int mixAhead);
+	LavDevice(std::shared_ptr<LavSimulation> simulation, unsigned int mixAhead);
+	virtual ~LavDevice();
 	virtual void init(unsigned int targetSr); //second step in initialization. We can't just fall through to the constructor.
 	virtual void start(); //final step in initialization via subclasses: starts the background thread.
 	virtual void stop(); //stop the output.
 	//these hooks are run in the background thread, and should be overridden in subclasses.
 	virtual void startup_hook();
 	virtual void shutdown_hook();
-	virtual ~LavPhysicalOutput();
 	virtual void zeroOrNextBuffer(float* where);
 	virtual void mixingThreadFunction();
 	unsigned int output_buffer_size = 0, mix_ahead = 0, channels = 0;
