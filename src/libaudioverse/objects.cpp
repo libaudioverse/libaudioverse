@@ -6,10 +6,9 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/private_memory.hpp>
-
 #include <libaudioverse/private_objects.hpp>
 #include <libaudioverse/private_properties.hpp>
-#include <libaudioverse/private_devices.hpp>
+#include <libaudioverse/private_simulation.hpp>
 #include <libaudioverse/private_macros.hpp>
 #include <libaudioverse/private_metadata.hpp>
 #include <algorithm>
@@ -36,25 +35,25 @@ void LavObject::computeInputBuffers() {
 	}
 }
 
-LavObject::LavObject(int type, std::shared_ptr<LavDevice> device, unsigned int numInputs, unsigned int numOutputs): type(type) {
+LavObject::LavObject(int type, std::shared_ptr<LavSimulation> simulation, unsigned int numInputs, unsigned int numOutputs): type(type) {
 	//allocations:
 	input_descriptors.resize(numInputs, LavInputDescriptor(nullptr, 0));
 	inputs.resize(numInputs, nullptr);
 	outputs.resize(numOutputs);
 	for(auto i = outputs.begin(); i != outputs.end(); i++) {
-		*i = new float[device->getBlockSize()];
+		*i = new float[simulation->getBlockSize()];
 	}
 
-	this->device = device;
+	this->simulation= simulation;
 	//request properties from the metadata module.
 	properties = makePropertyTable(type);
 	//and callbacks.
 	callbacks = makeCallbackTable(type);
 
-	//Loop through callbacks, associating them with our device.
+	//Loop through callbacks, associating them with our simulation.
 	//map iterators dont' give references, only operator[].
 	for(auto i: callbacks) {
-		callbacks[i.first].associateDevice(device);
+		callbacks[i.first].associateSimulation(simulation);
 		callbacks[i.first].associateObject(this);
 	}
 
@@ -72,13 +71,13 @@ void LavObject::willProcess() {
 	computeInputBuffers();
 	num_inputs = inputs.size();
 	num_outputs = outputs.size();
-	block_size = device->getBlockSize();
+	block_size = simulation->getBlockSize();
 }
 
 /*Default Processing function.*/
 void LavObject::process() {
 	for(unsigned int i = 0; i < outputs.size(); i++) {
-		memset(outputs[i], 0, device->getBlockSize()*sizeof(float));
+		memset(outputs[i], 0, block_size*sizeof(float));
 	}
 }
 
@@ -151,8 +150,8 @@ void LavObject::getOutputPointers(float** dest) {
 	std::copy(outputs.begin(), outputs.end(), dest);
 }
 
-std::shared_ptr<LavDevice> LavObject::getDevice() {
-	return device;
+std::shared_ptr<LavSimulation> LavObject::getSimulation() {
+	return simulation;
 }
 
 LavProperty& LavObject::getProperty(int slot) {
@@ -174,11 +173,11 @@ LavCallback& LavObject::getCallback(int which) {
 }
 
 void LavObject::lock() {
-	device->lock();
+	simulation->lock();
 }
 
 void LavObject::unlock() {
-	device->unlock();
+	simulation->unlock();
 }
 
 //protected resize function.
@@ -197,14 +196,14 @@ void LavObject::resize(unsigned int newInputCount, unsigned int newOutputCount) 
 	outputs.resize(newOutputCount, nullptr);
 	if(newOutputCount > oldOutputCount) { //we need to allocate some more arrays.
 		for(auto i = oldOutputCount; i < newOutputCount; i++) {
-			outputs[i] = new float[device->getBlockSize()];
+			outputs[i] = new float[simulation->getBlockSize()];
 		}
 	}
 }
 
 /**Implementation of LavPasssthroughObject.*/
 
-LavSubgraphObject::LavSubgraphObject(int type, std::shared_ptr<LavDevice> device): LavObject(type, device, 0, 0) {
+LavSubgraphObject::LavSubgraphObject(int type, std::shared_ptr<LavSimulation> simulation): LavObject(type, simulation, 0, 0) {
 }
 
 void LavSubgraphObject::configureSubgraph(std::shared_ptr<LavObject> input, std::shared_ptr<LavObject> output) {
@@ -315,7 +314,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectSetInput(LavObject *obj, unsigned int inp
 }
 
 //this is properties.
-//this is here because properties do not "know" about objects and only objects have properties; also, it made properties.cpp ahve to "know" about devices and objects.
+//this is here because properties do not "know" about objects and only objects have properties; also, it made properties.cpp have to "know" about simulations and objects.
 
 //this works for getters and setters to lock the object and set a variable prop to be a pointer-like thing to a property.
 #define PROP_PREAMBLE(o, s, t) auto obj_ptr = incomingPointer<LavObject>(obj);\

@@ -117,18 +117,18 @@ Lav_PUBLIC_FUNCTION LavError Lav_getDeviceCount(unsigned int* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_getDeviceLatency(unsigned int index, float* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_getDeviceName(unsigned int index, char** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_getDeviceChannels(unsigned int index, unsigned int* destination);
-Lav_PUBLIC_FUNCTION LavError Lav_createSimulationForPhysicalOutput(int index, unsigned int sr, unsigned int blockSize, unsigned int mixAhead, LavDevice** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createSimulationForDevice(int index, unsigned int sr, unsigned int blockSize, unsigned int mixAhead, LavSimulation** destination);
 
 /**This type of simulation is intended for apps that wish to handle audio themselves: it will not output and time will not advance for it.
 Combine it with Lav_simulationReadBlock to make use of it.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createReadSimulation(unsigned int sr, unsigned int channels, unsigned int blockSize, LavDevice** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createReadSimulation(unsigned int sr, unsigned int channels, unsigned int blockSize, LavSimulation** destination);
 
-Lav_PUBLIC_FUNCTION LavError Lav_simulationSetOutputObject(LavDevice* device, LavObject* object);
-Lav_PUBLIC_FUNCTION LavError Lav_simulationGetOutputObject(LavDevice* device, LavObject** destination);
-Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlockSize(LavDevice* dev, int* destination);
-Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlock(LavDevice* device, float* buffer);
-Lav_PUBLIC_FUNCTION LavError Lav_simulationGetSr(LavDevice* device, int* destination);
-Lav_PUBLIC_FUNCTION LavError Lav_simulationGetChannels(LavDevice* device, int* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_simulationSetOutputObject(LavSimulation* simulation, LavObject* object);
+Lav_PUBLIC_FUNCTION LavError Lav_simulationGetOutputObject(LavSimulation* simulation, LavObject** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlockSize(LavSimulation* simulation, int* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlock(LavSimulation* simulation, float* buffer);
+Lav_PUBLIC_FUNCTION LavError Lav_simulationGetSr(LavSimulation* simulation, int* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_simulationGetChannels(LavSimulation* simulation, int* destination);
 
 /**Query object type.*/
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetType(LavObject* obj, int* destination);
