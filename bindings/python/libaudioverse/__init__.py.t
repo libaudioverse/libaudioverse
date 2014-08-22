@@ -159,14 +159,27 @@ class DeviceInfo(object):
 		self.name = name
 		self.index = index
 
+def enumerate_devices():
+	"""Returns a list of DeviceInfo representing the devices on the system.
+
+The position in the list is the needed device index for Simulation.__iniit__."""
+	max_index = _lav.device_get_count()
+	infos = []
+	for i in xrange(max_index):
+		info = DeviceInfo(index = i,
+		latency = _lav.device_get_latency(i),
+		channels = _lav.device_get_channels(i),
+		name = _lav.device_get_name(i))
+		infos.append(info)
+	return infos
+
 class Simulation(object):
 	"""Represents a running simulation.  All libaudioverse objects must be passed a simulation at creation time and cannot migrate between them.  Furthermore, it is an error to try to connect objects from different simulations."""
-
 
 	def __init__(self, sample_rate = 44100, block_size = 1024, mix_ahead = 1, channels = 2, device_index = None):
 		"""Create a simulation.
 
-See get_device_infos, a static method on this class, for the possible values of device_index and other output information.
+See enumerate_devices for the possible values of device_index and other output information.
 
 There are two ways to initialize a device.
 
@@ -189,18 +202,6 @@ Calling this on an audio output device will cause the audio thread to skip ahead
 		buff = (ctypes.c_float*length)()
 		_lav.simulation_get_block(self.handle, buff)
 		return list(buff)
-
-	@staticmethod
-	def get_device_infos():
-		max_index = _lav.get_device_count()
-		infos = []
-		for i in xrange(max_index):
-			info = DeviceInfo(index = i,
-			latency = _lav.get_physical_output_latency(i),
-			channels = _lav.get_physical_output_channels(i),
-			name = _lav.get_physical_output_name(i))
-			infos.append(info)
-		return infos
 
 	@property
 	def output_object(self):

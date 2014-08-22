@@ -19,19 +19,19 @@ if((x) != Lav_ERROR_NONE) {\
 void main() {
 	ERRCHECK(Lav_initializeLibrary());
 	unsigned int max_devices = 0;
-	ERRCHECK(Lav_getDeviceCount(&max_devices));
+	ERRCHECK(Lav_deviceGetCount(&max_devices));
 	printf("%u devices detected.\n", max_devices);
 	for(unsigned int i = 0; i < max_devices; i++) {
 		printf("\n\n");
 		char* name;
-		ERRCHECK(Lav_getDeviceName(i, &name));
+		ERRCHECK(Lav_deviceGetName(i, &name));
 		printf("%s:\n", name);
 		Lav_free(name);
 		float latency = 0.0f;
-		ERRCHECK(Lav_getDeviceLatency(i, &latency));
+		ERRCHECK(Lav_deviceGetLatency(i, &latency));
 		printf("Latency: %f\n", latency);
 		unsigned int channels = 0;
-		ERRCHECK(Lav_getDeviceChannels(i, &channels));
+		ERRCHECK(Lav_deviceGetChannels(i, &channels));
 		printf("channels: %u\n", channels);
 	}
 }

@@ -42,13 +42,13 @@ void initializeSimulationFactory() {
 
 //begin public api.
 
-Lav_PUBLIC_FUNCTION LavError Lav_getDeviceCount(unsigned int* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_deviceGetCount(unsigned int* destination) {
 	PUB_BEGIN
 	*destination = chosen_factory->getOutputCount();
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_getDeviceLatency(unsigned int index, float* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_deviceGetLatency(unsigned int index, float* destination) {
 	PUB_BEGIN
 	auto l = chosen_factory->getOutputLatencies();
 	if(index >= l.size()) throw LavErrorException(Lav_ERROR_RANGE);
@@ -56,7 +56,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_getDeviceLatency(unsigned int index, float* des
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_getDeviceName(unsigned int index, char** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_deviceGetName(unsigned int index, char** destination) {
 	PUB_BEGIN
 	auto n = chosen_factory->getOutputNames();
 	if(index >= n.size()) throw LavErrorException(Lav_ERROR_RANGE);
@@ -69,7 +69,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_getDeviceName(unsigned int index, char** destin
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_getDeviceChannels(unsigned int index, unsigned int* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_deviceGetChannels(unsigned int index, unsigned int* destination) {
 	PUB_BEGIN
 	auto c = chosen_factory->getOutputMaxChannels();
 	if(index >= c.size()) throw LavErrorException(Lav_ERROR_RANGE);

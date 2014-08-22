@@ -113,10 +113,10 @@ Index -1 is special.  Any attempts to query about index -1 will fail.  Index -1 
 Opening a device on index -1 requests that the default system audio device be used.  In addition, however, index -1 will follow the default system audio device when the backend supports it.
 It is constrained to two channels because there is no graceful way to handle moving to a device with less channels, and it is assumed apps looking for this functionality will not mind the loss.  This may/will probably be changed in future.
 */
-Lav_PUBLIC_FUNCTION LavError Lav_getDeviceCount(unsigned int* destination);
-Lav_PUBLIC_FUNCTION LavError Lav_getDeviceLatency(unsigned int index, float* destination);
-Lav_PUBLIC_FUNCTION LavError Lav_getDeviceName(unsigned int index, char** destination);
-Lav_PUBLIC_FUNCTION LavError Lav_getDeviceChannels(unsigned int index, unsigned int* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_deviceGetCount(unsigned int* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_deviceGetLatency(unsigned int index, float* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_deviceGetName(unsigned int index, char** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_deviceGetChannels(unsigned int index, unsigned int* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createSimulationForDevice(int index, unsigned int sr, unsigned int blockSize, unsigned int mixAhead, LavSimulation** destination);
 
 /**This type of simulation is intended for apps that wish to handle audio themselves: it will not output and time will not advance for it.
