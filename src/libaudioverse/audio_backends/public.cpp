@@ -3,7 +3,7 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/private_physical_outputs.hpp>
-#include <libaudioverse/private_devices.hpp>
+#include <libaudioverse/private_simulation.hpp>
 #include <libaudioverse/private_resampler.hpp>
 #include <libaudioverse/private_macros.hpp>
 #include <libaudioverse/private_memory.hpp>
@@ -22,15 +22,15 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 /**Public facing code.  This includes the rest of the library itself and the public API.*/
 
 //list from greatest to least priority.
-LavPhysicalOutputFactoryCreationFunction possible_backends[] = {
-	createPortaudioPhysicalOutputFactory,
+LavSimulationFactoryCreationFunction possible_backends[] = {
+	createPortaudioSimulationFactory,
 };
-LavPhysicalOutputFactory* chosen_factory = nullptr;
+LavSimulationFactory* chosen_factory = nullptr;
 
 
-void initializePhysicalOutputFactory() {
-	for(unsigned int i = 0; i < sizeof(possible_backends)/sizeof(LavPhysicalOutputFactoryCreationFunction); i++) {
-		LavPhysicalOutputFactory* possible = possible_backends[i]();
+void initializeSimulationFactory() {
+	for(unsigned int i = 0; i < sizeof(possible_backends)/sizeof(LavSimulationFactoryCreationFunction); i++) {
+		LavSimulationFactory* possible = possible_backends[i]();
 		if(possible != nullptr) {
 			chosen_factory = possible;
 			return;
@@ -42,13 +42,13 @@ void initializePhysicalOutputFactory() {
 
 //begin public api.
 
-Lav_PUBLIC_FUNCTION LavError Lav_getPhysicalOutputCount(unsigned int* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_getDeviceCount(unsigned int* destination) {
 	PUB_BEGIN
 	*destination = chosen_factory->getOutputCount();
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_getPhysicalOutputLatency(unsigned int index, float* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_getDeviceLatency(unsigned int index, float* destination) {
 	PUB_BEGIN
 	auto l = chosen_factory->getOutputLatencies();
 	if(index >= l.size()) throw LavErrorException(Lav_ERROR_RANGE);
@@ -56,7 +56,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_getPhysicalOutputLatency(unsigned int index, fl
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_getPhysicalOutputName(unsigned int index, char** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_getDeviceName(unsigned int index, char** destination) {
 	PUB_BEGIN
 	auto n = chosen_factory->getOutputNames();
 	if(index >= n.size()) throw LavErrorException(Lav_ERROR_RANGE);
@@ -69,7 +69,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_getPhysicalOutputName(unsigned int index, char*
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_getPhysicalOutputChannels(unsigned int index, unsigned int* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_getDeviceChannels(unsigned int index, unsigned int* destination) {
 	PUB_BEGIN
 	auto c = chosen_factory->getOutputMaxChannels();
 	if(index >= c.size()) throw LavErrorException(Lav_ERROR_RANGE);
@@ -77,17 +77,17 @@ Lav_PUBLIC_FUNCTION LavError Lav_getPhysicalOutputChannels(unsigned int index, u
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_createDeviceForPhysicalOutput(int index, unsigned int sr, unsigned int blockSize, unsigned int mixAhead, LavDevice** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createSimulationForDevice(int index, unsigned int sr, unsigned int blockSize, unsigned int mixAhead, LavSimulation** destination) {
 	PUB_BEGIN
-	auto dev = chosen_factory->createDevice(index, sr, blockSize, mixAhead);
-	*destination = outgoingPointer<LavDevice>(dev);
+	auto sim = chosen_factory->createSimulation(index, sr, blockSize, mixAhead);
+	*destination = outgoingPointer<LavSimulation>(sim);
 	PUB_END
 }
 
 //the special case of a device without an output.
-Lav_PUBLIC_FUNCTION LavError Lav_createReadDevice(unsigned int sr, unsigned int channels, unsigned int blockSize, LavDevice** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createReadSimulation(unsigned int sr, unsigned int channels, unsigned int blockSize, LavSimulation** destination) {
 	PUB_BEGIN
-	auto shared = std::make_shared<LavDevice>(sr, channels, blockSize, 0);
+	auto shared = std::make_shared<LavSimulation>(sr, channels, blockSize, 0);
 	*destination = outgoingPointer(shared);
 	PUB_END
 }

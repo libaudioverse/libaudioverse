@@ -3,7 +3,7 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/private_physical_outputs.hpp>
-#include <libaudioverse/private_devices.hpp>
+#include <libaudioverse/private_simulation.hpp>
 #include <libaudioverse/private_resampler.hpp>
 #include <string>
 #include <vector>
@@ -18,18 +18,18 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 /**Code common to all backends, i.e. enumeration.*/
 
-LavPhysicalOutput::LavPhysicalOutput(std::shared_ptr<LavDevice> dev, unsigned int mixAhead): mix_ahead(mixAhead), device(dev), channels(dev->getChannels()) {
+LavDevice::LavDevice(std::shared_ptr<LavSimulation> sim, unsigned int mixAhead): mix_ahead(mixAhead), simulation(sim), channels(sim->getChannels()) {
 	buffers = new float*[mixAhead+1];
 	buffer_statuses = new std::atomic<int>[mixAhead+1];
 }
 
 //these are the next two steps in initialization, and are consequently put before the destructor.
-void LavPhysicalOutput::init(unsigned int targetSr) {
+void LavDevice::init(unsigned int targetSr) {
 	target_sr = targetSr;
 	//compute an estimated "good" size for the buffers, given the device's blockSize and channels.
-	output_buffer_size = (unsigned int)device->getBlockSize();
-	if(targetSr != device->getSr()) {
-		output_buffer_size = (unsigned int)(output_buffer_size*(double)targetSr/device->getSr());
+	output_buffer_size = (unsigned int)simulation->getBlockSize();
+	if(targetSr != simulation->getSr()) {
+		output_buffer_size = (unsigned int)(output_buffer_size*(double)targetSr/simulation->getSr());
 		//always go for the multiples of 4.  This doesn't hurt anything, and some backends may be faster because of it.
 		if(output_buffer_size%4) output_buffer_size = output_buffer_size+(4-output_buffer_size%4);
 	}
@@ -39,12 +39,12 @@ void LavPhysicalOutput::init(unsigned int targetSr) {
 	}
 }
 
-void LavPhysicalOutput::start() {
+void LavDevice::start() {
 	mixing_thread_continue.test_and_set();
 	mixing_thread = std::thread([this] () {mixingThreadFunction();});
 }
 
-LavPhysicalOutput::~LavPhysicalOutput() {
+LavDevice::~LavDevice() {
 	stop();
 	for(unsigned int i = 0; i < mix_ahead+1; i++) {
 		delete[] buffers[i];
@@ -53,12 +53,12 @@ LavPhysicalOutput::~LavPhysicalOutput() {
 	delete[] buffer_statuses;
 }
 
-void LavPhysicalOutput::stop() {
+void LavDevice::stop() {
 	mixing_thread_continue.clear();
 	mixing_thread.join();
 }
 
-void LavPhysicalOutput::zeroOrNextBuffer(float* where) {
+void LavDevice::zeroOrNextBuffer(float* where) {
 	if(buffer_statuses[next_output_buffer].load() == 1) {
 		std::copy(buffers[next_output_buffer], buffers[next_output_buffer]+output_buffer_size, where);
 		buffer_statuses[next_output_buffer].store(0);
@@ -70,38 +70,38 @@ void LavPhysicalOutput::zeroOrNextBuffer(float* where) {
 	next_output_buffer %= mix_ahead+1;
 }
 
-void LavPhysicalOutput::startup_hook() {
+void LavDevice::startup_hook() {
 }
 
-void LavPhysicalOutput::shutdown_hook() {
+void LavDevice::shutdown_hook() {
 }
 
-void LavPhysicalOutput::mixingThreadFunction() {
+void LavDevice::mixingThreadFunction() {
 	startup_hook();
-	unsigned int sourceSr = (unsigned int)device->getSr();
-	LavResampler resampler((unsigned int)device->getBlockSize(), device->getChannels(), sourceSr, target_sr);
+	unsigned int sourceSr = (unsigned int)simulation->getSr();
+	LavResampler resampler((unsigned int)simulation->getBlockSize(), simulation->getChannels(), sourceSr, target_sr);
 	unsigned int currentBuffer = 0;
-	unsigned int sleepFor = (unsigned int)(device->getBlockSize()/(double)device->getSr())*1000;
-	float* tempBuffer = new float[device->getBlockSize()*device->getChannels()]();
+	unsigned int sleepFor = (unsigned int)(simulation->getBlockSize()/(double)simulation->getSr())*1000;
+	float* tempBuffer = new float[simulation->getBlockSize()*simulation->getChannels()]();
 	while(mixing_thread_continue.test_and_set()) {
 		if(buffer_statuses[currentBuffer].load()) { //we've done this one, but the callback hasn't gotten to it yet.
 			if(sleepFor) std::this_thread::sleep_for(std::chrono::milliseconds(sleepFor));
 			continue;
 		}
 		if(sourceSr == target_sr) {
-			device->lock();
-			device->getBlock(buffers[currentBuffer]);
-			device->unlock();
+			simulation->lock();
+			simulation->getBlock(buffers[currentBuffer]);
+			simulation->unlock();
 		}
 		else { //we need to resample.
 			unsigned int got = 0;
-			device->lock();
+			simulation->lock();
 			while(got < output_buffer_size) {
-				device->getBlock(tempBuffer);
+				simulation->getBlock(tempBuffer);
 				resampler.read(tempBuffer);
 				got += resampler.write(buffers[currentBuffer]+got, output_buffer_size-got);
 			}
-			device->unlock();
+			simulation->unlock();
 		}
 		buffer_statuses[currentBuffer].store(1); //mark it as ready.
 		currentBuffer ++;
@@ -110,6 +110,6 @@ void LavPhysicalOutput::mixingThreadFunction() {
 	shutdown_hook();
 }
 
-unsigned int LavPhysicalOutputFactory::getOutputCount() {
+unsigned int LavSimulationFactory::getOutputCount() {
 	return (unsigned int)output_count;
 }

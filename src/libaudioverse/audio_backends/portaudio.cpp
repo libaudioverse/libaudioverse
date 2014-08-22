@@ -30,7 +30,7 @@ class LavPortaudioDevice: public  LavDevice {
 	friend int portaudioOutputCallback(const void* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
 };
 
-class LavPortaudioSimulationFactory: public LavDeviceFactory {
+class LavPortaudioSimulationFactory: public LavSimulationFactory {
 	public:
 	LavPortaudioSimulationFactory();
 	virtual std::vector<std::string> getOutputNames();
@@ -54,7 +54,7 @@ LavPortaudioDevice::LavPortaudioDevice(std::shared_ptr<LavSimulation> sim, unsig
 	params.suggestedLatency = devinfo->defaultLowOutputLatency;
 	double sr = devinfo->defaultSampleRate;
 	init((unsigned int)sr);
-	PaError err = Pa_OpenStream(&stream, nullptr, &params, sr, output_buffer_size, 0, portaudioOutputCallbackB, this);
+	PaError err = Pa_OpenStream(&stream, nullptr, &params, sr, output_buffer_size, 0, portaudioOutputCallback, this);
 	if(err != paNoError) throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
 	start();
 }
@@ -116,10 +116,10 @@ std::shared_ptr<LavSimulation> LavPortaudioSimulationFactory::createSimulation(i
 	if(index == -1) needed = Pa_GetDefaultOutputDevice();
 	else needed = output_indices_map[index];
 	//we create a device, first.
-	std::shared_ptr<LavDevice> retval = std::make_shared<LavDevice>(sr, index != -1 ? max_channels[index] : 2, blockSize, mixAhead);
+	std::shared_ptr<LavSimulation> retval = std::make_shared<LavSimulation>(sr, index != -1 ? max_channels[index] : 2, blockSize, mixAhead);
 	//create the output.
 	std::shared_ptr<LavPortaudioDevice> output = std::make_shared<LavPortaudioDevice>(retval, mixAhead, needed);
-	retval->associateOutput(output);
+	retval->associateDevice(output);
 	return retval;
 }
 
