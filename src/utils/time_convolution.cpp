@@ -29,17 +29,17 @@ void main(int argc, char** args) {
 		printf("Usage: %s <hrtf file>", args[0]);
 		return;
 	}
-	LavDevice* device;
+	LavSimulation* simulation;
 	LavObject* world;
 	std::vector<LavObject*> sources;
 	std::vector<LavObject*> sines;
 	unsigned int numSources = 0;
 	float timeDelta = 0.0f;
 
-	//some setup: create a world and a device.
-	ERRCHECK(Lav_createReadDevice(44100, 2, BLOCK_SIZE, &device));
-	ERRCHECK(Lav_createWorldObject(device, args[1], &world));
-	ERRCHECK(Lav_deviceSetOutputObject(device, world));
+	//some setup: create a world and a simulation.
+	ERRCHECK(Lav_createReadSimulation(44100, 2, BLOCK_SIZE, &simulation));
+	ERRCHECK(Lav_createWorldObject(simulation, args[1], &world));
+	ERRCHECK(Lav_simulationSetOutputObject(simulation, world));
 	while(timeDelta < SECONDS) {
 		numSources += 10;
 		printf("Preparing to test with %u sources...\n", numSources);
@@ -52,10 +52,10 @@ void main(int argc, char** args) {
 			auto sinePtr = *sineIter;
 			auto sourcePtr = *sourceIter;
 			if(sinePtr == nullptr) {
-				ERRCHECK(Lav_createSineObject(device, &sinePtr));
+				ERRCHECK(Lav_createSineObject(simulation, &sinePtr));
 			}
 			if(sourcePtr == nullptr) {
-				ERRCHECK(Lav_createSourceObject(device, world, &sourcePtr));
+				ERRCHECK(Lav_createSourceObject(simulation, world, &sourcePtr));
 				ERRCHECK(Lav_objectSetInput(sourcePtr, 0, sinePtr, 0));
 			}
 			//write them back.
@@ -65,7 +65,7 @@ void main(int argc, char** args) {
 		clock_t startTime = clock();
 		printf("Beginning test...\n");
 		for(unsigned int i = 0; i < SECONDS*44100; i+=BLOCK_SIZE) {
-			Lav_deviceGetBlock(device, storage);
+			Lav_simulationGetBlock(simulation, storage);
 		}
 		clock_t endTime = clock();
 		timeDelta = (endTime-startTime)/(float)CLOCKS_PER_SEC;

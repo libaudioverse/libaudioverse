@@ -23,17 +23,17 @@ void main(int argc, char** args) {
 		return;
 	}
 	char *soundFile = args[1], *hrtfFile = args[2];
-	LavDevice* device;
+	LavSimulation* simulation;
 	LavObject* node, *world, *source;
 	ERRCHECK(Lav_initializeLibrary());
-	ERRCHECK(Lav_createDeviceForPhysicalOutput(-1, 44100, 512, 2, &device));
-	ERRCHECK(Lav_createWorldObject(device, hrtfFile, &world));
-	ERRCHECK(Lav_createFileObject(device, soundFile, &node));
-	ERRCHECK(Lav_createSourceObject(device, world, &source));
+	ERRCHECK(Lav_createSimulationForDevice(-1, 44100, 512, 2, &simulation));
+	ERRCHECK(Lav_createWorldObject(simulation, hrtfFile, &world));
+	ERRCHECK(Lav_createFileObject(simulation, soundFile, &node));
+	ERRCHECK(Lav_createSourceObject(simulation, world, &source));
 	ERRCHECK(Lav_objectSetInput(source, 0, node, 0));
 	const int resolution = 1000, length = 3000; //length in ms.
 	const float width = 30.0;
-	Lav_deviceSetOutputObject(device, world);
+	Lav_simulationSetOutputObject(simulation, world);
 	//do a square over and over.
 	while(1) {
 		for(int i = 0; i < resolution; i++) {

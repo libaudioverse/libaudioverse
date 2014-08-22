@@ -21,18 +21,18 @@ void main(int argc, char** args) {
 		printf("Usage: %s <sound file> <hrtf file>", args[0]);
 		return;
 	}
-	LavDevice* device;
+	LavSimulation* simulation;
 	LavObject* fileNode, *hrtfNode, *limit;
 	ERRCHECK(Lav_initializeLibrary());
-	ERRCHECK(Lav_createDeviceForPhysicalOutput(-1, 44100, 1024, 2, &device));
-	ERRCHECK(Lav_createFileObject(device, args[1], &fileNode));
-	ERRCHECK(Lav_createHrtfObject(device, args[2], &hrtfNode));
+	ERRCHECK(Lav_createSimulationForDevice(-1, 44100, 1024, 2, &simulation));
+	ERRCHECK(Lav_createFileObject(simulation, args[1], &fileNode));
+	ERRCHECK(Lav_createHrtfObject(simulation, args[2], &hrtfNode));
 
 	ERRCHECK(Lav_objectSetInput(hrtfNode, 0, fileNode, 0));
-	ERRCHECK(Lav_createHardLimiterObject(device, 2, &limit));
+	ERRCHECK(Lav_createHardLimiterObject(simulation, 2, &limit));
 	ERRCHECK(Lav_objectSetInput(limit, 0, hrtfNode, 0));
 	ERRCHECK(Lav_objectSetInput(limit, 1, hrtfNode, 1));
-	ERRCHECK(Lav_deviceSetOutputObject(device, limit));
+	ERRCHECK(Lav_simulationSetOutputObject(simulation, limit));
 	int shouldContinue = 1;
 	printf("Enter pairs of numbers separated by whitespace, where the first is azimuth (anything) and the second\n"
 "is elevation (-90 to 90).\n"

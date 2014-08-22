@@ -27,16 +27,16 @@ void main(int argc, char** args) {
 
 	char* path = args[1];
 	LavObject *node;
-	LavDevice* device;
+	LavSimulation* simulation;
 	ERRCHECK(Lav_initializeLibrary());
-	ERRCHECK(Lav_createDeviceForPhysicalOutput(-1, 44100, 1024, 2, &device));
-	ERRCHECK(Lav_createFileObject(device, path, &node));
+	ERRCHECK(Lav_createSimulationForDevice(-1, 44100, 1024, 2, &simulation));
+	ERRCHECK(Lav_createFileObject(simulation, path, &node));
 	LavObject* atten, *limit, *mix;
 	unsigned int fileChannels;
 	ERRCHECK(Lav_objectGetOutputCount(node, &fileChannels));
-	ERRCHECK(Lav_createAttenuatorObject(device, fileChannels == 1 ? 2 : fileChannels, &atten));
-	ERRCHECK(Lav_createHardLimiterObject(device, fileChannels == 1 ? 2 : fileChannels, &limit));
-	ERRCHECK(Lav_createMixerObject(device, 1, fileChannels == 1 ? 2 : fileChannels, &mix));
+	ERRCHECK(Lav_createAttenuatorObject(simulation, fileChannels == 1 ? 2 : fileChannels, &atten));
+	ERRCHECK(Lav_createHardLimiterObject(simulation, fileChannels == 1 ? 2 : fileChannels, &limit));
+	ERRCHECK(Lav_createMixerObject(simulation, 1, fileChannels == 1 ? 2 : fileChannels, &mix));
 	for(unsigned int i = 0; i < fileChannels; i++) {
 		ERRCHECK(Lav_objectSetInput(atten, i, node, i));
 		ERRCHECK(Lav_objectSetInput(mix, i, atten, i));
@@ -48,7 +48,7 @@ void main(int argc, char** args) {
 		ERRCHECK(Lav_objectSetInput(limit, 1, mix, 0));
 	}
 	ERRCHECK(Lav_objectSetCallback(node, Lav_FILE_END_CALLBACK, endOfFileCallback, nullptr));
-	ERRCHECK(Lav_deviceSetOutputObject(device, limit));
+	ERRCHECK(Lav_simulationSetOutputObject(simulation, limit));
 
 	//enter the transducer loop.
 	char command[1024];

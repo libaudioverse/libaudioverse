@@ -17,13 +17,13 @@ if((x) != Lav_ERROR_NONE) {\
 } while(0)\
 
 void main() {
-	LavDevice* device;
+	LavSimulation* simulation;
 	LavObject* node;
 	ERRCHECK(Lav_initializeLibrary());
-	ERRCHECK(Lav_createDeviceForPhysicalOutput(-1, 44100, 1024, 2, &device));
-	ERRCHECK(Lav_createSineObject(device, &node));
+	ERRCHECK(Lav_createSimulationForDevice(-1, 44100, 1024, 2, &simulation));
+	ERRCHECK(Lav_createSineObject(simulation, &node));
 	ERRCHECK(Lav_objectSetFloatProperty(node, Lav_SINE_FREQUENCY, 0));
-	ERRCHECK(Lav_deviceSetOutputObject(device, node));
+	ERRCHECK(Lav_simulationSetOutputObject(simulation, node));
 	for(unsigned int i = 0; i < 500; i++) {
 		ERRCHECK(Lav_objectSetFloatProperty(node, Lav_SINE_FREQUENCY, (float)i));
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
