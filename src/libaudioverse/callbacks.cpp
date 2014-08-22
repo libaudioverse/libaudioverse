@@ -3,7 +3,7 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/private_callbacks.hpp>
-#include <libaudioverse/private_devices.hpp>
+#include <libaudioverse/private_simulation.hpp>
 #include <libaudioverse/private_objects.hpp>
 #include <string>
 #include <memory>
@@ -19,20 +19,20 @@ LavEventCallback LavCallback::getHandler() {
 
 void LavCallback::fire() {
 	if(handler == nullptr) return; //nothing to do.
-	//we need to hold local copies of both the object and data in case they are changed between firing and processing by the device.
+	//we need to hold local copies of both the object and data in case they are changed between firing and processing by the simulation.
 	auto obj = std::weak_ptr<LavObject>(associated_object->shared_from_this());
 	void* userdata = user_data;
 	LavEventCallback cb = handler;
 	//fire a lambda that uses these by copy.
-	associated_device->enqueueTask([=]() {
+	associated_simulation->enqueueTask([=]() {
 		auto shared_obj = obj.lock();
 		if(shared_obj == nullptr) return;	
 		cb(shared_obj.get(), userdata);
 	});
 }
 
-void LavCallback::associateDevice(std::shared_ptr<LavDevice> dev) {
-	associated_device = dev;
+void LavCallback::associateSimulation(std::shared_ptr<LavSimulation> simulation) {
+	associated_simulation = simulation;
 }
 
 void LavCallback::associateObject(LavObject* obj) {
