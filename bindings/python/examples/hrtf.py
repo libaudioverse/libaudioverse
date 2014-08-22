@@ -3,15 +3,15 @@ import libaudioverse
 import os.path
 import time
 
-dev = libaudioverse.Device(physical_output_index = -1)
+sim = libaudioverse.Simulation(device_index = -1)
 print "Enter a file path.  For best results, this should be a"
 print "mono file; if not, only the first (usually left) channel will be used."
 path = raw_input()
 path = os.path.abspath(path)
-fobj = libaudioverse.FileObject(dev, path)
-panner = libaudioverse.HrtfObject(dev, os.path.join(os.path.split(__file__)[0], 'mit.hrtf'))
+fobj = libaudioverse.FileObject(sim, path)
+panner = libaudioverse.HrtfObject(sim, os.path.join(os.path.split(__file__)[0], 'mit.hrtf'))
 panner.inputs[0] = fobj, 0
-dev.output_object =panner
+sim.output_object =panner
 print """Beginning evaluation.
 Enter any python expression that returns a tuple of numbers.  The first is azimuth and the second is elevation.  Azimuth may be anything, but elevation must be on the range -90 to 90.
 Enter quit to quit.

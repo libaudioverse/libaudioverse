@@ -150,8 +150,8 @@ class _EventCallbackWrapper(object):
 			return
 		self.callback(actual_object, *self.additional_arguments)
 
-class PhysicalOutput(object):
-	"""Represents info on a physical output."""
+class DeviceInfo(object):
+	"""Represents info on a audio device."""
 
 	def __init__(self, latency, channels, name, index):
 		self.latency = latency
@@ -159,48 +159,48 @@ class PhysicalOutput(object):
 		self.name = name
 		self.index = index
 
-class Device(object):
-	"""Represents an output, either to an audio card or otherwise.  A device is required by all other Libaudioverse objects."""
+class Simulation(object):
+	"""Represents a running simulation.  All libaudioverse objects must be passed a simulation at creation time and cannot migrate between them.  Furthermore, it is an error to try to connect objects from different simulations."""
 
 
-	def __init__(self, sample_rate = 44100, block_size = 1024, mix_ahead = 1, channels = 2, physical_output_index = None):
-		"""Create a device, required before any other functionality can be used.
+	def __init__(self, sample_rate = 44100, block_size = 1024, mix_ahead = 1, channels = 2, device_index = None):
+		"""Create a simulation.
 
-See get_physical_outputs, a static method on this class, for the possible values of physical_output_index and other output information.
+See get_device_infos, a static method on this class, for the possible values of device_index and other output information.
 
 There are two ways to initialize a device.
 
-If physical_output_index is None, sample_rate, buffer_size, and channels are used to give a device that doesn't actually output.  In this case, use the get_block method yourself to retrieve blocks of 32-bit floating point audio data.
+If device_index is None, sample_rate, buffer_size, and channels are used to give a simulation that doesn't actually output.  In this case, use the get_block method yourself to retrieve blocks of 32-bit floating point audio data.
 
-Alternatively, if physical_output_index is an integer, a device is created which feeds the specified output.  In this case, sample_rate, block_size, and mix_ahead are respected; channels is determined by the physical output in question.
+Alternatively, if device_index is an integer, a device is created which feeds the specified output.  In this case, sample_rate, block_size, and mix_ahead are respected; channels is determined by the device in question.
 
-One special value is not included in get_physical_outputs; this is -1.  -1 is the default system audio device plus the functionality required to follow the default if the user changes it, i.e. by unplugging headphones.  In this case, the returned device is always 2 channels."""
-		if physical_output_index is not None:
-			handle = _lav.create_device_for_physical_output(physical_output_index, sample_rate, block_size, mix_ahead)
+One special value is not included in get_device_infos; this is -1.  -1 is the default system audio device plus the functionality required to follow the default if the user changes it, i.e. by unplugging headphones.  In this case, the returned device is always 2 channels."""
+		if device_index is not None:
+			handle = _lav.create_simulation_for_device(device_index, sample_rate, block_size, mix_ahead)
 		else:
-			handle = _lav.create_read_device(sample_rate, channels, block_size)
+			handle = _lav.create_read_simulation(sample_rate, channels, block_size)
 		self.handle = handle
 		self._output_object = None
 
 	def get_block(self):
 		"""Returns a block of data.
 Calling this on an audio output device will cause the audio thread to skip ahead a block, so don't do that."""
-		length = _lav.device_get_block_size(self.handle)*_lav.device_get_channels(self.handle)
+		length = _lav.simulation_get_block_size(self.handle)*_lav.simulation_get_channels(self.handle)
 		buff = (ctypes.c_float*length)()
-		_lav.device_get_block(self.handle, buff)
+		_lav.simulation_get_block(self.handle, buff)
 		return list(buff)
 
 	@staticmethod
-	def get_physical_outputs():
-		max_index = _lav.get_physical_output_count()
-		outputs = []
+	def get_device_infos():
+		max_index = _lav.get_device_count()
+		infos = []
 		for i in xrange(max_index):
-			info = PhysicalOutput(index = i,
+			info = DeviceInfo(index = i,
 			latency = _lav.get_physical_output_latency(i),
 			channels = _lav.get_physical_output_channels(i),
 			name = _lav.get_physical_output_name(i))
-			outputs.append(info)
-		return outputs
+			infos.append(info)
+		return infos
 
 	@property
 	def output_object(self):
@@ -211,7 +211,7 @@ Calling this on an audio output device will cause the audio thread to skip ahead
 	def output_object(self, val):
 		if not (isinstance(val, GenericObject) or val is None):
 			raise TypeError("Expected subclass of Libaudioverse.GenericObject")
-		_lav.device_set_output_object(self.handle, val.handle if val is not None else val)
+		_lav.simulation_set_output_object(self.handle, val.handle if val is not None else val)
 		self._output_object = val
 
 #These are the enums which are needed publicly, i.e. distance model, etc.
@@ -229,8 +229,9 @@ class {{name|without_lav|underscores_to_camelcase(True)}}(enum.IntEnum):
 class GenericObject(object):
 	"""A Libaudioverse object."""
 
-	def __init__(self, handle):
+	def __init__(self, handle, simulation):
 		self.handle = handle
+		self.simulation = simulation
 		self._inputs = [(None, 0)]*_lav.object_get_input_count(handle)
 		self._callbacks = dict()
 
@@ -287,8 +288,7 @@ class GenericObject(object):
 {%set constructor_arg_names = functions[constructor_name].input_args|map(attribute='name')|map('camelcase_to_underscores')|list-%}
 class {{friendly_name}}(GenericObject):
 	def __init__(self{%if constructor_arg_names|length > 0%}, {%endif%}{{constructor_arg_names|join(', ')}}):
-		{{constructor_arg_names[0]}} = {{constructor_arg_names[0]}}.handle
-		super({{friendly_name}}, self).__init__(_lav.{{constructor_name|without_lav|camelcase_to_underscores}}({{constructor_arg_names|join(', ')}}))
+		super({{friendly_name}}, self).__init__(_lav.{{constructor_name|without_lav|camelcase_to_underscores}}({{constructor_arg_names|join(', ')}}), {{constructor_arg_names[0]}})
 
 {%for enumerant, prop in metadata.get(object_name, dict()).get('properties', dict()).iteritems()%}
 {{implement_property(enumerant, prop)}}

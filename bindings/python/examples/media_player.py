@@ -2,14 +2,14 @@
 import libaudioverse
 import os.path
 
-dev = libaudioverse.Device(physical_output_index = -1)
+sim = libaudioverse.Simulation(device_index = -1)
 print """Command line Media player.
 Please enter the path to a file in a format supported by Libsndfile: typically wave or ogg.
 Mono or stereo files will work fine.  Surround sound files will have additional channels stripped, keeping only the first two."""
 filepath = raw_input()
 filepath = os.path.abspath(filepath)
-filenode = libaudioverse.FileObject(dev, filepath)
-mixer = libaudioverse.MixerObject(dev, max_parents = 1, inputs_per_parent = 2) #for upconverting mono files.
+filenode = libaudioverse.FileObject(sim, filepath)
+mixer = libaudioverse.MixerObject(sim, max_parents = 1, inputs_per_parent = 2) #for upconverting mono files.
 if filenode.output_count == 1:
 	mixer.inputs[0] = filenode, 0
 	mixer.inputs[1] = filenode, 0
@@ -23,7 +23,7 @@ def finished(obj):
 
 filenode.end_callback = finished
 
-dev.output_object = mixer
+sim.output_object = mixer
 
 commands = """Commands:
 play
