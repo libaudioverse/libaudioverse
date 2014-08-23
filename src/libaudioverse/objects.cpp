@@ -18,6 +18,26 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 float zerobuffer[Lav_MAX_BLOCK_SIZE] = {0}; //this is a shared buffer for the "no parent" case.
 
+/**The following function verifies that, given two objects, an edge between them will not cause a cycle.
+The edge is directed from start to end.*/
+bool doesEdgePreserveAcyclicity(LavObject* start, LavObject* end) {
+	std::set<LavObject*> checked;
+	//this is a lambda trick to prevent needing to pass a third parameter around.
+	std::function<bool(LavObject*)> bfs;
+	bfs = [&](LavObject* what) {
+		if(what == nullptr) return false; //the simplest base case: we were called on null.
+		if(what == start) return true; //Travelling from end, we managed to reach start.
+		if(checked.count(what)) return false; //we already checked this object and the graph is guaranteed to be static.
+		for(unsigned int i = 0; i < what->getParentCount(); i++) {
+			LavObject* par = what->getParentObject(i).get();
+			if(bfs(par)) return true;
+		}
+		return false;
+	};
+	return bfs(end);
+}
+
+
 void LavObject::computeInputBuffers() {
 	//point our inputs either at a zeroed buffer or the output of our parent.
 	for(unsigned int i = 0; i < input_descriptors.size(); i++) {
@@ -107,6 +127,8 @@ void LavObject::unsuspend() {
 void LavObject::setParent(unsigned int input, std::shared_ptr<LavObject> parent, unsigned int parentOutput) {
 	if(input >= input_descriptors.size()) throw LavErrorException(Lav_ERROR_RANGE);
 	if(parent != nullptr && parentOutput >= parent->getOutputCount()) throw LavErrorException(Lav_ERROR_RANGE);
+	//check acyclicity.
+	if(doesEdgePreserveAcyclicity(this, parent.get())) throw LavErrorException(Lav_ERROR_CAUSES_CYCLE);
 	input_descriptors[input].parent = parent;
 	input_descriptors[input].output = parentOutput;
 }
