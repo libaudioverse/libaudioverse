@@ -32,7 +32,7 @@ enum Lav_SINE_PROPERTIES {
 enum Lav_FILE_PROPERTIES {
 	Lav_FILE_POSITION = -1,
 	Lav_FILE_PITCH_BEND = -2,
-
+	Lav_FILE_LOOPING = -3,
 	//callbacks
 	Lav_FILE_END_CALLBACK = -1,
 };

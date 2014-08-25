@@ -9,6 +9,7 @@ Lav_OBJTYPE_FILE:
  properties:
   Lav_FILE_POSITION: {name: position, type: double, default: 0.0, range: [0.0, 0.0]}
   Lav_FILE_PITCH_BEND: {name: pitch_bend, type: float, default: 1.0, range: [0, INFINITY]}
+  Lav_FILE_LOOPING: {name: looping, type: boolean, default: 0}
  callbacks:
   Lav_FILE_END_CALLBACK: {name: end}
 Lav_OBJTYPE_HRTF:

@@ -66,19 +66,33 @@ void LavFileObject::seek() {
 }
 
 void LavFileObject::process() {
+	bool isLooping = (bool)getProperty(Lav_FILE_LOOPING).getIntValue();
 	if(has_ended) {
-		LavObject::process();
-		return;
+		if(isLooping) {
+			position = 0;
+			offset = 0.0f;
+			has_ended = false;
+		}
+		else {
+			LavObject::process();
+			return;
+		}
 	}
 	bool switch_to_ended = false;
 	const float pitch_bend = getProperty(Lav_FILE_PITCH_BEND).getFloatValue();
 	for(unsigned int i = 0; i < block_size; i++) {
 		if(position >= frame_count) {
-			for(unsigned int j = 0; j < num_outputs; j++) {
-				outputs[j][i] = 0.0f;
+			if(isLooping) {
+				position = 0;
+				offset = 0;
 			}
-			switch_to_ended = true;
-			continue;
+			else {
+				for(unsigned int j = 0; j < num_outputs; j++) {
+					outputs[j][i] = 0.0f;
+				}
+				switch_to_ended = true;
+				continue;
+			}
 		}
 		unsigned int samp1 = (unsigned int)position;
 		unsigned int samp2 = (unsigned int)position+1;
