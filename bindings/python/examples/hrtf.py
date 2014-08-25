@@ -9,6 +9,7 @@ print "mono file; if not, only the first (usually left) channel will be used."
 path = raw_input()
 path = os.path.abspath(path)
 fobj = libaudioverse.FileObject(sim, path)
+fobj.looping = True
 panner = libaudioverse.HrtfObject(sim, os.path.join(os.path.split(__file__)[0], 'mit.hrtf'))
 panner.inputs[0] = fobj, 0
 sim.output_object =panner
