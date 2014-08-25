@@ -17,7 +17,7 @@ simulation.cpp
 utils/file_reader.cpp
 utils/interleaving.cpp
 utils/hrtf.cpp
-utils/dspmath.cpp
+dspmath/ringmod.cpp
 utils/resampler.cpp
 
 #the metadata store
