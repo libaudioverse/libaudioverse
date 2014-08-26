@@ -1,4 +1,4 @@
-#Libaudioverse Object Reference#
+== Libaudioverse Object Reference
 
 This page is an overview of all Libaudioverse objects.
 The following tables completely describe all implemented Libaudioverse objects in terms of the C API.
@@ -14,25 +14,37 @@ For a discussion of property types, see Property Types.  For a discussion of cal
 
 {%for obj_name in sorted_objects%}
 {%set doc_header = metadata[obj_name]['doc_name']%}
-##{{doc_header}}##
+=== {{doc_header}}
 
 {%if metadata[obj_name].get('properties', [])|length > 0%}
-###Properties###
+==== Properties
 
-Name | C Constant | Type | Range | Default | Description
------|-----|-----|-----|-----
+|===
+|Name|C Constant|Type|Range|Default | Description
 {%for propinfo in metadata[obj_name]['properties'].iteritems()%}
-{{propinfo[1]['name']}} | {{propinfo[0]}} | {{propinfo[1]['type']}} | {{propinfo[1].get('range', '')}} | {{propinfo[1].get('default', 'See Description')}} | {{propinfo[1].get('doc_description', 'None Defined')}}
+
+|{{propinfo[1]['name']}}
+|{{propinfo[0]}}
+|{{propinfo[1]['type']}}
+|{{propinfo[1].get('range', '')}}
+|{{propinfo[1].get('default', 'See Description')}}
+|{{propinfo[1].get('doc_description', 'None Defined')}}
 {%endfor%}
+|===
 
 {%endif%}
 {%if metadata[obj_name].get('callbacks', [])|length > 0%}
-##callbacks##
-Name | C Constant | description
------|-----
+==== Callbacks
+
+|===
+|Name | C Constant | description
 {%for callinfo in metadata[obj_name]['callbacks'].iteritems()%}
-{{callinfo[1]['name']}} | {{callinfo[0]}} | {{callinfo[1].get('doc_description', 'None Defined')}}
+
+|{{callinfo[1]['name']}}
+|{{callinfo[0]}}
+|{{callinfo[1].get('doc_description', 'None Defined')}}
 {%endfor%}
+|===
 {%endif%}
 
 {%endfor%}

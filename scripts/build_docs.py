@@ -14,5 +14,5 @@ shutil.copytree(os.path.join(repository_root, 'documentation'), dest_dir)
 
 property_table = docgen.make_property_table()
 
-with file(os.path.join(dest_dir, 'object_reference.md'), 'wb') as f:
+with file(os.path.join(dest_dir, 'object_reference.txt'), 'wb') as f:
 	f.write(property_table)

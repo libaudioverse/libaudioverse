@@ -1,0 +1,7 @@
+= Libaudioverse 1.0 Reference Manual
+
+include::build_instructions.txt[tabsize=4]
+
+//everything after this point is generated.
+
+include::object_reference.txt[tabsize=4]
