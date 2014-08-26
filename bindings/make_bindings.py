@@ -16,7 +16,7 @@ def write_files(files, source_dir, dest_dir):
 	special_keys = ['dll_location', 'additional_directories', 'libsndfile_location']
 	if os.path.exists(dest_dir):
 		shutil.rmtree(dest_dir)
-			for name, contents in files.iteritems():
+	for name, contents in files.iteritems():
 		if name in special_keys:
 			continue
 		fullpath = os.path.join(dest_dir, name)
