@@ -2,7 +2,7 @@ Lav_OBJTYPE_GENERIC:
  suppress_implied_inherit: true
  properties:
   Lav_OBJECT_SUSPENDED: {name: suspended, type: boolean, default: 0}
- exclude_from_docs: true
+ doc_name: Generic Properties Common to All Objects
 Lav_OBJTYPE_SINE:
  properties:
   Lav_SINE_FREQUENCY: {name: frequency, type: float, default: 440.0, range: [0, INFINITY]}
