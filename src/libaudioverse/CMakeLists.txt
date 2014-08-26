@@ -1,8 +1,7 @@
 add_custom_command(
-OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/metadata/metadata.cpp" ALWAYS_FORCE_REBUILD.DUMMY
-#note: the above is a horrible hack, but should work.
+OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/metadata/metadata.cpp"
 COMMAND python "${CMAKE_CURRENT_SOURCE_DIR}/metadata/metadata.py" "${CMAKE_CURRENT_BINARY_DIR}/metadata/metadata.cpp"
-)
+DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/metadata/metadata.t" "${CMAKE_CURRENT_SOURCE_DIR}/metadata/metadata.py" "${CMAKE_CURRENT_SOURCE_DIR}/metadata/metadata.y")
 
 add_library(libaudioverse SHARED
 #the core infrastructure.

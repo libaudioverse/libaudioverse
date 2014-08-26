@@ -7,6 +7,7 @@ sys.path = [os.path.join(os.path.dirname(__file__), '../../../')] + sys.path
 import bindings.get_info
 
 if len(sys.argv) != 2:
+	print"Invalid usage: do not have destination"
 	sys.exit(1)
 
 print "Generating", sys.argv[1]
@@ -44,6 +45,7 @@ for objkey, objinfo in [(i, metadata.get(i, dict())) for i in bindings.get_info.
 	if not objinfo.get('suppress_implied_inherit', False):
 		for callkey, callinfo in metadata['Lav_OBJTYPE_GENERIC'].get('callbacks', dict()).iteritems():
 			joined_callbacks.append((objkey, callkey, callinfo))
+print joined_callbacks
 #the template will convert the types into enums via judicious use of if statements-we use it like augmented c, and prefer to do refactoring only there when possible.
 #each property will be crammed into a property descriptor, but some of the ranges here are currently potentially unfriendly, most notably float3 and float6.
 #we are going to convert all numbers into strings, and make them valid c identifiers.  Skip anything that is already a string.
