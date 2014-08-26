@@ -12,3 +12,27 @@ These transformations are done for you in this document, listed as Camelcase Ide
 
 For a discussion of property types, see Property Types.  For a discussion of callbacksk see Callbacks.  This document is focused only on the objects themselves.
 
+{%for obj_name in sorted_objects%}
+{%set doc_header = metadata[obj_name]['doc_name']%}
+##{{doc_header}}##
+
+{%if metadata[obj_name].get('properties', [])|length > 0%}
+###Properties###
+
+Name | C Constant | Type | Range | Default | Description
+-----|-----|-----|-----|-----
+{%for propinfo in metadata[obj_name]['properties'].iteritems()%}
+{{propinfo[1]['name']}} | {{propinfo[0]}} | {{propinfo[1]['type']}} | {{propinfo[1].get('range', '')}} | {{propinfo[1].get('default', 'See Description')}} | {{propinfo[1].get('doc_description', 'None Defined')}}
+{%endfor%}
+
+{%endif%}
+{%if metadata[obj_name].get('callbacks', [])|length > 0%}
+##callbacks##
+Name | C Constant | description
+-----|-----
+{%for callinfo in metadata[obj_name]['callbacks'].iteritems()%}
+{{callinfo[1]['name']}} | {{callinfo[0]}} | {{callinfo[1].get('doc_description', 'None Defined')}}
+{%endfor%}
+{%endif%}
+
+{%endfor%}
