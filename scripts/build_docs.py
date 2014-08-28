@@ -7,12 +7,9 @@ sys.path = [repository_root] + sys.path
 import docgen
 
 print "Building documentation..."
-dest_dir = os.path.join(repository_root, 'build', 'documentation')
-if os.path.exists(dest_dir):
-	shutil.rmtree(dest_dir)
-shutil.copytree(os.path.join(repository_root, 'documentation'), dest_dir)
+dest_dir = os.path.join(repository_root, 'documentation')
 
 property_table = docgen.make_property_table()
 
-with file(os.path.join(dest_dir, 'object_reference.txt'), 'wb') as f:
+with file(os.path.join(dest_dir, 'object_reference.asciidoc'), 'wb') as f:
 	f.write(property_table)
