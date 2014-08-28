@@ -1,0 +1,24 @@
+== Introduction
+
+Libaudioverse is a library for building audio simulations and the audio component of multimedia applications and a system for simple 3D and environmental audio simulations built on top of the lower-level components.
+capabilities of Libaudioverse include the ability to run the simulation at a different sampling rate than the host audio device, to receive callbacks on various events, and to rapidly (7 lines in Pythhon) build 3d simulations for games.
+Libaudioverse provides all necessary primitives for basic audio applications and many synthesis algorithms.
+it then uses these to build higher-level synthesis primitives.
+A good example is the 3d simulation, which uses an attenuator, a panner, and a mixer.
+
+From a technical perspective, Libaudioverse presents a collection of various objects with inputs and outputs.
+In much the same way one might wire speakers to a computer, one can wire Libaudioverse objects together.
+The only limitation on the configuration of objects is that no cycles may be formed.
+To put this simply, no object may ever directly or indirectly depend on its output.
+
+Libaudioverse has applications across many fields.  Here's a brief list of just some of the things that can be done with libaudioverse:
+
+- A first person shooter with high quality audio.  High quality enough that blind people can play it.
+- A media player capable of applying any of a host of effects to tracks, implemented without requiring users to write plugins in C/C++.
+- Add-ons for screen readers and other assistive technologies that augment user interfaces with auditory feedback, including use of the so-called head-related transfer function.
+- Virtual surround sound systems.
+
+The rest of this manual discusses Libaudioverse from a technical point of view.
+For those looking for tutorials, see <<tutorials>>.
+The <,basic-concepts,basic concepts>> section is required reading for anyone wanting to get far.
+When demonstrating concepts, the programming language of choice for this manual is Python, but a discussion of the C API can be dfound <<c-api,here>>.

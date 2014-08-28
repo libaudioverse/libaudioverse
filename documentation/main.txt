@@ -2,6 +2,8 @@
 :toc:
 :toclevels: 1
 
+include::introduction.txt[tabsize=4]
+
 include::build_instructions.txt[tabsize=4]
 
 //everything after this point is generated.
