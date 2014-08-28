@@ -19,6 +19,6 @@ Libaudioverse has applications across many fields.  Here's a brief list of just 
 - Virtual surround sound systems.
 
 The rest of this manual discusses Libaudioverse from a technical point of view.
-For those looking for tutorials, see <<tutorials>>.
-The <,basic-concepts,basic concepts>> section is required reading for anyone wanting to get far.
+For those looking for tutorials, see <<tutorials,Tutorials>>.
+The <<basics,setion discussing basic concepts>> is required reading for anyone wanting to get far.
 When demonstrating concepts, the programming language of choice for this manual is Python, but a discussion of the C API can be dfound <<c-api,here>>.

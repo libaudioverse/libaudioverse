@@ -6,6 +6,14 @@ include::introduction.txt[tabsize=4]
 
 include::build_instructions.txt[tabsize=4]
 
+include::tutorials.txt[tabsize=4]
+
+include::basics.txt[tabsize=4]
+
+include::c_api.txt[tabsize=4]
+
+include::binding_notes.txt[tabsize=4]
+
 //everything after this point is generated.
 
 include::object_reference.txt[tabsize=4]
