@@ -1,6 +1,8 @@
 == Building Libaudioverse
 
-IMPORTANT: While this page is platform-neutral, Libaudioverse currently only builds on Windows.  Overcoming this shortcoming will happen in short order.
+IMPORTANT:
+While this page is platform-neutral, Libaudioverse currently only builds on Windows.
+Overcoming this shortcoming will happen in short order.
 
 === Dependencies
 
@@ -17,17 +19,25 @@ And the following Python packages (all available on PyPI):
 - Enum34 (for running the Python bindings only)
 - Pycparser
 
-For the documentation, you will also need a working implementation of Asciidoc.  See below for specifics on how to make your own copy of this manual, or just use this one.  The rest of the build process will complete without Asciidoc, but a final, manual step is needed to turn the text files the build process gives into HTML.
+For the documentation, you will also need a working implementation of Asciidoc.
+See below for specifics on how to make your own copy of this manual, or just use this one.
+The build process will complete without Asciidoc, but a final, manual step is needed to turn the text files the build process gives into HTML.
 
 === Setup
 
-At the moment, Libaudioverse's build system assumes windows in a few places.  Specifically, the directories to Libsndfile are hard-coded in exactly two places, and the paths therein may not be correct.  You may need to update both CMakeLists.txt and the top of bindings/build_bindings.py to point at your Libsndfile.  If this is the case and you used the pre-built binaries that come as an installer, then please report this as an issue so I can fix it.  This only applies to windows.
+At the moment, Libaudioverse's build system assumes windows in a few places.
+Specifically, the directories to Libsndfile are hard-coded in exactly two places, and the paths therein may not be correct.
+You may need to update both CMakeLists.txt and the top of bindings/build_bindings.py to point at your Libsndfile.
+If this is the case and you used the pre-built binaries that come as an installer, then please report this as an issue so I can fix it.
+This only applies to windows.
 
 === Building
 
-IMPORTANT: you must do an out-of-source build with CMake and it must be in `repository_root/build`.  Otherwise, binding and documentation generation will crash.
+IMPORTANT: you must do an out-of-source build with CMake and it must be in `repository_root/build`.
+Otherwise, binding and documentation generation will crash.
 
-The rest of the process is the standard CMake process.  Something like the following:
+The rest of the process is the standard CMake process.
+Something like the following:
 
 ....
 mkddir build
@@ -36,5 +46,6 @@ cmake -G "MY_GENERATOR" ..
 my_generator_specific_build_command
 ....
 
-A custom target, `libaudioverse_docs`, generates a set of Asciidoc documentation in `build/documentation`.  To build the docs, run Asciidoc on main.txt.  Main.txt includes the other files that make up this manual, generates tables of contents, and the like.
+A custom target, `libaudioverse_docs`, generates a set of Asciidoc documentation in `build/documentation`.
+To build the docs, run Asciidoc on main.txt.  Main.txt includes the other files that make up this manual, generates tables of contents, and the like.
 
