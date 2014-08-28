@@ -1,4 +1,6 @@
 = Libaudioverse 1.0 Reference Manual
+:toc:
+:toclevels: 1
 
 include::build_instructions.txt[tabsize=4]
 

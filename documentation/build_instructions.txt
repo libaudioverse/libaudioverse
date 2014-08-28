@@ -1,6 +1,6 @@
 == Building Libaudioverse
 
-Important status note: While this page is platform-neutral, Libaudioverse currently only builds on Windows.  Overcoming this shortcoming will happen in short order.
+IMPORTANT: While this page is platform-neutral, Libaudioverse currently only builds on Windows.  Overcoming this shortcoming will happen in short order.
 
 === Dependencies
 
@@ -12,9 +12,12 @@ All of the following dependencies are required to build Libaudioverse.
 - Python 2.7.x.
 
 And the following Python packages (all available on PyPI):
+
 - Jinja2
 - Enum34 (for running the Python bindings only)
 - Pycparser
+
+For the documentation, you will also need a working implementation of Asciidoc.  See below for specifics on how to make your own copy of this manual, or just use this one.  The rest of the build process will complete without Asciidoc, but a final, manual step is needed to turn the text files the build process gives into HTML.
 
 === Setup
 
@@ -22,7 +25,7 @@ At the moment, Libaudioverse's build system assumes windows in a few places.  Sp
 
 === Building
 
-Important note: you must do an out-of-source build with CMake and it must be in `repository_root/build`.  otherwise, the step of the build process that builds bindings will not be able to work properly, as it hard-codes a minimal amount of information required to bundle Libaudioverse.
+IMPORTANT: you must do an out-of-source build with CMake and it must be in `repository_root/build`.  Otherwise, binding and documentation generation will crash.
 
 The rest of the process is the standard CMake process.  Something like the following:
 
@@ -32,3 +35,6 @@ cd build
 cmake -G "MY_GENERATOR" ..
 my_generator_specific_build_command
 ....
+
+A custom target, `libaudioverse_docs`, generates a set of Asciidoc documentation in `build/documentation`.  To build the docs, run Asciidoc on main.txt.  Main.txt includes the other files that make up this manual, generates tables of contents, and the like.
+
