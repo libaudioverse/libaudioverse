@@ -56,11 +56,14 @@ std::shared_ptr<LavObject>createHrtfObject(std::shared_ptr<LavSimulation>simulat
 void LavHrtfObject::process() {
 	//calculating the hrir is expensive, do it only if needed.
 	bool didRecompute = false;
+	bool allowCrossfade = getProperty(Lav_PANNER_SHOULD_CROSSFADE).getIntValue();
 	float current_azimuth = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
 	float current_elevation = getProperty(Lav_PANNER_ELEVATION).getFloatValue();
 	if(fabs(current_elevation-prev_elevation) > 2.0f || fabs(current_azimuth-prev_azimuth) > 2.0f) {
-		std::copy(left_response, left_response+hrtf->getLength(), old_left_response);
-		std::copy(right_response, right_response+hrtf->getLength(), old_right_response);
+		if(allowCrossfade) {
+			std::copy(left_response, left_response+hrtf->getLength(), old_left_response);
+			std::copy(right_response, right_response+hrtf->getLength(), old_right_response);
+		}
 		hrtf->computeCoefficientsStereo(current_elevation, current_azimuth, left_response, right_response);
 		didRecompute = true;
 	}
@@ -72,9 +75,15 @@ void LavHrtfObject::process() {
 	//stick our input on the end...
 	std::copy(inputs[0], inputs[0]+block_size, start);
 	//finally, do the usual convolution loop.
-	if(didRecompute) { //very, very slow.
-		crossfadeConvolutionKernel(history, block_size, outputs[0], hrtfLength, old_left_response, left_response);
-		crossfadeConvolutionKernel(history, block_size, outputs[1], hrtfLength, old_right_response, right_response);
+	if(didRecompute) {
+		if(allowCrossfade) {
+			crossfadeConvolutionKernel(history, block_size, outputs[0], hrtfLength, old_left_response, left_response);
+			crossfadeConvolutionKernel(history, block_size, outputs[1], hrtfLength, old_right_response, right_response);
+		}
+		else {
+			convolutionKernel(history, block_size, outputs[0], hrtf->getLength(), left_response);
+			convolutionKernel(history, block_size, outputs[1], hrtf->getLength(), right_response);
+		}
 		//note: putting these anywhere in the didnt-recompute path causes things to never move.
 		prev_elevation = current_elevation;
 		prev_azimuth = current_azimuth;
