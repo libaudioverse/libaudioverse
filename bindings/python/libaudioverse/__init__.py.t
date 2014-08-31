@@ -283,6 +283,9 @@ class GenericObject(object):
 		"""Get the number of outputs that this object has."""
 		return _lav.object_get_output_count(self.handle)
 
+	def reset(self):
+		_lav.object_reset(self)
+
 {%for object_name in constants.iterkeys()|prefix_filter("Lav_OBJTYPE_")|remove_filter("Lav_OBJTYPE_GENERIC")%}
 {%set friendly_name = object_name|strip_prefix("Lav_OBJTYPE_")|lower|underscores_to_camelcase(True) + "Object"%}
 {%set constructor_name = "Lav_create" + friendly_name%}
