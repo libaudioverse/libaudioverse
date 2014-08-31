@@ -21,7 +21,9 @@ class LavHrtfObject: public LavObject {
 	LavHrtfObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf);
 	~LavHrtfObject();
 	virtual void process();
+	void reset();
 	private:
+	int history_length = 0;
 	float *history = nullptr, *left_response = nullptr, *right_response = nullptr, *old_left_response = nullptr, *old_right_response = nullptr;
 	std::shared_ptr<LavHrtfData> hrtf = nullptr;
 	float prev_azimuth = 0.0f, prev_elevation = 0.0f;
@@ -35,7 +37,8 @@ LavHrtfObject::LavHrtfObject(std::shared_ptr<LavSimulation> simulation, std::sha
 	//used for moving objects.
 	old_left_response = new float[hrtf->getLength()];
 	old_right_response = new float[hrtf->getLength()];
-	history = new float[hrtf->getLength() + simulation->getBlockSize()](); //odd c++ syntax to create 0-initialized array.
+	history_length = hrtf->getLength() + simulation->getBlockSize();
+	history = new float[history_length](); //odd c++ syntax to create 0-initialized array.
 	hrtf->computeCoefficientsStereo(0.0f, 0.0f, left_response, right_response);
 	prev_azimuth = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
 	prev_elevation = getProperty(Lav_PANNER_ELEVATION).getFloatValue();
@@ -92,6 +95,10 @@ void LavHrtfObject::process() {
 		convolutionKernel(history, block_size, outputs[0], hrtf->getLength(), left_response);
 		convolutionKernel(history, block_size, outputs[1], hrtf->getLength(), right_response);
 	}
+}
+
+void LavHrtfObject::reset() {
+	memset(history, 0, sizeof(float)*history_length);
 }
 
 //begin public api
