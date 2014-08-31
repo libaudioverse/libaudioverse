@@ -200,7 +200,10 @@ One special value is not included in get_device_infos; this is -1.  -1 is the de
 Calling this on an audio output device will cause the audio thread to skip ahead a block, so don't do that."""
 		length = _lav.simulation_get_block_size(self.handle)*_lav.simulation_get_channels(self.handle)
 		buff = (ctypes.c_float*length)()
-		_lav.simulation_get_block(self.handle, buff)
+		#circumvent automatic conversion of iterables.
+		buff_ptr = ctypes.POINTER(ctypes.c_float)()
+		buff_ptr.contents = buff
+		_lav.simulation_get_block(self.handle, buff_ptr)
 		return list(buff)
 
 	@property
