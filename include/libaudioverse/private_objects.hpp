@@ -82,6 +82,8 @@ Consider an hrtf node, taking 22579200 mathematical operations plus loop overhea
 	void lock();
 	void unlock();
 
+	//Override hook for resetting.
+	virtual void reset();
 	protected:
 	//this should definitely be protected, and should never be touched by anything that's not a subclass.
 	virtual void resize(unsigned int newInputsCount, unsigned int newOutputsCount);

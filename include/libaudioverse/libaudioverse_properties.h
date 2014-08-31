@@ -16,13 +16,14 @@ Lav_OBJTYPE_PROPNAME
 or
 Lav_OBJTYPE_callbackname_CALLBACK
 
-Furthermore, all libaudioverse properties are negative, save on those objects for which documentation says otherwise.  Examples of objects with positive properties include highly configurable mixers and attenuators, among others.
+Furthermore, all libaudioverse properties are negative.
 
 Values below -100 are reserved for standard callbacks and properties on all objects.
 */
 
 enum lav_STANDARD_PROPERTIES {
 	Lav_OBJECT_SUSPENDED = -100,
+	Lav_OBJECT_AUTORESET = -101,
 };
 
 enum Lav_SINE_PROPERTIES {

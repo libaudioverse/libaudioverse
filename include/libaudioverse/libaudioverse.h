@@ -197,6 +197,11 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetCallbackHandler(LavObject* obj, int ca
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetCallbackUserDataPointer(LavObject* obj, int callback, void** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_objectSetCallback(LavObject* obj, int callback, LavEventCallback handler, void* userData);
 
+/**Performs the object-specific reset operation.
+
+This does not reset properties, merely internal histories and the like.  Specifically what this means depends on the object; see the manual.*/
+Lav_PUBLIC_FUNCTION LavError Lav_objectReset(LavObject* obj);
+
 //creators for different objject types.
 //also see libaudioverse3d.h.
 Lav_PUBLIC_FUNCTION LavError Lav_createSineObject(LavSimulation* sim, LavObject **destination);

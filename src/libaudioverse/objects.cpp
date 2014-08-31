@@ -150,6 +150,7 @@ unsigned int LavObject::getParentCount() {
 
 void LavObject::setInput(unsigned int input, std::shared_ptr<LavObject> object, unsigned int output) {
 	setParent(input, object, output);
+	if(getProperty(Lav_OBJECT_AUTORESET).getIntValue()) reset();
 }
 
 std::shared_ptr<LavObject> LavObject::getInputObject(unsigned int input) {
@@ -200,6 +201,9 @@ void LavObject::lock() {
 
 void LavObject::unlock() {
 	simulation->unlock();
+}
+
+void LavObject::reset() {
 }
 
 //protected resize function.
@@ -332,6 +336,13 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectSetInput(LavObject *obj, unsigned int inp
 	auto obj_ptr = incomingPointer<LavObject>(obj);
 	LOCK(*obj);
 	obj->setInput(input, parent ? incomingPointer<LavObject>(parent) : nullptr, output);
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_objectReset(LavObject* obj) {
+	PUB_BEGIN
+	LOCK(*obj);
+	obj->reset();
 	PUB_END
 }
 

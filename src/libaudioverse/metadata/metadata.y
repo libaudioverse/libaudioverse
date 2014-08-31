@@ -2,6 +2,7 @@ Lav_OBJTYPE_GENERIC:
  suppress_implied_inherit: true
  properties:
   Lav_OBJECT_SUSPENDED: {name: suspended, type: boolean, default: 0}
+  Lav_OBJECT_AUTORESET: {name: autoreset, type: boolean, default: 1}
  doc_name: Generic Properties Common to All Objects
 Lav_OBJTYPE_SINE:
  properties:
