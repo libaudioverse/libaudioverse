@@ -26,7 +26,7 @@ class LavAmplitudePannerObject: public LavObject {
 	int* channel_indices = nullptr;
 };
 
-LavAmplitudePannerObject::LavAmplitudePannerObject(std::shared_ptr<LavSimulation> device): LavObject(Lav_OBJTYPE_AMPLITUDE_PANNER, simulation, 1, 0) {
+LavAmplitudePannerObject::LavAmplitudePannerObject(std::shared_ptr<LavSimulation> simulation): LavObject(Lav_OBJTYPE_AMPLITUDE_PANNER, simulation, 1, 0) {
 	getProperty(Lav_PANNER_CHANNEL_MAP).setPostChangedCallback([this](){recomputeChannelMap();});
 	recomputeChannelMap();
 }
