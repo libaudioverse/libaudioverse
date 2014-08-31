@@ -33,6 +33,8 @@ void reverse_endianness(char* buffer, unsigned int count, unsigned int window) {
 static_assert(sizeof(float) == 4, "Sizeof float is not 4; cannot safely work with hrtfs");
 
 LavHrtfData::~LavHrtfData() {
+	if(temporary_buffer1) delete[] temporary_buffer1;
+	if(temporary_buffer2) delete[] temporary_buffer2;
 	if(hrirs == nullptr) return; //we never loaded one.
 	for(unsigned int i = 0; i < elev_count; i++) {
 		for(unsigned int j = 0; j < azimuth_counts[i]; j++) delete[] hrirs[i][j];
@@ -143,9 +145,14 @@ void LavHrtfData::loadFromFile(std::string path, int forSr) {
 			}
 		}
 	}
+	if(temporary_buffer1) delete[] temporary_buffer1;
+	if(temporary_buffer2) delete[] temporary_buffer2;
+	temporary_buffer1 = new float[hrir_length];
+	temporary_buffer2 = new float[hrir_length];
 }
 
-//a complete HRTF for stereo is two calls to this function.
+//a complete HRTF for stereo is four calls to this function.
+//some final preparation is done afterwords.
 void LavHrtfData::computeCoefficientsMono(float elevation, float azimuth, float* out) {
 	//clamp the elevation.
 	if(elevation < min_elevation) {elevation = (float)min_elevation;}
@@ -191,9 +198,21 @@ void LavHrtfData::computeCoefficientsMono(float elevation, float azimuth, float*
 void LavHrtfData::computeCoefficientsStereo(float elevation, float azimuth, float *left, float* right) {
 	//wrap azimuth to be > 0 and < 360.
 	azimuth = ringmodf(azimuth, 360.0f);
+	float elev_distance = ((float)(max_elevation-min_elevation)/(float)elev_count);
+	float elevation1 = floorf(elevation/elev_distance)*elev_distance;
+	float elevation2 = elevation+elev_distance;
+	//we need a w1 and w2, as usual.
+	float w1, w2;
+	w1 = (elevation-elevation1)/elev_distance;
+	w2 = 1.0f-w1;
 	//the hrtf datasets are right ear coefficients.  Consequently, the right ear requires no changes.
-	computeCoefficientsMono(elevation, azimuth, right);
+	computeCoefficientsMono(elevation, azimuth, temporary_buffer1);
+	//we also grab the next elevation. computeCoefficientsMono clamps.
+	computeCoefficientsMono(elevation2, azimuth, temporary_buffer2);
+	for(unsigned int i = 0; i < hrir_length; i++) right[i] = temporary_buffer1[i]*w1+temporary_buffer2[i]*w2;
 	//the left ear is found at an azimuth which is reflectred about 0 degrees.
 	azimuth = ringmodf(360-azimuth, 360.0f);
-	computeCoefficientsMono(elevation, azimuth, left);
+	computeCoefficientsMono(elevation1, azimuth, temporary_buffer1);
+	computeCoefficientsMono(elevation2, azimuth, temporary_buffer2);
+	for(unsigned int i = 0; i < hrir_length; i++) left[i] = temporary_buffer1[i]*w1+temporary_buffer2[i]*w2;
 }

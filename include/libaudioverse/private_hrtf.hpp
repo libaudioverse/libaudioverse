@@ -26,4 +26,6 @@ class LavHrtfData {
 	unsigned int *azimuth_counts = nullptr;
 	unsigned int samplerate = 0;
 	float ***hrirs = nullptr;
+	//used for crossfading so we don't clobber the heap.
+	float *temporary_buffer1 = nullptr, *temporary_buffer2 = nullptr;
 };
