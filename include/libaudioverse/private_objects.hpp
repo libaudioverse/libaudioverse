@@ -46,14 +46,6 @@ class LavObject: public std::enable_shared_from_this<LavObject> { //enable_share
 	//Note that this isn't shared ptr.  The output pointers for an object are managed by the object itself and we need to be able to allocate/deallocate them for SSE, as well as work with arrays.  Don't hold on to output pointers.
 	virtual void getOutputPointers(float** dest);
 
-	/**This requires explanation.
-The graph algorithm checks all objects it sees.  An object marked to always process will always process, but this is an internal detail of the object.
-An object marked as suspended will not process.  In addition, the graph algorithm shall ignore its parents.
-Consider an hrtf node, taking 22579200 mathematical operations plus loop overhead and a memory copy.  If it is known in some topology that the hrtf node will be receiving silent input, you can suspend it; if you wish a parent to still advance, you may mark the parent as always needing processing.*/
-	virtual bool isSuspended();
-	virtual void suspend();
-	virtual void unsuspend();
-
 	//these three methods are all involved in the processing logic: willProcess is called immediately before and didProcess immediately after the actual process method.
 	//this is a strong guarantee: no other operation shall be performed on this object between these three calls.
 	//This one does three things:

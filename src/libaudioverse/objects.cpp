@@ -112,18 +112,6 @@ int LavObject::getType() {
 	return type;
 }
 
-bool LavObject::isSuspended() {
-	return getProperty(Lav_OBJECT_SUSPENDED).getIntValue() != 0;
-}
-
-void LavObject::suspend() {
-	getProperty(Lav_OBJECT_SUSPENDED).setIntValue(1);
-}
-
-void LavObject::unsuspend() {
-	getProperty(Lav_OBJECT_SUSPENDED).setIntValue(0);
-}
-
 void LavObject::setParent(unsigned int input, std::shared_ptr<LavObject> parent, unsigned int parentOutput) {
 	if(input >= input_descriptors.size()) throw LavErrorException(Lav_ERROR_RANGE);
 	if(parent != nullptr && parentOutput >= parent->getOutputCount()) throw LavErrorException(Lav_ERROR_RANGE);
