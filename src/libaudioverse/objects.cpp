@@ -112,6 +112,10 @@ int LavObject::getType() {
 	return type;
 }
 
+int LavObject::getState() {
+	return getProperty(Lav_OBJECT_STATE).getIntValue();
+}
+
 void LavObject::setParent(unsigned int input, std::shared_ptr<LavObject> parent, unsigned int parentOutput) {
 	if(input >= input_descriptors.size()) throw LavErrorException(Lav_ERROR_RANGE);
 	if(parent != nullptr && parentOutput >= parent->getOutputCount()) throw LavErrorException(Lav_ERROR_RANGE);

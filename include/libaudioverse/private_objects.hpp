@@ -46,6 +46,9 @@ class LavObject: public std::enable_shared_from_this<LavObject> { //enable_share
 	//Note that this isn't shared ptr.  The output pointers for an object are managed by the object itself and we need to be able to allocate/deallocate them for SSE, as well as work with arrays.  Don't hold on to output pointers.
 	virtual void getOutputPointers(float** dest);
 
+	//equivalent to reading lav_OBJECT_STATE.
+	virtual int getState();
+
 	//these three methods are all involved in the processing logic: willProcess is called immediately before and didProcess immediately after the actual process method.
 	//this is a strong guarantee: no other operation shall be performed on this object between these three calls.
 	//This one does three things:
