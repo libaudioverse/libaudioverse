@@ -66,7 +66,7 @@ void main(int argc, char** args) {
 			case 'p': Lav_objectSetFloatProperty(node, Lav_FILE_PITCH_BEND, value); break;
 			case 'v': Lav_objectSetFloatProperty(atten, Lav_ATTENUATOR_MULTIPLIER, value); break;
 			case 's': Lav_objectSetDoubleProperty(node, Lav_FILE_POSITION, value); break;
-			case 'a': isPlaying = ! isPlaying; Lav_objectSetIntProperty(node, Lav_OBJECT_SUSPENDED, isPlaying == false); break;
+			case 'a': isPlaying = ! isPlaying; Lav_objectSetIntProperty(node, Lav_OBJECT_STATE, isPlaying == false ? Lav_OBJECT_STATE_PAUSED: Lav_OBJECT_STATE_PLAYING); break;
 			default: printf("Unrecognized command.\n"); break;
 		}
 	}

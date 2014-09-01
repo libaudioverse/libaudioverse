@@ -53,7 +53,7 @@ class LavSimulation {
 	unsigned int block_size = 0, channels = 0, mixahead = 0, is_started = 0;
 	float sr = 0.0f;
 	//if objects die, they automatically need to be removed.  We can do said removal on next process.
-	std::set<std::weak_ptr<LavObject>, std::owner_less<std::weak_ptr<LavObject>>> objects, always_process;
+	std::set<std::weak_ptr<LavObject>, std::owner_less<std::weak_ptr<LavObject>>> objects;
 	std::shared_ptr<LavObject> output_object = nullptr;
 	std::recursive_mutex mutex;
 

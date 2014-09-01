@@ -56,7 +56,7 @@ LavError LavSimulation::getBlock(float* out) {
 		obj->process();
 		obj->didProcess();
 	}
-	if(output_object->isSuspended()) { //fast path, just zero.
+	if(output_object->getState() == Lav_OBJECT_STATE_PAUSED) { //fast path, just zero.
 		memset(out, 0, sizeof(float)*block_size*channels);
 		return Lav_ERROR_NONE;
 	}
@@ -111,38 +111,13 @@ void LavSimulation::visitAllObjectsInProcessOrder(std::function<void(std::shared
 			seen.insert(o);
 		});
 	}
-	std::set<std::shared_ptr<LavObject>> still_needed, always_process_shared;
-	for(auto i: always_process) {
-		auto tmp = i.lock();
-		if(tmp == nullptr) continue;
-		always_process_shared.insert(tmp);
-	}
-	do {
-		still_needed.clear();
-		std::set_difference(always_process_shared.begin(), always_process_shared.end(), seen.begin(), seen.end(),
-			std::inserter(still_needed, still_needed.end()));
-		for(auto i = still_needed.begin(); i != still_needed.end(); i++) {
-			visitForProcessing(*i, [&] (std::shared_ptr<LavObject> o) {
-				if(seen.count(o) == 0) {
-					visitor(o);
-					seen.insert(o);
-				}
-			});
-		}
-	} while(still_needed.size());
-	always_process.clear();
-	//this keeps us from building up control blocks, etc.
-	//may be premature optimization, but doesn't hurt.
-	for(auto i: always_process_shared) {
-		always_process.insert(i);
-	}
 }
 
 void LavSimulation::visitForProcessing(std::shared_ptr<LavObject> obj, std::function<void(std::shared_ptr<LavObject>)> visitor) {
 	//if obj is null, bail out.  This is the base case.
 	if(obj == nullptr) return;
-	//if the object is suspended, we also bail out: this object and its parents are not needed.
-	if(obj->isSuspended()) return;
+	//if the object is paused, we also bail out: this object and its parents are not needed.
+	if(obj->getState() == Lav_OBJECT_STATE_PAUSED) return;
 	//we call ourselves on all parents of obj, and then pass obj to visitor.  This is essentially depth-first search.
 	for(unsigned int i = 0; i < obj->getParentCount(); i++) {
 		visitForProcessing(obj->getParentObject(i), visitor);
