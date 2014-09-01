@@ -32,7 +32,7 @@ The outputs of the output object are mapped directly to sound card channels: out
 
 In order to process audio quickly, Libaudioverse locks the simulation while preparing blocks of audio.
 Consequently, any changes made to the object graph will happen either before or after a block.
-For a full discussion of the block size, see <<quantifying-latency,quantifying latency>>
+For a full discussion of the block size, see <<quantifying-latency,quantifying latency>>.
 
 Libaudioverse's internal sampling rates are not those of your sound card, so it is possible to run at any sampling rate.
 It is not possible for Libaudioverse objects to produce anything but one full block of audio, so all resampling either happens at inputs to the library (file nodes, etc) or between the output object and the sound card.
@@ -41,6 +41,11 @@ A prime example of this is the HRTF object, which works best at the sampling rat
 
 [[basics-object-states]]
 === Object States: When Are Objects processed?
+
+WARNING:
+This section is complex the first time you read it.
+Libaudioverse's goal is to be fast, so the functionality described in this section is unfortunately necessary.
+If this is your first time playing with Libaudioverse, start with the <<tutorials,tutorials>>, which spend time showing how this works in a much gentler fashion.
 
 As stated above, Libaudioverse objects are in a dependency graph.  This means that it is possible to perform pruning.  This is best illustrated with an example.
 
@@ -53,24 +58,72 @@ If `f` is made the output object of the simulation, `m` will stop processing (be
 
 The rule can formally be stated as follows.
 If a simulation has no output object and all objects are in their default states (see below), then no objects which are part of that simulation process.
-Otherwise, start at the output object of the simulation and build a set of objects by following all inputs of the output object, recursively.  process each object seen exactly once in an order such that no object is processed before all objects to which its inputs point are processed.
+Otherwise, start at the output object of the simulation and build a set of objects by following all inputs of the output object.
+Recursively.  process each object seen exactly once in an order such that no object is processed before all objects to which its inputs point are processed.
+In the below discussion, any objects reachable by following inputs from some other object A are termed A's  parents.
 
 This seems overly complicated, but three things should be noted:
 
 - Some objects are prohibitively expensive, for example the HRTF panners.
-HRTF panners take millions of mathematical operations per second
-processing them when they are not required penalizes the rest of the simulation heavily.
+HRTF panners take millions of mathematical operations per second.
+Processing them when they are not required penalizes the rest of the simulation heavily.
+This algorithm is especially important when working in garbage collected languages: we don't know when objects will die, but we do know when they have been disconnected from everything else.
 
 - This will usually do what one expects.
-If the mixing paths are pre-built, all objects in them will process.
-For a majority of applications, this is the case.
-For those in which it is not, this behavior can be directly useful.
+For a majority of applications, all objects are connected at start-up and this algorithm can be disregarded.
+For those in which this is not the case, this behavior can be directly useful.
 
 - Finally, if you wish to change this default, keep reading.
-it is not advised to abuse object states in this manner, but it is possible to essentially circumvent this algorithm by placing all objects in the `ALWAYS_PROCESS` state.
+it is not advised to abuse object states in this manner, but it is possible to essentially circumvent this algorithm by placing all objects in the `always_playing` state.
 
 Every object has a state.
-//todo: discuss when states are formally coded.
+By default, the above algorithm holds.
+This is because all objects start in the `playing` state.
+The possible values for the `state` property are as follows:
+
+- paused: A paused object does not process.
+if its parents are not needed by any other object, then those objects do not process either.
+In terms of what gets processed, pausing an object is functionally identical to disconnecting any inputs pointed at it.
+
+- Playing: the default.
+The algorithm works as described above.
+
+- always_playing: The object can be treated like an additional output object, save that it is not connected to the audio device.
+Always_playing objects will process their parents recursively as described above.
+Every block.
+Guaranteed.
+
+==== Some Practical notes
+
+When building applications under this system, most will connect all objects at start-up.  Furthermore, many objects are not stateful.  There are some best practices, however, which this section will discuss.
+
+HRTf objects, delay lines, file objects, and the like have internal state that advances with time.
+if no input points at these objects, they will not be processed; time will not advance for them.
+This can lead to some odd behavior when reconnected, for which there are two approaches.
+While it is true that many objects do not have state, much benefit can be reached from simply assuming that they do.
+
+First, when possible, use object states to pause and play.
+It is more than possible to pause something by disconneccting inputs from it, but this is hard to get right.
+This is especially true of objects which are shared between multiple game components or the like.
+For example, if pausing a file, pause the file directly.
+Do not work around the library and try to unhook the file object from the graph.
+When paused, objects will take up almost no CPU, so there is no advantage in disconnecting them.
+
+Second, when you make the decision to unplug objects, consider why you are doing so.
+If this is because the object will not be needed for a long time and you don't specifically care if time advances for it, then call the `reset` metod on it before beginning to use it again.
+Otherwise, set the object's state to always_playing and leave it there.
+
+Third, a very convenient way to pause large groups of objects is to place them behind a mixer.
+Connect to the mixer instead of the objects.
+Any object behind the mixer should have its state set to playing and an effort should be made to have no connection ignore the intermediate mixer object.
+When the mixer is paused, all objects behind it will also be paused.
+In this way, it is easily possible to make complex components that can be treated as one.
+While mixers do combine objects by adding their channels, they can also be treated as something akin to classes.
+The creation of factory functions can then be used to make so-called subgraphs.
+
+Finally, setting all objects in your simulation to always_playing is a useful debugging tool.
+If things work right with all objects in the always_playing state, then there is something wrong with your input connection logic.
+This will only be useful for those apps which spend large amounts of time changing where inputs go, but is worth mentioning nonetheless.
 
 [[basics-properties]]
 === Properties
