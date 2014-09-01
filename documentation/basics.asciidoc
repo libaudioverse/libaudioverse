@@ -1,2 +1,79 @@
 [[basics]]
 == Basic Concepts of Libaudioverse
+
+[[view-of-audio]]
+=== Libaudioverse's View of Audio
+
+Many libraries that provide audio provide a very small set of services.
+A good example of such a library is OpenAL:
+one may use a predefined mixer path only.
+Anything outside that path is simply not doable.
+While some programmers may believe the Libaudioverse approach to be overly complex, it is not.
+In order to begin using Libaudioverse's 3d components, it is not necessary to fully understand this section.
+For a gentler introduction, see the tutorials.
+
+In order to provide flexibility to the programmer, Libaudioverse presents audio as a set of interconnected objects arranged in an acyclic dependency graph.
+Each object has some number of inputs, some number of properties, and some number of outputs.
+The relationship of inputs to outputs is one-to-many.
+Properties are not the domain of this discussion; see <<basics-properties,properties>> for an overview.
+This section focuses on inputs, outputs, and connections between them.
+
+To provide a helpful analogy for those not familiar with graph terminology, Libaudioverse objects are like boxes with wires and ports.
+The wires represent inputs and the ports represent outputs.
+Because analogies aren't perfect, multiple wires may be plugged into one port.
+The bit about acyclicity is simply this: if you can follow wires to ports in such a way that you reach a port on the object with which you started, you have a cycle.
+This invarriant is inforced by the library and will result in an error if violated.
+
+Objects are part of a simulation.  The simulation holds information about sampling rates, block sizes, and other miscellania.
+It is an error to connect an input of one object in one simulation to an object in another simulation.
+
+One object per simulation is designated the output object.
+The outputs of the output object are mapped directly to sound card channels: output 0 is channel 0, output 1 is channel 1, and so on.
+
+In order to process audio quickly, Libaudioverse locks the simulation while preparing blocks of audio.
+Consequently, any changes made to the object graph will happen either before or after a block.
+For a full discussion of the block size, see <<quantifying-latency,quantifying latency>>
+
+Libaudioverse's internal sampling rates are not those of your sound card, so it is possible to run at any sampling rate.
+It is not possible for Libaudioverse objects to produce anything but one full block of audio, so all resampling either happens at inputs to the library (file nodes, etc) or between the output object and the sound card.
+Lowering the sampling rate is one way to drastically lower the CPU usage of the library, though some objects will lose quality if you do so.
+A prime example of this is the HRTF object, which works best at the sampling rate of the HRTF file fed to it.
+
+[[basics-object-states]]
+=== Object States: When Are Objects processed?
+
+As stated above, Libaudioverse objects are in a dependency graph.  This means that it is possible to perform pruning.  This is best illustrated with an example.
+
+Say you have a mixer called `m` and a file object called `f`.  For simplicity, let's say they both have one output.  Furthermore, let `m` be the output object of some simulation.
+
+`m` will always process, so long as it is the designated output object.
+At this point, however, `f` does not process.
+If the input of `m` is connected to `f`'s output, `f` will begin processing.
+If `f` is made the output object of the simulation, `m` will stop processing (because no input of `f` connects to `m`) and `f` will begin processing.
+
+The rule can formally be stated as follows.
+If a simulation has no output object and all objects are in their default states (see below), then no objects which are part of that simulation process.
+Otherwise, start at the output object of the simulation and build a set of objects by following all inputs of the output object, recursively.  process each object seen exactly once in an order such that no object is processed before all objects to which its inputs point are processed.
+
+This seems overly complicated, but three things should be noted:
+
+- Some objects are prohibitively expensive, for example the HRTF panners.
+HRTF panners take millions of mathematical operations per second
+processing them when they are not required penalizes the rest of the simulation heavily.
+
+- This will usually do what one expects.
+If the mixing paths are pre-built, all objects in them will process.
+For a majority of applications, this is the case.
+For those in which it is not, this behavior can be directly useful.
+
+- Finally, if you wish to change this default, keep reading.
+it is not advised to abuse object states in this manner, but it is possible to essentially circumvent this algorithm by placing all objects in the `ALWAYS_PROCESS` state.
+
+Every object has a state.
+//todo: discuss when states are formally coded.
+
+[[basics-properties]]
+=== Properties
+
+[[quantifying-latency]]
+=== Quantifying Latency: the Block Size and the Mixahead
