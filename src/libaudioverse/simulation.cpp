@@ -104,12 +104,20 @@ void LavSimulation::associateDevice(std::shared_ptr<LavDevice> what) {
 
 void LavSimulation::visitAllObjectsInProcessOrder(std::function<void(std::shared_ptr<LavObject>)> visitor) {
 	std::set<std::shared_ptr<LavObject>> seen;
+	auto visitorWrapped = [&](std::shared_ptr<LavObject> o) {
+		if(seen.count(o)) return;
+		visitor(o);
+		seen.insert(o);
+	};
 	if(output_object) {
-		visitForProcessing(output_object, [&](std::shared_ptr<LavObject> o) {
-			if(seen.count(o)) return;
-			visitor(o);
-			seen.insert(o);
-		});
+		visitForProcessing(output_object, visitorWrapped);
+	}
+	//visit the rest: lav_OBJECT_STATE_ALWAYS_PLAYING.
+	for(auto& i: objects) {
+		std::shared_ptr<LavObject> j = i.lock();
+		if(j->getState() == Lav_OBJECT_STATE_ALWAYS_PLAYING) {
+			visitForProcessing(j, visitorWrapped);
+		}
 	}
 }
 
