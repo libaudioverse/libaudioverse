@@ -35,12 +35,6 @@ LavError LavSimulation::getBlock(float* out) {
 		memset(out, 0, sizeof(float)*channels*block_size);
 		return Lav_ERROR_NONE;
 	}
-	//if no output object, memset 0 and bail out again.
-	if(output_object == nullptr) {
-		memset(out, 0, sizeof(float)*channels*block_size);
-		return Lav_ERROR_NONE;
-	}
-	//okay, we're not paused.  Visit all objects in the order that they would be processed, and record it.
 	process_order.clear();
 	visitAllObjectsInProcessOrder([this] (std::shared_ptr<LavObject> o) {
 		process_order.push_back(o);
@@ -56,7 +50,7 @@ LavError LavSimulation::getBlock(float* out) {
 		obj->process();
 		obj->didProcess();
 	}
-	if(output_object->getState() == Lav_OBJECT_STATE_PAUSED) { //fast path, just zero.
+	if(output_object == nullptr || output_object->getState() == Lav_OBJECT_STATE_PAUSED) { //fast path, just zero.
 		memset(out, 0, sizeof(float)*block_size*channels);
 		return Lav_ERROR_NONE;
 	}
