@@ -103,10 +103,10 @@ enum Lav_OBJTYPES {
 };
 
 /**Object states.*/
-enum Lav_OBJECT_STATES {
-	Lav_OBJECT_STATE_PAUSED = 0,
-	Lav_OBJECT_STATE_PLAYING = 1,
-	Lav_OBJECT_STATE_ALWAYS_PLAYING = 2
+enum Lav_OBJSTATES {
+	Lav_OBJSTATE_PAUSED = 0,
+	Lav_OBJSTATE_PLAYING = 1,
+	Lav_OBJSTATE_ALWAYS_PLAYING = 2
 };
 
 /**Initialize Libaudioverse.*/

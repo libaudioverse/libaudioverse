@@ -50,7 +50,7 @@ LavError LavSimulation::getBlock(float* out) {
 		obj->process();
 		obj->didProcess();
 	}
-	if(output_object == nullptr || output_object->getState() == Lav_OBJECT_STATE_PAUSED) { //fast path, just zero.
+	if(output_object == nullptr || output_object->getState() == Lav_OBJSTATE_PAUSED) { //fast path, just zero.
 		memset(out, 0, sizeof(float)*block_size*channels);
 		return Lav_ERROR_NONE;
 	}
@@ -106,10 +106,10 @@ void LavSimulation::visitAllObjectsInProcessOrder(std::function<void(std::shared
 	if(output_object) {
 		visitForProcessing(output_object, visitorWrapped);
 	}
-	//visit the rest: lav_OBJECT_STATE_ALWAYS_PLAYING.
+	//visit the rest: Lav_OBJSTATE_ALWAYS_PLAYING.
 	for(auto& i: objects) {
 		std::shared_ptr<LavObject> j = i.lock();
-		if(j->getState() == Lav_OBJECT_STATE_ALWAYS_PLAYING) {
+		if(j->getState() == Lav_OBJSTATE_ALWAYS_PLAYING) {
 			visitForProcessing(j, visitorWrapped);
 		}
 	}
@@ -119,7 +119,7 @@ void LavSimulation::visitForProcessing(std::shared_ptr<LavObject> obj, std::func
 	//if obj is null, bail out.  This is the base case.
 	if(obj == nullptr) return;
 	//if the object is paused, we also bail out: this object and its parents are not needed.
-	if(obj->getState() == Lav_OBJECT_STATE_PAUSED) return;
+	if(obj->getState() == Lav_OBJSTATE_PAUSED) return;
 	//we call ourselves on all parents of obj, and then pass obj to visitor.  This is essentially depth-first search.
 	for(unsigned int i = 0; i < obj->getParentCount(); i++) {
 		visitForProcessing(obj->getParentObject(i), visitor);
