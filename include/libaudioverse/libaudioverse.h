@@ -102,6 +102,14 @@ enum Lav_OBJTYPES {
 	Lav_OBJTYPE_AMPLITUDE_PANNER = 10,
 };
 
+/**Object states.*/
+enum Lav_OBJECT_STATES {
+	Lav_OBJECT_STATE_SUSPENDED = 0,
+	Lav_OBJECT_STATE_PAUSED = 1,
+	Lav_OBJECT_STATE_PLAYING = 2,
+	Lav_OBJECT_STATE_ALWAYS_PLAYING = 3
+};
+
 /**Initialize Libaudioverse.*/
 Lav_PUBLIC_FUNCTION LavError Lav_initializeLibrary();
 
