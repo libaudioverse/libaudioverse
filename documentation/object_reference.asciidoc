@@ -19,11 +19,18 @@ For a discussion of property types, see Property Types.  For a discussion of cal
 |===
 |Name|C Constant|Type|Range|Default | Description
 
-|suspended
-|Lav_OBJECT_SUSPENDED
+|autoreset
+|Lav_OBJECT_AUTORESET
 |boolean
 |
-|0
+|1
+|None Defined
+
+|state
+|Lav_OBJECT_STATE
+|int
+|[0, 2]
+|1
 |None Defined
 |===
 
@@ -169,6 +176,13 @@ For a discussion of property types, see Property Types.  For a discussion of cal
 |float
 |[-90.0, 90.0]
 |0.0
+|None Defined
+
+|should_crossfade
+|Lav_PANNER_SHOULD_CROSSFADE
+|boolean
+|
+|1
 |None Defined
 |===
 
