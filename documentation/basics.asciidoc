@@ -46,6 +46,7 @@ In this configuration, the simulation's `get_block` method must be used directly
 
 The second method is to specify a sampling rate, mixahead, buffer size, and device index.
 If initialized in this manner, Libaudioverse decides the number of channels.
+Mixahead and buffer size are discussed further in <<quantifying-latency,Quantifying Latency>>.
 
 Device indexes are integers which Libaudioverse assigns to devices.
 it is possible to enumerate all devices on the system.
@@ -55,9 +56,9 @@ Device indexes 0 to n represent all output devices on the system.
 Device index -1 is special and refers to the default audio output device with following functionality.
 Device index -1 will always have 2 channels.
 This is due to the fact that, should it be supported on the platform Libaudioverse is running on, device index -1 is an explicit request to follow the default audio device if it changes.
-Changing the number of channels as the device changes leads to too many ambiguities; should your application wish to support surround sound or even odder channel setups, this functionality must be foregone.
+Changing the number of channels as the device changes leads to too many ambiguities; should your application wish to support surround sound or even odder channel setups, this functionality must be foregone or manually implemented by the application.
 
-most language bindings choose the second approach when constructing a simulation with the default constructor.
+most language bindings choose the second approach when constructing a simulation with the default constructor, though it is obviously possible to change this.
 
 [[basics-object-states]]
 === Object States: When Are Objects processed?
@@ -91,7 +92,7 @@ This algorithm is especially important when working in garbage collected languag
 
 - This will usually do what one expects.
 For a majority of applications, all objects are connected at start-up and this algorithm can be disregarded.
-For those in which this is not the case, this behavior can be directly useful.
+For those in which this is not the case, this behavior can be directly useful to the programmer.
 
 - Finally, if you wish to change this default, keep reading.
 it is not advised to abuse object states in this manner, but it is possible to essentially circumvent this algorithm by placing all objects in the `always_playing` state.
@@ -131,7 +132,7 @@ When paused, objects will take up almost no CPU, so there is no advantage in dis
 
 Second, when you make the decision to unplug objects, consider why you are doing so.
 If this is because the object will not be needed for a long time and you don't specifically care if time advances for it, then call the `reset` metod on it before beginning to use it again.
-Otherwise, set the object's state to always_playing and leave it there.
+Otherwise, set the object's state to always_playing and leave it there unless you intend to explicitly pause it.
 
 Third, a very convenient way to pause large groups of objects is to place them behind a mixer.
 Connect to the mixer instead of the objects.
@@ -147,6 +148,57 @@ This will only be useful for those apps which spend large amounts of time changi
 
 [[basics-properties]]
 === Properties
+
+In order to function in a language-agnostic manner, communicating with Libaudioverse is performed primarily through setting properties.
+Examples include file names, delay line lengths, and positions of objects in 3D space.
+In the view of Libaudioverse, your code is not requesting a service; it is asserting that specific conditions are true.
+The philosophical difference is simple: in Libaudioverse, you state that a 3D source is at (3, 0, 3).  You do not request that libaudioverse move it there.
+
+properties have a type, default value, name, and range.
+There are many different types of properties, which are enumerated below.
+The <<object-reference,Object Reference>> contains a reference of the properties on various objects,
+the <<bindings,Bindings>> secction tells you how properties are bound to your language, and the <<c-api,C API>> section discusses the functions and constants used with properties for those working at that level.
+
+The types of Libaudioverse properties are as follows:
+
+- Boolean.
+Boolean properties are a special case of integer properties with the range [0, 1].
+They are used in the same manner as integer properties from the C API.
+They exist so that languages which provide a boolean type may take advantage of it; bindings will bind boolean properties to true/false whenever possible.
+
+- Integer.
+Integer properties are signed 32-bit integers, typically used to accept enumeration values or to represent other quantities that are discrete.
+A good example of an integer property is the state property, available on all objects; the state property may be set to one of the `Lav_OBJSTATE` constants.
+Whenever possible, integer properties have an associated enumeration.
+This information is used by the bindings to allow one to use symbolic constants rather than memorized integral values.
+Again, the <<bindings,Bindings>> section discusses how this works for your language.
+
+- Float.
+Float properties represent volumes, pitches, and other low-precision decimal qualities as a 32-bit floating point value.
+
+- Double.
+Double properties are rarely used and exist primarily for high-precision timing information and deltas.
+Double properties are the 64-bit double from C.
+
+- Float3.
+Float3 properties are a fast path for vectors, which also have the side effect of forcing atomic updates.
+Float3 properties are used primarily in the 3D audio API for position information.
+
+- Float6.
+Float6 properties are rarely used and are a set of 6 packed floats.
+usually, float6 properties are used for pairs of vectors which must be atompically updated;
+an example of this is the orientation of the listener in the 3d audio objects.
+
+- Strings.
+Exactly what they sound like.
+There isn't much to say about them, save that if you don't know what they are, you've got problems.
+
+There are two further property types which should be discussed together: array of ints and array of floats.
+Both of these are used only for the most advanced objects and both are intensionally designed to be inefficient.
+While it is possible to perform partial updates of these properties in C, bindings will usually bind them to force whole, atomic updates of the entire array.
+Arrays are not meant for large lists of ints or floats; in this case, Libaudioverse will either expect a file or provide dedicated functions on a per-object basis.
+The only way to read arrays is to copy to buffers owned by the application.
+This is due to Libaudioverse's policy of never exposing internnal memory. Ever.
 
 [[quantifying-latency]]
 === Quantifying Latency: the Block Size and the Mixahead
