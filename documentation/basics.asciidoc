@@ -1,16 +1,11 @@
 [[basics]]
 == Basic Concepts of Libaudioverse
 
-[[view-of-audio]]
-=== Libaudioverse's View of Audio
-
-Many libraries that provide audio provide a very small set of services.
-A good example of such a library is OpenAL:
-one may use a predefined mixer path only.
-Anything outside that path is simply not doable.
-While some programmers may believe the Libaudioverse approach to be overly complex, it is not.
 In order to begin using Libaudioverse's 3d components, it is not necessary to fully understand this section.
 For a gentler introduction, see the tutorials.
+
+[[view-of-audio]]
+=== Libaudioverse's View of Audio
 
 In order to provide flexibility to the programmer, Libaudioverse presents audio as a set of interconnected objects arranged in an acyclic dependency graph.
 Each object has some number of inputs, some number of properties, and some number of outputs.
@@ -38,6 +33,31 @@ Libaudioverse's internal sampling rates are not those of your sound card, so it 
 It is not possible for Libaudioverse objects to produce anything but one full block of audio, so all resampling either happens at inputs to the library (file nodes, etc) or between the output object and the sound card.
 Lowering the sampling rate is one way to drastically lower the CPU usage of the library, though some objects will lose quality if you do so.
 A prime example of this is the HRTF object, which works best at the sampling rate of the HRTF file fed to it.
+
+[[basics-devices-and-simulations]]
+=== Devices and the Simulation
+
+As discussed above, a simulation is needed by every every Libaudioverse program.
+It encapsulates a chosen sampling rate and number of channels as well as providing functions for requesting blocks of audio.
+
+There are two ways in which a simulation may be used.
+The first is to specify the sampling rate, channels, and block size.
+In this configuration, the simulation's `get_block` method must be used directly and no audio will be heard.
+
+The second method is to specify a sampling rate, mixahead, buffer size, and device index.
+If initialized in this manner, Libaudioverse decides the number of channels.
+
+Device indexes are integers which Libaudioverse assigns to devices.
+it is possible to enumerate all devices on the system.
+For specifics, see the tutorials for how this is done in Python, the binding-specific notes for your language, or the <<c-api,section on the C API>>.
+
+Device indexes 0 to n represent all output devices on the system.
+Device index -1 is special and refers to the default audio output device with following functionality.
+Device index -1 will always have 2 channels.
+This is due to the fact that, should it be supported on the platform Libaudioverse is running on, device index -1 is an explicit request to follow the default audio device if it changes.
+Changing the number of channels as the device changes leads to too many ambiguities; should your application wish to support surround sound or even odder channel setups, this functionality must be foregone.
+
+most language bindings choose the second approach when constructing a simulation with the default constructor.
 
 [[basics-object-states]]
 === Object States: When Are Objects processed?
