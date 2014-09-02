@@ -201,4 +201,35 @@ The only way to read arrays is to copy to buffers owned by the application.
 This is due to Libaudioverse's policy of never exposing internnal memory. Ever.
 
 [[quantifying-latency]]
-=== Quantifying Latency: the Block Size and the Mixahead
+=== Quantifying Latency, Memory, and CPU: the Block Size and the Mixahead
+
+Libaudioverse has two parameters which are specified at simulation creation: the block size and the mixahead.
+
+Block size is always specified, and represents the size of one "block" of audio.
+This is normally called the buffer size, but buffer implies that it can be changed or partially filled by data.
+When reading audio, no matter if this is done internally for output or by the application for some other purpose, one always gets exactly one block.
+No more, no less.
+
+The second parameter is only used in the case of audio output and is the primary discussion topic of this section.
+
+The mixahead is how many buffers to prepare in advance of playing.  The minimum value is 0 and the maximum value is unbounded.
+
+before discussing memory and CPU, a discussion of latency is in order.
+The approximate length of time before any change in the simulation's objects is processed is computed as `(mixahead+1)*block_size`.
+This is subject to variation.  The mixahead exists to give the internal audio backends extra audio in the event that a simulation suddenly becomes expensive.
+high mixaheads will cause stuttering audio to stop stuttering, but at the cost of higher latency.
+While not a solution for a simulation that is always too expensive to process in real-time, it allows things such as crossfading to avoid audible breaks in the output.
+
+When processing, Libaudioverse holds a per-simulation lock.
+Larger block sizes can cause this lock to be held longer, while larger mixaheads will cause the lock to be released and reaquired more rapidly.
+While this lock is held, your code cannot make changes to the objects in the simulation being processed.
+Should the simulation become too expensive or both the block size and mixahead be too high, the application using Libaudioverse may experience unresponsiveness.
+The main contributing factor is simulation expense,but tuning these parameters can help.
+
+Small block sizes cause a growing amount of overhead in terms of releasing locks, copying buffers, and other such mundanities.
+Below a certain point (the specific point depends on the configuration of the simulation's objects), Libaudioverse will spend more time performing overhead than mixing.
+Extremely low block sizes also decrease cache friendliness and cause internal optimizations to no longer provide benefit.
+
+In terms of memory, the majority goes to outputs.  Inputs take up almost nothing, and properties should be considered free.  Every output takes up exactly `4*block_size` bytes.
+Counting outputs is merely a lower bound, because some objects in libaudioverse are  actually made up of more than one object internally; Libaudioverse is programmed, in some cases, by using Libaudioverse as the application programmer does.
+
