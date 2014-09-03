@@ -16,6 +16,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_kernels.hpp>
 #include <math.h>
 #include <memory>
+#include <algorithm>
 
 /**Swaps bytes to reverse endianness.*/
 void reverse_endianness(char* buffer, unsigned int count, unsigned int window) {
@@ -215,4 +216,13 @@ void LavHrtfData::computeCoefficientsStereo(float elevation, float azimuth, floa
 	computeCoefficientsMono(elevation1, azimuth, temporary_buffer1);
 	computeCoefficientsMono(elevation2, azimuth, temporary_buffer2);
 	for(unsigned int i = 0; i < hrir_length; i++) left[i] = temporary_buffer1[i]*w1+temporary_buffer2[i]*w2;
+	//normalize in attempt to always produce no net decrease in volume.
+	auto cmp = [](const float x, const float y) {return fabs(x) < fabs(y);};
+	float lmax = *std::max_element<float*>(left, left+hrir_length, cmp);
+	float rmax = *std::max_element<float*>(right, right+hrir_length, cmp);
+	float maxVal = std::max(fabs(lmax), fabs(rmax));
+	for(unsigned int i = 0; i < hrir_length; i++) {
+		left[i]/=maxVal;
+		right[i]/=maxVal;
+	}
 }
