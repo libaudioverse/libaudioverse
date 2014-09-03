@@ -104,7 +104,7 @@ enum Lav_OBJTYPES {
 };
 
 /**Object states.*/
-enum Lav_OBJSTATES {
+enum Lav_OBJECT_STATES {
 	Lav_OBJSTATE_PAUSED = 0,
 	Lav_OBJSTATE_PLAYING = 1,
 	Lav_OBJSTATE_ALWAYS_PLAYING = 2
