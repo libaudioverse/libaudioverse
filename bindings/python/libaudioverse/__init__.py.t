@@ -305,5 +305,15 @@ class {{friendly_name}}(GenericObject):
 {{implement_callback(info['name'], "_libaudioverse." + enumerant)}}
 
 {%endfor%}
+
+{%for func_name, func_info in metadata.get(object_name, dict()).get('extra_functions', dict()).iteritems()%}
+{%set friendly_name = func_info['name']%}
+{%set func = functions[func_name]%}
+{%set lav_func = func.name|without_lav|camelcase_to_underscores%}
+	def {{friendly_name}}({{func.input_args|map(attribute='name')|list|join(', ')}}):
+		return _lav.{{lav_func}}({{func.input_args|map(attribute='name')|list|join(', ')}})
+
+{%endfor%}
+
 {%endfor%}
 

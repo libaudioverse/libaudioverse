@@ -100,6 +100,7 @@ enum Lav_OBJTYPES {
 	Lav_OBJTYPE_HARD_LIMITER = 8,
 	Lav_OBJTYPE_DELAY = 9,
 	Lav_OBJTYPE_AMPLITUDE_PANNER = 10,
+	Lav_OBJTYPE_PUSH = 11,
 };
 
 /**Object states.*/
@@ -219,6 +220,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_createAttenuatorObject(LavSimulation *sim, unsi
 Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterObject(LavSimulation* sim, unsigned int numInputs, LavObject** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createDelayObject(LavSimulation* sim, unsigned int lines, LavObject** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createAmplitudePannerObject(LavSimulation* sim, LavObject** destination);
+
+Lav_PUBLIC_FUNCTION LavError Lav_createPushObject(LavSimulation* simulation, unsigned int sr, unsigned int channels, LavObject** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_pushObjectFeed(LavObject* handle, unsigned int length, float* buffer);
 
 #ifdef __cplusplus
 }

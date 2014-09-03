@@ -56,3 +56,7 @@ Lav_OBJTYPE_DELAY:
   Lav_DELAY_FEEDBACK: {name: feedback, type: float, default: 0.0, range: [0.0, 1.0]}
   Lav_DELAY_INTERPOLATION_TIME: {name: interpolation_time, type: float, default: 0.001, range: [0.001, INFINITY]}
  doc_name: Delay Line
+Lav_OBJTYPE_PUSH:
+ doc_name: Push Object
+ extra_functions:
+  Lav_pushObjectFeed: {name: feed}

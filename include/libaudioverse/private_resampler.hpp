@@ -18,6 +18,7 @@ class LavResampler {
 	public:
 	LavResampler(int inputFrameCount, int inputChannels, int inputSr, int outputSr);
 	int write(float* dest, int maxFrameCount);
+	//this copies, the buffer can be reused.
 	void read(float* source);
 	private:
 	void writeFrame(float* input, float* dest);
