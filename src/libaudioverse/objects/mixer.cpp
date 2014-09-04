@@ -17,12 +17,13 @@ class LavMixerObject: public LavObject {
 	virtual void process();
 	protected:
 	void maxParentsChanged();
-	unsigned int inputs_per_parent;
 };
 
 LavMixerObject::LavMixerObject(std::shared_ptr<LavSimulation> simulation, unsigned int maxParents, unsigned int inputsPerParent): LavObject(Lav_OBJTYPE_MIXER, simulation, inputsPerParent*maxParents, inputsPerParent) {
 	type = Lav_OBJTYPE_MIXER;
-	inputs_per_parent = inputsPerParent;
+	getProperty(Lav_MIXER_INPUTS_PER_PARENT).setIntRange(inputsPerParent, inputsPerParent);
+	getProperty(Lav_MIXER_INPUTS_PER_PARENT).setIntValue(inputsPerParent);
+	getProperty(Lav_MIXER_MAX_PARENTS).setIntValue(maxParents);
 	getProperty(Lav_MIXER_MAX_PARENTS).setPostChangedCallback([this] () {maxParentsChanged();});
 }
 
@@ -34,15 +35,17 @@ std::shared_ptr<LavObject> createMixerObject(std::shared_ptr<LavSimulation> simu
 
 void LavMixerObject::maxParentsChanged() {
 	unsigned int newInputsCount = (unsigned int)(getProperty(Lav_MIXER_MAX_PARENTS).getIntValue());
-	newInputsCount *= inputs_per_parent;
-	resize(newInputsCount, inputs_per_parent);
+	int inputsPerParent = getProperty(Lav_MIXER_INPUTS_PER_PARENT).getIntValue();
+	newInputsCount *= inputsPerParent;
+	resize(newInputsCount, inputsPerParent);
 }
 
 void LavMixerObject::process() {
+	int inputsPerParent = getProperty(Lav_MIXER_INPUTS_PER_PARENT).getIntValue();
 	for(unsigned int i = 0; i < block_size; i++) {
 		for(unsigned int j = 0; j < num_outputs; j++) outputs[j][i] = 0.0f;
 		for(unsigned int j = 0; j < inputs.size(); j++) {
-			outputs[j%inputs_per_parent][i] += inputs[j][i];
+			outputs[j%inputsPerParent][i] += inputs[j][i];
 		}
 	}
 }
