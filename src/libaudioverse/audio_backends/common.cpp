@@ -81,7 +81,7 @@ void LavDevice::mixingThreadFunction() {
 	unsigned int sourceSr = (unsigned int)simulation->getSr();
 	LavResampler resampler((unsigned int)simulation->getBlockSize(), simulation->getChannels(), sourceSr, target_sr);
 	unsigned int currentBuffer = 0;
-	unsigned int sleepFor = (unsigned int)(simulation->getBlockSize()/(double)simulation->getSr())*1000;
+	unsigned int sleepFor = (unsigned int)((simulation->getBlockSize()/(double)simulation->getSr())*1000);
 	float* tempBuffer = new float[simulation->getBlockSize()*simulation->getChannels()]();
 	while(mixing_thread_continue.test_and_set()) {
 		if(buffer_statuses[currentBuffer].load()) { //we've done this one, but the callback hasn't gotten to it yet.

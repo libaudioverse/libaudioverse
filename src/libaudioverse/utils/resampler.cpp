@@ -76,3 +76,8 @@ int LavResampler::write(float* dest, int maxFrameCount) {
 	}
 	return count;
 }
+
+int LavResampler::estimateAvailableSamples() {
+	float delta_rec = 1.0/delta;
+	return queue.size()*delta_rec*input_frame_count;
+}
