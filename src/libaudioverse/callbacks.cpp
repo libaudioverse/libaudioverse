@@ -15,7 +15,7 @@ LavCallback::LavCallback() {
 }
 
 LavCallback::LavCallback(const LavCallback &other):
-name(other.name), associated_simulation(other.associated_simulation), handler(other.handler), associated_object(other.associated_object), user_data(other.user_data) {
+name(other.name), associated_simulation(other.associated_simulation), handler(other.handler), associated_object(other.associated_object), user_data(other.user_data), no_multifire(other.no_multifire) {
 	is_firing.store(0);
 }
 
@@ -33,8 +33,9 @@ LavEventCallback LavCallback::getHandler() {
 }
 
 void LavCallback::fire() {
+
 	if(handler == nullptr) return; //nothing to do.
-	if(no_multifire && is_firing.load()) return;
+	if(no_multifire && is_firing.load() == 1) return;
 	is_firing.store(1);
 	//we need to hold local copies of both the object and data in case they are changed between firing and processing by the simulation.
 	auto obj = std::weak_ptr<LavObject>(associated_object->shared_from_this());

@@ -11,7 +11,8 @@ sim = libaudioverse.Simulation(device_index = -1)
 p = libaudioverse.PushObject(sim, 44100, 2)
 sim.output_object = p
 
-for i in xrange(5):
-	p.feed(len(stereo), stereo)
+def feeder(obj):
+	obj.feed(len(stereo), stereo)
 
-time.sleep(6.0)
+p.audio_callback = feeder
+time.sleep(10.0)

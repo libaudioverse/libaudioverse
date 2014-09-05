@@ -58,9 +58,9 @@ Lav_OBJTYPE_DELAY:
  doc_name: Delay Line
 Lav_OBJTYPE_PUSH:
  properties:
-  Lav_PUSH_THRESHOLD: {name: threshold, type: float, range: [0.0, 1.0], default: 0.01}
+  Lav_PUSH_THRESHOLD: {name: threshold, type: float, range: [0.0, INFINITY], default: 0.03}
  callbacks:
-  Lav_PUSH_AUDIO_CALLBACK: {name: audio_callback, multifiring_protection: true}
+  Lav_PUSH_AUDIO_CALLBACK: {name: audio, multifiring_protection: true}
  doc_name: Push Object
  extra_functions:
   Lav_pushObjectFeed: {name: feed}
