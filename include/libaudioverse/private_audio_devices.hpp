@@ -50,6 +50,7 @@ class LavSimulationFactory {
 };
 
 LavSimulationFactory* createPortaudioSimulationFactory();
+LavSimulationFactory* createWinmmSimulationFactory();
 typedef LavSimulationFactory* (*LavSimulationFactoryCreationFunction)();
 
 //finally, the function that initializes all of this.

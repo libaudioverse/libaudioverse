@@ -43,6 +43,7 @@ objects/push.cpp
 audio_backends/common.cpp
 audio_backends/public.cpp
 audio_backends/portaudio.cpp
+audio_backends/winmm.cpp
 
 #the 3D abstraction on top of libaudioverse.
 3d/world.cpp
