@@ -61,6 +61,11 @@ enum Lav_DELAY_PROPERTIES {
 	Lav_DELAY_INTERPOLATION_TIME = -4,
 };
 
+enum Lav_PUSH_OBJECT_PROPERTIES {
+	Lav_PUSH_THRESHOLD = -1,
+	Lav_PUSH_AUDIO_CALLBACK = -2
+};
+
 #ifdef __cplusplus
 }
 #endif

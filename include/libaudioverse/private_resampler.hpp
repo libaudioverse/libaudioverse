@@ -21,7 +21,7 @@ class LavResampler {
 	//this copies, the buffer can be reused.
 	void read(float* source);
 	//note the estimate: this is not necessarily sample-accurate due to fp issues.
-	int estimateAvailableSamples();
+	int estimateAvailableFrames();
 	private:
 	void writeFrame(float* input, float* dest);
 	float *last_frame = nullptr;

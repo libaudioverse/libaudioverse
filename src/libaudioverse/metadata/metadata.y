@@ -57,6 +57,10 @@ Lav_OBJTYPE_DELAY:
   Lav_DELAY_INTERPOLATION_TIME: {name: interpolation_time, type: float, default: 0.001, range: [0.001, INFINITY]}
  doc_name: Delay Line
 Lav_OBJTYPE_PUSH:
+ properties:
+  Lav_PUSH_THRESHOLD: {name: threshold, type: float, range: [0.0, 1.0], default: 0.01}
+ callbacks:
+  Lav_PUSH_AUDIO_CALLBACK: {name: audio_callback}
  doc_name: Push Object
  extra_functions:
   Lav_pushObjectFeed: {name: feed}

@@ -54,6 +54,11 @@ void LavPushObject::process() {
 		unsigned int position = i/push_channels;
 		outputs[output][position] = workspace[i];
 	}
+	float threshold = getProperty(Lav_PUSH_THRESHOLD).getFloatValue();
+	float remaining = resampler->estimateAvailableFrames()/(float)simulation->getSr();
+	if(remaining < threshold) {
+		getCallback(Lav_PUSH_AUDIO_CALLBACK).fire();
+	}
 }
 
 void LavPushObject::feed(unsigned int length, float* buffer) {
