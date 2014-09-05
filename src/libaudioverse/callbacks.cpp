@@ -9,6 +9,21 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <memory>
 
 /**Callbacks.*/
+
+LavCallback::LavCallback() {
+	is_firing.store(0);
+}
+
+LavCallback::LavCallback(const LavCallback &other):
+name(other.name), associated_simulation(other.associated_simulation), handler(other.handler), associated_object(other.associated_object), user_data(other.user_data) {
+	is_firing.store(0);
+}
+
+LavCallback& LavCallback::operator=(LavCallback other) {
+	swap(*this, other);
+	return *this;
+}
+
 void LavCallback::setHandler(LavEventCallback cb) {
 	handler = cb;
 }
@@ -19,6 +34,8 @@ LavEventCallback LavCallback::getHandler() {
 
 void LavCallback::fire() {
 	if(handler == nullptr) return; //nothing to do.
+	if(no_multifire && is_firing.load()) return;
+	is_firing.store(1);
 	//we need to hold local copies of both the object and data in case they are changed between firing and processing by the simulation.
 	auto obj = std::weak_ptr<LavObject>(associated_object->shared_from_this());
 	void* userdata = user_data;
@@ -27,7 +44,9 @@ void LavCallback::fire() {
 	associated_simulation->enqueueTask([=]() {
 		auto shared_obj = obj.lock();
 		if(shared_obj == nullptr) return;	
+		//callbacks die with objects; if we get this far, this is still a valid pointer.
 		cb(shared_obj.get(), userdata);
+		this->is_firing.store(0);
 	});
 }
 
@@ -53,4 +72,12 @@ void* LavCallback::getUserData() {
 
 void LavCallback::setUserData(void* data) {
 	user_data = data;
+}
+
+bool LavCallback::getNoMultifire() {
+	return no_multifire;
+}
+
+void LavCallback::setNoMultifire(bool what) {
+	no_multifire = what;
 }

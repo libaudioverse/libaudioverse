@@ -79,6 +79,7 @@ void initializeMetadata() {
 	{%for objid, callid, callinfo in joined_callbacks%}
 	tempcall = new LavCallback();
 	tempcall->setName("<%callinfo["name"]%>");
+	tempcall->setNoMultifire(<%callinfo.get('multifiring', False)|lower%>);
 	(*default_callback_instances)[std::tuple<int, int>(<%objid%>, <%callid%>)] = *tempcall;
 	delete tempcall;
 	(*callbacks_by_object_type)[<%objid%>].insert(<%callid%>);

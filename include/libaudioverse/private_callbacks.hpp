@@ -6,11 +6,15 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <utility>
 #include <memory>
 #include <string>
+#include <atomic>
 
 class LavSimulation;
 
 class LavCallback {
 	public:
+	LavCallback();
+	LavCallback(const LavCallback& other);
+	LavCallback& operator=(const LavCallback other);
 	void setHandler(LavEventCallback cb);
 	LavEventCallback getHandler();
 	void fire();
@@ -20,10 +24,25 @@ class LavCallback {
 	void setName(const char* n);
 	void* getUserData();
 	void setUserData(void* data);
+	bool getNoMultifire();
+	void setNoMultifire(bool what);
+	//this has to be here.
+	friend void swap(LavCallback &a, LavCallback &b) {
+		using std::swap;
+		swap(a.associated_simulation, b.associated_simulation);
+		swap(a.handler, b.handler);
+		swap(a.name, b.name);
+		swap(a.associated_object, b.associated_object);
+		swap(a.user_data, b.user_data);
+		swap(a.no_multifire, b.no_multifire);
+		//ignore isFiring.
+	};
 	private:
 	std::shared_ptr<LavSimulation> associated_simulation = nullptr;
 	LavEventCallback handler = nullptr;
 	std::string name;
 	LavObject* associated_object = nullptr;
 	void* user_data = nullptr;
+	std::atomic<int> is_firing;
+	bool no_multifire = false;
 };
