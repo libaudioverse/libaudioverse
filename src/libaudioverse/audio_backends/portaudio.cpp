@@ -54,7 +54,7 @@ LavPortaudioDevice::LavPortaudioDevice(std::shared_ptr<LavSimulation> sim, unsig
 	params.suggestedLatency = devinfo->defaultLowOutputLatency;
 	double sr = devinfo->defaultSampleRate;
 	init((unsigned int)sr);
-	PaError err = Pa_OpenStream(&stream, nullptr, &params, sr, output_buffer_size, 0, portaudioOutputCallback, this);
+	PaError err = Pa_OpenStream(&stream, nullptr, &params, sr, output_buffer_size/simulation->getChannels(), 0, portaudioOutputCallback, this);
 	if(err != paNoError) throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
 	start();
 }
