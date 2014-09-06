@@ -59,7 +59,7 @@ enum Lav_ERRORS {
 	Lav_ERROR_NULL_POINTER = 4, //you passed a NULL pointer into something that shouldn't have it.
 	Lav_ERROR_MEMORY = 5, //a memory problem which probably isn't the fault of the application.
 	Lav_ERROR_RANGE = 6, //out of range function parameter.
-	Lav_ERROR_CANNOT_INIT_AUDIO = 7, //We couldn't even initialize the audio library.
+	Lav_ERROR_CANNOT_INIT_AUDIO = 7, //We couldn't initialize the audio library or open a device
 	Lav_ERROR_FILE = 8, //error to do with files.
 	Lav_ERROR_FILE_NOT_FOUND = 9, //specifically, we couldn't find a file.
 

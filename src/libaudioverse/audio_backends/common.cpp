@@ -27,7 +27,7 @@ LavDevice::LavDevice(std::shared_ptr<LavSimulation> sim, unsigned int mixAhead):
 void LavDevice::init(unsigned int targetSr) {
 	target_sr = targetSr;
 	//compute an estimated "good" size for the buffers, given the device's blockSize and channels.
-	output_buffer_size = (unsigned int)simulation->getBlockSize();
+	output_buffer_size = (unsigned int)simulation->getBlockSize()*simulation->getChannels();
 	if(targetSr != simulation->getSr()) {
 		output_buffer_size = (unsigned int)(output_buffer_size*(double)targetSr/simulation->getSr());
 		//always go for the multiples of 4.  This doesn't hurt anything, and some backends may be faster because of it.
