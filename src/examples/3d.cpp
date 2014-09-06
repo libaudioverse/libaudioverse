@@ -26,7 +26,7 @@ void main(int argc, char** args) {
 	LavSimulation* simulation;
 	LavObject* node, *world, *source;
 	ERRCHECK(Lav_initializeLibrary());
-	ERRCHECK(Lav_createSimulationForDevice(-1, 44100, 512, 2, &simulation));
+	ERRCHECK(Lav_createSimulationForDevice(-1, 44100, 1024, 3, &simulation));
 	ERRCHECK(Lav_createWorldObject(simulation, hrtfFile, &world));
 	ERRCHECK(Lav_createFileObject(simulation, soundFile, &node));
 	ERRCHECK(Lav_createSourceObject(simulation, world, &source));
