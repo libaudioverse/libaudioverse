@@ -21,6 +21,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 LavDevice::LavDevice(std::shared_ptr<LavSimulation> sim, unsigned int mixAhead): mix_ahead(mixAhead), simulation(sim), channels(sim->getChannels()) {
 	buffers = new float*[mixAhead+1];
 	buffer_statuses = new std::atomic<int>[mixAhead+1];
+	for(unsigned int i = 0; i < mixAhead + 1; i++) buffer_statuses[i].store(0);
 }
 
 //these are the next two steps in initialization, and are consequently put before the destructor.
