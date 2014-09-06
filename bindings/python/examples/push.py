@@ -7,7 +7,7 @@ l = [math.sin((i/44100.0)*2*math.pi*300) for i in xrange(44100)]
 r = [math.sin((i/44100.0)*2*math.pi*310) for i in xrange(44100)]
 stereo = [i for l in zip(l, r) for i in l]
 
-sim = libaudioverse.Simulation(device_index = -1)
+sim = libaudioverse.Simulation(device_index = -1, block_size = 512, mix_ahead = 10)
 p = libaudioverse.PushObject(sim, 44100, 2)
 sim.output_object = p
 

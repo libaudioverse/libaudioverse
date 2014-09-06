@@ -27,7 +27,10 @@ def make_error_from_code(err):
 {%endif%}
 {%if arg.type.indirection == 1 and not arg.type.base == 'char'%}
 	if isinstance({{arg.name}}, collections.Sized):
-		{{arg.name}} = ({{arg.type|ctypes_string(1)}}*len({{arg.name}}))(*{{arg.name}})
+		if not isinstance({{arg.name}}, basestring):
+			{{arg.name}} = ({{arg.type|ctypes_string(1)}}*len({{arg.name}}))(*{{arg.name}})
+		else:
+			{{arg.name}} = ctypes.cast(ctypes.create_string_buffer({{arg.name}}, len({{arg.name}})), {{arg.type|ctypes_string}})
 {%endif%}
 {%endfor%}
 {%endmacro%}
