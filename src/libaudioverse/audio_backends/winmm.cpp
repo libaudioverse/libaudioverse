@@ -86,7 +86,7 @@ void LavWinmmDevice::winmm_mixer() {
 			waveOutPrepareHeader(winmm_handle, nextHeader, sizeof(WAVEHDR));
 			waveOutWrite(winmm_handle, nextHeader, sizeof(WAVEHDR));
 		}
-//	WaitForSingleObject(buffer_state_changed_event, 5); //the timeout is to let us detect that we've been requested to die.
+	WaitForSingleObject(buffer_state_changed_event, 5); //the timeout is to let us detect that we've been requested to die.
 	}
 }
 
