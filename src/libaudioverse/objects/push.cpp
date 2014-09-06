@@ -30,6 +30,7 @@ class LavPushObject: public LavObject {
 	unsigned int push_channels = 0;
 	unsigned int push_frames = 1024;
 	unsigned int push_offset = 0;
+	bool fired_out_callback = false;
 };
 
 LavPushObject::LavPushObject(std::shared_ptr<LavSimulation> sim, unsigned int inputSr, unsigned int channels): LavObject(Lav_OBJTYPE_PUSH, sim, 0, channels) {
@@ -48,7 +49,17 @@ std::shared_ptr<LavObject> createPushObject(std::shared_ptr<LavSimulation> sim, 
 
 void LavPushObject::process() {
 	memset(workspace, 0, sizeof(float)*push_channels*block_size);
-	resampler->write(workspace, simulation->getBlockSize());
+	unsigned int got = resampler->write(workspace, simulation->getBlockSize());
+	if(got < simulation->getBlockSize()) {
+		resampler->read(push_buffer);
+		memset(push_buffer, 0, sizeof(float)*push_channels*push_frames);
+		push_offset = 0;
+		got += resampler->write(workspace+got*push_channels, simulation->getBlockSize()-got);
+		if(fired_out_callback == false && got < simulation->getBlockSize()) {
+			getCallback(Lav_PUSH_OUT_CALLBACK).fire();
+			fired_out_callback = true;
+		}
+	}
 	for(unsigned int i = 0; i < push_channels*block_size; i++) {
 		unsigned int output = i%push_channels;
 		unsigned int position = i/push_channels;
@@ -62,6 +73,7 @@ void LavPushObject::process() {
 }
 
 void LavPushObject::feed(unsigned int length, float* buffer) {
+	fired_out_callback = false;
 	if(length%push_channels != 0) throw LavErrorException(Lav_ERROR_RANGE);
 	unsigned int frames = length/push_channels;
 	unsigned int offset = 0;
