@@ -61,6 +61,7 @@ Lav_OBJTYPE_PUSH:
   Lav_PUSH_THRESHOLD: {name: threshold, type: float, range: [0.0, INFINITY], default: 0.03}
  callbacks:
   Lav_PUSH_AUDIO_CALLBACK: {name: audio, multifiring_protection: true}
+  Lav_PUSH_OUT_CALLBACK: {name: out}
  doc_name: Push Object
  extra_functions:
   Lav_pushObjectFeed: {name: feed}

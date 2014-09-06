@@ -63,7 +63,8 @@ enum Lav_DELAY_PROPERTIES {
 
 enum Lav_PUSH_OBJECT_PROPERTIES {
 	Lav_PUSH_THRESHOLD = -1,
-	Lav_PUSH_AUDIO_CALLBACK = -2
+	Lav_PUSH_AUDIO_CALLBACK = -2,
+	Lav_PUSH_OUT_CALLBACK = -3,
 };
 
 #ifdef __cplusplus
