@@ -127,11 +127,14 @@ Note also that we are not inheriting from MutableSequence because we cannot supp
 		return par, out
 
 	def __setitem__(self, key, val):
-		if len(val) != 2 and val is not None:
+		if val is None:
+			self.for_object._set_input(key, None, 0)
+			return
+		if len(val) != 2:
 			raise TypeError("Expected list of length 2 or None.")
 		if not isinstance(val[0], GenericObject):
 			raise TypeError("val[0]: is not a Libaudioverse object.")
-		self.for_object._set_input(key, val[0] if val is not None else None, val[1] if val is not None else 0)
+		self.for_object._set_input(key, val[0], val[1])
 
 class _EventCallbackWrapper(object):
 	"""Wraps callbacks into something sane.  Do not use externally."""
