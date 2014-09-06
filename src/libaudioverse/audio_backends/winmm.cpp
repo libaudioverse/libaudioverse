@@ -64,9 +64,6 @@ void LavWinmmDevice::shutdown_hook() {
 }
 
 void LavWinmmDevice::winmm_mixer() {
-	//We need to give the other thread a chance to get ahead of us.
-	//this does not introduce permanent latency, but lets tings start properly.
-	std::this_thread::sleep_for(std::chrono::milliseconds(30));
 	float* workspace = new float[simulation->getBlockSize()*simulation->getChannels()];
 	while(winmm_mixing_flag.test_and_set()) {
 		while(1) {

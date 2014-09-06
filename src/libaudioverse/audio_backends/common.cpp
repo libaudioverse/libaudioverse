@@ -78,7 +78,7 @@ void LavDevice::shutdown_hook() {
 }
 
 void LavDevice::mixingThreadFunction() {
-	startup_hook();
+	bool hasFilledQueueFirstTime = false;
 	unsigned int sourceSr = (unsigned int)simulation->getSr();
 	LavResampler resampler((unsigned int)simulation->getBlockSize(), simulation->getChannels(), sourceSr, target_sr);
 	unsigned int currentBuffer = 0;
@@ -86,6 +86,10 @@ void LavDevice::mixingThreadFunction() {
 	float* tempBuffer = new float[simulation->getBlockSize()*simulation->getChannels()]();
 	while(mixing_thread_continue.test_and_set()) {
 		if(buffer_statuses[currentBuffer].load()) { //we've done this one, but the callback hasn't gotten to it yet.
+			if(hasFilledQueueFirstTime == false) {
+				startup_hook();
+				hasFilledQueueFirstTime = true;
+			}
 			if(sleepFor) std::this_thread::sleep_for(std::chrono::milliseconds(sleepFor));
 			continue;
 		}
