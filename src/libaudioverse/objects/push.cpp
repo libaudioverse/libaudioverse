@@ -55,7 +55,7 @@ void LavPushObject::process() {
 		memset(push_buffer, 0, sizeof(float)*push_channels*push_frames);
 		push_offset = 0;
 		resampler->write(workspace+got*push_channels, simulation->getBlockSize()-got);
-		if(fired_out_callback == false && got < simulation->getBlockSize()) {
+		if(fired_out_callback == false) {
 			getCallback(Lav_PUSH_OUT_CALLBACK).fire();
 			fired_out_callback = true;
 		}
