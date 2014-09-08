@@ -43,3 +43,6 @@ class LavLogger {
 
 //give everything access to the global logger.
 void log(int level, std::string fmt, ...);
+
+//deinitialization function.
+void shutdownLogging();

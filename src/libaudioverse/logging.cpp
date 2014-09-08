@@ -80,6 +80,11 @@ void log(int level, std::string fmt, ...) {
 	va_end(argptr);
 }
 
+void shutdownLogging() {
+	delete logger;
+}
+
+//begin public api.
 Lav_PUBLIC_FUNCTION LavError Lav_setLoggingCallback(LavLoggingCallback cb) {
 	PUB_BEGIN
 	PUB_END

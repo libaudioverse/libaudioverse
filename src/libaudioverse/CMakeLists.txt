@@ -9,6 +9,7 @@ objects.cpp
 properties.cpp
 functiontables.cpp
 initialization.cpp
+termination.cpp
 memory.cpp
 callbacks.cpp
 simulation.cpp

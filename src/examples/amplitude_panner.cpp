@@ -12,6 +12,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #define ERRCHECK(x) do {\
 if((x) != Lav_ERROR_NONE) {\
 	printf(#x " errored: %i", (x));\
+	Lav_shutdown();\
 	return;\
 }\
 } while(0)\
@@ -23,7 +24,7 @@ void main(int argc, char** args) {
 	}
 	LavSimulation* simulation;
 	LavObject* fileNode, *panNode, *limit;
-	ERRCHECK(Lav_initializeLibrary());
+	ERRCHECK(Lav_initialize());
 	ERRCHECK(Lav_createSimulationForDevice(-1, 44100, 1024, 2, &simulation));
 	ERRCHECK(Lav_createFileObject(simulation, args[1], &fileNode));
 	float map[] = {270.0f, 90.0f};
@@ -61,4 +62,5 @@ void main(int argc, char** args) {
 			continue;
 		}
 	}
+	Lav_shutdown();
 }

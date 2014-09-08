@@ -13,6 +13,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #define ERRCHECK(x) do {\
 if((x) != Lav_ERROR_NONE) {\
 	printf(#x " errored: %i", (x));\
+	Lav_shutdown();\
 	return;\
 }\
 } while(0)\
@@ -25,7 +26,7 @@ void main(int argc, char** args) {
 	char *soundFile = args[1], *hrtfFile = args[2];
 	LavSimulation* simulation;
 	LavObject* node, *world, *source;
-	ERRCHECK(Lav_initializeLibrary());
+	ERRCHECK(Lav_initialize());
 	ERRCHECK(Lav_createSimulationForDevice(-1, 44100, 1024, 3, &simulation));
 	ERRCHECK(Lav_createWorldObject(simulation, hrtfFile, &world));
 	ERRCHECK(Lav_createFileObject(simulation, soundFile, &node));
@@ -53,4 +54,5 @@ void main(int argc, char** args) {
 			std::this_thread::sleep_for(std::chrono::milliseconds(length/resolution));
 		}
 	}
+	Lav_shutdown();
 }

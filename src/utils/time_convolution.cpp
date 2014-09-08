@@ -19,12 +19,13 @@ float storage[BLOCK_SIZE*2] = {0};
 #define ERRCHECK(x) do {\
 if((x) != Lav_ERROR_NONE) {\
 	printf(#x " errored: %i", (x));\
+	Lav_shutdown();\
 	return;\
 }\
 } while(0)\
 
 void main(int argc, char** args) {
-	ERRCHECK(Lav_initializeLibrary());
+	ERRCHECK(Lav_initialize());
 	if(argc != 2) {
 		printf("Usage: %s <hrtf file>", args[0]);
 		return;
@@ -72,4 +73,5 @@ void main(int argc, char** args) {
 		printf("Done.  Took %f seconds to process.\n", timeDelta);
 		if(timeDelta < 5.0f) printf("Still capable of processing in real-time; increasing sources and retesting.\n");
 	}
+	Lav_shutdown();
 }

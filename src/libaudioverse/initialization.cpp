@@ -25,7 +25,7 @@ initfunc_t initializers[] = {
 };
 unsigned int isInitialized = 0;
 
-Lav_PUBLIC_FUNCTION LavError Lav_initializeLibrary() {
+Lav_PUBLIC_FUNCTION LavError Lav_initialize() {
 	PUB_BEGIN
 	if(isInitialized == 1) {
 		return Lav_ERROR_NONE;

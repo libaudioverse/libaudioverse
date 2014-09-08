@@ -12,6 +12,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #define ERRCHECK(x) do {\
 if((x) != Lav_ERROR_NONE) {\
 	printf(#x " errored: %i", (x));\
+	Lav_shutdown();\
 	return;\
 }\
 } while(0)\
@@ -19,7 +20,7 @@ if((x) != Lav_ERROR_NONE) {\
 void main() {
 	LavSimulation* simulation;
 	LavObject* node;
-	ERRCHECK(Lav_initializeLibrary());
+	ERRCHECK(Lav_initialize());
 	ERRCHECK(Lav_createSimulationForDevice(-1, 44100, 1024, 2, &simulation));
 	ERRCHECK(Lav_createSineObject(simulation, &node));
 	ERRCHECK(Lav_objectSetFloatProperty(node, Lav_SINE_FREQUENCY, 0));
@@ -29,4 +30,5 @@ void main() {
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+	Lav_shutdown();
 }

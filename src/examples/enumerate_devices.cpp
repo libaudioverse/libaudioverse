@@ -12,12 +12,13 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #define ERRCHECK(x) do {\
 if((x) != Lav_ERROR_NONE) {\
 	printf(#x " errored: %i", (x));\
+	Lav_shutdown();\
 	return;\
 }\
 } while(0)\
 
 void main() {
-	ERRCHECK(Lav_initializeLibrary());
+	ERRCHECK(Lav_initialize());
 	unsigned int max_devices = 0;
 	ERRCHECK(Lav_deviceGetCount(&max_devices));
 	printf("%u devices detected.\n", max_devices);
@@ -34,4 +35,5 @@ void main() {
 		ERRCHECK(Lav_deviceGetChannels(i, &channels));
 		printf("channels: %u\n", channels);
 	}
+	Lav_shutdown();
 }
