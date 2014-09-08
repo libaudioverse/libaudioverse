@@ -24,7 +24,7 @@ class LavLogMessage {
 class LavLogger {
 	public:
 	LavLogger();
-	void log(int level, std::string fmt, ...);
+	void log(int level, std::string fmt, va_list &argptr);
 	void setLoggingLevel(int level);
 	int getLoggingLevel();
 	void setLoggingCallback(LavLoggingCallback cb);

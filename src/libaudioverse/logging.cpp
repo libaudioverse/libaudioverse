@@ -10,6 +10,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <algorithm>
 #include <iterator>
 #include <thread>
+#include <mutex>
 #include <stdio.h>
 #include <stdarg.h>
 #include <libaudioverse/private_logging.hpp>
@@ -21,11 +22,8 @@ LavLogger::LavLogger() {
 	workspace = new char[workspace_length];
 }
 
-void LavLogger::log(int level, std::string fmt, ...) {
-	va_list argptr;
-	va_start(argptr, fmt);
+void LavLogger::log(int level, std::string fmt, va_list& argptr) {
 	int got = vsnprintf(workspace, workspace_length, fmt.c_str(), argptr);
-	va_end(argptr);
 	if(got == 0) return;
 	LavLogMessage msg(level, std::string(workspace), false);
 	log_queue.enqueue(msg);
@@ -68,7 +66,13 @@ void LavLogger::loggingThreadFunction() {
 	}
 }
 
+std::once_flag logging_init_flag;
 void log(int level, std::string fmt, ...) {
+	std::call_once(logging_init_flag, [&]() {logger = new LavLogger();});
+	va_list argptr;
+	va_start(argptr, fmt);
+	logger->log(level, fmt, argptr);
+	va_end(argptr);
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_setLoggingCallback(LavLoggingCallback cb) {
