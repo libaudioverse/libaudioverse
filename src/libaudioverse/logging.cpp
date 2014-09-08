@@ -22,6 +22,11 @@ LavLogger::LavLogger() {
 	workspace = new char[workspace_length];
 }
 
+LavLogger::~LavLogger() {
+	log_queue.enqueue(LavLogMessage(Lav_LOG_LEVEL_CRITICAL, "Logger shutting down", true));
+	logging_thread.join();
+}
+
 void LavLogger::log(int level, std::string fmt, va_list& argptr) {
 	int got = vsnprintf(workspace, workspace_length, fmt.c_str(), argptr);
 	if(got == 0) return;
