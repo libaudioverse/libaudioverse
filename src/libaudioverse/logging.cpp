@@ -70,3 +70,23 @@ void LavLogger::loggingThreadFunction() {
 
 void log(int level, std::string fmt, ...) {
 }
+
+Lav_PUBLIC_FUNCTION LavError Lav_setLoggingCallback(LavLoggingCallback cb) {
+	PUB_BEGIN
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_getLoggingCallback(LavLoggingCallback* destination) {
+	PUB_BEGIN
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_setLoggingLevel(int level) {
+	PUB_BEGIN
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_getLoggingLevel(int* destination) {
+	PUB_BEGIN
+	PUB_END
+}
