@@ -2,11 +2,17 @@
 import ctypes
 import os.path
 import os
+import sys
 
 #this is a windows hack.
 #we want it to find out libsndfile before the system one, so we do this.
-libsndfile_module = ctypes.cdll.LoadLibrary(os.path.join(os.path.split(os.path.abspath(__file__))[0], 'libsndfile-1.dll'))
-libaudioverse_module = ctypes.cdll.LoadLibrary(os.path.join(os.path.split(os.path.abspath(__file__))[0], 'libaudioverse.dll'))
+if hasattr(sys, 'frozen'):
+	path = os.path.join(os.path.abspath(os.path.dirname(sys.executable)), 'libaudioverse')
+	libsndfile_module = ctypes.cdll.LoadLibrary(os.path.join(path, 'libsndfile-1.dll'))
+	libaudioverse_module = ctypes.cdll.LoadLibrary(os.path.join(path, 'libaudioverse.dll'))
+else:
+	libsndfile = ctypes.cdll.LoadLibrary(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'libsndfile-1.dll'))
+	libaudioverse_module = ctypes.cdll.LoadLibrary(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'libaudioverse.dll'))
 
 {%for name, val in constants.iteritems() -%}
 {{name}} = {{val}}

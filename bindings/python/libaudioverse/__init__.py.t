@@ -83,6 +83,15 @@ import enum
 		_global_callbacks[self.handle].add(callback_obj)
 {%endmacro%}
 
+def find_datafiles():
+	import glob
+	import platform
+	import os.path
+	if platform.system() != 'Windows':
+		return []
+	dlls = glob.glob(os.path.join(__path__[0], '*.dll'))
+	return [('libaudioverse', dlls)]
+
 #initialize libaudioverse.  This is per-app and implies no context settings, etc.
 _lav.initialize_library()
 

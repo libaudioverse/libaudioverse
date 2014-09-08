@@ -12,6 +12,7 @@ initialization.cpp
 memory.cpp
 callbacks.cpp
 simulation.cpp
+logging.cpp
 
 #utilities: file reading, platform-specific code, etc:
 utils/file_reader.cpp

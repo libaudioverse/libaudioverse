@@ -110,11 +110,26 @@ enum Lav_OBJECT_STATES {
 	Lav_OBJSTATE_ALWAYS_PLAYING = 2
 };
 
+/**Logging flags.*/
+enum Lav_LOGGING_LEVELS {
+	Lav_LOG_LEVEL_OFF = 0,
+	Lav_LOG_LEVEL_CRITICAL = 1,
+	Lav_LOG_INFO = 2,
+	Lav_LOG_LEVEL_DEBUG = 3,
+};
+
 /**Initialize Libaudioverse.*/
 Lav_PUBLIC_FUNCTION LavError Lav_initializeLibrary();
 
 /**Free any pointer that libaudioverse gives you.  If something goes wrong, namely that the pointer isn't from Libaudioverse in the first place, this tries to fail gracefully, but usually can't.*/
 Lav_PUBLIC_FUNCTION LavError Lav_free(void* obj);
+
+/**Configure and query logging.*/
+typedef void (*LavLoggingCallback)(int level, const char* message, int is_final);
+Lav_PUBLIC_FUNCTION LavError Lav_setLoggingCallback(LavLoggingCallback cb);
+Lav_PUBLIC_FUNCTION LavError Lav_getLoggingCallback(LavLoggingCallback* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_setLoggingLevel(int level);
+Lav_PUBLIC_FUNCTION LavError Lav_getLoggingLevel(int* destination);
 
 //devices...
 /**
