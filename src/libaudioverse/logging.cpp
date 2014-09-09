@@ -65,7 +65,7 @@ void LavLogger::loggingThreadFunction() {
 	while(shouldContinue) {
 		LavLogMessage msg= log_queue.dequeue();
 		config_mutex.lock();
-		if(callback && msg.level >= level) callback(msg.level, msg.message.c_str(), msg.is_final);
+		if(callback && msg.level <= level) callback(msg.level, msg.message.c_str(), msg.is_final);
 		config_mutex.unlock();
 		if(msg.is_final) shouldContinue = false;
 	}

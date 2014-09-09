@@ -121,7 +121,7 @@ use None to clear."""
 	callback_c = _libaudioverse.LavLoggingCallback(callback)
 	_lav.set_logging_callback(callback_c)
 	_logging_callback = callback
-	_logging_callback_c = callback_c
+	_logging_callback_ctypes = callback_c
 
 def get_logging_callback():
 	"""Returns the logging callback."""
