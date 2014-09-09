@@ -37,6 +37,7 @@ class LavPortaudioSimulationFactory: public LavSimulationFactory {
 	virtual std::vector<float> getOutputLatencies();
 	virtual std::vector<int> getOutputMaxChannels();
 	virtual std::shared_ptr<LavSimulation> createSimulation(int index, unsigned int sr, unsigned int blockSize, unsigned int mixAhead);
+	std::string getName();
 	private:
 	std::map<unsigned int, PaDeviceIndex> output_indices_map;
 	std::vector<float> latencies;
@@ -107,6 +108,10 @@ std::vector<float> LavPortaudioSimulationFactory::getOutputLatencies() {
 
 std::vector<int> LavPortaudioSimulationFactory::getOutputMaxChannels() {
 	return max_channels;
+}
+
+std::string LavPortaudioSimulationFactory::getName() {
+	return "Portaudio";
 }
 
 std::shared_ptr<LavSimulation> LavPortaudioSimulationFactory::createSimulation(int index, unsigned int sr, unsigned int blockSize, unsigned int mixAhead) {

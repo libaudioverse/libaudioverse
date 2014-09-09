@@ -99,6 +99,7 @@ class LavWinmmSimulationFactory: public LavSimulationFactory {
 	virtual std::shared_ptr<LavSimulation> createSimulation(int index, unsigned int sr, unsigned int blockSize, unsigned int mixAhead);
 	virtual unsigned int getOutputCount();
 	virtual bool scan();
+	std::string getName();
 	private:
 	std::vector<float> latencies;
 	std::vector<std::string> names;
@@ -155,6 +156,10 @@ std::shared_ptr<LavSimulation> LavWinmmSimulationFactory::createSimulation(int i
 
 unsigned int LavWinmmSimulationFactory::getOutputCount() {
 	return names.size();
+}
+
+std::string LavWinmmSimulationFactory::getName() {
+	return "Winmm";
 }
 
 bool LavWinmmSimulationFactory::scan() {

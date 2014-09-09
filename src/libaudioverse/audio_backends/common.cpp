@@ -118,3 +118,7 @@ void LavDevice::mixingThreadFunction() {
 unsigned int LavSimulationFactory::getOutputCount() {
 	return (unsigned int)output_count;
 }
+
+std::string LavSimulationFactory::getName() {
+	return "Invalid backend: subclass failed to implement";
+}

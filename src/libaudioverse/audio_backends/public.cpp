@@ -18,6 +18,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <algorithm>
 #include <thread>
 #include <chrono>
+#include <libaudioverse/private_logging.hpp>
 
 /**Public facing code.  This includes the rest of the library itself and the public API.*/
 
@@ -30,10 +31,12 @@ LavSimulationFactory* chosen_factory = nullptr;
 
 
 void initializeSimulationFactory() {
+	log(Lav_LOG_LEVEL_INFO, "Initializing audio backend.");
 	for(unsigned int i = 0; i < sizeof(possible_backends)/sizeof(LavSimulationFactoryCreationFunction); i++) {
 		LavSimulationFactory* possible = possible_backends[i]();
 		if(possible != nullptr) {
 			chosen_factory = possible;
+			log(Lav_LOG_LEVEL_INFO, "Chosen backend is %s", chosen_factory->getName().c_str());
 			return;
 		}
 	}

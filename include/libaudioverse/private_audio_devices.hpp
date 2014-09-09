@@ -45,6 +45,7 @@ class LavSimulationFactory {
 	virtual std::vector<int> getOutputMaxChannels() = 0;
 	virtual std::shared_ptr<LavSimulation> createSimulation(int index, unsigned int sr, unsigned int blockSize, unsigned int mixAhead) = 0;
 	virtual unsigned int getOutputCount();
+	std::string getName();
 	protected:
 	int output_count = 0;
 };
