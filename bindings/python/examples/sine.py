@@ -1,6 +1,9 @@
 import libaudioverse
 import time
 
+#initialize libaudioverse.
+libaudioverse.initialize()
+
 #make a device using the default (always stereo) output.
 sim = libaudioverse.Simulation(device_index = -1)
 #make a sine object.
@@ -16,3 +19,5 @@ mixer.inputs[1] = sobj, 0
 sobj.frequency = 440
 sim.output_object = mixer
 time.sleep(5.0)
+
+libaudioverse.shutdown()

@@ -1,6 +1,7 @@
 #a simple command line media player.
 import libaudioverse
 import os.path
+libaudioverse.initialize()
 
 sim = libaudioverse.Simulation(device_index = -1)
 print """Command line Media player.
@@ -53,3 +54,5 @@ while True:
 	except Exception as e:
 		print "Libaudioverse error.  Unrecognized command, or invalid syntax."
 		print commands
+
+libaudioverse.shutdown()

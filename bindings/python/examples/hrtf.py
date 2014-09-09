@@ -3,6 +3,7 @@ import libaudioverse
 import os.path
 import time
 
+libaudioverse.initialize()
 sim = libaudioverse.Simulation(device_index = -1)
 print "Enter a file path.  For best results, this should be a"
 print "mono file; if not, only the first (usually left) channel will be used."
@@ -24,3 +25,5 @@ while True:
 	az, elev = eval(command)
 	panner.azimuth = az
 	panner.elevation = elev
+
+libaudioverse.shutdown()

@@ -92,8 +92,6 @@ def find_datafiles():
 	dlls = glob.glob(os.path.join(__path__[0], '*.dll'))
 	return [('libaudioverse', dlls)]
 
-#initialize libaudioverse.  This is per-app and implies no context settings, etc.
-_lav.initialize_library()
 
 #this makes sure that callback objects do not die.
 _global_callbacks = collections.defaultdict(set)
@@ -110,6 +108,45 @@ class {{friendly_name}}Error(GenericError):
 _lav.bindings_register_exception(_libaudioverse.{{error_name}}, {{friendly_name}}Error)
 
 {%endfor%}
+
+#logging infrastructure
+_logging_callback = None
+_logging_callback_ctypes = None
+
+def set_logging_callback(callback):
+	"""Callback must be a function taking 3 arguments: level, message, and is_last.  is_last is set to 1 on the last logging message to be seen, typically found at Libaudioverse shutdown.
+
+use None to clear."""
+	global _logging_callback, _logging_callback_ctypes
+	callback_c = _libaudioverse.LavLoggingCallback(callback)
+	_lav.set_logging_callback(callback_c)
+	_logging_callback = callback
+	_logging_callback_c = callback_c
+
+def get_logging_callback():
+	"""Returns the logging callback."""
+	return _logging_callback
+
+def set_logging_level(level):
+	"""Set the logging level."""
+	_lav.set_logging_level(level)
+
+def get_logging_level():
+	"""Get the logging level."""
+	return _lav.get_logging_level()
+
+#library initialization and termination.
+
+_initialized = False
+def initialize():
+	global _initialized
+	_lav.initialize()
+	_initialized = True
+
+def shutdown():
+	global _initialized
+	_initialized = False
+	_lav.shutdown()
 
 #A list-like thing that knows how to manipulate inputs.
 class InputProxy(collections.Sequence):

@@ -72,8 +72,12 @@ void LavLogger::loggingThreadFunction() {
 }
 
 std::once_flag logging_init_flag;
+void initLogging() {
+	logger = new LavLogger();
+}
+
 void log(int level, std::string fmt, ...) {
-	std::call_once(logging_init_flag, [&]() {logger = new LavLogger();});
+	std::call_once(logging_init_flag, initLogging);
 	va_list argptr;
 	va_start(argptr, fmt);
 	logger->log(level, fmt, argptr);
@@ -87,20 +91,28 @@ void shutdownLogging() {
 //begin public api.
 Lav_PUBLIC_FUNCTION LavError Lav_setLoggingCallback(LavLoggingCallback cb) {
 	PUB_BEGIN
+	std::call_once(logging_init_flag, initLogging);
+	logger->setLoggingCallback(cb);
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_getLoggingCallback(LavLoggingCallback* destination) {
 	PUB_BEGIN
+		std::call_once(logging_init_flag, initLogging);
+	*destination = logger->getLoggingCallback();
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_setLoggingLevel(int level) {
 	PUB_BEGIN
+	std::call_once(logging_init_flag, initLogging);
+	logger->setLoggingLevel(level);
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_getLoggingLevel(int* destination) {
 	PUB_BEGIN
+	std::call_once(logging_init_flag, initLogging);
+	*destination = logger->getLoggingLevel();
 	PUB_END
 }

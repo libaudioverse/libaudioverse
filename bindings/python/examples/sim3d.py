@@ -1,6 +1,7 @@
 #demonstrates how to use the 3d simulation.
 import libaudioverse
 import collections
+libaudioverse.initialize()
 
 sim = libaudioverse.Simulation(device_index = -1)
 world = libaudioverse.WorldObject(sim, "mit.hrtf")
@@ -24,3 +25,5 @@ while True:
 		print "Must evaluate to a 3-tuple.  Try again"
 		continue
 	source.position = vect
+
+libaudioverse.shutdown()
