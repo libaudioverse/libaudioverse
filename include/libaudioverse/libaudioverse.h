@@ -110,11 +110,11 @@ enum Lav_OBJECT_STATES {
 	Lav_OBJSTATE_ALWAYS_PLAYING = 2
 };
 
-/**Logging flags.*/
+/**Logging levels.*/
 enum Lav_LOGGING_LEVELS {
 	Lav_LOG_LEVEL_OFF = 0,
 	Lav_LOG_LEVEL_CRITICAL = 1,
-	Lav_LOG_INFO = 2,
+	Lav_LOG_LEVEL_INFO = 2,
 	Lav_LOG_LEVEL_DEBUG = 3,
 };
 
