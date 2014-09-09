@@ -288,10 +288,10 @@ class GenericObject(object):
 		self._inputs = [(None, 0)]*_lav.object_get_input_count(handle)
 		self._callbacks = dict()
 
-{%for enumerant, prop in metadata['Lav_OBJTYPE_GENERIC']['properties'].iteritems()%}
+{%for enumerant, prop in metadata['objects']['Lav_OBJTYPE_GENERIC']['properties'].iteritems()%}
 {{implement_property(enumerant, prop)}}
 {%endfor%}
-{%for enumerant, info in metadata['Lav_OBJTYPE_GENERIC'].get('callbacks', dict()).iteritems()%}
+{%for enumerant, info in metadata['objects']['Lav_OBJTYPE_GENERIC'].get('callbacks', dict()).iteritems()%}
 {{implement_callback(info['name'], "_libaudioverse." + enumerant)}}
 {%endfor%}
 
@@ -346,16 +346,16 @@ class {{friendly_name}}(GenericObject):
 	def __init__(self{%if constructor_arg_names|length > 0%}, {%endif%}{{constructor_arg_names|join(', ')}}):
 		super({{friendly_name}}, self).__init__(_lav.{{constructor_name|without_lav|camelcase_to_underscores}}({{constructor_arg_names|join(', ')}}), {{constructor_arg_names[0]}})
 
-{%for enumerant, prop in metadata.get(object_name, dict()).get('properties', dict()).iteritems()%}
+{%for enumerant, prop in metadata['objects'].get(object_name, dict()).get('properties', dict()).iteritems()%}
 {{implement_property(enumerant, prop)}}
 
 {%endfor%}
-{%for enumerant, info in metadata.get(object_name, dict()).get('callbacks', dict()).iteritems()%}
+{%for enumerant, info in metadata['objects'].get(object_name, dict()).get('callbacks', dict()).iteritems()%}
 {{implement_callback(info['name'], "_libaudioverse." + enumerant)}}
 
 {%endfor%}
 
-{%for func_name, func_info in metadata.get(object_name, dict()).get('extra_functions', dict()).iteritems()%}
+{%for func_name, func_info in metadata['objects'].get(object_name, dict()).get('extra_functions', dict()).iteritems()%}
 {%set friendly_name = func_info['name']%}
 {%set func = functions[func_name]%}
 {%set lav_func = func.name|without_lav|camelcase_to_underscores%}
