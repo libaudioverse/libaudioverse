@@ -36,7 +36,7 @@ class LavLogger {
 	std::thread logging_thread;
 	std::mutex config_mutex;
 	LavLoggingCallback callback = nullptr;
-	int level = Lav_LOG_LEVEL_CRITICAL;
+	int level = Lav_LOG_LEVEL_INFO;
 	char* workspace;
 	size_t workspace_length = 8192;
 };
