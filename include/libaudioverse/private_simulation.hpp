@@ -32,6 +32,9 @@ class LavSimulation {
 	virtual float getSr() { return sr;}
 	virtual int getChannels() {return channels;}
 
+//this is called whenever the graph changes.
+	void invalidatePlan();
+
 	//these make us meet the basic lockable concept.
 	void lock() {mutex.lock();}
 	void unlock() {mutex.unlock();}

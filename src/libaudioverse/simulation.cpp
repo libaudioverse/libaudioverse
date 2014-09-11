@@ -96,6 +96,9 @@ void LavSimulation::associateDevice(std::shared_ptr<LavDevice> what) {
 	device = what;
 }
 
+void LavSimulation::invalidatePlan() {
+}
+
 void LavSimulation::visitAllObjectsInProcessOrder(std::function<void(std::shared_ptr<LavObject>)> visitor) {
 	std::set<std::shared_ptr<LavObject>> seen;
 	auto visitorWrapped = [&](std::shared_ptr<LavObject> o) {
