@@ -46,13 +46,15 @@ class LavSimulation {
 	void associateDevice(std::shared_ptr<LavDevice> what);
 
 	protected:
+	//reexecute planning logic.
+	void replan();
 	//visit all objects in the order they need to be visited if we were processing the graph.
 	virtual void visitAllObjectsInProcessOrder(std::function<void(std::shared_ptr<LavObject>)> visitor);
 	//visit all objects in the order they must be visited to prepare for and process obj for a block of audio.  This is not the same as all parents: this call respects suspended.
 	virtual void visitForProcessing(std::shared_ptr<LavObject> obj, std::function<void(std::shared_ptr<LavObject>)> visitor);
 	std::function<void(void)> preprocessing_hook;
-	//this is a reusable vector that we allow to grow, but clear every tick.  Holds nodes in the order we need to process them.
-	std::vector<std::shared_ptr<LavObject>> process_order;
+	//the execution plan.
+	std::vector<std::shared_ptr<LavObject>> plan;
 	unsigned int block_size = 0, channels = 0, mixahead = 0, is_started = 0;
 	float sr = 0.0f;
 	//if objects die, they automatically need to be removed.  We can do said removal on next process.
@@ -66,6 +68,9 @@ class LavSimulation {
 
 	//our output, if any.
 	std::shared_ptr<LavDevice> device = nullptr;
+
+	//the field to mark plans as invalid.
+	bool planInvalidated = true;
 };
 
 //initialize the audio backend.

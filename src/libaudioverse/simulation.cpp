@@ -35,17 +35,18 @@ LavError LavSimulation::getBlock(float* out) {
 		memset(out, 0, sizeof(float)*channels*block_size);
 		return Lav_ERROR_NONE;
 	}
-	process_order.clear();
-	visitAllObjectsInProcessOrder([this] (std::shared_ptr<LavObject> o) {
-		process_order.push_back(o);
-	});
+	//replan, if needed.
+	if(planInvalidated) {
+		replan();
+		planInvalidated = false;
+	}
 	//visit all objects in reverse order.
 	//an object to the right in the vector depends on some subset of objects to its left, but never anything to its right.
-	for(auto i = process_order.rbegin(); i != process_order.rend(); i++) {
+	for(auto i = plan.rbegin(); i != plan.rend(); i++) {
 		(*i)->willProcessParents();
 	}
 	//visit all objects in order, and do the processing.
-	for(auto obj: process_order) {
+	for(auto obj: plan) {
 		obj->willProcess();
 		obj->process();
 		obj->didProcess();
@@ -81,6 +82,7 @@ LavError LavSimulation::associateObject(std::shared_ptr<LavObject> obj) {
 
 LavError LavSimulation::setOutputObject(std::shared_ptr<LavObject> obj) {
 	output_object = obj;
+	invalidatePlan();
 	return Lav_ERROR_NONE;
 }
 
@@ -97,6 +99,14 @@ void LavSimulation::associateDevice(std::shared_ptr<LavDevice> what) {
 }
 
 void LavSimulation::invalidatePlan() {
+	planInvalidated = true;
+}
+
+void LavSimulation::replan() {
+	plan.clear();
+	visitAllObjectsInProcessOrder([this] (std::shared_ptr<LavObject> o) {
+		plan.push_back(o);
+	});
 }
 
 void LavSimulation::visitAllObjectsInProcessOrder(std::function<void(std::shared_ptr<LavObject>)> visitor) {
