@@ -84,6 +84,7 @@ LavObject::~LavObject() {
 	for(auto i: outputs) {
 		delete[] i;
 	}
+	simulation->invalidatePlan();
 }
 
 void LavObject::willProcess() {
@@ -123,6 +124,7 @@ void LavObject::setParent(unsigned int input, std::shared_ptr<LavObject> parent,
 	if(doesEdgePreserveAcyclicity(this, parent.get())) throw LavErrorException(Lav_ERROR_CAUSES_CYCLE);
 	input_descriptors[input].parent = parent;
 	input_descriptors[input].output = parentOutput;
+	simulation->invalidatePlan();
 }
 
 std::shared_ptr<LavObject> LavObject::getParentObject(unsigned int input) {
@@ -217,9 +219,10 @@ void LavObject::resize(unsigned int newInputCount, unsigned int newOutputCount) 
 			outputs[i] = new float[simulation->getBlockSize()];
 		}
 	}
+	simulation->invalidatePlan();
 }
 
-/**Implementation of LavPasssthroughObject.*/
+//LavSubgraphObject
 
 LavSubgraphObject::LavSubgraphObject(int type, std::shared_ptr<LavSimulation> simulation): LavObject(type, simulation, 0, 0) {
 }
@@ -278,6 +281,7 @@ unsigned int LavSubgraphObject::getOutputCount() {
 	if(subgraph_output) return subgraph_output->getOutputCount();
 	else return 0;
 }
+
 void LavSubgraphObject::getOutputPointers(float** dest) {
 	if(subgraph_output) subgraph_output->getOutputPointers(dest);
 }
