@@ -15,10 +15,12 @@ callbacks.cpp
 simulation.cpp
 logging.cpp
 
-#utilities: file reading, platform-specific code, etc:
+#utilities: file reading, platform-specific code, stateful filters that can't be represented as kernels, etc:
 utils/file_reader.cpp
 utils/interleaving.cpp
 utils/hrtf.cpp
+utils/biquad.cpp
+
 dspmath/ringmod.cpp
 utils/resampler.cpp
 
