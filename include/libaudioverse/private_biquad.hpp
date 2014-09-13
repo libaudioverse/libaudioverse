@@ -8,7 +8,8 @@ class LavBiquad {
 	//advance the biquad by one sample.
 	float tick(float sample);
 	private:
-	double a1=0, a2=0, b1=0, b2=0;
+	double a1=0, a2=0, b1=0, b2=0, gain = 0;
 	float history[2];
+	double recursion_history[2];
 };
 
