@@ -87,6 +87,14 @@ void LavBiquad::configure(int type, double sr, double frequency, double dbGain, 
 		a1 = 2.0*((a-1)-(a+1)*cos(w0));
 		a2 = (a+1)-(a-1)*cos(w0)-2*sqrt(a)*alpha;
 		break;
+		case Lav_BIQUAD_TYPE_WIRE:
+		//essentially disabled.
+		this->b1 = 0;
+		this->b2 = 0;
+		this->a1 = 0;
+		this->a2 = 0;
+		this->gain = 1;
+		return;
 	};
 	//first, the normalization and calculation of gain.
 	/**Justification:
