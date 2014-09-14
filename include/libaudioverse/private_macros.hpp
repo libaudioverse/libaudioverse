@@ -23,3 +23,5 @@ return Lav_ERROR_MEMORY;\
 return Lav_ERROR_UNKNOWN;\
 }\
 return Lav_ERROR_NONE;
+
+#define STANDARD_PROPERTIES_BEGIN (-100)

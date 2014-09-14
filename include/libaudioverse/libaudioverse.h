@@ -247,7 +247,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createAmplitudePannerObject(LavSimulation* sim,
 
 Lav_PUBLIC_FUNCTION LavError Lav_createPushObject(LavSimulation* simulation, unsigned int sr, unsigned int channels, LavObject** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_pushObjectFeed(LavObject* handle, unsigned int length, float* buffer);
-Lav_PUBLIC_FUNCTION LavError Lav_createBiquadObject(LavSimulation* sim, unsigned int channels);
+Lav_PUBLIC_FUNCTION LavError Lav_createBiquadObject(LavSimulation* sim, unsigned int channels, LavObject** destination);
 
 #ifdef __cplusplus
 }

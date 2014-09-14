@@ -7,8 +7,13 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/libaudioverse_properties.h>
 #include <math.h>
 #include <libaudioverse/private_constants.hpp>
+#include <stdio.h>
 
-void LavBiquad::configure(int type, double sr, double frequency, double dbGain, double q) {
+LavBiquadFilter::LavBiquadFilter() {
+	clearHistories();
+}
+
+void LavBiquadFilter::configure(int type, double sr, double frequency, double dbGain, double q) {
 	//this entire function is a straightforward implementation of the Audio EQ cookbook, included with this repository.
 	//we move these onto the class at the end of the function explicitly.
 	double a0, a1, a2, b0, b1, b2, gain;
@@ -115,16 +120,21 @@ But we want to undo this, so multiply by a gain that is the reciprocal:*/
 	this->b2 = b2;
 }
 
-
-float LavBiquad::tick(float sample) {
+float LavBiquadFilter::tick(float sample) {
 	//broken up for sanity. No reason a good compiler won't optimize here.
 	double term1 = gain*(sample + b1*history[1] + b2*history[0]);
-	double term2 = a1*recursion_history[1] - a2*recursion_history[2];
-	double result = term1-term2;
+	double result = term1-a1*recursion_history[1] - a2*recursion_history[0];
 	//move the histories.
 	history[0] = history[1];
 	recursion_history[0] = recursion_history[1];
 	history[1] = sample;
 	recursion_history[1] = result;
 	return (float)result;
+}
+
+void LavBiquadFilter::clearHistories() {
+	history[0] = 0.0f;
+	history[1] = 0.0f;
+	recursion_history[0] = 0.0;
+	recursion_history[1] = 0.0;
 }
