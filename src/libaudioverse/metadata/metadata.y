@@ -66,5 +66,13 @@ objects:
   doc_name: Push Object
   extra_functions:
    Lav_pushObjectFeed: {name: feed}
+ Lav_OBJTYPE_BIQUAD:
+  properties:
+   Lav_BIQUAD_FILTER_TYPE: {name: filter_type, type: int, range: [0, 8], default: 0}
+   Lav_BIQUAD_Q: {name: q, type: float, range: [0.0, INFINITY], default: 0.7}
+   Lav_BIQUAD_FREQUENCY: {name: frequency, type: float, range: [0, INFINITY], default: 500.0}
+   Lav_BIQUAD_BANDWIDTH: {name: bandwidth, type: float, range: [0, INFINITY], default: 1}
+   Lav_BIQUAD_S: {name: s, range: [0, 1], type: int, default: 1}
+  doc_name: Biquad Filter
 additional_important_enums:
  - Lav_LOGGING_LEVELS
