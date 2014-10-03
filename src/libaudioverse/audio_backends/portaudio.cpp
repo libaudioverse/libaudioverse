@@ -36,7 +36,7 @@ class LavPortaudioSimulationFactory: public LavSimulationFactory {
 	virtual std::vector<std::string> getOutputNames();
 	virtual std::vector<float> getOutputLatencies();
 	virtual std::vector<int> getOutputMaxChannels();
-	virtual std::shared_ptr<LavSimulation> createSimulation(int index, int sr, int blockSize, int mixAhead);
+	virtual std::shared_ptr<LavSimulation> createSimulation(int index, bool useDefaults, unsigned int sr, unsigned int blockSize, unsigned int mixAhead);
 	std::string getName();
 	private:
 	std::map<unsigned int, PaDeviceIndex> output_indices_map;
@@ -114,10 +114,12 @@ std::string LavPortaudioSimulationFactory::getName() {
 	return "Portaudio";
 }
 
-std::shared_ptr<LavSimulation> LavPortaudioSimulationFactory::createSimulation(int index, int sr, int blockSize, int mixAhead) {
-	if(sr == -1) sr = 44100;
-	if(blockSize == -1) blockSize = 512;
-	if(mixAhead == -1) mixAhead = 6;
+std::shared_ptr<LavSimulation> LavPortaudioSimulationFactory::createSimulation(int index, bool useDefaults, unsigned int sr, unsigned int blockSize, unsigned int mixAhead) {
+	if(useDefaults) {
+		sr = 44100;
+		blockSize = 512;
+		mixAhead = 6;
+	}
 	if(index != -1 || index >= output_count) throw LavErrorException(Lav_ERROR_RANGE);
 	//if it's not -1, then we can cast it to a PaDeviceIndex.  Otherwise, we use Pa_GetDefaultOutputDevice();
 	PaDeviceIndex needed;

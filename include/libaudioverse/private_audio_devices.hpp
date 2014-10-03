@@ -44,10 +44,9 @@ class LavSimulationFactory {
 	//returns -1.0f for unknown.
 	virtual std::vector<float> getOutputLatencies() = 0;
 	virtual std::vector<int> getOutputMaxChannels() = 0;
-	//-1 for any of these parameters requests the default.
-	//It is probably a horrible idea to only use -1 for some of them.
-	//That is, if requesting defaults, request all defaults.
-	virtual std::shared_ptr<LavSimulation> createSimulation(int index, int sr, int blockSize, int mixAhead) = 0;
+	//if useDefaults is on, the last three parameters don't matter.
+	//useDefaults is a request to the backend to do something appropriate.
+	virtual std::shared_ptr<LavSimulation> createSimulation(int index, bool useDefaults, unsigned int sr, unsigned int blockSize, unsigned int mixAhead) = 0;
 	virtual unsigned int getOutputCount();
 	virtual std::string getName();
 	protected:
