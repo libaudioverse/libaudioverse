@@ -50,6 +50,10 @@ endif()
 #include glm
 include_directories("${CMAKE_SOURCE_DIR}/glm")
 
+#include and build OpenAL-Soft.
+add_subdirectory("OpenAL-Soft")
+include_directories("OpenAL-Soft/include")
+
 #below here is us.  First, set a variable to all the libraries we need to link with:
 SET(libaudioverse_required_libraries ${libsndfile_name} ${portaudio_name})
 add_subdirectory(src)
