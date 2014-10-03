@@ -183,7 +183,7 @@ bool LavWinmmSimulationFactory::scan() {
 		newSrs.push_back(sr);
 		//we have no latency information.
 		//This is too system specific. Consequently, we ahve to assume 0.
-		newLatencies.push_back(0.0f);
+		newLatencies.push_back(-1.0f);
 	}
 	this->max_channels = newMaxChannels;
 	this->latencies = newLatencies;

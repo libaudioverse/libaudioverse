@@ -41,6 +41,7 @@ class LavSimulationFactory {
 	LavSimulationFactory() = default;
 	virtual ~LavSimulationFactory() {}
 	virtual std::vector<std::string> getOutputNames() = 0;
+	//returns -1.0f for unknown.
 	virtual std::vector<float> getOutputLatencies() = 0;
 	virtual std::vector<int> getOutputMaxChannels() = 0;
 	virtual std::shared_ptr<LavSimulation> createSimulation(int index, unsigned int sr, unsigned int blockSize, unsigned int mixAhead) = 0;
