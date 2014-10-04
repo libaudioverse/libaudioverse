@@ -145,6 +145,14 @@ Lav_PUBLIC_FUNCTION LavError Lav_getLoggingLevel(int* destination);
 Index -1 is special.  Any attempts to query about index -1 will fail.  Index -1 is always 2 channels.
 Opening a device on index -1 requests that the default system audio device be used.  In addition, however, index -1 will follow the default system audio device when the backend supports it.
 It is constrained to two channels because there is no graceful way to handle moving to a device with less channels, and it is assumed apps looking for this functionality will not mind the loss.  This may/will probably be changed in future.
+
+For audio output devices, valid channel counts are as follows:
+1- mono
+2- stereo
+6- 5.1 surround
+8- 7.1 surround
+
+Any channel count that is not one of the above is not guaranteed to work on all backends.
 */
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetCount(unsigned int* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetLatency(unsigned int index, float* destination);

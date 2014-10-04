@@ -96,7 +96,7 @@ class LavWinmmSimulationFactory: public LavSimulationFactory {
 	virtual std::vector<std::string> getOutputNames();
 	virtual std::vector<float> getOutputLatencies();
 	virtual std::vector<int> getOutputMaxChannels();
-	virtual std::shared_ptr<LavSimulation> createSimulation(int index, bool useDefaults, unsigned int sr, unsigned int blockSize, unsigned int mixAhead);
+	virtual std::shared_ptr<LavSimulation> createSimulation(int index, bool useDefaults, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead);
 	virtual unsigned int getOutputCount();
 	virtual bool scan();
 	std::string getName();
@@ -136,7 +136,7 @@ std::vector<int> LavWinmmSimulationFactory::getOutputMaxChannels() {
 	return max_channels;
 }
 
-std::shared_ptr<LavSimulation> LavWinmmSimulationFactory::createSimulation(int index, bool useDefaults, unsigned int sr, unsigned int blockSize, unsigned int mixAhead) {
+std::shared_ptr<LavSimulation> LavWinmmSimulationFactory::createSimulation(int index, bool useDefaults, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead) {
 	if(useDefaults) {
 		sr = 44100;
 		blockSize = 512;

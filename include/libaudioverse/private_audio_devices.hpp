@@ -46,16 +46,19 @@ class LavSimulationFactory {
 	virtual std::vector<int> getOutputMaxChannels() = 0;
 	//if useDefaults is on, the last three parameters don't matter.
 	//useDefaults is a request to the backend to do something appropriate.
-	virtual std::shared_ptr<LavSimulation> createSimulation(int index, bool useDefaults, unsigned int sr, unsigned int blockSize, unsigned int mixAhead) = 0;
+	virtual std::shared_ptr<LavSimulation> createSimulation(int index, bool useDefaults, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead) = 0;
 	virtual unsigned int getOutputCount();
 	virtual std::string getName();
 	protected:
 	int output_count = 0;
 };
 
+typedef LavSimulationFactory* (*LavSimulationFactoryCreationFunction)();
 LavSimulationFactory* createPortaudioSimulationFactory();
 LavSimulationFactory* createWinmmSimulationFactory();
-typedef LavSimulationFactory* (*LavSimulationFactoryCreationFunction)();
+LavSimulationFactory* createOpenALSimulationFactory();
+
 
 //finally, the function that initializes all of this.
 void initializeSimulationFactory();
+

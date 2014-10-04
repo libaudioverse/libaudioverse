@@ -51,11 +51,15 @@ endif()
 include_directories("${CMAKE_SOURCE_DIR}/glm")
 
 #include and build OpenAL-Soft.
+#this makes OpenALSoft build statically.
+add_definitions(-DAL_LIBTYPE_STATIC)
+set(LIBTYPE STATIC)	
 add_subdirectory("OpenAL-Soft")
 include_directories("OpenAL-Soft/include")
+SET(OPENAL_NAME openalsoft_camlorn)
 
 #below here is us.  First, set a variable to all the libraries we need to link with:
-SET(libaudioverse_required_libraries ${libsndfile_name} ${portaudio_name})
+SET(libaudioverse_required_libraries ${libsndfile_name} ${portaudio_name} ${OPENAL_NAME})
 add_subdirectory(src)
 
 #this makes the bindings generation step always run after a Libaudioverse build.
