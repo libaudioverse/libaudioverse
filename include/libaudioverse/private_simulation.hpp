@@ -20,9 +20,10 @@ class LavThreadTerminationException {
 
 class LavSimulation {
 	public:
-	LavSimulation(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead);
+	LavSimulation(unsigned int sr, unsigned int blockSize, unsigned int mixahead);
 	virtual ~LavSimulation();
-	virtual LavError getBlock(float* out);
+	virtual void getBlock(float* out, unsigned int channels);
+	//this is in frames of audio data.
 	virtual unsigned int getBlockSize() { return block_size;}
 	virtual LavError start();
 	virtual LavError stop();
@@ -30,9 +31,8 @@ class LavSimulation {
 	virtual std::shared_ptr<LavObject> getOutputObject();
 	virtual LavError setOutputObject(std::shared_ptr<LavObject> obj);
 	virtual float getSr() { return sr;}
-	virtual int getChannels() {return channels;}
 
-//this is called whenever the graph changes.
+	//this is called whenever the graph changes.
 	void invalidatePlan();
 
 	//these make us meet the basic lockable concept.
@@ -55,7 +55,7 @@ class LavSimulation {
 	std::function<void(void)> preprocessing_hook;
 	//the execution plan.
 	std::vector<std::shared_ptr<LavObject>> plan;
-	unsigned int block_size = 0, channels = 0, mixahead = 0, is_started = 0;
+	unsigned int block_size = 0, mixahead = 0, is_started = 0;
 	float sr = 0.0f;
 	//if objects die, they automatically need to be removed.  We can do said removal on next process.
 	std::set<std::weak_ptr<LavObject>, std::owner_less<std::weak_ptr<LavObject>>> objects;

@@ -78,7 +78,7 @@ LavOpenALDevice::LavOpenALDevice(std::shared_ptr<LavSimulation> sim, unsigned in
 	block = new float[samples_per_buffer];
 	outgoing = new short[samples_per_buffer];
 	sending_thread_sleep_time = (unsigned int)(((float)blockSize/sr)*1000);
-	init(sr);
+	init(sr, channels);
 	start();
 }
 
@@ -105,7 +105,7 @@ void LavOpenALDevice::sendingThreadFunction() {
 	openal_linearizer->lock();
 	alSourceQueueBuffers(source, buffers.size(), &buffers[0]);
 	alSourcePlay(source);
-alGetError();
+	alGetError();
 	openal_linearizer->unlock();
 	bool hasBlock = false;
 	while(sending_thread_continue.test_and_set()) {
@@ -217,7 +217,7 @@ std::shared_ptr<LavSimulation> LavOpenALSimulationFactory::createSimulation(int 
 	}
 	if((channels <= openal_max_channels && (channels == 1 || channels == 2
 || channels == 6 ||channels == 8) && sr != 0 && blockSize != 0) == false)throw LavErrorException(Lav_ERROR_RANGE);
-	auto sim = std::make_shared<LavSimulation>(sr, channels, blockSize, mixAhead);
+	auto sim = std::make_shared<LavSimulation>(sr, blockSize, mixAhead);
 	auto backend = std::make_shared<LavOpenALDevice>(sim, sr, channels, blockSize, mixAhead, name);
 	sim->associateDevice(backend);
 	return sim;

@@ -17,7 +17,7 @@ class LavDevice {
 	protected:
 	LavDevice(std::shared_ptr<LavSimulation> simulation, unsigned int mixAhead);
 	virtual ~LavDevice();
-	virtual void init(unsigned int targetSr); //second step in initialization. We can't just fall through to the constructor.
+	virtual void init(unsigned int targetSr, unsigned int channels); //second step in initialization. We can't just fall through to the constructor.
 	virtual void start(); //final step in initialization via subclasses: starts the background thread.
 	virtual void stop(); //stop the output.
 	//these hooks are run in the background thread, and should be overridden in subclasses.

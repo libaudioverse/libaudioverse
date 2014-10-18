@@ -99,9 +99,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSimulationForDeviceSimple(int index, LavS
 }
 
 //the special case of a device without an output.
-Lav_PUBLIC_FUNCTION LavError Lav_createReadSimulation(unsigned int sr, unsigned int channels, unsigned int blockSize, LavSimulation** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createReadSimulation(unsigned int sr, unsigned int blockSize, LavSimulation** destination) {
 	PUB_BEGIN
-	auto shared = std::make_shared<LavSimulation>(sr, channels, blockSize, 0);
+	auto shared = std::make_shared<LavSimulation>(sr, blockSize, 0);
 	*destination = outgoingPointer(shared);
 	PUB_END
 }

@@ -173,12 +173,12 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSimulationForDeviceSimple(int index, LavS
 
 /**This type of simulation is intended for apps that wish to handle audio themselves: it will not output and time will not advance for it.
 Combine it with Lav_simulationReadBlock to make use of it.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createReadSimulation(unsigned int sr, unsigned int channels, unsigned int blockSize, LavSimulation** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createReadSimulation(unsigned int sr, unsigned int blockSize, LavSimulation** destination);
 
 Lav_PUBLIC_FUNCTION LavError Lav_simulationSetOutputObject(LavSimulation* simulation, LavObject* object);
 Lav_PUBLIC_FUNCTION LavError Lav_simulationGetOutputObject(LavSimulation* simulation, LavObject** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlockSize(LavSimulation* simulation, int* destination);
-Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlock(LavSimulation* simulation, float* buffer);
+Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlock(LavSimulation* simulation, unsigned int channels, float* buffer);
 Lav_PUBLIC_FUNCTION LavError Lav_simulationGetSr(LavSimulation* simulation, int* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_simulationGetChannels(LavSimulation* simulation, int* destination);
 

@@ -13,9 +13,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <iterator>
 #include <thread>
 
-LavSimulation::LavSimulation(unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixahead) {
+LavSimulation::LavSimulation(unsigned int sr, unsigned int blockSize, unsigned int mixahead) {
 	this->sr = (float)sr;
-	this->channels = channels;
 	this->block_size = blockSize;
 	this->mixahead = mixahead;
 	//fire up the background thread.
@@ -29,11 +28,12 @@ LavSimulation::~LavSimulation() {
 	backgroundTaskThread.join();
 }
 
-LavError LavSimulation::getBlock(float* out) {
+void LavSimulation::getBlock(float* out, unsigned int channels) {
+	if(channels == 0) return;
 	//if paused, memset 0s.
 	if(is_started == 0) {
 		memset(out, 0, sizeof(float)*channels*block_size);
-		return Lav_ERROR_NONE;
+		return;
 	}
 	//replan, if needed.
 	if(planInvalidated) {
@@ -53,7 +53,7 @@ LavError LavSimulation::getBlock(float* out) {
 	}
 	if(output_object == nullptr || output_object->getState() == Lav_OBJSTATE_PAUSED) { //fast path, just zero.
 		memset(out, 0, sizeof(float)*block_size*channels);
-		return Lav_ERROR_NONE;
+		return;
 	}
 	float** outputs = new float*[output_object->getOutputCount()];
 	output_object->getOutputPointers(outputs);
@@ -62,7 +62,6 @@ LavError LavSimulation::getBlock(float* out) {
 		out[i] = i%channels < output_object->getOutputCount() ? outputs[i%channels][i/channels] : 0.0f; //i%channels is the channel this sample belongs to; i/channels is the position in the i%channelsth output.
 	}
 	delete[] outputs;
-	return Lav_ERROR_NONE;
 }
 
 LavError LavSimulation::start() {
@@ -169,10 +168,10 @@ Lav_PUBLIC_FUNCTION LavError Lav_simulationGetOutputObject(LavSimulation* simula
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlock(LavSimulation* simulation, float* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlock(LavSimulation* simulation, unsigned int channels, float* destination) {
 	PUB_BEGIN
 	LOCK(*simulation);
-	simulation->getBlock(destination);
+	simulation->getBlock(destination, channels);
 	PUB_END
 }
 
@@ -187,12 +186,5 @@ Lav_PUBLIC_FUNCTION LavError Lav_simulationGetSr(LavSimulation* simulation, int*
 	PUB_BEGIN
 	LOCK(*simulation);
 	*destination = (int)simulation->getSr();
-	PUB_END
-}
-
-Lav_PUBLIC_FUNCTION LavError Lav_simulationGetChannels(LavSimulation* simulation, int* destination) {
-	PUB_BEGIN
-	LOCK(*simulation);
-	*destination = simulation->getChannels();
 	PUB_END
 }

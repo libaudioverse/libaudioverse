@@ -18,17 +18,18 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 /**Code common to all backends, i.e. enumeration.*/
 
-LavDevice::LavDevice(std::shared_ptr<LavSimulation> sim, unsigned int mixAhead): mix_ahead(mixAhead), simulation(sim), channels(sim->getChannels()) {
+LavDevice::LavDevice(std::shared_ptr<LavSimulation> sim, unsigned int mixAhead): mix_ahead(mixAhead), simulation(sim) {
 	buffers = new float*[mixAhead+1];
 	buffer_statuses = new std::atomic<int>[mixAhead+1];
 	for(unsigned int i = 0; i < mixAhead + 1; i++) buffer_statuses[i].store(0);
 }
 
 //these are the next two steps in initialization, and are consequently put before the destructor.
-void LavDevice::init(unsigned int targetSr) {
+void LavDevice::init(unsigned int targetSr, unsigned int channels) {
+	this->channels = channels;
 	target_sr = targetSr;
 	//compute an estimated "good" size for the buffers, given the device's blockSize and channels.
-	output_buffer_size = (unsigned int)simulation->getBlockSize()*simulation->getChannels();
+	output_buffer_size = (unsigned int)simulation->getBlockSize()*channels;
 	if(targetSr != simulation->getSr()) {
 		output_buffer_size = (unsigned int)(output_buffer_size*(double)targetSr/simulation->getSr());
 		//always go for the multiples of 4.  This doesn't hurt anything, and some backends may be faster because of it.
@@ -80,10 +81,10 @@ void LavDevice::shutdown_hook() {
 void LavDevice::mixingThreadFunction() {
 	bool hasFilledQueueFirstTime = false;
 	unsigned int sourceSr = (unsigned int)simulation->getSr();
-	LavResampler resampler((unsigned int)simulation->getBlockSize(), simulation->getChannels(), sourceSr, target_sr);
+	LavResampler resampler((unsigned int)simulation->getBlockSize(), channels, sourceSr, target_sr);
 	unsigned int currentBuffer = 0;
 	unsigned int sleepFor = (unsigned int)((simulation->getBlockSize()/(double)simulation->getSr())*1000);
-	float* tempBuffer = new float[simulation->getBlockSize()*simulation->getChannels()]();
+	float* tempBuffer = new float[simulation->getBlockSize()*channels]();
 	while(mixing_thread_continue.test_and_set()) {
 		if(buffer_statuses[currentBuffer].load()) { //we've done this one, but the callback hasn't gotten to it yet.
 			if(hasFilledQueueFirstTime == false) {
@@ -95,14 +96,14 @@ void LavDevice::mixingThreadFunction() {
 		}
 		if(sourceSr == target_sr) {
 			simulation->lock();
-			simulation->getBlock(buffers[currentBuffer]);
+			simulation->getBlock(buffers[currentBuffer], channels);
 			simulation->unlock();
 		}
 		else { //we need to resample.
 			unsigned int got = 0;
 			simulation->lock();
 			while(got < output_buffer_size) {
-				simulation->getBlock(tempBuffer);
+				simulation->getBlock(tempBuffer, channels);
 				resampler.read(tempBuffer);
 				got += resampler.write(buffers[currentBuffer]+got, output_buffer_size-got);
 			}

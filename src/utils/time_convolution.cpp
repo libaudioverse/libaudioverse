@@ -38,7 +38,7 @@ void main(int argc, char** args) {
 	float timeDelta = 0.0f;
 
 	//some setup: create a world and a simulation.
-	ERRCHECK(Lav_createReadSimulation(44100, 2, BLOCK_SIZE, &simulation));
+	ERRCHECK(Lav_createReadSimulation(44100, BLOCK_SIZE, &simulation));
 	ERRCHECK(Lav_createWorldObject(simulation, args[1], &world));
 	ERRCHECK(Lav_simulationSetOutputObject(simulation, world));
 	while(timeDelta < SECONDS) {
@@ -66,7 +66,7 @@ void main(int argc, char** args) {
 		clock_t startTime = clock();
 		printf("Beginning test...\n");
 		for(unsigned int i = 0; i < SECONDS*44100; i+=BLOCK_SIZE) {
-			Lav_simulationGetBlock(simulation, storage);
+			Lav_simulationGetBlock(simulation, 2, storage);
 		}
 		clock_t endTime = clock();
 		timeDelta = (endTime-startTime)/(float)CLOCKS_PER_SEC;

@@ -19,11 +19,14 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <algorithm>
 #include <vector>
 
-LavWorldObject::LavWorldObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf): LavSourceManager(Lav_OBJTYPE_WORLD, simulation) {
-	this->hrtf = hrtf;
-	mixer = createMixerObject(simulation, 1, simulation->getChannels());
-	limiter = createHardLimiterObject(simulation, simulation->getChannels());
-	for(int i = 0; i < simulation->getChannels(); i++) {
+LavWorldObject::LavWorldObject(std::shared_ptr<LavSimulation> simulation, unsigned int forChannels, std::shared_ptr<LavHrtfData> hrtf): LavSourceManager(Lav_OBJTYPE_WORLD, simulation)  {
+	this->forChannels = forChannels;
+	if(forChannels == 2) {
+		this->hrtf = hrtf;
+	}
+	mixer = createMixerObject(simulation, 1, forChannels);
+	limiter = createHardLimiterObject(simulation, forChannels);
+	for(int i = 0; i < forChannels; i++) {
 		limiter->setInput(i, mixer, i);
 	}
 
@@ -35,8 +38,8 @@ LavWorldObject::LavWorldObject(std::shared_ptr<LavSimulation> simulation, std::s
 	configureSubgraph(nullptr, limiter);
 }
 
-std::shared_ptr<LavWorldObject> createWorldObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf) {
-	return std::make_shared<LavWorldObject>(simulation, hrtf);
+std::shared_ptr<LavWorldObject> createWorldObject(std::shared_ptr<LavSimulation> simulation, unsigned int forChannels, std::shared_ptr<LavHrtfData> hrtf) {
+	return std::make_shared<LavWorldObject>(simulation, forChannels, hrtf);
 }
 
 void LavWorldObject::willProcessParents() {
@@ -80,7 +83,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createWorldObject(LavSimulation* simulation, co
 	LOCK(*simulation);
 	auto hrtf = std::make_shared<LavHrtfData>();
 	hrtf->loadFromFile(hrtfPath, simulation->getSr());
-	auto retval = createWorldObject(incomingPointer<LavSimulation>(simulation), hrtf);
+	auto retval = createWorldObject(incomingPointer<LavSimulation>(simulation), 2, hrtf);
 	*destination = outgoingPointer<LavObject>(retval);
 	PUB_END
 }
