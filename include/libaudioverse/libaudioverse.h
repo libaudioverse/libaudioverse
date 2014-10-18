@@ -65,7 +65,7 @@ enum Lav_ERRORS {
 
 	Lav_ERROR_HRTF_INVALID = 10,
 
-	/**This one is odd.  It is what is thrown if you pasas a object with the wrong "shape" to a function, most notably source creation.*/
+	/**This one is odd.  It is what is thrown if you pass a object with the wrong "shape" to a function, most notably source creation.*/
 	Lav_ERROR_SHAPE = 11,
 
 	Lav_ERROR_CANNOT_CROSS_DEVICES = 12, //an attempto either create a parent-child connect with objects from different devices or to set an output with an object from a different device.
