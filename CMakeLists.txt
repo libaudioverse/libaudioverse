@@ -57,7 +57,9 @@ set(LIBTYPE STATIC)
 add_subdirectory("OpenAL-Soft")
 include_directories("OpenAL-Soft/include")
 SET(OPENAL_NAME openalsoft_camlorn)
-
+#set when using my fork of OpenALSoft: we have header defs for config functions.
+#see src/libaudioverse/audio_backends/openal.cpp, only affects there.
+add_definitions(-DUSING_OPENAL_SOFT_CAMLORN)
 #below here is us.  First, set a variable to all the libraries we need to link with:
 SET(libaudioverse_required_libraries ${libsndfile_name} ${portaudio_name} ${OPENAL_NAME})
 add_subdirectory(src)
