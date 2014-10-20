@@ -24,15 +24,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 //the mutex to make sure that nothing touches OpenAL while something else is.
 std::mutex *openal_linearizer = nullptr;
 
-//Whether or not we have 5.1 audio.
-bool openal_has_51_audio = false;
-ALCenum openal_51_format_specifier = AL_NONE;
-//same for 7.1
-bool openal_has_71_audio = false;
-ALCenum openal_71_format_specifier = AL_NONE;
-
-unsigned int openal_max_channels = 0;
-
 class LavOpenALDevice: public  LavDevice {
 	public:
 	virtual void startup_hook();
@@ -70,10 +61,23 @@ LavOpenALDevice::LavOpenALDevice(std::shared_ptr<LavSimulation> sim, unsigned in
 		if(err != AL_NONE) throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
 		buffers.push_back(buff);
 	}
+	ALuint openAL51Format, openAL71Format;
+	if(channels == 8) { //can we get hold of 7.1?
+		if(alIsExtensionPresent("AL_EXT_MCFORMATS") == AL_TRUE && (openAL71Format = alGetEnumValue("AL_FORMAT_71CHN16")) != 0) {
+		//yes, this should be empty.
+		}
+		else channels = 6; //fall down to 5.1.
+	}
+	if(channels == 6) { //5.1
+		if(alIsExtensionPresent("AL_EXT_MCFORMATS") == AL_TRUE && (openAL51Format = alGetEnumValue("AL_FORMAT_51CHN16")) != 0) {
+		//yes, this should be empty.
+		}
+		else channels = 2; //fall down to stereo.
+	}
 	data_format = AL_FORMAT_MONO16;
 	if(channels == 2) data_format = AL_FORMAT_STEREO16;
-	else if(channels == 6) data_format = openal_51_format_specifier;
-	else if(channels == 8) data_format = openal_71_format_specifier;
+	else if(channels == 6) data_format = openAL51Format;
+	else if(channels == 8) data_format = openAL71Format;
 	samples_per_buffer = channels*blockSize;
 	block = new float[samples_per_buffer];
 	outgoing = new short[samples_per_buffer];
@@ -175,7 +179,7 @@ void LavOpenALSimulationFactory::scan() {
 		std::string name(&devices[index]);
 		newNames.push_back(name);
 		newLatencies.push_back(-1.0f);
-		newMaxChannels.push_back(openal_max_channels);
+		newMaxChannels.push_back(2);
 		//move to the first character of the next device.
 		index += name.size()+1;
 	}
@@ -202,7 +206,7 @@ std::vector<std::string> LavOpenALSimulationFactory::getOutputNames() {
 
 std::shared_ptr<LavSimulation> LavOpenALSimulationFactory::createSimulation(int index, bool useDefaults, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead) {
 	if(useDefaults) {
-		channels = openal_max_channels;
+		channels = 2;
 		sr = 44100;
 		mixAhead = 6;
 		blockSize = 512;
@@ -215,7 +219,7 @@ std::shared_ptr<LavSimulation> LavOpenALSimulationFactory::createSimulation(int 
 	else {
 		name = names[index];
 	}
-	if((channels <= openal_max_channels && (channels == 1 || channels == 2
+	if(((channels == 1 || channels == 2
 || channels == 6 ||channels == 8) && sr != 0 && blockSize != 0) == false)throw LavErrorException(Lav_ERROR_RANGE);
 	auto sim = std::make_shared<LavSimulation>(sr, blockSize, mixAhead);
 	auto backend = std::make_shared<LavOpenALDevice>(sim, sr, channels, blockSize, mixAhead, name);
@@ -225,10 +229,5 @@ std::shared_ptr<LavSimulation> LavOpenALSimulationFactory::createSimulation(int 
 
 LavSimulationFactory* createOpenALSimulationFactory() {
 	openal_linearizer = new std::mutex();
-	//in order to support 5.1 and 7.1, we have to make some queries.
-	//todo: implement these queries.
-	openal_has_51_audio = false;
-	openal_has_71_audio = false;
-	openal_max_channels = 2;
 	return new LavOpenALSimulationFactory();
 }
