@@ -19,10 +19,11 @@ logging.cpp
 utils/file_reader.cpp
 utils/interleaving.cpp
 utils/hrtf.cpp
-utils/biquad.cpp
-
-dspmath/ringmod.cpp
 utils/resampler.cpp
+
+#classes and functionality for DSp that are stateful, and miscellaneous DSP-related math functions.
+dsp/biquad.cpp
+dsp/ringmod.cpp
 
 #the metadata store
 metadata/metadata.cpp
