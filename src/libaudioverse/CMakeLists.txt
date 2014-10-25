@@ -17,7 +17,6 @@ logging.cpp
 
 #utilities: file reading, platform-specific code, stateful filters that can't be represented as kernels, etc:
 utils/file_reader.cpp
-utils/interleaving.cpp
 utils/hrtf.cpp
 utils/resampler.cpp
 
@@ -32,6 +31,7 @@ metadata/metadata.cpp
 kernels/convolution.cpp
 kernels/panning.cpp
 kernels/resamplers.cpp
+kernels/interleaving.cpp
 
 #specific node types.
 objects/sine.cpp
