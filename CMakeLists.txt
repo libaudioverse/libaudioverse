@@ -24,13 +24,13 @@ add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
 
 #This fixes portaudio.
 #first, disable ksguid.lib.
-add_definitions(-DPA_WDMKS_NO_KSGUID_LIB)
+#add_definitions(-DPA_WDMKS_NO_KSGUID_LIB)
 #next, disable wasapi, which is apparently very very fragile.
-set(PA_USE_WASAPI OFF CACHE BOOL "Note: WASAPI is broken. Leave as off")
-set(PA_USE_WDMKS OFF CACHE BOOL "WDMKS is majorly deprecated. Leave as off")
+#set(PA_USE_WASAPI OFF CACHE BOOL "Note: WASAPI is broken. Leave as off")
+#set(PA_USE_WDMKS OFF CACHE BOOL "WDMKS is majorly deprecated. Leave as off")
 #build and setup portaudio:
-add_subdirectory(portaudio)
-include_directories("${portaudio_SOURCE_DIR}/include")
+#add_subdirectory(portaudio)
+#include_directories("${portaudio_SOURCE_DIR}/include")
 endif()
 
 #For linux and mac, we must append -std=c99 and -std=c++99
@@ -59,7 +59,7 @@ include_directories("OpenAL-Soft/include")
 SET(OPENAL_NAME openalsoft_camlorn)
 
 #below here is us.  First, set a variable to all the libraries we need to link with:
-SET(libaudioverse_required_libraries ${libsndfile_name} ${portaudio_name} ${OPENAL_NAME})
+SET(libaudioverse_required_libraries ${libsndfile_name} ${OPENAL_NAME})
 add_subdirectory(src)
 
 #this makes the bindings generation step always run after a Libaudioverse build.
