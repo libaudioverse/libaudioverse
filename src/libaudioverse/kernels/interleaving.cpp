@@ -23,13 +23,10 @@ void uninterleaveSamples(unsigned int channels, unsigned int frames, float* samp
 	//this loop steps by samples, not frames.
 	//each iteration, i is at the next block's beginning.
 	for(unsigned int i = 0; i < frames*channels; i+= channels*channels) {
-		//fill the tempBlock.
-		for(unsigned int channel = 0; channel < channels; channel++) {
-			for(unsigned int frame= 0; frame< channels; frame++) {
-				//grab all the channel 1s, 2s, 3s, for example.
-				//the reverse order here makes us group channel 1s together, etc.
-				//yes, this is a complicated line.  There appears no simpler alternative.
-				tempBlock[channel*channels+frame] = i+frame*channels+channel >= frames*channels ? 0 : samples[i+frame*channels+channel];
+		//fill the tempBlock with a transpose.
+		for(unsigned int j = 0; j < channels; j++) {
+			for(unsigned int k = 0; k < channels; k++) {
+			tempBlock[j*channels+k] = i+k*channels+j > frames*channels ? 0 : samples[i+k*channels+j];
 			}
 		}
 		//now, we splice it back in.

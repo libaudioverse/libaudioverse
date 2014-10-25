@@ -44,6 +44,8 @@ class LavObject: public std::enable_shared_from_this<LavObject> { //enable_share
 
 	virtual unsigned int getOutputCount();
 	//Note that this isn't shared ptr.  The output pointers for an object are managed by the object itself and we need to be able to allocate/deallocate them for SSE, as well as work with arrays.  Don't hold on to output pointers.
+	virtual float* getOutputPointer(unsigned int output);
+	//this is guaranteed to be written in terms of getOutputPointer, so subclasses can override the former:
 	virtual void getOutputPointers(float** dest);
 
 	//equivalent to reading lav_OBJECT_STATE.
@@ -113,7 +115,7 @@ class LavSubgraphObject: public LavObject {
 	virtual void setParent(unsigned int par, std::shared_ptr<LavObject> obj, unsigned int input);
 
 	virtual unsigned int getOutputCount();
-	virtual void getOutputPointers(float** dest);
+	virtual float* getOutputPointer(unsigned int output);
 	virtual void setInput(unsigned int input, std::shared_ptr<LavObject> object, unsigned int output);
 	virtual std::shared_ptr<LavObject> getInputObject(unsigned int input);
 	virtual unsigned int getInputOutput(unsigned int input);

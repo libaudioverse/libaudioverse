@@ -6,6 +6,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_objects.hpp>
 #include <libaudioverse/private_macros.hpp>
 #include <libaudioverse/private_memory.hpp>
+#include <libaudioverse/private_kernels.hpp>
 #include <libaudioverse/private_audio_devices.hpp>
 #include <stdlib.h>
 #include <functional>
@@ -55,13 +56,13 @@ void LavSimulation::getBlock(float* out, unsigned int channels) {
 		memset(out, 0, sizeof(float)*block_size*channels);
 		return;
 	}
-	float** outputs = new float*[output_object->getOutputCount()];
-	output_object->getOutputPointers(outputs);
-	//interweave them.
-	for(unsigned int i = 0; i < block_size*channels; i++) {
-		out[i] = i%channels < output_object->getOutputCount() ? outputs[i%channels][i/channels] : 0.0f; //i%channels is the channel this sample belongs to; i/channels is the position in the i%channelsth output.
+
+	//copy everything into the destination. Then, call interleaveSamples on it.
+	for(unsigned int i = 0; i < channels; i++) {
+		if(i < output_object->getOutputCount()) memcpy(out+i*getBlockSize(), output_object->getOutputPointer(i), sizeof(float)*getBlockSize());
+		else memset(out, 0, sizeof(float)*getBlockSize()); //we're beyond the number of inputs.
 	}
-	delete[] outputs;
+	interleaveSamples(channels, getBlockSize(), out);
 }
 
 LavError LavSimulation::start() {

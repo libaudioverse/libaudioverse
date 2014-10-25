@@ -163,8 +163,13 @@ unsigned int LavObject::getOutputCount() {
 	return outputs.size();
 }
 
+float* LavObject::getOutputPointer(unsigned int output) {
+	if(output > outputs.size()) throw LavErrorException(Lav_ERROR_RANGE);
+	return outputs[output];
+}
+
 void LavObject::getOutputPointers(float** dest) {
-	std::copy(outputs.begin(), outputs.end(), dest);
+	for(unsigned int i = 0; i < outputs.size(); i++) dest[i] = getOutputPointer(i);
 }
 
 std::shared_ptr<LavSimulation> LavObject::getSimulation() {
@@ -282,8 +287,9 @@ unsigned int LavSubgraphObject::getOutputCount() {
 	else return 0;
 }
 
-void LavSubgraphObject::getOutputPointers(float** dest) {
-	if(subgraph_output) subgraph_output->getOutputPointers(dest);
+float* LavSubgraphObject::getOutputPointer(unsigned int output) {
+	if(subgraph_output) return subgraph_output->getOutputPointer(output);
+	else return nullptr;
 }
 
 //begin public api
