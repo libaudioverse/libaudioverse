@@ -80,4 +80,7 @@ class LavSimulation {
 
 	//the registered mixing matrices for this simulation.
 	std::map<std::tuple<unsigned int, unsigned int>, float*> mixing_matrices;
+	unsigned int largest_seen_mixing_matrix_input = 0;
+	//used to apply mixing matrices when downmixing.
+	float* mixing_matrix_workspace = nullptr;
 };

@@ -104,6 +104,11 @@ void LavSimulation::associateDevice(std::shared_ptr<LavDevice> what) {
 
 void LavSimulation::registerMixingMatrix(unsigned int inChannels, unsigned int outChannels, float* matrix) {
 	mixing_matrices[std::tuple<unsigned int, unsigned int>(inChannels, outChannels)] = matrix;
+	if(inChannels > largest_seen_mixing_matrix_input) {
+		if(mixing_matrix_workspace) delete[] mixing_matrix_workspace;
+		mixing_matrix_workspace = new float[block_size*inChannels]();
+		largest_seen_mixing_matrix_input = outChannels;
+	}
 }
 
 void LavSimulation::resetMixingMatrix(unsigned int  inChannels, unsigned int outChannels) {
