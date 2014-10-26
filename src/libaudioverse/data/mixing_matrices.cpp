@@ -17,6 +17,23 @@ It is not inconceivable that this will be useful for testing, and those apps whi
 Note 2: This file will need revision as practical examples of these configurations are found in the wild.*/
 #include <libaudioverse/private_data.hpp> //extern declarations.
 
+//this is the registry. The matrices are below.
+LavMixingMatrixInfo mixing_matrix_list[] = {
+{1, 2, mixing_matrix_1_2},
+{1, 6, mixing_matrix_1_6},
+{1, 8, mixing_matrix_1_8},
+{2, 1, mixing_matrix_2_1},
+{2, 6, mixing_matrix_2_6},
+{2, 8, mixing_matrix_2_8},
+{6, 1, mixing_matrix_6_1},
+{6, 2, mixing_matrix_6_2},
+{6, 8, mixing_matrix_6_8},
+{8, 1, mixing_matrix_8_1},
+{8, 2, mixing_matrix_8_2},
+{8, 6, mixing_matrix_8_6},
+{0, 0, nullptr},
+};
+
 float mixing_matrix_1_2[] = {
 1.0f,
 1.0f,

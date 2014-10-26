@@ -9,6 +9,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <mutex>
 #include <memory>
 #include <thread>
+#include <tuple>
+#include <map>
 #include "libaudioverse.h"
 
 class LavObject;
@@ -45,6 +47,10 @@ class LavSimulation {
 	//makes this device hold a shared pointer to its output.
 	void associateDevice(std::shared_ptr<LavDevice> what);
 
+	//register a mixing matrix with this device.
+	void registerMixingMatrix(unsigned int inChannels, unsigned int outChannels, float* matrix);
+	void resetMixingMatrix(unsigned int inChannels, unsigned int outChannels);
+	void registerDefaultMixingMatrices();
 	protected:
 	//reexecute planning logic.
 	void replan();
@@ -71,4 +77,7 @@ class LavSimulation {
 
 	//the field to mark plans as invalid.
 	bool planInvalidated = true;
+
+	//the registered mixing matrices for this simulation.
+	std::map<std::tuple<unsigned int, unsigned int>, float*> mixing_matrices;
 };

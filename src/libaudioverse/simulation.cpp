@@ -8,16 +8,20 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_memory.hpp>
 #include <libaudioverse/private_kernels.hpp>
 #include <libaudioverse/private_audio_devices.hpp>
+#include <libaudioverse/private_data.hpp>
 #include <stdlib.h>
 #include <functional>
 #include <algorithm>
 #include <iterator>
 #include <thread>
+#include <tuple>
+#include <map>
 
 LavSimulation::LavSimulation(unsigned int sr, unsigned int blockSize, unsigned int mixahead) {
 	this->sr = (float)sr;
 	this->block_size = blockSize;
 	this->mixahead = mixahead;
+	registerDefaultMixingMatrices();
 	//fire up the background thread.
 	backgroundTaskThread = std::thread([this]() {backgroundTaskThreadFunction();});
 	start();
@@ -98,6 +102,23 @@ void LavSimulation::associateDevice(std::shared_ptr<LavDevice> what) {
 	device = what;
 }
 
+void LavSimulation::registerMixingMatrix(unsigned int inChannels, unsigned int outChannels, float* matrix) {
+	mixing_matrices[std::tuple<unsigned int, unsigned int>(inChannels, outChannels)] = matrix;
+}
+
+void LavSimulation::resetMixingMatrix(unsigned int  inChannels, unsigned int outChannels) {
+	for(LavMixingMatrixInfo* i = mixing_matrix_list; i->pointer; i++) {
+		if(i->in_channels == inChannels && i->out_channels == outChannels) {
+			mixing_matrices[std::tuple<unsigned int, unsigned int>(inChannels, outChannels)] = i->pointer;
+			return;
+		}
+	}
+	if(mixing_matrices.count(std::tuple<unsigned int, unsigned int>(inChannels, outChannels)) != 0) mixing_matrices.erase(std::tuple<unsigned int, unsigned int>(inChannels, outChannels));
+}
+
+void LavSimulation::registerDefaultMixingMatrices() {
+	for(LavMixingMatrixInfo* i = mixing_matrix_list; i->pointer; i++) registerMixingMatrix(i->in_channels, i->out_channels, i->pointer);
+}
 void LavSimulation::invalidatePlan() {
 	planInvalidated = true;
 }
