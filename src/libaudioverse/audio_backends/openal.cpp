@@ -173,7 +173,12 @@ void LavOpenALSimulationFactory::scan() {
 	std::vector<float> newLatencies;
 	std::vector<int> newMaxChannels;
 	const char* devices;
-	devices = alcGetString(nullptr, ALC_DEVICE_SPECIFIER);
+	ALCenum query = ALC_DEVICE_SPECIFIER;
+	if(alcIsExtensionPresent(nullptr, "ALC_ENUMERATE_ALL_EXT") == AL_TRUE) {
+		query = alcGetEnumValue(nullptr, "ALC_ALL_DEVICES_SPECIFIER");
+		if(query == AL_NONE) query = ALC_DEVICE_SPECIFIER;
+	}
+	devices = alcGetString(nullptr, query);
 	unsigned int index = 0;
 	while(devices[index]) {
 		std::string name(&devices[index]);
@@ -186,6 +191,7 @@ void LavOpenALSimulationFactory::scan() {
 	names = newNames;
 	max_channels = newMaxChannels;
 	latencies = newLatencies;
+	output_count = names.size();
 }
 
 std::string LavOpenALSimulationFactory::getName() {
