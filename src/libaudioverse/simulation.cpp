@@ -33,7 +33,7 @@ LavSimulation::~LavSimulation() {
 	backgroundTaskThread.join();
 }
 
-void LavSimulation::getBlock(float* out, unsigned int channels) {
+void LavSimulation::getBlock(float* out, unsigned int channels, bool mayApplyMixingMatrix) {
 	if(channels == 0) return;
 	//if paused, memset 0s.
 	if(is_started == 0) {
@@ -61,12 +61,21 @@ void LavSimulation::getBlock(float* out, unsigned int channels) {
 		return;
 	}
 
-	//copy everything into the destination. Then, call interleaveSamples on it.
-	for(unsigned int i = 0; i < channels; i++) {
-		if(i < output_object->getOutputCount()) memcpy(out+i*getBlockSize(), output_object->getOutputPointer(i), sizeof(float)*getBlockSize());
-		else memset(out, 0, sizeof(float)*getBlockSize()); //we're beyond the number of inputs.
+	float *mixingMatrix = getMixingMatrix(output_object->getOutputCount(), channels);
+	if(mixingMatrix && mayApplyMixingMatrix) {
+		for(unsigned int i = 0; i < output_object->getOutputCount(); i++) {
+			std::copy(output_object->getOutputPointer(i), output_object->getOutputPointer(i)+block_size, mixing_matrix_workspace+i*block_size);
+		}
+		interleaveSamples(output_object->getOutputCount(), block_size, mixing_matrix_workspace);
+		applyMixingMatrix(output_object->getOutputCount()*block_size, mixing_matrix_workspace, out, output_object->getOutputCount(), channels, mixingMatrix);
 	}
-	interleaveSamples(channels, getBlockSize(), out);
+	else {
+		for(unsigned int i = 0; i < channels; i++) {
+			if(i < output_object->getOutputCount()) memcpy(out+i*getBlockSize(), output_object->getOutputPointer(i), sizeof(float)*getBlockSize());
+			else memset(out, 0, sizeof(float)*getBlockSize()); //we're beyond the number of inputs.
+		}
+		interleaveSamples(channels, getBlockSize(), out);
+	}
 }
 
 LavError LavSimulation::start() {
@@ -124,6 +133,13 @@ void LavSimulation::resetMixingMatrix(unsigned int  inChannels, unsigned int out
 void LavSimulation::registerDefaultMixingMatrices() {
 	for(LavMixingMatrixInfo* i = mixing_matrix_list; i->pointer; i++) registerMixingMatrix(i->in_channels, i->out_channels, i->pointer);
 }
+
+float* LavSimulation::getMixingMatrix(unsigned int inChannels, unsigned int outChannels) {
+	std::tuple<unsigned int, unsigned int> key(inChannels, outChannels);
+	if(mixing_matrices.count(key) != 0) return mixing_matrices[key];
+	else return nullptr;
+}
+
 void LavSimulation::invalidatePlan() {
 	planInvalidated = true;
 }

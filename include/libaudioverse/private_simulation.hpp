@@ -24,7 +24,7 @@ class LavSimulation {
 	public:
 	LavSimulation(unsigned int sr, unsigned int blockSize, unsigned int mixahead);
 	virtual ~LavSimulation();
-	virtual void getBlock(float* out, unsigned int channels);
+	virtual void getBlock(float* out, unsigned int channels, bool mayApplyMixingMatrix = true);
 	//this is in frames of audio data.
 	virtual unsigned int getBlockSize() { return block_size;}
 	virtual LavError start();
@@ -51,6 +51,7 @@ class LavSimulation {
 	void registerMixingMatrix(unsigned int inChannels, unsigned int outChannels, float* matrix);
 	void resetMixingMatrix(unsigned int inChannels, unsigned int outChannels);
 	void registerDefaultMixingMatrices();
+	float* getMixingMatrix(unsigned int inChannels, unsigned int outChannels);
 	protected:
 	//reexecute planning logic.
 	void replan();
