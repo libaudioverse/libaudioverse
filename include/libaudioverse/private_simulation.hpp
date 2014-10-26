@@ -72,6 +72,3 @@ class LavSimulation {
 	//the field to mark plans as invalid.
 	bool planInvalidated = true;
 };
-
-//initialize the audio backend.
-void initializeAudioBackend();
