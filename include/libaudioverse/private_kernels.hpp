@@ -7,6 +7,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 Note that these functions are actually the same; interleaveSamples simply calls uninterleaveSamples.  See interleaving.cpp for details of the algorithm.*/
 void uninterleaveSamples(unsigned int channels, unsigned int frames, float* samples);
 void interleaveSamples(unsigned int channels, unsigned int frames, float* samples);
+
 /**The convolution kernel.
 The first response-1 samples of the input buffer are assumed to be a running history, so the actual length of the input buffer needs to be outputSampleCount+responseLength-1.
 */
@@ -28,3 +29,9 @@ void amplitudePanKernel(float azimuth, float elevation, unsigned int inputLength
 
 It's also much higher quality.*/
 void staticResamplerKernel(int inputSr, int outputSr, int inputLength, float* input, int* outputLengthDestination, float** outputDestination, bool makeMultipleOfFour = true);
+
+/*Apply a mixing matrix.
+This is not in place and expects interleaved samples; it is typically the last stage in the mixing pipeline.
+
+The matrix is in row-major order.  The input samples are broken into inChannels sized vectors and multiplied to produce outChannel-sized vectors.*/
+void applyMixingMatrix(unsigned int inSampleCount, float* inSamples, float* outSamples, unsigned int inChannels, unsigned int outChannels, float* matrix);

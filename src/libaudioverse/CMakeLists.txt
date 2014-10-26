@@ -32,6 +32,7 @@ kernels/convolution.cpp
 kernels/panning.cpp
 kernels/resamplers.cpp
 kernels/interleaving.cpp
+kernels/mixing_matrix.cpp
 
 #specific node types.
 objects/sine.cpp
