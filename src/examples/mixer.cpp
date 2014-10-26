@@ -37,7 +37,7 @@ void main(int argc, char** args) {
 	LavSimulation* simulation;
 	LavObject** nodes;
 	ERRCHECK(Lav_initialize());
-	ERRCHECK(Lav_createSimulationForDevice(-1, 44100, 1024, 2, &simulation));
+	ERRCHECK(Lav_createSimulationForDevice(-1, 2, 44100, 1024, 2, &simulation));
 	nodes = new LavObject*[argc-1];
 	for(int i = 0; i < argc-1; i++) {
 		LavObject* n = makeNode(simulation, args[i+1]);

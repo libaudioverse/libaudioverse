@@ -66,7 +66,7 @@ void main(int argc, char** args) {
 		clock_t startTime = clock();
 		printf("Beginning test...\n");
 		for(unsigned int i = 0; i < SECONDS*44100; i+=BLOCK_SIZE) {
-			Lav_simulationGetBlock(simulation, 2, storage);
+			Lav_simulationGetBlock(simulation, 2, 1, storage);
 		}
 		clock_t endTime = clock();
 		timeDelta = (endTime-startTime)/(float)CLOCKS_PER_SEC;

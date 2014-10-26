@@ -82,10 +82,10 @@ Lav_PUBLIC_FUNCTION LavError Lav_deviceGetChannels(unsigned int index, unsigned 
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_createSimulationForDevice(int index, unsigned int sr, unsigned int blockSize, unsigned int mixAhead, LavSimulation** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createSimulationForDevice(int index, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead, LavSimulation** destination) {
 	PUB_BEGIN
 	//don't use defaults, use user options.
-	auto sim = chosen_factory->createSimulation(index, false, 2, sr, blockSize, mixAhead);
+	auto sim = chosen_factory->createSimulation(index, false, channels, sr, blockSize, mixAhead);
 	*destination = outgoingPointer<LavSimulation>(sim);
 	PUB_END
 }

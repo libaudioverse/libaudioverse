@@ -232,30 +232,32 @@ See enumerate_devices for the possible values of device_index and other output i
 
 There are two ways to initialize a device.
 
-If device_index is None, sample_rate, buffer_size, and channels are used to give a simulation that doesn't actually output.  In this case, use the get_block method yourself to retrieve blocks of 32-bit floating point audio data.  This is the default.
+If device_index is None, sample_rate and buffer_size are used to give a simulation that doesn't actually output.  In this case, use the get_block method yourself to retrieve blocks of 32-bit floating point audio data.  This is the default.
 
-If device_index is an integer, a device is created which feeds the specified output.  In this case, sample_rate, block_size, and mix_ahead are respected; channels is determined by the device in question.  Alternatively, set simple to True and Libaudioverse will pick the best options for the specified device index.
+If device_index is an integer, a device is created which feeds the specified output.  In this case, sample_rate, block_size, channels, and mix_ahead are respected.  Alternatively, set simple to True and Libaudioverse will pick the best options for the specified device index.
 
-One special value is not included in get_device_infos; this is -1.  -1 is the default system audio device plus the functionality required to follow the default if the user changes it, i.e. by unplugging headphones.  In this case, the returned device is always 2 channels."""
+One special value is not included in get_device_infos; this is -1.  -1 is the default system audio device plus the functionality required to follow the default if the user changes it, i.e. by unplugging headphones.  In this case, the returned device is always 2 channels.
+
+See the manual for specifics on how output objects work.  A brief summary is given here: if the output object has 1, 2, 6, or 8 outputs, it is mixed to the output channel count using internal mixing matrices.  Otherwise, the first n outputs are taken as the channels to be outputted and mapped to the channels of the output device.."""
 		if device_index is not None:
 			if simple == True:
 				handle = _lav.create_simulation_for_device_simple(device_index)
 			else:
 				handle = _lav.create_simulation_for_device(device_index, sample_rate, block_size, mix_ahead)
 		else:
-			handle = _lav.create_read_simulation(sample_rate, channels, block_size)
+			handle = _lav.create_read_simulation(sample_rate, block_size)
 		self.handle = handle
 		self._output_object = None
 
-	def get_block(self):
+	def get_block(self, channels, may_apply_mixing_matrix = True):
 		"""Returns a block of data.
 Calling this on an audio output device will cause the audio thread to skip ahead a block, so don't do that."""
-		length = _lav.simulation_get_block_size(self.handle)*_lav.simulation_get_channels(self.handle)
+		length = _lav.simulation_get_block_size(self.handle)*channels
 		buff = (ctypes.c_float*length)()
 		#circumvent automatic conversion of iterables.
 		buff_ptr = ctypes.POINTER(ctypes.c_float)()
 		buff_ptr.contents = buff
-		_lav.simulation_get_block(self.handle, buff_ptr)
+		_lav.simulation_get_block(self.handle, channels, may_apply_mixing_matrix, buff_ptr)
 		return list(buff)
 
 	@property

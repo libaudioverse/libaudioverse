@@ -30,7 +30,7 @@ void main(int argc, char** args) {
 	LavObject *node;
 	LavSimulation* simulation;
 	ERRCHECK(Lav_initialize());
-	ERRCHECK(Lav_createSimulationForDevice(-1, 44100, 1024, 2, &simulation));
+	ERRCHECK(Lav_createSimulationForDevice(-1, 2, 44100, 1024, 2, &simulation));
 	ERRCHECK(Lav_createFileObject(simulation, path, &node));
 	LavObject* atten, *limit, *mix;
 	unsigned int fileChannels;

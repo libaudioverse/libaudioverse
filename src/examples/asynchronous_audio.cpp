@@ -21,7 +21,7 @@ void main() {
 	LavSimulation* simulation;
 	LavObject* node;
 	ERRCHECK(Lav_initialize());
-	ERRCHECK(Lav_createSimulationForDevice(-1, 44100, 1024, 2, &simulation));
+	ERRCHECK(Lav_createSimulationForDevice(-1, 2, 44100, 1024, 2, &simulation));
 	ERRCHECK(Lav_createSineObject(simulation, &node));
 	ERRCHECK(Lav_objectSetFloatProperty(node, Lav_SINE_FREQUENCY, 0));
 	ERRCHECK(Lav_simulationSetOutputObject(simulation, node));

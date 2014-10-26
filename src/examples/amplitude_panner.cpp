@@ -25,7 +25,7 @@ void main(int argc, char** args) {
 	LavSimulation* simulation;
 	LavObject* fileNode, *panNode, *limit;
 	ERRCHECK(Lav_initialize());
-	ERRCHECK(Lav_createSimulationForDevice(-1, 44100, 1024, 2, &simulation));
+	ERRCHECK(Lav_createSimulationForDevice(-1, 2, 44100, 1024, 2, &simulation));
 	ERRCHECK(Lav_createFileObject(simulation, args[1], &fileNode));
 	float map[] = {270.0f, 90.0f};
 	ERRCHECK(Lav_createAmplitudePannerObject(simulation, &panNode));

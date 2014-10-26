@@ -116,7 +116,7 @@ void LavSimulation::registerMixingMatrix(unsigned int inChannels, unsigned int o
 	if(inChannels > largest_seen_mixing_matrix_input) {
 		if(mixing_matrix_workspace) delete[] mixing_matrix_workspace;
 		mixing_matrix_workspace = new float[block_size*inChannels]();
-		largest_seen_mixing_matrix_input = outChannels;
+		largest_seen_mixing_matrix_input = inChannels;
 	}
 }
 
@@ -211,10 +211,10 @@ Lav_PUBLIC_FUNCTION LavError Lav_simulationGetOutputObject(LavSimulation* simula
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlock(LavSimulation* simulation, unsigned int channels, float* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlock(LavSimulation* simulation, unsigned int channels, int mayApplyMixingMatrix, float* destination) {
 	PUB_BEGIN
 	LOCK(*simulation);
-	simulation->getBlock(destination, channels);
+	simulation->getBlock(destination, channels, mayApplyMixingMatrix != 0);
 	PUB_END
 }
 

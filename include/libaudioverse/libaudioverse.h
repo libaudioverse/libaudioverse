@@ -165,7 +165,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_deviceGetCount(unsigned int* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetLatency(unsigned int index, float* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetName(unsigned int index, char** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetChannels(unsigned int index, unsigned int* destination);
-Lav_PUBLIC_FUNCTION LavError Lav_createSimulationForDevice(int index, unsigned int sr, unsigned int blockSize, unsigned int mixAhead, LavSimulation** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createSimulationForDevice(int index, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead, LavSimulation** destination);
 //simpler version. Only needs device index.
 //This exists so that those without audio knowledge can use the library.
 //For some system and backend, this function is basically saying "Do your best".
@@ -178,9 +178,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_createReadSimulation(unsigned int sr, unsigned 
 Lav_PUBLIC_FUNCTION LavError Lav_simulationSetOutputObject(LavSimulation* simulation, LavObject* object);
 Lav_PUBLIC_FUNCTION LavError Lav_simulationGetOutputObject(LavSimulation* simulation, LavObject** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlockSize(LavSimulation* simulation, int* destination);
-Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlock(LavSimulation* simulation, unsigned int channels, float* buffer);
+Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlock(LavSimulation* simulation, unsigned int channels, int mayApplyMixingMatrix, float* buffer);
 Lav_PUBLIC_FUNCTION LavError Lav_simulationGetSr(LavSimulation* simulation, int* destination);
-Lav_PUBLIC_FUNCTION LavError Lav_simulationGetChannels(LavSimulation* simulation, int* destination);
 
 /**Query object type.*/
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetType(LavObject* obj, int* destination);
