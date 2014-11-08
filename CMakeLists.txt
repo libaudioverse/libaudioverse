@@ -16,21 +16,10 @@ INCLUDE_DIRECTORIES(${LIBSNDFILE_INCLUDE_DIR})
 LINK_DIRECTORIES(${LIBSNDFILE_LIBRARY_DIR})
 endif()
 
-#more msvc specific stuff: if on windows, do special handling for portaudio.
 if(${MSVC})
 #turn off the secure crt warnings, because we're not allowed to use microsoft specific functions.
 #Also turn off unsafe stl warnings.  This library likes the unsafe stl.
 add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
-
-#This fixes portaudio.
-#first, disable ksguid.lib.
-#add_definitions(-DPA_WDMKS_NO_KSGUID_LIB)
-#next, disable wasapi, which is apparently very very fragile.
-#set(PA_USE_WASAPI OFF CACHE BOOL "Note: WASAPI is broken. Leave as off")
-#set(PA_USE_WDMKS OFF CACHE BOOL "WDMKS is majorly deprecated. Leave as off")
-#build and setup portaudio:
-#add_subdirectory(portaudio)
-#include_directories("${portaudio_SOURCE_DIR}/include")
 endif()
 
 #For linux and mac, we must append -std=c99 and -std=c++99

@@ -54,7 +54,6 @@ class LavSimulationFactory {
 };
 
 typedef LavSimulationFactory* (*LavSimulationFactoryCreationFunction)();
-LavSimulationFactory* createPortaudioSimulationFactory();
 LavSimulationFactory* createWinmmSimulationFactory();
 LavSimulationFactory* createOpenALSimulationFactory();
 
