@@ -60,7 +60,13 @@ def string_from_number(val, type):
 		print "Returning val unchanged."
 		return val
 
+#note that there is a very interesting little hack heere.
+#Since the second key of every tuple is a dict, it's possible that we're marking up a property we've already marked up.
+#Problem: if we just do dict(foo), and later nest dicts, we'll have hard-to-find problems.
+#solution: mark the properties as we normalize them.
 for propkey, propid, propinfo in joined_properties:
+	if propinfo.get('normalized', False):
+		continue
 	if propinfo['type'] == 'boolean':
 		propinfo['range'] = [0, 1]
 	for i, j in enumerate(list(propinfo.get('range', []))): #if we don't have a range, this will do nothing.
@@ -78,6 +84,7 @@ for propkey, propid, propinfo in joined_properties:
 	elif propinfo['type'] in {'int_array', 'float_array'}:
 		for i, j in enumerate(list(propinfo.get('default', []))):
 			propinfo['default'][i] = string_from_number(j, propinfo['type'])
+	propinfo['normalized'] = True
 
 #do the render, and write to the file specified on the command line.
 context = {

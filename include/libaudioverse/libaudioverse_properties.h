@@ -24,6 +24,7 @@ Values below -100 are reserved for standard callbacks and properties on all obje
 enum lav_STANDARD_PROPERTIES {
 	Lav_OBJECT_STATE = -100,
 	Lav_OBJECT_AUTORESET = -101,
+	Lav_OBJECT_MUL = -102,
 };
 
 enum Lav_SINE_PROPERTIES {

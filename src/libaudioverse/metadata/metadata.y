@@ -4,6 +4,7 @@ objects:
   properties:
    Lav_OBJECT_STATE: {name: state, type: int, range: [0, 2], default: 1, value_enum: Lav_OBJECT_STATES}
    Lav_OBJECT_AUTORESET: {name: autoreset, type: boolean, default: 1}
+   Lav_OBJECT_MUL: {name: mul, type: float, default: 1.0, range: [-INFINITY, INFINITY]}
   doc_name: Generic Properties Common to All Objects
  Lav_OBJTYPE_SINE:
   properties:
