@@ -1,4 +1,4 @@
-Code will supplement this document; do not expect this document to remain.
+This document's long-term accuracy has been proven, and the code is not likely to change.  if there is any doubt, however, the code wins.
 
 A file specifying an HRTF definition shall consist of the following, specified in the order below.  Note that everything is either ints or floats, so moving over the file with a window size of 4 and swapping bytes can totally reverse its endianness for little-endian processors.  HRTF files are written in whatever endianness the writing machine happens to have, and it is fixed on read.
 
