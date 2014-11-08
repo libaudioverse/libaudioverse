@@ -258,7 +258,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createFileObject(LavSimulation *sim, const char
 Lav_PUBLIC_FUNCTION LavError Lav_createHrtfObject(LavSimulation *simulation, const char* hrtfPath, LavObject **destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createMixerObject(LavSimulation* sim, unsigned int maxParents, unsigned int inputsPerParent, LavObject **destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterObject(LavSimulation* sim, unsigned int numInputs, LavObject** destination);
-Lav_PUBLIC_FUNCTION LavError Lav_createDelayObject(LavSimulation* sim, float maxDelay, LavObject** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createDelayObject(LavSimulation* sim, float maxDelay, unsigned int lineCount, LavObject** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createAmplitudePannerObject(LavSimulation* sim, LavObject** destination);
 
 Lav_PUBLIC_FUNCTION LavError Lav_createPushObject(LavSimulation* simulation, unsigned int sr, unsigned int channels, LavObject** destination);
