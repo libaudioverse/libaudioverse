@@ -87,12 +87,14 @@ LavObject::~LavObject() {
 	simulation->invalidatePlan();
 }
 
-void LavObject::willProcess() {
+void LavObject::doProcessProtocol() {
 	is_processing = true;
 	computeInputBuffers();
 	num_inputs = inputs.size();
 	num_outputs = outputs.size();
 	block_size = simulation->getBlockSize();
+	process();
+	is_processing = false;
 }
 
 /*Default Processing function.*/
@@ -100,10 +102,6 @@ void LavObject::process() {
 	for(unsigned int i = 0; i < outputs.size(); i++) {
 		memset(outputs[i], 0, block_size*sizeof(float));
 	}
-}
-
-void LavObject::didProcess() {
-	is_processing = false;
 }
 
 void LavObject::willProcessParents() {

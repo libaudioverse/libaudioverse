@@ -52,9 +52,7 @@ void LavSimulation::getBlock(float* out, unsigned int channels, bool mayApplyMix
 	}
 	//visit all objects in order, and do the processing.
 	for(auto obj: plan) {
-		obj->willProcess();
-		obj->process();
-		obj->didProcess();
+		obj->doProcessProtocol();
 	}
 	if(output_object == nullptr || output_object->getState() == Lav_OBJSTATE_PAUSED) { //fast path, just zero.
 		memset(out, 0, sizeof(float)*block_size*channels);

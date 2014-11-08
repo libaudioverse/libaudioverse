@@ -51,15 +51,10 @@ class LavObject: public std::enable_shared_from_this<LavObject> { //enable_share
 	//equivalent to reading lav_OBJECT_STATE.
 	virtual int getState();
 
-	//these three methods are all involved in the processing logic: willProcess is called immediately before and didProcess immediately after the actual process method.
-	//this is a strong guarantee: no other operation shall be performed on this object between these three calls.
-	//This one does three things:
-	//1. Toggle on is_processing;
-	//2. Call computeInputBuffers.
-	//3. Update the convenience variables num_inputs and num_outputs to be the sizes of the input and output vectors.
-	virtual void willProcess();
+	//do not override. Handles the processing protocol: updating some globals and calling process.
+	void doProcessProtocol();
+	//override this one instead.
 	virtual void process();
-	virtual void didProcess();
 
 	//this is called at some point in the processing logic which is guaranteed to be before this object's parents are processed and after the device is locked.
 	//additionally, a parent will have its willProcessParents called after this object.
