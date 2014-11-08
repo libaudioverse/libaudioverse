@@ -94,6 +94,15 @@ void LavObject::doProcessProtocol() {
 	num_outputs = outputs.size();
 	block_size = simulation->getBlockSize();
 	process();
+	float mul = getProperty(Lav_OBJECT_MUL).getFloatValue();
+	if(mul != 1.0f) {
+		for(unsigned int i = 0; i < getOutputCount(); i++) {
+			float* output = getOutputPointer(i);
+			for(unsigned int j = 0; j < block_size; j++) {
+				output[j] *= mul;
+			}
+		}
+	}
 	is_processing = false;
 }
 
