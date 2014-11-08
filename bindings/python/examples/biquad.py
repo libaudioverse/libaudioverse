@@ -6,8 +6,7 @@ time_per_demo = 5.0
 libaudioverse.initialize()
 sim = libaudioverse.Simulation(device_index = -1)
 print """Biquad demo.
-Please enter the path to a file in a format supported by Libsndfile: typically wave or ogg.
-Mono or stereo files will work fine.  Surround sound files will have additional channels stripped, keeping only the first two."""
+Please enter the path to a file in a format supported by Libsndfile: typically wave or ogg."""
 filepath = raw_input()
 filepath = os.path.abspath(filepath)
 filenode = libaudioverse.FileObject(sim, filepath)

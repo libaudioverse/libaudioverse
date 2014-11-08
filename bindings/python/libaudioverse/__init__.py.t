@@ -225,16 +225,16 @@ The position in the list is the needed device index for Simulation.__iniit__."""
 class Simulation(object):
 	"""Represents a running simulation.  All libaudioverse objects must be passed a simulation at creation time and cannot migrate between them.  Furthermore, it is an error to try to connect objects from different simulations."""
 
-	def __init__(self, sample_rate = 44100, block_size = 1024, mix_ahead = 1, channels = 2, device_index = None, simple = False):
+	def __init__(self, sample_rate = 44100, block_size = 1024, mix_ahead = 2, channels = 2, device_index = -1, simple = False):
 		"""Create a simulation.
 
 See enumerate_devices for the possible values of device_index and other output information.
 
 There are two ways to initialize a device.
 
-If device_index is None, sample_rate and buffer_size are used to give a simulation that doesn't actually output.  In this case, use the get_block method yourself to retrieve blocks of 32-bit floating point audio data.  This is the default.
+If device_index is None, sample_rate and buffer_size are used to give a simulation that doesn't actually output.  In this case, use the get_block method yourself to retrieve blocks of 32-bit floating point audio data.
 
-If device_index is an integer, a device is created which feeds the specified output.  In this case, sample_rate, block_size, channels, and mix_ahead are respected.  Alternatively, set simple to True and Libaudioverse will pick the best options for the specified device index.
+If device_index is an integer, a device is created which feeds the specified output.  In this case, sample_rate, block_size, channels, and mix_ahead are respected.  Alternatively, set simple to True and Libaudioverse will pick the best options for the specified device index.  Using the system's default device is the default, but most apps will not wish to use simple; for this reason, it is off.
 
 One special value is not included in get_device_infos; this is -1.  -1 is the default system audio device plus the functionality required to follow the default if the user changes it, i.e. by unplugging headphones.  In this case, the returned device is always 2 channels.
 
@@ -243,7 +243,7 @@ See the manual for specifics on how output objects work.  A brief summary is giv
 			if simple == True:
 				handle = _lav.create_simulation_for_device_simple(device_index)
 			else:
-				handle = _lav.create_simulation_for_device(device_index, sample_rate, block_size, mix_ahead)
+				handle = _lav.create_simulation_for_device(device_index, channels, sample_rate, block_size, mix_ahead)
 		else:
 			handle = _lav.create_read_simulation(sample_rate, block_size)
 		self.handle = handle

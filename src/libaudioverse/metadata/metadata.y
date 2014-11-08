@@ -30,10 +30,6 @@ objects:
    Lav_PANNER_ELEVATION: {name: elevation, type: float, default: 0.0, range: [-90.0, 90.0]}
    Lav_PANNER_CHANNEL_MAP: {name: channel_map, type: float_array, min_length: 2, max_length: MAX_INT, default: [-90, 90]}
   doc_name: Amplitude Panner
- Lav_OBJTYPE_ATTENUATOR:
-  properties:
-   Lav_ATTENUATOR_MULTIPLIER: {name: multiplier, type: float, default: 1.0, range: [0.0, INFINITY]}
-  doc_name: Attenuator
  Lav_OBJTYPE_MIXER:
   properties:
    Lav_MIXER_MAX_PARENTS: {name: max_parents, type: int, default: 0, range: [0, MAX_INT]}

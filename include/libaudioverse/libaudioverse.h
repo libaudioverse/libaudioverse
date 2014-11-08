@@ -96,12 +96,11 @@ enum Lav_OBJTYPES {
 	Lav_OBJTYPE_HRTF = 4,
 	Lav_OBJTYPE_SINE = 5,
 	Lav_OBJTYPE_MIXER = 6,
-	Lav_OBJTYPE_ATTENUATOR = 7,
-	Lav_OBJTYPE_HARD_LIMITER = 8,
-	Lav_OBJTYPE_DELAY = 9,
-	Lav_OBJTYPE_AMPLITUDE_PANNER = 10,
-	Lav_OBJTYPE_PUSH = 11,
-	Lav_OBJTYPE_BIQUAD = 12,
+	Lav_OBJTYPE_HARD_LIMITER = 7,
+	Lav_OBJTYPE_DELAY = 8,
+	Lav_OBJTYPE_AMPLITUDE_PANNER = 9,
+	Lav_OBJTYPE_PUSH = 10,
+	Lav_OBJTYPE_BIQUAD = 11,
 };
 
 /**Object states.*/
@@ -258,7 +257,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSineObject(LavSimulation* sim, LavObject 
 Lav_PUBLIC_FUNCTION LavError Lav_createFileObject(LavSimulation *sim, const char* path, LavObject **destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createHrtfObject(LavSimulation *simulation, const char* hrtfPath, LavObject **destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createMixerObject(LavSimulation* sim, unsigned int maxParents, unsigned int inputsPerParent, LavObject **destination);
-Lav_PUBLIC_FUNCTION LavError Lav_createAttenuatorObject(LavSimulation *sim, unsigned int numChannels, LavObject** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterObject(LavSimulation* sim, unsigned int numInputs, LavObject** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createDelayObject(LavSimulation* sim, unsigned int lines, LavObject** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createAmplitudePannerObject(LavSimulation* sim, LavObject** destination);

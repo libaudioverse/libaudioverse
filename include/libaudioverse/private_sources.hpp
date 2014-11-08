@@ -12,6 +12,6 @@ class LavSourceObject: public LavSubgraphObject {
 	LavSourceObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavSourceManager> world);
 	void update(LavEnvironment env);
 	private:
-	std::shared_ptr<LavObject> panner_object, attenuator_object;
+	std::shared_ptr<LavObject> panner_object;
 	std::shared_ptr<LavSourceManager> manager;
 };

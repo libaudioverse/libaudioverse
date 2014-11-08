@@ -22,10 +22,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 
 LavSourceObject::LavSourceObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavSourceManager> manager): LavSubgraphObject(Lav_OBJTYPE_SOURCE, simulation) {
-	attenuator_object = createAttenuatorObject(simulation, 1);
 	panner_object = manager->createPannerObject();
-	panner_object->setInput(0, attenuator_object, 0);
-	configureSubgraph(attenuator_object, nullptr); //we input to the attenuator, and output to nothing (because the manager grabs hold of the panner directly).
+	configureSubgraph(panner_object, nullptr); //we input to the panner, and output to nothing (because the manager grabs hold of the panner directly).
 	this->manager = manager;
 }
 
@@ -63,10 +61,10 @@ void LavSourceObject::update(LavEnvironment environment) {
 	float maxDistance = getProperty(Lav_SOURCE_MAX_DISTANCE).getFloatValue();
 	float gain = calculateGainForDistanceModel(distanceModel, distance, maxDistance);
 
-	//set the panner and attenuator.
+	//set the panner.
 	panner_object->getProperty(Lav_PANNER_AZIMUTH).setFloatValue(azimuth);
 	panner_object->getProperty(Lav_PANNER_ELEVATION).setFloatValue(elevation);
-	attenuator_object ->getProperty(Lav_ATTENUATOR_MULTIPLIER).setFloatValue(gain);
+	panner_object ->getProperty(Lav_OBJECT_MUL).setFloatValue(gain);
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_createSourceObject(LavSimulation* simulation, LavObject* environment, LavObject** destination) {

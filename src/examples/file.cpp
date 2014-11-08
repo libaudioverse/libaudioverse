@@ -32,21 +32,12 @@ void main(int argc, char** args) {
 	ERRCHECK(Lav_initialize());
 	ERRCHECK(Lav_createSimulationForDevice(-1, 2, 44100, 1024, 2, &simulation));
 	ERRCHECK(Lav_createFileObject(simulation, path, &node));
-	LavObject* atten, *limit, *mix;
+	LavObject *limit;
 	unsigned int fileChannels;
 	ERRCHECK(Lav_objectGetOutputCount(node, &fileChannels));
-	ERRCHECK(Lav_createAttenuatorObject(simulation, fileChannels == 1 ? 2 : fileChannels, &atten));
-	ERRCHECK(Lav_createHardLimiterObject(simulation, fileChannels == 1 ? 2 : fileChannels, &limit));
-	ERRCHECK(Lav_createMixerObject(simulation, 1, fileChannels == 1 ? 2 : fileChannels, &mix));
+	ERRCHECK(Lav_createHardLimiterObject(simulation, fileChannels, &limit));
 	for(unsigned int i = 0; i < fileChannels; i++) {
-		ERRCHECK(Lav_objectSetInput(atten, i, node, i));
-		ERRCHECK(Lav_objectSetInput(mix, i, atten, i));
-		ERRCHECK(Lav_objectSetInput(limit, i, mix, i));
-	}
-	//this makes mono play through both channels.
-	if(fileChannels == 1) {
-		ERRCHECK(Lav_objectSetInput(mix, 1, atten, 0));
-		ERRCHECK(Lav_objectSetInput(limit, 1, mix, 0));
+		ERRCHECK(Lav_objectSetInput(limit, i, node, i));
 	}
 	ERRCHECK(Lav_objectSetCallback(node, Lav_FILE_END_CALLBACK, endOfFileCallback, nullptr));
 	ERRCHECK(Lav_simulationSetOutputObject(simulation, limit));
@@ -65,7 +56,7 @@ void main(int argc, char** args) {
 		sscanf(start, "%f", &value);
 		switch(command[0]) {
 			case 'p': Lav_objectSetFloatProperty(node, Lav_FILE_PITCH_BEND, value); break;
-			case 'v': Lav_objectSetFloatProperty(atten, Lav_ATTENUATOR_MULTIPLIER, value); break;
+			case 'v': Lav_objectSetFloatProperty(node, Lav_OBJECT_MUL, value); break;
 			case 's': Lav_objectSetDoubleProperty(node, Lav_FILE_POSITION, value); break;
 			case 'a': isPlaying = ! isPlaying; Lav_objectSetIntProperty(node, Lav_OBJECT_STATE, isPlaying == false ? Lav_OBJSTATE_PAUSED: Lav_OBJSTATE_PLAYING); break;
 			default: printf("Unrecognized command.\n"); break;

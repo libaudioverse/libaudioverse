@@ -40,7 +40,6 @@ objects/file.cpp
 objects/hard_limiter.cpp
 objects/hrtf.cpp
 objects/mixer.cpp
-objects/attenuator.cpp
 objects/delay.cpp
 objects/amplitude_panner.cpp
 objects/push.cpp
