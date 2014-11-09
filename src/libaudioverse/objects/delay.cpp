@@ -47,6 +47,8 @@ LavDelayObject::LavDelayObject(std::shared_ptr<LavSimulation> simulation, float 
 	getProperty(Lav_DELAY_INTERPOLATION_TIME).setPostChangedCallback([this] () {recomputeDelta();});
 	getProperty(Lav_DELAY_DELAY).setPostChangedCallback([this] () {delayChanged();});
 	recomputeDelta();
+	//finally, set the read-only max delay.
+	getProperty(Lav_DELAY_DELAY_MAX).setFloatValue(maxDelay);
 }
 
 std::shared_ptr<LavObject> createDelayObject(std::shared_ptr<LavSimulation> simulation, float maxDelay, unsigned int lineCount) {

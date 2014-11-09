@@ -69,6 +69,12 @@ for propkey, propid, propinfo in joined_properties:
 		continue
 	if propinfo['type'] == 'boolean':
 		propinfo['range'] = [0, 1]
+	if propinfo['type'] == 'int' and propinfo.get('read_only', False):
+		propinfo['range'] = [0, 0]
+	if propinfo['type'] == 'float' and propinfo.get('read_only', False):
+		propinfo['range'] = [0.0, 0.0]
+	if propinfo['type'] == 'double' and propinfo.get('read_only', False):
+		propinfo['range'] = [0.0, 0.0]
 	for i, j in enumerate(list(propinfo.get('range', []))): #if we don't have a range, this will do nothing.
 		if isinstance(j, basestring):
 			continue #it's either MIN_INT, MAX_INT, INFINITY, -INFINITY, or another special identifier.  Pass through unchanged.

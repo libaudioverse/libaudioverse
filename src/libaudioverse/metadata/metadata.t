@@ -70,7 +70,7 @@ void initializeMetadata() {
 	{%endif%}
 	{%endif%}
 	{%if prop.get('read_only', False)%}
-	tempProp->setReadOnly(True);
+	tempProp->setReadOnly(true);
 	{%endif%}
 	{#Use the copy constructor to put this into the default instances##}
 	(*default_property_instances)[std::tuple<int, int>(<%objid%>, <%propid%>)] = *tempProp;
