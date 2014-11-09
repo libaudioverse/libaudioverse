@@ -69,6 +69,9 @@ void initializeMetadata() {
 	tempProp = createFloatArrayProperty("<%prop['name']%>", minLength, maxLength, defaultLength, defaultData);
 	{%endif%}
 	{%endif%}
+	{%if prop.get('read_only', False)%}
+	tempProp->setReadOnly(True);
+	{%endif%}
 	{#Use the copy constructor to put this into the default instances##}
 	(*default_property_instances)[std::tuple<int, int>(<%objid%>, <%propid%>)] = *tempProp;
 	delete tempProp;

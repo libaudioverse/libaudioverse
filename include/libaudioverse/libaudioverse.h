@@ -72,6 +72,7 @@ enum Lav_ERRORS {
 	Lav_ERROR_NO_OUTPUTS = 13, //we expected the object to have outputs here, but it didn't.
 	Lav_ERROR_LIMIT_EXCEEDED = 14,
 	Lav_ERROR_CAUSES_CYCLE = 15,
+	Lav_ERROR_PROPERTY_IS_READ_ONLY = 16,
 	Lav_ERROR_INTERNAL= 999,
 };
 

@@ -28,6 +28,7 @@ import enum
 		return tuple(retval)
 {%endif%}
 
+{%if prop.get('read_only', False) == False%}
 	@{{prop['name']}}.setter
 	def {{prop['name']}}(self, val):
 {%if 'value_enum' in prop%}
@@ -60,6 +61,7 @@ import enum
 		if not isinstance(val, collections.Sized):
 			raise ValueError('expected an iterable with known size')
 		_lav.object_replace.Int_array_property(self.handle, _libaudioverse.{{enumerant}}, len(val), val)
+{%endif%}
 {%endif%}
 {%endmacro%}
 

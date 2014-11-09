@@ -366,11 +366,14 @@ if(prop.getType() != (t)) {\
 throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);\
 }
 
+#define READONLY_CHECK if(prop.isReadOnly()) throw LavErrorException(Lav_ERROR_PROPERTY_IS_READ_ONLY);
+
 Lav_PUBLIC_FUNCTION LavError Lav_objectResetProperty(LavObject *obj, int slot) {
 	PUB_BEGIN
 	auto obj_ptr = incomingPointer<LavObject>(obj);
 	LOCK(*obj);
 	auto prop = obj->getProperty(slot);
+	READONLY_CHECK
 	prop.reset();
 	PUB_END
 }
@@ -378,6 +381,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectResetProperty(LavObject *obj, int slot) {
 Lav_PUBLIC_FUNCTION LavError Lav_objectSetIntProperty(LavObject* obj, int slot, int value) {
 	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_INT);
+	READONLY_CHECK
 	prop.setIntValue(value);
 	PUB_END
 }
@@ -385,6 +389,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectSetIntProperty(LavObject* obj, int slot, 
 Lav_PUBLIC_FUNCTION LavError Lav_objectSetFloatProperty(LavObject *obj, int slot, float value) {
 	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_FLOAT);
+	READONLY_CHECK
 	prop.setFloatValue(value);
 	PUB_END
 }
@@ -392,6 +397,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectSetFloatProperty(LavObject *obj, int slot
 Lav_PUBLIC_FUNCTION LavError Lav_objectSetDoubleProperty(LavObject *obj, int slot, double value) {
 	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_DOUBLE);
+	READONLY_CHECK
 	prop.setDoubleValue(value);
 	PUB_END
 }
@@ -399,6 +405,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectSetDoubleProperty(LavObject *obj, int slo
 Lav_PUBLIC_FUNCTION LavError Lav_objectSetStringProperty(LavObject*obj, int slot, char* value) {
 	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_STRING);
+	READONLY_CHECK
 	prop.setStringValue(value);
 	PUB_END
 }
@@ -406,6 +413,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectSetStringProperty(LavObject*obj, int slot
 Lav_PUBLIC_FUNCTION LavError Lav_objectSetFloat3Property(LavObject* obj, int slot, float v1, float v2, float v3) {
 	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_FLOAT3);
+	READONLY_CHECK
 	prop.setFloat3Value(v1, v2, v3);
 	PUB_END
 }
@@ -413,6 +421,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectSetFloat3Property(LavObject* obj, int slo
 Lav_PUBLIC_FUNCTION LavError Lav_objectSetFloat6Property(LavObject* obj, int slot, float v1, float v2, float v3, float v4, float v5, float v6) {
 	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_FLOAT6);
+	READONLY_CHECK
 	prop.setFloat6Value(v1, v2, v3, v4, v5, v6);
 	return Lav_ERROR_NONE;
 	PUB_END
@@ -493,7 +502,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetDoublePropertyRange(LavObject* obj, in
 	PUB_END
 }
 
-
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyIndices(LavObject* obj, int** destination) {
 	PUB_BEGIN
 	auto obj_ptr = incomingPointer<LavObject>(obj);
@@ -523,6 +531,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyName(LavObject* obj, int slot,
 Lav_PUBLIC_FUNCTION LavError Lav_objectReplaceFloatArrayProperty(LavObject* obj, int slot, unsigned int length, float* values) {
 	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_FLOAT_ARRAY);
+	READONLY_CHECK
 	prop.replaceFloatArray(length, values);
 	PUB_END
 }
@@ -537,6 +546,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectReadFloatArrayProperty(LavObject* obj, in
 Lav_PUBLIC_FUNCTION LavError  Lav_objectWriteFloatArrayProperty(LavObject* obj, int slot, unsigned int start, unsigned int stop, float* values) {
 	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_FLOAT_ARRAY);
+	READONLY_CHECK
 	prop.writeFloatArray(start, stop, values);
 	PUB_END
 }
@@ -569,6 +579,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloatArrayPropertyLength(LavObject* ob
 Lav_PUBLIC_FUNCTION LavError Lav_objectReplaceIntArrayProperty(LavObject* obj, int slot, unsigned int length, int* values) {
 	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_INT_ARRAY);
+	READONLY_CHECK
 	prop.replaceIntArray(length, values);
 	PUB_END
 }
@@ -583,6 +594,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectReadIntArrayProperty(LavObject* obj, int 
 Lav_PUBLIC_FUNCTION LavError  Lav_objectWriteIntArrayProperty(LavObject* obj, int slot, unsigned int start, unsigned int stop, int* values) {
 	PUB_BEGIN
 	PROP_PREAMBLE(obj, slot, Lav_PROPERTYTYPE_INT_ARRAY);
+	READONLY_CHECK
 	prop.writeIntArray(start, stop, values);
 	PUB_END
 }

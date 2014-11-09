@@ -34,6 +34,8 @@ class LavProperty {
 	void setName(const char* n) { name = std::string(n);}
 	int getTag() {return tag;}
 	void setTag(int t) {tag = t;}
+	bool isReadOnly() { return read_only;}
+	void setReadOnly(bool what) {read_only = what;}
 
 	//yes, really. This is as uggly as it looks.
 	int getIntValue() { return value.ival;}
@@ -181,6 +183,7 @@ class LavProperty {
 	std::vector<int> iarray_value, default_iarray_value;
 	unsigned int min_array_length = 0, max_array_length = std::numeric_limits<unsigned int>::max();
 	std::function<void(void)> post_changed_callback;
+	bool read_only = false;
 };
 
 //helper methods to quickly make properties.
