@@ -19,7 +19,8 @@ union LavPropertyValue {
 };
 
 //quick range check helper...
-#define RC(val, fld) if(val > maximum_value.fld || val < minimum_value.fld) throw LavErrorException(Lav_ERROR_RANGE)
+//this disables on readonly because it is expected that the library can handle that itself, and bumping ranges for writes on readonly properties would be annoying.
+#define RC(val, fld) if((val > maximum_value.fld || val < minimum_value.fld) && read_only == false) throw LavErrorException(Lav_ERROR_RANGE)
 
 class LavProperty {
 	public:
@@ -104,6 +105,7 @@ class LavProperty {
 	void setFloat6Default(float v1, float v2, float v3, float v4, float v5, float v6) {default_value.f6val[0] = v1; default_value.f6val[1] = v2; default_value.f6val[2] = v3; default_value.f6val[3] = v4; default_value.f6val[4] = v5; default_value.f6val[5] = v6;}
 
 	//applies to both array properties.
+	//note that in the below, we again disable all range checks for properties which are read_only.
 	void setArrayLengthRange(unsigned int lower, unsigned int upper) { min_array_length = lower; max_array_length = upper;}
 	void getArraylengthRange(unsigned int* min, unsigned int* max) {*min = min_array_length; *max = max_array_length;}
 
@@ -120,7 +122,7 @@ class LavProperty {
 		if(post_changed_callback) post_changed_callback();
 	}
 	void replaceFloatArray(unsigned int length, float* values) {
-		if(length < min_array_length || length > max_array_length) throw LavErrorException(Lav_ERROR_RANGE);
+		if((length < min_array_length || length > max_array_length) && read_only == false) throw LavErrorException(Lav_ERROR_RANGE);
 		farray_value.resize(length);
 		std::copy(values, values+length, farray_value.begin());
 		if(post_changed_callback) post_changed_callback();
@@ -148,7 +150,7 @@ class LavProperty {
 		if(post_changed_callback) post_changed_callback();
 	}
 	void replaceIntArray(unsigned int length, int* values) {
-		if(length < min_array_length || length > max_array_length) throw LavErrorException(Lav_ERROR_RANGE);
+		if((length < min_array_length || length > max_array_length) && read_only == false) throw LavErrorException(Lav_ERROR_RANGE);
 		iarray_value.resize(length);
 		std::copy(values, values+length, iarray_value.begin());
 		if(post_changed_callback) post_changed_callback();
