@@ -14,11 +14,11 @@ It is worth keeping separate because it will grow rapidly and contain documentat
 The standard for naming is:
 Lav_OBJTYPE_PROPNAME
 or
-Lav_OBJTYPE_callbackname_CALLBACK
+Lav_OBJTYPE_callbackname_EVENT
 
 Furthermore, all libaudioverse properties are negative.
 
-Values below -100 are reserved for standard callbacks and properties on all objects.
+Values below -100 are reserved for standard events and properties on all objects.
 */
 
 enum lav_STANDARD_PROPERTIES {
@@ -35,8 +35,7 @@ enum Lav_FILE_PROPERTIES {
 	Lav_FILE_POSITION = -1,
 	Lav_FILE_PITCH_BEND = -2,
 	Lav_FILE_LOOPING = -3,
-	//callbacks
-	Lav_FILE_END_CALLBACK = -1,
+	Lav_FILE_END_EVENT = -1,
 };
 
 enum Lav_PANNER_PROPERTIES {
@@ -60,8 +59,8 @@ enum Lav_DELAY_PROPERTIES {
 
 enum Lav_PUSH_OBJECT_PROPERTIES {
 	Lav_PUSH_THRESHOLD = -1,
-	Lav_PUSH_AUDIO_CALLBACK = -2,
-	Lav_PUSH_OUT_CALLBACK = -3,
+	Lav_PUSH_AUDIO_EVENT = -2,
+	Lav_PUSH_OUT_EVENT = -3,
 };
 
 //biquad objects.

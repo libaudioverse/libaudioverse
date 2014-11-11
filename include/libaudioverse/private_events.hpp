@@ -10,11 +10,11 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 class LavSimulation;
 
-class LavCallback {
+class LavEvent {
 	public:
-	LavCallback();
-	LavCallback(const LavCallback& other);
-	LavCallback& operator=(const LavCallback other);
+	LavEvent();
+	LavEvent(const LavEvent& other);
+	LavEvent& operator=(const LavEvent other);
 	void setHandler(LavEventCallback cb);
 	LavEventCallback getHandler();
 	void fire();
@@ -27,7 +27,7 @@ class LavCallback {
 	bool getNoMultifire();
 	void setNoMultifire(bool what);
 	//this has to be here.
-	friend void swap(LavCallback &a, LavCallback &b) {
+	friend void swap(LavEvent &a, LavEvent &b) {
 		using std::swap;
 		swap(a.associated_simulation, b.associated_simulation);
 		swap(a.handler, b.handler);

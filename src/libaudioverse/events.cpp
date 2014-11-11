@@ -2,38 +2,37 @@
 This file is part of Libaudioverse, a library for 3D and environmental audio simulation, and is released under the terms of the Gnu General Public License Version 3 or (at your option) any later version.
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
-#include <libaudioverse/private_callbacks.hpp>
+#include <libaudioverse/private_events.hpp>
 #include <libaudioverse/private_simulation.hpp>
 #include <libaudioverse/private_objects.hpp>
 #include <string>
 #include <memory>
 
-/**Callbacks.*/
+/**events.*/
 
-LavCallback::LavCallback() {
+LavEvent::LavEvent() {
 	is_firing.store(0);
 }
 
-LavCallback::LavCallback(const LavCallback &other):
+LavEvent::LavEvent(const LavEvent &other):
 name(other.name), associated_simulation(other.associated_simulation), handler(other.handler), associated_object(other.associated_object), user_data(other.user_data), no_multifire(other.no_multifire) {
 	is_firing.store(0);
 }
 
-LavCallback& LavCallback::operator=(LavCallback other) {
+LavEvent& LavEvent::operator=(LavEvent other) {
 	swap(*this, other);
 	return *this;
 }
 
-void LavCallback::setHandler(LavEventCallback cb) {
+void LavEvent::setHandler(LavEventCallback cb) {
 	handler = cb;
 }
 
-LavEventCallback LavCallback::getHandler() {
+LavEventCallback LavEvent::getHandler() {
 	return handler;
 }
 
-void LavCallback::fire() {
-
+void LavEvent::fire() {
 	if(handler == nullptr) return; //nothing to do.
 	if(no_multifire && is_firing.load() == 1) return;
 	is_firing.store(1);
@@ -51,34 +50,34 @@ void LavCallback::fire() {
 	});
 }
 
-void LavCallback::associateSimulation(std::shared_ptr<LavSimulation> simulation) {
+void LavEvent::associateSimulation(std::shared_ptr<LavSimulation> simulation) {
 	associated_simulation = simulation;
 }
 
-void LavCallback::associateObject(LavObject* obj) {
+void LavEvent::associateObject(LavObject* obj) {
 	associated_object = obj;
 }
 
-const char* LavCallback::getName() {
+const char* LavEvent::getName() {
 	return name.c_str();
 }
 
-void LavCallback::setName(const char* n) {
+void LavEvent::setName(const char* n) {
 	name = std::string(n);
 }
 
-void* LavCallback::getUserData() {
+void* LavEvent::getUserData() {
 	return user_data;
 }
 
-void LavCallback::setUserData(void* data) {
+void LavEvent::setUserData(void* data) {
 	user_data = data;
 }
 
-bool LavCallback::getNoMultifire() {
+bool LavEvent::getNoMultifire() {
 	return no_multifire;
 }
 
-void LavCallback::setNoMultifire(bool what) {
+void LavEvent::setNoMultifire(bool what) {
 	no_multifire = what;
 }

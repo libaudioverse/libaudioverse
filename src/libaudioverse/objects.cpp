@@ -67,14 +67,14 @@ LavObject::LavObject(int type, std::shared_ptr<LavSimulation> simulation, unsign
 	this->simulation= simulation;
 	//request properties from the metadata module.
 	properties = makePropertyTable(type);
-	//and callbacks.
-	callbacks = makeCallbackTable(type);
+	//and events.
+	events = makeEventTable(type);
 
 	//Loop through callbacks, associating them with our simulation.
 	//map iterators dont' give references, only operator[].
-	for(auto i: callbacks) {
-		callbacks[i.first].associateSimulation(simulation);
-		callbacks[i.first].associateObject(this);
+	for(auto i: events) {
+		events[i.first].associateSimulation(simulation);
+		events[i.first].associateObject(this);
 	}
 
 	computeInputBuffers(); //at the moment, this is going to just make them all 0, but it takes effect once parents are added.
@@ -196,9 +196,9 @@ std::vector<int> LavObject::getStaticPropertyIndices() {
 	return res;
 }
 
-LavCallback& LavObject::getCallback(int which) {
-	if(callbacks.count(which) == 0) throw LavErrorException(Lav_ERROR_RANGE);
-	return callbacks[which];
+LavEvent& LavObject::getEvent(int which) {
+	if(events.count(which) == 0) throw LavErrorException(Lav_ERROR_RANGE);
+	return events[which];
 }
 
 void LavObject::lock() {
@@ -636,27 +636,27 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetArrayPropertyLengthRange(LavObject* ob
 
 //callback setup/configure/retrieval.
 
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetCallbackHandler(LavObject* obj, int callback, LavEventCallback *destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetEventHandler(LavObject* obj, int event, LavEventCallback *destination) {
 	PUB_BEGIN
 	auto ptr = incomingPointer<LavObject>(obj);
 	LOCK(*obj);
-	*destination = obj->getCallback(callback).getHandler();
+	*destination = obj->getEvent(event).getHandler();
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetCallbackUserDataPointer(LavObject* obj, int callback, void** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetEventUserDataPointer(LavObject* obj, int event, void** destination) {
 	PUB_BEGIN
 	auto ptr = incomingPointer<LavObject>(obj);
 	LOCK(*obj);
-	*destination = obj->getCallback(callback).getUserData();
+	*destination = obj->getEvent(event).getUserData();
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_objectSetCallback(LavObject* obj, int callback, LavEventCallback handler, void* userData) {
+Lav_PUBLIC_FUNCTION LavError Lav_objectSetEvent(LavObject* obj, int event, LavEventCallback handler, void* userData) {
 	PUB_BEGIN
 	auto ptr = incomingPointer<LavObject>(obj);
 	LOCK(*ptr);
-	obj->getCallback(callback).setHandler(handler);
-	obj->getCallback(callback).setUserData(userData);
+	obj->getEvent(event).setHandler(handler);
+	obj->getEvent(event).setUserData(userData);
 	PUB_END
 }

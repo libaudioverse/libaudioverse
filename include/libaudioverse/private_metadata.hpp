@@ -4,8 +4,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include <map>
 #include "private_properties.hpp"
-#include "private_callbacks.hpp"
+#include "private_events.hpp"
 
 void initializeMetadata();
 std::map<int, LavProperty> makePropertyTable(int objtype);
-std::map<int, LavCallback> makeCallbackTable(int objtyp);
+std::map<int, LavEvent> makeEventTable(int objtyp);

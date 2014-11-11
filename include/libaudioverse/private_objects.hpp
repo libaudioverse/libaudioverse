@@ -4,7 +4,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include "libaudioverse.h"
 #include "private_properties.hpp"
-#include "private_callbacks.hpp"
+#include "private_events.hpp"
 #include <map>
 #include <memory>
 #include <vector>
@@ -19,7 +19,7 @@ class LavInputDescriptor {
 };
 
 /**Things all Libaudioverse objects have.*/
-class LavObject: public std::enable_shared_from_this<LavObject> { //enable_shared_from_this is for callback infrastructure.
+class LavObject: public std::enable_shared_from_this<LavObject> { //enable_shared_from_this is for event infrastructure.
 	public:
 	LavObject(int type, std::shared_ptr<LavSimulation> simulation, unsigned int numInputs, unsigned int numOutputs);
 	virtual ~LavObject();
@@ -66,8 +66,8 @@ class LavObject: public std::enable_shared_from_this<LavObject> { //enable_share
 	virtual LavProperty& getProperty(int slot);
 	virtual std::vector<int> getStaticPropertyIndices();
 
-	//callback helper methods.
-	LavCallback& getCallback(int which);
+	//event helper methods.
+	LavEvent& getEvent(int which);
 
 	//meet the lockable concept.
 	//Warning: these aren't virtual because they're just so that our macro works; all locking still forwards to devices.
@@ -81,7 +81,7 @@ class LavObject: public std::enable_shared_from_this<LavObject> { //enable_share
 	virtual void resize(unsigned int newInputsCount, unsigned int newOutputsCount);
 	std::shared_ptr<LavSimulation> simulation = nullptr;
 	std::map<int, LavProperty> properties;
-	std::map<int, LavCallback> callbacks;
+	std::map<int, LavEvent> events;
 	std::vector<float*> inputs;
 	std::vector<LavInputDescriptor> input_descriptors;
 	std::vector<float*> outputs;

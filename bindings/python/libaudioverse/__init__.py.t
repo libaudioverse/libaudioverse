@@ -65,24 +65,24 @@ import enum
 {%endif%}
 {%endmacro%}
 
-{%macro implement_callback(name, index)%}
+{%macro implement_event(name, index)%}
 	@property
-	def {{name}}_callback(self):
-		cb = self._callbacks.get({{index}}, None)
-		if cb is None:
+	def {{name}}_event(self):
+		evt = self._events.get({{index}}, None)
+		if evt is None:
 			return
-		return (cb.callback, cb.extra_arguments)
+		return (evt.callback, evt.extra_arguments)
 
-	@{{name}}_callback.setter
-	def {{name}}_callback(self, val):
-		global _global_callbacks
+	@{{name}}_event.setter
+	def {{name}}_event(self, val):
+		global _global_events
 		val_tuple = tuple(val) if isinstance(val, collections.Iterable) else (val, )
 		if len(val_tuple) == 1:
 			val_tuple = (val, ())
 		cb, extra_args = val_tuple
-		callback_obj = _EventCallbackWrapper(self, {{index}}, cb, extra_args)
-		self._callbacks[{{index}}] = callback_obj
-		_global_callbacks[self.handle].add(callback_obj)
+		event_obj = _EventCallbackWrapper(self, {{index}}, cb, extra_args)
+		self._events[{{index}}] = event_obj
+		_global_events[self.handle].add(event_obj)
 {%endmacro%}
 
 def find_datafiles():
@@ -96,7 +96,7 @@ def find_datafiles():
 
 
 #this makes sure that callback objects do not die.
-_global_callbacks = collections.defaultdict(set)
+_global_events= collections.defaultdict(set)
 
 #build and register all the error classes.
 class GenericError(Exception):
@@ -193,7 +193,7 @@ class _EventCallbackWrapper(object):
 		self.slot = slot
 		self.callback = callback
 		self.fptr = _libaudioverse.LavEventCallback(self)
-		_lav.object_set_callback(for_object.handle, slot, self.fptr, None)
+		_lav.object_set_event(for_object.handle, slot, self.fptr, None)
 
 	def __call__(self, obj, userdata):
 		actual_object = self.obj_weakref()
@@ -293,13 +293,13 @@ class GenericObject(object):
 		self.handle = handle
 		self.simulation = simulation
 		self._inputs = [(None, 0)]*_lav.object_get_input_count(handle)
-		self._callbacks = dict()
+		self._events= dict()
 
 {%for enumerant, prop in metadata['objects']['Lav_OBJTYPE_GENERIC']['properties'].iteritems()%}
 {{implement_property(enumerant, prop)}}
 {%endfor%}
-{%for enumerant, info in metadata['objects']['Lav_OBJTYPE_GENERIC'].get('callbacks', dict()).iteritems()%}
-{{implement_callback(info['name'], "_libaudioverse." + enumerant)}}
+{%for enumerant, info in metadata['objects']['Lav_OBJTYPE_GENERIC'].get('events', dict()).iteritems()%}
+{{implement_event(info['name'], "_libaudioverse." + enumerant)}}
 {%endfor%}
 
 	def __del__(self):
@@ -357,8 +357,8 @@ class {{friendly_name}}(GenericObject):
 {{implement_property(enumerant, prop)}}
 
 {%endfor%}
-{%for enumerant, info in metadata['objects'].get(object_name, dict()).get('callbacks', dict()).iteritems()%}
-{{implement_callback(info['name'], "_libaudioverse." + enumerant)}}
+{%for enumerant, info in metadata['objects'].get(object_name, dict()).get('events', dict()).iteritems()%}
+{{implement_event(info['name'], "_libaudioverse." + enumerant)}}
 
 {%endfor%}
 

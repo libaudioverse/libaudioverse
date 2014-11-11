@@ -56,7 +56,7 @@ void LavPushObject::process() {
 		push_offset = 0;
 		resampler->write(workspace+got*push_channels, simulation->getBlockSize()-got);
 		if(fired_out_callback == false) {
-			getCallback(Lav_PUSH_OUT_CALLBACK).fire();
+			getEvent(Lav_PUSH_OUT_EVENT).fire();
 			fired_out_callback = true;
 		}
 	}
@@ -68,7 +68,7 @@ void LavPushObject::process() {
 	float threshold = getProperty(Lav_PUSH_THRESHOLD).getFloatValue();
 	float remaining = resampler->estimateAvailableFrames()/(float)simulation->getSr();
 	if(remaining < threshold) {
-		getCallback(Lav_PUSH_AUDIO_CALLBACK).fire();
+		getEvent(Lav_PUSH_AUDIO_EVENT).fire();
 	}
 }
 

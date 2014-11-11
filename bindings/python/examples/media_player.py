@@ -14,7 +14,7 @@ filenode = libaudioverse.FileObject(sim, filepath)
 def finished(obj):
 	print "Finished playing."
 
-filenode.end_callback = finished
+filenode.end_event = finished
 
 sim.output_object = filenode
 

@@ -15,8 +15,8 @@ objects:
    Lav_FILE_POSITION: {name: position, type: double, default: 0.0, range: [0.0, 0.0]}
    Lav_FILE_PITCH_BEND: {name: pitch_bend, type: float, default: 1.0, range: [0, INFINITY]}
    Lav_FILE_LOOPING: {name: looping, type: boolean, default: 0}
-  callbacks:
-   Lav_FILE_END_CALLBACK: {name: end}
+  events:
+   Lav_FILE_END_EVENT: {name: end}
   doc_name: File
  Lav_OBJTYPE_HRTF:
   properties:
@@ -57,9 +57,9 @@ objects:
  Lav_OBJTYPE_PUSH:
   properties:
    Lav_PUSH_THRESHOLD: {name: threshold, type: float, range: [0.0, INFINITY], default: 0.03}
-  callbacks:
-   Lav_PUSH_AUDIO_CALLBACK: {name: audio, multifiring_protection: true}
-   Lav_PUSH_OUT_CALLBACK: {name: out}
+  events:
+   Lav_PUSH_AUDIO_EVENT: {name: audio, multifiring_protection: true}
+   Lav_PUSH_OUT_EVENT: {name: out}
   doc_name: Push Object
   extra_functions:
    Lav_pushObjectFeed: {name: feed}

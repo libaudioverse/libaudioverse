@@ -8,7 +8,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/libaudioverse3d.h>
 #include <libaudioverse/private_properties.hpp>
-#include <libaudioverse/private_callbacks.hpp>
+#include <libaudioverse/private_events.hpp>
 #include <libaudioverse/private_metadata.hpp>
 #include <limits>
 #include <tuple>
@@ -36,17 +36,17 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 std::map<std::tuple<int, int>, LavProperty> *default_property_instances = nullptr;
 std::map<int, std::set<int>> *properties_by_object_type;
 
-//exactly the same thing for callbacks.
-std::map<std::tuple<int, int>, LavCallback> *default_callback_instances = nullptr;
-std::map<int, std::set<int>> *callbacks_by_object_type = nullptr;
+//exactly the same thing for events.
+std::map<std::tuple<int, int>, LavEvent> *default_event_instances = nullptr;
+std::map<int, std::set<int>> *events_by_object_type = nullptr;
 
 void initializeMetadata() {
 	properties_by_object_type = new std::map<int, std::set<int>>();
 	default_property_instances = new std::map<std::tuple<int, int>, LavProperty>();
-	callbacks_by_object_type = new std::map<int, std::set<int>>();
-	default_callback_instances = new std::map<std::tuple<int, int>, LavCallback>();
+	events_by_object_type = new std::map<int, std::set<int>>();
+	default_event_instances = new std::map<std::tuple<int, int>, LavEvent>();
 	LavProperty* tempProp= nullptr; //a temporary that we use a bunch of times.
-	LavCallback *tempcall = nullptr; //similarly for callbacks.
+	LavEvent *tempevt = nullptr; //similarly for callbacks.
 	{%for objid, propid, prop in joined_properties%}
 	//<%prop['name']%> on <%objid%>
 	{
@@ -78,14 +78,14 @@ void initializeMetadata() {
 	(*properties_by_object_type)[<%objid%>].insert(<%propid%>);
 	}
 	{%endfor%}
-	{#very similar logic for callbacks, but simpler because there's only ever the one type#}
-	{%for objid, callid, callinfo in joined_callbacks%}
-	tempcall = new LavCallback();
-	tempcall->setName("<%callinfo["name"]%>");
-	tempcall->setNoMultifire(<%callinfo.get('multifiring_protection', False)|lower%>);
-	(*default_callback_instances)[std::tuple<int, int>(<%objid%>, <%callid%>)] = *tempcall;
-	delete tempcall;
-	(*callbacks_by_object_type)[<%objid%>].insert(<%callid%>);
+	{#very similar logic for events, but simpler because there's only ever the one type#}
+	{%for objid, evtid, evtinfo in joined_events%}
+	tempevt = new LavEvent();
+	tempevt->setName("<%evtinfo["name"]%>");
+	tempevt->setNoMultifire(<%evtinfo.get('multifiring_protection', False)|lower%>);
+	(*default_event_instances)[std::tuple<int, int>(<%objid%>, <%evtid%>)] = *tempevt;
+	delete tempevt;
+	(*events_by_object_type)[<%objid%>].insert(<%evtid%>);
 	{%endfor%}
 }
 
@@ -99,11 +99,11 @@ std::map<int, LavProperty> makePropertyTable(int objtype) {
 	return retval;
 }
 
-std::map<int, LavCallback> makeCallbackTable(int objtype) {
-	std::map<int, LavCallback> retval;
-	std::set<int> needed = (*callbacks_by_object_type)[objtype];
+std::map<int, LavEvent> makeEventTable(int objtype) {
+	std::map<int, LavEvent> retval;
+	std::set<int> needed = (*events_by_object_type)[objtype];
 	for(auto index: needed) {
-		retval[index] = (*default_callback_instances)[std::tuple<int, int>(objtype, index)];
+		retval[index] = (*default_event_instances)[std::tuple<int, int>(objtype, index)];
 	}
 	return retval;
 }

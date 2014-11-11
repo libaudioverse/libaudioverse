@@ -240,12 +240,13 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetIntArrayPropertyLength(LavObject* obj,
 //applies to eather array type.
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetArrayPropertyLengthRange(LavObject* obj, int slot, unsigned int* destinationMin, unsigned int* destinationMax);
 
-/**Callbacks (events).
-Some objects go further and define specialized methods that have different signatures, but these are few and very far between.*/
+/**events.
+Unlike callbacks, which are dedicated on a per-object basis, events fire in a background thread. It is safe to call the Libaudioverse API from a firing event.
+It is documented which of these will fire more than once.  Most events will wait for you to return from the handler before firing a duplicate event.  It is wise to be as quick as possible.*/
 EXTERN_FUNCTION typedef void (*LavEventCallback)(LavObject* cause, void* userdata);
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetCallbackHandler(LavObject* obj, int callback, LavEventCallback *destination);
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetCallbackUserDataPointer(LavObject* obj, int callback, void** destination);
-Lav_PUBLIC_FUNCTION LavError Lav_objectSetCallback(LavObject* obj, int callback, LavEventCallback handler, void* userData);
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetEventHandler(LavObject* obj, int event, LavEventCallback *destination);
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetEventUserDataPointer(LavObject* obj, int event, void** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_objectSetEvent(LavObject* obj, int event, LavEventCallback handler, void* userData);
 
 /**Performs the object-specific reset operation.
 

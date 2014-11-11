@@ -39,7 +39,7 @@ void main(int argc, char** args) {
 	for(unsigned int i = 0; i < fileChannels; i++) {
 		ERRCHECK(Lav_objectSetInput(limit, i, node, i));
 	}
-	ERRCHECK(Lav_objectSetCallback(node, Lav_FILE_END_CALLBACK, endOfFileCallback, nullptr));
+	ERRCHECK(Lav_objectSetEvent(node, Lav_FILE_END_EVENT, endOfFileCallback, nullptr));
 	ERRCHECK(Lav_simulationSetOutputObject(simulation, limit));
 
 	//enter the transducer loop.
