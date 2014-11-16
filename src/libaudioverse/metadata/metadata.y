@@ -70,5 +70,7 @@ objects:
    Lav_BIQUAD_FREQUENCY: {name: frequency, type: float, range: [0, INFINITY], default: 2000.0}
    Lav_BIQUAD_DBGAIN: {name: dbgain, type: float, range: [-INFINITY, INFINITY], default: 0.0}
   doc_name: Biquad Filter
+ Lav_OBJTYPE_PULL:
+  callbacks: [audio_callback]
 additional_important_enums:
  - Lav_LOGGING_LEVELS
