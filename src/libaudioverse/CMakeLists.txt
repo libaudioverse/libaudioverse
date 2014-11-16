@@ -44,6 +44,7 @@ objects/delay.cpp
 objects/amplitude_panner.cpp
 objects/push.cpp
 objects/biquad.cpp
+objects/pull.cpp
 
 #physical outputs, etc.
 audio_backends/common.cpp

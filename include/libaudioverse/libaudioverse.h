@@ -102,6 +102,7 @@ enum Lav_OBJTYPES {
 	Lav_OBJTYPE_AMPLITUDE_PANNER = 9,
 	Lav_OBJTYPE_PUSH = 10,
 	Lav_OBJTYPE_BIQUAD = 11,
+	Lav_OBJTYPE_PULL = 12,
 };
 
 /**Object states.*/
@@ -266,6 +267,11 @@ Lav_PUBLIC_FUNCTION LavError Lav_createAmplitudePannerObject(LavSimulation* sim,
 Lav_PUBLIC_FUNCTION LavError Lav_createPushObject(LavSimulation* simulation, unsigned int sr, unsigned int channels, LavObject** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_pushObjectFeed(LavObject* handle, unsigned int length, float* buffer);
 Lav_PUBLIC_FUNCTION LavError Lav_createBiquadObject(LavSimulation* sim, unsigned int channels, LavObject** destination);
+
+//pull object:
+typedef void (*LavPullObjectAudioCallback)(LavObject* obj, int frames, int channels, float* buffer);
+Lav_PUBLIC_FUNCTION LavError Lav_createPullObject(LavSimulation* simulation, unsigned int sr, unsigned int channels, LavObject** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_pullObjectSetAudioCallback(LavObject* object, LavPullObjectAudioCallback callback);
 
 #ifdef __cplusplus
 }
