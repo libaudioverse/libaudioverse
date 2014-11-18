@@ -299,19 +299,6 @@ float* LavSubgraphObject::getOutputPointer(unsigned int output) {
 	else return nullptr;
 }
 
-//LavAnalyzerObject: base class for analysis objects, i.e. the graph listener, fft, things that exist only to fire events...
-LavAnalyzerObject::LavAnalyzerObject(int type, std::shared_ptr<LavSimulation> sim, unsigned int channels): LavObject(type, sim, channels, 0) {
-}
-
-unsigned int LavAnalyzerObject::getOutputCount() {
-	return inputs.size();
-}
-
-float* LavAnalyzerObject::getOutputPointer(unsigned int output) {
-	if(output >= inputs.size()) throw LavErrorException(Lav_ERROR_RANGE);
-	return inputs[output];
-}
-
 //begin public api
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetType(LavObject* obj, int* destination) {
 	PUB_BEGIN

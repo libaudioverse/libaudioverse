@@ -17,7 +17,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <vector>
 #include <lambdatask/threadsafe_queue.hpp>
 
-class LavGraphListenerObject: public LavAnalyzerObject {
+class LavGraphListenerObject: public LavObject {
 	public:
 	LavGraphListenerObject(std::shared_ptr<LavSimulation> sim, unsigned int channels);
 	~LavGraphListenerObject();
@@ -28,7 +28,7 @@ class LavGraphListenerObject: public LavAnalyzerObject {
 	unsigned int channels = 0;
 };
 
-LavGraphListenerObject::LavGraphListenerObject(std::shared_ptr<LavSimulation> sim, unsigned int channels): LavAnalyzerObject(Lav_OBJTYPE_GRAPH_LISTENER, sim, channels) {
+LavGraphListenerObject::LavGraphListenerObject(std::shared_ptr<LavSimulation> sim, unsigned int channels): LavObject(Lav_OBJTYPE_GRAPH_LISTENER, sim, channels, channels) {
 	outgoing_buffer = new float[channels*sim->getBlockSize()]();
 	this->channels = channels;
 }
@@ -46,6 +46,7 @@ void LavGraphListenerObject::process() {
 	for(unsigned int i = 0; i < block_size; i++) {
 		for(unsigned int j = 0; j < channels; j++) {
 			outgoing_buffer[i*channels+j] = inputs[j][i];
+			outputs[j][i] = inputs[j][i];
 		}
 	}
 	callback(this, block_size, channels, outgoing_buffer, callback_userdata);
