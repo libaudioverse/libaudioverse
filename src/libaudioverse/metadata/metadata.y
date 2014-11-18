@@ -72,5 +72,7 @@ objects:
   doc_name: Biquad Filter
  Lav_OBJTYPE_PULL:
   callbacks: [audio]
+ Lav_OBJTYPE_GRAPH_LISTENER:
+  callbacks: [listening]
 additional_important_enums:
  - Lav_LOGGING_LEVELS

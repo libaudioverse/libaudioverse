@@ -119,3 +119,14 @@ class LavSubgraphObject: public LavObject {
 	protected:
 	std::shared_ptr<LavObject> subgraph_input, subgraph_output;
 };
+
+//needed for things like FFT, firing events, doing statistics...
+//this is less common than the subgraph, but plans need it in at least two places, so it is abstracted.
+//the only difference is that this object does not allocate outputs. Instead, the inputs *are* the outputs.
+class LavAnalyzerObject: public LavObject {
+	public:
+	LavAnalyzerObject(int type, std::shared_ptr<LavSimulation> sim, unsigned int channels);
+	virtual unsigned int getOutputCount();
+	//Note that this isn't shared ptr.  The output pointers for an object are managed by the object itself and we need to be able to allocate/deallocate them for SSE, as well as work with arrays.  Don't hold on to output pointers.
+	virtual float* getOutputPointer(unsigned int output);
+};

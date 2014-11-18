@@ -103,6 +103,7 @@ enum Lav_OBJTYPES {
 	Lav_OBJTYPE_PUSH = 10,
 	Lav_OBJTYPE_BIQUAD = 11,
 	Lav_OBJTYPE_PULL = 12,
+	Lav_OBJTYPE_GRAPH_LISTENER = 13,
 };
 
 /**Object states.*/
@@ -272,6 +273,11 @@ Lav_PUBLIC_FUNCTION LavError Lav_createBiquadObject(LavSimulation* sim, unsigned
 typedef void (*LavPullObjectAudioCallback)(LavObject* obj, int frames, int channels, float* buffer, void* userdata);
 Lav_PUBLIC_FUNCTION LavError Lav_createPullObject(LavSimulation* simulation, unsigned int sr, unsigned int channels, LavObject** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_pullObjectSetAudioCallback(LavObject* object, LavPullObjectAudioCallback callback, void* userdata);
+
+//graph listeners: a way to intercept the graph.
+typedef void (*LavGraphListenerObjectListeningCallback)(LavObject* obj, unsigned int frames, unsigned int channels, float* buffer, void* userdata);
+Lav_PUBLIC_FUNCTION LavError Lav_createGraphListenerObject(LavSimulation* simulation, unsigned int channels, LavObject** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_graphListenerObjectSetListeningCallback(LavObject* obj, LavGraphListenerObjectListeningCallback callback, void* userdata);
 
 #ifdef __cplusplus
 }
