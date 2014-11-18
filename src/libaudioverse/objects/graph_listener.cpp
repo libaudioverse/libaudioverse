@@ -43,9 +43,9 @@ LavGraphListenerObject::~LavGraphListenerObject() {
 
 void LavGraphListenerObject::process() {
 	if(callback == nullptr) return;
-	for(unsigned int i = 0; i < block_size*channels; i+=channels) {
+	for(unsigned int i = 0; i < block_size; i++) {
 		for(unsigned int j = 0; j < channels; j++) {
-			outgoing_buffer[i+j] = inputs[j][i];
+			outgoing_buffer[i*channels+j] = inputs[j][i];
 		}
 	}
 	callback(this, block_size, channels, outgoing_buffer, callback_userdata);
