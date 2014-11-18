@@ -16,7 +16,7 @@ listener = libaudioverse.GraphListenerObject(sim, 2) #This passes through, and c
 listener.inputs[0] = w1, 0
 listener.inputs[1] = w2, 0
 
-#settings for binaural beats: 300 and 310.
+#settings for binaural beats: 300 and 305.
 w1.frequency = 300
 w2.frequency = 305
 
