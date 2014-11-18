@@ -71,6 +71,6 @@ objects:
    Lav_BIQUAD_DBGAIN: {name: dbgain, type: float, range: [-INFINITY, INFINITY], default: 0.0}
   doc_name: Biquad Filter
  Lav_OBJTYPE_PULL:
-  callbacks: [audio_callback]
+  callbacks: [audio]
 additional_important_enums:
  - Lav_LOGGING_LEVELS

@@ -185,7 +185,7 @@ Note also that we are not inheriting from MutableSequence because we cannot supp
 		self.for_object._set_input(key, val[0], val[1])
 
 class _EventCallbackWrapper(object):
-	"""Wraps callbacks into something sane.  Do not use externally."""
+	"""Wraps events into something sane.  Do not use externally."""
 
 	def __init__(self, for_object, slot, callback, additional_args):
 		self.obj_weakref = weakref.ref(for_object)
@@ -200,6 +200,18 @@ class _EventCallbackWrapper(object):
 		if actual_object is None:
 			return
 		self.callback(actual_object, *self.additional_arguments)
+
+class _CallbackWrapper(object):
+
+	def __init__(self, obj, cb, additional_args, additional_kwargs):
+		self.additional_args = additional_args
+		self.additional_kwargs = additional_kwargs
+		self.cb = cb
+		self.obj_weakref = weakref.ref(obj)
+
+	def __call__(self, *args):
+		needed_args = (self.obj_weakref(),)+args[1:]
+		return self.cb(*needed_args, **self.additional_kwargs)
 
 class DeviceInfo(object):
 	"""Represents info on a audio device."""
@@ -294,6 +306,7 @@ class GenericObject(object):
 		self.simulation = simulation
 		self._inputs = [(None, 0)]*_lav.object_get_input_count(handle)
 		self._events= dict()
+		self._callbacks = dict()
 
 {%for enumerant, prop in metadata['objects']['Lav_OBJTYPE_GENERIC']['properties'].iteritems()%}
 {{implement_property(enumerant, prop)}}
@@ -369,6 +382,21 @@ class {{friendly_name}}(GenericObject):
 	def {{friendly_name}}({{func.input_args|map(attribute='name')|list|join(', ')}}):
 		return _lav.{{lav_func}}({{func.input_args|map(attribute='name')|list|join(', ')}})
 
+{%endfor%}
+
+{%for callback_name in metadata['objects'].get(object_name, dict()).get('callbacks', [])%}
+{%set libaudioverse_function_name = "_lav."+friendly_name|camelcase_to_underscores+"_set_"+callback_name+"_callback"%}
+{%set ctypes_name = "_libaudioverse.Lav"+friendly_name+callback_name|underscores_to_camelcase(True)+"Callback"%}
+	def set_{{callback_name}}_callback(self, callback, additional_args = None, additional_kwargs = None):
+		if additional_args is None:
+			additionnal_args = ()
+		if additional_kwargs is None:
+			additional_kwargs = dict()
+		wrapper = _CallbackWrapper(self, callback, additional_args, additional_kwargs)
+		ctypes_callback = {{ctypes_name}}(wrapper)
+		{{libaudioverse_function_name}}(self.handle, ctypes_callback)
+		#if we get here, we hold both objects; we succeeded in setting because no exception was thrown.
+		self._callbacks["{{callback_name}}"] = (wrapper, ctypes_callback)
 {%endfor%}
 
 {%endfor%}
