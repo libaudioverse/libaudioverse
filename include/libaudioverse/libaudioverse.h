@@ -104,6 +104,7 @@ enum Lav_OBJTYPES {
 	Lav_OBJTYPE_BIQUAD = 11,
 	Lav_OBJTYPE_PULL = 12,
 	Lav_OBJTYPE_GRAPH_LISTENER = 13,
+	Lav_OBJTYPE_CUSTOM = 14,
 };
 
 /**Object states.*/
@@ -279,6 +280,11 @@ typedef void (*LavGraphListenerObjectListeningCallback)(LavObject* obj, unsigned
 Lav_PUBLIC_FUNCTION LavError Lav_createGraphListenerObject(LavSimulation* simulation, unsigned int channels, LavObject** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_graphListenerObjectSetListeningCallback(LavObject* obj, LavGraphListenerObjectListeningCallback callback, void* userdata);
 
+//custom objects.
+//the calback does the processing if set, otherwise outputs are zeroed.
+typedef void (*LavCustomObjectProcessingCallback)(LavObject* obj, unsigned int frames, unsigned int numInputs, float** inputs, unsigned int numOutputs, float** outputs, void* userdata);
+Lav_PUBLIC_FUNCTION LavError Lav_createCustomObject(LavSimulation* simulation, unsigned int inputs, unsigned int outputs, LavObject** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_customObjectSetProcessingCallback(LavObject* obj, LavCustomObjectProcessingCallback callback, void* userdata);
 #ifdef __cplusplus
 }
 #endif

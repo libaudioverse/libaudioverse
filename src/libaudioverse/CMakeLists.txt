@@ -46,6 +46,7 @@ objects/push.cpp
 objects/biquad.cpp
 objects/pull.cpp
 objects/graph_listener.cpp
+objects/custom.cpp
 
 #physical outputs, etc.
 audio_backends/common.cpp

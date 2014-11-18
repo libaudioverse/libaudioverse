@@ -74,5 +74,7 @@ objects:
   callbacks: [audio]
  Lav_OBJTYPE_GRAPH_LISTENER:
   callbacks: [listening]
+ Lav_OBJTYPE_CUSTOM:
+  callbacks: [processing]
 additional_important_enums:
  - Lav_LOGGING_LEVELS
