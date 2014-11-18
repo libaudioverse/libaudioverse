@@ -210,7 +210,7 @@ class _CallbackWrapper(object):
 		self.obj_weakref = weakref.ref(obj)
 
 	def __call__(self, *args):
-		needed_args = (self.obj_weakref(),)+args[1:]
+		needed_args = (self.obj_weakref(),)+args[1:-1] #be sure to eliminate userdata, which is always the last argument.
 		return self.cb(*needed_args, **self.additional_kwargs)
 
 class DeviceInfo(object):
@@ -394,7 +394,7 @@ class {{friendly_name}}(GenericObject):
 			additional_kwargs = dict()
 		wrapper = _CallbackWrapper(self, callback, additional_args, additional_kwargs)
 		ctypes_callback = {{ctypes_name}}(wrapper)
-		{{libaudioverse_function_name}}(self.handle, ctypes_callback)
+		{{libaudioverse_function_name}}(self.handle, ctypes_callback, None)
 		#if we get here, we hold both objects; we succeeded in setting because no exception was thrown.
 		self._callbacks["{{callback_name}}"] = (wrapper, ctypes_callback)
 {%endfor%}

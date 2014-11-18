@@ -269,9 +269,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_pushObjectFeed(LavObject* handle, unsigned int 
 Lav_PUBLIC_FUNCTION LavError Lav_createBiquadObject(LavSimulation* sim, unsigned int channels, LavObject** destination);
 
 //pull object:
-typedef void (*LavPullObjectAudioCallback)(LavObject* obj, int frames, int channels, float* buffer);
+typedef void (*LavPullObjectAudioCallback)(LavObject* obj, int frames, int channels, float* buffer, void* userdata);
 Lav_PUBLIC_FUNCTION LavError Lav_createPullObject(LavSimulation* simulation, unsigned int sr, unsigned int channels, LavObject** destination);
-Lav_PUBLIC_FUNCTION LavError Lav_pullObjectSetAudioCallback(LavObject* object, LavPullObjectAudioCallback callback);
+Lav_PUBLIC_FUNCTION LavError Lav_pullObjectSetAudioCallback(LavObject* object, LavPullObjectAudioCallback callback, void* userdata);
 
 #ifdef __cplusplus
 }

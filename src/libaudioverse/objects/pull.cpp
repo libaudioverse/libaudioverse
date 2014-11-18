@@ -25,6 +25,7 @@ class LavPullObject: public LavObject {
 	std::shared_ptr<LavResampler> resampler = nullptr;
 	float* incoming_buffer = nullptr, *resampled_buffer = nullptr;
 	LavPullObjectAudioCallback callback = nullptr;
+	void* callback_userdata = nullptr;
 };
 
 LavPullObject::LavPullObject(std::shared_ptr<LavSimulation> sim, unsigned int inputSr, unsigned int channels): LavObject(Lav_OBJTYPE_PULL, sim, 0, channels) {
@@ -47,7 +48,7 @@ void LavPullObject::process() {
 		got += resampler->write(resampled_buffer, block_size-got);
 		if(got >= block_size) break; //we may have done it on this iteration.
 		if(callback) {
-			callback(this, block_size, channels, incoming_buffer);
+			callback(this, block_size, channels, incoming_buffer, callback_userdata);
 		} else {
 			memset(incoming_buffer, 0, block_size*sizeof(float)*channels);
 		}
@@ -70,10 +71,11 @@ Lav_PUBLIC_FUNCTION LavError Lav_createPullObject(LavSimulation* simulation, uns
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_pullObjectSetAudioCallback(LavObject* object, LavPullObjectAudioCallback callback) {
+Lav_PUBLIC_FUNCTION LavError Lav_pullObjectSetAudioCallback(LavObject* object, LavPullObjectAudioCallback callback, void* userdata) {
 	PUB_BEGIN
 	LOCK(*object);
 	if(object->getType() != Lav_OBJTYPE_PULL) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
 	((LavPullObject*)object)->callback = callback;
+	((LavPullObject*)object)->callback_userdata = userdata;
 	PUB_END
 }
