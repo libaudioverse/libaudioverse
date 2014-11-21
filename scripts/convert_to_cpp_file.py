@@ -21,6 +21,7 @@ Do not edit.*/
 
 char {{array_name}}[] = {{"{"}}{%for i in chars%}'{{i}}',{%if loop.index%40 == 0%}
 {%endif%}{%endfor%}{{"}"}};
+unsigned int {{array_name}}_size = {{chars|length}}*sizeof(char);
 """
 
 with file(input_file_name, "rb") as f:

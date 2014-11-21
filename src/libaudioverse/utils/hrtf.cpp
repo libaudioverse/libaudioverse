@@ -14,6 +14,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_macros.hpp>
 #include <libaudioverse/private_errors.hpp>
 #include <libaudioverse/private_kernels.hpp>
+#include <libaudioverse/private_data.hpp>
 #include <math.h>
 #include <memory>
 #include <algorithm>
@@ -49,7 +50,7 @@ unsigned int LavHrtfData::getLength() {
 	return hrir_length;
 }
 
-void LavHrtfData::loadFromFile(std::string path, int forSr) {
+void LavHrtfData::loadFromFile(std::string path, unsigned int forSr) {
 	//first, load the file if we can.
 	FILE *fp = fopen(path.c_str(), "rb");
 	if(fp == nullptr) throw LavErrorException(Lav_ERROR_FILE);
@@ -64,15 +65,23 @@ void LavHrtfData::loadFromFile(std::string path, int forSr) {
 	//do the read.
 	size_t read;
 	read = fread(data, 1, size, fp);
+	loadFromBuffer(read, data, forSr);
+	delete[] data;
+}
 
+void LavHrtfData::loadFromDefault(unsigned int forSr) {
+	loadFromBuffer(default_hrtf_size, default_hrtf, forSr);
+}
+
+void LavHrtfData::loadFromBuffer(unsigned int length, char* buffer, unsigned int forSr) {
 	//we now handle endianness.
-	int32_t endianness_marker = *(int32_t*)data;
-	if(endianness_marker != 1) reverse_endianness(data, size, 4);
+	int32_t endianness_marker = *(int32_t*)buffer;
+	if(endianness_marker != 1) reverse_endianness(buffer, length, 4);
 	//read it again; if it is still not 1, something has gone badly wrong.
-	endianness_marker = *(int32_t*)data;
+	endianness_marker = *(int32_t*)buffer;
 	if(endianness_marker != 1) throw LavErrorException(Lav_ERROR_HRTF_INVALID);
 
-	char* iterator = data;
+	char* iterator = buffer;
 	const unsigned int window_size = 4;
 
 	//read the header information.
@@ -104,8 +113,8 @@ void LavHrtfData::loadFromFile(std::string path, int forSr) {
 	int before_hrir_length = *(int32_t*)iterator;
 	iterator += window_size;
 
-	unsigned int size_so_far = iterator-data;
-	size_t size_remaining = size-size_so_far;
+	unsigned int length_so_far = iterator-buffer;
+	size_t size_remaining = length-length_so_far;
 	//we must have enough remaining to be all hrir hrirs.
 	size_t hrir_size = before_hrir_length*hrir_count*sizeof(float);
 	if(hrir_size != size_remaining) throw LavErrorException(Lav_ERROR_HRTF_INVALID);
