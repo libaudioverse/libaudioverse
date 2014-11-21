@@ -144,23 +144,7 @@ void LavHrtfData::loadFromBuffer(unsigned int length, char* buffer, unsigned int
 	hrir_length = final_hrir_length;
 	samplerate = forSr;
 	delete[] tempBuffer;
-	//this final loop cleans up the impulse responses a bit.
-	float maxOutput = 0.0f;
-	for(unsigned int elev = 0; elev < elev_count; elev++) {
-		for(unsigned int az = 0; az < azimuth_counts[elev]; az++) {
-			float sum = 0.0f;
-			for(int j = 0; j < hrir_length; j++) sum+= fabs(hrirs[elev][az][j]);
-			if(sum > maxOutput) maxOutput = sum;
-		}
-	}
-	//go over it all one more time, and normalize.
-	for(unsigned int elev = 0; elev < elev_count; elev++) {
-		for(unsigned int az = 0; az < azimuth_counts[elev]; az++) {
-			for(unsigned int j = 0; j < hrir_length; j++) {
-//				hrirs[elev][az][j] /= maxOutput;
-			}
-		}
-	}
+
 	if(temporary_buffer1) delete[] temporary_buffer1;
 	if(temporary_buffer2) delete[] temporary_buffer2;
 	temporary_buffer1 = new float[hrir_length];
