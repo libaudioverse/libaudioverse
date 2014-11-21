@@ -72,9 +72,14 @@ objects:
   doc_name: Biquad Filter
  Lav_OBJTYPE_PULL:
   callbacks: [audio]
+  doc_name: Pull Object
  Lav_OBJTYPE_GRAPH_LISTENER:
   callbacks: [listening]
+  doc_name: graph Listener
  Lav_OBJTYPE_CUSTOM:
   callbacks: [processing]
+  doc_name: Custom Object
+ Lav_OBJTYPE_RINGMOD:
+  doc_name: Ring Modulator
 additional_important_enums:
  - Lav_LOGGING_LEVELS

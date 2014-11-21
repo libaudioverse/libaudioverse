@@ -105,6 +105,7 @@ enum Lav_OBJTYPES {
 	Lav_OBJTYPE_PULL = 12,
 	Lav_OBJTYPE_GRAPH_LISTENER = 13,
 	Lav_OBJTYPE_CUSTOM = 14,
+	Lav_OBJTYPE_RINGMOD = 15,
 };
 
 /**Object states.*/
@@ -285,6 +286,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_graphListenerObjectSetListeningCallback(LavObje
 typedef void (*LavCustomObjectProcessingCallback)(LavObject* obj, unsigned int frames, unsigned int numInputs, float** inputs, unsigned int numOutputs, float** outputs, void* userdata);
 Lav_PUBLIC_FUNCTION LavError Lav_createCustomObject(LavSimulation* simulation, unsigned int inputs, unsigned int outputs, LavObject** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_customObjectSetProcessingCallback(LavObject* obj, LavCustomObjectProcessingCallback callback, void* userdata);
+
+Lav_PUBLIC_FUNCTION LavError Lav_createRingmodObject(LavSimulation* sim, LavObject** destination);
 #ifdef __cplusplus
 }
 #endif
