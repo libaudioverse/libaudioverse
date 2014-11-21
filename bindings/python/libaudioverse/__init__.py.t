@@ -387,7 +387,19 @@ class {{friendly_name}}(GenericObject):
 {%for callback_name in metadata['objects'].get(object_name, dict()).get('callbacks', [])%}
 {%set libaudioverse_function_name = "_lav."+friendly_name|camelcase_to_underscores+"_set_"+callback_name+"_callback"%}
 {%set ctypes_name = "_libaudioverse.Lav"+friendly_name+callback_name|underscores_to_camelcase(True)+"Callback"%}
+	def get_{{callback_name}}(self):
+		cb = self._callbacks.get("{{callback_name}}", None)
+		if cb is None:
+			return None
+		else:
+			return cb[0]
+
 	def set_{{callback_name}}_callback(self, callback, additional_args = None, additional_kwargs = None):
+		if callback is None:
+			#delete the key, clear the callback with Libaudioverse.
+			{{libaudioverse_function_name}}(self.handle, None, None)
+			del self._callbacks[{{callback_name}}]
+			return
 		if additional_args is None:
 			additionnal_args = ()
 		if additional_kwargs is None:
@@ -396,7 +408,8 @@ class {{friendly_name}}(GenericObject):
 		ctypes_callback = {{ctypes_name}}(wrapper)
 		{{libaudioverse_function_name}}(self.handle, ctypes_callback, None)
 		#if we get here, we hold both objects; we succeeded in setting because no exception was thrown.
-		self._callbacks["{{callback_name}}"] = (wrapper, ctypes_callback)
+		#As this is just for GC and the getter, we don't deal with the overhead of an object, and just use tuples.
+		self._callbacks["{{callback_name}}"] = (callback, wrapper, ctypes_callback)
 {%endfor%}
 
 {%endfor%}
