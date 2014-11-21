@@ -106,7 +106,11 @@ void LavHrtfObject::reset() {
 Lav_PUBLIC_FUNCTION LavError Lav_createHrtfObject(LavSimulation* simulation, const char* hrtfPath, LavObject** destination) {
 	PUB_BEGIN
 	auto hrtf = std::make_shared<LavHrtfData>();
-	hrtf->loadFromFile(hrtfPath, simulation->getSr());
+	if(std::string(hrtfPath) != "default") {
+		hrtf->loadFromFile(hrtfPath, simulation->getSr());
+	} else {
+		hrtf->loadFromDefault(simulation->getSr());
+	}
 	LOCK(*simulation);
 	auto retval = createHrtfObject(incomingPointer<LavSimulation>(simulation), hrtf);
 	*destination = outgoingPointer<LavObject>(retval);

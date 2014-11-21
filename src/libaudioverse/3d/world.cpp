@@ -82,7 +82,11 @@ Lav_PUBLIC_FUNCTION LavError Lav_createWorldObject(LavSimulation* simulation, co
 	PUB_BEGIN
 	LOCK(*simulation);
 	auto hrtf = std::make_shared<LavHrtfData>();
-	hrtf->loadFromFile(hrtfPath, simulation->getSr());
+	if(std::string(hrtfPath) != "default") {
+		hrtf->loadFromFile(hrtfPath, simulation->getSr());
+	} else {
+		hrtf->loadFromDefault(simulation->getSr());
+	}
 	auto retval = createWorldObject(incomingPointer<LavSimulation>(simulation), 2, hrtf);
 	*destination = outgoingPointer<LavObject>(retval);
 	PUB_END
