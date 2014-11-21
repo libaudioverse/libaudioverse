@@ -10,4 +10,5 @@ mono_library/
 build/
 *.pyc
 *.hrtf
+!default_hrtf.hrtf
 venv/
