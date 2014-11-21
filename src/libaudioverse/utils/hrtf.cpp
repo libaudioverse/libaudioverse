@@ -15,6 +15,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_errors.hpp>
 #include <libaudioverse/private_kernels.hpp>
 #include <libaudioverse/private_data.hpp>
+#include <libaudioverse/private_memory.hpp>
 #include <math.h>
 #include <memory>
 #include <algorithm>
@@ -73,12 +74,15 @@ void LavHrtfData::loadFromDefault(unsigned int forSr) {
 	loadFromBuffer(default_hrtf_size, default_hrtf, forSr);
 }
 
+#define convi(b) safeConvertMemory<int32_t>(b)
+#define convf(b) safeConvertMemory<float>*(b)
+
 void LavHrtfData::loadFromBuffer(unsigned int length, char* buffer, unsigned int forSr) {
 	//we now handle endianness.
-	int32_t endianness_marker = *(int32_t*)buffer;
+	int32_t endianness_marker =convi(buffer);
 	if(endianness_marker != 1) reverse_endianness(buffer, length, 4);
 	//read it again; if it is still not 1, something has gone badly wrong.
-	endianness_marker = *(int32_t*)buffer;
+	endianness_marker = convi(buffer);;
 	if(endianness_marker != 1) throw LavErrorException(Lav_ERROR_HRTF_INVALID);
 
 	char* iterator = buffer;
@@ -86,22 +90,22 @@ void LavHrtfData::loadFromBuffer(unsigned int length, char* buffer, unsigned int
 
 	//read the header information.
 	iterator += window_size;//skip the endianness marker, which is handled above.
-	samplerate = *(int32_t*)iterator;
+	samplerate = convi(iterator);
 
 	iterator += window_size;
-	hrir_count = *(int32_t*)iterator;
+	hrir_count = convi(iterator);
 	iterator += window_size;
-	elev_count = *(int32_t*)iterator;
+	elev_count = convi(iterator);
 	iterator += window_size;
-	min_elevation = *(int32_t*)iterator;
+	min_elevation = convi(iterator);
 	iterator += window_size;
-	max_elevation = *(int32_t*)iterator;
+	max_elevation = convi(iterator);
 	iterator += window_size;
 
 	//this is the first "dynamic" piece of information.
 	azimuth_counts = new unsigned int[elev_count];
 	for(unsigned int i = 0; i < elev_count; i++) {
-		azimuth_counts[i] = *(int32_t*)iterator;
+		azimuth_counts[i] = convi(iterator);
 		iterator += window_size;
 	}
 
@@ -110,7 +114,7 @@ void LavHrtfData::loadFromBuffer(unsigned int length, char* buffer, unsigned int
 	for(unsigned int i = 0; i < elev_count; i++) sum_sanity_check +=azimuth_counts[i];
 	if(sum_sanity_check != hrir_count) throw LavErrorException(Lav_ERROR_HRTF_INVALID);
 
-	int before_hrir_length = *(int32_t*)iterator;
+	int before_hrir_length = convi(iterator);
 	iterator += window_size;
 
 	unsigned int length_so_far = iterator-buffer;
@@ -128,16 +132,18 @@ void LavHrtfData::loadFromBuffer(unsigned int length, char* buffer, unsigned int
 
 	//the above gives us what amounts to a 2d array.  The first dimension represents elevation.  The second dimension represents azimuth going clockwise.
 	//fill it.
+	float* tempBuffer = new float[before_hrir_length]();
 	int final_hrir_length = 0;
 	for(unsigned int elev = 0; elev < elev_count; elev++) {
 		for(unsigned int azimuth = 0; azimuth < azimuth_counts[elev]; azimuth++) {
-			staticResamplerKernel(samplerate, forSr, before_hrir_length, (float*)iterator, &final_hrir_length, &hrirs[elev][azimuth]);
+			memcpy(tempBuffer, iterator, sizeof(float)*before_hrir_length);
+			staticResamplerKernel(samplerate, forSr, before_hrir_length, tempBuffer, &final_hrir_length, &hrirs[elev][azimuth]);
 			iterator+=before_hrir_length*sizeof(float);
 		}
 	}
 	hrir_length = final_hrir_length;
 	samplerate = forSr;
-
+	delete[] tempBuffer;
 	//this final loop cleans up the impulse responses a bit.
 	float maxOutput = 0.0f;
 	for(unsigned int elev = 0; elev < elev_count; elev++) {

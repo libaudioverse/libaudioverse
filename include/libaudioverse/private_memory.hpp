@@ -4,7 +4,9 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include <map>
 #include <memory>
+#include <string.h>
 #include <mutex>
+//contains some various memory-related bits and pieces, as well as the smart pointer marshalling.
 
 /**This is a standalone component that knows how to hold onto smart pointers, avoid accidentally duplicating entries, and cast the entries before giving them to us.
 
@@ -35,3 +37,11 @@ t* outgoingPointer(std::shared_ptr<t> ptr) {
 }
 
 void initializeMemoryModule();
+
+/**This template uses memcpy to perform a safe type pun and avoid violating strict aliasing.*/
+template<class t>
+t safeConvertMemory(char* b) {
+	t tmp;
+	memcpy(&tmp, b, sizeof(t));
+	return tmp;
+}
