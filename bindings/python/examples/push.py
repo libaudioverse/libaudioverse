@@ -10,7 +10,7 @@ libaudioverse.initialize()
 
 sim = libaudioverse.Simulation(device_index = -1, block_size = 1024, mix_ahead = 2)
 p = libaudioverse.Push(sim, 48000, 2)
-sim.output_object = p
+
 def audio_callback(obj):
 	p.feed(len(stereo), stereo)
 
@@ -18,7 +18,9 @@ def out_callback(obj):
 	p.feed(len(stereo), stereo)
 
 p.threshold = 0.1
-p.audio_callback = audio_callback
-p.out_callback = out_callback
+p.audio_event = audio_callback
+p.out_event = out_callback
+sim.output_object = p
+
 time.sleep(10.0)
 libaudioverse.shutdown()
