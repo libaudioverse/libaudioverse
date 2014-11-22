@@ -359,8 +359,8 @@ class GenericObject(object):
 		_lav.object_reset(self)
 
 {%for object_name in constants.iterkeys()|prefix_filter("Lav_OBJTYPE_")|remove_filter("Lav_OBJTYPE_GENERIC")%}
-{%set friendly_name = object_name|strip_prefix("Lav_OBJTYPE_")|lower|underscores_to_camelcase(True) + "Object"%}
-{%set constructor_name = "Lav_create" + friendly_name%}
+{%set friendly_name = object_name|strip_prefix("Lav_OBJTYPE_")|lower|underscores_to_camelcase(True)%}
+{%set constructor_name = "Lav_create" + friendly_name + "Object"%}
 {%set constructor_arg_names = functions[constructor_name].input_args|map(attribute='name')|map('camelcase_to_underscores')|list-%}
 class {{friendly_name}}(GenericObject):
 	def __init__(self{%if constructor_arg_names|length > 0%}, {%endif%}{{constructor_arg_names|join(', ')}}):
@@ -376,17 +376,17 @@ class {{friendly_name}}(GenericObject):
 {%endfor%}
 
 {%for func_name, func_info in metadata['objects'].get(object_name, dict()).get('extra_functions', dict()).iteritems()%}
-{%set friendly_name = func_info['name']%}
+{%set friendly_func_name = func_info['name']%}
 {%set func = functions[func_name]%}
 {%set lav_func = func.name|without_lav|camelcase_to_underscores%}
-	def {{friendly_name}}({{func.input_args|map(attribute='name')|list|join(', ')}}):
+	def {{friendly_func_name}}({{func.input_args|map(attribute='name')|list|join(', ')}}):
 		return _lav.{{lav_func}}({{func.input_args|map(attribute='name')|list|join(', ')}})
 
 {%endfor%}
 
 {%for callback_name in metadata['objects'].get(object_name, dict()).get('callbacks', [])%}
-{%set libaudioverse_function_name = "_lav."+friendly_name|camelcase_to_underscores+"_set_"+callback_name+"_callback"%}
-{%set ctypes_name = "_libaudioverse.Lav"+friendly_name+callback_name|underscores_to_camelcase(True)+"Callback"%}
+{%set libaudioverse_function_name = "_lav."+friendly_name|camelcase_to_underscores+"_object_set_"+callback_name+"_callback"%}
+{%set ctypes_name = "_libaudioverse.Lav"+friendly_name+"Object"+callback_name|underscores_to_camelcase(True)+"Callback"%}
 	def get_{{callback_name}}(self):
 		cb = self._callbacks.get("{{callback_name}}", None)
 		if cb is None:

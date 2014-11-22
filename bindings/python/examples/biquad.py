@@ -9,8 +9,8 @@ print """Biquad demo.
 Please enter the path to a file in a format supported by Libsndfile: typically wave or ogg."""
 filepath = raw_input()
 filepath = os.path.abspath(filepath)
-filenode = libaudioverse.FileObject(sim, filepath)
-bq = libaudioverse.BiquadObject(sim, 2)
+filenode = libaudioverse.File(sim, filepath)
+bq = libaudioverse.Biquad(sim, 2)
 if filenode.output_count == 1:
 	bq.inputs[0] = filenode, 0
 	bq.inputs[1] = filenode, 0

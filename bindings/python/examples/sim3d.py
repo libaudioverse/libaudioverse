@@ -4,12 +4,12 @@ import collections
 libaudioverse.initialize()
 
 sim = libaudioverse.Simulation(device_index = -1)
-world = libaudioverse.WorldObject(sim, "mit.hrtf")
-source = libaudioverse.SourceObject(sim, world)
+world = libaudioverse.World(sim, "mit.hrtf")
+source = libaudioverse.Source(sim, world)
 print """Enter a path to a sound file.
 For best results, this should be mono.  If not, only the first (usually left) channel will be used."""
 filepath = raw_input()
-f = libaudioverse.FileObject(sim, filepath)
+f = libaudioverse.File(sim, filepath)
 f.looping = True
 source.inputs[0] = f, 0
 sim.output_object = world

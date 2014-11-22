@@ -10,9 +10,9 @@ import struct
 
 libaudioverse.initialize()
 sim = libaudioverse.Simulation()
-w1 = libaudioverse.SineObject(sim)
-w2 = libaudioverse.SineObject(sim)
-listener = libaudioverse.GraphListenerObject(sim, 2) #This passes through, and can--in this case--take the place of mixers.
+w1 = libaudioverse.Sine(sim)
+w2 = libaudioverse.Sine(sim)
+listener = libaudioverse.GraphListener(sim, 2) #This passes through, and can--in this case--take the place of mixers.
 listener.inputs[0] = w1, 0
 listener.inputs[1] = w2, 0
 

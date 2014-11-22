@@ -9,7 +9,7 @@ stereo = [i for l in zip(l, r) for i in l]*20
 libaudioverse.initialize()
 
 sim = libaudioverse.Simulation(device_index = -1, block_size = 1024, mix_ahead = 2)
-p = libaudioverse.PushObject(sim, 48000, 2)
+p = libaudioverse.Push(sim, 48000, 2)
 sim.output_object = p
 def audio_callback(obj):
 	p.feed(len(stereo), stereo)
