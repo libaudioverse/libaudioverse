@@ -38,10 +38,12 @@ metadata/metadata.cpp
 
 #mathematical kernels for common dsp operations.
 kernels/convolution.cpp
-kernels/panning.cpp
 kernels/resamplers.cpp
 kernels/interleaving.cpp
 kernels/mixing_matrix.cpp
+
+#Like kernels, but stateful.
+implementations/panner.cpp
 
 #specific node types.
 objects/sine.cpp
@@ -50,7 +52,7 @@ objects/hard_limiter.cpp
 objects/hrtf.cpp
 objects/mixer.cpp
 objects/delay.cpp
-objects/amplitude_panner.cpp
+#objects/amplitude_panner.cpp
 objects/push.cpp
 objects/biquad.cpp
 objects/pull.cpp
