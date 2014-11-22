@@ -16,3 +16,6 @@ std::shared_ptr<LavObject> createMixerObject(std::shared_ptr<LavSimulation> simu
 std::shared_ptr<LavObject> createSineObject(std::shared_ptr<LavSimulation> Simulation);
 std::shared_ptr<LavObject> createDelayObject(std::shared_ptr<LavSimulation> simulation, unsigned int lines);
 std::shared_ptr<LavObject>createAmplitudePannerObject(std::shared_ptr<LavSimulation> Simulation);
+std::shared_ptr<LavObject> createCustomObject(std::shared_ptr<LavSimulation> sim, unsigned int inputs, unsigned int outputs);
+std::shared_ptr<LavObject> createGraphListenerObject(std::shared_ptr<LavSimulation> sim, unsigned int channels);
+std::shared_ptr<LavObject> createPullObject(std::shared_ptr<LavSimulation> sim, unsigned int inputSr, unsigned int channels);
