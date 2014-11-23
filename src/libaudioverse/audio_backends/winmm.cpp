@@ -20,6 +20,37 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <windows.h>
 #include <mmreg.h> //WAVEFORMATEXTENSIBLE
 
+WAVEFORMATEXTENSIBLE makeFormat(unsigned int channels, unsigned int sr, bool isExtended) {
+	//lookup table so we can easily pull out masks.
+	unsigned int chanmasks[] = {
+		0,
+		0,
+		SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT,
+		0,
+		0,
+		0,
+		SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_FRONT_CENTER|SPEAKER_LOW_FREQUENCY|SPEAKER_BACK_LEFT|SPEAKER_BACK_RIGHT,
+		0,
+		SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_FRONT_CENTER|SPEAKER_LOW_FREQUENCY|SPEAKER_BACK_LEFT|SPEAKER_BACK_RIGHT|SPEAKER_SIDE_LEFT|SPEAKER_SIDE_RIGHT,
+	};
+	WAVEFORMATEXTENSIBLE format;
+	format.Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE;
+	format.Format.nSamplesPerSec = sr;
+	format.Format.wBitsPerSample = 16;
+	format.Format.cbSize = 22; //this comes directly from msdn, which gives no further explanation.
+	format.Samples.wValidBitsPerSample = 16;
+	format.Format.nAvgBytesPerSec = channels*2*sr;
+	format.Format.nBlockAlign = channels*2;
+	format.Format.nChannels = channels;
+	format.dwChannelMask = chanmasks[channels];
+	format.SubFormat = KSDATAFORMAT_SUBTYPE_PCM;
+	if(isExtended == false) {
+		format.Format.cbSize = 0;
+		format.Format.wFormatTag = WAVE_FORMAT_PCM;
+	}
+	return format;
+}
+
 class LavWinmmDevice: public  LavDevice {
 	public:
 	LavWinmmDevice(std::shared_ptr<LavSimulation> sim, unsigned int channels, unsigned int mixAhead, UINT_PTR which, unsigned int targetSr);
@@ -43,27 +74,13 @@ LavWinmmDevice::LavWinmmDevice(std::shared_ptr<LavSimulation> sim, unsigned int 
 	if(buffer_state_changed_event == NULL) throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
 	//we try all the channels until we get a device, and then bale out if we've still failed.
 	unsigned int chancounts[] = {8, 6, 2};
-	unsigned int chanmasks[] = {
-		SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_FRONT_CENTER|SPEAKER_LOW_FREQUENCY|SPEAKER_BACK_LEFT|SPEAKER_BACK_RIGHT|SPEAKER_SIDE_LEFT|SPEAKER_SIDE_RIGHT,
-		SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_FRONT_CENTER|SPEAKER_LOW_FREQUENCY|SPEAKER_BACK_LEFT|SPEAKER_BACK_RIGHT,
-		SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT,
-	};
 	MMRESULT res = 0;
 	winmm_handle = nullptr;
-	format.Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE;
-	format.Format.nSamplesPerSec = targetSr;
-	format.Format.wBitsPerSample = 16;
-	format.Format.cbSize = 22; //this comes directly from msdn, which gives no further explanation.
-	format.Samples.wValidBitsPerSample = 16;
 	bool gotAudio = false;
 	unsigned int neededChannels = channels < 2 ? 2 : channels;
 	for(unsigned int i = 0; i < 3; i++) {
 		if(chancounts[i] > neededChannels) continue;
-		format.Format.nAvgBytesPerSec = chancounts[i]*2*targetSr;
-		format.Format.nBlockAlign = chancounts[i]*2;
-		format.Format.nChannels = chancounts[i];
-		format.dwChannelMask = chanmasks[i];
-		format.SubFormat = KSDATAFORMAT_SUBTYPE_PCM;
+		format = makeFormat(chancounts[i], targetSr, true);
 		res = waveOutOpen(&winmm_handle, which, (WAVEFORMATEX*)&format, (DWORD)buffer_state_changed_event, NULL, CALLBACK_EVENT);
 		if(res == MMSYSERR_NOERROR) {
 			gotAudio = true;
@@ -72,11 +89,7 @@ LavWinmmDevice::LavWinmmDevice(std::shared_ptr<LavSimulation> sim, unsigned int 
 	}
 	if(gotAudio == false) { //we can still maybe get something by falling back to a last resort.
 		//we make this back into a waveformatex and request stereo.
-		format.Format.cbSize = 0;
-		format.Format.wFormatTag = WAVE_FORMAT_PCM;
-		format.Format.nChannels = 2;
-		format.Format.nAvgBytesPerSec = 2*2*targetSr;
-		format.Format.nBlockAlign = 4;
+		format = makeFormat(2, targetSr, false);
 		res = waveOutOpen(&winmm_handle, which, (WAVEFORMATEX*)&format, (DWORD)buffer_state_changed_event, NULL, CALLBACK_EVENT);
 		if(res != MMSYSERR_NOERROR) throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
 	}
