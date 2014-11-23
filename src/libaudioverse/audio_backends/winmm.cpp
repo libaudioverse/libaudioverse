@@ -100,7 +100,7 @@ LavWinmmDevice::LavWinmmDevice(std::shared_ptr<LavSimulation> sim, unsigned int 
 		winmm_headers[i].dwBufferLength = sizeof(short)*sim->getBlockSize()*channels;
 		winmm_headers[i].dwFlags = WHDR_DONE;
 	}
-	init(targetSr, channels);
+	init(targetSr, neededChannels);
 	start();
 }
 
