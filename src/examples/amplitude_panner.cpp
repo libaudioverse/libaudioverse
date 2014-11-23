@@ -18,23 +18,28 @@ if((x) != Lav_ERROR_NONE) {\
 } while(0)\
 
 void main(int argc, char** args) {
-	if(argc != 2) {
-		printf("Usage: %s <sound file>", args[0]);
+	if(argc != 3) {
+		printf("Usage: %s <sound file> <channels>", args[0]);
+		return;
+	}
+	int channels = 0;
+	sscanf(args[2], "%d", &channels);
+	if(channels != 2
+&& channels != 6
+&& channels != 8) {
+		printf("Cannot work with %d channels", channels);
 		return;
 	}
 	LavSimulation* simulation;
 	LavObject* fileNode, *panNode, *limit;
 	ERRCHECK(Lav_initialize());
-	ERRCHECK(Lav_createSimulationForDevice(-1, 2, 44100, 1024, 2, &simulation));
+	ERRCHECK(Lav_createSimulationForDevice(-1, channels, 44100, 1024, 2, &simulation));
 	ERRCHECK(Lav_createFileObject(simulation, args[1], &fileNode));
-	float map[] = {270.0f, 90.0f};
 	ERRCHECK(Lav_createAmplitudePannerObject(simulation, &panNode));
-	ERRCHECK(Lav_objectReplaceFloatArrayProperty(panNode, Lav_PANNER_CHANNEL_MAP, 2, map));
-
+	ERRCHECK(Lav_amplitudePannerObjectConfigureStandardMap(panNode, channels));
 	ERRCHECK(Lav_objectSetInput(panNode, 0, fileNode, 0));
-	ERRCHECK(Lav_createHardLimiterObject(simulation, 2, &limit));
-	ERRCHECK(Lav_objectSetInput(limit, 0, panNode, 0));
-	ERRCHECK(Lav_objectSetInput(limit, 1, panNode, 1));
+	ERRCHECK(Lav_createHardLimiterObject(simulation, channels, &limit));
+	for(unsigned int i = 0; i < channels; i++) ERRCHECK(Lav_objectSetInput(limit, i, panNode, i));
 	ERRCHECK(Lav_simulationSetOutputObject(simulation, limit));
 	int shouldContinue = 1;
 	printf("Enter pairs of numbers separated by whitespace, where the first is azimuth (anything) and the second\n"

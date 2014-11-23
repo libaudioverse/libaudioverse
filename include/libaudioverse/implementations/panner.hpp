@@ -8,8 +8,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 //very very private. This does almost no error checking.
 
 struct LavPannerEntry {
-	LavPannerEntry(float _x, float _y, unsigned int _c): x(_x), y(_y), channel(_c) {}
-	float x, y;
+	LavPannerEntry(float _angle, unsigned int _c): angle(_angle), channel(_c) {}
+	float angle;
 	unsigned int channel;
 };
 
@@ -17,7 +17,7 @@ class LavPannerImplementation {
 	public:
 	void reset();
 	void addEntry(float angle, unsigned int channel);
-	void pan(float angle, unsigned int block_size, float* input, float** outputs);
+	void pan(float angle, unsigned int block_size, float* input, unsigned int outputCount, float** outputs);
 	private:
 	std::vector<LavPannerEntry> channels;
 };

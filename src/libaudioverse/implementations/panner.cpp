@@ -14,41 +14,59 @@ void LavPannerImplementation::reset() {
 }
 
 void LavPannerImplementation::addEntry(float angle, unsigned int channel) {
-	//note that clockwise/counterclockwise literally doesn't matter with this algorithm.
-	//it is important only that we be consistent.
-	float x = cos(angle);
-	float y = sin(angle);
-	channels.emplace_back(x, y, channel);
+	channels.emplace_back(ringmodf(angle, 360.0f), channel);
+	std::sort(channels.begin(), channels.end(),
+	[](LavPannerEntry &a, LavPannerEntry& b) {return a.angle < b.angle;});
 }
 
-void LavPannerImplementation::pan(float angle, unsigned int block_size, float* input, float** outputs) {
+void LavPannerImplementation::pan(float angle, unsigned int block_size, float* input, unsigned int outputCount, float** outputs) {
 	//the two degenerates: 0 and 1 channels.
 	if(input == nullptr || outputs == nullptr) return;
 	if(channels.size() == 0 || channels.size() == 1) {
 		std::copy(input, input+block_size, outputs[channels[0].channel]);
 		return;
 	}
-	float x = cos(angle);
-	float y = sin(angle);
-	//we use a lambda because we need to capture the above variables.
-	std::function<bool(LavPannerEntry, LavPannerEntry)> comparer = [=](const LavPannerEntry &a, const LavPannerEntry &b) {
-		float dist1 = (a.x-x)*(a.x-x)+(a.y-y)*(a.y-y);
-		float dist2 = (b.x-x)*(b.x-x)+(b.y-y)*(b.y-y);
-		return dist1 < dist2;
-	};
-	std::sort(channels.begin(), channels.end(), comparer);
-	LavPannerEntry &closest = channels[0], &second_closest = channels[1];
-	//dot product and acos give us angles. Magnitude is normalized to 1 already, no need for division.
-	float dot1 = closest.x*x+closest.y*y;
-	float dot2 = second_closest.x*x+second_closest.y*y;
-	float angle1 = acos(dot1 > 1.0f ? 1.0f: dot1); //floating point error might trigger range issues.
-	float angle2 = acos(dot2 > 1.0f ? 1.0f : dot2);
-	float angleSum = angle1+angle2;
-	float weight1 = angle1/angleSum;
-	float weight2 = angle2/angleSum;
-	unsigned int channel1 = closest.channel, channel2 = second_closest.channel;
-	for(unsigned int i = 0; i < block_size; i++) {
-		outputs[channel1][i] = weight1*input[i];
-		outputs[channel2][i] = weight2*input[i];
+	angle = ringmodf(angle, 360.0f);
+	unsigned int left = 0, right = 0;
+	bool found_right= false;
+	for(unsigned int i = 0; i < channels.size(); i++) {
+		if(channels[i].angle >= angle) {
+			right = i;
+			found_right = true;
+			break;
+		}
+	}
+	if(found_right == false) {
+		right = 0;
+		left = channels.size()-1;
+	}
+	else {
+		left = right == 0 ? channels.size()-1 : right-1;
+	}
+	unsigned int channel1 = channels[left].channel;
+	unsigned int channel2 = channels[right].channel;
+	//two cases: we wrapped or didn't.
+	float angle1, angle2, angleSum;
+	if(right == 0) { //left is all the way around, special handling is needed.
+		if(angle >= channels[left].angle) {
+			angle1 = angle-channels[left].angle; //angle between left and source.
+			angle2 = (360.0f-angle)+channels[right].angle;
+		}
+		else {
+			angle1 = (360-channels[left].angle)+angle;
+			angle2 = fabs(channels[right].angle-angle);
+		}
+	}
+	else {
+		angle1 = fabs(channels[left].angle-angle);
+		angle2 = fabs(channels[right].angle-angle);
+	}
+	angleSum = angle1+angle2;
+	float weight2 = angle1/angleSum;
+	float weight1 = angle2/angleSum;
+	for(unsigned int i = 0; i < outputCount; i++) {
+		if(i == channel1) for(unsigned int j = 0; j < block_size; j++) outputs[i][j] = weight1*input[j];
+		else if(i == channel2) for(unsigned int j = 0; j < block_size; j++) outputs[i][j] = weight2*input[j];
+		else memset(outputs[i], 0, sizeof(float)*block_size);
 	}
 }

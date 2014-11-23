@@ -265,7 +265,10 @@ Lav_PUBLIC_FUNCTION LavError Lav_createHrtfObject(LavSimulation *simulation, con
 Lav_PUBLIC_FUNCTION LavError Lav_createMixerObject(LavSimulation* sim, unsigned int maxParents, unsigned int inputsPerParent, LavObject **destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterObject(LavSimulation* sim, unsigned int numInputs, LavObject** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createDelayObject(LavSimulation* sim, float maxDelay, unsigned int lineCount, LavObject** destination);
+
 Lav_PUBLIC_FUNCTION LavError Lav_createAmplitudePannerObject(LavSimulation* sim, LavObject** destination);
+//can set the standard channel map for 2, 6, and 8 channels. Other values cause Lav_ERROR_RANGE.
+Lav_PUBLIC_FUNCTION LavError Lav_amplitudePannerObjectConfigureStandardMap(LavObject* obj, unsigned int channels);
 
 Lav_PUBLIC_FUNCTION LavError Lav_createPushObject(LavSimulation* simulation, unsigned int sr, unsigned int channels, LavObject** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_pushObjectFeed(LavObject* handle, unsigned int length, float* buffer);

@@ -52,7 +52,7 @@ objects/hard_limiter.cpp
 objects/hrtf.cpp
 objects/mixer.cpp
 objects/delay.cpp
-#objects/amplitude_panner.cpp
+objects/amplitude_panner.cpp
 objects/push.cpp
 objects/biquad.cpp
 objects/pull.cpp
