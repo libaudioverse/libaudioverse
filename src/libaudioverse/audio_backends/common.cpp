@@ -19,7 +19,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 /**Code common to all backends, i.e. enumeration.*/
 
 LavDevice::LavDevice(std::shared_ptr<LavSimulation> sim, unsigned int mixAhead): mix_ahead(mixAhead), simulation(sim) {
-	buffers = new float*[mixAhead+1];
 	buffer_statuses = new std::atomic<int>[mixAhead+1];
 	for(unsigned int i = 0; i < mixAhead + 1; i++) buffer_statuses[i].store(0);
 }
@@ -36,6 +35,7 @@ void LavDevice::init(unsigned int targetSr, unsigned int channels) {
 		if(output_buffer_size%4) output_buffer_size = output_buffer_size+(4-output_buffer_size%4);
 	}
 	unsigned int goodBufferSize = output_buffer_size*channels;
+	buffers = new float*[mix_ahead];
 	for(unsigned int i = 0; i < mix_ahead+1; i++) {
 		buffers[i] = new float[goodBufferSize];
 	}
@@ -44,18 +44,21 @@ void LavDevice::init(unsigned int targetSr, unsigned int channels) {
 void LavDevice::start() {
 	mixing_thread_continue.test_and_set();
 	mixing_thread = std::thread([this] () {mixingThreadFunction();});
+	started = true;
 }
 
 LavDevice::~LavDevice() {
 	stop();
+	if(buffers != nullptr)
 	for(unsigned int i = 0; i < mix_ahead+1; i++) {
-		delete[] buffers[i];
+		if(buffers[i]) delete[] buffers[i];
 	}
-	delete[] buffers;
-	delete[] buffer_statuses;
+	if(buffers) delete[] buffers;
+	if(buffer_statuses) delete[] buffer_statuses;
 }
 
 void LavDevice::stop() {
+	if(started == false) return;
 	mixing_thread_continue.clear();
 	mixing_thread.join();
 }

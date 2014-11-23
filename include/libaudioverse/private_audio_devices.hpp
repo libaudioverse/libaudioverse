@@ -34,6 +34,7 @@ class LavDevice {
 	std::atomic_flag mixing_thread_continue;
 	std::shared_ptr<LavSimulation> simulation = nullptr;
 	std::thread mixing_thread;
+	bool started = false;
 };
 
 class LavSimulationFactory {
