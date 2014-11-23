@@ -25,7 +25,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 //list from greatest to least priority.
 LavSimulationFactoryCreationFunction possible_backends[] = {
 	createWinmmSimulationFactory,
-//	createOpenALSimulationFactory,
+	createOpenALSimulationFactory,
 };
 LavSimulationFactory* chosen_factory = nullptr;
 
