@@ -213,22 +213,53 @@ std::string LavWinmmSimulationFactory::getName() {
 	return "Winmm";
 }
 
+struct WinmmCapabilities {
+	unsigned int sr;
+	std::string name;
+	unsigned int channels;
+};
+
+WinmmCapabilities getWinmmCapabilities(UINT index) {
+	WAVEFORMATEXTENSIBLE format;
+	WAVEOUTCAPS caps;
+	waveOutGetDevCaps(index, &caps, sizeof(caps));
+	WinmmCapabilities retval;
+	retval.sr = 44100;
+	retval.channels = 2;
+	retval.name = std::string(caps.szPname);
+	unsigned int srs[] = {48000, 44100, 22050};
+	unsigned int srsCount = 3;
+	unsigned int channels[] = {8, 6, 2};
+	unsigned int channelsCount = 3;
+	for(unsigned int i = 0; i < channelsCount; i++) {
+		for(unsigned int j = 0; j < srsCount; j++) {
+			format = makeFormat(channels[i], srs[j], true);
+			auto res = waveOutOpen(NULL, index, (WAVEFORMATEX*)&format, NULL, NULL, WAVE_FORMAT_QUERY);
+			if(res == MMSYSERR_NOERROR) {
+				retval.sr = srs[j];
+				retval.channels = channels[i];
+				goto done;
+			}
+		}
+	}
+	done:
+	return retval;
+}
+
 bool LavWinmmSimulationFactory::scan() {
 	std::vector<float> newLatencies;
 	std::vector<std::string> newNames;
 	std::vector<int> newMaxChannels;
 	std::vector<unsigned int> newSrs; //we need this, because these are not easy to query.
-	WAVEOUTCAPS caps;
 	UINT devs = waveOutGetNumDevs();
+	WinmmCapabilities caps;
 	for(UINT i = 0; i < devs; i++) {
-		waveOutGetDevCaps(i, &caps, sizeof(caps));
+		caps = getWinmmCapabilities(i);
 		//todo: unicode support
-		std::string name(caps.szPname);
+		std::string name(caps.name);
 		//channels.
-		int channels = caps.wChannels;
-		unsigned int sr = 0;		
-		sr = winmmExtractSr(caps);
-		if(sr == 0) return false;
+		unsigned int channels = caps.channels;
+		unsigned int sr = caps.sr;
 		newMaxChannels.push_back(channels);
 		newNames.push_back(name);
 		newSrs.push_back(sr);
