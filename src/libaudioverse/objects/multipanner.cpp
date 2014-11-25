@@ -34,7 +34,7 @@ LavMultipannerObject::LavMultipannerObject(std::shared_ptr<LavSimulation> sim, s
 	inputMixer = createMixerObject(sim, 1, 1);
 	hrtfPanner->setInput(0, inputMixer, 0);
 	amplitudePanner->setInput(0, inputMixer, 0);
-	configureSubgraph(inputMixer, hrtfPanner);
+	configureSubgraph(inputMixer, amplitudePanner);
 	//We have to make property forwarders.
 	getProperty(Lav_PANNER_AZIMUTH).setPostChangedCallback([this](){forwardAzimuth();});
 	getProperty(Lav_PANNER_ELEVATION).setPostChangedCallback([this](){forwardElevation();});
@@ -89,7 +89,11 @@ Lav_PUBLIC_FUNCTION LavError Lav_createMultipannerObject(LavSimulation* sim, cha
 	PUB_BEGIN
 	LOCK(*sim);
 	std::shared_ptr<LavHrtfData> hrtf = std::make_shared<LavHrtfData>();
-	hrtf->loadFromFile(hrtfPath, sim->getSr());
+	if(std::string(hrtfPath) == "default") {
+		hrtf->loadFromDefault(sim->getSr());
+	} else {
+		hrtf->loadFromFile(hrtfPath, sim->getSr());
+	}
 	*destination = outgoingPointer<LavObject>(createMultipannerObject(incomingPointer<LavSimulation>(sim), hrtf));
 	PUB_END
 }

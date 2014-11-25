@@ -242,6 +242,7 @@ LavSubgraphObject::LavSubgraphObject(int type, std::shared_ptr<LavSimulation> si
 void LavSubgraphObject::configureSubgraph(std::shared_ptr<LavObject> input, std::shared_ptr<LavObject> output) {
 	subgraph_input = input;
 	subgraph_output = output;
+	simulation->invalidatePlan();
 }
 
 void LavSubgraphObject::computeInputBuffers() {
