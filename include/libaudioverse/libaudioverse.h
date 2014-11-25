@@ -106,6 +106,7 @@ enum Lav_OBJTYPES {
 	Lav_OBJTYPE_GRAPH_LISTENER = 13,
 	Lav_OBJTYPE_CUSTOM = 14,
 	Lav_OBJTYPE_RINGMOD = 15,
+	Lav_OBJTYPE_MULTIPANNER = 16,
 };
 
 /**Object states.*/
@@ -269,6 +270,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_createDelayObject(LavSimulation* sim, float max
 Lav_PUBLIC_FUNCTION LavError Lav_createAmplitudePannerObject(LavSimulation* sim, LavObject** destination);
 //can set the standard channel map for 2, 6, and 8 channels. Other values cause Lav_ERROR_RANGE.
 Lav_PUBLIC_FUNCTION LavError Lav_amplitudePannerObjectConfigureStandardMap(LavObject* obj, unsigned int channels);
+
+Lav_PUBLIC_FUNCTION LavError Lav_createMultipannerObject(LavSimulation* sim, char* hrtfPath, LavObject** destination);
 
 Lav_PUBLIC_FUNCTION LavError Lav_createPushObject(LavSimulation* simulation, unsigned int sr, unsigned int channels, LavObject** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_pushObjectFeed(LavObject* handle, unsigned int length, float* buffer);

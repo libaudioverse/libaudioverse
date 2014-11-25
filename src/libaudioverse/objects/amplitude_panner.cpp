@@ -9,6 +9,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_macros.hpp>
 #include <libaudioverse/private_memory.hpp>
 #include <libaudioverse/implementations/panner.hpp>
+#include <libaudioverse/objects/panner.hpp>
 #include <libaudioverse/private_constants.hpp>
 #include <limits>
 #include <memory>
@@ -20,15 +21,8 @@ float standard_map_stereo[] = {-90.0f, 90.0f};
 float standard_map_51[] = {-22.5f, 22.5f, -110.0f, 110.0f};
 float standard_map_71[] = {-22.5f, 22.5f, -150.0f, 150.0f, -110.0f, 110.0f};
 
-class LavAmplitudePannerObject: public LavObject {
-	public:
-	LavAmplitudePannerObject(std::shared_ptr<LavSimulation> device);
-	virtual void process();
-	void recomputeChannelMap();
-	void configureStandardChannelMap(unsigned int channels);
-	bool map_changed = true;
-	LavPannerImplementation panner;
-};
+//This class needs to be public because of the multipanner, which needs to make a method call against it directly.
+//see include/libaudioverse/objects/panner.hpp.
 
 LavAmplitudePannerObject::LavAmplitudePannerObject(std::shared_ptr<LavSimulation> simulation): LavObject(Lav_OBJTYPE_AMPLITUDE_PANNER, simulation, 1, 0) {
 	getProperty(Lav_PANNER_CHANNEL_MAP).setPostChangedCallback([this](){recomputeChannelMap();});

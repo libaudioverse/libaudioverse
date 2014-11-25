@@ -59,6 +59,7 @@ objects/pull.cpp
 objects/graph_listener.cpp
 objects/custom.cpp
 objects/ringmod.cpp
+objects/multipanner.cpp
 
 #physical outputs, etc.
 audio_backends/common.cpp

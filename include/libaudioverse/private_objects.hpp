@@ -115,6 +115,9 @@ class LavSubgraphObject: public LavObject {
 	virtual std::shared_ptr<LavObject> getInputObject(unsigned int input);
 	virtual unsigned int getInputOutput(unsigned int input);
 	virtual unsigned int getInputCount();
+	//care must be taken with this function.
+	//changing the output object is permissible, but changing the input object will change the parents of the complex object the subgraph represents.
+	//the solution is to protect using a mixer of n channels and 1 parent, connecting to the mixer instead.
 	virtual void configureSubgraph(std::shared_ptr<LavObject> input, std::shared_ptr<LavObject> output);
 	protected:
 	std::shared_ptr<LavObject> subgraph_input, subgraph_output;
