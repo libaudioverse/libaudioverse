@@ -98,14 +98,14 @@ LavWinmmDevice::LavWinmmDevice(std::shared_ptr<LavSimulation> sim, unsigned int 
 		if(res != MMSYSERR_NOERROR) throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
 		outChannels = 2;
 	}
-	for(unsigned int i = 0; i < audio_data.size(); i++) audio_data[i] = new short[sim->getBlockSize()*channels]();
+	init(targetSr, inChannels, outChannels);
+	for(unsigned int i = 0; i < audio_data.size(); i++) audio_data[i] = new short[output_buffer_size];
 	//we can go ahead and set up the headers.
 	for(unsigned int i = 0; i < winmm_headers.size(); i++) {
 		winmm_headers[i].lpData = (LPSTR)audio_data[i];
 		winmm_headers[i].dwBufferLength = sizeof(short)*sim->getBlockSize()*channels;
 		winmm_headers[i].dwFlags = WHDR_DONE;
 	}
-	init(targetSr, inChannels, outChannels);
 	start();
 }
 
@@ -122,7 +122,7 @@ void LavWinmmDevice::shutdown_hook() {
 }
 
 void LavWinmmDevice::winmm_mixer() {
-	float* workspace = new float[simulation->getBlockSize()*channels];
+	float* workspace = new float[output_buffer_size];
 	while(winmm_mixing_flag.test_and_set()) {
 		while(1) {
 			short* nextBuffer = nullptr;
@@ -137,9 +137,9 @@ void LavWinmmDevice::winmm_mixer() {
 			if(nextHeader == nullptr || nextBuffer == nullptr) break;
 			zeroOrNextBuffer(workspace);
 			waveOutUnprepareHeader(winmm_handle, nextHeader, sizeof(WAVEHDR));
-			for(unsigned int i = 0; i < simulation->getBlockSize()*channels; i++) nextBuffer[i] = (short)(workspace[i]*32767);
+			for(unsigned int i = 0; i < output_buffer_size; i++) nextBuffer[i] = (short)(workspace[i]*32767);
 			nextHeader->dwFlags = 0;
-			nextHeader->dwBufferLength = sizeof(short)*simulation->getBlockSize()*channels;
+			nextHeader->dwBufferLength = sizeof(short)*output_buffer_size;
 			nextHeader->lpData = (LPSTR)nextBuffer;
 			waveOutPrepareHeader(winmm_handle, nextHeader, sizeof(WAVEHDR));
 			waveOutWrite(winmm_handle, nextHeader, sizeof(WAVEHDR));
@@ -163,6 +163,7 @@ class LavWinmmSimulationFactory: public LavSimulationFactory {
 	std::vector<std::string> names;
 	std::vector<int> max_channels;
 	std::vector<unsigned int> srs; //we need this, because these are not easy to query.
+	unsigned int mapper_max_channels = 2, mapper_sr = 44100;
 };
 
 LavWinmmSimulationFactory::LavWinmmSimulationFactory() {
@@ -191,7 +192,7 @@ std::shared_ptr<LavSimulation> LavWinmmSimulationFactory::createSimulation(int i
 	if(index < -1 || index > (int)names.size()) throw LavErrorException(Lav_ERROR_RANGE);
 	//create a simulation with the required parameters.
 	std::shared_ptr<LavSimulation> retval = std::make_shared<LavSimulation>(sr, blockSize, mixAhead);
-	std::shared_ptr<LavWinmmDevice> device = std::make_shared<LavWinmmDevice>(retval, channels, index != -1 ? max_channels[index] : 2, mixAhead, index == -1 ? WAVE_MAPPER : index, index == -1 ? 44100 : srs[index]);
+	std::shared_ptr<LavWinmmDevice> device = std::make_shared<LavWinmmDevice>(retval, channels, index != -1 ? max_channels[index] : mapper_max_channels, mixAhead, index == -1 ? WAVE_MAPPER : index, index == -1 ? mapper_sr : srs[index]);
 	retval->associateDevice(device);
 	return retval;
 }
@@ -262,6 +263,10 @@ bool LavWinmmSimulationFactory::scan() {
 	this->latencies = newLatencies;
 	this->names = newNames;
 	this->srs = newSrs;
+	caps = getWinmmCapabilities(WAVE_MAPPER);
+	mapper_max_channels = caps.channels;
+	mapper_sr = caps.sr;
+	printf("Mapper caps: channels=%i and sr=%i\n", mapper_max_channels, mapper_sr);
 	return true;
 }
 
