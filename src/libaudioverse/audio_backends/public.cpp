@@ -89,20 +89,11 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSimulationForDevice(int index, unsigned i
 		sim->getBlock(out, channels, false);
 		sim->unlock();
 	};
-	auto dev = chosen_factory->createDevice(audioFunction, index, false, channels, sr, blockSize, mixAhead);
+	auto dev = chosen_factory->createDevice(audioFunction, index, channels, sr, blockSize, mixAhead);
 	sim->associateDevice(dev);
 	*destination = outgoingPointer<LavSimulation>(sim);
 	PUB_END
 }
-/*
-Lav_PUBLIC_FUNCTION LavError Lav_createSimulationForDeviceSimple(int index, LavSimulation** destination) {
-	PUB_BEGIN
-	//use backend defaults.
-	auto sim = chosen_factory->createSimulation(index, true, 0, 0, 0, 0);
-	*destination = outgoingPointer<LavSimulation>(sim);
-	PUB_END
-}
-*/
 
 //the special case of a device without an output.
 Lav_PUBLIC_FUNCTION LavError Lav_createReadSimulation(unsigned int sr, unsigned int blockSize, LavSimulation** destination) {

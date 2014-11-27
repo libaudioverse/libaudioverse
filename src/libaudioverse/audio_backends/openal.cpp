@@ -156,7 +156,7 @@ class LavOpenALDeviceFactory: public LavDeviceFactory {
 	virtual std::vector<std::string> getOutputNames();
 	virtual std::vector<float> getOutputLatencies();
 	virtual std::vector<int> getOutputMaxChannels();
-	virtual std::shared_ptr<LavDevice> createDevice(std::function<void(float*)> getBlock, int index, bool useDefaults, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead);
+	virtual std::shared_ptr<LavDevice> createDevice(std::function<void(float*)> getBlock, int index, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead);
 	std::string getName();
 	private:
 	std::vector<std::string> names;
@@ -211,13 +211,7 @@ std::vector<std::string> LavOpenALDeviceFactory::getOutputNames() {
 	return names;
 }
 
-std::shared_ptr<LavDevice> LavOpenALDeviceFactory::createDevice(std::function<void(float*)> getBuffer, int index, bool useDefaults, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead) {
-	if(useDefaults) {
-		channels = 2;
-		sr = 44100;
-		mixAhead = 6;
-		blockSize = 512;
-	}
+std::shared_ptr<LavDevice> LavOpenALDeviceFactory::createDevice(std::function<void(float*)> getBuffer, int index, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead) {
 	std::string name;
 	if(index < -1 || index >= (int)names.size()) throw LavErrorException(Lav_ERROR_RANGE);
 	if(index == -1) {

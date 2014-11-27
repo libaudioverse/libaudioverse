@@ -171,10 +171,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_deviceGetLatency(unsigned int index, float* des
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetName(unsigned int index, char** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetChannels(unsigned int index, unsigned int* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createSimulationForDevice(int index, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead, LavSimulation** destination);
-//simpler version. Only needs device index.
-//This exists so that those without audio knowledge can use the library.
-//For some system and backend, this function is basically saying "Do your best".
-//Lav_PUBLIC_FUNCTION LavError Lav_createSimulationForDeviceSimple(int index, LavSimulation** destination);
 
 /**This type of simulation is intended for apps that wish to handle audio themselves: it will not output and time will not advance for it.
 Combine it with Lav_simulationReadBlock to make use of it.*/

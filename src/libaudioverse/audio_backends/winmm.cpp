@@ -154,7 +154,7 @@ class LavWinmmDeviceFactory: public LavDeviceFactory {
 	virtual std::vector<std::string> getOutputNames();
 	virtual std::vector<float> getOutputLatencies();
 	virtual std::vector<int> getOutputMaxChannels();
-	virtual std::shared_ptr<LavDevice> createDevice(std::function<void(float*)> getBuffer, int index, bool useDefaults, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead);
+	virtual std::shared_ptr<LavDevice> createDevice(std::function<void(float*)> getBuffer, int index, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead);
 	virtual unsigned int getOutputCount();
 	virtual bool scan();
 	std::string getName();
@@ -181,13 +181,7 @@ std::vector<int> LavWinmmDeviceFactory::getOutputMaxChannels() {
 	return max_channels;
 }
 
-std::shared_ptr<LavDevice> LavWinmmDeviceFactory::createDevice(std::function<void(float*)> getBuffer, int index, bool useDefaults, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead) {
-	if(useDefaults) {
-		channels = 2;
-		sr = 44100;
-		blockSize = 512;
-		mixAhead = 8;
-	}
+std::shared_ptr<LavDevice> LavWinmmDeviceFactory::createDevice(std::function<void(float*)> getBuffer, int index, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead) {
 	//first, we need to do sanity checks.
 	if(index < -1 || index > (int)names.size()) throw LavErrorException(Lav_ERROR_RANGE);
 	std::shared_ptr<LavDevice> device = std::make_shared<LavWinmmDevice>(getBuffer, blockSize, channels, index != -1 ? max_channels[index] : mapper_max_channels, mixAhead, index == -1 ? WAVE_MAPPER : index, sr, index == -1 ? mapper_sr : srs[index]);
