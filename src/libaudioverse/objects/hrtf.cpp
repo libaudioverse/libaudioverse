@@ -29,7 +29,7 @@ class LavHrtfObject: public LavObject {
 	float prev_azimuth = 0.0f, prev_elevation = 0.0f;
 };
 
-LavHrtfObject::LavHrtfObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf): LavObject(Lav_OBJTYPE_HRTF, simulation, 1, 8) {
+LavHrtfObject::LavHrtfObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf): LavObject(Lav_OBJTYPE_HRTF, simulation, 1, 2) {
 	type = Lav_OBJTYPE_HRTF;
 	this->hrtf = hrtf;
 	left_response = new float[hrtf->getLength()];
