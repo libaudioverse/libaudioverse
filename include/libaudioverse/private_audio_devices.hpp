@@ -25,7 +25,9 @@ class LavDevice {
 	virtual void shutdown_hook();
 	virtual void zeroOrNextBuffer(float* where);
 	virtual void mixingThreadFunction();
-	unsigned int output_buffer_size = 0, mix_ahead = 0, channels = 0, user_requested_channels = 0;
+	unsigned int channels = 0, user_requested_channels = 0;
+	unsigned int mix_ahead = 0;
+	unsigned int input_buffer_size, output_buffer_size, input_buffer_frames, output_buffer_frames;
 	float* mixing_matrix = nullptr;
 	bool should_apply_mixing_matrix = false;
 	unsigned int next_output_buffer = 0;

@@ -44,11 +44,13 @@ void LavDevice::init(unsigned int targetSr, unsigned int userRequestedChannels, 
 	}
 	target_sr = targetSr;
 	//compute an estimated "good" size for the buffers, given the device's blockSize and channels.
-	output_buffer_size = (unsigned int)simulation->getBlockSize();
+	output_buffer_frames = (unsigned int)simulation->getBlockSize();
 	if(targetSr != simulation->getSr()) {
-		output_buffer_size = (unsigned int)(output_buffer_size*(double)targetSr/simulation->getSr());
+		output_buffer_frames = (unsigned int)(output_buffer_frames*(double)targetSr/simulation->getSr());
 	}
-	output_buffer_size *= channels;
+	output_buffer_size = output_buffer_frames*channels;
+	input_buffer_frames = simulation->getBlockSize();
+	input_buffer_size = input_buffer_frames*user_requested_channels;
 	buffers = new float*[mix_ahead];
 	for(unsigned int i = 0; i < mix_ahead+1; i++) {
 		buffers[i] = new float[output_buffer_size];
@@ -101,10 +103,8 @@ void LavDevice::mixingThreadFunction() {
 	LavResampler resampler((unsigned int)simulation->getBlockSize(), user_requested_channels, sourceSr, target_sr);
 	unsigned int currentBuffer = 0;
 	unsigned int sleepFor = (unsigned int)((simulation->getBlockSize()/(double)simulation->getSr())*1000);
-	//this needs to be big enough to be involved in downmixing.
-	float* tempBuffer = new float[output_buffer_size]();
-	float* currentBlock = new float[simulation->getBlockSize()*user_requested_channels]();
-	float* resampledBlock= new float[(output_buffer_size/channels)*user_requested_channels]();
+	float* currentBlock = new float[input_buffer_size]();
+	float* resampledBlock= new float[output_buffer_frames*user_requested_channels]();
 	while(mixing_thread_continue.test_and_set()) {
 		if(buffer_statuses[currentBuffer].load()) { //we've done this one, but the callback hasn't gotten to it yet.
 			if(hasFilledQueueFirstTime == false) {
@@ -122,15 +122,15 @@ void LavDevice::mixingThreadFunction() {
 		else { //we need to resample.
 			unsigned int got = 0;
 			simulation->lock();
-			while(got < output_buffer_size/channels) {
+			while(got < output_buffer_frames) {
 				simulation->getBlock(currentBlock, user_requested_channels, false);
 				resampler.read(currentBlock);
-				got += resampler.write(resampledBlock+got, output_buffer_size/channels-got);
+				got += resampler.write(resampledBlock+got, output_buffer_frames-got);
 			}
 			simulation->unlock();
 		}
 		if(should_apply_mixing_matrix) {
-			applyMixingMatrix((output_buffer_size/channels)*user_requested_channels, sourceSr == target_sr ? currentBlock : resampledBlock, buffers[currentBuffer], user_requested_channels, channels, mixing_matrix);
+			applyMixingMatrix(output_buffer_frames*user_requested_channels, sourceSr == target_sr ? currentBlock : resampledBlock, buffers[currentBuffer], user_requested_channels, channels, mixing_matrix);
 		}
 		else {
 			if(sourceSr == target_sr) {
