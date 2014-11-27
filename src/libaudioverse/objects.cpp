@@ -61,7 +61,7 @@ LavObject::LavObject(int type, std::shared_ptr<LavSimulation> simulation, unsign
 	inputs.resize(numInputs, nullptr);
 	outputs.resize(numOutputs);
 	for(auto i = outputs.begin(); i != outputs.end(); i++) {
-		*i = new float[simulation->getBlockSize()];
+		*i = new float[simulation->getBlockSize()]();
 	}
 
 	this->simulation= simulation;
