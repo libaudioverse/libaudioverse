@@ -70,7 +70,7 @@ void LavSimulation::getBlock(float* out, unsigned int channels, bool mayApplyMix
 	else {
 		for(unsigned int i = 0; i < channels; i++) {
 			if(i < output_object->getOutputCount()) memcpy(out+i*getBlockSize(), output_object->getOutputPointer(i), sizeof(float)*getBlockSize());
-			else memset(out, 0, sizeof(float)*getBlockSize()); //we're beyond the number of inputs.
+			else memset(out+i*getBlockSize(), 0, sizeof(float)*getBlockSize()); //we're beyond the number of inputs.
 		}
 		interleaveSamples(channels, getBlockSize(), out);
 	}
