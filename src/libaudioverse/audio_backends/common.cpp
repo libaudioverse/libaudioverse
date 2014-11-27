@@ -99,14 +99,14 @@ void LavDevice::mixingThreadFunction() {
 		}
 		if(sourceSr == target_sr) {
 			simulation->lock();
-			simulation->getBlock(buffers[currentBuffer], channels);
+			simulation->getBlock(buffers[currentBuffer], channels, false);
 			simulation->unlock();
 		}
 		else { //we need to resample.
 			unsigned int got = 0;
 			simulation->lock();
 			while(got < output_buffer_size) {
-				simulation->getBlock(tempBuffer, channels);
+				simulation->getBlock(tempBuffer, channels, false);
 				resampler.read(tempBuffer);
 				got += resampler.write(buffers[currentBuffer]+got, output_buffer_size-got);
 			}
