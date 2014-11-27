@@ -3,14 +3,13 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/private_audio_devices.hpp>
-#include <libaudioverse/private_simulation.hpp>
 #include <libaudioverse/private_resampler.hpp>
 #include <libaudioverse/private_data.hpp>
 #include <libaudioverse/private_errors.hpp>
 #include <libaudioverse/private_kernels.hpp>
 #include <string>
 #include <vector>
-#include <string>
+#include <functional>
 #include <memory>
 #include <utility>
 #include <mutex>
@@ -21,19 +20,24 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 /**Code common to all backends, i.e. enumeration.*/
 
-LavDevice::LavDevice(std::shared_ptr<LavSimulation> sim, unsigned int mixAhead): mix_ahead(mixAhead), simulation(sim) {
-	buffer_statuses = new std::atomic<int>[mixAhead+1];
-	for(unsigned int i = 0; i < mixAhead + 1; i++) buffer_statuses[i].store(0);
+LavDevice::LavDevice() {
 }
 
 //these are the next two steps in initialization, and are consequently put before the destructor.
-void LavDevice::init(unsigned int targetSr, unsigned int userRequestedChannels, unsigned int channels) {
-	this->channels = channels;
-	this->user_requested_channels = userRequestedChannels;
-	if(channels != userRequestedChannels) {
+void LavDevice::init(std::function<void(float*)> getBuffer, unsigned int inputBufferFrames,  unsigned int inputBufferChannels, unsigned int inputBufferSr, unsigned int outputChannels, unsigned int outputSr, unsigned int mixAhead) {
+	input_buffer_frames = inputBufferFrames;
+	input_channels = inputChannels;
+	mix_ahead = mixAhead;
+	input_buffer_size = inputBufferFrames*inputBufferChannels;
+	input_sr = inputBufferSr;
+	output_sr = outputSr;
+	output_channels = outputChannels;
+	buffer_statuses = new std::atomic<int>[mixAhead+1];
+	for(unsigned int i = 0; i < mixAhead + 1; i++) buffer_statuses[i].store(0);
+	if(input_channels != output_channels) {
 		float* match = nullptr;
 		for(LavMixingMatrixInfo* i = mixing_matrix_list; i->pointer; i++) {
-			if(i->in_channels == userRequestedChannels && i->out_channels == channels) {
+			if(i->in_channels == input_channels && i->out_channels == output_channels) {
 				match = i->pointer;
 				break;
 			}
@@ -42,15 +46,12 @@ void LavDevice::init(unsigned int targetSr, unsigned int userRequestedChannels, 
 		mixing_matrix = match;
 		should_apply_mixing_matrix = true;
 	}
-	target_sr = targetSr;
-	//compute an estimated "good" size for the buffers, given the device's blockSize and channels.
-	output_buffer_frames = (unsigned int)simulation->getBlockSize();
-	if(targetSr != simulation->getSr()) {
-		output_buffer_frames = (unsigned int)(output_buffer_frames*(double)targetSr/simulation->getSr());
+	if(input_sr != output_sr) is_resampling = true;
+	output_buffer_frames = input_buffer_frames;
+	if(output_sr != input_sr) {
+		output_buffer_frames = (unsigned int)(output_buffer_frames*(double)output_sr/input_sr;
 	}
 	output_buffer_size = output_buffer_frames*channels;
-	input_buffer_frames = simulation->getBlockSize();
-	input_buffer_size = input_buffer_frames*user_requested_channels;
 	buffers = new float*[mix_ahead];
 	for(unsigned int i = 0; i < mix_ahead+1; i++) {
 		buffers[i] = new float[output_buffer_size];
@@ -99,10 +100,9 @@ void LavDevice::shutdown_hook() {
 
 void LavDevice::mixingThreadFunction() {
 	bool hasFilledQueueFirstTime = false;
-	unsigned int sourceSr = (unsigned int)simulation->getSr();
-	LavResampler resampler((unsigned int)simulation->getBlockSize(), user_requested_channels, sourceSr, target_sr);
+	LavResampler resampler(input_buffer_frames, input_channels, input_sr, output_sr);
 	unsigned int currentBuffer = 0;
-	unsigned int sleepFor = (unsigned int)((simulation->getBlockSize()/(double)simulation->getSr())*1000);
+	unsigned int sleepFor = (unsigned int)((double)input_buffer_frames/input_sr)*1000);
 	float* currentBlock = new float[input_buffer_size]();
 	float* resampledBlock= new float[output_buffer_frames*user_requested_channels]();
 	while(mixing_thread_continue.test_and_set()) {
@@ -114,26 +114,22 @@ void LavDevice::mixingThreadFunction() {
 			if(sleepFor) std::this_thread::sleep_for(std::chrono::milliseconds(sleepFor));
 			continue;
 		}
-		if(sourceSr == target_sr) {
-			simulation->lock();
-			simulation->getBlock(currentBlock, user_requested_channels, false);
-			simulation->unlock();
+		if(is_resampling == false) {
+			get_buffer(currentBlock);
 		}
 		else { //we need to resample.
 			unsigned int got = 0;
-			simulation->lock();
 			while(got < output_buffer_frames) {
-				simulation->getBlock(currentBlock, user_requested_channels, false);
+				get_buffer(currentBlock);
 				resampler.read(currentBlock);
 				got += resampler.write(resampledBlock+got, output_buffer_frames-got);
 			}
-			simulation->unlock();
 		}
 		if(should_apply_mixing_matrix) {
-			applyMixingMatrix(output_buffer_frames*user_requested_channels, sourceSr == target_sr ? currentBlock : resampledBlock, buffers[currentBuffer], user_requested_channels, channels, mixing_matrix);
+			applyMixingMatrix(output_buffer_frames*user_requested_channels, is_resampling == false ? currentBlock : resampledBlock, buffers[currentBuffer], user_requested_channels, channels, mixing_matrix);
 		}
 		else {
-			if(sourceSr == target_sr) {
+			if(is_resampling == false) {
 				std::copy(currentBlock, currentBlock+output_buffer_size, buffers[currentBuffer]);
 			}
 			else {

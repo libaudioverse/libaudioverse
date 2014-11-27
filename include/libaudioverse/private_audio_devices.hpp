@@ -11,13 +11,14 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <atomic>
 #include <mutex>
 #include <thread>
+#include <functional>
 
 /**A physical output.*/
 class LavDevice {
 	protected:
-	LavDevice(std::shared_ptr<LavSimulation> simulation, unsigned int mixAhead);
+	LavDevice();
 	virtual ~LavDevice();
-	virtual void init(unsigned int targetSr, unsigned int userRequestedChannels, unsigned int channels); //second step in initialization. We can't just fall through to the constructor.
+	virtual void init(std::function<void(float*)> getBuffer, unsigned int inputBufferFrames,  unsigned int inputBufferChannels, unsigned int inputBufferSr, unsigned int outputChannels, unsigned int outputSr, unsigned int mixAhead); //second step in initialization. We can't just fall through to the constructor.
 	virtual void start(); //final step in initialization via subclasses: starts the background thread.
 	virtual void stop(); //stop the output.
 	//these hooks are run in the background thread, and should be overridden in subclasses.
@@ -25,19 +26,22 @@ class LavDevice {
 	virtual void shutdown_hook();
 	virtual void zeroOrNextBuffer(float* where);
 	virtual void mixingThreadFunction();
-	unsigned int channels = 0, user_requested_channels = 0;
+	unsigned int input_channels = 0, output_channels = 0;
 	unsigned int mix_ahead = 0;
 	unsigned int input_buffer_size, output_buffer_size, input_buffer_frames, output_buffer_frames;
+	unsigned int input_sr = 0;
+	unsigned int output_sr = 0;
+	bool is_resampling = false;
 	float* mixing_matrix = nullptr;
 	bool should_apply_mixing_matrix = false;
 	unsigned int next_output_buffer = 0;
 	unsigned int callback_buffer_index = 0;
-	unsigned int target_sr = 0;
+
 	float** buffers = nullptr;
 	std::atomic<int>* buffer_statuses = nullptr;
 	std::atomic_flag mixing_thread_continue;
-	std::shared_ptr<LavSimulation> simulation = nullptr;
 	std::thread mixing_thread;
+	std::function<void(float*)> get_buffer;
 	bool started = false;
 };
 
