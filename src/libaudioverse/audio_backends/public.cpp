@@ -23,17 +23,16 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 /**Public facing code.  This includes the rest of the library itself and the public API.*/
 
 //list from greatest to least priority.
-LavSimulationFactoryCreationFunction possible_backends[] = {
-	createWinmmSimulationFactory,
-	createOpenALSimulationFactory,
+LavDeviceFactoryCreationFunction possible_backends[] = {
+	createWinmmDeviceFactory,
+	createOpenALDeviceFactory,
 };
-LavSimulationFactory* chosen_factory = nullptr;
+LavDeviceFactory* chosen_factory = nullptr;
 
-
-void initializeSimulationFactory() {
+void initializeDeviceFactory() {
 	log(Lav_LOG_LEVEL_INFO, "Initializing audio backend.");
-	for(unsigned int i = 0; i < sizeof(possible_backends)/sizeof(LavSimulationFactoryCreationFunction); i++) {
-		LavSimulationFactory* possible = possible_backends[i]();
+	for(unsigned int i = 0; i < sizeof(possible_backends)/sizeof(LavDeviceFactoryCreationFunction); i++) {
+		LavDeviceFactory* possible = possible_backends[i]();
 		if(possible != nullptr) {
 			chosen_factory = possible;
 			log(Lav_LOG_LEVEL_INFO, "Chosen backend is %s", chosen_factory->getName().c_str());
@@ -84,11 +83,18 @@ Lav_PUBLIC_FUNCTION LavError Lav_deviceGetChannels(unsigned int index, unsigned 
 Lav_PUBLIC_FUNCTION LavError Lav_createSimulationForDevice(int index, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead, LavSimulation** destination) {
 	PUB_BEGIN
 	//don't use defaults, use user options.
-	auto sim = chosen_factory->createSimulation(index, false, channels, sr, blockSize, mixAhead);
+	auto sim = std::make_shared<LavSimulation>(sr, blockSize, mixAhead);
+	auto audioFunction = [=](float* out) {
+		sim->lock();
+		sim->getBlock(out, channels, false);
+		sim->unlock();
+	};
+	auto dev = chosen_factory->createDevice(audioFunction, index, false, channels, sr, blockSize, mixAhead);
+	sim->associateDevice(dev);
 	*destination = outgoingPointer<LavSimulation>(sim);
 	PUB_END
 }
-
+/*
 Lav_PUBLIC_FUNCTION LavError Lav_createSimulationForDeviceSimple(int index, LavSimulation** destination) {
 	PUB_BEGIN
 	//use backend defaults.
@@ -96,6 +102,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSimulationForDeviceSimple(int index, LavS
 	*destination = outgoingPointer<LavSimulation>(sim);
 	PUB_END
 }
+*/
 
 //the special case of a device without an output.
 Lav_PUBLIC_FUNCTION LavError Lav_createReadSimulation(unsigned int sr, unsigned int blockSize, LavSimulation** destination) {

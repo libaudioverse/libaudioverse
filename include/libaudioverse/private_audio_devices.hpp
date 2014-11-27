@@ -3,7 +3,6 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #pragma once
 #include "libaudioverse.h"
-#include "private_simulation.hpp"
 #include <vector>
 #include <set>
 #include <memory>
@@ -16,7 +15,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 /**A physical output.*/
 class LavDevice {
 	protected:
-	LavDevice();
+	LavDevice() = default;
 	virtual ~LavDevice();
 	virtual void init(std::function<void(float*)> getBuffer, unsigned int inputBufferFrames,  unsigned int inputBufferChannels, unsigned int inputBufferSr, unsigned int outputChannels, unsigned int outputSr, unsigned int mixAhead); //second step in initialization. We can't just fall through to the constructor.
 	virtual void start(); //final step in initialization via subclasses: starts the background thread.
@@ -45,28 +44,27 @@ class LavDevice {
 	bool started = false;
 };
 
-class LavSimulationFactory {
+class LavDeviceFactory {
 	public:
-	LavSimulationFactory() = default;
-	virtual ~LavSimulationFactory() {}
+	LavDeviceFactory() = default;
+	virtual ~LavDeviceFactory() {}
 	virtual std::vector<std::string> getOutputNames() = 0;
 	//returns -1.0f for unknown.
 	virtual std::vector<float> getOutputLatencies() = 0;
 	virtual std::vector<int> getOutputMaxChannels() = 0;
 	//if useDefaults is on, the last three parameters don't matter.
 	//useDefaults is a request to the backend to do something appropriate.
-	virtual std::shared_ptr<LavSimulation> createSimulation(int index, bool useDefaults, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead) = 0;
+	virtual std::shared_ptr<LavDevice> createDevice(std::function<void(float*)> getBuffer, int index, bool useDefaults, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead) = 0;
 	virtual unsigned int getOutputCount();
 	virtual std::string getName();
 	protected:
 	int output_count = 0;
 };
 
-typedef LavSimulationFactory* (*LavSimulationFactoryCreationFunction)();
-LavSimulationFactory* createWinmmSimulationFactory();
-LavSimulationFactory* createOpenALSimulationFactory();
-
+typedef LavDeviceFactory* (*LavDeviceFactoryCreationFunction)();
+LavDeviceFactory* createWinmmDeviceFactory();
+LavDeviceFactory* createOpenALDeviceFactory();
 
 //finally, the function that initializes all of this.
-void initializeSimulationFactory();
+void initializeDeviceFactory();
 

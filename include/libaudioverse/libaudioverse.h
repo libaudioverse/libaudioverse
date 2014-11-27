@@ -174,7 +174,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSimulationForDevice(int index, unsigned i
 //simpler version. Only needs device index.
 //This exists so that those without audio knowledge can use the library.
 //For some system and backend, this function is basically saying "Do your best".
-Lav_PUBLIC_FUNCTION LavError Lav_createSimulationForDeviceSimple(int index, LavSimulation** destination);
+//Lav_PUBLIC_FUNCTION LavError Lav_createSimulationForDeviceSimple(int index, LavSimulation** destination);
 
 /**This type of simulation is intended for apps that wish to handle audio themselves: it will not output and time will not advance for it.
 Combine it with Lav_simulationReadBlock to make use of it.*/

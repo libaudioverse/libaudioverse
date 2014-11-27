@@ -3,7 +3,6 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/private_audio_devices.hpp>
-#include <libaudioverse/private_simulation.hpp>
 #include <libaudioverse/private_resampler.hpp>
 #include <libaudioverse/private_errors.hpp>
 #include <string>
@@ -12,6 +11,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <utility>
 #include <mutex>
 #include <map>
+#include <functional>
 #include <string.h>
 #include <algorithm>
 #include <thread>
@@ -28,7 +28,7 @@ class LavOpenALDevice: public  LavDevice {
 	public:
 	virtual void startup_hook();
 	virtual void shutdown_hook();
-	LavOpenALDevice(std::shared_ptr<LavSimulation> sim, unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixAhead, std::string which);
+	LavOpenALDevice(std::function<void(float*)> getBuffer, unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixAhead, std::string which);
 	void sendingThreadFunction();
 	ALCdevice* device = nullptr;
 	ALCcontext *context = nullptr;
@@ -43,7 +43,7 @@ class LavOpenALDevice: public  LavDevice {
 	unsigned int sending_thread_sleep_time = 0;
 };
 
-LavOpenALDevice::LavOpenALDevice(std::shared_ptr<LavSimulation> sim, unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixAhead, std::string which): LavDevice(sim, mixAhead) {
+LavOpenALDevice::LavOpenALDevice(std::function<void(float*)> getBuffer, unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixAhead, std::string which) {
 	auto lg = std::lock_guard<std::mutex>(*openal_linearizer);
 	unsigned int outChannels = channels;
 	device = alcOpenDevice(which.c_str());
@@ -83,7 +83,7 @@ LavOpenALDevice::LavOpenALDevice(std::shared_ptr<LavSimulation> sim, unsigned in
 	block = new float[samples_per_buffer];
 	outgoing = new short[samples_per_buffer];
 	sending_thread_sleep_time = (unsigned int)(((float)blockSize/sr)*1000);
-	init(sr, channels, outChannels);
+	init(getBuffer, blockSize, channels, sr, channels, sr, mixAhead);
 	start();
 }
 
@@ -104,7 +104,7 @@ void LavOpenALDevice::sendingThreadFunction() {
 	for(auto i = buffers.begin(); i != buffers.end(); i++) {
 		for(unsigned int j = 0; j < samples_per_buffer; j++) outgoing[j] = (short)(block[j]*32767);
 		buff = *i;
-		alBufferData(buff, data_format, outgoing, 2*samples_per_buffer, target_sr); //in this case, target_sr == source_sr always.
+		alBufferData(buff, data_format, outgoing, 2*samples_per_buffer, output_sr); //in this case, output_sr == input_sr always.
 	}
 	//enqueue everything in the buffers vector.
 	openal_linearizer->lock();
@@ -130,7 +130,7 @@ void LavOpenALDevice::sendingThreadFunction() {
 			openal_linearizer->unlock();
 			continue;
 		}
-		alBufferData(buff, data_format, outgoing, 2*samples_per_buffer, target_sr); //in this case, target_sr == source_sr always.
+		alBufferData(buff, data_format, outgoing, 2*samples_per_buffer, output_sr); //in this case, target_sr == source_sr always.
 		if(alGetError() != AL_NONE) {
 			openal_linearizer->unlock();
 			continue;
@@ -150,13 +150,13 @@ void LavOpenALDevice::sendingThreadFunction() {
 	}
 }
 
-class LavOpenALSimulationFactory: public LavSimulationFactory {
+class LavOpenALDeviceFactory: public LavDeviceFactory {
 	public:
-	LavOpenALSimulationFactory();
+	LavOpenALDeviceFactory();
 	virtual std::vector<std::string> getOutputNames();
 	virtual std::vector<float> getOutputLatencies();
 	virtual std::vector<int> getOutputMaxChannels();
-	virtual std::shared_ptr<LavSimulation> createSimulation(int index, bool useDefaults, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead);
+	virtual std::shared_ptr<LavDevice> createDevice(std::function<void(float*)> getBlock, int index, bool useDefaults, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead);
 	std::string getName();
 	private:
 	std::vector<std::string> names;
@@ -165,11 +165,11 @@ class LavOpenALSimulationFactory: public LavSimulationFactory {
 	void scan();
 };
 
-LavOpenALSimulationFactory::LavOpenALSimulationFactory() {
+LavOpenALDeviceFactory::LavOpenALDeviceFactory() {
 	scan();
 }
 
-void LavOpenALSimulationFactory::scan() {
+void LavOpenALDeviceFactory::scan() {
 	std::vector<std::string> newNames;
 	std::vector<float> newLatencies;
 	std::vector<int> newMaxChannels;
@@ -195,23 +195,23 @@ void LavOpenALSimulationFactory::scan() {
 	output_count = names.size();
 }
 
-std::string LavOpenALSimulationFactory::getName() {
+std::string LavOpenALDeviceFactory::getName() {
 	return "OpenAL";
 }
 
-std::vector<float> LavOpenALSimulationFactory::getOutputLatencies() {
+std::vector<float> LavOpenALDeviceFactory::getOutputLatencies() {
 	return latencies;
 }
 
-std::vector<int>LavOpenALSimulationFactory::getOutputMaxChannels() {
+std::vector<int>LavOpenALDeviceFactory::getOutputMaxChannels() {
 	return max_channels;
 }
 
-std::vector<std::string> LavOpenALSimulationFactory::getOutputNames() {
+std::vector<std::string> LavOpenALDeviceFactory::getOutputNames() {
 	return names;
 }
 
-std::shared_ptr<LavSimulation> LavOpenALSimulationFactory::createSimulation(int index, bool useDefaults, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead) {
+std::shared_ptr<LavDevice> LavOpenALDeviceFactory::createDevice(std::function<void(float*)> getBuffer, int index, bool useDefaults, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead) {
 	if(useDefaults) {
 		channels = 2;
 		sr = 44100;
@@ -228,13 +228,11 @@ std::shared_ptr<LavSimulation> LavOpenALSimulationFactory::createSimulation(int 
 	}
 	if(((channels == 1 || channels == 2
 || channels == 6 ||channels == 8) && sr != 0 && blockSize != 0) == false)throw LavErrorException(Lav_ERROR_RANGE);
-	auto sim = std::make_shared<LavSimulation>(sr, blockSize, mixAhead);
-	auto backend = std::make_shared<LavOpenALDevice>(sim, sr, channels, blockSize, mixAhead, name);
-	sim->associateDevice(backend);
-	return sim;
+	auto backend = std::make_shared<LavOpenALDevice>(getBuffer, sr, channels, blockSize, mixAhead, name);
+	return backend;
 }
 
-LavSimulationFactory* createOpenALSimulationFactory() {
+LavDeviceFactory* createOpenALDeviceFactory() {
 	openal_linearizer = new std::mutex();
-	return new LavOpenALSimulationFactory();
+	return new LavOpenALDeviceFactory();
 }

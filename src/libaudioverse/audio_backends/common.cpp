@@ -20,19 +20,17 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 /**Code common to all backends, i.e. enumeration.*/
 
-LavDevice::LavDevice() {
-}
-
-//these are the next two steps in initialization, and are consequently put before the destructor.
+//these are the two steps in initialization, and are consequently put before the destructor.
 void LavDevice::init(std::function<void(float*)> getBuffer, unsigned int inputBufferFrames,  unsigned int inputBufferChannels, unsigned int inputBufferSr, unsigned int outputChannels, unsigned int outputSr, unsigned int mixAhead) {
 	input_buffer_frames = inputBufferFrames;
-	input_channels = inputChannels;
+	input_channels = inputBufferChannels;
 	mix_ahead = mixAhead;
 	input_buffer_size = inputBufferFrames*inputBufferChannels;
 	input_sr = inputBufferSr;
 	output_sr = outputSr;
 	output_channels = outputChannels;
 	buffer_statuses = new std::atomic<int>[mixAhead+1];
+	get_buffer = getBuffer;
 	for(unsigned int i = 0; i < mixAhead + 1; i++) buffer_statuses[i].store(0);
 	if(input_channels != output_channels) {
 		float* match = nullptr;
@@ -49,9 +47,9 @@ void LavDevice::init(std::function<void(float*)> getBuffer, unsigned int inputBu
 	if(input_sr != output_sr) is_resampling = true;
 	output_buffer_frames = input_buffer_frames;
 	if(output_sr != input_sr) {
-		output_buffer_frames = (unsigned int)(output_buffer_frames*(double)output_sr/input_sr;
+		output_buffer_frames = (unsigned int)(output_buffer_frames*(double)output_sr)/input_sr;
 	}
-	output_buffer_size = output_buffer_frames*channels;
+	output_buffer_size = output_buffer_frames*output_channels;
 	buffers = new float*[mix_ahead];
 	for(unsigned int i = 0; i < mix_ahead+1; i++) {
 		buffers[i] = new float[output_buffer_size];
@@ -102,9 +100,9 @@ void LavDevice::mixingThreadFunction() {
 	bool hasFilledQueueFirstTime = false;
 	LavResampler resampler(input_buffer_frames, input_channels, input_sr, output_sr);
 	unsigned int currentBuffer = 0;
-	unsigned int sleepFor = (unsigned int)((double)input_buffer_frames/input_sr)*1000);
+	unsigned int sleepFor = (unsigned int)(((double)input_buffer_frames/input_sr)*1000);
 	float* currentBlock = new float[input_buffer_size]();
-	float* resampledBlock= new float[output_buffer_frames*user_requested_channels]();
+	float* resampledBlock= new float[output_buffer_frames*input_channels]();
 	while(mixing_thread_continue.test_and_set()) {
 		if(buffer_statuses[currentBuffer].load()) { //we've done this one, but the callback hasn't gotten to it yet.
 			if(hasFilledQueueFirstTime == false) {
@@ -126,7 +124,7 @@ void LavDevice::mixingThreadFunction() {
 			}
 		}
 		if(should_apply_mixing_matrix) {
-			applyMixingMatrix(output_buffer_frames*user_requested_channels, is_resampling == false ? currentBlock : resampledBlock, buffers[currentBuffer], user_requested_channels, channels, mixing_matrix);
+			applyMixingMatrix(output_buffer_frames*input_channels, is_resampling == false ? currentBlock : resampledBlock, buffers[currentBuffer], input_channels, output_channels, mixing_matrix);
 		}
 		else {
 			if(is_resampling == false) {
@@ -143,10 +141,10 @@ void LavDevice::mixingThreadFunction() {
 	shutdown_hook();
 }
 
-unsigned int LavSimulationFactory::getOutputCount() {
+unsigned int LavDeviceFactory::getOutputCount() {
 	return (unsigned int)output_count;
 }
 
-std::string LavSimulationFactory::getName() {
+std::string LavDeviceFactory::getName() {
 	return "Invalid backend: subclass failed to implement";
 }

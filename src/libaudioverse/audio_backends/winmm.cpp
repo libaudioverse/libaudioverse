@@ -3,9 +3,9 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/private_audio_devices.hpp>
-#include <libaudioverse/private_simulation.hpp>
 #include <libaudioverse/private_resampler.hpp>
 #include <libaudioverse/private_errors.hpp>
+#include <functional>
 #include <string>
 #include <vector>
 #include <string>
@@ -54,7 +54,7 @@ WAVEFORMATEXTENSIBLE makeFormat(unsigned int channels, unsigned int sr, bool isE
 class LavWinmmDevice: public  LavDevice {
 	public:
 	//channels is what user requested, maxChannels is what the device can support at most.
-	LavWinmmDevice(std::shared_ptr<LavSimulation> sim, unsigned int channels, unsigned int maxChannels, unsigned int mixAhead, UINT_PTR which, unsigned int targetSr);
+	LavWinmmDevice(std::function<void(float*)> getBuffer, unsigned int blockSize, unsigned int channels, unsigned int maxChannels, unsigned int mixAhead, UINT_PTR which, unsigned int sourceSr, unsigned int targetSr);
 	virtual void startup_hook();
 	virtual void shutdown_hook();
 	void winmm_mixer();
@@ -66,7 +66,7 @@ class LavWinmmDevice: public  LavDevice {
 	std::atomic_flag winmm_mixing_flag;
 };
 
-LavWinmmDevice::LavWinmmDevice(std::shared_ptr<LavSimulation> sim, unsigned int channels, unsigned int maxChannels, unsigned int mixAhead, UINT_PTR which, unsigned int targetSr): LavDevice(sim, mixAhead) {
+LavWinmmDevice::LavWinmmDevice(std::function<void(float*)> getBuffer, unsigned int blockSize, unsigned int channels, unsigned int maxChannels, unsigned int mixAhead, UINT_PTR which, unsigned int sourceSr, unsigned int targetSr) {
 	WAVEFORMATEXTENSIBLE format = {0};
 	mixAhead += 1;
 	winmm_headers.resize(mixAhead);
@@ -98,12 +98,12 @@ LavWinmmDevice::LavWinmmDevice(std::shared_ptr<LavSimulation> sim, unsigned int 
 		if(res != MMSYSERR_NOERROR) throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
 		outChannels = 2;
 	}
-	init(targetSr, inChannels, outChannels);
+	init(getBuffer, blockSize, channels, sourceSr, outChannels, targetSr, mixAhead);
 	for(unsigned int i = 0; i < audio_data.size(); i++) audio_data[i] = new short[output_buffer_size];
 	//we can go ahead and set up the headers.
 	for(unsigned int i = 0; i < winmm_headers.size(); i++) {
 		winmm_headers[i].lpData = (LPSTR)audio_data[i];
-		winmm_headers[i].dwBufferLength = sizeof(short)*sim->getBlockSize()*channels;
+		winmm_headers[i].dwBufferLength = sizeof(short)*blockSize*channels;
 		winmm_headers[i].dwFlags = WHDR_DONE;
 	}
 	start();
@@ -148,13 +148,13 @@ void LavWinmmDevice::winmm_mixer() {
 	}
 }
 
-class LavWinmmSimulationFactory: public LavSimulationFactory {
+class LavWinmmDeviceFactory: public LavDeviceFactory {
 	public:
-	LavWinmmSimulationFactory();
+	LavWinmmDeviceFactory();
 	virtual std::vector<std::string> getOutputNames();
 	virtual std::vector<float> getOutputLatencies();
 	virtual std::vector<int> getOutputMaxChannels();
-	virtual std::shared_ptr<LavSimulation> createSimulation(int index, bool useDefaults, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead);
+	virtual std::shared_ptr<LavDevice> createDevice(std::function<void(float*)> getBuffer, int index, bool useDefaults, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead);
 	virtual unsigned int getOutputCount();
 	virtual bool scan();
 	std::string getName();
@@ -166,22 +166,22 @@ class LavWinmmSimulationFactory: public LavSimulationFactory {
 	unsigned int mapper_max_channels = 2, mapper_sr = 44100;
 };
 
-LavWinmmSimulationFactory::LavWinmmSimulationFactory() {
+LavWinmmDeviceFactory::LavWinmmDeviceFactory() {
 }
 
-std::vector<std::string> LavWinmmSimulationFactory::getOutputNames() {
+std::vector<std::string> LavWinmmDeviceFactory::getOutputNames() {
 	return names;
 }
 
-std::vector<float> LavWinmmSimulationFactory::getOutputLatencies() {
+std::vector<float> LavWinmmDeviceFactory::getOutputLatencies() {
 	return latencies;
 }
 
-std::vector<int> LavWinmmSimulationFactory::getOutputMaxChannels() {
+std::vector<int> LavWinmmDeviceFactory::getOutputMaxChannels() {
 	return max_channels;
 }
 
-std::shared_ptr<LavSimulation> LavWinmmSimulationFactory::createSimulation(int index, bool useDefaults, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead) {
+std::shared_ptr<LavDevice> LavWinmmDeviceFactory::createDevice(std::function<void(float*)> getBuffer, int index, bool useDefaults, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead) {
 	if(useDefaults) {
 		channels = 2;
 		sr = 44100;
@@ -190,18 +190,15 @@ std::shared_ptr<LavSimulation> LavWinmmSimulationFactory::createSimulation(int i
 	}
 	//first, we need to do sanity checks.
 	if(index < -1 || index > (int)names.size()) throw LavErrorException(Lav_ERROR_RANGE);
-	//create a simulation with the required parameters.
-	std::shared_ptr<LavSimulation> retval = std::make_shared<LavSimulation>(sr, blockSize, mixAhead);
-	std::shared_ptr<LavWinmmDevice> device = std::make_shared<LavWinmmDevice>(retval, channels, index != -1 ? max_channels[index] : mapper_max_channels, mixAhead, index == -1 ? WAVE_MAPPER : index, index == -1 ? mapper_sr : srs[index]);
-	retval->associateDevice(device);
-	return retval;
+	std::shared_ptr<LavDevice> device = std::make_shared<LavWinmmDevice>(getBuffer, blockSize, channels, index != -1 ? max_channels[index] : mapper_max_channels, mixAhead, index == -1 ? WAVE_MAPPER : index, sr, index == -1 ? mapper_sr : srs[index]);
+	return device;
 }
 
-unsigned int LavWinmmSimulationFactory::getOutputCount() {
+unsigned int LavWinmmDeviceFactory::getOutputCount() {
 	return names.size();
 }
 
-std::string LavWinmmSimulationFactory::getName() {
+std::string LavWinmmDeviceFactory::getName() {
 	return "Winmm";
 }
 
@@ -238,7 +235,7 @@ WinmmCapabilities getWinmmCapabilities(UINT index) {
 	return retval;
 }
 
-bool LavWinmmSimulationFactory::scan() {
+bool LavWinmmDeviceFactory::scan() {
 	std::vector<float> newLatencies;
 	std::vector<std::string> newNames;
 	std::vector<int> newMaxChannels;
@@ -270,8 +267,8 @@ bool LavWinmmSimulationFactory::scan() {
 	return true;
 }
 
-LavSimulationFactory* createWinmmSimulationFactory() {
-	LavWinmmSimulationFactory* fact = new LavWinmmSimulationFactory();
+LavDeviceFactory* createWinmmDeviceFactory() {
+	LavWinmmDeviceFactory* fact = new LavWinmmDeviceFactory();
 	if(fact->scan() == false) {
 		delete fact;
 		return nullptr;
