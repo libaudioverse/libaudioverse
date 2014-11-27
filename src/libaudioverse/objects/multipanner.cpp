@@ -21,7 +21,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 class LavMultipannerObject: public LavSubgraphObject {
 	public:
 	LavMultipannerObject(std::shared_ptr<LavSimulation> sim, std::shared_ptr<LavHrtfData> hrtf);
-	std::shared_ptr<LavObject> hrtfPanner = nullptr, amplitudePanner = nullptr, inputMixer = nullptr;
+	std::shared_ptr<LavObject> hrtfPanner = nullptr, amplitudePanner = nullptr, inputMixer = nullptr, outputMixer = nullptr;
 	void forwardAzimuth();
 	void forwardElevation();
 	void forwardShouldCrossfade();
@@ -32,9 +32,13 @@ LavMultipannerObject::LavMultipannerObject(std::shared_ptr<LavSimulation> sim, s
 	hrtfPanner = createHrtfObject(sim, hrtf);
 	amplitudePanner = createAmplitudePannerObject(sim);
 	inputMixer = createMixerObject(sim, 1, 1);
+	outputMixer = createMixerObject(sim, 2, 8);
 	hrtfPanner->setInput(0, inputMixer, 0);
 	amplitudePanner->setInput(0, inputMixer, 0);
-	configureSubgraph(inputMixer, amplitudePanner);
+	//we use the second set of mixer outputs for the hrtf panner because it never invalidates.
+	outputMixer->setInput(8, hrtfPanner, 0);
+	outputMixer->setInput(9, hrtfPanner, 1);
+	configureSubgraph(inputMixer, outputMixer);
 	//We have to make property forwarders.
 	getProperty(Lav_PANNER_AZIMUTH).setPostChangedCallback([this](){forwardAzimuth();});
 	getProperty(Lav_PANNER_ELEVATION).setPostChangedCallback([this](){forwardElevation();});
@@ -68,20 +72,27 @@ void LavMultipannerObject::strategyChanged() {
 	int newStrategy = getProperty(Lav_PANNER_STRATEGY).getIntValue();
 	switch(newStrategy) {
 		case Lav_PANNER_STRATEGY_HRTF:
-		configureSubgraph(inputMixer, hrtfPanner);
+		hrtfPanner->getProperty(Lav_OBJECT_STATE).setIntValue(Lav_OBJSTATE_PLAYING);
+		amplitudePanner->getProperty(Lav_OBJECT_STATE).setIntValue(Lav_OBJSTATE_PAUSED);
 		break;
 		case Lav_PANNER_STRATEGY_STEREO:
-		configureSubgraph(inputMixer, amplitudePanner);
 		std::dynamic_pointer_cast<LavAmplitudePannerObject>(amplitudePanner)->configureStandardChannelMap(2);
+		amplitudePanner->getProperty(Lav_OBJECT_STATE).setIntValue(Lav_OBJSTATE_PLAYING);
+		hrtfPanner->getProperty(Lav_OBJECT_STATE).setIntValue(Lav_OBJSTATE_PAUSED);
 		break;
 		case Lav_PANNER_STRATEGY_SURROUND51:
-		configureSubgraph(inputMixer, amplitudePanner);
 		std::dynamic_pointer_cast<LavAmplitudePannerObject>(amplitudePanner)->configureStandardChannelMap(6);
+		amplitudePanner->getProperty(Lav_OBJECT_STATE).setIntValue(Lav_OBJSTATE_PLAYING);
+		hrtfPanner->getProperty(Lav_OBJECT_STATE).setIntValue(Lav_OBJSTATE_PAUSED);
 		break;
 		case Lav_PANNER_STRATEGY_SURROUND71:
-		configureSubgraph(inputMixer, amplitudePanner);
 		std::dynamic_pointer_cast<LavAmplitudePannerObject>(amplitudePanner)->configureStandardChannelMap(8);
+		hrtfPanner->getProperty(Lav_OBJECT_STATE).setIntValue(Lav_OBJSTATE_PAUSED);
+		amplitudePanner->getProperty(Lav_OBJECT_STATE).setIntValue(Lav_OBJSTATE_PLAYING);
 		break;
+	}
+	for(unsigned int i = 0; i < amplitudePanner->getOutputCount(); i++) {
+		outputMixer->setInput(i, amplitudePanner, i);
 	}
 }
 
