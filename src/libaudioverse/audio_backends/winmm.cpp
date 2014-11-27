@@ -165,20 +165,6 @@ class LavWinmmSimulationFactory: public LavSimulationFactory {
 	std::vector<unsigned int> srs; //we need this, because these are not easy to query.
 };
 
-unsigned int winmmExtractSr(WAVEOUTCAPS caps) {
-	unsigned int sr = 0;
-	if(caps.dwFormats && (WAVE_FORMAT_96S16 | WAVE_FORMAT_96M16)) {
-		sr = 96000;
-	} else if(caps.dwFormats & (WAVE_FORMAT_4S16 | WAVE_FORMAT_4M16)) {
-		sr = 44100;
-	} else if(caps.dwFormats & (WAVE_FORMAT_2S16 | WAVE_FORMAT_2M16)) {
-		sr = 22050;
-	} else if(caps.dwFormats  & (WAVE_FORMAT_1S16 | WAVE_FORMAT_1M16)) {
-		sr = 11025;
-	}
-	return sr;
-}
-
 LavWinmmSimulationFactory::LavWinmmSimulationFactory() {
 }
 
