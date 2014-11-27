@@ -53,7 +53,8 @@ WAVEFORMATEXTENSIBLE makeFormat(unsigned int channels, unsigned int sr, bool isE
 
 class LavWinmmDevice: public  LavDevice {
 	public:
-	LavWinmmDevice(std::shared_ptr<LavSimulation> sim, unsigned int channels, unsigned int mixAhead, UINT_PTR which, unsigned int targetSr);
+	//channels is what user requested, maxChannels is what the device can support at most.
+	LavWinmmDevice(std::shared_ptr<LavSimulation> sim, unsigned int channels, unsigned int maxChannels, unsigned int mixAhead, UINT_PTR which, unsigned int targetSr);
 	virtual void startup_hook();
 	virtual void shutdown_hook();
 	void winmm_mixer();
@@ -65,7 +66,7 @@ class LavWinmmDevice: public  LavDevice {
 	std::atomic_flag winmm_mixing_flag;
 };
 
-LavWinmmDevice::LavWinmmDevice(std::shared_ptr<LavSimulation> sim, unsigned int channels, unsigned int mixAhead, UINT_PTR which, unsigned int targetSr): LavDevice(sim, mixAhead) {
+LavWinmmDevice::LavWinmmDevice(std::shared_ptr<LavSimulation> sim, unsigned int channels, unsigned int maxChannels, unsigned int mixAhead, UINT_PTR which, unsigned int targetSr): LavDevice(sim, mixAhead) {
 	WAVEFORMATEXTENSIBLE format = {0};
 	mixAhead += 1;
 	winmm_headers.resize(mixAhead);
@@ -78,12 +79,15 @@ LavWinmmDevice::LavWinmmDevice(std::shared_ptr<LavSimulation> sim, unsigned int 
 	winmm_handle = nullptr;
 	bool gotAudio = false;
 	unsigned int neededChannels = channels < 2 ? 2 : channels;
+	unsigned int inChannels = neededChannels, outChannels = 0;
 	for(unsigned int i = 0; i < 3; i++) {
 		if(chancounts[i] > neededChannels) continue;
+		if(chancounts[i] > maxChannels) continue;
 		format = makeFormat(chancounts[i], targetSr, true);
 		res = waveOutOpen(&winmm_handle, which, (WAVEFORMATEX*)&format, (DWORD)buffer_state_changed_event, NULL, CALLBACK_EVENT);
 		if(res == MMSYSERR_NOERROR) {
 			gotAudio = true;
+			outChannels = chancounts[i];
 			break;
 		}
 	}
@@ -92,6 +96,7 @@ LavWinmmDevice::LavWinmmDevice(std::shared_ptr<LavSimulation> sim, unsigned int 
 		format = makeFormat(2, targetSr, false);
 		res = waveOutOpen(&winmm_handle, which, (WAVEFORMATEX*)&format, (DWORD)buffer_state_changed_event, NULL, CALLBACK_EVENT);
 		if(res != MMSYSERR_NOERROR) throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
+		outChannels = 2;
 	}
 	for(unsigned int i = 0; i < audio_data.size(); i++) audio_data[i] = new short[sim->getBlockSize()*channels]();
 	//we can go ahead and set up the headers.
@@ -100,7 +105,7 @@ LavWinmmDevice::LavWinmmDevice(std::shared_ptr<LavSimulation> sim, unsigned int 
 		winmm_headers[i].dwBufferLength = sizeof(short)*sim->getBlockSize()*channels;
 		winmm_headers[i].dwFlags = WHDR_DONE;
 	}
-	init(targetSr, neededChannels);
+	init(targetSr, inChannels, outChannels);
 	start();
 }
 
@@ -200,7 +205,7 @@ std::shared_ptr<LavSimulation> LavWinmmSimulationFactory::createSimulation(int i
 	if(index < -1 || index > (int)names.size()) throw LavErrorException(Lav_ERROR_RANGE);
 	//create a simulation with the required parameters.
 	std::shared_ptr<LavSimulation> retval = std::make_shared<LavSimulation>(sr, blockSize, mixAhead);
-	std::shared_ptr<LavWinmmDevice> device = std::make_shared<LavWinmmDevice>(retval, channels, mixAhead, index == -1 ? WAVE_MAPPER : index, index == -1 ? 44100 : srs[index]);
+	std::shared_ptr<LavWinmmDevice> device = std::make_shared<LavWinmmDevice>(retval, channels, index != -1 ? max_channels[index] : 2, mixAhead, index == -1 ? WAVE_MAPPER : index, index == -1 ? 44100 : srs[index]);
 	retval->associateDevice(device);
 	return retval;
 }

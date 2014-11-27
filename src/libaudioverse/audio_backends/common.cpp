@@ -5,6 +5,9 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_audio_devices.hpp>
 #include <libaudioverse/private_simulation.hpp>
 #include <libaudioverse/private_resampler.hpp>
+#include <libaudioverse/private_data.hpp>
+#include <libaudioverse/private_errors.hpp>
+#include <libaudioverse/private_kernels.hpp>
 #include <string>
 #include <vector>
 #include <string>
@@ -24,20 +27,31 @@ LavDevice::LavDevice(std::shared_ptr<LavSimulation> sim, unsigned int mixAhead):
 }
 
 //these are the next two steps in initialization, and are consequently put before the destructor.
-void LavDevice::init(unsigned int targetSr, unsigned int channels) {
+void LavDevice::init(unsigned int targetSr, unsigned int userRequestedChannels, unsigned int channels) {
 	this->channels = channels;
+	this->user_requested_channels = userRequestedChannels;
+	if(channels != userRequestedChannels) {
+		float* match = nullptr;
+		for(LavMixingMatrixInfo* i = mixing_matrix_list; i->pointer; i++) {
+			if(i->in_channels == userRequestedChannels && i->out_channels == channels) {
+				match = i->pointer;
+				break;
+			}
+		}
+		if(match == nullptr) throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
+		mixing_matrix = match;
+		should_apply_mixing_matrix = true;
+	}
 	target_sr = targetSr;
 	//compute an estimated "good" size for the buffers, given the device's blockSize and channels.
-	output_buffer_size = (unsigned int)simulation->getBlockSize()*channels;
+	output_buffer_size = (unsigned int)simulation->getBlockSize();
 	if(targetSr != simulation->getSr()) {
 		output_buffer_size = (unsigned int)(output_buffer_size*(double)targetSr/simulation->getSr());
-		//always go for the multiples of 4.  This doesn't hurt anything, and some backends may be faster because of it.
-		if(output_buffer_size%4) output_buffer_size = output_buffer_size+(4-output_buffer_size%4);
 	}
-	unsigned int goodBufferSize = output_buffer_size*channels;
+	output_buffer_size *= channels;
 	buffers = new float*[mix_ahead];
 	for(unsigned int i = 0; i < mix_ahead+1; i++) {
-		buffers[i] = new float[goodBufferSize];
+		buffers[i] = new float[output_buffer_size];
 	}
 }
 
@@ -84,10 +98,13 @@ void LavDevice::shutdown_hook() {
 void LavDevice::mixingThreadFunction() {
 	bool hasFilledQueueFirstTime = false;
 	unsigned int sourceSr = (unsigned int)simulation->getSr();
-	LavResampler resampler((unsigned int)simulation->getBlockSize(), channels, sourceSr, target_sr);
+	LavResampler resampler((unsigned int)simulation->getBlockSize(), user_requested_channels, sourceSr, target_sr);
 	unsigned int currentBuffer = 0;
 	unsigned int sleepFor = (unsigned int)((simulation->getBlockSize()/(double)simulation->getSr())*1000);
-	float* tempBuffer = new float[simulation->getBlockSize()*channels]();
+	//this needs to be big enough to be involved in downmixing.
+	float* tempBuffer = new float[output_buffer_size]();
+	float* currentBlock = new float[simulation->getBlockSize()*user_requested_channels]();
+	float* resampledBlock= new float[(output_buffer_size/channels)*user_requested_channels]();
 	while(mixing_thread_continue.test_and_set()) {
 		if(buffer_statuses[currentBuffer].load()) { //we've done this one, but the callback hasn't gotten to it yet.
 			if(hasFilledQueueFirstTime == false) {
@@ -99,18 +116,29 @@ void LavDevice::mixingThreadFunction() {
 		}
 		if(sourceSr == target_sr) {
 			simulation->lock();
-			simulation->getBlock(buffers[currentBuffer], channels, false);
+			simulation->getBlock(currentBlock, user_requested_channels, false);
 			simulation->unlock();
 		}
 		else { //we need to resample.
 			unsigned int got = 0;
 			simulation->lock();
 			while(got < output_buffer_size) {
-				simulation->getBlock(tempBuffer, channels, false);
-				resampler.read(tempBuffer);
-				got += resampler.write(buffers[currentBuffer]+got, output_buffer_size-got);
+				simulation->getBlock(currentBlock, user_requested_channels, false);
+				resampler.read(currentBlock);
+				got += resampler.write(resampledBlock+got, output_buffer_size/channels-got);
 			}
 			simulation->unlock();
+		}
+		if(should_apply_mixing_matrix) {
+			applyMixingMatrix((output_buffer_size/channels)*user_requested_channels, sourceSr == target_sr ? currentBlock : resampledBlock, buffers[currentBuffer], user_requested_channels, channels, mixing_matrix);
+		}
+		else {
+			if(sourceSr == target_sr) {
+				std::copy(currentBlock, currentBlock+output_buffer_size, buffers[currentBuffer]);
+			}
+			else {
+				std::copy(resampledBlock, resampledBlock+output_buffer_size, buffers[currentBuffer]);
+			}
 		}
 		buffer_statuses[currentBuffer].store(1); //mark it as ready.
 		currentBuffer ++;

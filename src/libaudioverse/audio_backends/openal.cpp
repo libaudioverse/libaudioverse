@@ -45,6 +45,7 @@ class LavOpenALDevice: public  LavDevice {
 
 LavOpenALDevice::LavOpenALDevice(std::shared_ptr<LavSimulation> sim, unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixAhead, std::string which): LavDevice(sim, mixAhead) {
 	auto lg = std::lock_guard<std::mutex>(*openal_linearizer);
+	unsigned int outChannels = channels;
 	device = alcOpenDevice(which.c_str());
 	if(device == nullptr)  throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
 	context = alcCreateContext(device, nullptr);
@@ -62,27 +63,27 @@ LavOpenALDevice::LavOpenALDevice(std::shared_ptr<LavSimulation> sim, unsigned in
 		buffers.push_back(buff);
 	}
 	ALuint openAL51Format, openAL71Format;
-	if(channels == 8) { //can we get hold of 7.1?
+	if(outChannels == 8) { //can we get hold of 7.1?
 		if(alIsExtensionPresent("AL_EXT_MCFORMATS") == AL_TRUE && (openAL71Format = alGetEnumValue("AL_FORMAT_71CHN16")) != 0) {
 		//yes, this should be empty.
 		}
-		else channels = 6; //fall down to 5.1.
+		else outChannels = 6; //fall down to 5.1.
 	}
-	if(channels == 6) { //5.1
+	if(outChannels == 6) { //5.1
 		if(alIsExtensionPresent("AL_EXT_MCFORMATS") == AL_TRUE && (openAL51Format = alGetEnumValue("AL_FORMAT_51CHN16")) != 0) {
 		//yes, this should be empty.
 		}
-		else channels = 2; //fall down to stereo.
+		else outChannels = 2; //fall down to stereo.
 	}
 	data_format = AL_FORMAT_MONO16;
-	if(channels == 2) data_format = AL_FORMAT_STEREO16;
-	else if(channels == 6) data_format = openAL51Format;
-	else if(channels == 8) data_format = openAL71Format;
-	samples_per_buffer = channels*blockSize;
+	if(outChannels == 2) data_format = AL_FORMAT_STEREO16;
+	else if(outChannels == 6) data_format = openAL51Format;
+	else if(outChannels == 8) data_format = openAL71Format;
+	samples_per_buffer = outChannels*blockSize;
 	block = new float[samples_per_buffer];
 	outgoing = new short[samples_per_buffer];
 	sending_thread_sleep_time = (unsigned int)(((float)blockSize/sr)*1000);
-	init(sr, channels);
+	init(sr, channels, outChannels);
 	start();
 }
 

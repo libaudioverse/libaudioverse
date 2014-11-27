@@ -17,6 +17,7 @@ It is the last piece in the pipeline, responsible for moving the Libaudioverse s
 class LavResampler {
 	public:
 	LavResampler(int inputFrameCount, int inputChannels, int inputSr, int outputSr);
+	//returns frames written, not samples.
 	int write(float* dest, int maxFrameCount);
 	//this copies, the buffer can be reused.
 	void read(float* source);

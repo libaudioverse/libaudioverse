@@ -17,7 +17,7 @@ class LavDevice {
 	protected:
 	LavDevice(std::shared_ptr<LavSimulation> simulation, unsigned int mixAhead);
 	virtual ~LavDevice();
-	virtual void init(unsigned int targetSr, unsigned int channels); //second step in initialization. We can't just fall through to the constructor.
+	virtual void init(unsigned int targetSr, unsigned int userRequestedChannels, unsigned int channels); //second step in initialization. We can't just fall through to the constructor.
 	virtual void start(); //final step in initialization via subclasses: starts the background thread.
 	virtual void stop(); //stop the output.
 	//these hooks are run in the background thread, and should be overridden in subclasses.
@@ -25,7 +25,9 @@ class LavDevice {
 	virtual void shutdown_hook();
 	virtual void zeroOrNextBuffer(float* where);
 	virtual void mixingThreadFunction();
-	unsigned int output_buffer_size = 0, mix_ahead = 0, channels = 0;
+	unsigned int output_buffer_size = 0, mix_ahead = 0, channels = 0, user_requested_channels = 0;
+	float* mixing_matrix = nullptr;
+	bool should_apply_mixing_matrix = false;
 	unsigned int next_output_buffer = 0;
 	unsigned int callback_buffer_index = 0;
 	unsigned int target_sr = 0;
