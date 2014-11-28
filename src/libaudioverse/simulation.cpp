@@ -62,17 +62,18 @@ void LavSimulation::getBlock(float* out, unsigned int channels, bool mayApplyMix
 	float *mixingMatrix = getMixingMatrix(output_object->getOutputCount(), channels);
 	if(mixingMatrix && mayApplyMixingMatrix) {
 		for(unsigned int i = 0; i < output_object->getOutputCount(); i++) {
-			std::copy(output_object->getOutputPointer(i), output_object->getOutputPointer(i)+block_size, mixing_matrix_workspace+i*block_size);
+			for(unsigned int j = 0; j < getBlockSize(); j++) {
+				mixing_matrix_workspace[j*output_object->getOutputCount()+i] = output_object->getOutputPointer(i)[j];
+			}
 		}
-		interleaveSamples(output_object->getOutputCount(), block_size, mixing_matrix_workspace);
 		applyMixingMatrix(output_object->getOutputCount()*block_size, mixing_matrix_workspace, out, output_object->getOutputCount(), channels, mixingMatrix);
 	}
 	else {
 		for(unsigned int i = 0; i < channels; i++) {
-			if(i < output_object->getOutputCount()) memcpy(out+i*getBlockSize(), output_object->getOutputPointer(i), sizeof(float)*getBlockSize());
-			else memset(out+i*getBlockSize(), 0, sizeof(float)*getBlockSize()); //we're beyond the number of inputs.
+			for(unsigned int j = 0; j < getBlockSize(); j++) {
+				out[channels*j+i] = i <= output_object->getOutputCount() ? output_object->getOutputPointer(i)[j] : 0.0f;
+			}
 		}
-		interleaveSamples(channels, getBlockSize(), out);
 	}
 }
 
