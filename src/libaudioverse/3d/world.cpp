@@ -19,14 +19,11 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <algorithm>
 #include <vector>
 
-LavWorldObject::LavWorldObject(std::shared_ptr<LavSimulation> simulation, unsigned int forChannels, std::shared_ptr<LavHrtfData> hrtf): LavSourceManager(Lav_OBJTYPE_WORLD, simulation)  {
-	this->forChannels = forChannels;
-	if(forChannels == 2) {
-		this->hrtf = hrtf;
-	}
-	mixer = createMixerObject(simulation, 1, forChannels);
-	limiter = createHardLimiterObject(simulation, forChannels);
-	for(int i = 0; i < forChannels; i++) {
+LavWorldObject::LavWorldObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf): LavSourceManager(Lav_OBJTYPE_WORLD, simulation)  {
+	this->hrtf = hrtf;
+	mixer = createMixerObject(simulation, 1, 8);
+	limiter = createHardLimiterObject(simulation, 8);
+	for(int i = 0; i < 8; i++) {
 		limiter->setInput(i, mixer, i);
 	}
 
@@ -38,8 +35,8 @@ LavWorldObject::LavWorldObject(std::shared_ptr<LavSimulation> simulation, unsign
 	configureSubgraph(nullptr, limiter);
 }
 
-std::shared_ptr<LavWorldObject> createWorldObject(std::shared_ptr<LavSimulation> simulation, unsigned int forChannels, std::shared_ptr<LavHrtfData> hrtf) {
-	return std::make_shared<LavWorldObject>(simulation, forChannels, hrtf);
+std::shared_ptr<LavWorldObject> createWorldObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf) {
+	return std::make_shared<LavWorldObject>(simulation, hrtf);
 }
 
 void LavWorldObject::willProcessParents() {
@@ -61,14 +58,14 @@ void LavWorldObject::willProcessParents() {
 }
 
 std::shared_ptr<LavObject> LavWorldObject::createPannerObject() {
-	auto pan = createHrtfObject(simulation, hrtf);
+	auto pan = createMultipannerObject(simulation, hrtf);
 	unsigned int slot = panners.size();
 	panners.push_back(pan);
-	//todo: assumes stereo implicitly, this is bad.
 	//expand the mixer by one parent.
 	mixer->getProperty(Lav_MIXER_MAX_PARENTS).setIntValue(panners.size());
-	mixer->setInput(slot*2, pan, 0);
-	mixer->setInput(slot*2+1, pan, 1);
+	for(unsigned int i = 0; i < 8; i++) {
+		mixer->setInput(slot*8+i, pan, i);
+	}
 	return pan;
 }
 
@@ -87,7 +84,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createWorldObject(LavSimulation* simulation, co
 	} else {
 		hrtf->loadFromDefault(simulation->getSr());
 	}
-	auto retval = createWorldObject(incomingPointer<LavSimulation>(simulation), 2, hrtf);
+	auto retval = createWorldObject(incomingPointer<LavSimulation>(simulation), hrtf);
 	*destination = outgoingPointer<LavObject>(retval);
 	PUB_END
 }

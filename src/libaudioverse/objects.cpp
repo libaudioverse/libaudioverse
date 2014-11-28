@@ -47,7 +47,7 @@ void LavObject::computeInputBuffers() {
 			if(output >= parent->getOutputCount()) { //the parent node no longer has this output, probably due to resizing.
 				setParent(i, nullptr, 0); //so we clear this parent.
 			}
-			inputs[i] = parent->outputs[output];
+			inputs[i] = parent->getOutputPointer(output);
 		}
 		else {
 			inputs[i] = zerobuffer;
