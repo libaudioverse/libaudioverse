@@ -2,8 +2,8 @@
 This file is part of Libaudioverse, a library for 3D and environmental audio simulation, and is released under the terms of the Gnu General Public License Version 3 or (at your option) any later version.
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 
-#include <libaudioverse/private_sources.hpp>
-#include <libaudioverse/private_sourcemanager.hpp>
+#include <libaudioverse/3d/private_sources.hpp>
+#include <libaudioverse/3d/private_environmentbase.hpp>
 #include <libaudioverse/private_properties.hpp>
 #include <libaudioverse/private_macros.hpp>
 #include <libaudioverse/private_constants.hpp>
@@ -21,13 +21,13 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <memory>
 
 
-LavSourceObject::LavSourceObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavSourceManager> manager): LavSubgraphObject(Lav_OBJTYPE_SOURCE, simulation) {
+LavSourceObject::LavSourceObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavEnvironmentBase> manager): LavSubgraphObject(Lav_OBJTYPE_SOURCE, simulation) {
 	panner_object = manager->createPannerObject();
 	configureSubgraph(panner_object, nullptr); //we input to the panner, and output to nothing (because the manager grabs hold of the panner directly).
 	this->manager = manager;
 }
 
-std::shared_ptr<LavObject> createSourceObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavSourceManager> manager) {
+std::shared_ptr<LavObject> createSourceObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavEnvironmentBase> manager) {
 	auto temp = std::make_shared<LavSourceObject>(simulation, manager);
 	manager->registerSourceForUpdates(temp);
 	return temp;
@@ -70,7 +70,7 @@ void LavSourceObject::update(LavEnvironment environment) {
 Lav_PUBLIC_FUNCTION LavError Lav_createSourceObject(LavSimulation* simulation, LavObject* environment, LavObject** destination) {
 	PUB_BEGIN
 	LOCK(*simulation);
-	auto retval = createSourceObject(incomingPointer<LavSimulation>(simulation), incomingPointer<LavSourceManager>(environment));
+	auto retval = createSourceObject(incomingPointer<LavSimulation>(simulation), incomingPointer<LavEnvironmentBase>(environment));
 	*destination = outgoingPointer<LavObject>(retval);
 	PUB_END
 }

@@ -257,7 +257,6 @@ bool LavWinmmDeviceFactory::scan() {
 	caps = getWinmmCapabilities(WAVE_MAPPER);
 	mapper_max_channels = caps.channels;
 	mapper_sr = caps.sr;
-	printf("Mapper caps: channels=%i and sr=%i\n", mapper_max_channels, mapper_sr);
 	return true;
 }
 

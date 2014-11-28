@@ -2,8 +2,8 @@
 This file is part of Libaudioverse, a library for 3D and environmental audio simulation, and is released under the terms of the Gnu General Public License Version 3 or (at your option) any later version.
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 
-#include <libaudioverse/private_sources.hpp>
-#include <libaudioverse/private_world.hpp>
+#include <libaudioverse/3d/private_sources.hpp>
+#include <libaudioverse/3d/private_simpleenvironment.hpp>
 #include <libaudioverse/private_properties.hpp>
 #include <libaudioverse/private_macros.hpp>
 #include <libaudioverse/private_creators.hpp>
@@ -19,7 +19,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <algorithm>
 #include <vector>
 
-LavWorldObject::LavWorldObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf): LavSourceManager(Lav_OBJTYPE_WORLD, simulation)  {
+LavSimpleEnvironment::LavSimpleEnvironment(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf): LavEnvironmentBase(Lav_OBJTYPE_SIMPLE_ENVIRONMENT, simulation)  {
 	this->hrtf = hrtf;
 	mixer = createMixerObject(simulation, 1, 8);
 	limiter = createHardLimiterObject(simulation, 8);
@@ -35,11 +35,11 @@ LavWorldObject::LavWorldObject(std::shared_ptr<LavSimulation> simulation, std::s
 	configureSubgraph(nullptr, limiter);
 }
 
-std::shared_ptr<LavWorldObject> createWorldObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf) {
-	return std::make_shared<LavWorldObject>(simulation, hrtf);
+std::shared_ptr<LavSimpleEnvironment> createWorldObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf) {
+	return std::make_shared<LavSimpleEnvironment>(simulation, hrtf);
 }
 
-void LavWorldObject::willProcessParents() {
+void LavSimpleEnvironment::willProcessParents() {
 	//update the matrix.
 	const float* pos = getProperty(Lav_3D_POSITION).getFloat3Value();
 	const float* atup = getProperty(Lav_3D_ORIENTATION).getFloat6Value();
@@ -57,7 +57,7 @@ void LavWorldObject::willProcessParents() {
 	}
 }
 
-std::shared_ptr<LavObject> LavWorldObject::createPannerObject() {
+std::shared_ptr<LavObject> LavSimpleEnvironment::createPannerObject() {
 	auto pan = createMultipannerObject(simulation, hrtf);
 	unsigned int slot = panners.size();
 	panners.push_back(pan);
@@ -69,13 +69,13 @@ std::shared_ptr<LavObject> LavWorldObject::createPannerObject() {
 	return pan;
 }
 
-void LavWorldObject::registerSourceForUpdates(std::shared_ptr<LavSourceObject> source) {
+void LavSimpleEnvironment::registerSourceForUpdates(std::shared_ptr<LavSourceObject> source) {
 	sources.insert(source);
 }
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createWorldObject(LavSimulation* simulation, const char*hrtfPath, LavObject** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createSimpleEnvironmentObject(LavSimulation* simulation, const char*hrtfPath, LavObject** destination) {
 	PUB_BEGIN
 	LOCK(*simulation);
 	auto hrtf = std::make_shared<LavHrtfData>();

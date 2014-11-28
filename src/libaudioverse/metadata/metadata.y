@@ -47,11 +47,11 @@ objects:
    Lav_MIXER_MAX_PARENTS: {name: max_parents, type: int, default: 0, range: [0, MAX_INT]}
    Lav_MIXER_INPUTS_PER_PARENT: {name: inputs_per_parent, type: int, default: 0, range: [0, 0]}
   doc_name: Mixer
- Lav_OBJTYPE_WORLD:
+ Lav_OBJTYPE_SIMPLE_ENVIRONMENT:
   properties:
    Lav_3D_POSITION: {name: position, type: float3, default: [0.0, 0.0, 0.0]}
    Lav_3D_ORIENTATION: {name: orientation, type: float6, default: [0.0, 0.0, -1.0, 0.0, 1.0, 0.0]}
-  doc_name: World
+  doc_name: Simple Environment
  Lav_OBJTYPE_SOURCE:
   properties:
    Lav_3D_POSITION: {name: position, type: float3, default: [0.0, 0.0, 0.0]}

@@ -39,7 +39,7 @@ void main(int argc, char** args) {
 
 	//some setup: create a world and a simulation.
 	ERRCHECK(Lav_createReadSimulation(44100, BLOCK_SIZE, &simulation));
-	ERRCHECK(Lav_createWorldObject(simulation, args[1], &world));
+	ERRCHECK(Lav_createSimpleEnvironmentObject(simulation, args[1], &world));
 	ERRCHECK(Lav_simulationSetOutputObject(simulation, world));
 	while(timeDelta < SECONDS) {
 		numSources += 10;
