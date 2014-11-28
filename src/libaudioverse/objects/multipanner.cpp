@@ -32,12 +32,9 @@ LavMultipannerObject::LavMultipannerObject(std::shared_ptr<LavSimulation> sim, s
 	hrtfPanner = createHrtfObject(sim, hrtf);
 	amplitudePanner = createAmplitudePannerObject(sim);
 	inputMixer = createMixerObject(sim, 1, 1);
-	outputMixer = createMixerObject(sim, 2, 8);
+	outputMixer = createMixerObject(sim, 1, 8);
 	hrtfPanner->setInput(0, inputMixer, 0);
 	amplitudePanner->setInput(0, inputMixer, 0);
-	//we use the second set of mixer outputs for the hrtf panner because it never invalidates.
-	outputMixer->setInput(8, hrtfPanner, 0);
-	outputMixer->setInput(9, hrtfPanner, 1);
 	configureSubgraph(inputMixer, outputMixer);
 	//We have to make property forwarders.
 	getProperty(Lav_PANNER_AZIMUTH).setPostChangedCallback([this](){forwardAzimuth();});
@@ -71,29 +68,35 @@ void LavMultipannerObject::forwardShouldCrossfade() {
 
 void LavMultipannerObject::strategyChanged() {
 	int newStrategy = getProperty(Lav_PANNER_STRATEGY).getIntValue();
+	bool hookHrtf = false, hookAmplitude = false;
 	switch(newStrategy) {
 		case Lav_PANNER_STRATEGY_HRTF:
-		hrtfPanner->getProperty(Lav_OBJECT_STATE).setIntValue(Lav_OBJSTATE_PLAYING);
-		amplitudePanner->getProperty(Lav_OBJECT_STATE).setIntValue(Lav_OBJSTATE_PAUSED);
+		hookHrtf = true;
 		break;
 		case Lav_PANNER_STRATEGY_STEREO:
 		std::dynamic_pointer_cast<LavAmplitudePannerObject>(amplitudePanner)->configureStandardChannelMap(2);
-		amplitudePanner->getProperty(Lav_OBJECT_STATE).setIntValue(Lav_OBJSTATE_PLAYING);
-		hrtfPanner->getProperty(Lav_OBJECT_STATE).setIntValue(Lav_OBJSTATE_PAUSED);
+		hookAmplitude = true;
 		break;
 		case Lav_PANNER_STRATEGY_SURROUND51:
 		std::dynamic_pointer_cast<LavAmplitudePannerObject>(amplitudePanner)->configureStandardChannelMap(6);
-		amplitudePanner->getProperty(Lav_OBJECT_STATE).setIntValue(Lav_OBJSTATE_PLAYING);
-		hrtfPanner->getProperty(Lav_OBJECT_STATE).setIntValue(Lav_OBJSTATE_PAUSED);
+		hookAmplitude = true;
 		break;
 		case Lav_PANNER_STRATEGY_SURROUND71:
 		std::dynamic_pointer_cast<LavAmplitudePannerObject>(amplitudePanner)->configureStandardChannelMap(8);
-		hrtfPanner->getProperty(Lav_OBJECT_STATE).setIntValue(Lav_OBJSTATE_PAUSED);
-		amplitudePanner->getProperty(Lav_OBJECT_STATE).setIntValue(Lav_OBJSTATE_PLAYING);
+		hookAmplitude=true;
 		break;
 	}
-	for(unsigned int i = 0; i < amplitudePanner->getOutputCount(); i++) {
-		outputMixer->setInput(i, amplitudePanner, i);
+	if(hookAmplitude) {
+		outputMixer->setInput(0, nullptr, 0);
+		outputMixer->setInput(1, nullptr, 0);
+		for(unsigned int i = 0; i < amplitudePanner->getOutputCount(); i++) {
+			outputMixer->setInput(i, amplitudePanner, i);
+		}
+	}
+	if(hookHrtf) {
+		for(unsigned int i = 0; i < 8; i++) outputMixer->setInput(i, nullptr, 0);
+		outputMixer->setInput(0, hrtfPanner, 0);
+		outputMixer->setInput(1, hrtfPanner, 1);
 	}
 }
 
