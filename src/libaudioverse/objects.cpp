@@ -78,6 +78,11 @@ LavObject::LavObject(int type, std::shared_ptr<LavSimulation> simulation, unsign
 	}
 
 	computeInputBuffers(); //at the moment, this is going to just make them all 0, but it takes effect once parents are added.
+
+	//state changes must invalidate objects.
+	getProperty(Lav_OBJECT_STATE).setPostChangedCallback([this]() {
+		this->simulation->invalidatePlan();
+	});
 }
 
 LavObject::~LavObject() {
