@@ -11,10 +11,19 @@ extern "C" {
 Lav_PUBLIC_FUNCTION LavError Lav_createSimpleEnvironmentObject(LavSimulation* sim, const char*hrtfPath, LavObject** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createSourceObject(LavSimulation* sim, LavObject* environment, LavObject** destination);
 
-///A few properties common to most objects.
+///A few properties common to most objects in the 3d simulation including all environments.
+//note: reserves up to -20 before hitting Lav_ENVIRONMENT_STANDARD_PROPERTIES.
 enum Lav_3D_PROPERTIES {
 	Lav_3D_ORIENTATION = -1, //float6 consisting of an at followed by an up vector.
 	Lav_3D_POSITION = -2, //float3, consisting of the position of the object.
+};
+
+//all environments have these properties.
+enum lav_STANDARD_ENVIRONMENT_PROPERTIES {
+	Lav_ENVIRONMENT_DEFAULT_DISTANCE_MODEL = -11,
+	Lav_ENVIRONMENT_DEFAULT_MAX_DISTANCE = -12,
+	//reserved space for more default stuff related to distance calculations.
+	Lav_ENVIRONMENT_DEFAULT_PANNING_STRATEGY = -18,
 };
 
 enum Lav_SOURCE_PROPERTIES {

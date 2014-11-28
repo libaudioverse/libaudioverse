@@ -40,7 +40,7 @@ objects:
    Lav_PANNER_AZIMUTH: {name: azimuth, type: float, default: 0.0, range: [-INFINITY, INFINITY]}
    Lav_PANNER_ELEVATION: {name: elevation, type: float, default: 0.0, range: [-90.0, 90.0]}
    Lav_PANNER_SHOULD_CROSSFADE: {name: should_crossfade, type: boolean, default: 1}
-   Lav_PANNER_STRATEGY: {name: strategy, range: [0, 3], default: 0, type: int, value_enum: Lav_PANNER_STRATEGIES}
+   Lav_PANNER_STRATEGY: {name: strategy, range: [0, 3], default: 0, type: int, value_enum: Lav_PANNING_STRATEGIES}
   doc_name: Multipanner
  Lav_OBJTYPE_MIXER:
   properties:
@@ -51,6 +51,9 @@ objects:
   properties:
    Lav_3D_POSITION: {name: position, type: float3, default: [0.0, 0.0, 0.0]}
    Lav_3D_ORIENTATION: {name: orientation, type: float6, default: [0.0, 0.0, -1.0, 0.0, 1.0, 0.0]}
+   Lav_ENVIRONMENT_DEFAULT_DISTANCE_MODEL: {name: default_distance_model, range: [0, 0], default: 0, type: int, value_enum: Lav_DISTANCE_MODELS}
+   Lav_ENVIRONMENT_DEFAULT_MAX_DISTANCE: {name: default_max_distance, range: [0.0, INFINITY], type: float, default: 50.0}
+   Lav_ENVIRONMENT_DEFAULT_PANNING_STRATEGY: {name: default_panning_strategy, range: [0, 3], type: int, default: 1, value_enum: Lav_PANNING_STRATEGIES}
   doc_name: Simple Environment
  Lav_OBJTYPE_SOURCE:
   properties:
