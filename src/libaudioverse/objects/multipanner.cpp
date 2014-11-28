@@ -44,6 +44,7 @@ LavMultipannerObject::LavMultipannerObject(std::shared_ptr<LavSimulation> sim, s
 	getProperty(Lav_PANNER_ELEVATION).setPostChangedCallback([this](){forwardElevation();});
 	getProperty(Lav_PANNER_SHOULD_CROSSFADE).setPostChangedCallback([this](){forwardShouldCrossfade();});
 	getProperty(Lav_PANNER_STRATEGY).setPostChangedCallback([this](){strategyChanged();});
+	strategyChanged();
 }
 
 std::shared_ptr<LavObject> createMultipannerObject(std::shared_ptr<LavSimulation> sim, std::shared_ptr<LavHrtfData> hrtf) {

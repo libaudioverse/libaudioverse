@@ -9,6 +9,9 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <memory>
 #include <vector>
 
+//built-in zerobuffer, here so we don't have to actually ever allocate space for inputs.
+extern float zerobuffer[];
+
 class LavProperty;
 
 class LavInputDescriptor {

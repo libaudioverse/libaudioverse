@@ -42,10 +42,21 @@ void LavMixerObject::maxParentsChanged() {
 
 void LavMixerObject::process() {
 	int inputsPerParent = getProperty(Lav_MIXER_INPUTS_PER_PARENT).getIntValue();
-	for(unsigned int i = 0; i < block_size; i++) {
-		for(unsigned int j = 0; j < num_outputs; j++) outputs[j][i] = 0.0f;
-		for(unsigned int j = 0; j < inputs.size(); j++) {
-			outputs[j%inputsPerParent][i] += inputs[j][i];
+	int maxParents = getProperty(Lav_MIXER_MAX_PARENTS).getIntValue();
+	//common case, 1 parent.
+	//most commonly seen internally to this library because mixers make forwarders in subgraphs.
+	if(maxParents == 1) {
+		for(unsigned int i = 0; i < num_outputs; i++) {
+			std::copy(inputs[i], inputs[i]+block_size, outputs[i]);
+		}
+		return;
+	}
+	LavObject::process();
+	for(unsigned int i = 0; i < num_inputs; i++) {
+		//if this is the zerobuffer, we can save block_size adds, vector accesses, etc.
+		if(inputs[i] == zerobuffer) continue;
+		for(unsigned int j = 0; j < block_size; j++) {
+			outputs[i%inputsPerParent][j] += inputs[i][j];
 		}
 	}
 }
