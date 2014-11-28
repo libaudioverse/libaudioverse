@@ -70,18 +70,18 @@ void LavMultipannerObject::strategyChanged() {
 	int newStrategy = getProperty(Lav_PANNER_STRATEGY).getIntValue();
 	bool hookHrtf = false, hookAmplitude = false;
 	switch(newStrategy) {
-		case Lav_PANNER_STRATEGY_HRTF:
+		case Lav_PANNING_STRATEGY_HRTF:
 		hookHrtf = true;
 		break;
-		case Lav_PANNER_STRATEGY_STEREO:
+		case Lav_PANNING_STRATEGY_STEREO:
 		std::dynamic_pointer_cast<LavAmplitudePannerObject>(amplitudePanner)->configureStandardChannelMap(2);
 		hookAmplitude = true;
 		break;
-		case Lav_PANNER_STRATEGY_SURROUND51:
+		case Lav_PANNING_STRATEGY_SURROUND51:
 		std::dynamic_pointer_cast<LavAmplitudePannerObject>(amplitudePanner)->configureStandardChannelMap(6);
 		hookAmplitude = true;
 		break;
-		case Lav_PANNER_STRATEGY_SURROUND71:
+		case Lav_PANNING_STRATEGY_SURROUND71:
 		std::dynamic_pointer_cast<LavAmplitudePannerObject>(amplitudePanner)->configureStandardChannelMap(8);
 		hookAmplitude=true;
 		break;

@@ -81,6 +81,8 @@ for propkey, propid, propinfo in joined_properties:
 		r1 = min(e.values())
 		r2 = max(e.values())
 		propinfo['range'] = [r1, r2]
+	if propinfo['type'] == 'int' and propinfo.get('default', None) in bindings.get_info.all_info['constants']:
+		propinfo['default'] = bindings.get_info.all_info['constants'][propinfo['default']]
 	for i, j in enumerate(list(propinfo.get('range', []))): #if we don't have a range, this will do nothing.
 		if isinstance(j, basestring):
 			continue #it's either MIN_INT, MAX_INT, INFINITY, -INFINITY, or another special identifier.  Pass through unchanged.
