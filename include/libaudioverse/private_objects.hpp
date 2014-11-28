@@ -104,6 +104,9 @@ class LavSubgraphObject: public LavObject {
 	virtual void process();
 	//we do no processing and forward onto another object.  Therefore, we do not compute input buffers.
 	virtual void computeInputBuffers();
+	//Best to override this too.
+	//otherwise, mul gets applied inappropriately.
+	virtual void doProcessProtocol();
 	//these overrides allow us to "step aside" and always say that the output of this subgraph is our parent.
 	virtual unsigned int getParentCount();
 	virtual std::shared_ptr<LavObject> getParentObject(unsigned int par);
@@ -111,7 +114,6 @@ class LavSubgraphObject: public LavObject {
 	//and this one crashes us if anything tries to set the parent.
 	//the purpose will become clearer once logging is introduced.
 	virtual void setParent(unsigned int par, std::shared_ptr<LavObject> obj, unsigned int input);
-
 	virtual unsigned int getOutputCount();
 	virtual float* getOutputPointer(unsigned int output);
 	virtual void setInput(unsigned int input, std::shared_ptr<LavObject> object, unsigned int output);

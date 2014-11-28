@@ -253,6 +253,10 @@ void LavSubgraphObject::configureSubgraph(std::shared_ptr<LavObject> input, std:
 void LavSubgraphObject::computeInputBuffers() {
 }
 
+void LavSubgraphObject::doProcessProtocol() {
+	//empty. Don't do anything for a subgraph.
+}
+
 void LavSubgraphObject::process() {
 //empty because we can forward onto the output object.
 }
