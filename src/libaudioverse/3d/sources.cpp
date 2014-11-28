@@ -25,6 +25,9 @@ LavSourceObject::LavSourceObject(std::shared_ptr<LavSimulation> simulation, std:
 	panner_object = manager->createPannerObject();
 	configureSubgraph(panner_object, nullptr); //we input to the panner, and output to nothing (because the manager grabs hold of the panner directly).
 	this->manager = manager;
+	//we have to read off these defaults manually, and it must always be the last thing in the constructor.
+	getProperty(Lav_SOURCE_DISTANCE_MODEL).setIntValue(manager->getProperty(Lav_ENVIRONMENT_DEFAULT_DISTANCE_MODEL).getIntValue());
+	getProperty(Lav_SOURCE_MAX_DISTANCE).setFloatValue(manager->getProperty(Lav_ENVIRONMENT_DEFAULT_MAX_DISTANCE).getFloatValue());
 }
 
 std::shared_ptr<LavObject> createSourceObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavEnvironmentBase> manager) {
