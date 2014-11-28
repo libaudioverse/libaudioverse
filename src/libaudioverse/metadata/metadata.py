@@ -76,6 +76,11 @@ for propkey, propid, propinfo in joined_properties:
 		propinfo['range'] = [0.0, 0.0]
 	if propinfo['type'] == 'double' and propinfo.get('read_only', False):
 		propinfo['range'] = [0.0, 0.0]
+	if propinfo['type'] == 'int' and not propinfo.get('read_only', False) and 'value_enum' in propinfo:
+		e = bindings.get_info.all_info['constants_by_enum'][propinfo['value_enum']]
+		r1 = min(e.values())
+		r2 = max(e.values())
+		propinfo['range'] = [r1, r2]
 	for i, j in enumerate(list(propinfo.get('range', []))): #if we don't have a range, this will do nothing.
 		if isinstance(j, basestring):
 			continue #it's either MIN_INT, MAX_INT, INFINITY, -INFINITY, or another special identifier.  Pass through unchanged.
