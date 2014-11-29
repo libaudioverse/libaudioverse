@@ -9,6 +9,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_macros.hpp>
 #include <libaudioverse/private_memory.hpp>
 #include <libaudioverse/private_dspmath.hpp>
+#include <libaudioverse/implementations/delayline.hpp>
+#include <vector>
 #include <limits>
 #include <memory>
 #include <algorithm>
@@ -17,36 +19,22 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 class LavDelayObject: public LavObject {
 	public:
 	LavDelayObject(std::shared_ptr<LavSimulation> simulation, float maxDelay, unsigned int lineCount);
-	~LavDelayObject();
 	void process();
 	protected:
 	void delayChanged();
 	void recomputeDelta();
 	unsigned int delay_line_length = 0;
-	float** lines = nullptr;
-	unsigned int read_head = 0, new_read_head = 0, write_head = 1; //if write_head=0, delay wraps
-	float read_head_weight = 1.0f, new_read_head_weight = 0.0f, delta = 1.0f;
-	bool interpolating = false;
-	unsigned int line_count;
+	std::vector<LavDelayLine> lines;
 };
 
 LavDelayObject::LavDelayObject(std::shared_ptr<LavSimulation> simulation, float maxDelay, unsigned int lineCount): LavObject(Lav_OBJTYPE_DELAY, simulation, lineCount, lineCount) {
 	if(lineCount == 0) throw LavErrorException(Lav_ERROR_RANGE);
-	line_count = lineCount;
-	//we always offset all delays by exactly 1 sample.
-	//this avoids an ambiguity for when read_head=write_head that causes the delay to wrap to the maximum.
-	//We could fix this by reading first, but this delay line supports feedback, which then breaks.
-	delay_line_length = (unsigned int)(maxDelay*simulation->getSr());
-	if(delay_line_length == 0) throw LavErrorException(Lav_ERROR_RANGE);
-	delay_line_length++; //the extra sample.
-	lines = new float*[lineCount];
-	for(unsigned int i = 0; i < lineCount; i++) {
-		lines[i] = new float[delay_line_length]();
-	}
+	for(unsigned int i = 0; i < lineCount; i++) lines.emplace_back(maxDelay, simulation->getSr());
 	getProperty(Lav_DELAY_DELAY).setFloatRange(0.0f, maxDelay);
 	getProperty(Lav_DELAY_INTERPOLATION_TIME).setPostChangedCallback([this] () {recomputeDelta();});
 	getProperty(Lav_DELAY_DELAY).setPostChangedCallback([this] () {delayChanged();});
 	recomputeDelta();
+	delayChanged();
 	//finally, set the read-only max delay.
 	getProperty(Lav_DELAY_DELAY_MAX).setFloatValue(maxDelay);
 }
@@ -57,51 +45,24 @@ std::shared_ptr<LavObject> createDelayObject(std::shared_ptr<LavSimulation> simu
 	return tmp;
 }
 
-LavDelayObject::~LavDelayObject() {
-	for(unsigned int i = 0; i < line_count; i++) delete[] lines[i];
-	delete[] lines;
-}
-
 void LavDelayObject::recomputeDelta() {
-	delta = (1.0f/(getProperty(Lav_DELAY_INTERPOLATION_TIME).getFloatValue())/simulation->getSr());
+	float delta = (1.0f/(getProperty(Lav_DELAY_INTERPOLATION_TIME).getFloatValue())/simulation->getSr());
+	for(auto &line: lines) line.setInterpolationDelta(delta);
 }
 
 void LavDelayObject::delayChanged() {
-	//get the new read head position to the nearest sample.
-	unsigned int newReadHeadPos = (unsigned int)(getProperty(Lav_DELAY_DELAY).getFloatValue()*simulation->getSr()) + 1; //+1 because we offset by one sample.
-	if(newReadHeadPos >= delay_line_length) newReadHeadPos = delay_line_length - 1;
-	newReadHeadPos = ringmodi(write_head-newReadHeadPos, delay_line_length);
-	//we set this as the new delay line position.
-	new_read_head = newReadHeadPos;
-	//the new read head's weight gets reset to 0.
-	new_read_head_weight = 0.0f;
-	//we leave the old one alone, in order to protect against rapid changes.
-	interpolating = true;
+	float newDelay = getProperty(Lav_DELAY_DELAY).getFloatValue();
+	for(auto &line: lines) line.setDelay(newDelay);
 }
 
 void LavDelayObject::process() {
 	float feedback = getProperty(Lav_DELAY_FEEDBACK).getFloatValue();
-	for(unsigned int i = 0; i < block_size; i++) {
-		for(unsigned int line = 0; line < line_count; line++) {
-			float outSample = lines[line][read_head]*read_head_weight+lines[line][new_read_head]*new_read_head_weight;
-			lines[line][write_head] = inputs[line][i]+outSample*feedback;
-			outputs[line][i] = outSample;
+	for(unsigned int output = 0; output < getOutputCount(); output++) {
+		auto &line = lines[output];
+		for(unsigned int i = 0; i < block_size; i++) {
+			outputs[output][i] = line.read();
+			line.advance(inputs[output][i]+outputs[output][i]*feedback);
 		}
-		//advance both pointers one sample.
-		read_head = ringmodi(read_head+1, delay_line_length);
-		new_read_head = ringmodi(new_read_head+1, delay_line_length);
-		write_head = ringmodi(write_head+1, delay_line_length);
-		//update the weights.
-		if(interpolating) {
-			read_head_weight = fmin(0.0f, read_head_weight - delta);
-			new_read_head_weight = fmax(1.0f, new_read_head_weight+delta);
-			if(new_read_head_weight == 1.0f) { //finished interpolating.
-				std::swap(read_head, new_read_head);
-				std::swap(read_head_weight, new_read_head_weight);
-				interpolating = false;	
-			}
-		}
-	//and output the sample.
 	}
 }
 

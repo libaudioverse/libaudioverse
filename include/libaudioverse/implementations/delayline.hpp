@@ -7,6 +7,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 //This rounds to the nearest sample for fractional delays.
 
 class LavDelayLine {
+	public:
 	LavDelayLine(float maxDelay, float sr);
 	~LavDelayLine();
 	void setDelay(float delay);
