@@ -20,7 +20,7 @@ LavDelayLine::~LavDelayLine() {
 void LavDelayLine::setDelay(float delay) {
 	unsigned int newDelay = (unsigned int)(delay*sr);
 	if(newDelay >= line_length) newDelay = line_length-1;
-	new_delay = delay;
+	new_delay = newDelay;
 	is_interpolating = true;
 	//we do not screw with the weights.
 	//if we are already interpolating, there is no good option, but suddenly moving back is worse.
@@ -31,7 +31,7 @@ void LavDelayLine::setInterpolationDelta(float d) {
 }
 
 float LavDelayLine::read() {
-	return weight1*line[delay]+weight2*line[new_delay];
+	return weight1*line[ringmodi(write_head-delay, line_length)]+weight2*line[ringmodi(write_head-new_delay, line_length)];
 }
 
 void LavDelayLine::advance(float sample) {
