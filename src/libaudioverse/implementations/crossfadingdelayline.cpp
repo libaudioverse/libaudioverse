@@ -7,17 +7,16 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <functional>
 #include <math.h>
 
-LavDelayLine::LavDelayLine(float maxDelay, float sr) {
-	this->sr = sr;
+LavCrossfadingDelayLine::LavCrossfadingDelayLine(float maxDelay, float sr) {
 	line_length = (unsigned int)(sr*maxDelay)+1;
 	line = new float[line_length];
 }
 
-LavDelayLine::~LavDelayLine() {
+LavCrossfadingDelayLine::~LavCrossfadingDelayLine() {
 	delete[] line;
 }
 
-void LavDelayLine::setDelay(float delay) {
+void LavCrossfadingDelayLine::setDelay(float delay) {
 	unsigned int newDelay = (unsigned int)(delay*sr);
 	if(newDelay >= line_length) newDelay = line_length-1;
 	new_delay = newDelay;
@@ -26,15 +25,15 @@ void LavDelayLine::setDelay(float delay) {
 	//if we are already interpolating, there is no good option, but suddenly moving back is worse.
 }
 
-void LavDelayLine::setInterpolationDelta(float d) {
+void LavCrossfadingDelayLine::setInterpolationDelta(float d) {
 	interpolation_delta = d;
 }
 
-float LavDelayLine::read() {
+float LavCrossfadingDelayLine::read() {
 	return weight1*line[ringmodi(write_head-delay, line_length)]+weight2*line[ringmodi(write_head-new_delay, line_length)];
 }
 
-void LavDelayLine::advance(float sample) {
+void LavCrossfadingDelayLine::advance(float sample) {
 	write_head = ringmodi(write_head+1, line_length);
 	line[write_head] = sample;
 	if(is_interpolating) {

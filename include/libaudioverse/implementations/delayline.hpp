@@ -6,10 +6,10 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 //A single channel delay line.
 //This rounds to the nearest sample for fractional delays.
 
-class LavDelayLine {
+class LavCrossfadingDelayLine {
 	public:
-	LavDelayLine(float maxDelay, float sr);
-	~LavDelayLine();
+	LavCrossfadingDelayLine(float maxDelay, float sr);
+	~LavCrossfadingDelayLine();
 	void setDelay(float delay);
 	float read();
 	void advance(float sample);
@@ -18,6 +18,6 @@ class LavDelayLine {
 	float* line = nullptr;
 	unsigned int line_length = 0, delay = 0, write_head = 0, new_delay = 0, new_write_head = 0;
 	bool is_interpolating = false;
-	float sr = 0, interpolation_delta = 1.0f;
-	float weight1=1.0f, weight2=0.0f;
+	float interpolation_delta = 1.0f;
+	float sr = 0.0f, weight1=1.0f, weight2=0.0f;
 };

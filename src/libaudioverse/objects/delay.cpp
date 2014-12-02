@@ -24,7 +24,7 @@ class LavDelayObject: public LavObject {
 	void delayChanged();
 	void recomputeDelta();
 	unsigned int delay_line_length = 0;
-	std::vector<LavDelayLine> lines;
+	std::vector<LavCrossfadingDelayLine> lines;
 };
 
 LavDelayObject::LavDelayObject(std::shared_ptr<LavSimulation> simulation, float maxDelay, unsigned int lineCount): LavObject(Lav_OBJTYPE_DELAY, simulation, lineCount, lineCount) {
