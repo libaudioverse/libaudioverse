@@ -25,7 +25,8 @@ void LavCrossfadingDelayLine::setInterpolationDelta(float d) {
 }
 
 float LavCrossfadingDelayLine::computeSample() {
-	return weight1*line.read(delay)+weight2*line.read(new_delay);
+	if(is_interpolating) return weight1*line.read(delay)+weight2*line.read(new_delay);
+	return line.read(delay);
 }
 
 void LavCrossfadingDelayLine::advance(float sample) {

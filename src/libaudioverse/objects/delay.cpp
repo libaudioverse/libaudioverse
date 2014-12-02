@@ -56,11 +56,24 @@ void LavDelayObject::delayChanged() {
 
 void LavDelayObject::process() {
 	float feedback = getProperty(Lav_DELAY_FEEDBACK).getFloatValue();
-	for(unsigned int output = 0; output < getOutputCount(); output++) {
-		auto &line = lines[output];
-		for(unsigned int i = 0; i < block_size; i++) {
-			outputs[output][i] = line.computeSample();
-			line.advance(inputs[output][i]+outputs[output][i]*feedback);
+	//optimize the common case of not having feedback.
+	//the only difference between these blocks is in the advance line.
+	if(feedback == 0.0f) {
+		for(unsigned int output = 0; output < getOutputCount(); output++) {
+			auto &line = lines[output];
+			for(unsigned int i = 0; i < block_size; i++) {
+				outputs[output][i] = line.computeSample();
+				line.advance(inputs[output][i]);
+			}
+		}
+	}
+	else {
+		for(unsigned int output = 0; output < getOutputCount(); output++) {
+			auto &line = lines[output];
+			for(unsigned int i = 0; i < block_size; i++) {
+				outputs[output][i] = line.computeSample();
+				line.advance(inputs[output][i]+outputs[output][i]*feedback);
+			}
 		}
 	}
 }
