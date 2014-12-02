@@ -44,6 +44,7 @@ kernels/mixing_matrix.cpp
 
 #Like kernels, but stateful.
 implementations/panner.cpp
+implementations/delayringbuffer.cpp
 implementations/crossfadingdelayline.cpp
 
 #specific node types.

@@ -44,7 +44,6 @@ std::shared_ptr<LavObject> createDelayObject(std::shared_ptr<LavSimulation> simu
 	simulation->associateObject(tmp);
 	return tmp;
 }
-
 void LavDelayObject::recomputeDelta() {
 	float delta = (1.0f/(getProperty(Lav_DELAY_INTERPOLATION_TIME).getFloatValue())/simulation->getSr());
 	for(auto &line: lines) line.setInterpolationDelta(delta);
@@ -60,7 +59,7 @@ void LavDelayObject::process() {
 	for(unsigned int output = 0; output < getOutputCount(); output++) {
 		auto &line = lines[output];
 		for(unsigned int i = 0; i < block_size; i++) {
-			outputs[output][i] = line.read();
+			outputs[output][i] = line.computeSample();
 			line.advance(inputs[output][i]+outputs[output][i]*feedback);
 		}
 	}
