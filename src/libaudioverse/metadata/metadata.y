@@ -97,5 +97,10 @@ objects:
   doc_name: Custom Object
  Lav_OBJTYPE_RINGMOD:
   doc_name: Ring Modulator
+ Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK:
+  properties:
+   Lav_FDN_INTERPOLATION_TIME: {name: interpolation_time, type: float, range:[0.001, INFINITY], default: 0.001}
+   Lav_FDN_MAX_DELAY: {name: delay_max, type: float, read_only: true}
+  doc_name: Feedback Delay Network
 additional_important_enums:
  - Lav_LOGGING_LEVELS

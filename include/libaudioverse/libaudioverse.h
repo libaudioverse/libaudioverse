@@ -107,6 +107,7 @@ enum Lav_OBJTYPES {
 	Lav_OBJTYPE_CUSTOM = 14,
 	Lav_OBJTYPE_RINGMOD = 15,
 	Lav_OBJTYPE_MULTIPANNER = 16,
+	Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK = 17,
 };
 
 /**Object states.*/
@@ -290,6 +291,15 @@ Lav_PUBLIC_FUNCTION LavError Lav_createCustomObject(LavSimulation* simulation, u
 Lav_PUBLIC_FUNCTION LavError Lav_customObjectSetProcessingCallback(LavObject* obj, LavCustomObjectProcessingCallback callback, void* userdata);
 
 Lav_PUBLIC_FUNCTION LavError Lav_createRingmodObject(LavSimulation* sim, LavObject** destination);
+
+//these are for feedback delay networks.
+//Warning: this is one of if not the single most complex objects in Libaudioverse.
+Lav_PUBLIC_FUNCTION LavError Lav_createFeedbackDelayNetworkObject(LavSimulation* sim, float maxDelay, int lines, LavObject** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkObjectSetFeedbackMatrix(LavObject* obj, int count, float* values);
+Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkObjectSetOutputGains(LavObject* obj, int count, float* values);
+Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkObjectSetDelays(LavObject* obj, int count, float* values);
+Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkObjectSetFeedbackDelayMatrix(LavObject* obj, int count, float* values);
+
 #ifdef __cplusplus
 }
 #endif
