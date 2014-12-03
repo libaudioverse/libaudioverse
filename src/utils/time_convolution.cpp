@@ -33,7 +33,7 @@ void main(int argc, char** args) {
 	LavSimulation* simulation;
 	LavObject* world;
 	std::vector<LavObject*> sources;
-	std::vector<LavObject*> sines;
+	LavObject* sineObj;
 	unsigned int numSources = 0;
 	float timeDelta = 0.0f;
 
@@ -42,37 +42,26 @@ void main(int argc, char** args) {
 	ERRCHECK(Lav_createSimpleEnvironmentObject(simulation, args[1], &world));
 	ERRCHECK(Lav_objectSetIntProperty(world, Lav_ENVIRONMENT_DEFAULT_PANNER_STRATEGY, Lav_PANNING_STRATEGY_HRTF));
 	ERRCHECK(Lav_simulationSetOutputObject(simulation, world));
+	ERRCHECK(Lav_createSineObject(simulation, &sineObj));
 	while(timeDelta < SECONDS) {
 		numSources += 10;
 		printf("Preparing to test with %u sources...\n", numSources);
 		sources.resize(numSources, nullptr);
-		sines.resize(numSources, nullptr);
-		//anywhere there's a null pointer in either of them, replace it with a new source or sine object.
-		auto sineIter  = sines.begin();
-		auto sourceIter = sources.begin();
-		for(; sineIter != sines.end() && sourceIter != sources.end(); sineIter++, sourceIter++) {
-			auto sinePtr = *sineIter;
-			auto sourcePtr = *sourceIter;
-			if(sinePtr == nullptr) {
-				ERRCHECK(Lav_createSineObject(simulation, &sinePtr));
-			}
-			if(sourcePtr == nullptr) {
-				ERRCHECK(Lav_createSourceObject(simulation, world, &sourcePtr));
-				ERRCHECK(Lav_objectSetInput(sourcePtr, 0, sinePtr, 0));
-			}
-			//write them back.
-			*sineIter = sinePtr;
-			*sourceIter = sourcePtr;
+		//anywhere there's a null pointer, replace it with a source.
+		for(auto i = sources.begin(); i != sources.end(); i++) {
+			if(*i != nullptr) continue;
+			LavObject* newSource;
+			ERRCHECK(Lav_createSourceObject(simulation, world, &newSource));
+			ERRCHECK(Lav_objectSetInput(newSource, 0, sineObj, 0));
+			*i = newSource;
 		}
 		clock_t startTime = clock();
-		printf("Beginning test...\n");
 		for(unsigned int i = 0; i < SECONDS*44100; i+=BLOCK_SIZE) {
 			Lav_simulationGetBlock(simulation, 2, 1, storage);
 		}
 		clock_t endTime = clock();
 		timeDelta = (endTime-startTime)/(float)CLOCKS_PER_SEC;
 		printf("Done.  Took %f seconds to process.\n", timeDelta);
-		if(timeDelta < 5.0f) printf("Still capable of processing in real-time; increasing sources and retesting.\n");
 	}
 	Lav_shutdown();
 }
