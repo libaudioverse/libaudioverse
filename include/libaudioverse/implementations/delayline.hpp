@@ -12,6 +12,9 @@ class LavDelayRingbuffer {
 	float read(int offset);
 	int getLength();
 	void advance(float sample);
+	void write(int offset, float value);
+	void add(int index, float value);
+	void reset();
 	private:
 	float* buffer = nullptr;
 	int buffer_length = 0, write_head = 0;
@@ -26,7 +29,10 @@ class LavCrossfadingDelayLine {
 	void setDelay(float delay);
 	float computeSample();
 	void advance(float sample);
-	void setInterpolationDelta(float d);
+	void write(float delay, float value);
+	void add(float delay, float value);
+	void reset();
+	void setInterpolationTime(float t);
 	private:
 	LavDelayRingbuffer line;
 	unsigned int line_length = 0, delay = 0, new_delay = 0;

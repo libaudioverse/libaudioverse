@@ -28,3 +28,15 @@ void LavDelayRingbuffer::advance(float sample) {
 	write_head++;
 	buffer[ringmodi(write_head, buffer_length)] = sample;
 }
+
+void LavDelayRingbuffer::write(int index, float value) {
+	buffer[ringmodi(write_head-index, buffer_length)] = value;
+}
+
+void LavDelayRingbuffer::add(int index, float value) {
+	buffer[ringmodi(write_head-index, buffer_length)] += value;
+}
+
+void LavDelayRingbuffer::reset() {
+	memset(buffer, 0, sizeof(float)*buffer_length);
+}

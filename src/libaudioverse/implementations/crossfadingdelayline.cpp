@@ -20,8 +20,8 @@ void LavCrossfadingDelayLine::setDelay(float delay) {
 	//if we are already interpolating, there is no good option, but suddenly moving back is worse.
 }
 
-void LavCrossfadingDelayLine::setInterpolationDelta(float d) {
-	interpolation_delta = d;
+void LavCrossfadingDelayLine::setInterpolationTime(float t) {
+	interpolation_delta = 1.0/(t*sr);
 }
 
 float LavCrossfadingDelayLine::computeSample() {
@@ -42,4 +42,20 @@ void LavCrossfadingDelayLine::advance(float sample) {
 			is_interpolating = false;
 		}
 	}
+}
+void LavCrossfadingDelayLine::write(float delay, float value) {
+	int index = (int)(delay*sr);
+	line.write(index, value);
+}
+
+void LavCrossfadingDelayLine::add(float delay, float value) {
+	int index = (int)(delay*sr);
+	line.write(index, value);
+}
+
+void LavCrossfadingDelayLine::reset() {
+	weight1 = 1.0f;
+	weight2 = 0.0f;
+	is_interpolating = false;
+	line.reset();
 }

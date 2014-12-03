@@ -46,6 +46,7 @@ kernels/mixing_matrix.cpp
 implementations/panner.cpp
 implementations/delayringbuffer.cpp
 implementations/crossfadingdelayline.cpp
+implementations/feedback_delay_network.cpp
 
 #specific node types.
 objects/sine.cpp
