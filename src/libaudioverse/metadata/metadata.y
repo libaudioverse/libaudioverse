@@ -101,6 +101,11 @@ objects:
   properties:
    Lav_FDN_INTERPOLATION_TIME: {name: interpolation_time, type: float, range:[0.001, INFINITY], default: 0.001}
    Lav_FDN_MAX_DELAY: {name: delay_max, type: float, read_only: true}
+  extra_functions:
+   Lav_feedbackDelayNetworkObjectSetFeedbackMatrix: {name: set_feedback_matrix}
+   Lav_feedbackDelayNetworkObjectSetOutputGains: {name: set_output_gains}
+   Lav_feedbackDelayNetworkObjectSetDelays: {name: set_delays}
+   Lav_feedbackDelayNetworkObjectSetFeedbackDelayMatrix: {name: set_feedback_delay_matrix}
   doc_name: Feedback Delay Network
 additional_important_enums:
  - Lav_LOGGING_LEVELS
