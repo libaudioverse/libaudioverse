@@ -25,6 +25,8 @@ LavObject(Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK, simulation, lines, lines) {
 	network = new LavFeedbackDelayNetwork(lines, maxDelay, simulation->getSr());
 	lastOutput = new float[lines]();
 	nextInput = new float[lines]();
+	gains = new float[lines]();
+	for(int i = 0; i < lines; i++) gains[i] = 1.0f;
 	getProperty(Lav_FDN_MAX_DELAY).setFloatValue(maxDelay);
 }
 
@@ -32,6 +34,7 @@ LavFeedbackDelayNetworkObject::~LavFeedbackDelayNetworkObject() {
 	delete network;
 	delete[] lastOutput;
 	delete[] nextInput;
+	delete[] gains;
 }
 
 std::shared_ptr<LavObject> createFeedbackDelayNetworkObject(std::shared_ptr<LavSimulation> simulation, float maxDelay, int lines) {
@@ -43,7 +46,7 @@ void LavFeedbackDelayNetworkObject::process() {
 		network->computeFrame(lastOutput);
 		for(unsigned int j = 0; j < getOutputCount(); j++) {
 			nextInput[j] = inputs[j][i];
-			outputs[j][i] = lastOutput[j];
+			outputs[j][i] = lastOutput[j]*gains[j];
 		}
 		network->advance(nextInput, lastOutput);
 	}
@@ -56,7 +59,7 @@ void LavFeedbackDelayNetworkObject::setFeedbackMatrix(int length, float* values)
 
 void LavFeedbackDelayNetworkObject::setOutputGains(int count, float* values) {
 	if(count != line_count) throw LavErrorException(Lav_ERROR_RANGE);
-	network->setOutputGains(values);
+	std::copy(values, values+count, gains);
 }
 
 void LavFeedbackDelayNetworkObject::setDelays(int length, float* values) {

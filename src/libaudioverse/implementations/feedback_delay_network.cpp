@@ -11,12 +11,11 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 LavFeedbackDelayNetwork::LavFeedbackDelayNetwork(int n, float maxDelay, float sr) {
 	this->n = n;
 	this->sr = sr;
+	this->using_feedback_delay_matrix = false;
 	bank = new LavCrossfadingDelayLine*[n];
 	for(int i = 0; i < n; i++) bank[i] = new LavCrossfadingDelayLine(maxDelay, sr);
 	feedback_matrix = new float[n*n]();
 	feedback_delay_matrix = new float[n*n]();
-	output_gains = new float[n]();
-	for(int i = 0; i < n; i++) output_gains[i]= 1.0f/n;
 	delays = new float[n]();
 	workspace = new float[n*n]();
 }
@@ -26,14 +25,13 @@ LavFeedbackDelayNetwork::~LavFeedbackDelayNetwork() {
 	delete[] bank;
 	delete[] feedback_matrix;
 	delete[] feedback_delay_matrix;
-	delete[] output_gains;
 	delete[] delays;
 	delete[] workspace;
 }
 
 void LavFeedbackDelayNetwork::computeFrame(float* outputs) {
 	//the output step is not special.
-	for(int i = 0; i < n; i++) outputs[i] = bank[i]->computeSample()*output_gains[i];
+	for(int i = 0; i < n; i++) outputs[i] = bank[i]->computeSample();
 }
 
 void LavFeedbackDelayNetwork::advance(float* nextInput, float* lastOutput) {
@@ -48,7 +46,7 @@ void LavFeedbackDelayNetwork::advance(float* nextInput, float* lastOutput) {
 void LavFeedbackDelayNetwork::computeFeedbacks(float* lastOutput) {
 	for(int row = 0; row < n; row++) {
 		for(int column = 0; column < n; column++) {
-			workspace[row*n+column] = lastOutput[column]*feedback_matrix[row*n+column];
+			workspace[row*n+column] = lastOutput[row]*feedback_matrix[row*n+column];
 		}
 	}
 	//now we sum them in the first row.
@@ -62,7 +60,7 @@ void LavFeedbackDelayNetwork::computeFeedbacks(float* lastOutput) {
 
 void LavFeedbackDelayNetwork::advanceNoFeedbackDelayMatrix(float* nextInput, float* lastOutput) {
 	//in this case, we advance the delay lines with their computed feedback samples.
-	//fill workspace with a computed feedback frame as first row:
+	//fill workspace with a computed feedback frame:
 	computeFeedbacks(lastOutput);
 	//sum onto workspace the next input frame.
 	for(int column = 0; column < n; column++) workspace[column]+=nextInput[column];
@@ -86,10 +84,6 @@ void LavFeedbackDelayNetwork::advanceFeedbackDelayMatrix(float* nextInput, float
 
 //below here is not very algorithmic, just setters.
 
-void LavFeedbackDelayNetwork::setOutputGains(float* gains) {
-	std::copy(gains, gains+n, output_gains);
-}
-
 void LavFeedbackDelayNetwork::setFeedbackMatrix(float* feedbacks) {
 	std::copy(feedbacks, feedbacks+n*n, feedback_matrix);
 }
@@ -106,7 +100,7 @@ void LavFeedbackDelayNetwork::setDelays(float* delays) {
 void LavFeedbackDelayNetwork::setCrossfadingTime(float time) {
 	for(int i = 0; i < n; i++) bank[i]->setInterpolationTime(time);
 }
-\
+
 void LavFeedbackDelayNetwork::reset() {
 	for(int i = 0; i < n; i++) bank[i]->reset();
 }

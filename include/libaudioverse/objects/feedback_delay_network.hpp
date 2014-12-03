@@ -20,4 +20,5 @@ class LavFeedbackDelayNetworkObject: public LavObject {
 	float max_delay = 0.0f;
 	int line_count = 0;
 	float*lastOutput = nullptr, *nextInput = nullptr;
+	float* gains = nullptr;
 };

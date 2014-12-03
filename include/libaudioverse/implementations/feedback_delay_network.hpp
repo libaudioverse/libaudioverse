@@ -26,7 +26,6 @@ class LavFeedbackDelayNetwork {
 	~LavFeedbackDelayNetwork();
 	void computeFrame(float* outputs);
 	void advance(float* nextInput, float* lastOutput);
-	void setOutputGains(float* gains);
 	void setFeedbackMatrix(float* feedbacks);
 	void setFeedbackDelayMatrix(float* feedbackDelays);
 	void setDelays(float* delays);
@@ -41,7 +40,6 @@ class LavFeedbackDelayNetwork {
 	float sr;
 	LavCrossfadingDelayLine **bank = nullptr;
 	float *feedback_matrix = nullptr, *feedback_delay_matrix = nullptr;
-	float *output_gains = nullptr;
 	//avoids very continuous reallocation, an n*n matrix.
 	float* workspace = nullptr;
 	float* delays = nullptr;
