@@ -169,10 +169,10 @@ Note also that we are not inheriting from MutableSequence because we cannot supp
 		return _lav.object_get_input_count(self.for_object.handle)
 
 	def __getitem__(self, key):
-		par, out = self.for_object._get_input(key)
-		if par is None:
+		input = self.for_object._get_input(key)
+		if input is None:
 			return None
-		return par, out
+		return input
 
 	def __setitem__(self, key, val):
 		if val is None:
@@ -301,7 +301,7 @@ class GenericObject(object):
 	def __init__(self, handle, simulation):
 		self.handle = handle
 		self.simulation = simulation
-		self._inputs = [(None, 0)]*_lav.object_get_input_count(handle)
+		self._inputs = [None]*_lav.object_get_input_count(handle)
 		self._events= dict()
 		self._callbacks = dict()
 
@@ -330,14 +330,23 @@ class GenericObject(object):
 		new_input_count = _lav.object_get_input_count(self.handle)
 		new_input_list = self._inputs
 		if new_input_count < len(self._inputs):
-			new_input_list = self._inputs[0:new_parents_count]
+			new_input_list = self._inputs[0:new_input_count]
 		elif new_input_count > len(self._inputs):
-			additional_inputs = [(None, 0)]*(new_input_count-len(self._inputs))
+			additional_inputs = [None]*(new_input_count-len(self._inputs))
 			new_input_list = new_input_list + additional_inputs
 		self._inputs = new_input_list
 
 	def _get_input(self, key):
-		return self._inputs[key]
+		if self._inputs[key] is None:
+			return None
+		obj, slot = self._inputs[key]
+		handle = obj.handle
+		#We need to check and make sure this is still valid.
+		#It's possible our parent(s) resized their outputs and that libaudioverse killed this connection.
+		if handle != _lav.object_get_input_object(self.handle, key):
+			self._inputs[key] = None
+			return None
+		return obj, slot
 
 	def _set_input(self, key, obj, inp):
 		if obj is None:
