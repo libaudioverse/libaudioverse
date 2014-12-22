@@ -193,12 +193,16 @@ LavProperty& LavObject::getProperty(int slot) {
 	else return properties[slot];
 }
 
-std::vector<int> LavObject::getStaticPropertyIndices() {
+std::vector<int> LavObject::getPropertyIndices() {
 	std::vector<int> res;
 	for(auto i = properties.begin(); i != properties.end(); i++) {
-		if(i->first < 0) res.push_back(i->first);
+		res.push_back(i->first);
 	}
 	return res;
+}
+
+int LavObject::getPropertyCount() {
+	return properties.size();
 }
 
 LavEvent& LavObject::getEvent(int which) {
@@ -512,11 +516,18 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetDoublePropertyRange(LavObject* obj, in
 	PUB_END
 }
 
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyCount(LavObject* obj, int* destination) {
+	PUB_BEGIN
+	LOCK(*obj);
+	*destination = obj->getPropertyCount();
+	PUB_END
+}
+
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyIndices(LavObject* obj, int** destination) {
 	PUB_BEGIN
 	auto obj_ptr = incomingPointer<LavObject>(obj);
 	LOCK(*obj);
-	std::vector<int> indices = obj->getStaticPropertyIndices();
+	std::vector<int> indices = obj->getPropertyIndices();
 	int* result = new int[indices.size()+1]; //so we can terminate with 0.
 	std::copy(indices.begin(), indices.end(), result);
 	result[indices.size()] = 0;

@@ -67,7 +67,8 @@ class LavObject: public std::enable_shared_from_this<LavObject> { //enable_share
 
 	virtual std::shared_ptr<LavSimulation> getSimulation();
 	virtual LavProperty& getProperty(int slot);
-	virtual std::vector<int> getStaticPropertyIndices();
+	virtual std::vector<int> getPropertyIndices();
+	int getPropertyCount();
 
 	//event helper methods.
 	LavEvent& getEvent(int which);

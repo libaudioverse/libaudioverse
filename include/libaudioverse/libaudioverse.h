@@ -218,7 +218,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetIntPropertyRange(LavObject* obj, int s
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloatPropertyRange(LavObject* obj, int slot, float* destination_lower, float* destination_upper);
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetDoublePropertyRange(LavObject* obj, int slot, double* destination_lower, double* destination_upper);
 
-/**Get the indices of all nondynamic properties on an object as an array of ints, that is all properties with numeric index less than 0.  Allocates memory; free with Lav_free.*/
+/**Get the count of properties on an object.*/
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyCount(LavObject* obj, int* destination);
+/**Get the indices of all properties on an object as an array of ints, that is all properties with numeric index less than 0.  Allocates memory; free with Lav_free.*/
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyIndices(LavObject* obj, int** destination);
 /**Get the name of a property.  Again, allocates memory.*/
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyName(LavObject* obj, int slot, char** destination);

@@ -214,24 +214,6 @@ class {{name|without_lav|underscores_to_camelcase(True)}}(enum.IntEnum):
 {%endfor%}
 {%endfor%}
 
-class PropertyInfo(object):
-	"""Represents information about a property.
-
-type: Type as a member of libaudioverse.PropertyTypes.
-
-range: The range, if applicable.  Otherwise None.  May contain -infinity or infinity for floats.
-
-dynamic_range: Does the range change based on other conditions (i.e. loaded file)?
-
-name: Name of the property.
-"""
-
-	def __init__(self, name, range, dynamic_range, type):
-		self.name = name
-		self.type = type
-		self.range = range
-		self.dynamic_range = dynamic_range
-
 #This is the class hierarchy.
 #GenericObject is at the bottom, and we should never see one; and GenericObject should hold most implementation.
 class GenericObject(object):
