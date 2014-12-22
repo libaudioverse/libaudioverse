@@ -12,11 +12,12 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_dspmath.hpp>
 #include <libaudioverse/private_properties.hpp>
 #include <libaudioverse/private_memory.hpp>
+#include <libaudioverse/private_creators.hpp>
 #include <limits>
 #include <memory>
 #include <math.h>
 
-class LavMultifileObject: LavSubgraphObject {
+class LavMultifileObject: public LavSubgraphObject {
 	public:
 	LavMultifileObject(std::shared_ptr<LavSimulation> simulation, int channels, int maxSimultaneousFiles);
 	~LavMultifileObject();
@@ -26,7 +27,7 @@ class LavMultifileObject: LavSubgraphObject {
 	std::vector<std::shared_ptr<LavObject>> file_nodes;
 };
 
-LavMultifileObject::LavMultifileObject(std::shared_ptr<LavSimulation> simulation, int channels, int maxSimultaneousFiles): LavSubgraphObject(lav_OBJTYPE_MULTIFILE, simulation) {
+LavMultifileObject::LavMultifileObject(std::shared_ptr<LavSimulation> simulation, int channels, int maxSimultaneousFiles): LavSubgraphObject(Lav_OBJTYPE_MULTIFILE, simulation) {
 	this->channels = channels;
 	this->max_simultaneous_files = maxSimultaneousFiles;
 	this->mixer =createMixerObject(simulation, maxSimultaneousFiles, channels);
@@ -35,7 +36,7 @@ LavMultifileObject::LavMultifileObject(std::shared_ptr<LavSimulation> simulation
 	for(int i = 0; i < file_nodes.size(); i++) file_nodes[i] = nullptr;
 }
 
-lavMultifileObject::~LavMultifileObject() {
+LavMultifileObject::~LavMultifileObject() {
 }
 
 std::shared_ptr<LavObject> createMultifileObject(std::shared_ptr<LavSimulation> simulation, int channels, int maxSimultaneousFiles) {
@@ -57,11 +58,11 @@ void LavMultifileObject::play(std::string file) {
 	//make a file node, put it in the slot.
 	auto obj = createFileObject(simulation, file.c_str());
 	for(int i = 0; i < channels; i++) {
-		if(i >= obj.getInputCount()) mixer->setInput(empty_slot*channels+i, nullptr, 0);
-		else mixer->setInput(empty_slot*channels+i, obj);
+		if(i >= obj->getInputCount()) mixer->setInput(empty_slot*channels+i, nullptr, 0);
+		else mixer->setInput(empty_slot*channels+i, obj, i);
 	}
 	//we need to hook up a clearing event.  We do this here.
-	std::weak_ptr<LavMultifileObject> weakref = this->shared_from_this();
+	std::weak_ptr<LavMultifileObject> weakref = std::static_pointer_cast<LavMultifileObject>(this->shared_from_this());
 	auto &ev =getEvent(Lav_FILE_END_EVENT);
 	ev.setHandler([=](LavObject* obj, void* userdata) {
 		auto strongref = weakref.lock();
@@ -72,5 +73,5 @@ void LavMultifileObject::play(std::string file) {
 		}
 		strongref->file_nodes[empty_slot] = nullptr; //this slot has again become available.
 	});
-	file_nodes[i] = obj;
+	file_nodes[empty_slot] = obj;
 }
