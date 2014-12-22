@@ -677,7 +677,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetEventHandler(LavObject* obj, int event
 	PUB_BEGIN
 	auto ptr = incomingPointer<LavObject>(obj);
 	LOCK(*obj);
-	*destination = obj->getEvent(event).getHandler();
+	*destination = obj->getEvent(event).getExternalHandler();
 	PUB_END
 }
 
@@ -693,7 +693,14 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectSetEvent(LavObject* obj, int event, LavEv
 	PUB_BEGIN
 	auto ptr = incomingPointer<LavObject>(obj);
 	LOCK(*ptr);
-	obj->getEvent(event).setHandler(handler);
-	obj->getEvent(event).setUserData(userData);
+	auto &ev = obj->getEvent(event);
+	if(handler) {
+		ev.setHandler([=](LavObject* o, void* d) { handler(o, d);});
+		ev.setExternalHandler(handler);
+		ev.setUserData(userData);
+	} else {
+		ev.setHandler(std::function<void(LavObject*, void*)>());
+		ev.setExternalHandler(nullptr);
+	}
 	PUB_END
 }

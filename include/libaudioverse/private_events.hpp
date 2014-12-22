@@ -7,6 +7,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <memory>
 #include <string>
 #include <atomic>
+#include <functional>
 
 class LavSimulation;
 
@@ -15,8 +16,10 @@ class LavEvent {
 	LavEvent();
 	LavEvent(const LavEvent& other);
 	LavEvent& operator=(const LavEvent other);
-	void setHandler(LavEventCallback cb);
-	LavEventCallback getHandler();
+	void setHandler(std::function<void(LavObject*, void*)> cb);
+	//these two are for when using externally. Allows us to make a query of what the handler is for c api.
+	void setExternalHandler(LavEventCallback cb);
+	LavEventCallback getExternalHandler();
 	void fire();
 	void associateSimulation(std::shared_ptr<LavSimulation> sim);
 	void associateObject(LavObject* obj);
@@ -39,7 +42,8 @@ class LavEvent {
 	};
 	private:
 	std::shared_ptr<LavSimulation> associated_simulation = nullptr;
-	LavEventCallback handler = nullptr;
+	LavEventCallback external_handler = nullptr;
+	std::function<void(LavObject*, void*)> handler;
 	std::string name;
 	LavObject* associated_object = nullptr;
 	void* user_data = nullptr;

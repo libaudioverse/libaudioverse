@@ -24,28 +24,31 @@ LavEvent& LavEvent::operator=(LavEvent other) {
 	return *this;
 }
 
-void LavEvent::setHandler(LavEventCallback cb) {
-	handler = cb;
+void LavEvent::setExternalHandler(LavEventCallback cb) {
+	external_handler = cb;
 }
 
-LavEventCallback LavEvent::getHandler() {
-	return handler;
+LavEventCallback LavEvent::getExternalHandler() {
+	return external_handler;
+}
+
+void LavEvent::setHandler(std::function<void(LavObject*, void*)> handler) {
+	this->handler = handler;
 }
 
 void LavEvent::fire() {
-	if(handler == nullptr) return; //nothing to do.
+	if(handler == false) return; //nothing to do.
 	if(no_multifire && is_firing.load() == 1) return;
 	is_firing.store(1);
 	//we need to hold local copies of both the object and data in case they are changed between firing and processing by the simulation.
 	auto obj = std::weak_ptr<LavObject>(associated_object->shared_from_this());
 	void* userdata = user_data;
-	LavEventCallback cb = handler;
 	//fire a lambda that uses these by copy.
 	associated_simulation->enqueueTask([=]() {
 		auto shared_obj = obj.lock();
 		if(shared_obj == nullptr) return;	
 		//callbacks die with objects; if we get this far, this is still a valid pointer.
-		cb(shared_obj.get(), userdata);
+		handler(shared_obj.get(), userdata);
 		this->is_firing.store(0);
 	});
 }
