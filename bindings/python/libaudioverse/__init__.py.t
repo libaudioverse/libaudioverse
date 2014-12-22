@@ -214,6 +214,26 @@ class {{name|without_lav|underscores_to_camelcase(True)}}(enum.IntEnum):
 {%endfor%}
 {%endfor%}
 
+class PropertyInfo(object):
+	"""Gives info about a property.
+
+type: Type of the property as libaudioverse.PropertyTypes.
+
+name: Name of the property.
+
+range:Range of the property, if applicable.  Otherwise none.
+
+has_dynamic_range: True if the property has a dynamic range (i.e. file object's position property), otherwise False.
+
+Note that this only communicates info.  If changes happen after you requested this instance, they will not be reflected here.
+"""
+
+	def __init__(self, name, type, range, has_dynamic_range):
+		self.name = name
+		self.type = type
+		self.range = range
+		self.has_dynamic_range = has_dynamic_range
+
 #This is the class hierarchy.
 #GenericObject is at the bottom, and we should never see one; and GenericObject should hold most implementation.
 class GenericObject(object):
@@ -234,6 +254,25 @@ class GenericObject(object):
 			self._properties[name] = property_array[i]
 			if _lav.object_get_property_has_dynamic_range(self.handle, property_array[i]) != 0:
 				self._dynamic_properties.add(name)
+
+	def get_property_names(self):
+		return self._properties.keys()
+
+	def get_property_info(self, name):
+		"""Return info for the property named name."""
+		if name not in self._properties:
+			raise ValueError(name + " is not a property on this instance.")
+		index = self._properties[name]
+		type = PropertyTypes(_lav.object_get_property_type(self.handle, index))
+		range = None
+		has_dynamic_range = bool(_lav.object_get_property_has_dynamic_range(self.handle, index))
+		if type == PropertyTypes.int:
+			range = _lav.object_get_int_property_range(self.handle, index)
+		elif type == PropertyTypes.float:
+			range = _lav.object_get_float_property_range()
+		elif type == PropertyTypes.double:
+			range = _lav.object_get_double_property_range(self.handle, index)
+		return PropertyInfo(name = name, type = type, range = range, has_dynamic_range = has_dynamic_range)
 
 {%for enumerant, prop in metadata['objects']['Lav_OBJTYPE_GENERIC']['properties'].iteritems()%}
 {{macros.implement_property(enumerant, prop)}}

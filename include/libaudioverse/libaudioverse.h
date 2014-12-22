@@ -224,7 +224,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyCount(LavObject* obj, int* des
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyIndices(LavObject* obj, int** destination);
 /**Get the name of a property.  Again, allocates memory.*/
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyName(LavObject* obj, int slot, char** destination);
-Lav_PUBLIC_FUNCTION LavError Lav_getPropertyType(LavObject* obj, int slot, int* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyType(LavObject* obj, int slot, int* destination);
 /**Properties with dynamic ranges may change the endpoints of their range at any time and for any reason.
 This is primarily used by bindings, but may be useful to user interface developers.*/
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyHasDynamicRange(LavObject* obj, int slot, int* destination);
