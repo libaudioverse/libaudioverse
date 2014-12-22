@@ -109,3 +109,4 @@ objects:
   doc_name: Feedback Delay Network
 additional_important_enums:
  - Lav_LOGGING_LEVELS
+ - Lav_PROPERTY_TYPES

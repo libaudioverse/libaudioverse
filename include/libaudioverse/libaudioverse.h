@@ -77,7 +77,7 @@ enum Lav_ERRORS {
 };
 
 /**These are property types, either int, float, double, vector of 3 floats, vector of 6 floats, string, or int/float array of any length.*/
-enum Lav_PROPERTYTYPES {
+enum Lav_PROPERTY_TYPES {
 	Lav_PROPERTYTYPE_INT = 1,
 	Lav_PROPERTYTYPE_FLOAT = 2,
 	Lav_PROPERTYTYPE_DOUBLE = 3,
