@@ -535,6 +535,14 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyIndices(LavObject* obj, int** 
 	PUB_END
 }
 
+Lav_PUBLIC_FUNCTION LavError Lav_getPropertyType(LavObject* obj, int slot, int* destination) {
+	PUB_BEGIN
+	LOCK(*obj);
+	auto &prop = obj->getProperty(slot);
+	*destination = prop.getType();
+	PUB_END
+}
+
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyName(LavObject* obj, int slot, char** destination) {
 	PUB_BEGIN
 	auto obj_ptr = incomingPointer<LavObject>(obj);
