@@ -177,6 +177,15 @@ class LavProperty {
 	//set the callback...
 	void setPostChangedCallback(std::function<void(void)> cb) {post_changed_callback = cb;}
 
+	//get/set dynamic range status.
+	bool getHasDynamicRange() {
+		return has_dynamic_range;
+	}
+
+	void setHasDynamicRange(bool v) {
+		has_dynamic_range = v;
+	}
+
 	private:
 	int type, tag;
 	LavPropertyValue value, default_value, minimum_value, maximum_value;
@@ -186,6 +195,7 @@ class LavProperty {
 	unsigned int min_array_length = 0, max_array_length = std::numeric_limits<unsigned int>::max();
 	std::function<void(void)> post_changed_callback;
 	bool read_only = false;
+	bool has_dynamic_range = false;
 };
 
 //helper methods to quickly make properties.

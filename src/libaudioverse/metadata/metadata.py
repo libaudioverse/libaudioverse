@@ -85,6 +85,7 @@ for propkey, propid, propinfo in joined_properties:
 		propinfo['default'] = bindings.get_info.all_info['constants'][propinfo['default']]
 	if propinfo.get('range', None) =='dynamic':
 		propinfo['range'] = [0, 0]
+		propinfo['is_dynamic'] = True
 	for i, j in enumerate(list(propinfo.get('range', []))): #if we don't have a range, this will do nothing.
 		if isinstance(j, basestring):
 			continue #it's either MIN_INT, MAX_INT, INFINITY, -INFINITY, or another special identifier.  Pass through unchanged.

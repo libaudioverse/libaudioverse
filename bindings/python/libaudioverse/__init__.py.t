@@ -226,11 +226,14 @@ class GenericObject(object):
 		self._events= dict()
 		self._callbacks = dict()
 		self._properties = dict()
+		self._dynamic_properties =  set()
 		property_count = _lav.object_get_property_count(self.handle)
 		property_array = _lav.object_get_property_indices(self.handle)
 		for i in xrange(property_count):
 			name = _lav.object_get_property_name(self.handle, property_array[i])
 			self._properties[name] = property_array[i]
+			if _lav.object_get_property_has_dynamic_range(self.handle, property_array[i]) != 0:
+				self._dynamic_properties.add(name)
 
 {%for enumerant, prop in metadata['objects']['Lav_OBJTYPE_GENERIC']['properties'].iteritems()%}
 {{macros.implement_property(enumerant, prop)}}

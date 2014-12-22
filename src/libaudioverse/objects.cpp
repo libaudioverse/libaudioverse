@@ -547,6 +547,14 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyName(LavObject* obj, int slot,
 	PUB_END
 }
 
+Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyHasDynamicRange(LavObject* obj, int slot, int* destination) {
+	PUB_BEGIN
+	LOCK(*obj);
+	auto &prop = obj->getProperty(slot);
+	*destination = prop.getHasDynamicRange();
+	PUB_END
+}
+
 //array properties.
 
 Lav_PUBLIC_FUNCTION LavError Lav_objectReplaceFloatArrayProperty(LavObject* obj, int slot, unsigned int length, float* values) {
