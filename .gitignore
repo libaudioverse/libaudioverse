@@ -12,3 +12,4 @@ build/
 *.hrtf
 !default_hrtf.hrtf
 venv/
+*.ogg
