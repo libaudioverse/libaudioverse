@@ -22,6 +22,7 @@ class LavMultifileObject: public LavSubgraphObject {
 	LavMultifileObject(std::shared_ptr<LavSimulation> simulation, int channels, int maxSimultaneousFiles);
 	~LavMultifileObject();
 	void play(std::string file);
+	void stopAll();
 	std::shared_ptr<LavObject> mixer = nullptr;
 	int channels, max_simultaneous_files;
 	std::vector<std::shared_ptr<LavObject>> file_nodes;
@@ -78,6 +79,13 @@ void LavMultifileObject::play(std::string file) {
 	file_nodes[empty_slot] = obj;
 }
 
+void LavMultifileObject::stopAll() {
+	for(int i = 0; i < file_nodes.size(); i++) file_nodes[i]=nullptr;
+	for(int i = 0; i < mixer->getInputCount(); i++) mixer->setInput(i, nullptr, 0);
+}
+
+//begin public api
+
 Lav_PUBLIC_FUNCTION LavError Lav_createMultifileObject(LavSimulation* sim, int channels, int maxSimultaneousFiles, LavObject** destination) {
 	PUB_BEGIN
 	LOCK(*sim);
@@ -90,5 +98,13 @@ Lav_PUBLIC_FUNCTION LavError Lav_multifileObjectPlay(LavObject* obj, char* path)
 	LOCK(*obj);
 	if(obj->getType() != Lav_OBJTYPE_MULTIFILE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
 	((LavMultifileObject*)obj)->play(path);
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_multifileObjectStopAll(LavObject* obj) {
+	PUB_BEGIN
+	LOCK(*obj);
+	if(obj->getType() != Lav_OBJTYPE_MULTIFILE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
+	((LavMultifileObject*)obj)->stopAll();
 	PUB_END
 }

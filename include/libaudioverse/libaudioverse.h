@@ -309,6 +309,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkObjectSetFeedbackDelayMatri
 
 Lav_PUBLIC_FUNCTION LavError Lav_createMultifileObject(LavSimulation* sim, int channels, int maxSimultaneousFiles, LavObject** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_multifileObjectPlay(LavObject* obj, char* path);
+Lav_PUBLIC_FUNCTION LavError Lav_multifileObjectStopAll(LavObject* obj);
 
 #ifdef __cplusplus
 }

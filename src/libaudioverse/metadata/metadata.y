@@ -111,6 +111,7 @@ objects:
   doc_name: Multifile Object
   extra_functions:
    Lav_multifileObjectPlay: {name: play}
+   Lav_multifileObjectStopAll: {name: stop_all}
 additional_important_enums:
  - Lav_LOGGING_LEVELS
  - Lav_PROPERTY_TYPES
