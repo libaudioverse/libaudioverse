@@ -158,6 +158,7 @@ void LavSimulation::visitAllObjectsInProcessOrder(std::function<void(std::shared
 	//visit the rest: Lav_OBJSTATE_ALWAYS_PLAYING.
 	for(auto& i: objects) {
 		std::shared_ptr<LavObject> j = i.lock();
+		if(j == nullptr) return; //this is dead.
 		if(j->getState() == Lav_OBJSTATE_ALWAYS_PLAYING) {
 			visitForProcessing(j, visitorWrapped);
 		}

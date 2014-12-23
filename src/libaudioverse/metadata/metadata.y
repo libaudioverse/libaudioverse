@@ -107,6 +107,10 @@ objects:
    Lav_feedbackDelayNetworkObjectSetDelays: {name: set_delays}
    Lav_feedbackDelayNetworkObjectSetFeedbackDelayMatrix: {name: set_feedback_delay_matrix}
   doc_name: Feedback Delay Network
+ Lav_OBJTYPE_MULTIFILE:
+  doc_name: Multifile Object
+  extra_functions:
+   Lav_multifileObjectPlay: {name: play}
 additional_important_enums:
  - Lav_LOGGING_LEVELS
  - Lav_PROPERTY_TYPES

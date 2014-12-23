@@ -40,7 +40,9 @@ LavMultifileObject::~LavMultifileObject() {
 }
 
 std::shared_ptr<LavObject> createMultifileObject(std::shared_ptr<LavSimulation> simulation, int channels, int maxSimultaneousFiles) {
-	return std::make_shared<LavMultifileObject>(simulation, channels, maxSimultaneousFiles);
+	auto retval =std::make_shared<LavMultifileObject>(simulation, channels, maxSimultaneousFiles);
+	simulation->associateObject(retval);
+	return retval;
 }
 
 void LavMultifileObject::play(std::string file) {
@@ -58,12 +60,12 @@ void LavMultifileObject::play(std::string file) {
 	//make a file node, put it in the slot.
 	auto obj = createFileObject(simulation, file.c_str());
 	for(int i = 0; i < channels; i++) {
-		if(i >= obj->getInputCount()) mixer->setInput(empty_slot*channels+i, nullptr, 0);
+		if(i >= obj->getOutputCount()) mixer->setInput(empty_slot*channels+i, nullptr, 0);
 		else mixer->setInput(empty_slot*channels+i, obj, i);
 	}
 	//we need to hook up a clearing event.  We do this here.
 	std::weak_ptr<LavMultifileObject> weakref = std::static_pointer_cast<LavMultifileObject>(this->shared_from_this());
-	auto &ev =getEvent(Lav_FILE_END_EVENT);
+	auto &ev = obj->getEvent(Lav_FILE_END_EVENT);
 	ev.setHandler([=](LavObject* obj, void* userdata) {
 		auto strongref = weakref.lock();
 		if(strongref == nullptr) return; //no more strong reference for us to work with.
@@ -74,4 +76,19 @@ void LavMultifileObject::play(std::string file) {
 		strongref->file_nodes[empty_slot] = nullptr; //this slot has again become available.
 	});
 	file_nodes[empty_slot] = obj;
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_createMultifileObject(LavSimulation* sim, int channels, int maxSimultaneousFiles, LavObject** destination) {
+	PUB_BEGIN
+	LOCK(*sim);
+	*destination = outgoingPointer(createMultifileObject(incomingPointer<LavSimulation>(sim), channels, maxSimultaneousFiles));
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_multifileObjectPlay(LavObject* obj, char* path) {
+	PUB_BEGIN
+	LOCK(*obj);
+	if(obj->getType() != Lav_OBJTYPE_MULTIFILE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
+	((LavMultifileObject*)obj)->play(path);
+	PUB_END
 }

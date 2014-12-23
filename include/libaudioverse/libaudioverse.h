@@ -307,6 +307,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkObjectSetOutputGains(LavObj
 Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkObjectSetDelays(LavObject* obj, int count, float* values);
 Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkObjectSetFeedbackDelayMatrix(LavObject* obj, int count, float* values);
 
+Lav_PUBLIC_FUNCTION LavError Lav_createMultifileObject(LavSimulation* sim, int channels, int maxSimultaneousFiles, LavObject** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_multifileObjectPlay(LavObject* obj, char* path);
+
 #ifdef __cplusplus
 }
 #endif
