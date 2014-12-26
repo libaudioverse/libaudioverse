@@ -45,7 +45,8 @@ void LavSimpleEnvironment::willProcessParents() {
 	const float* atup = getProperty(Lav_3D_ORIENTATION).getFloat6Value();
 	environment.world_to_listener_transform = glm::lookAt(
 		glm::vec3(pos[0], pos[1], pos[2]),
-		glm::vec3(atup[0], atup[1], atup[2]),
+		//this is a point in 3d space, not a unit vector indicating direction.
+		glm::vec3(pos[0]+atup[0], pos[1]+atup[1], pos[2]+atup[2]),
 		glm::vec3(atup[3], atup[4], atup[5]));
 
 	//todo: the following needs to clean up dead sources.
