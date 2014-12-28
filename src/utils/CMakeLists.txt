@@ -11,3 +11,4 @@ SET_PROPERTY(TARGET ${name} PROPERTY RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_BINARY_D
 endmacro()
 util(time_convolution)
 util(time_delay_lines)
+util(time_mixer)
