@@ -12,6 +12,10 @@ void multiplicationKernelSimple(int length, float* a1, float* a2, float* dest) {
 	for(int i = 0; i < length; i++) dest[i]=a1[i]*a2[i];
 }
 
+void scalarMultiplicationKernelSimple(int length, float c, float* a1, float* dest) {
+	for(int i = 0; i < length; i++) dest[i]=c*a1[i];
+}
+
 #if defined(LIBAUDIOVERSE_USE_SSE2)
 void multiplicationKernel(int length, float* a1, float* a2, float* dest) {
 	int neededLength = (length/4)*4;
@@ -24,9 +28,26 @@ void multiplicationKernel(int length, float* a1, float* a2, float* dest) {
 	}
 	multiplicationKernelSimple(length-neededLength, a1+neededLength, a2+neededLength, dest+neededLength);
 }
+
+void scalarMultiplicationKernel(int length, float c, float* a1, float* dest) {
+	int neededLength = (length/4)*4;
+	__m128 a1r, cr;
+	cr = _mm_load1_ps(&c);
+	for(int i = 0; i < neededLength; i+= 4) {
+		a1r = _mm_load_ps(a1+i);
+		a1r=_mm_mul_ps(a1r, cr);
+		_mm_store_ps(dest+i, a1r);
+	}
+	scalarMultiplicationKernelSimple(length-neededLength, c, a1+neededLength, dest+neededLength);
+}
 #else
 void multiplicationKernel(int length, float* a1, float* a2, float* dest) {
 	multiplicationKernelSimple(length, a1, a2, dest);
 }
+
+void scalarMultiplicationKernel(int length, float c, float* a1, float*dest) {
+	scalarMultiplicationKernelSimple(length, c, a1, dest);
+}
+
 #endif
 
