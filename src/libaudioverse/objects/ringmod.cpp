@@ -33,7 +33,7 @@ std::shared_ptr<LavObject> createRingmodObject(std::shared_ptr<LavSimulation> si
 }
 
 void LavRingmodObject::process() {
-	for(unsigned int i = 0; i < block_size; i++) outputs[0][i]=inputs[0][i]*inputs[1][i];
+	multiplicationKernel(block_size, inputs[0], inputs[1], outputs[0]);
 }
 
 //begin public api.
