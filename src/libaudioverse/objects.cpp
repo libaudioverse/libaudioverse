@@ -11,6 +11,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_simulation.hpp>
 #include <libaudioverse/private_macros.hpp>
 #include <libaudioverse/private_metadata.hpp>
+#include <libaudioverse/private_kernels.hpp>
 #include <algorithm>
 #include <memory>
 #include <stdlib.h>
@@ -103,9 +104,7 @@ void LavObject::doProcessProtocol() {
 	if(mul != 1.0f) {
 		for(unsigned int i = 0; i < getOutputCount(); i++) {
 			float* output = getOutputPointer(i);
-			for(unsigned int j = 0; j < block_size; j++) {
-				output[j] *= mul;
-			}
+			scalarMultiplicationKernel(block_size, mul, output, output);
 		}
 	}
 	is_processing = false;
