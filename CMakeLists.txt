@@ -4,8 +4,13 @@ project(Libaudioverse)
 include_directories("${CMAKE_SOURCE_DIR}/include")
 include_directories("${CMAKE_SOURCE_DIR}/lambdatask/include")
 
+#Which CPU extensions to enable?
+option(LIBAUDIOVERSE_USE_SSE2 "Use SSE2" ON)
 #this is the required alignment for allocation, a default which is configured in case sse/other processor extensions are disabled.
 SET(LIBAUDIOVERSE_MALLOC_ALIGNMENT 1)
+if(${LIBAUDIOVERSE_USE_SSE2})
+SET(LIBAUDIOVERSE_MALLOC_ALIGNMENT 16)
+ENDIF()
 
 #This is LibSNDFile for windows.
 #if you've got them somewhere else, you need to change these lines.
