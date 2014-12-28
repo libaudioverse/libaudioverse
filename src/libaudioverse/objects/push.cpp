@@ -44,7 +44,9 @@ LavPushObject::LavPushObject(std::shared_ptr<LavSimulation> sim, unsigned int in
 }
 
 std::shared_ptr<LavObject> createPushObject(std::shared_ptr<LavSimulation> sim, unsigned int inputSr, unsigned int channels) {
-	return std::make_shared<LavPushObject>(sim, inputSr, channels);
+	auto retval = std::make_shared<LavPushObject>(sim, inputSr, channels);
+	sim->associateObject(retval);
+	return retval;
 }
 
 void LavPushObject::process() {

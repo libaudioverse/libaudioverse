@@ -45,7 +45,9 @@ LavMultipannerObject::LavMultipannerObject(std::shared_ptr<LavSimulation> sim, s
 }
 
 std::shared_ptr<LavObject> createMultipannerObject(std::shared_ptr<LavSimulation> sim, std::shared_ptr<LavHrtfData> hrtf) {
-	return std::make_shared<LavMultipannerObject>(sim, hrtf);
+	auto retval = std::make_shared<LavMultipannerObject>(sim, hrtf);
+	sim->associateObject(retval);
+	return retval;
 }
 
 void LavMultipannerObject::forwardAzimuth() {

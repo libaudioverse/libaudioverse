@@ -38,7 +38,9 @@ LavFeedbackDelayNetworkObject::~LavFeedbackDelayNetworkObject() {
 }
 
 std::shared_ptr<LavObject> createFeedbackDelayNetworkObject(std::shared_ptr<LavSimulation> simulation, float maxDelay, int lines) {
-	return std::make_shared<LavFeedbackDelayNetworkObject>(simulation, maxDelay, lines);
+	auto retval = std::make_shared<LavFeedbackDelayNetworkObject>(simulation, maxDelay, lines);
+	simulation->associateObject(retval);
+	return retval;
 }
 
 void LavFeedbackDelayNetworkObject::process() {

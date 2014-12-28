@@ -39,7 +39,9 @@ LavBiquadObject::LavBiquadObject(std::shared_ptr<LavSimulation> sim, unsigned in
 }
 
 std::shared_ptr<LavObject> createBiquadObject(std::shared_ptr<LavSimulation> sim, unsigned int channels) {
-	return std::make_shared<LavBiquadObject>(sim, channels);
+	auto retval = std::make_shared<LavBiquadObject>(sim, channels);
+	sim->associateObject(retval);
+	return retval;
 }
 
 void LavBiquadObject::reconfigure() {

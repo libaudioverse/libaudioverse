@@ -34,7 +34,9 @@ LavGraphListenerObject::LavGraphListenerObject(std::shared_ptr<LavSimulation> si
 }
 
 std::shared_ptr<LavObject> createGraphListenerObject(std::shared_ptr<LavSimulation> sim, unsigned int channels) {
-	return std::make_shared<LavGraphListenerObject>(sim, channels);
+	auto retval = std::make_shared<LavGraphListenerObject>(sim, channels);
+	sim->associateObject(retval);
+	return retval;
 }
 
 LavGraphListenerObject::~LavGraphListenerObject() {
