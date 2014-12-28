@@ -51,13 +51,19 @@ void LavSimpleEnvironment::willProcessParents() {
 		glm::vec3(pos[0]+atup[0], pos[1]+atup[1], pos[2]+atup[2]),
 		glm::vec3(atup[3], atup[4], atup[5]));
 
-	//todo: the following needs to clean up dead sources.
 	//give the new environment to the sources.
+	//this is a set of weak pointers.
+	decltype(sources) needsRemoval; //for source cleanup below.
 	for(auto i: sources) {
 		auto tmp = i.lock();
-		if(tmp == nullptr) continue;
+		if(tmp == nullptr) {
+			needsRemoval.insert(i);
+			continue;
+		}
 		tmp->update(environment);
 	}
+	//do cleanup of dead sources.
+	for(auto i: needsRemoval) sources.erase(i);
 }
 
 std::shared_ptr<LavObject> LavSimpleEnvironment::createPannerObject() {
