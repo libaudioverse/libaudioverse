@@ -4,6 +4,9 @@ project(Libaudioverse)
 include_directories("${CMAKE_SOURCE_DIR}/include")
 include_directories("${CMAKE_SOURCE_DIR}/lambdatask/include")
 
+#this is the required alignment for allocation, a default which is configured in case sse/other processor extensions are disabled.
+SET(LIBAUDIOVERSE_MALLOC_ALIGNMENT 1)
+
 #This is LibSNDFile for windows.
 #if you've got them somewhere else, you need to change these lines.
 if(${MSVC})
@@ -47,7 +50,10 @@ add_subdirectory("OpenAL-Soft")
 include_directories("OpenAL-Soft/include")
 SET(OPENAL_NAME openalsoft_camlorn)
 
-#below here is us.  First, set a variable to all the libraries we need to link with:
+#below here is us.  First our macros.
+add_definitions(-DLIBAUDIOVERSE_MALLOC_ALIGNMENT=${LIBAUDIOVERSE_MALLOC_ALIGNMENT})
+
+#Second, set a variable to all the libraries we need to link with:
 SET(libaudioverse_required_libraries ${libsndfile_name} ${OPENAL_NAME})
 add_subdirectory(src)
 
