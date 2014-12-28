@@ -341,6 +341,10 @@ class {{friendly_name}}(GenericObject):
 	def __init__(self{%if constructor_arg_names|length > 0%}, {%endif%}{{constructor_arg_names|join(', ')}}):
 		super({{friendly_name}}, self).__init__(_lav.{{constructor_name|without_lav|camelcase_to_underscores}}({{constructor_arg_names|join(', ')}}), {{constructor_arg_names[0]}})
 
+	#This has to be here. Killing this is bad. It is not a no-op.
+	def __del__(self):
+		super({{friendly_name}}, self).__del__()
+
 {%for enumerant, prop in metadata['objects'].get(object_name, dict()).get('properties', dict()).iteritems()%}
 {{macros.implement_property(enumerant, prop)}}
 

@@ -23,7 +23,7 @@ class LavSimpleEnvironment: public LavEnvironmentBase {
 	//the world is more capable of handling a source that dies than a source a world that dies.
 	std::set<std::weak_ptr<LavSourceObject>, std::owner_less<std::weak_ptr<LavSourceObject>>> sources;
 	//these are parents of us, so this doesn't create cyclic behavior.  We give a new one out and connect it through our mixer for each source.
-	std::vector<std::shared_ptr<LavObject>> panners;
+	std::vector<std::weak_ptr<LavObject>> panners;
 	std::shared_ptr<LavObject> mixer = nullptr, limiter = nullptr;
 	std::shared_ptr<LavHrtfData > hrtf;
 	LavEnvironment environment;
