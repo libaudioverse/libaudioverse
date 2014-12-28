@@ -23,18 +23,18 @@ LavObject(Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK, simulation, lines, lines) {
 	max_delay = maxDelay;
 	line_count = lines;
 	network = new LavFeedbackDelayNetwork(lines, maxDelay, simulation->getSr());
-	lastOutput = new float[lines]();
-	nextInput = new float[lines]();
-	gains = new float[lines]();
+	lastOutput = LavAllocFloatArray(lines);
+	nextInput = LavAllocFloatArray(lines);
+	gains = LavAllocFloatArray(lines);
 	for(int i = 0; i < lines; i++) gains[i] = 1.0f;
 	getProperty(Lav_FDN_MAX_DELAY).setFloatValue(maxDelay);
 }
 
 LavFeedbackDelayNetworkObject::~LavFeedbackDelayNetworkObject() {
 	delete network;
-	delete[] lastOutput;
-	delete[] nextInput;
-	delete[] gains;
+	LavFreeFloatArray(lastOutput);
+	LavFreeFloatArray(nextInput);
+	LavFreeFloatArray(gains);
 }
 
 std::shared_ptr<LavObject> createFeedbackDelayNetworkObject(std::shared_ptr<LavSimulation> simulation, float maxDelay, int lines) {

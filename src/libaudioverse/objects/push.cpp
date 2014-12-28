@@ -20,6 +20,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 class LavPushObject: public LavObject {
 	public:
 	LavPushObject(std::shared_ptr<LavSimulation> sim, unsigned int inputSr, unsigned int channels);
+	~LavPushObject();
 	void process();
 	void feed(unsigned int length, float* buffer);
 	unsigned int input_sr = 0;
@@ -37,16 +38,18 @@ LavPushObject::LavPushObject(std::shared_ptr<LavSimulation> sim, unsigned int in
 	input_sr = inputSr;
 	resampler = std::make_shared<LavResampler>(push_frames, channels, inputSr, (int)sim->getSr());
 	this->push_channels = channels;
-	workspace = new float[push_channels*simulation->getBlockSize()];
-	memset(workspace, 0, sizeof(float)*push_channels*simulation->getBlockSize());
-	push_buffer = new float[push_frames*channels];
-	memset(push_buffer, 0, sizeof(float)*push_frames*channels);
+	workspace = LavAllocFloatArray(push_channels*simulation->getBlockSize());
+	push_buffer = LavAllocFloatArray(push_frames*channels);
 }
 
 std::shared_ptr<LavObject> createPushObject(std::shared_ptr<LavSimulation> sim, unsigned int inputSr, unsigned int channels) {
 	auto retval = std::make_shared<LavPushObject>(sim, inputSr, channels);
 	sim->associateObject(retval);
 	return retval;
+}
+LavPushObject::~LavPushObject() {
+	LavFreeFloatArray(workspace);
+	LavFreeFloatArray(push_buffer);
 }
 
 void LavPushObject::process() {

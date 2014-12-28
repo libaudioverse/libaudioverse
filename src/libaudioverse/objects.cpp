@@ -61,7 +61,7 @@ LavObject::LavObject(int type, std::shared_ptr<LavSimulation> simulation, unsign
 	inputs.resize(numInputs, nullptr);
 	outputs.resize(numOutputs);
 	for(auto i = outputs.begin(); i != outputs.end(); i++) {
-		*i = new float[simulation->getBlockSize()]();
+		*i = LavAllocFloatArray(sizeof(float)*simulation->getBlockSize());
 	}
 
 	this->simulation= simulation;
@@ -87,7 +87,7 @@ LavObject::LavObject(int type, std::shared_ptr<LavSimulation> simulation, unsign
 
 LavObject::~LavObject() {
 	for(auto i: outputs) {
-		delete[] i;
+		LavFreeFloatArray(i);
 	}
 	simulation->invalidatePlan();
 }

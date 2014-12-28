@@ -36,7 +36,7 @@ class LavFileObject: public LavObject {
 //todo: when objects support resizing their inputs and outputs, as they will inevitably support this, rewrite to use that functionality.
 LavFileObject::LavFileObject(std::shared_ptr<LavSimulation> simulation, const char* path, unsigned int channels): LavObject(Lav_OBJTYPE_FILE, simulation, 0, channels) {
 	file.open(path);
-	buffer = new float[file.getSampleCount()];
+	buffer = LavAllocFloatArray(file.getSampleCount());
 	file.readAll(buffer);
 	delta = file.getSr()/simulation->getSr();
 	getProperty(Lav_FILE_POSITION).setPostChangedCallback([this] () {seek();});
@@ -46,7 +46,7 @@ LavFileObject::LavFileObject(std::shared_ptr<LavSimulation> simulation, const ch
 }
 
 LavFileObject::~LavFileObject() {
-	delete[] buffer;
+	LavFreeFloatArray(buffer);
 }
 
 std::shared_ptr<LavObject> createFileObject(std::shared_ptr<LavSimulation> simulation, const char* path) {

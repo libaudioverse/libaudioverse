@@ -32,22 +32,24 @@ class LavHrtfObject: public LavObject {
 LavHrtfObject::LavHrtfObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf): LavObject(Lav_OBJTYPE_HRTF, simulation, 1, 2) {
 	type = Lav_OBJTYPE_HRTF;
 	this->hrtf = hrtf;
-	left_response = new float[hrtf->getLength()];
-	right_response = new float[hrtf->getLength()];
+	left_response = LavAllocFloatArray(hrtf->getLength()*sizeof(float));
+	right_response = LavAllocFloatArray(hrtf->getLength()*sizeof(float));
 	//used for moving objects.
-	old_left_response = new float[hrtf->getLength()];
-	old_right_response = new float[hrtf->getLength()];
+	old_left_response = LavAllocFloatArray(hrtf->getLength());
+	old_right_response = LavAllocFloatArray(hrtf->getLength());
 	history_length = hrtf->getLength() + simulation->getBlockSize();
-	history = new float[history_length](); //odd c++ syntax to create 0-initialized array.
+	history = LavAllocFloatArray(history_length);
 	hrtf->computeCoefficientsStereo(0.0f, 0.0f, left_response, right_response);
 	prev_azimuth = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
 	prev_elevation = getProperty(Lav_PANNER_ELEVATION).getFloatValue();
 }
 
 LavHrtfObject::~LavHrtfObject() {
-	delete[] history;
-	delete[] left_response;
-	delete[] right_response;
+	LavFreeFloatArray(history);
+	LavFreeFloatArray(left_response);
+	LavFreeFloatArray(right_response);
+	LavFreeFloatArray(old_left_response);
+	LavFreeFloatArray(old_right_response);
 }
 
 std::shared_ptr<LavObject>createHrtfObject(std::shared_ptr<LavSimulation>simulation, std::shared_ptr<LavHrtfData> hrtf) {

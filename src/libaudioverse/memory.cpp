@@ -25,23 +25,23 @@ Lav_PUBLIC_FUNCTION LavError Lav_free(void* ptr) {
 	PUB_END
 }
 
-void* LavAllocPtr(unsigned int size) {
+float* LavAllocFloatArray(unsigned int size) {
 	#if LIBAUDIOVERSE_MALLOC_ALIGNMENT == 1
-	return calloc(size, 1);
+	return (float*)calloc(size*sizeof(float), 1);
 	#else
 	//otherwise, we have this bit of fun.
 	void* p1;
 	void** p2;
 	int offset = LIBAUDIOVERSE_MALLOC_ALIGNMENT-1+sizeof(void*);
-	p1 = calloc(size+offset, 1);
+	p1 = calloc(size*sizeof(float)+offset, 1);
 	if(p1 == nullptr) return nullptr;
 	p2 = (void**)(((intptr_t)(p1)+offset)&~(LIBAUDIOVERSE_MALLOC_ALIGNMENT-1);
 	p2[-1]=p1;
-	return p2;
+	return (float*)p2;
 	#endif
 }
 
-void LavFreePtr(void* ptr) {
+void LavFreeFloatArray(float* ptr) {
 	#if LIBAUDIOVERSE_MALLOC_ALIGNMENT == 1
 	free(ptr);
 	#else

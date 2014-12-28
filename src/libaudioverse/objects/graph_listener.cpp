@@ -29,7 +29,7 @@ class LavGraphListenerObject: public LavObject {
 };
 
 LavGraphListenerObject::LavGraphListenerObject(std::shared_ptr<LavSimulation> sim, unsigned int channels): LavObject(Lav_OBJTYPE_GRAPH_LISTENER, sim, channels, channels) {
-	outgoing_buffer = new float[channels*sim->getBlockSize()]();
+	outgoing_buffer = LavAllocFloatArray(channels*sim->getBlockSize());
 	this->channels = channels;
 }
 
@@ -40,7 +40,7 @@ std::shared_ptr<LavObject> createGraphListenerObject(std::shared_ptr<LavSimulati
 }
 
 LavGraphListenerObject::~LavGraphListenerObject() {
-	delete[] outgoing_buffer;
+	LavFreeFloatArray(outgoing_buffer);
 }
 
 void LavGraphListenerObject::process() {

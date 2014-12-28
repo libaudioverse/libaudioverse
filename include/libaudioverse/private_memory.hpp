@@ -49,7 +49,7 @@ t safeConvertMemory(char* b) {
 /**Libaudioverse allocation routines.
 
 These return and free pointers to zero-initialized memory aligned on the appropriate boundary for the enabled SIMD extensions, if any.  If no SIMD extensions are enabled, these gracefully fall back to normal calloc/free.
+*/
 
-The odd naming is so that we don't start clashing with lav_free, among other things.*/
-void* LavAllocPtr(unsigned int size);
-void LavFreePtr(void* ptr);
+float* LavAllocFloatArray(unsigned int size);
+void LavFreeFloatArray(float* ptr);

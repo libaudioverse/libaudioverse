@@ -20,6 +20,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 class LavPullObject: public LavObject {
 	public:
 	LavPullObject(std::shared_ptr<LavSimulation> sim, unsigned int inputSr, unsigned int channels);
+	~LavPullObject();
 	void process();
 	unsigned int input_sr = 0, channels = 0;
 	std::shared_ptr<LavResampler> resampler = nullptr;
@@ -33,14 +34,19 @@ LavPullObject::LavPullObject(std::shared_ptr<LavSimulation> sim, unsigned int in
 	input_sr = inputSr;
 	resampler = std::make_shared<LavResampler>(sim->getBlockSize(), channels, inputSr, (int)sim->getSr());
 	this->channels = channels;
-	incoming_buffer = new float[channels*simulation->getBlockSize()]();
-	resampled_buffer = new float[channels*sim->getBlockSize()]();
+	incoming_buffer = LavAllocFloatArray(channels*simulation->getBlockSize());
+	resampled_buffer = LavAllocFloatArray(channels*sim->getBlockSize());
 }
 
 std::shared_ptr<LavObject> createPullObject(std::shared_ptr<LavSimulation> sim, unsigned int inputSr, unsigned int channels) {
 	auto retval = std::make_shared<LavPullObject>(sim, inputSr, channels);
 	sim->associateObject(retval);
 	return retval;
+}
+
+LavPullObject::~LavPullObject() {
+	LavFreeFloatArray(incoming_buffer);
+	LavFreeFloatArray(resampled_buffer);
 }
 
 void LavPullObject::process() {
