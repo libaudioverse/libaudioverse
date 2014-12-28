@@ -41,7 +41,7 @@ kernels/convolution.cpp
 kernels/resamplers.cpp
 kernels/interleaving.cpp
 kernels/mixing_matrix.cpp
-
+kernels/adding.cpp
 #Like kernels, but stateful.
 implementations/panner.cpp
 implementations/delayringbuffer.cpp

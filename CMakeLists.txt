@@ -57,7 +57,9 @@ SET(OPENAL_NAME openalsoft_camlorn)
 
 #below here is us.  First our macros.
 add_definitions(-DLIBAUDIOVERSE_MALLOC_ALIGNMENT=${LIBAUDIOVERSE_MALLOC_ALIGNMENT})
-
+if(${LIBAUDIOVERSE_USE_SSE2})
+add_definitions(-DLIBAUDIOVERSE_USE_SSE2)
+endif()
 #Second, set a variable to all the libraries we need to link with:
 SET(libaudioverse_required_libraries ${libsndfile_name} ${OPENAL_NAME})
 add_subdirectory(src)

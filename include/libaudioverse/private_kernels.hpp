@@ -12,6 +12,9 @@ These two cases are rare and mainly exist to enable code reuse for getting block
 void uninterleaveSamples(unsigned int channels, unsigned int frames, float* samples, unsigned int outputCount, float** outputs);
 void interleaveSamples(unsigned int channels, unsigned int frames, unsigned int inputCount, float** inputs, float* output);
 
+/**Add two buffers into a third.*/
+void additionKernel(int length, float* a1, float* a2, float* dest);
+
 /**The convolution kernel.
 The first response-1 samples of the input buffer are assumed to be a running history, so the actual length of the input buffer needs to be outputSampleCount+responseLength-1.
 */

@@ -8,6 +8,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_simulation.hpp>
 #include <libaudioverse/private_macros.hpp>
 #include <libaudioverse/private_memory.hpp>
+#include <libaudioverse/private_kernels.hpp>
 #include <limits>
 #include <memory>
 
@@ -55,9 +56,7 @@ void LavMixerObject::process() {
 	for(unsigned int i = 0; i < num_inputs; i++) {
 		//if this is the zerobuffer, we can save block_size adds, vector accesses, etc.
 		if(inputs[i] == zerobuffer) continue;
-		for(unsigned int j = 0; j < block_size; j++) {
-			outputs[i%inputsPerParent][j] += inputs[i][j];
-		}
+			additionKernel(block_size, outputs[i%inputsPerParent], inputs[i], outputs[i%inputsPerParent]);
 	}
 }
 
