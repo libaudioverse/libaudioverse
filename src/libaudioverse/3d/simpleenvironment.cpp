@@ -36,7 +36,9 @@ LavSimpleEnvironment::LavSimpleEnvironment(std::shared_ptr<LavSimulation> simula
 }
 
 std::shared_ptr<LavSimpleEnvironment> createWorldObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf) {
-	return std::make_shared<LavSimpleEnvironment>(simulation, hrtf);
+	auto retval = std::make_shared<LavSimpleEnvironment>(simulation, hrtf);
+	simulation->associateObject(retval);
+	return retval;
 }
 
 void LavSimpleEnvironment::willProcessParents() {
