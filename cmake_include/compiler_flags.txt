@@ -1,0 +1,16 @@
+if(${MSVC})
+#turn off the secure crt warnings, because we're not allowed to use microsoft specific functions.
+#Also turn off unsafe stl warnings.  This library likes the unsafe stl.
+add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
+endif()
+
+#For linux and mac, we must append -std=c99 and -std=c++99
+if(${CMAKE_COMPILER_IS_GNUCC})
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+endif()
+
+add_definitions(-DLIBAUDIOVERSE_MALLOC_ALIGNMENT=${LIBAUDIOVERSE_MALLOC_ALIGNMENT})
+if(${LIBAUDIOVERSE_USE_SSE2})
+add_definitions(-DLIBAUDIOVERSE_USE_SSE2)
+endif()

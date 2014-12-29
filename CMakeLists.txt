@@ -12,55 +12,13 @@ if(${LIBAUDIOVERSE_USE_SSE2})
 SET(LIBAUDIOVERSE_MALLOC_ALIGNMENT 16)
 ENDIF()
 
-#This is LibSNDFile for windows.
-#if you've got them somewhere else, you need to change these lines.
-if(${MSVC})
-SET(LIBSNDFILE_INCLUDE_DIR "C:/Program Files (x86)/Mega-Nerd/libsndfile/include" CACHE PATH
-"Directory for Libsndfile headers.")
-SET(LIBSNDFILE_LIBRARY_DIR "C:/Program Files (x86)/Mega-Nerd/libsndfile/lib" CACHE PATH
-"Libsndfile library directory.")
+#sets up compiler flags for things: sse, vc++ silencing, etc.
+include("cmake_include/compiler_flags.txt")
 
-INCLUDE_DIRECTORIES(${LIBSNDFILE_INCLUDE_DIR})
-LINK_DIRECTORIES(${LIBSNDFILE_LIBRARY_DIR})
-endif()
-
-if(${MSVC})
-#turn off the secure crt warnings, because we're not allowed to use microsoft specific functions.
-#Also turn off unsafe stl warnings.  This library likes the unsafe stl.
-add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
-endif()
-
-#For linux and mac, we must append -std=c99 and -std=c++99
-if(${CMAKE_COMPILER_IS_GNUCC})
-SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-endif()
-
-if(${CMAKE_COMPILER_IS_GNUCC})
-SET(portaudio_name portaudio)
-SET(libsndfile_name sndfile)
-endif()
-if(${MSVC})
-set(portaudio_name portaudio_static)
-set(libsndfile_name libsndfile-1)
-endif()
-#include glm
-include_directories("${CMAKE_SOURCE_DIR}/glm")
-
-#include and build OpenAL-Soft.
-#this makes OpenALSoft build statically.
-add_definitions(-DAL_LIBTYPE_STATIC)
-set(LIBTYPE STATIC)	
-add_subdirectory("OpenAL-Soft")
-include_directories("OpenAL-Soft/include")
-SET(OPENAL_NAME openalsoft_camlorn)
-
-#below here is us.  First our macros.
-add_definitions(-DLIBAUDIOVERSE_MALLOC_ALIGNMENT=${LIBAUDIOVERSE_MALLOC_ALIGNMENT})
-if(${LIBAUDIOVERSE_USE_SSE2})
-add_definitions(-DLIBAUDIOVERSE_USE_SSE2)
-endif()
-#Second, set a variable to all the libraries we need to link with:
+include("vendoring/openalsoft.txt")
+include("vendoring/libsndfile.txt")
+include("vendoring/glm.txt")
+#All the libraries we need to link with:
 SET(libaudioverse_required_libraries ${libsndfile_name} ${OPENAL_NAME})
 add_subdirectory(src)
 

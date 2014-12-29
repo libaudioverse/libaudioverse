@@ -1,0 +1,18 @@
+if(${MSVC})
+SET(LIBSNDFILE_INCLUDE_DIR "C:/Program Files (x86)/Mega-Nerd/libsndfile/include" CACHE PATH
+"Directory for Libsndfile headers.")
+SET(LIBSNDFILE_LIBRARY_DIR "C:/Program Files (x86)/Mega-Nerd/libsndfile/lib" CACHE PATH
+"Libsndfile library directory.")
+
+INCLUDE_DIRECTORIES(${LIBSNDFILE_INCLUDE_DIR})
+LINK_DIRECTORIES(${LIBSNDFILE_LIBRARY_DIR})
+endif()
+
+
+
+	if(${CMAKE_COMPILER_IS_GNUCC})
+SET(libsndfile_name sndfile)
+endif()
+if(${MSVC})
+set(libsndfile_name libsndfile-1)
+endif()

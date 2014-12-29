@@ -1,0 +1,2 @@
+#include glm
+include_directories("${CMAKE_SOURCE_DIR}/glm")
