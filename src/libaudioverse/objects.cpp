@@ -229,14 +229,14 @@ void LavObject::resize(unsigned int newInputCount, unsigned int newOutputCount) 
 	unsigned int oldOutputCount = outputs.size();
 	if(newOutputCount < oldOutputCount) { //we need to free some arrays.
 		for(auto i = newOutputCount; i < oldOutputCount; i++) {
-			delete[] outputs[i];
+			LavFreeFloatArray(outputs[i]);
 		}
 	}
 	//do the resize.
 	outputs.resize(newOutputCount, nullptr);
 	if(newOutputCount > oldOutputCount) { //we need to allocate some more arrays.
 		for(auto i = oldOutputCount; i < newOutputCount; i++) {
-			outputs[i] = new float[simulation->getBlockSize()];
+			outputs[i] = LavAllocFloatArray(simulation->getBlockSize());
 		}
 	}
 	simulation->invalidatePlan();
