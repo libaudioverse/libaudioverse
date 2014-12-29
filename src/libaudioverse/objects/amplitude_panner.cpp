@@ -33,7 +33,7 @@ LavAmplitudePannerObject::LavAmplitudePannerObject(std::shared_ptr<LavSimulation
 
 
 std::shared_ptr<LavObject>createAmplitudePannerObject(std::shared_ptr<LavSimulation> simulation) {
-	auto retval = std::make_shared<LavAmplitudePannerObject>(simulation);
+	auto retval = std::shared_ptr<LavAmplitudePannerObject>(new LavAmplitudePannerObject(simulation), LavObjectDeleter);
 	simulation->associateObject(retval);
 	return retval;
 }

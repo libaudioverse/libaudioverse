@@ -22,7 +22,7 @@ LavHardLimiterObject::LavHardLimiterObject(std::shared_ptr<LavSimulation> simula
 }
 
 std::shared_ptr<LavObject>createHardLimiterObject(std::shared_ptr<LavSimulation> simulation, unsigned int numChannels) {
-	auto retval = std::make_shared<LavHardLimiterObject>(simulation, numChannels);
+	auto retval = std::shared_ptr<LavHardLimiterObject>(new LavHardLimiterObject(simulation, numChannels), LavObjectDeleter);
 	simulation->associateObject(retval);
 	return retval;
 }

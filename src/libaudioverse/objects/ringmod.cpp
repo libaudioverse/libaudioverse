@@ -27,7 +27,7 @@ LavRingmodObject::LavRingmodObject(std::shared_ptr<LavSimulation> sim): LavObjec
 }
 
 std::shared_ptr<LavObject> createRingmodObject(std::shared_ptr<LavSimulation> sim) {
-	auto retval = std::make_shared<LavRingmodObject>(sim);
+	auto retval = std::shared_ptr<LavRingmodObject>(new LavRingmodObject(sim), LavObjectDeleter);
 	sim->associateObject(retval);
 	return retval;
 }

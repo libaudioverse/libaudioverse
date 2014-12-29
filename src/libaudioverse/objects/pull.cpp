@@ -39,7 +39,7 @@ LavPullObject::LavPullObject(std::shared_ptr<LavSimulation> sim, unsigned int in
 }
 
 std::shared_ptr<LavObject> createPullObject(std::shared_ptr<LavSimulation> sim, unsigned int inputSr, unsigned int channels) {
-	auto retval = std::make_shared<LavPullObject>(sim, inputSr, channels);
+	auto retval = std::shared_ptr<LavPullObject>(new LavPullObject(sim, inputSr, channels), LavObjectDeleter);
 	sim->associateObject(retval);
 	return retval;
 }

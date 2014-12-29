@@ -53,7 +53,7 @@ LavHrtfObject::~LavHrtfObject() {
 }
 
 std::shared_ptr<LavObject>createHrtfObject(std::shared_ptr<LavSimulation>simulation, std::shared_ptr<LavHrtfData> hrtf) {
-	auto retval = std::make_shared<LavHrtfObject>(simulation, hrtf);
+	auto retval = std::shared_ptr<LavHrtfObject>(new LavHrtfObject(simulation, hrtf), LavObjectDeleter);
 	simulation->associateObject(retval);
 	return retval;
 }

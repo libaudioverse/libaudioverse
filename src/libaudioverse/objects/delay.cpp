@@ -40,7 +40,7 @@ LavDelayObject::LavDelayObject(std::shared_ptr<LavSimulation> simulation, float 
 }
 
 std::shared_ptr<LavObject> createDelayObject(std::shared_ptr<LavSimulation> simulation, float maxDelay, unsigned int lineCount) {
-	auto tmp = std::make_shared<LavDelayObject>(simulation, maxDelay, lineCount);
+	auto tmp = std::shared_ptr<LavDelayObject>(new LavDelayObject(simulation, maxDelay, lineCount), LavObjectDeleter);
 	simulation->associateObject(tmp);
 	return tmp;
 }

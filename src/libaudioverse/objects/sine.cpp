@@ -31,7 +31,7 @@ LavSineObject::LavSineObject(std::shared_ptr<LavSimulation> simulation): LavObje
 }
 
 std::shared_ptr<LavObject> createSineObject(std::shared_ptr<LavSimulation> simulation) {
-	std::shared_ptr<LavSineObject> retval = std::make_shared<LavSineObject>(simulation);
+	std::shared_ptr<LavSineObject> retval = std::shared_ptr<LavSineObject>(new LavSineObject(simulation), LavObjectDeleter);
 	simulation->associateObject(retval);
 	return retval;
 }

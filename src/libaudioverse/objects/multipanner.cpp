@@ -45,7 +45,7 @@ LavMultipannerObject::LavMultipannerObject(std::shared_ptr<LavSimulation> sim, s
 }
 
 std::shared_ptr<LavObject> createMultipannerObject(std::shared_ptr<LavSimulation> sim, std::shared_ptr<LavHrtfData> hrtf) {
-	auto retval = std::make_shared<LavMultipannerObject>(sim, hrtf);
+	auto retval = std::shared_ptr<LavMultipannerObject>(new LavMultipannerObject(sim, hrtf), LavObjectDeleter);
 	sim->associateObject(retval);
 	return retval;
 }

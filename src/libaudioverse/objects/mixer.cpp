@@ -29,7 +29,7 @@ LavMixerObject::LavMixerObject(std::shared_ptr<LavSimulation> simulation, unsign
 }
 
 std::shared_ptr<LavObject> createMixerObject(std::shared_ptr<LavSimulation> simulation, unsigned int maxParents, unsigned int inputsPerParent) {
-	auto retval = std::make_shared<LavMixerObject>(simulation, maxParents, inputsPerParent);
+	auto retval = std::shared_ptr<LavMixerObject>(new LavMixerObject(simulation, maxParents, inputsPerParent), LavObjectDeleter);
 	simulation->associateObject(retval);
 	return retval;
 }

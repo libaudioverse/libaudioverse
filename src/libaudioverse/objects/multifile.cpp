@@ -41,7 +41,7 @@ LavMultifileObject::~LavMultifileObject() {
 }
 
 std::shared_ptr<LavObject> createMultifileObject(std::shared_ptr<LavSimulation> simulation, int channels, int maxSimultaneousFiles) {
-	auto retval =std::make_shared<LavMultifileObject>(simulation, channels, maxSimultaneousFiles);
+	auto retval =std::shared_ptr<LavMultifileObject>(new LavMultifileObject(simulation, channels, maxSimultaneousFiles), LavObjectDeleter);
 	simulation->associateObject(retval);
 	return retval;
 }

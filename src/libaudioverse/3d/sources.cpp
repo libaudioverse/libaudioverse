@@ -35,7 +35,7 @@ LavSourceObject::LavSourceObject(std::shared_ptr<LavSimulation> simulation, std:
 }
 
 std::shared_ptr<LavObject> createSourceObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavEnvironmentBase> manager) {
-	auto temp = std::make_shared<LavSourceObject>(simulation, manager);
+	auto temp = std::shared_ptr<LavSourceObject>(new LavSourceObject(simulation, manager), LavObjectDeleter);
 	manager->registerSourceForUpdates(temp);
 	simulation->associateObject(temp);
 	return temp;

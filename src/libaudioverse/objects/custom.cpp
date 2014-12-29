@@ -29,7 +29,7 @@ LavCustomObject::LavCustomObject(std::shared_ptr<LavSimulation> sim, unsigned in
 }
 
 std::shared_ptr<LavObject> createCustomObject(std::shared_ptr<LavSimulation> sim, unsigned int inputs, unsigned int outputs) {
-	auto retval = std::make_shared<LavCustomObject>(sim, inputs, outputs);
+	auto retval = std::shared_ptr<LavCustomObject>(new LavCustomObject(sim, inputs, outputs), LavObjectDeleter);
 	sim->associateObject(retval);
 	return retval;
 }

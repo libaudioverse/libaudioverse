@@ -4,6 +4,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_memory.hpp>
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/private_macros.hpp>
+#include <libaudioverse/private_objects.hpp>
+#include <libaudioverse/private_simulation.hpp>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -48,4 +50,10 @@ void LavFreeFloatArray(float* ptr) {
 	void* p = ((void**)ptr)[-1];
 	free(p);
 	#endif
+}
+
+void LavObjectDeleter(LavObject *obj) {
+	auto sim = obj->getSimulation();
+	LOCK(*sim);
+	delete obj;
 }

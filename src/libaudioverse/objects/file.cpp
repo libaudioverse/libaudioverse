@@ -52,7 +52,7 @@ LavFileObject::~LavFileObject() {
 std::shared_ptr<LavObject> createFileObject(std::shared_ptr<LavSimulation> simulation, const char* path) {
 	auto f = LavFileReader();
 	f.open(path);
-	auto retval = std::make_shared<LavFileObject>(simulation, path, f.getChannelCount());
+	auto retval = std::shared_ptr<LavFileObject>(new LavFileObject(simulation, path, f.getChannelCount()), LavObjectDeleter);
 	simulation->associateObject(retval);
 	return retval;
 }
