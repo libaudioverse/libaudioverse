@@ -7,6 +7,3 @@
 [submodule "OpenAL-Soft"]
 	path = OpenAL-Soft
 	url = git@github.com:camlorn/OpenAL-Soft.git
-[submodule "kissfft"]
-	path = kissfft
-	url = git@github.com:itdaniher/kissfft.git
