@@ -62,6 +62,7 @@ class LavSimulation {
 	std::function<void(void)> preprocessing_hook;
 	//the execution plan.
 	std::vector<std::shared_ptr<LavObject>> plan;
+	std::vector<std::weak_ptr<LavObject>> weak_plan;
 	unsigned int block_size = 0, mixahead = 0, is_started = 0;
 	float sr = 0.0f;
 	//if objects die, they automatically need to be removed.  We can do said removal on next process.

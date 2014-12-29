@@ -44,6 +44,12 @@ void LavSimulation::getBlock(float* out, unsigned int channels, bool mayApplyMix
 	if(planInvalidated) {
 		replan();
 		planInvalidated = false;
+		std::copy(plan.begin(), plan.end(), std::inserter(weak_plan, weak_plan.end()));
+	}
+	else {
+		for(auto i: weak_plan) {
+			plan.push_back(i.lock());
+		}
 	}
 	//visit all objects in reverse order.
 	//an object to the right in the vector depends on some subset of objects to its left, but never anything to its right.
@@ -54,6 +60,9 @@ void LavSimulation::getBlock(float* out, unsigned int channels, bool mayApplyMix
 	for(auto obj: plan) {
 		obj->doProcessProtocol();
 	}
+	//we're done with the strong plan, so kill it.
+	//this lets objects delete.
+	plan.clear();
 	if(output_object == nullptr || output_object->getState() == Lav_OBJSTATE_PAUSED) { //fast path, just zero.
 		memset(out, 0, sizeof(float)*block_size*channels);
 		return;

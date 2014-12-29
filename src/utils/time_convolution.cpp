@@ -63,5 +63,8 @@ void main(int argc, char** args) {
 		timeDelta = (endTime-startTime)/(float)CLOCKS_PER_SEC;
 		printf("Done.  Took %f seconds to process.\n", timeDelta);
 	}
+	for(auto i: sources) {
+		ERRCHECK(Lav_free(i));
+	}
 	Lav_shutdown();
 }
