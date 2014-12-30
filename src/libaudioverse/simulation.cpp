@@ -40,16 +40,24 @@ void LavSimulation::getBlock(float* out, unsigned int channels, bool mayApplyMix
 		memset(out, 0, sizeof(float)*channels*block_size);
 		return;
 	}
+	//try to restore the plan, at least unless it is invalidated.
+	if(planInvalidated == false) {
+		for(auto i: weak_plan) {
+			auto j= i.lock();
+	if(j== nullptr) {
+				planInvalidated = true;
+				break;	
+			}
+			plan.push_back(j);
+		}
+	}
+	//this is here because the above block can also invalidate the plan.
 	//replan, if needed.
 	if(planInvalidated) {
 		replan();
 		planInvalidated = false;
+		weak_plan.clear();
 		std::copy(plan.begin(), plan.end(), std::inserter(weak_plan, weak_plan.end()));
-	}
-	else {
-		for(auto i: weak_plan) {
-			plan.push_back(i.lock());
-		}
 	}
 	//visit all objects in reverse order.
 	//an object to the right in the vector depends on some subset of objects to its left, but never anything to its right.
