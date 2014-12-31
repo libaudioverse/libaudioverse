@@ -4,18 +4,15 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 /**Implements the convolution kernel.*/
 #include <libaudioverse/private_kernels.hpp>
-
+#include <string.h>
 
 void convolutionKernel(float* input, unsigned int outputSampleCount, float* output, unsigned int responseLength, float* response) {
-	for(unsigned int i = 0; i < outputSampleCount; i++) {
-		float samp = 0.0f;
-		for(unsigned int j = 0; j < responseLength; j++) {
-			samp += input[i+j]*response[responseLength-j-1];
-		}
-		output[i] = samp;
+	memset(output, 0, sizeof(float)*outputSampleCount);
+	for(int i = 0; i < responseLength; i++) {
+		float c=response[responseLength-i-1];
+		for(int j = 0; j < outputSampleCount; j++) output[j]+=c*input[i+j];
 	}
 }
-
 
 void crossfadeConvolutionKernel(float* input, unsigned int outputSampleCount, float* output, unsigned int responseLength, float* from, float* to) {
 	float delta = 1.0f/outputSampleCount;
