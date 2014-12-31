@@ -17,6 +17,11 @@ void interleaveSamples(unsigned int channels, unsigned int frames, unsigned int 
 void additionKernel(int length, float* a1, float* a2, float* dest);
 void scalarMultiplicationKernel(int length, float c, float* a1, float* dest);
 void multiplicationKernel(int length, float* a1, float* a2, float* dest);
+//found in multiplying.cpp
+//multiply a1 by c, sum with a2, and store result in dest.
+//a1==dest and a2==dest are, again, safe.
+void multiplicationAdditionKernel(int length, float c, float* a1, float* a2, float* dest);
+
 
 /**The convolution kernel.
 The first response-1 samples of the input buffer are assumed to be a running history, so the actual length of the input buffer needs to be outputSampleCount+responseLength-1.
