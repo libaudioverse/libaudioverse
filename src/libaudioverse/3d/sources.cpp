@@ -46,6 +46,8 @@ float calculateGainForDistanceModel(int model, float distance, float maxDistance
 	float retval = 1.0f;
 	switch(model) {
 		case Lav_DISTANCE_MODEL_LINEAR: retval = 1.0f-(distance/maxDistance); break;
+		case Lav_DISTANCE_MODEL_EXPONENTIAL: retval = 1.0f/distance; break;
+		case Lav_DISTANCE_MODEL_INVERSE_SQUARE: retval = 1.0f/(distance*distance); break;
 	}
 
 	//safety clamping.  Some of the equations above will go negative after max_distance.
