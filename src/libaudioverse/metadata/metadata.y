@@ -53,6 +53,7 @@ objects:
    Lav_3D_ORIENTATION: {name: orientation, type: float6, default: [0.0, 0.0, -1.0, 0.0, 1.0, 0.0]}
    Lav_ENVIRONMENT_DEFAULT_DISTANCE_MODEL: {name: default_distance_model, default: Lav_DISTANCE_MODEL_LINEAR, type: int, value_enum: Lav_DISTANCE_MODELS}
    Lav_ENVIRONMENT_DEFAULT_MAX_DISTANCE: {name: default_max_distance, range: [0.0, INFINITY], type: float, default: 50.0}
+   Lav_ENVIRONMENT_DEFAULT_SIZE: {name: default_size, type: float, range: [0.0, INFINITY], default: 0.0}
    Lav_ENVIRONMENT_DEFAULT_PANNER_STRATEGY: {name: default_panner_strategy, type: int, default: 1, value_enum: Lav_PANNING_STRATEGIES}
   doc_name: Simple Environment
  Lav_OBJTYPE_SOURCE:
@@ -60,6 +61,7 @@ objects:
    Lav_3D_POSITION: {name: position, type: float3, default: [0.0, 0.0, 0.0]}
    Lav_3D_ORIENTATION: {name: orientation, type: float6, default: [0.0, 0.0, -1.0, 0.0, 1.0, 0.0]}
    Lav_SOURCE_MAX_DISTANCE: {name: max_distance, type: float, default: 50.0, range: [0.0, INFINITY]}
+   Lav_SOURCE_SIZE: {name: size, type: float, range: [0.0, INFINITY], default: 1.0}
    Lav_SOURCE_DISTANCE_MODEL: {name: distance_model, type: int, default: Lav_DISTANCE_MODEL_LINEAR, value_enum: Lav_DISTANCE_MODELS}
    Lav_SOURCE_PANNER_STRATEGY: {name: panner_strategy, default: Lav_PANNING_STRATEGY_STEREO, value_enum: Lav_PANNING_STRATEGIES, type: int}
   doc_name: Simple Source

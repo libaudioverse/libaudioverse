@@ -20,15 +20,16 @@ enum Lav_3D_PROPERTIES {
 
 //all environments have these properties.
 enum lav_STANDARD_ENVIRONMENT_PROPERTIES {
+	Lav_ENVIRONMENT_DEFAULT_PANNER_STRATEGY = -8,
 	Lav_ENVIRONMENT_DEFAULT_DISTANCE_MODEL = -11,
 	Lav_ENVIRONMENT_DEFAULT_MAX_DISTANCE = -12,
-	//reserved space for more default stuff related to distance calculations.
-	Lav_ENVIRONMENT_DEFAULT_PANNER_STRATEGY = -8,
+	Lav_ENVIRONMENT_DEFAULT_SIZE = -13,
 };
 
 enum Lav_SOURCE_PROPERTIES {
 	Lav_SOURCE_MAX_DISTANCE = -3,
 	Lav_SOURCE_DISTANCE_MODEL = -4,
+	Lav_SOURCE_SIZE = -5,
 	Lav_SOURCE_PANNER_STRATEGY = -8,
 };
 

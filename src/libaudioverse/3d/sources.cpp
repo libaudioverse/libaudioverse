@@ -32,6 +32,7 @@ LavSourceObject::LavSourceObject(std::shared_ptr<LavSimulation> simulation, std:
 	getProperty(Lav_SOURCE_DISTANCE_MODEL).setIntValue(manager->getProperty(Lav_ENVIRONMENT_DEFAULT_DISTANCE_MODEL).getIntValue());
 	getProperty(Lav_SOURCE_MAX_DISTANCE).setFloatValue(manager->getProperty(Lav_ENVIRONMENT_DEFAULT_MAX_DISTANCE).getFloatValue());
 	getProperty(Lav_SOURCE_PANNER_STRATEGY).setIntValue(manager->getProperty(Lav_ENVIRONMENT_DEFAULT_PANNER_STRATEGY).getIntValue());
+	getProperty(Lav_SOURCE_SIZE).setFloatValue(manager->getProperty(Lav_ENVIRONMENT_DEFAULT_SIZE).getFloatValue());
 }
 
 std::shared_ptr<LavObject> createSourceObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavEnvironmentBase> manager) {
@@ -42,12 +43,13 @@ std::shared_ptr<LavObject> createSourceObject(std::shared_ptr<LavSimulation> sim
 }
 
 //helper function: calculates gains given distance models.
-float calculateGainForDistanceModel(int model, float distance, float maxDistance) {
+float calculateGainForDistanceModel(int model, float distance, float maxDistance, float referenceDistance) {
 	float retval = 1.0f;
+	float adjustedDistance = std::max<float>(0.0f, distance-referenceDistance);
 	switch(model) {
-		case Lav_DISTANCE_MODEL_LINEAR: retval = 1.0f-(distance/maxDistance); break;
-		case Lav_DISTANCE_MODEL_EXPONENTIAL: retval = 1.0f/distance; break;
-		case Lav_DISTANCE_MODEL_INVERSE_SQUARE: retval = 1.0f/(distance*distance); break;
+		case Lav_DISTANCE_MODEL_LINEAR: retval = 1.0f-(adjustedDistance/maxDistance); break;
+		case Lav_DISTANCE_MODEL_EXPONENTIAL: retval = 1.0f/adjustedDistance; break;
+		case Lav_DISTANCE_MODEL_INVERSE_SQUARE: retval = 1.0f/(adjustedDistance*adjustedDistance); break;
 	}
 
 	//safety clamping.  Some of the equations above will go negative after max_distance.
@@ -69,7 +71,8 @@ void LavSourceObject::update(LavEnvironment environment) {
 	if(elevation < -90.0f) elevation = -90.0f;
 	int distanceModel = getProperty(Lav_SOURCE_DISTANCE_MODEL).getIntValue();
 	float maxDistance = getProperty(Lav_SOURCE_MAX_DISTANCE).getFloatValue();
-	float gain = calculateGainForDistanceModel(distanceModel, distance, maxDistance);
+	float referenceDistance = getProperty(Lav_SOURCE_SIZE).getFloatValue();
+	float gain = calculateGainForDistanceModel(distanceModel, distance, maxDistance, referenceDistance);
 
 	//set the panner.
 	panner_object->getProperty(Lav_PANNER_AZIMUTH).setFloatValue(azimuth);
