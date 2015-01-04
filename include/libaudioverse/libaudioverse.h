@@ -184,6 +184,15 @@ Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlockSize(LavSimulation* simulatio
 Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlock(LavSimulation* simulation, unsigned int channels, int mayApplyMixingMatrix, float* buffer);
 Lav_PUBLIC_FUNCTION LavError Lav_simulationGetSr(LavSimulation* simulation, int* destination);
 
+/**Atomic block support.
+This isn't truly atomic: operations you perform will not roll back on error.
+When an atomic block is begun, the net effect is that the current thread holds a lock to the libaudioverse simulation. If your code blocks, Libaudioverse cannot mix.
+Every call to Lav_simulationBeginAtomicBlock must be matched with a call to Lav_simulationEndAtomicBlock or audio will stop. Atomic blocks do nest.
+*/
+Lav_PUBLIC_FUNCTION LavError Lav_simulationBeginAtomicBlock(LavSimulation *simulation);
+Lav_PUBLIC_FUNCTION LavError Lav_simulationEndAtomicBlock(LavSimulation* simulation);
+
+
 /**Query object type.*/
 Lav_PUBLIC_FUNCTION LavError Lav_objectGetType(LavObject* obj, int* destination);
 

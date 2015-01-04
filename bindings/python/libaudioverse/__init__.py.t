@@ -158,7 +158,10 @@ The position in the list is the needed device index for Simulation.__iniit__."""
 	return infos
 
 class Simulation(object):
-	"""Represents a running simulation.  All libaudioverse objects must be passed a simulation at creation time and cannot migrate between them.  Furthermore, it is an error to try to connect objects from different simulations."""
+	"""Represents a running simulation.  All libaudioverse objects must be passed a simulation at creation time and cannot migrate between them.  Furthermore, it is an error to try to connect objects from different simulations.
+
+Instances of this class are context managers.  Using the with statement on an instance of this class invoke's Libaudioverse's atomic block support."""
+
 
 	def __init__(self, sample_rate = 44100, block_size = 1024, mix_ahead = 2, channels = 2, device_index = -1):
 		"""Create a simulation.
@@ -203,6 +206,13 @@ Calling this on an audio output device will cause the audio thread to skip ahead
 			raise TypeError("Expected subclass of Libaudioverse.GenericObject")
 		_lav.simulation_set_output_object(self.handle, val.handle if val is not None else val)
 		self._output_object = val
+
+	#context manager support.
+	def __enter__(self):
+		_lav.simulation_begin_atomic_block(self.handle)
+
+	def __exit__(self, type, value, traceback):
+		_lav.simulation_end_atomic_block(self.handle)
 
 #These are the enums which are needed publicly, i.e. distance model, etc.
 {%for name in important_enums%}

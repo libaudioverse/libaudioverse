@@ -243,3 +243,17 @@ Lav_PUBLIC_FUNCTION LavError Lav_simulationGetSr(LavSimulation* simulation, int*
 	*destination = (int)simulation->getSr();
 	PUB_END
 }
+
+//atomic blocks
+
+Lav_PUBLIC_FUNCTION LavError Lav_simulationBeginAtomicBlock(LavSimulation *simulation) {
+	PUB_BEGIN
+	simulation->lock();
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_simulationEndAtomicBlock(LavSimulation* simulation) {
+	PUB_BEGIN
+	simulation->unlock();
+	PUB_END
+}
