@@ -92,6 +92,8 @@ class LavObject: public std::enable_shared_from_this<LavObject> { //enable_share
 	bool is_processing = false, is_suspended = false;
 	int type = Lav_OBJTYPE_GENERIC;
 	unsigned int num_inputs = 0, num_outputs = 0, block_size = 0;
+	//used to make no-op state changes free.
+	int prev_state = Lav_OBJSTATE_PLAYING;
 
 	//we are never allowed to copy.
 	LavObject(const LavObject&) = delete;

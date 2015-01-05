@@ -82,7 +82,9 @@ LavObject::LavObject(int type, std::shared_ptr<LavSimulation> simulation, unsign
 
 	//state changes must invalidate objects.
 	getProperty(Lav_OBJECT_STATE).setPostChangedCallback([this]() {
+		if(getProperty(Lav_OBJECT_STATE).getIntValue() == prev_state) return;
 		this->simulation->invalidatePlan();
+		prev_state = getProperty(Lav_OBJECT_STATE).getIntValue();
 	});
 }
 
