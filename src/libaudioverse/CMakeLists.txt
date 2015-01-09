@@ -67,6 +67,7 @@ objects/ringmod.cpp
 objects/multipanner.cpp
 objects/feedback_delay_network.cpp
 objects/multifile.cpp
+objects/square.cpp
 
 #physical outputs, etc.
 audio_backends/common.cpp

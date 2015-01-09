@@ -109,6 +109,7 @@ enum Lav_OBJTYPES {
 	Lav_OBJTYPE_MULTIPANNER = 16,
 	Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK = 17,
 	Lav_OBJTYPE_MULTIFILE = 18,
+	Lav_OBJTYPE_SQUARE = 19,
 };
 
 /**Object states.*/
@@ -273,7 +274,10 @@ Lav_PUBLIC_FUNCTION LavError Lav_objectReset(LavObject* obj);
 
 //creators for different objject types.
 //also see libaudioverse3d.h.
+
 Lav_PUBLIC_FUNCTION LavError Lav_createSineObject(LavSimulation* sim, LavObject **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createSquareObject(LavSimulation* simulation, LavObject **destination);
+
 Lav_PUBLIC_FUNCTION LavError Lav_createFileObject(LavSimulation *sim, const char* path, LavObject **destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createHrtfObject(LavSimulation *simulation, const char* hrtfPath, LavObject **destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createMixerObject(LavSimulation* sim, unsigned int maxParents, unsigned int inputsPerParent, LavObject **destination);

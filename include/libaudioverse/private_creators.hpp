@@ -14,6 +14,8 @@ std::shared_ptr<LavObject> createHardLimiterObject(std::shared_ptr<LavSimulation
 std::shared_ptr<LavObject> createHrtfObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf);
 std::shared_ptr<LavObject> createMixerObject(std::shared_ptr<LavSimulation> simulation, unsigned int maxParents, unsigned int inputsPerParent);
 std::shared_ptr<LavObject> createSineObject(std::shared_ptr<LavSimulation> Simulation);
+std::shared_ptr<LavObject> createSquareObject(std::shared_ptr<LavSimulation> simulation);
+
 std::shared_ptr<LavObject> createDelayObject(std::shared_ptr<LavSimulation> simulation, unsigned int lines);
 std::shared_ptr<LavObject>createAmplitudePannerObject(std::shared_ptr<LavSimulation> Simulation);
 std::shared_ptr<LavObject> createCustomObject(std::shared_ptr<LavSimulation> sim, unsigned int inputs, unsigned int outputs);

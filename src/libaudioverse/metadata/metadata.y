@@ -10,6 +10,11 @@ objects:
   properties:
    Lav_SINE_FREQUENCY: {name: frequency, type: float, default: 440.0, range: [0, INFINITY]}
   doc_name: Sine
+ Lav_OBJTYPE_SQUARE:
+  properties:
+   Lav_SQUARE_FREQUENCY: {name: frequency, type: float, default: 440.0, range: [0, INFINITY]}
+   Lav_SQUARE_DUTY_CYCLE: {name: duty_cycle, type: float, default: 0.5, range: [0.0, 1.0]}
+  doc_name: Square
  Lav_OBJTYPE_FILE:
   properties:
    Lav_FILE_POSITION: {name: position, type: double, default: 0.0, range: dynamic}
