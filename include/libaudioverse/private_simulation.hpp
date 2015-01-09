@@ -11,6 +11,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <thread>
 #include <tuple>
 #include <map>
+#include <random>
 #include "libaudioverse.h"
 
 class LavObject;
@@ -52,6 +53,8 @@ class LavSimulation {
 	void resetMixingMatrix(unsigned int inChannels, unsigned int outChannels);
 	void registerDefaultMixingMatrices();
 	float* getMixingMatrix(unsigned int inChannels, unsigned int outChannels);
+
+
 	protected:
 	//reexecute planning logic.
 	void replan();

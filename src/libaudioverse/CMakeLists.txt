@@ -68,6 +68,7 @@ objects/multipanner.cpp
 objects/feedback_delay_network.cpp
 objects/multifile.cpp
 objects/square.cpp
+objects/noise.cpp
 
 #physical outputs, etc.
 audio_backends/common.cpp

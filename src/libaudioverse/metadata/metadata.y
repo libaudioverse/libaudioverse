@@ -15,6 +15,10 @@ objects:
    Lav_SQUARE_FREQUENCY: {name: frequency, type: float, default: 440.0, range: [0, INFINITY]}
    Lav_SQUARE_DUTY_CYCLE: {name: duty_cycle, type: float, default: 0.5, range: [0.0, 1.0]}
   doc_name: Square
+ Lav_OBJTYPE_NOISE:
+  properties:
+   Lav_NOISE_NOISE_TYPE: {name: noise_type, type: int, value_enum: Lav_NOISE_TYPES, default: Lav_NOISE_TYPE_WHITE}
+  doc_name: Noise Generator
  Lav_OBJTYPE_FILE:
   properties:
    Lav_FILE_POSITION: {name: position, type: double, default: 0.0, range: dynamic}
