@@ -30,7 +30,6 @@ utils/hrtf.cpp
 utils/resampler.cpp
 
 #classes and functionality for DSp that are stateful, and miscellaneous DSP-related math functions.
-dsp/biquad.cpp
 dsp/ringmod.cpp
 dsp/iir.cpp
 

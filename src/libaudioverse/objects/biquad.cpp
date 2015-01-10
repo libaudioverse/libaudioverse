@@ -14,7 +14,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <algorithm>
 #include <utility>
 #include <vector>
-#include <libaudioverse/private_biquad.hpp>
+#include <libaudioverse/private_iir.hpp>
 
 class LavBiquadObject: public LavObject {
 	public:
@@ -22,7 +22,7 @@ class LavBiquadObject: public LavObject {
 	void process();
 	void reconfigure();
 	private:
-	std::vector<LavBiquadFilter> biquads;
+	std::vector<LavIIRFilter> biquads;
 	int prev_type;
 };
 
@@ -52,7 +52,7 @@ void LavBiquadObject::reconfigure() {
 	float dbgain= getProperty(Lav_BIQUAD_DBGAIN).getFloatValue();
 	for(auto &i: biquads) {
 		if(type != prev_type) i.clearHistories();
-		i.configure(type, sr, frequency, dbgain, q);
+		i.configureBiquad(type, sr, frequency, dbgain, q);
 	}
 	prev_type = type;
 }
@@ -61,7 +61,7 @@ void LavBiquadObject::process() {
 	//doing this this way may make the algorithm morecache- friendly on some compilers/systems.
 	//It also avoids a large number of extraneous lookups in the vctor.
 	for(int j = 0; j < biquads.size(); j++) {
-		LavBiquadFilter &bq = biquads[j];
+		LavIIRFilter &bq = biquads[j];
 		for(unsigned int i = 0; i < block_size; i++) {
 			outputs[j][i] = bq.tick(inputs[j][i]);
 		}

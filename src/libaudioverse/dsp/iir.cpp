@@ -13,7 +13,9 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_errors.hpp>
 
 void LavIIRFilter::configure(int newNumeratorLength, double* newNumerator, int newDenominatorLength, double* newDenominator) {
-	if(newNumeratorLength == 0 || newDenominatorLength == 0 || newDenominator[0] == 0.0) throw LavErrorException(Lav_ERROR_RANGE); //each must have at least one sample, and a0==0 is a pole at the origin which can be done with the mul property or similar.
+	if(newNumeratorLength == 0 || newDenominatorLength == 0) throw LavErrorException(Lav_ERROR_RANGE);
+	//we normalize by the first coefficient but throw it out; consequently, it must be nonzero.
+	if(newDenominator[0] == 0.0) throw LavErrorException(Lav_ERROR_RANGE);
 	if(history) delete[] history;
 	if(numerator) delete[] numerator;
 	if(denominator) delete[] denominator;
@@ -26,8 +28,7 @@ void LavIIRFilter::configure(int newNumeratorLength, double* newNumerator, int n
 	std::copy(newDenominator, newDenominator+newDenominatorLength, denominator);
 	numerator_length= newNumeratorLength;
 	denominator_length = newDenominatorLength;
-	//we normalize by a0.
-	for(int i = 0; i < newDenominatorLength; i++) newDenominator[i]/=newDenominator[0];
+	for(int i = 0; i <denominator_length; i++) denominator[i]/=denominator[0];
 }
 
 void LavIIRFilter::clearHistories() {
@@ -35,20 +36,115 @@ void LavIIRFilter::clearHistories() {
 	if(denominator_length) memset(recursion_history, 0, sizeof(double)*denominator_length);
 }
 
+void LavIIRFilter::setGain(double gain) {
+	this->gain = gain;
+}
+
 float LavIIRFilter::tick(float sample) {
 	int i;
-	double result = 0.0;
-	history[0] = sample;
+	history[0] = sample*gain;
+	recursion_history[0] = 0.0;
 	for(i= numerator_length-1; i > 0; i--) {
-		result +=history[i]*numerator[i];
+		recursion_history[0]+=history[i]*numerator[i];
 		history[i]=history[i-1];
 	}
-	result+=sample*numerator[0];
+	recursion_history[0]+=history[0]*numerator[0];
 	for(i = denominator_length-1 ; i >0; i--) {
-		result +=-denominator[i]*recursion_history[i];
+		recursion_history[0]+=-denominator[i]*recursion_history[i];
 		recursion_history[i]=recursion_history[i-1];
 	}
-	result += -denominator[0]*recursion_history[0];
-	recursion_history[0]=result;
-	return (float)result;
+	return (float)recursion_history[0];
+}
+
+void LavIIRFilter::configureBiquad(int type, double sr, double frequency, double dbGain, double q) {
+	//this entire function is a straightforward implementation of the Audio EQ cookbook, included with this repository.
+	//we move these onto the class at the end of the function explicitly.
+	double a0, a1, a2, b0, b1, b2, gain;
+	//alias our parameters to match the Audio EQ cookbook.
+	double fs = sr;
+	double f0 = frequency;
+	//only common intermediate variable for all of these.
+	double w0 = 2.0*PI*f0/fs;
+	double alpha = sin(w0) / (2.0 * q);
+	double  a = sqrt(pow(10, dbGain/20.0)); //this is recalculated for 3 special cases later.
+	switch(type) {
+		case Lav_BIQUAD_TYPE_LOWPASS:
+		b0 = (1 - cos(w0))/2.0;
+		b1 = 1 - cos(w0);
+		b2 = (1 - cos(w0)) /2.0;
+		a0 = 1 + alpha;
+		a1 = -2.0 * cos(w0);
+		a2 = 1 - alpha;
+		break;
+		case Lav_BIQUAD_TYPE_HIGHPASS:
+		b0 = (1 + cos(w0))/2.0;
+		b1 = -(1 + cos(w0));
+		b2 = (1 + cos(w0)) / 2.0;
+		a0 = 1 + alpha;
+		a1 = -2.0*cos(w0);
+		a2 = 1 - alpha;
+		break;
+		case Lav_BIQUAD_TYPE_BANDPASS:
+		b0 = sin(w0) / 2.0;
+		b1 = 0;
+		b2 = -sin(w0)/2.0;
+		a0 = 1 + alpha;
+		a1 = -2.0*cos(w0);
+		a2 = 1 - alpha;
+		break;
+		case Lav_BIQUAD_TYPE_NOTCH:
+		b0 = 1;
+		b1 = -2.0 * cos(w0);
+		b2 = 1.0;
+		a0 = 1 + alpha;
+		a1 = -2.0 * cos(w0);
+		a2 = 1 - alpha;
+		break;
+		case Lav_BIQUAD_TYPE_ALLPASS:
+		b0 = 1 - alpha;
+		b1 = -2.0 * cos(w0);
+		b2 = 1 + alpha;
+		a0 = 1 + alpha;
+		a1 = -2.0 * cos(w0);
+		a2 = 1 - alpha;
+		break;
+		case Lav_BIQUAD_TYPE_PEAKING:
+		a = pow(10, dbGain/40.0);
+		b0 = 1 + alpha*a;
+		b1 = -2.0 * cos(w0);
+		b2 = 1 - alpha * a;
+		a0 = 1 + alpha / a;
+		a1 = -2.0 * cos(w0);
+		a2 = 1 - alpha / a;
+		break;
+		case Lav_BIQUAD_TYPE_LOWSHELF:
+		a = pow(10, dbGain/40.0);
+		b0 = a*((a+1) - (a - 1)*cos(w0) + 2.0 * sqrt(a) * alpha);
+		b1 = 2 * a * ((a - 1) - (a + 1) * cos(w0));
+		b2 = a * ((a + 1) - (a - 1) * cos(w0) - 2.0 * sqrt(a)*alpha);
+		a0 = (a + 1) + (a - 1)*cos(w0) + 2*sqrt(a)*alpha;
+		a1 = -2.0*((a - 1)+ (a+1) * cos(w0));
+		a2 = (a + 1) - (a - 1)*cos(w0) - 2*sqrt(a)*alpha;
+		break;
+		case Lav_BIQUAD_TYPE_HIGHSHELF:
+		a = pow(10, dbGain/40.0);
+		b0 = a*((a+1)+(a-1)*cos(w0) + 2*sqrt(a)*alpha);
+		b1 = -2.0*a*((a - 1)+(a+1)*cos(w0));
+		b2 = a*((a+1)+(a-1)*cos(w0)-2*sqrt(a)*alpha);
+		a0 = (a+1) - (a - 1)*cos(w0) + 2*sqrt(a)*alpha;
+		a1 = 2.0*((a-1)-(a+1)*cos(w0));
+		a2 = (a+1)-(a-1)*cos(w0)-2*sqrt(a)*alpha;
+		break;
+		case Lav_BIQUAD_TYPE_IDENTITY:
+		b0 = 1;
+		b1 = 0;
+		b2 = 0;
+		a0 = 1;
+		a1 = 0;
+		a2 = 0;
+	};
+	double numerator[] = {1, b1/b0, b2/b0};
+	double denominator[] = {1, a1/a0, a2/a0};
+	configure(3, numerator, 3, denominator);
+	setGain(b0/a0);
 }

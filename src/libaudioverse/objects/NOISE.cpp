@@ -27,7 +27,6 @@ class LavNoiseObject: public LavObject {
 	std::mt19937_64 random_number_generator;
 	std::uniform_real_distribution<float> uniform_distribution;
 	LavIIRFilter pinkifier; //filter to turn white noise into pink noise.
-	float max = 0.0;
 };
 
 //we give the random number generator a fixed seed for debugging purposes.
@@ -63,16 +62,9 @@ void LavNoiseObject::white() {
 void LavNoiseObject::pink() {
 	white();
 	for(int i = 0; i < block_size; i++) outputs[0][i] =pinkifier.tick(outputs[0][i]);
-	for(int i= 0; i < block_size; i++) {
-		if(fabs(outputs[0][i])>max) {
-			max =outputs[0][i];
-			printf("%f\n", max);
-		}
-	}
 }
 
 void LavNoiseObject::brown() {
-	
 }
 
 void LavNoiseObject::process() {
