@@ -13,6 +13,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_dspmath.hpp>
 #include <libaudioverse/private_macros.hpp>
 #include <libaudioverse/private_memory.hpp>
+#include <libaudioverse/private_iir.hpp>
 #include <limits>
 #include <random>
 
@@ -25,11 +26,20 @@ class LavNoiseObject: public LavObject {
 	void brown();
 	std::mt19937_64 random_number_generator;
 	std::uniform_real_distribution<float> uniform_distribution;
+	LavIIRFilter pinkifier; //filter to turn white noise into pink noise.
+	float max = 0.0;
 };
 
 //we give the random number generator a fixed seed for debugging purposes.
 LavNoiseObject::LavNoiseObject(std::shared_ptr<LavSimulation> simulation): LavObject(Lav_OBJTYPE_NOISE, simulation, 0, 1),
 random_number_generator(1234), uniform_distribution(-1.0f, 1.0f)  {
+	/**We have to configure the pinkifier.
+This was originally taken from Spectral Audio processing by JOS.*/
+	//zeros
+	double pinkNumer[] = {0.049922035, -0.095993537, 0.050612699, -0.004408786};
+	//and the poles.
+	double pinkDenom[] = {1, -2.494956002,   2.017265875,  -0.522189400};
+	pinkifier.configure(sizeof(pinkNumer)/sizeof(double), pinkNumer, sizeof(pinkDenom)/sizeof(double), pinkDenom);
 }
 
 std::shared_ptr<LavObject> createNoiseObject(std::shared_ptr<LavSimulation> simulation) {
@@ -51,9 +61,18 @@ void LavNoiseObject::white() {
 }
 
 void LavNoiseObject::pink() {
+	white();
+	for(int i = 0; i < block_size; i++) outputs[0][i] =pinkifier.tick(outputs[0][i]);
+	for(int i= 0; i < block_size; i++) {
+		if(fabs(outputs[0][i])>max) {
+			max =outputs[0][i];
+			printf("%f\n", max);
+		}
+	}
 }
 
 void LavNoiseObject::brown() {
+	
 }
 
 void LavNoiseObject::process() {

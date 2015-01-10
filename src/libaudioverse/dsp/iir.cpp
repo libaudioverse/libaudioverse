@@ -13,11 +13,11 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private_errors.hpp>
 
 void LavIIRFilter::configure(int newNumeratorLength, double* newNumerator, int newDenominatorLength, double* newDenominator) {
+	if(newNumeratorLength == 0 || newDenominatorLength == 0 || newDenominator[0] == 0.0) throw LavErrorException(Lav_ERROR_RANGE); //each must have at least one sample, and a0==0 is a pole at the origin which can be done with the mul property or similar.
 	if(history) delete[] history;
 	if(numerator) delete[] numerator;
 	if(denominator) delete[] denominator;
 	if(recursion_history) delete[] recursion_history;
-	if(numerator_length == 0 || denominator_length == 0) throw LavErrorException(Lav_ERROR_RANGE); //each must ahve at least one sample.
 	history = new double[newNumeratorLength]();
 	recursion_history = new double[newDenominatorLength]();
 	numerator = new double[newNumeratorLength]();
@@ -26,27 +26,29 @@ void LavIIRFilter::configure(int newNumeratorLength, double* newNumerator, int n
 	std::copy(newDenominator, newDenominator+newDenominatorLength, denominator);
 	numerator_length= newNumeratorLength;
 	denominator_length = newDenominatorLength;
+	//we normalize by a0.
+	for(int i = 0; i < newDenominatorLength; i++) newDenominator[i]/=newDenominator[0];
 }
 
 void LavIIRFilter::clearHistories() {
-	if(numerator_length) memset(numerator, 0, sizeof(double)*numerator_length);
-	if(denominator_length) memset(denominator, 0, sizeof(double)*denominator_length);
+	if(numerator_length) memset(history, 0, sizeof(double)*numerator_length);
+	if(denominator_length) memset(recursion_history, 0, sizeof(double)*denominator_length);
 }
 
 float LavIIRFilter::tick(float sample) {
-	//roll back the history.
-	std::copy(history+1, history+numerator_length, history);
-	//put sample in the rightmost history slot.
-	history[numerator_length-1] = sample;
-	//result.
+	int i;
 	double result = 0.0;
-	//first, a convolution but with doubles.  Convolve the numerator coefficients with the history, adding terms.
-	for(int i = 0; i < numerator_length; i++) result+=history[numerator_length-i-1]*numerator[i];
-	//second, do likewise with recursion history, but this time subtract.
-	for(int i = 0; i < denominator_length; i++) result-=recursion_history[denominator_length-i-1]*denominator[i];
-	//roll back the recursion history.
-	std::copy(recursion_history+1, recursion_history+denominator_length, recursion_history);
-	//insert result into the recursion history.
-	recursion_history[denominator_length-1] = result;
+	history[0] = sample;
+	for(i= numerator_length-1; i > 0; i--) {
+		result +=history[i]*numerator[i];
+		history[i]=history[i-1];
+	}
+	result+=sample*numerator[0];
+	for(i = denominator_length-1 ; i >0; i--) {
+		result +=-denominator[i]*recursion_history[i];
+		recursion_history[i]=recursion_history[i-1];
+	}
+	result += -denominator[0]*recursion_history[0];
+	recursion_history[0]=result;
 	return (float)result;
 }
