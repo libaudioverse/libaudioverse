@@ -18,6 +18,7 @@ objects:
  Lav_OBJTYPE_NOISE:
   properties:
    Lav_NOISE_NOISE_TYPE: {name: noise_type, type: int, value_enum: Lav_NOISE_TYPES, default: Lav_NOISE_TYPE_WHITE}
+   Lav_NOISE_SHOULD_NORMALIZE: {name: should_normalize, type: boolean, default: 0}
   doc_name: Noise Generator
  Lav_OBJTYPE_FILE:
   properties:
@@ -123,6 +124,10 @@ objects:
   extra_functions:
    Lav_multifileObjectPlay: {name: play}
    Lav_multifileObjectStopAll: {name: stop_all}
+ Lav_OBJTYPE_IIR:
+  doc_name: IIR Filter
+  extra_functions:
+   Lav_iirObjectSetCoefficients: {name: set_coefficients}
 additional_important_enums:
  - Lav_LOGGING_LEVELS
  - Lav_PROPERTY_TYPES

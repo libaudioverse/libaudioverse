@@ -27,6 +27,8 @@ class LavNoiseObject: public LavObject {
 	std::mt19937_64 random_number_generator;
 	std::uniform_real_distribution<float> uniform_distribution;
 	LavIIRFilter pinkifier; //filter to turn white noise into pink noise.
+	LavIIRFilter brownifier; //and likewise for brown.
+	float pink_max = 0.0f, brown_max = 0.0f; //used for normalizing noise.
 };
 
 //we give the random number generator a fixed seed for debugging purposes.
@@ -39,6 +41,17 @@ This was originally taken from Spectral Audio processing by JOS.*/
 	//and the poles.
 	double pinkDenom[] = {1, -2.494956002,   2.017265875,  -0.522189400};
 	pinkifier.configure(sizeof(pinkNumer)/sizeof(double), pinkNumer, sizeof(pinkDenom)/sizeof(double), pinkDenom);
+	//this is a butterworth filter designed with the following numpy code:
+	//b, a = butter(1, 0.002)
+	//this is not 100% accurate, but it is doubtful that the error is audible.
+	double brownNumer[] = {0.00313176, 0.00313176};
+	double brownDenom[] = {1.0, -0.99373647};
+	brownifier.configure(sizeof(brownNumer)/sizeof(double), brownNumer, sizeof(brownDenom)/sizeof(double), brownDenom);
+	//the pinkifier and brownifier are too quiet, so we bump them up some.
+	//these numbers were obtained by listening to the output and adjusting.
+	//if users need to have the noise on the range-1.0 to 1.0, they can use should_normalize=Truewhich works for all but absurdly small block sizes.
+	pinkifier.setGain(4.0);
+	brownifier.setGain(12.0);
 }
 
 std::shared_ptr<LavObject> createNoiseObject(std::shared_ptr<LavSimulation> simulation) {
@@ -62,9 +75,24 @@ void LavNoiseObject::white() {
 void LavNoiseObject::pink() {
 	white();
 	for(int i = 0; i < block_size; i++) outputs[0][i] =pinkifier.tick(outputs[0][i]);
+	//pass over the output buffer and find the max sample.
+	for(int i = 0; i < block_size; i++) {
+		if(fabs(outputs[0][i]) > pink_max) pink_max= fabs(outputs[0][i]);
+	}
+	if(getProperty(Lav_NOISE_SHOULD_NORMALIZE).getIntValue() == 0 || pink_max == 0.0f) return;
+	for(int i = 0; i < block_size; i++) outputs[0][i]/=pink_max;
 }
 
 void LavNoiseObject::brown() {
+	white();
+	for(int i= 0; i < block_size; i++) outputs[0][i]=brownifier.tick(outputs[0][i]);
+	//do something to make brown noise here...
+	//pass over the output buffer and find the max sample.
+	for(int i = 0; i < block_size; i++) {
+		if(fabs(outputs[0][i]) > brown_max) brown_max= fabs(outputs[0][i]);
+	}
+	if(getProperty(Lav_NOISE_SHOULD_NORMALIZE).getIntValue() == 0 || brown_max == 0.0f) return;
+	for(int i = 0; i < block_size; i++) outputs[0][i]/=brown_max;
 }
 
 void LavNoiseObject::process() {

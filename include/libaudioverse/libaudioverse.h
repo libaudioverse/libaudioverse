@@ -111,6 +111,7 @@ enum Lav_OBJTYPES {
 	Lav_OBJTYPE_MULTIFILE = 18,
 	Lav_OBJTYPE_SQUARE = 19,
 	Lav_OBJTYPE_NOISE = 20,
+	Lav_OBJTYPE_IIR =21,
 };
 
 /**Object states.*/
@@ -325,6 +326,13 @@ Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkObjectSetFeedbackDelayMatri
 Lav_PUBLIC_FUNCTION LavError Lav_createMultifileObject(LavSimulation* sim, int channels, int maxSimultaneousFiles, LavObject** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_multifileObjectPlay(LavObject* obj, char* path);
 Lav_PUBLIC_FUNCTION LavError Lav_multifileObjectStopAll(LavObject* obj);
+
+//implements iir filters.
+Lav_PUBLIC_FUNCTION LavError Lav_createIirObject(LavSimulation* simulation, int channels, LavObject **destination);
+/*Set the IIR coefficients.
+The numerator can be anything, but the denominator must have a nonzero first coefficient, and you must use both.
+For a filter without a denominator, use the FIR object-among other things, FIR filters can use floats, whereas this uses doubles internally.*/
+Lav_PUBLIC_FUNCTION LavError Lav_iirObjectSetCoefficients(LavObject* obj, int numeratorLength, double* numerator, int denominatorLength, double* denominator, int shouldClearHistory);
 
 #ifdef __cplusplus
 }
