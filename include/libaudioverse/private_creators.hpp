@@ -15,6 +15,7 @@ std::shared_ptr<LavObject> createHrtfObject(std::shared_ptr<LavSimulation> simul
 std::shared_ptr<LavObject> createMixerObject(std::shared_ptr<LavSimulation> simulation, unsigned int maxParents, unsigned int inputsPerParent);
 std::shared_ptr<LavObject> createSineObject(std::shared_ptr<LavSimulation> Simulation);
 std::shared_ptr<LavObject> createSquareObject(std::shared_ptr<LavSimulation> simulation);
+std::shared_ptr<LavObject> createNoiseObject(std::shared_ptr<LavSimulation> simulation);
 
 std::shared_ptr<LavObject> createDelayObject(std::shared_ptr<LavSimulation> simulation, unsigned int lines);
 std::shared_ptr<LavObject>createAmplitudePannerObject(std::shared_ptr<LavSimulation> Simulation);
@@ -24,3 +25,5 @@ std::shared_ptr<LavObject> createPullObject(std::shared_ptr<LavSimulation> sim, 
 std::shared_ptr<LavObject> createMultipannerObject(std::shared_ptr<LavSimulation> sim, std::shared_ptr<LavHrtfData> hrtf);
 std::shared_ptr<LavObject> createFeedbackDelayNetworkObject(std::shared_ptr<LavSimulation> simulation, float maxDelay, int lines);
 std::shared_ptr<LavObject> createMultifileObject(std::shared_ptr<LavSimulation> simulation, int channels, int maxSimultaneousFiles);
+
+std::shared_ptr<LavObject> createIirObject(std::shared_ptr<LavSimulation> simulation, int channels);
