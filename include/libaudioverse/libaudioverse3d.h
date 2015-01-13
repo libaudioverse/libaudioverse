@@ -8,11 +8,10 @@ extern "C" {
 #endif
 
 /**This is the interface to the 3d simulation of Libaudioverse, including its properties.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createSimpleEnvironmentObject(LavSimulation* sim, const char*hrtfPath, LavObject** destination);
-Lav_PUBLIC_FUNCTION LavError Lav_createSourceObject(LavSimulation* sim, LavObject* environment, LavObject** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createSimpleEnvironmentNode(LavSimulation* sim, const char*hrtfPath, LavNode** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createSourceNode(LavSimulation* sim, LavNode* environment, LavNode** destination);
 
-///A few properties common to most objects in the 3d simulation including all environments.
-//note: reserves up to -20 before hitting Lav_ENVIRONMENT_STANDARD_PROPERTIES.
+//A few properties common to most objects in the 3d simulation including all environments.
 enum Lav_3D_PROPERTIES {
 	Lav_3D_ORIENTATION = -1, //float6 consisting of an at followed by an up vector.
 	Lav_3D_POSITION = -2, //float3, consisting of the position of the object.
