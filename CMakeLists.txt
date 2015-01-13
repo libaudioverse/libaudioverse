@@ -25,10 +25,10 @@ SET(libaudioverse_required_libraries ${libsndfile_name} ${OPENAL_NAME} kissfft)
 add_subdirectory(src)
 
 #this makes the bindings generation step always run after a Libaudioverse build.
-ADD_CUSTOM_TARGET(libaudioverse_bindings ALL
-COMMAND python "\"${CMAKE_CURRENT_SOURCE_DIR}/scripts/build_bindings.py\""
-DEPENDS libaudioverse
-)
+#ADD_CUSTOM_TARGET(libaudioverse_bindings ALL
+#COMMAND python "\"${CMAKE_CURRENT_SOURCE_DIR}/scripts/build_bindings.py\""
+#DEPENDS libaudioverse
+#)
 
 #This makes documentation run, but only when requested.
 ADD_CUSTOM_TARGET(libaudioverse_docs
