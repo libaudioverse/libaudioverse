@@ -6,9 +6,9 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "../implementations/panner.hpp"
 #include <memory>
 
-class LavAmplitudePannerObject: public LavObject {
+class LavAmplitudePannerNode: public LavNode {
 	public:
-	LavAmplitudePannerObject(std::shared_ptr<LavSimulation> device);
+	LavAmplitudePannerNode(std::shared_ptr<LavSimulation> simulation);
 	virtual void process();
 	void recomputeChannelMap();
 	void configureStandardChannelMap(unsigned int channels);

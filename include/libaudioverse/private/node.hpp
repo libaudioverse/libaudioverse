@@ -16,42 +16,42 @@ class LavProperty;
 
 class LavInputDescriptor {
 	public:
-	LavInputDescriptor(std::shared_ptr<LavObject> p, unsigned int o): parent(p), output(o) {}
-	std::weak_ptr<LavObject> parent;
+	LavInputDescriptor(std::shared_ptr<LavNode> p, unsigned int o): parent(p), output(o) {}
+	std::weak_ptr<LavNode> parent;
 	unsigned int output = 0;
 };
 
-/**Things all Libaudioverse objects have.*/
-class LavObject: public std::enable_shared_from_this<LavObject> { //enable_shared_from_this is for event infrastructure.
+/**Things all Libaudioverse nodes have.*/
+class LavNode: public std::enable_shared_from_this<LavNode> { //enable_shared_from_this is for event infrastructure.
 	public:
-	LavObject(int type, std::shared_ptr<LavSimulation> simulation, unsigned int numInputs, unsigned int numOutputs);
-	virtual ~LavObject();
+	LavNode(int type, std::shared_ptr<LavSimulation> simulation, unsigned int numInputs, unsigned int numOutputs);
+	virtual ~LavNode();
 
 	virtual void computeInputBuffers();//update what we point to due to parent changes.
 	virtual int getType();
 	//The private version of inputs.
-	//For most objects, inputs are parents.  There are a few special cases, mostly involving subgraphs.
-	//This has a semantic meaning to the graph processor, but not necessarily to use code.  See setInput and getInput for the external versions.
-	//parents are dependency links.  Inputs are user-facing dependency links intended to hide library-internal objects where necessary.
-	virtual void setParent(unsigned int input, std::shared_ptr<LavObject> parent, unsigned int parentOutput);
-	virtual std::shared_ptr<LavObject> getParentObject(unsigned int slot);
+	//For most nodes, inputs are parents.  There are a few special cases, mostly involving subgraphs.
+	//This has a semantic meaning to the graph processor, but not necessarily to user code.  See setInput and getInput for the external versions.
+	//parents are dependency links.  Inputs are user-facing dependency links intended to hide library-internal nodes where necessary.
+	virtual void setParent(unsigned int input, std::shared_ptr<LavNode> parent, unsigned int parentOutput);
+	virtual std::shared_ptr<LavNode> getParentNode(unsigned int slot);
 	virtual unsigned int getParentOutput(unsigned int slot);
 	virtual unsigned int getParentCount();
 
 	//these are what is exposed to the public user.
 	//Most of them (including default implementations) forward to a get/set parent function.
-	virtual void setInput(unsigned int input, std::shared_ptr<LavObject> object, unsigned int output);
-	virtual std::shared_ptr<LavObject> getInputObject(unsigned int input);
+	virtual void setInput(unsigned int input, std::shared_ptr<LavNode> node, unsigned int output);
+	virtual std::shared_ptr<LavNode> getInputNode(unsigned int input);
 	virtual unsigned int getInputOutput(unsigned int input);
 	virtual unsigned int getInputCount();
 
 	virtual unsigned int getOutputCount();
-	//Note that this isn't shared ptr.  The output pointers for an object are managed by the object itself and we need to be able to allocate/deallocate them for SSE, as well as work with arrays.  Don't hold on to output pointers.
+	//Note that this isn't shared ptr.  The output pointers for a node are managed by the node itself and we need to be able to allocate/deallocate them for SSE, as well as work with arrays.  Don't hold on to output pointers.
 	virtual float* getOutputPointer(unsigned int output);
 	//this is guaranteed to be written in terms of getOutputPointer, so subclasses can override the former:
 	virtual void getOutputPointers(float** dest);
 
-	//equivalent to reading lav_OBJECT_STATE.
+	//equivalent to reading lav_NODE_STATE.
 	virtual int getState();
 
 	//do not override. Handles the processing protocol: updating some globals and calling process.
@@ -59,9 +59,9 @@ class LavObject: public std::enable_shared_from_this<LavObject> { //enable_share
 	//override this one instead.
 	virtual void process();
 
-	//this is called at some point in the processing logic which is guaranteed to be before this object's parents are processed and after the device is locked.
-	//additionally, a parent will have its willProcessParents called after this object.
-	//that is, nothing else will touch this object but the mixer thread, and the next thing to be called (at some point in future) is willProcess.
+	//this is called at some point in the processing logic which is guaranteed to be before this node's parents are processed and after the device is locked.
+	//additionally, a parent will have its willProcessParents called after this node.
+	//that is, nothing else will touch this node but the mixer thread, and the next thing to be called (at some point in future) is willProcess.
 	//the default does nothing.
 	virtual void willProcessParents();
 
@@ -96,37 +96,37 @@ class LavObject: public std::enable_shared_from_this<LavObject> { //enable_share
 	int prev_state = Lav_OBJSTATE_PLAYING;
 
 	//we are never allowed to copy.
-	LavObject(const LavObject&) = delete;
-	LavObject& operator=(const LavObject&) = delete;
+	LavNode(const LavNode&) = delete;
+	LavNode& operator=(const LavNode&) = delete;
 };
 
 //needed for things that wish to encapsulate and manage nodes that the public API isn't supposed to see.
-class LavSubgraphObject: public LavObject {
+class LavSubgraphNode: public LavNode {
 	public:
-	LavSubgraphObject(int type, std::shared_ptr<LavSimulation> simulation);
+	LavSubgraphNode(int type, std::shared_ptr<LavSimulation> simulation);
 	virtual void process();
-	//we do no processing and forward onto another object.  Therefore, we do not compute input buffers.
+	//we do no processing and forward onto another node.  Therefore, we do not compute input buffers.
 	virtual void computeInputBuffers();
 	//Best to override this too.
 	//otherwise, mul gets applied inappropriately.
 	virtual void doProcessProtocol();
 	//these overrides allow us to "step aside" and always say that the output of this subgraph is our parent.
 	virtual unsigned int getParentCount();
-	virtual std::shared_ptr<LavObject> getParentObject(unsigned int par);
+	virtual std::shared_ptr<LavNode> getParentNode(unsigned int par);
 	virtual unsigned int getParentOutput(unsigned int par);
 	//and this one crashes us if anything tries to set the parent.
 	//the purpose will become clearer once logging is introduced.
-	virtual void setParent(unsigned int par, std::shared_ptr<LavObject> obj, unsigned int input);
+	virtual void setParent(unsigned int par, std::shared_ptr<LavNode> obj, unsigned int input);
 	virtual unsigned int getOutputCount();
 	virtual float* getOutputPointer(unsigned int output);
-	virtual void setInput(unsigned int input, std::shared_ptr<LavObject> object, unsigned int output);
-	virtual std::shared_ptr<LavObject> getInputObject(unsigned int input);
+	virtual void setInput(unsigned int input, std::shared_ptr<LavNode> node, unsigned int output);
+	virtual std::shared_ptr<LavNode> getInputNode(unsigned int input);
 	virtual unsigned int getInputOutput(unsigned int input);
 	virtual unsigned int getInputCount();
 	//care must be taken with this function.
-	//changing the output object is permissible, but changing the input object will change the parents of the complex object the subgraph represents.
+	//changing the output node is permissible, but changing the input node will change the parents of the complex object the subgraph represents.
 	//the solution is to protect using a mixer of n channels and 1 parent, connecting to the mixer instead.
-	virtual void configureSubgraph(std::shared_ptr<LavObject> input, std::shared_ptr<LavObject> output);
+	virtual void configureSubgraph(std::shared_ptr<LavNode> input, std::shared_ptr<LavNode> output);
 	protected:
-	std::shared_ptr<LavObject> subgraph_input, subgraph_output;
+	std::shared_ptr<LavNode> subgraph_input, subgraph_output;
 };

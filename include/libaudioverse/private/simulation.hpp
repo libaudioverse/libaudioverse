@@ -14,7 +14,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <random>
 #include "libaudioverse.h"
 
-class LavObject;
+class LavNode;
 class LavDevice;
 
 /*When thrown on the background thread, terminates it.*/
@@ -30,9 +30,9 @@ class LavSimulation {
 	virtual unsigned int getBlockSize() { return block_size;}
 	virtual LavError start();
 	virtual LavError stop();
-	virtual LavError associateObject(std::shared_ptr<LavObject> obj);
-	virtual std::shared_ptr<LavObject> getOutputObject();
-	virtual LavError setOutputObject(std::shared_ptr<LavObject> obj);
+	virtual LavError associateNode(std::shared_ptr<LavNode> obj);
+	virtual std::shared_ptr<LavNode> getOutputNode();
+	virtual LavError setOutputNode(std::shared_ptr<LavNode> node);
 	virtual float getSr() { return sr;}
 
 	//this is called whenever the graph changes.
@@ -58,19 +58,19 @@ class LavSimulation {
 	protected:
 	//reexecute planning logic.
 	void replan();
-	//visit all objects in the order they need to be visited if we were processing the graph.
-	virtual void visitAllObjectsInProcessOrder(std::function<void(std::shared_ptr<LavObject>)> visitor);
-	//visit all objects in the order they must be visited to prepare for and process obj for a block of audio.  This is not the same as all parents: this call respects suspended.
-	virtual void visitForProcessing(std::shared_ptr<LavObject> obj, std::function<void(std::shared_ptr<LavObject>)> visitor);
+	//visit all nodes in the order they need to be visited if we were processing the graph.
+	virtual void visitAllNodesInProcessOrder(std::function<void(std::shared_ptr<LavNode>)> visitor);
+	//visit all nodes in the order they must be visited to prepare for and process obj for a block of audio.  This is not the same as all parents: this call respects suspended.
+	virtual void visitForProcessing(std::shared_ptr<LavNode> obj, std::function<void(std::shared_ptr<LavNode>)> visitor);
 	std::function<void(void)> preprocessing_hook;
 	//the execution plan.
-	std::vector<std::shared_ptr<LavObject>> plan;
-	std::vector<std::weak_ptr<LavObject>> weak_plan;
+	std::vector<std::shared_ptr<LavNode>> plan;
+	std::vector<std::weak_ptr<LavNode>> weak_plan;
 	unsigned int block_size = 0, mixahead = 0, is_started = 0;
 	float sr = 0.0f;
-	//if objects die, they automatically need to be removed.  We can do said removal on next process.
-	std::set<std::weak_ptr<LavObject>, std::owner_less<std::weak_ptr<LavObject>>> objects;
-	std::shared_ptr<LavObject> output_object = nullptr;
+	//if nodes die, they automatically need to be removed.  We can do said removal on next process.
+	std::set<std::weak_ptr<LavNode>, std::owner_less<std::weak_ptr<LavNode>>> nodes;
+	std::shared_ptr<LavNode> output_node = nullptr;
 	std::recursive_mutex mutex;
 
 	lambdatask::ThreadsafeQueue<std::function<void(void)>>  tasks;
