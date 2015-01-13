@@ -353,7 +353,7 @@ class {{friendly_name}}Node(GenericNode):
 
 	#This has to be here. Killing this is bad. It is not a no-op.
 	def __del__(self):
-		super({{friendly_name}}, self).__del__()
+		super({{friendly_name}}Node, self).__del__()
 
 {%for enumerant, prop in metadata['objects'].get(object_name, dict()).get('properties', dict()).iteritems()%}
 {{macros.implement_property(enumerant, prop)}}
