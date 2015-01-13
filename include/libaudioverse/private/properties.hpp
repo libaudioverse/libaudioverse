@@ -8,7 +8,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <limits>
 #include <algorithm>
 #include "libaudioverse.h"
-#include "private_errors.hpp"
+#include "errors.hpp"
 
 union LavPropertyValue {
 	float fval;

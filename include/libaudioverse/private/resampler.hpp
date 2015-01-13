@@ -8,7 +8,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <limits>
 #include <algorithm>
 #include <utility>
-#include "libaudioverse.h"
 
 /**A resampler.
 
