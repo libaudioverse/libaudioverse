@@ -9,7 +9,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 /**This is an abstract class and helper struct that is the minimum a source needs to associate to an object.*/
 
-class LavSourceObject;
+class LavSourceNode;
 
 /**This holds info on listener positions, defaults, etc.
 Anything a source needs for updating, basically.*/
@@ -17,11 +17,11 @@ struct LavEnvironment {
 	glm::mat4 world_to_listener_transform;
 };
 
-class LavEnvironmentBase: public LavSubgraphObject {
+class LavEnvironmentBase: public LavSubgraphNode {
 	public:
-	LavEnvironmentBase(int type, std::shared_ptr<LavSimulation> simulation): LavSubgraphObject(type, simulation) {}
+	LavEnvironmentBase(int type, std::shared_ptr<LavSimulation> simulation): LavSubgraphNode(type, simulation) {}
 	//Register a source for updates.  Subclasses should only hold a weak_ptr to the source and should allow it to die.
-	virtual void registerSourceForUpdates(std::shared_ptr<LavSourceObject> source) = 0;
+	virtual void registerSourceForUpdates(std::shared_ptr<LavSourceNode> source) = 0;
 	//must return an appropriate panner object for this environment.
-	virtual std::shared_ptr<LavObject> createPannerObject() = 0;
+	virtual std::shared_ptr<LavNode> createPannerObject() = 0;
 };

@@ -8,23 +8,23 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <set>
 #include <memory>
 
-class LavSourceObject;
+class LavSourceNode;
 class LavHrtfData;
 
 class LavSimpleEnvironment: public LavEnvironmentBase {
 	public:
 	LavSimpleEnvironment(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf);
-	void registerSourceForUpdates(std::shared_ptr<LavSourceObject> source);
+	void registerSourceForUpdates(std::shared_ptr<LavSourceNode> source);
 	//call update on all sources.
 	virtual void willProcessParents();
-	std::shared_ptr<LavObject> createPannerObject();
+	std::shared_ptr<LavNode> createPannerObject();
 	private:
 	//while these may be parents (through virtue of the panners we give out), they also have to hold a reference to us-and that reference must be strong.
 	//the world is more capable of handling a source that dies than a source a world that dies.
-	std::set<std::weak_ptr<LavSourceObject>, std::owner_less<std::weak_ptr<LavSourceObject>>> sources;
-	//these are parents of us, so this doesn't create cyclic behavior.  We give a new one out and connect it through our mixer for each source.
-	std::vector<std::weak_ptr<LavObject>> panners;
-	std::shared_ptr<LavObject> mixer = nullptr, limiter = nullptr;
+	std::set<std::weak_ptr<LavSourceNode>, std::owner_less<std::weak_ptr<LavSourceObject>>> sources;
+	//These are parents of us, but sources hold strong references to their environment; thus the weak pointer.
+	std::vector<std::weak_ptr<LavNode>> panners;
+	std::shared_ptr<LavNode> mixer = nullptr, limiter = nullptr;
 	std::shared_ptr<LavHrtfData > hrtf;
 	LavEnvironment environment;
 };
