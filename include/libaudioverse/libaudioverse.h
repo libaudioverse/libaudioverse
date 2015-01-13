@@ -10,18 +10,18 @@ extern "C" {
 
 /*Forward-declares all Libaudioverse types.*/
 #ifdef __cplusplus
-class LavObject;
+class LavNode;
 class LavSimulation;
 #else
 typedef void LavSimulation;
-typedef void LavObject;
+typedef void LavNode;
 #endif
 /**Make sure that we are marshalling enums as integers in the public API for both c and c++.
 Note that, internally, it's safe to use enums directly.  But marshalling out to some languages with the enum type is potentially dangerous: the standard does not designate what an enum is internally represented as, so we rely on the implicit conversion.*/
 typedef int LavError;
 typedef int LavLimits;
 typedef int LavPropertyType;
-typedef int LavObjectType;
+typedef int LavNodeType;
 
 /**Does whatever is appropriate on a given platform to expose a Libaudioverse function publically.*/
 #ifdef _MSC_VER
@@ -65,11 +65,11 @@ enum Lav_ERRORS {
 
 	Lav_ERROR_HRTF_INVALID = 10,
 
-	/**This one is odd.  It is what is thrown if you pass a object with the wrong "shape" to a function, most notably source creation.*/
+	/**This one is odd.  It is what is thrown if you pass a node with the wrong "shape" to a function, most notably source creation.*/
 	Lav_ERROR_SHAPE = 11,
 
-	Lav_ERROR_CANNOT_CROSS_DEVICES = 12, //an attempto either create a parent-child connect with objects from different devices or to set an output with an object from a different device.
-	Lav_ERROR_NO_OUTPUTS = 13, //we expected the object to have outputs here, but it didn't.
+	Lav_ERROR_CANNOT_CROSS_DEVICES = 12, //an attempto either create a parent-child connect with nodes from different devices or to set an output with an node from a different device.
+	Lav_ERROR_NO_OUTPUTS = 13, //we expected the node to have outputs here, but it didn't.
 	Lav_ERROR_LIMIT_EXCEEDED = 14,
 	Lav_ERROR_CAUSES_CYCLE = 15,
 	Lav_ERROR_PROPERTY_IS_READ_ONLY = 16,
@@ -88,37 +88,37 @@ enum Lav_PROPERTY_TYPES {
 	Lav_PROPERTYTYPE_INT_ARRAY = 8,
 };
 
-/**These are used to tag objects with their type, so that external languages may see them.*/
-enum Lav_OBJTYPES {
-	Lav_OBJTYPE_GENERIC = 0, //this is not something you should ever see outside the library, and basically means none.
-	Lav_OBJTYPE_SIMPLE_ENVIRONMENT= 1,
-	Lav_OBJTYPE_SOURCE = 2,
-	Lav_OBJTYPE_FILE = 3,
-	Lav_OBJTYPE_HRTF = 4,
-	Lav_OBJTYPE_SINE = 5,
-	Lav_OBJTYPE_MIXER = 6,
-	Lav_OBJTYPE_HARD_LIMITER = 7,
-	Lav_OBJTYPE_DELAY = 8,
-	Lav_OBJTYPE_AMPLITUDE_PANNER = 9,
-	Lav_OBJTYPE_PUSH = 10,
-	Lav_OBJTYPE_BIQUAD = 11,
-	Lav_OBJTYPE_PULL = 12,
-	Lav_OBJTYPE_GRAPH_LISTENER = 13,
-	Lav_OBJTYPE_CUSTOM = 14,
-	Lav_OBJTYPE_RINGMOD = 15,
-	Lav_OBJTYPE_MULTIPANNER = 16,
-	Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK = 17,
-	Lav_OBJTYPE_MULTIFILE = 18,
-	Lav_OBJTYPE_SQUARE = 19,
-	Lav_OBJTYPE_NOISE = 20,
-	Lav_OBJTYPE_IIR =21,
+/**These are used to tag nodes with their type, so that external languages may see them.*/
+enum Lav_NODETYPES{
+	Lav_NODETYPE_GENERIC = 0, //this is not something you should ever see outside the library, and basically means none.
+	Lav_NODETYPE_SIMPLE_ENVIRONMENT= 1,
+	Lav_NODETYPE_SOURCE = 2,
+	Lav_NODETYPE_FILE = 3,
+	Lav_NODETYPE_HRTF = 4,
+	Lav_NODETYPE_SINE = 5,
+	Lav_NODETYPE_MIXER = 6,
+	Lav_NODETYPE_HARD_LIMITER = 7,
+	Lav_NODETYPE_DELAY = 8,
+	Lav_NODETYPE_AMPLITUDE_PANNER = 9,
+	Lav_NODETYPE_PUSH = 10,
+	Lav_NODETYPE_BIQUAD = 11,
+	Lav_NODETYPE_PULL = 12,
+	Lav_NODETYPE_GRAPH_LISTENER = 13,
+	Lav_NODETYPE_CUSTOM = 14,
+	Lav_NODETYPE_RINGMOD = 15,
+	Lav_NODETYPE_MULTIPANNER = 16,
+	Lav_NODETYPE_FEEDBACK_DELAY_NETWORK = 17,
+	Lav_NODETYPE_MULTIFILE = 18,
+	Lav_NODETYPE_SQUARE = 19,
+	Lav_NODETYPE_NOISE = 20,
+	Lav_NODETYPE_IIR =21,
 };
 
-/**Object states.*/
-enum Lav_OBJECT_STATES {
-	Lav_OBJSTATE_PAUSED = 0,
-	Lav_OBJSTATE_PLAYING = 1,
-	Lav_OBJSTATE_ALWAYS_PLAYING = 2
+/**Node states.*/
+enum Lav_NODE_STATES {
+	Lav_NODESTATE_PAUSED = 0,
+	Lav_NODESTATE_PLAYING = 1,
+	Lav_NODESTATE_ALWAYS_PLAYING = 2
 };
 
 /**Logging levels.*/
@@ -163,7 +163,7 @@ For audio output devices, valid channel counts are as follows:
 
 Any channel count that is not one of the above produces undefined behavior, should that channel count be used with the audio backend.
 
-Channel orders for the output object are as follows:
+Channel orders for the output node are as follows:
 1- mono
 2- left, right
 6- front left, front right, front center, lfe, back left, back right
@@ -181,8 +181,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSimulationForDevice(int index, unsigned i
 Combine it with Lav_simulationReadBlock to make use of it.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createReadSimulation(unsigned int sr, unsigned int blockSize, LavSimulation** destination);
 
-Lav_PUBLIC_FUNCTION LavError Lav_simulationSetOutputObject(LavSimulation* simulation, LavObject* object);
-Lav_PUBLIC_FUNCTION LavError Lav_simulationGetOutputObject(LavSimulation* simulation, LavObject** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_simulationSetOutputNode(LavSimulation* simulation, LavNode* node);
+Lav_PUBLIC_FUNCTION LavError Lav_simulationGetOutputNode(LavSimulation* simulation, LavNode** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlockSize(LavSimulation* simulation, int* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlock(LavSimulation* simulation, unsigned int channels, int mayApplyMixingMatrix, float* buffer);
 Lav_PUBLIC_FUNCTION LavError Lav_simulationGetSr(LavSimulation* simulation, int* destination);
@@ -196,51 +196,51 @@ Lav_PUBLIC_FUNCTION LavError Lav_simulationBeginAtomicBlock(LavSimulation *simul
 Lav_PUBLIC_FUNCTION LavError Lav_simulationEndAtomicBlock(LavSimulation* simulation);
 
 
-/**Query object type.*/
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetType(LavObject* obj, int* destination);
+/**Query node type.*/
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetType(LavNode* node, int* destination);
 
 /**Query maximum number of inputs and outputs.*/
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetInputCount(LavObject* obj, unsigned int* destination);
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetOutputCount(LavObject* obj, unsigned int* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetInputCount(LavNode* node, unsigned int* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetOutputCount(LavNode* node, unsigned int* destination);
 
 /**Input management.*/
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetInputObject(LavObject *obj, unsigned int slot, LavObject** destination);
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetInputOutput(LavObject* obj, unsigned int slot, unsigned int* destination);
-Lav_PUBLIC_FUNCTION LavError Lav_objectSetInput(LavObject *obj, unsigned int input, LavObject* parent, unsigned int output);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetInputNode(LavNode *node, unsigned int slot, LavNode** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetInputOutput(LavNode* node, unsigned int slot, unsigned int* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeSetInput(LavNode *node, unsigned int input, LavNode* parent, unsigned int output);
 
 /**Resets a property to its default value, for any type.*/
-Lav_PUBLIC_FUNCTION LavError Lav_objectResetProperty(LavObject *obj, int slot);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeResetProperty(LavNode *node, int slot);
 
 /**Property getters and setters.*/
-Lav_PUBLIC_FUNCTION LavError Lav_objectSetIntProperty(LavObject* obj, int slot, int value);
-Lav_PUBLIC_FUNCTION LavError Lav_objectSetFloatProperty(LavObject *obj, int slot, float value);
-Lav_PUBLIC_FUNCTION LavError Lav_objectSetDoubleProperty(LavObject *obj, int slot, double value);
-Lav_PUBLIC_FUNCTION LavError Lav_objectSetStringProperty(LavObject*obj, int slot, char* value);
-Lav_PUBLIC_FUNCTION LavError Lav_objectSetFloat3Property(LavObject* obj, int slot, float v1, float v2, float v3);
-Lav_PUBLIC_FUNCTION LavError Lav_objectSetFloat6Property(LavObject* obj, int slot, float v1, float v2, float v3, float v4, float v5, float v6);
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetIntProperty(LavObject*obj, int slot, int *destination);
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloatProperty(LavObject* obj, int slot, float *destination);
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetDoubleProperty(LavObject*obj, int slot, double *destination);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeSetIntProperty(LavNode* node, int slot, int value);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeSetFloatProperty(LavNode *node, int slot, float value);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeSetDoubleProperty(LavNode *node, int slot, double value);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeSetStringProperty(LavNode*node, int slot, char* value);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeSetFloat3Property(LavNode* node, int slot, float v1, float v2, float v3);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeSetFloat6Property(LavNode* node, int slot, float v1, float v2, float v3, float v4, float v5, float v6);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetIntProperty(LavNode*node, int slot, int *destination);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetFloatProperty(LavNode* node, int slot, float *destination);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetDoubleProperty(LavNode*node, int slot, double *destination);
 //Note: allocates memory for you, that should be freed with Lav_free.  This is a convenience for those using higher level languages, and to avoid having to make second queries for length.
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetStringProperty(LavObject* obj, int slot, const char** destination);
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloat3Property(LavObject* obj, int slot, float* destination1, float* destination2, float* destination3);
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloat6Property(LavObject* obj, int slot, float* destinationV1, float* destinationV2, float* destinationV3, float* destinationV4, float* destinationV5, float* destinationV6);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetStringProperty(LavNode* node, int slot, const char** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetFloat3Property(LavNode* node, int slot, float* destination1, float* destination2, float* destination3);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetFloat6Property(LavNode* node, int slot, float* destinationV1, float* destinationV2, float* destinationV3, float* destinationV4, float* destinationV5, float* destinationV6);
 
-/**Query property ranges. These are set only by internal code.  Float3 and Float6 are effectively rangeless: specifically what a range is for those is very undefined and specific to the object in question.*/
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetIntPropertyRange(LavObject* obj, int slot, int* destination_lower, int* destination_upper);
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloatPropertyRange(LavObject* obj, int slot, float* destination_lower, float* destination_upper);
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetDoublePropertyRange(LavObject* obj, int slot, double* destination_lower, double* destination_upper);
+/**Query property ranges. These are set only by internal code.  Float3 and Float6 are effectively rangeless: specifically what a range is for those is very undefined and specific to the node in question.*/
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetIntPropertyRange(LavNode* node, int slot, int* destination_lower, int* destination_upper);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetFloatPropertyRange(LavNode* node, int slot, float* destination_lower, float* destination_upper);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetDoublePropertyRange(LavNode* node, int slot, double* destination_lower, double* destination_upper);
 
-/**Get the count of properties on an object.*/
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyCount(LavObject* obj, int* destination);
-/**Get the indices of all properties on an object as an array of ints, that is all properties with numeric index less than 0.  Allocates memory; free with Lav_free.*/
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyIndices(LavObject* obj, int** destination);
+/**Get the count of properties on an node.*/
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetPropertyCount(LavNode* node, int* destination);
+/**Get the indices of all properties on an node as an array of ints, that is all properties with numeric index less than 0.  Allocates memory; free with Lav_free.*/
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetPropertyIndices(LavNode* node, int** destination);
 /**Get the name of a property.  Again, allocates memory.*/
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyName(LavObject* obj, int slot, char** destination);
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyType(LavObject* obj, int slot, int* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetPropertyName(LavNode* node, int slot, char** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetPropertyType(LavNode* node, int slot, int* destination);
 /**Properties with dynamic ranges may change the endpoints of their range at any time and for any reason.
 This is primarily used by bindings, but may be useful to user interface developers.*/
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetPropertyHasDynamicRange(LavObject* obj, int slot, int* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetPropertyHasDynamicRange(LavNode* node, int slot, int* destination);
 
 /**Array properties.
 An array property does not have a range. Instead, it has a minimum and maximum supported length.
@@ -248,91 +248,91 @@ Note that these provide functions for setting parts of the array: the property c
 
 In order to make reading sane, you can only read one value at a time. Since Libaudioverse never exposes internal memory to the public user, reading multiple values would require wasting huge amounts of ram.
 */
-Lav_PUBLIC_FUNCTION LavError Lav_objectReplaceFloatArrayProperty(LavObject* obj, int slot, unsigned int length, float* values);
-Lav_PUBLIC_FUNCTION LavError Lav_objectReadFloatArrayProperty(LavObject* obj, int slot, unsigned int index, float* destination);
-Lav_PUBLIC_FUNCTION LavError  Lav_objectWriteFloatArrayProperty(LavObject* obj, int slot, unsigned int start, unsigned int stop, float* values);
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloatArrayPropertyDefault(LavObject* obj, int slot, unsigned int* destinationLength, float** destinationArray);
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetFloatArrayPropertyLength(LavObject* obj, int slot, unsigned int* destination);
-Lav_PUBLIC_FUNCTION LavError Lav_objectReplaceIntArrayProperty(LavObject* obj, int slot, unsigned int length, int* values);
-Lav_PUBLIC_FUNCTION LavError Lav_objectReadIntArrayProperty(LavObject* obj, int slot, unsigned int index, int* destination);
-Lav_PUBLIC_FUNCTION LavError  Lav_objectWriteIntArrayProperty(LavObject* obj, int slot, unsigned int start, unsigned int stop, int* values);
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetIntArrayPropertyDefault(LavObject* obj, int slot, unsigned int* destinationLength, int** destinationArray);
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetIntArrayPropertyLength(LavObject* obj, int slot, int* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeReplaceFloatArrayProperty(LavNode* node, int slot, unsigned int length, float* values);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeReadFloatArrayProperty(LavNode* node, int slot, unsigned int index, float* destination);
+Lav_PUBLIC_FUNCTION LavError  Lav_nodeWriteFloatArrayProperty(LavNode* node, int slot, unsigned int start, unsigned int stop, float* values);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetFloatArrayPropertyDefault(LavNode* node, int slot, unsigned int* destinationLength, float** destinationArray);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetFloatArrayPropertyLength(LavNode* node, int slot, unsigned int* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeReplaceIntArrayProperty(LavNode* node, int slot, unsigned int length, int* values);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeReadIntArrayProperty(LavNode* node, int slot, unsigned int index, int* destination);
+Lav_PUBLIC_FUNCTION LavError  Lav_nodeWriteIntArrayProperty(LavNode* node, int slot, unsigned int start, unsigned int stop, int* values);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetIntArrayPropertyDefault(LavNode* node, int slot, unsigned int* destinationLength, int** destinationArray);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetIntArrayPropertyLength(LavNode* node, int slot, int* destination);
 //applies to eather array type.
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetArrayPropertyLengthRange(LavObject* obj, int slot, unsigned int* destinationMin, unsigned int* destinationMax);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetArrayPropertyLengthRange(LavNode* node, int slot, unsigned int* destinationMin, unsigned int* destinationMax);
 
 /**events.
-Unlike callbacks, which are dedicated on a per-object basis, events fire in a background thread. It is safe to call the Libaudioverse API from a firing event.
+Unlike callbacks, which are dedicated on a per-node basis, events fire in a background thread. It is safe to call the Libaudioverse API from a firing event.
 It is documented which of these will fire more than once.  Most events will wait for you to return from the handler before firing a duplicate event.  It is wise to be as quick as possible.*/
-EXTERN_FUNCTION typedef void (*LavEventCallback)(LavObject* cause, void* userdata);
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetEventHandler(LavObject* obj, int event, LavEventCallback *destination);
-Lav_PUBLIC_FUNCTION LavError Lav_objectGetEventUserDataPointer(LavObject* obj, int event, void** destination);
-Lav_PUBLIC_FUNCTION LavError Lav_objectSetEvent(LavObject* obj, int event, LavEventCallback handler, void* userData);
+EXTERN_FUNCTION typedef void (*LavEventCallback)(LavNode* cause, void* userdata);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetEventHandler(LavNode* node, int event, LavEventCallback *destination);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetEventUserDataPointer(LavNode* node, int event, void** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeSetEvent(LavNode* node, int event, LavEventCallback handler, void* userData);
 
-/**Performs the object-specific reset operation.
+/**Performs the node-specific reset operation.
 
-This does not reset properties, merely internal histories and the like.  Specifically what this means depends on the object; see the manual.*/
-Lav_PUBLIC_FUNCTION LavError Lav_objectReset(LavObject* obj);
+This does not reset properties, merely internal histories and the like.  Specifically what this means depends on the node; see the manual.*/
+Lav_PUBLIC_FUNCTION LavError Lav_nodeReset(LavNode* node);
 
 //creators for different objject types.
 //also see libaudioverse3d.h.
 
-Lav_PUBLIC_FUNCTION LavError Lav_createSineObject(LavSimulation* sim, LavObject **destination);
-Lav_PUBLIC_FUNCTION LavError Lav_createSquareObject(LavSimulation* simulation, LavObject **destination);
-Lav_PUBLIC_FUNCTION LavError Lav_createNoiseObject(LavSimulation* simulation, LavObject **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavSimulation* sim, LavNode **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createSquareNode(LavSimulation* simulation, LavNode **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createNoiseNode(LavSimulation* simulation, LavNode **destination);
 
-Lav_PUBLIC_FUNCTION LavError Lav_createFileObject(LavSimulation *sim, const char* path, LavObject **destination);
-Lav_PUBLIC_FUNCTION LavError Lav_createHrtfObject(LavSimulation *simulation, const char* hrtfPath, LavObject **destination);
-Lav_PUBLIC_FUNCTION LavError Lav_createMixerObject(LavSimulation* sim, unsigned int maxParents, unsigned int inputsPerParent, LavObject **destination);
-Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterObject(LavSimulation* sim, unsigned int numInputs, LavObject** destination);
-Lav_PUBLIC_FUNCTION LavError Lav_createDelayObject(LavSimulation* sim, float maxDelay, unsigned int lineCount, LavObject** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavSimulation *sim, const char* path, LavNode **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createHrtfNode(LavSimulation *simulation, const char* hrtfPath, LavNode **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createMixerNode(LavSimulation* sim, unsigned int maxParents, unsigned int inputsPerParent, LavNode **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterNode(LavSimulation* sim, unsigned int numInputs, LavNode** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createDelayNode(LavSimulation* sim, float maxDelay, unsigned int lineCount, LavNode** destination);
 
-Lav_PUBLIC_FUNCTION LavError Lav_createAmplitudePannerObject(LavSimulation* sim, LavObject** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createAmplitudePannerNode(LavSimulation* sim, LavNode** destination);
 //can set the standard channel map for 2, 6, and 8 channels. Other values cause Lav_ERROR_RANGE.
-Lav_PUBLIC_FUNCTION LavError Lav_amplitudePannerObjectConfigureStandardMap(LavObject* obj, unsigned int channels);
+Lav_PUBLIC_FUNCTION LavError Lav_amplitudePannerNodeConfigureStandardMap(LavNode* node, unsigned int channels);
 
-Lav_PUBLIC_FUNCTION LavError Lav_createMultipannerObject(LavSimulation* sim, char* hrtfPath, LavObject** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createMultipannerNode(LavSimulation* sim, char* hrtfPath, LavNode** destination);
 
-Lav_PUBLIC_FUNCTION LavError Lav_createPushObject(LavSimulation* simulation, unsigned int sr, unsigned int channels, LavObject** destination);
-Lav_PUBLIC_FUNCTION LavError Lav_pushObjectFeed(LavObject* handle, unsigned int length, float* buffer);
-Lav_PUBLIC_FUNCTION LavError Lav_createBiquadObject(LavSimulation* sim, unsigned int channels, LavObject** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createPushNode(LavSimulation* simulation, unsigned int sr, unsigned int channels, LavNode** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_pushNodeFeed(LavNode* handle, unsigned int length, float* buffer);
+Lav_PUBLIC_FUNCTION LavError Lav_createBiquadNode(LavSimulation* sim, unsigned int channels, LavNode** destination);
 
-//pull object:
-typedef void (*LavPullObjectAudioCallback)(LavObject* obj, int frames, int channels, float* buffer, void* userdata);
-Lav_PUBLIC_FUNCTION LavError Lav_createPullObject(LavSimulation* simulation, unsigned int sr, unsigned int channels, LavObject** destination);
-Lav_PUBLIC_FUNCTION LavError Lav_pullObjectSetAudioCallback(LavObject* object, LavPullObjectAudioCallback callback, void* userdata);
+//pull node:
+typedef void (*LavPullNodeAudioCallback)(LavNode* node, int frames, int channels, float* buffer, void* userdata);
+Lav_PUBLIC_FUNCTION LavError Lav_createPullNode(LavSimulation* simulation, unsigned int sr, unsigned int channels, LavNode** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_pullNodeSetAudioCallback(LavNode* node, LavPullNodeAudioCallback callback, void* userdata);
 
 //graph listeners: a way to intercept the graph.
-typedef void (*LavGraphListenerObjectListeningCallback)(LavObject* obj, unsigned int frames, unsigned int channels, float* buffer, void* userdata);
-Lav_PUBLIC_FUNCTION LavError Lav_createGraphListenerObject(LavSimulation* simulation, unsigned int channels, LavObject** destination);
-Lav_PUBLIC_FUNCTION LavError Lav_graphListenerObjectSetListeningCallback(LavObject* obj, LavGraphListenerObjectListeningCallback callback, void* userdata);
+typedef void (*LavGraphListenerNodeListeningCallback)(LavNode* node, unsigned int frames, unsigned int channels, float* buffer, void* userdata);
+Lav_PUBLIC_FUNCTION LavError Lav_createGraphListenerNode(LavSimulation* simulation, unsigned int channels, LavNode** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_graphListenerNodeSetListeningCallback(LavNode* node, LavGraphListenernodeListeningCallback callback, void* userdata);
 
-//custom objects.
-//the calback does the processing if set, otherwise outputs are zeroed.
-typedef void (*LavCustomObjectProcessingCallback)(LavObject* obj, unsigned int frames, unsigned int numInputs, float** inputs, unsigned int numOutputs, float** outputs, void* userdata);
-Lav_PUBLIC_FUNCTION LavError Lav_createCustomObject(LavSimulation* simulation, unsigned int inputs, unsigned int outputs, LavObject** destination);
-Lav_PUBLIC_FUNCTION LavError Lav_customObjectSetProcessingCallback(LavObject* obj, LavCustomObjectProcessingCallback callback, void* userdata);
+//custom nodes.
+//the callback does the processing if set, otherwise outputs are zeroed.
+typedef void (*LavCustomNodeProcessingCallback)(LavNode* node, unsigned int frames, unsigned int numInputs, float** inputs, unsigned int numOutputs, float** outputs, void* userdata);
+Lav_PUBLIC_FUNCTION LavError Lav_createCustomNode(LavSimulation* simulation, unsigned int inputs, unsigned int outputs, LavNode** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_customNodeSetProcessingCallback(LavNode* node, LavCustomNodeProcessingCallback callback, void* userdata);
 
-Lav_PUBLIC_FUNCTION LavError Lav_createRingmodObject(LavSimulation* sim, LavObject** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createRingmodNode(LavSimulation* sim, LavNode** destination);
 
 //these are for feedback delay networks.
-//Warning: this is one of if not the single most complex objects in Libaudioverse.
-Lav_PUBLIC_FUNCTION LavError Lav_createFeedbackDelayNetworkObject(LavSimulation* sim, float maxDelay, int lines, LavObject** destination);
-Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkObjectSetFeedbackMatrix(LavObject* obj, int count, float* values);
-Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkObjectSetOutputGains(LavObject* obj, int count, float* values);
-Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkObjectSetDelays(LavObject* obj, int count, float* values);
-Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkObjectSetFeedbackDelayMatrix(LavObject* obj, int count, float* values);
+//Warning: this is one of if not the single most complex nodes in Libaudioverse.
+Lav_PUBLIC_FUNCTION LavError Lav_createFeedbackDelayNetworkNode(LavSimulation* sim, float maxDelay, int lines, LavNode** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetFeedbackMatrix(LavNode* node, int count, float* values);
+Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetOutputGains(LavNode* node, int count, float* values);
+Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetDelays(LavNode* node, int count, float* values);
+Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetFeedbackDelayMatrix(LavNode* node, int count, float* values);
 
-Lav_PUBLIC_FUNCTION LavError Lav_createMultifileObject(LavSimulation* sim, int channels, int maxSimultaneousFiles, LavObject** destination);
-Lav_PUBLIC_FUNCTION LavError Lav_multifileObjectPlay(LavObject* obj, char* path);
-Lav_PUBLIC_FUNCTION LavError Lav_multifileObjectStopAll(LavObject* obj);
+Lav_PUBLIC_FUNCTION LavError Lav_createMultifileNode(LavSimulation* sim, int channels, int maxSimultaneousFiles, LavNode** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_multifileNodePlay(LavNode* node, char* path);
+Lav_PUBLIC_FUNCTION LavError Lav_multifileNodeStopAll(LavNode* obj);
 
 //implements iir filters.
-Lav_PUBLIC_FUNCTION LavError Lav_createIirObject(LavSimulation* simulation, int channels, LavObject **destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createIirNode(LavSimulation* simulation, int channels, LavNode **destination);
 /*Set the IIR coefficients.
 The numerator can be anything, but the denominator must have a nonzero first coefficient, and you must use both.
-For a filter without a denominator, use the FIR object-among other things, FIR filters can use floats, whereas this uses doubles internally.*/
-Lav_PUBLIC_FUNCTION LavError Lav_iirObjectSetCoefficients(LavObject* obj, int numeratorLength, double* numerator, int denominatorLength, double* denominator, int shouldClearHistory);
+For a filter without a denominator, use the FIR node-among other things, FIR filters can use floats, whereas this uses doubles internally.*/
+Lav_PUBLIC_FUNCTION LavError Lav_iirNodeSetCoefficients(LavNode* node, int numeratorLength, double* numerator, int denominatorLength, double* denominator, int shouldClearHistory);
 
 #ifdef __cplusplus
 }
