@@ -73,65 +73,65 @@ def shutdown():
 
 #A list-like thing that knows how to manipulate inputs.
 class InputProxy(collections.Sequence):
-	"""Manipulate inputs for some specific object.
+	"""Manipulate inputs for some specific node.
 This works exactly like a python list, save that concatenation is not allowed.  The elements are tuples: (parent, output) or, should no parent be set for a slot, None.
 
-To link a parent to an output using this object, use  obj.parents[num] = (myparent, output).
+To link a parent to an output, use  node.parents[num] = (myparent, output).
 To clear a parent, assign None.
 
-Note that these objects are always up to date with their associated libaudioverse object but that iterators to them will become outdated if anything changes the graph.
+Note that these objects are always up to date with their associated libaudioverse node but that iterators to them will become outdated if anything changes the graph.
 
 Note also that we are not inheriting from MutableSequence because we cannot support __del__ and insert, but that the above advertised functionality still works anyway."""
 
-	def __init__(self, for_object):
-		self.for_object = for_object	
+	def __init__(self, for_node):
+		self.for_node= for_node
 
 	def __len__(self):
-		return _lav.object_get_input_count(self.for_object.handle)
+		return _lav.object_get_input_count(self.for_node.handle)
 
 	def __getitem__(self, key):
-		input = self.for_object._get_input(key)
+		input = self.for_node._get_input(key)
 		if input is None:
 			return None
 		return input
 
 	def __setitem__(self, key, val):
 		if val is None:
-			self.for_object._set_input(key, None, 0)
+			self.for_node._set_input(key, None, 0)
 			return
 		if len(val) != 2:
 			raise TypeError("Expected list of length 2 or None.")
-		if not isinstance(val[0], GenericObject):
-			raise TypeError("val[0]: is not a Libaudioverse object.")
-		self.for_object._set_input(key, val[0], val[1])
+		if not isinstance(val[0], GenericNode):
+			raise TypeError("val[0]: is not a Libaudioverse node.")
+		self.for_node._set_input(key, val[0], val[1])
 
 class _EventCallbackWrapper(object):
 	"""Wraps events into something sane.  Do not use externally."""
 
-	def __init__(self, for_object, slot, callback, additional_args):
-		self.obj_weakref = weakref.ref(for_object)
+	def __init__(self, for_node, slot, callback, additional_args):
+		self.node_weakref = weakref.ref(for_node)
 		self.additional_arguments = additional_args
 		self.slot = slot
 		self.callback = callback
 		self.fptr = _libaudioverse.LavEventCallback(self)
-		_lav.object_set_event(for_object.handle, slot, self.fptr, None)
+		_lav.object_set_event(for_node.handle, slot, self.fptr, None)
 
-	def __call__(self, obj, userdata):
-		actual_object = self.obj_weakref()
-		if actual_object is None:
+	def __call__(self, node, userdata):
+		actual_node= self.node_weakref()
+		if actual_node is None:
 			return
-		self.callback(actual_object, *self.additional_arguments)
+		self.callback(actual_node, *self.additional_arguments)
 
 class _CallbackWrapper(object):
 
-	def __init__(self, obj, cb, additional_args, additional_kwargs):
+	def __init__(self, node, cb, additional_args, additional_kwargs):
 		self.additional_args = additional_args
 		self.additional_kwargs = additional_kwargs
 		self.cb = cb
-		self.obj_weakref = weakref.ref(obj)
+		self.node_weakref = weakref.ref(node)
 
 	def __call__(self, *args):
-		needed_args = (self.obj_weakref(),)+args[1:-1] #be sure to eliminate userdata, which is always the last argument.
+		needed_args = (self.node_weakref(),)+args[1:-1] #be sure to eliminate userdata, which is always the last argument.
 		return self.cb(*needed_args, **self.additional_kwargs)
 
 class DeviceInfo(object):
@@ -158,7 +158,7 @@ The position in the list is the needed device index for Simulation.__iniit__."""
 	return infos
 
 class Simulation(object):
-	"""Represents a running simulation.  All libaudioverse objects must be passed a simulation at creation time and cannot migrate between them.  Furthermore, it is an error to try to connect objects from different simulations.
+	"""Represents a running simulation.  All libaudioverse nodes must be passed a simulation at creation time and cannot migrate between them.  Furthermore, it is an error to try to connect objects from different simulations.
 
 Instances of this class are context managers.  Using the with statement on an instance of this class invoke's Libaudioverse's atomic block support."""
 
@@ -176,13 +176,13 @@ If device_index is an integer, a device is created which feeds the specified out
 
 One special value is not included in get_device_infos; this is -1.  -1 is the default system audio device plus the functionality required to follow the default if the user changes it, i.e. by unplugging headphones.  Backends will handle mixing to this device appropriately, though getting it's properties is not possible.
 
-See the manual for specifics on how output objects work.  A brief summary is given here: if the output object has 1, 2, 6, or 8 outputs, it is mixed to the output channel count using internal mixing matrices.  Otherwise, the first n outputs are taken as the channels to be outputted and mapped to the channels of the output device.."""
+See the manual for specifics on how output objects work.  A brief summary is given here: if the output object has 1, 2, 6, or 8 outputs, it is mixed to the output channel count using internal mixing matrices.  Otherwise, the first n outputs are taken as the channels to be outputted and mapped to the channels of the output device."""
 		if device_index is not None:
 			handle = _lav.create_simulation_for_device(device_index, channels, sample_rate, block_size, mix_ahead)
 		else:
 			handle = _lav.create_read_simulation(sample_rate, block_size)
 		self.handle = handle
-		self._output_object = None
+		self._output_node= None
 
 	def get_block(self, channels, may_apply_mixing_matrix = True):
 		"""Returns a block of data.
@@ -196,16 +196,16 @@ Calling this on an audio output device will cause the audio thread to skip ahead
 		return list(buff)
 
 	@property
-	def output_object(self):
-		"""The object assigned to this property is the object which will play through the device."""
-		return self._output_object
+	def output_node(self):
+		"""The node assigned to this property is the node which will play through the device."""
+		return self._output_node
 
-	@output_object.setter
-	def output_object(self, val):
-		if not (isinstance(val, GenericObject) or val is None):
-			raise TypeError("Expected subclass of Libaudioverse.GenericObject")
+	@output_node.setter
+	def output_node(self, val):
+		if not (isinstance(val, GenericNode) or val is None):
+			raise TypeError("Expected subclass of Libaudioverse.GenericNode")
 		_lav.simulation_set_output_object(self.handle, val.handle if val is not None else val)
-		self._output_object = val
+		self._output_node= val
 
 	#context manager support.
 	def __enter__(self):
@@ -233,7 +233,7 @@ name: Name of the property.
 
 range:Range of the property, if applicable.  Otherwise none.
 
-has_dynamic_range: True if the property has a dynamic range (i.e. file object's position property), otherwise False.
+has_dynamic_range: True if the property has a dynamic range (i.e. file node's position property), otherwise False.
 
 Note that this only communicates info.  If changes happen after you requested this instance, they will not be reflected here.
 """
@@ -245,8 +245,8 @@ Note that this only communicates info.  If changes happen after you requested th
 		self.has_dynamic_range = has_dynamic_range
 
 #This is the class hierarchy.
-#GenericObject is at the bottom, and we should never see one; and GenericObject should hold most implementation.
-class GenericObject(object):
+#GenericNode is at the bottom, and we should never see one; and GenericObject should hold most implementation.
+class GenericNode(object):
 	"""A Libaudioverse object."""
 
 	def __init__(self, handle, simulation):
@@ -318,22 +318,22 @@ class GenericObject(object):
 	def _get_input(self, key):
 		if self._inputs[key] is None:
 			return None
-		obj, slot = self._inputs[key]
-		handle = obj.handle
+		node, slot = self._inputs[key]
+		handle = node.handle
 		#We need to check and make sure this is still valid.
 		#It's possible our parent(s) resized their outputs and that libaudioverse killed this connection.
 		if handle != _lav.object_get_input_object(self.handle, key):
 			self._inputs[key] = None
 			return None
-		return obj, slot
+		return node, slot
 
-	def _set_input(self, key, obj, inp):
-		if obj is None:
+	def _set_input(self, key, node, inp):
+		if node is None:
 			_lav.object_set_input(self.handle, key, None, 0)
 			self._inputs[key] = (None, 0)
 		else:
-			_lav.object_set_input(self.handle, key, obj.handle, inp)
-			self._inputs[key] = (obj, inp)
+			_lav.object_set_input(self.handle, key, node.handle, inp)
+			self._inputs[key] = (node, inp)
 
 	@property
 	def output_count(self):
@@ -347,9 +347,9 @@ class GenericObject(object):
 {%set friendly_name = object_name|strip_prefix("Lav_OBJTYPE_")|lower|underscores_to_camelcase(True)%}
 {%set constructor_name = "Lav_create" + friendly_name + "Object"%}
 {%set constructor_arg_names = functions[constructor_name].input_args|map(attribute='name')|map('camelcase_to_underscores')|list-%}
-class {{friendly_name}}(GenericObject):
+class {{friendly_name}}Node(GenericNode):
 	def __init__(self{%if constructor_arg_names|length > 0%}, {%endif%}{{constructor_arg_names|join(', ')}}):
-		super({{friendly_name}}, self).__init__(_lav.{{constructor_name|without_lav|camelcase_to_underscores}}({{constructor_arg_names|join(', ')}}), {{constructor_arg_names[0]}})
+		super({{friendly_name}}Node, self).__init__(_lav.{{constructor_name|without_lav|camelcase_to_underscores}}({{constructor_arg_names|join(', ')}}), {{constructor_arg_names[0]}})
 
 	#This has to be here. Killing this is bad. It is not a no-op.
 	def __del__(self):
