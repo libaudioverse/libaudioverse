@@ -2,13 +2,13 @@
 This file is part of Libaudioverse, a library for 3D and environmental audio simulation, and is released under the terms of the Gnu General Public License Version 3 or (at your option) any later version.
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
-#include <libaudioverse/private_simulation.hpp>
-#include <libaudioverse/private_objects.hpp>
-#include <libaudioverse/private_macros.hpp>
-#include <libaudioverse/private_memory.hpp>
-#include <libaudioverse/private_kernels.hpp>
-#include <libaudioverse/private_audio_devices.hpp>
-#include <libaudioverse/private_data.hpp>
+#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/node.hpp>
+#include <libaudioverse/private/macros.hpp>
+#include <libaudioverse/private/memory.hpp>
+#include <libaudioverse/private/kernels.hpp>
+#include <libaudioverse/private/audio_devices.hpp>
+#include <libaudioverse/private/data.hpp>
 #include <stdlib.h>
 #include <functional>
 #include <algorithm>
@@ -59,32 +59,32 @@ void LavSimulation::getBlock(float* out, unsigned int channels, bool mayApplyMix
 		weak_plan.clear();
 		std::copy(plan.begin(), plan.end(), std::inserter(weak_plan, weak_plan.end()));
 	}
-	//visit all objects in reverse order.
-	//an object to the right in the vector depends on some subset of objects to its left, but never anything to its right.
+	//visit all nodesin reverse order.
+	//a nodeto the right in the vector depends on some subset of objects to its left, but never anything to its right.
 	for(auto i = plan.rbegin(); i != plan.rend(); i++) {
 		(*i)->willProcessParents();
 	}
-	//visit all objects in order, and do the processing.
+	//visit all nodes in order, and do the processing.
 	for(auto obj: plan) {
 		obj->doProcessProtocol();
 	}
 	//we're done with the strong plan, so kill it.
 	//this lets objects delete.
 	plan.clear();
-	if(output_object == nullptr || output_object->getState() == Lav_OBJSTATE_PAUSED) { //fast path, just zero.
+	if(output_node== nullptr || output_node->getState() == Lav_NODESTATE_PAUSED) { //fast path, just zero.
 		memset(out, 0, sizeof(float)*block_size*channels);
 		return;
 	}
 
-	float *mixingMatrix = getMixingMatrix(output_object->getOutputCount(), channels);
-	float** outputPointers = new float*[output_object->getOutputCount()];
-	output_object->getOutputPointers(outputPointers);
+	float *mixingMatrix = getMixingMatrix(output_node->getOutputCount(), channels);
+	float** outputPointers = new float*[output_node->getOutputCount()];
+	output_node->getOutputPointers(outputPointers);
 	if(mixingMatrix && mayApplyMixingMatrix) {
-		interleaveSamples(channels, getBlockSize(), output_object->getOutputCount(), outputPointers, mixing_matrix_workspace);
-		applyMixingMatrix(output_object->getOutputCount()*block_size, mixing_matrix_workspace, out, output_object->getOutputCount(), channels, mixingMatrix);
+		interleaveSamples(channels, getBlockSize(), output_node->getOutputCount(), outputPointers, mixing_matrix_workspace);
+		applyMixingMatrix(output_node->getOutputCount()*block_size, mixing_matrix_workspace, out, output_node->getOutputCount(), channels, mixingMatrix);
 	}
 	else {
-		interleaveSamples(channels, getBlockSize(), output_object->getOutputCount(), outputPointers, out);
+		interleaveSamples(channels, getBlockSize(), output_node->getOutputCount(), outputPointers, out);
 	}
 	delete[] outputPointers;
 }
@@ -99,19 +99,19 @@ LavError LavSimulation::stop() {
 	return Lav_ERROR_NONE;
 }
 
-LavError LavSimulation::associateObject(std::shared_ptr<LavObject> obj) {
-	objects.insert(std::weak_ptr<LavObject>(obj));
+LavError LavSimulation::associateNode(std::shared_ptr<LavNode> node) {
+	nodes.insert(std::weak_ptr<LavNode>(node));
 	return Lav_ERROR_NONE;
 }
 
-LavError LavSimulation::setOutputObject(std::shared_ptr<LavObject> obj) {
-	output_object = obj;
+LavError LavSimulation::setOutputNode(std::shared_ptr<LavNode> node) {
+	output_node= node;
 	invalidatePlan();
 	return Lav_ERROR_NONE;
 }
 
-std::shared_ptr<LavObject> LavSimulation::getOutputObject() {
-	return output_object;
+std::shared_ptr<LavNode> LavSimulation::getOutputNode() {
+	return output_node;
 }
 
 void LavSimulation::enqueueTask(std::function<void(void)> cb) {
@@ -157,41 +157,41 @@ void LavSimulation::invalidatePlan() {
 
 void LavSimulation::replan() {
 	plan.clear();
-	visitAllObjectsInProcessOrder([this] (std::shared_ptr<LavObject> o) {
-		plan.push_back(o);
+	visitAllNodesInProcessOrder([this] (std::shared_ptr<LavNode> n) {
+		plan.push_back(n);
 	});
 }
 
-void LavSimulation::visitAllObjectsInProcessOrder(std::function<void(std::shared_ptr<LavObject>)> visitor) {
-	std::set<std::shared_ptr<LavObject>> seen;
-	auto visitorWrapped = [&](std::shared_ptr<LavObject> o) {
-		if(seen.count(o)) return;
-		visitor(o);
-		seen.insert(o);
+void LavSimulation::visitAllNodesInProcessOrder(std::function<void(std::shared_ptr<LavNode>)> visitor) {
+	std::set<std::shared_ptr<LavNode>> seen;
+	auto visitorWrapped = [&](std::shared_ptr<LavNode> n) {
+		if(seen.count(n)) return;
+		visitor(n);
+		seen.insert(n);
 	};
-	if(output_object) {
-		visitForProcessing(output_object, visitorWrapped);
+	if(output_node) {
+		visitForProcessing(output_node, visitorWrapped);
 	}
-	//visit the rest: Lav_OBJSTATE_ALWAYS_PLAYING.
-	for(auto& i: objects) {
-		std::shared_ptr<LavObject> j = i.lock();
+	//visit the rest: Lav_NODESTATE_ALWAYS_PLAYING.
+	for(auto& i: nodes) {
+		std::shared_ptr<LavNode> j = i.lock();
 		if(j == nullptr) return; //this is dead.
-		if(j->getState() == Lav_OBJSTATE_ALWAYS_PLAYING) {
+		if(j->getState() == Lav_NODESTATE_ALWAYS_PLAYING) {
 			visitForProcessing(j, visitorWrapped);
 		}
 	}
 }
 
-void LavSimulation::visitForProcessing(std::shared_ptr<LavObject> obj, std::function<void(std::shared_ptr<LavObject>)> visitor) {
-	//if obj is null, bail out.  This is the base case.
-	if(obj == nullptr) return;
-	//if the object is paused, we also bail out: this object and its parents are not needed.
-	if(obj->getState() == Lav_OBJSTATE_PAUSED) return;
-	//we call ourselves on all parents of obj, and then pass obj to visitor.  This is essentially depth-first search.
-	for(unsigned int i = 0; i < obj->getParentCount(); i++) {
-		visitForProcessing(obj->getParentObject(i), visitor);
+void LavSimulation::visitForProcessing(std::shared_ptr<LavNode> node, std::function<void(std::shared_ptr<LavNode>)> visitor) {
+	//if node is null, bail out.  This is the base case.
+	if(node == nullptr) return;
+	//if the node is paused, we also bail out: this object and its parents are not needed.
+	if(node->getState() == Lav_NODESTATE_PAUSED) return;
+	//we call ourselves on all parents of node, and then pass node to visitor.  This is essentially depth-first search.
+	for(unsigned int i = 0; i < node->getParentCount(); i++) {
+		visitForProcessing(node->getParentNode(i), visitor);
 	}
-	visitor(obj);
+	visitor(node);
 }
 
 //Default callback implementation.
@@ -209,17 +209,17 @@ void LavSimulation::backgroundTaskThreadFunction() {
 
 //begin public API
 
-Lav_PUBLIC_FUNCTION LavError Lav_simulationSetOutputObject(LavSimulation* simulation, LavObject* object) {
+Lav_PUBLIC_FUNCTION LavError Lav_simulationSetOutputNode(LavSimulation* simulation, LavNode* node) {
 	PUB_BEGIN
 	LOCK(*simulation);
-	simulation->setOutputObject(incomingPointer<LavObject>(object));
+	simulation->setOutputNode(incomingPointer<LavNode>(node));
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_simulationGetOutputObject(LavSimulation* simulation, LavObject** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_simulationGetOutputNode(LavSimulation* simulation, LavNode** destination) {
 	PUB_BEGIN
 	LOCK(*simulation);
-	*destination = outgoingPointer<LavObject>(simulation->getOutputObject());
+	*destination = outgoingPointer<LavNode>(simulation->getOutputNode());
 	PUB_END
 }
 

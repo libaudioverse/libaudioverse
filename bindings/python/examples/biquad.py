@@ -9,15 +9,15 @@ print """Biquad demo.
 Please enter the path to a file in a format supported by Libsndfile: typically wave or ogg."""
 filepath = raw_input()
 filepath = os.path.abspath(filepath)
-filenode = libaudioverse.File(sim, filepath)
-bq = libaudioverse.Biquad(sim, 2)
+filenode = libaudioverse.FileNode(sim, filepath)
+bq = libaudioverse.BiquadNode(sim, 2)
 if filenode.output_count == 1:
 	bq.inputs[0] = filenode, 0
 	bq.inputs[1] = filenode, 0
 else:
 	bq.inputs[0] = filenode, 0
 	bq.inputs[1] = filenode, 1
-sim.output_object = bq
+sim.output_node = bq
 
 print "Sweeping lowpass from 0.0 hz to 10000 hz over", time_per_demo, "seconds:"
 resolution = 10

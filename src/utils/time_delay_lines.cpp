@@ -27,26 +27,26 @@ if((x) != Lav_ERROR_NONE) {\
 void main(int argc, char** args) {
 	ERRCHECK(Lav_initialize());
 	LavSimulation* simulation;
-	std::vector<LavObject*> lines;
-	LavObject* sineObj;
+	std::vector<LavNode*> lines;
+	LavNode* sineObj;
 	unsigned int numLines = 0;
 	float timeDelta = 0.0f;
 
 	ERRCHECK(Lav_createReadSimulation(44100, BLOCK_SIZE, &simulation));
-	ERRCHECK(Lav_createSineObject(simulation, &sineObj));
+	ERRCHECK(Lav_createSineNode(simulation, &sineObj));
 	while(timeDelta < SECONDS) {
 		numLines += 100;
 		printf("Preparing to test with %u lines...\n", numLines);
 		lines.resize(numLines, nullptr);
 		//anywhere there's a null pointer, replace it with a new line.
 		for(auto i = lines.begin(); i != lines.end(); i++) {
-			LavObject* newObj;
+			LavNode* newObj;
 			if(*i == nullptr) {
-				ERRCHECK(Lav_createDelayObject(simulation, 1.0, 1, &newObj));
+				ERRCHECK(Lav_createDelayNode(simulation, 1.0, 1, &newObj));
 				*i = newObj;
-				ERRCHECK(Lav_objectSetIntProperty(newObj, Lav_OBJECT_STATE, Lav_OBJSTATE_ALWAYS_PLAYING));
-				ERRCHECK(Lav_objectSetInput(newObj, 0, sineObj, 0));
-				ERRCHECK(Lav_objectSetFloatProperty(newObj, Lav_DELAY_DELAY, 0.5f));
+				ERRCHECK(Lav_nodeSetIntProperty(newObj, Lav_NODE_STATE, Lav_NODESTATE_ALWAYS_PLAYING));
+				ERRCHECK(Lav_nodeSetInput(newObj, 0, sineObj, 0));
+				ERRCHECK(Lav_nodeSetFloatProperty(newObj, Lav_DELAY_DELAY, 0.5f));
 			}
 		}
 		clock_t startTime = clock();

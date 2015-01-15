@@ -12,9 +12,9 @@ extern "C" {
 It is worth keeping separate because it will grow rapidly and contain documentation comments and etc.
 
 The standard for naming is:
-Lav_OBJTYPE_PROPNAME
+Lav_NODETYPE_PROPNAME
 or
-Lav_OBJTYPE_callbackname_EVENT
+Lav_NODETYPE_callbackname_EVENT
 
 Furthermore, all libaudioverse properties are negative.
 
@@ -22,9 +22,9 @@ Values below -100 are reserved for standard events and properties on all objects
 */
 
 enum lav_STANDARD_PROPERTIES {
-	Lav_OBJECT_STATE = -100,
-	Lav_OBJECT_AUTORESET = -101,
-	Lav_OBJECT_MUL = -102,
+	Lav_NODE_STATE = -100,
+	Lav_NODE_AUTORESET = -101,
+	Lav_NODE_MUL = -102,
 };
 
 enum Lav_SINE_PROPERTIES {
@@ -92,7 +92,7 @@ enum Lav_DELAY_PROPERTIES {
 	Lav_DELAY_INTERPOLATION_TIME = -4,
 };
 
-enum Lav_PUSH_OBJECT_PROPERTIES {
+enum Lav_PUSH_NODE_PROPERTIES {
 	Lav_PUSH_THRESHOLD = -1,
 	Lav_PUSH_AUDIO_EVENT = -2,
 	Lav_PUSH_OUT_EVENT = -3,

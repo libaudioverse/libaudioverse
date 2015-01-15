@@ -2,14 +2,14 @@
 This file is part of Libaudioverse, a library for 3D and environmental audio simulation, and is released under the terms of the Gnu General Public License Version 3 or (at your option) any later version.
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 
-#include <libaudioverse/3d/private_sources.hpp>
-#include <libaudioverse/3d/private_simpleenvironment.hpp>
-#include <libaudioverse/private_properties.hpp>
-#include <libaudioverse/private_macros.hpp>
-#include <libaudioverse/private_creators.hpp>
-#include <libaudioverse/private_simulation.hpp>
-#include <libaudioverse/private_memory.hpp>
-#include <libaudioverse/private_hrtf.hpp>
+#include <libaudioverse/3d/sources.hpp>
+#include <libaudioverse/3d/simpleenvironment.hpp>
+#include <libaudioverse/private/properties.hpp>
+#include <libaudioverse/private/macros.hpp>
+#include <libaudioverse/private/creators.hpp>
+#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/memory.hpp>
+#include <libaudioverse/private/hrtf.hpp>
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/libaudioverse3d.h>
@@ -19,10 +19,10 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <algorithm>
 #include <vector>
 
-LavSimpleEnvironment::LavSimpleEnvironment(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf): LavEnvironmentBase(Lav_OBJTYPE_SIMPLE_ENVIRONMENT, simulation)  {
+LavSimpleEnvironmentNode::LavSimpleEnvironmentNode(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf): LavEnvironmentBase(Lav_NODETYPE_SIMPLE_ENVIRONMENT, simulation)  {
 	this->hrtf = hrtf;
-	mixer = createMixerObject(simulation, 1, 8);
-	limiter = createHardLimiterObject(simulation, 8);
+	mixer = createMixerNode(simulation, 1, 8);
+	limiter = createHardLimiterNode(simulation, 8);
 	for(int i = 0; i < 8; i++) {
 		limiter->setInput(i, mixer, i);
 	}
@@ -35,13 +35,13 @@ LavSimpleEnvironment::LavSimpleEnvironment(std::shared_ptr<LavSimulation> simula
 	configureSubgraph(nullptr, limiter);
 }
 
-std::shared_ptr<LavSimpleEnvironment> createWorldObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf) {
-	auto retval = std::shared_ptr<LavSimpleEnvironment>(new LavSimpleEnvironment(simulation, hrtf), LavObjectDeleter);
-	simulation->associateObject(retval);
+std::shared_ptr<LavSimpleEnvironmentNode> createSimpleEnvironmentNode(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf) {
+	auto retval = std::shared_ptr<LavSimpleEnvironmentNode>(new LavSimpleEnvironmentNode(simulation, hrtf), LavNodeDeleter);
+	simulation->associateNode(retval);
 	return retval;
 }
 
-void LavSimpleEnvironment::willProcessParents() {
+void LavSimpleEnvironmentNode::willProcessParents() {
 	//update the matrix.
 	const float* pos = getProperty(Lav_3D_POSITION).getFloat3Value();
 	const float* atup = getProperty(Lav_3D_ORIENTATION).getFloat6Value();
@@ -66,8 +66,8 @@ void LavSimpleEnvironment::willProcessParents() {
 	for(auto i: needsRemoval) sources.erase(i);
 }
 
-std::shared_ptr<LavObject> LavSimpleEnvironment::createPannerObject() {
-	auto pan = createMultipannerObject(simulation, hrtf);
+std::shared_ptr<LavNode> LavSimpleEnvironmentNode::createPannerNode() {
+	auto pan = createMultipannerNode(simulation, hrtf);
 	unsigned int slot = panners.size();
 	panners.push_back(pan);
 	//expand the mixer by one parent.
@@ -78,13 +78,13 @@ std::shared_ptr<LavObject> LavSimpleEnvironment::createPannerObject() {
 	return pan;
 }
 
-void LavSimpleEnvironment::registerSourceForUpdates(std::shared_ptr<LavSourceObject> source) {
+void LavSimpleEnvironmentNode::registerSourceForUpdates(std::shared_ptr<LavSourceNode> source) {
 	sources.insert(source);
 }
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createSimpleEnvironmentObject(LavSimulation* simulation, const char*hrtfPath, LavObject** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createSimpleEnvironmentNode(LavSimulation* simulation, const char*hrtfPath, LavNode** destination) {
 	PUB_BEGIN
 	LOCK(*simulation);
 	auto hrtf = std::make_shared<LavHrtfData>();
@@ -93,7 +93,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSimpleEnvironmentObject(LavSimulation* si
 	} else {
 		hrtf->loadFromDefault(simulation->getSr());
 	}
-	auto retval = createWorldObject(incomingPointer<LavSimulation>(simulation), hrtf);
-	*destination = outgoingPointer<LavObject>(retval);
+	auto retval = createSimpleEnvironmentNode(incomingPointer<LavSimulation>(simulation), hrtf);
+	*destination = outgoingPointer<LavNode>(retval);
 	PUB_END
 }

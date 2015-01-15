@@ -3,9 +3,9 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 
 /**Implements the high-quality, static resampler.*/
-#include <libaudioverse/private_kernels.hpp>
-#include <libaudioverse/private_dspmath.hpp>
-#include <libaudioverse/private_constants.hpp>
+#include <libaudioverse/private/kernels.hpp>
+#include <libaudioverse/private/dspmath.hpp>
+#include <libaudioverse/private/constants.hpp>
 #include <algorithm>
 #include <math.h>
 

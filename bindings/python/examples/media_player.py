@@ -8,7 +8,7 @@ print """Command line Media player.
 Please enter the path to a file in a format supported by Libsndfile: typically wave or ogg."""
 filepath = raw_input()
 filepath = os.path.abspath(filepath)
-filenode = libaudioverse.File(sim, filepath)
+filenode = libaudioverse.FileNode(sim, filepath)
 
 #callback for when the file finishes.
 def finished(obj):
@@ -16,7 +16,7 @@ def finished(obj):
 
 filenode.end_event = finished
 
-sim.output_object = filenode
+sim.output_node= filenode
 
 commands = """Commands:
 play
@@ -34,9 +34,9 @@ while True:
 		if command[0] == 'quit':
 			break
 		elif command[0] == 'play':
-			filenode.suspended = False
+			filenode.state= libaudioverse.NodeStates.playing
 		elif command[0] == 'pause':
-			filenode.suspended = True
+			filenode.state = libaudioverse.NodeStates.paused
 		elif command[0] == 'seek':
 			to = float(command[1])
 			filenode.position = to

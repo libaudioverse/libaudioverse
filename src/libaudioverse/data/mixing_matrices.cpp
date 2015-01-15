@@ -15,7 +15,7 @@ Note: this file exists so that we can do something reasonable when the output ob
 It is not inconceivable that this will be useful for testing, and those apps which make the request will still need reasonable audio until they have input from the user.
 
 Note 2: This file will need revision as practical examples of these configurations are found in the wild.*/
-#include <libaudioverse/private_data.hpp> //extern declarations.
+#include <libaudioverse/private/data.hpp> //extern declarations.
 
 //this is the registry. The matrices are below.
 LavMixingMatrixInfo mixing_matrix_list[] = {

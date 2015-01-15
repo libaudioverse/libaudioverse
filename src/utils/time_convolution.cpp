@@ -31,18 +31,18 @@ void main(int argc, char** args) {
 		return;
 	}
 	LavSimulation* simulation;
-	LavObject* world;
-	std::vector<LavObject*> sources;
-	LavObject* sineObj;
+	LavNode* world;
+	std::vector<LavNode*> sources;
+	LavNode* sineObj;
 	unsigned int numSources = 0;
 	float timeDelta = 0.0f;
 
 	//some setup: create a world and a simulation.
 	ERRCHECK(Lav_createReadSimulation(44100, BLOCK_SIZE, &simulation));
-	ERRCHECK(Lav_createSimpleEnvironmentObject(simulation, args[1], &world));
-	ERRCHECK(Lav_objectSetIntProperty(world, Lav_ENVIRONMENT_DEFAULT_PANNER_STRATEGY, Lav_PANNING_STRATEGY_HRTF));
-	ERRCHECK(Lav_simulationSetOutputObject(simulation, world));
-	ERRCHECK(Lav_createSineObject(simulation, &sineObj));
+	ERRCHECK(Lav_createSimpleEnvironmentNode(simulation, args[1], &world));
+	ERRCHECK(Lav_nodeSetIntProperty(world, Lav_ENVIRONMENT_DEFAULT_PANNER_STRATEGY, Lav_PANNING_STRATEGY_HRTF));
+	ERRCHECK(Lav_simulationSetOutputNode(simulation, world));
+	ERRCHECK(Lav_createSineNode(simulation, &sineObj));
 	while(timeDelta < SECONDS) {
 		numSources += 10;
 		printf("Preparing to test with %u sources...\n", numSources);
@@ -50,9 +50,9 @@ void main(int argc, char** args) {
 		//anywhere there's a null pointer, replace it with a source.
 		for(auto i = sources.begin(); i != sources.end(); i++) {
 			if(*i != nullptr) continue;
-			LavObject* newSource;
-			ERRCHECK(Lav_createSourceObject(simulation, world, &newSource));
-			ERRCHECK(Lav_objectSetInput(newSource, 0, sineObj, 0));
+			LavNode* newSource;
+			ERRCHECK(Lav_createSourceNode(simulation, world, &newSource));
+			ERRCHECK(Lav_nodeSetInput(newSource, 0, sineObj, 0));
 			*i = newSource;
 		}
 		clock_t startTime = clock();

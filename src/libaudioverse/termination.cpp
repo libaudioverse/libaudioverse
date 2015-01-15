@@ -4,13 +4,13 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 /**Shut down Libaudioverse.*/
 #include <libaudioverse/libaudioverse.h>
-#include <libaudioverse/private_functiontables.hpp>
-#include <libaudioverse/private_simulation.hpp>
-#include <libaudioverse/private_macros.hpp>
-#include <libaudioverse/private_metadata.hpp>
-#include <libaudioverse/private_memory.hpp>
-#include <libaudioverse/private_audio_devices.hpp>
-#include <libaudioverse/private_logging.hpp>
+#include <libaudioverse/private/functiontables.hpp>
+#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/macros.hpp>
+#include <libaudioverse/private/metadata.hpp>
+#include <libaudioverse/private/memory.hpp>
+#include <libaudioverse/private/audio_devices.hpp>
+#include <libaudioverse/private/logging.hpp>
 
 typedef void (*shutdownfunc_t)();
 

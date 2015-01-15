@@ -6,7 +6,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 #include <stdlib.h>
 #include <string.h>
-#include <libaudioverse/private_functiontables.hpp>
+#include <libaudioverse/private/functiontables.hpp>
 #include <math.h>
 
 /**As a property of these tables, the last sample of the array must be the same as the first, and length must not include the last sample.
@@ -16,7 +16,7 @@ float sineTable[44101];
 const unsigned int sineTableLength = 44100;
 #define PI (3.14159f)
 
-Lav_PUBLIC_FUNCTION void computeSineTable() {
+void computeSineTable() {
 	for(unsigned int i = 0; i < sineTableLength; i++) {
 		sineTable[i] = sinf((2*PI*i)/sineTableLength); //sine wave of frequency 1 for 1 second.
 	}

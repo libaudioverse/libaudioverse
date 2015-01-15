@@ -27,20 +27,20 @@ if((x) != Lav_ERROR_NONE) {\
 void main(int argc, char** args) {
 	ERRCHECK(Lav_initialize());
 	LavSimulation* simulation;
-	LavObject* mixer;
-	LavObject* sineObj;
+	LavNode* mixer;
+	LavNode* sineObj;
 	unsigned int numInputs = 0;
 	float timeDelta = 0.0f;
 
 	ERRCHECK(Lav_createReadSimulation(44100, BLOCK_SIZE, &simulation));
-	ERRCHECK(Lav_createSineObject(simulation, &sineObj));
+	ERRCHECK(Lav_createSineNode(simulation, &sineObj));
 	while(timeDelta < SECONDS) {
 		numInputs += 10000;
 		printf("Preparing to test with %u inputs...\n", numInputs);
-		ERRCHECK(Lav_createMixerObject(simulation, numInputs, 1, &mixer));
-		ERRCHECK(Lav_simulationSetOutputObject(simulation, mixer));
+		ERRCHECK(Lav_createMixerNode(simulation, numInputs, 1, &mixer));
+		ERRCHECK(Lav_simulationSetOutputNode(simulation, mixer));
 		for(int i = 0; i < numInputs; i++) {
-			ERRCHECK(Lav_objectSetInput(mixer, i, sineObj, 0));
+			ERRCHECK(Lav_nodeSetInput(mixer, i, sineObj, 0));
 		}
 		clock_t startTime = clock();
 		for(unsigned int i = 0; i < SECONDS*44100; i+=BLOCK_SIZE) {

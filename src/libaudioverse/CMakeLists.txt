@@ -14,7 +14,7 @@ DEPENDS "${CMAKE_SOURCE_DIR}/scripts/convert_to_cpp_file.py"
 
 add_library(libaudioverse SHARED
 #the core infrastructure.
-objects.cpp
+node.cpp
 properties.cpp
 functiontables.cpp
 initialization.cpp
@@ -51,25 +51,25 @@ implementations/crossfadingdelayline.cpp
 implementations/feedback_delay_network.cpp
 
 #specific node types.
-objects/sine.cpp
-objects/file.cpp
-objects/hard_limiter.cpp
-objects/hrtf.cpp
-objects/mixer.cpp
-objects/delay.cpp
-objects/amplitude_panner.cpp
-objects/push.cpp
-objects/biquad.cpp
-objects/pull.cpp
-objects/graph_listener.cpp
-objects/custom.cpp
-objects/ringmod.cpp
-objects/multipanner.cpp
-objects/feedback_delay_network.cpp
-objects/multifile.cpp
-objects/square.cpp
-objects/noise.cpp
-objects/iir.cpp
+nodes/sine.cpp
+nodes/file.cpp
+nodes/hard_limiter.cpp
+nodes/hrtf.cpp
+nodes/mixer.cpp
+nodes/delay.cpp
+nodes/amplitude_panner.cpp
+nodes/push.cpp
+nodes/biquad.cpp
+nodes/pull.cpp
+nodes/graph_listener.cpp
+nodes/custom.cpp
+nodes/ringmod.cpp
+nodes/multipanner.cpp
+nodes/feedback_delay_network.cpp
+nodes/multifile.cpp
+nodes/square.cpp
+nodes/noise.cpp
+nodes/iir.cpp
 
 #physical outputs, etc.
 audio_backends/common.cpp

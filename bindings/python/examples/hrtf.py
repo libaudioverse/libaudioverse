@@ -9,11 +9,11 @@ print "Enter a file path.  For best results, this should be a"
 print "mono file; if not, only the first (usually left) channel will be used."
 path = raw_input()
 path = os.path.abspath(path)
-fobj = libaudioverse.File(sim, path)
-fobj.looping = True
-panner = libaudioverse.Hrtf(sim, os.path.join(os.path.split(__file__)[0], 'mit.hrtf'))
-panner.inputs[0] = fobj, 0
-sim.output_object =panner
+fnode = libaudioverse.FileNode(sim, path)
+fnode.looping = True
+panner = libaudioverse.HrtfNode(sim, "default")
+panner.inputs[0] = fnode, 0
+sim.output_node=panner
 print """Beginning evaluation.
 Enter any python expression that returns a tuple of numbers.  The first is azimuth and the second is elevation.  Azimuth may be anything, but elevation must be on the range -90 to 90.
 Enter quit to quit.
