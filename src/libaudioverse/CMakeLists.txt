@@ -37,12 +37,12 @@ dsp/iir.cpp
 #metadata/metadata.cpp
 
 #mathematical kernels for common dsp operations.
-#kernels/convolution.cpp
-#kernels/resamplers.cpp
-#kernels/interleaving.cpp
-#kernels/mixing_matrix.cpp
-#kernels/adding.cpp
-#kernels/multiplying.cpp
+kernels/convolution.cpp
+kernels/resamplers.cpp
+kernels/interleaving.cpp
+kernels/mixing_matrix.cpp
+kernels/adding.cpp
+kernels/multiplying.cpp
 
 #Like kernels, but stateful.
 #implementations/panner.cpp
