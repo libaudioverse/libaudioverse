@@ -20,7 +20,7 @@ functiontables.cpp
 initialization.cpp
 termination.cpp
 memory.cpp
-#events.cpp
+events.cpp
 simulation.cpp
 logging.cpp
 
