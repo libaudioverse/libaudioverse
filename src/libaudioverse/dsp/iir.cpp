@@ -4,13 +4,15 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 /**Implement a generic IIR filter.*/
 #include <algorithm>
-#include <libaudioverse/private_iir.hpp>
+#include <libaudioverse/private/iir.hpp>
+//for biquad types.
 #include <libaudioverse/libaudioverse_properties.h>
-#include <math.h>
-#include <libaudioverse/private_constants.hpp>
-#include <stdio.h>
+//for error codes
 #include <libaudioverse/libaudioverse.h>
-#include <libaudioverse/private_errors.hpp>
+#include <math.h>
+#include <libaudioverse/private/constants.hpp>
+#include <stdio.h>
+#include <libaudioverse/private/errors.hpp>
 
 void LavIIRFilter::configure(int newNumeratorLength, double* newNumerator, int newDenominatorLength, double* newDenominator) {
 	if(newNumeratorLength == 0 || newDenominatorLength == 0) throw LavErrorException(Lav_ERROR_RANGE);

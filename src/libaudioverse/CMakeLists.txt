@@ -30,8 +30,8 @@ utils/hrtf.cpp
 utils/resampler.cpp
 
 #classes and functionality for DSp that are stateful, and miscellaneous DSP-related math functions.
-#dsp/ringmod.cpp
-#dsp/iir.cpp
+dsp/ringmod.cpp
+dsp/iir.cpp
 
 #the metadata store
 #metadata/metadata.cpp
