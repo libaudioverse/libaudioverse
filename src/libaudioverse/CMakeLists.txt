@@ -21,7 +21,7 @@ node.cpp
 #termination.cpp
 #memory.cpp
 #events.cpp
-#simulation.cpp
+simulation.cpp
 #logging.cpp
 
 #utilities: file reading, platform-specific code, stateful filters that can't be represented as kernels, etc:

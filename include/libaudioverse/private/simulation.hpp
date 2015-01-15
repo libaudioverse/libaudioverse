@@ -30,7 +30,7 @@ class LavSimulation {
 	virtual unsigned int getBlockSize() { return block_size;}
 	virtual LavError start();
 	virtual LavError stop();
-	virtual LavError associateNode(std::shared_ptr<LavNode> obj);
+	virtual LavError associateNode(std::shared_ptr<LavNode> node);
 	virtual std::shared_ptr<LavNode> getOutputNode();
 	virtual LavError setOutputNode(std::shared_ptr<LavNode> node);
 	virtual float getSr() { return sr;}
