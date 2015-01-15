@@ -25,32 +25,32 @@ void main(int argc, char** args) {
 	}
 	char *soundFile = args[1], *hrtfFile = args[2];
 	LavSimulation* simulation;
-	LavObject* node, *world, *source;
+	LavNode* node, *world, *source;
 	ERRCHECK(Lav_initialize());
 	ERRCHECK(Lav_createSimulationForDevice(-1, 2, 44100, 1024, 3, &simulation));
-	ERRCHECK(Lav_createSimpleEnvironmentObject(simulation, hrtfFile, &world));
-	ERRCHECK(Lav_createFileObject(simulation, soundFile, &node));
-	ERRCHECK(Lav_createSourceObject(simulation, world, &source));
-	ERRCHECK(Lav_objectSetInput(source, 0, node, 0));
+	ERRCHECK(Lav_createSimpleEnvironmentNode(simulation, hrtfFile, &world));
+	ERRCHECK(Lav_createFileNode(simulation, soundFile, &node));
+	ERRCHECK(Lav_createSourceNode(simulation, world, &source));
+	ERRCHECK(Lav_nodeSetInput(source, 0, node, 0));
 	const int resolution = 1000, length = 3000; //length in ms.
 	const float width = 30.0;
-	Lav_simulationSetOutputObject(simulation, world);
+	Lav_simulationSetOutputNode(simulation, world);
 	//do a square over and over.
 	while(1) {
 		for(int i = 0; i < resolution; i++) {
-			Lav_objectSetFloat3Property(source, Lav_3D_POSITION, width*(i/(float)resolution)-width/2, 0, -width/2);
+			Lav_nodeSetFloat3Property(source, Lav_3D_POSITION, width*(i/(float)resolution)-width/2, 0, -width/2);
 			std::this_thread::sleep_for(std::chrono::milliseconds(length/resolution));
 		}
 		for(int i = 0; i < resolution; i++) {
-			Lav_objectSetFloat3Property(source, Lav_3D_POSITION, width/2, 0, (width*((float)i/resolution)-width/2) );
+			Lav_nodeSetFloat3Property(source, Lav_3D_POSITION, width/2, 0, (width*((float)i/resolution)-width/2) );
 			std::this_thread::sleep_for(std::chrono::milliseconds(length/resolution));
 		}
 		for(int i = 0; i < resolution; i++) {
-			Lav_objectSetFloat3Property(source, Lav_3D_POSITION, -(width*(i/(float)resolution)-width/2), 0, width/2);
+			Lav_nodeSetFloat3Property(source, Lav_3D_POSITION, -(width*(i/(float)resolution)-width/2), 0, width/2);
 			std::this_thread::sleep_for(std::chrono::milliseconds(length/resolution));
 		}
 		for(int i = 0; i < resolution; i++) {
-			Lav_objectSetFloat3Property(source, Lav_3D_POSITION, -width/2, 0, -(width*((float)i/resolution)-width/2));
+			Lav_nodeSetFloat3Property(source, Lav_3D_POSITION, -width/2, 0, -(width*((float)i/resolution)-width/2));
 			std::this_thread::sleep_for(std::chrono::milliseconds(length/resolution));
 		}
 	}

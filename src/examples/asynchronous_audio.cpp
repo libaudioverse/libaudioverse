@@ -19,14 +19,14 @@ if((x) != Lav_ERROR_NONE) {\
 
 void main() {
 	LavSimulation* simulation;
-	LavObject* node;
+	LavNode* node;
 	ERRCHECK(Lav_initialize());
 	ERRCHECK(Lav_createSimulationForDevice(-1, 2, 44100, 1024, 2, &simulation));
-	ERRCHECK(Lav_createSineObject(simulation, &node));
-	ERRCHECK(Lav_objectSetFloatProperty(node, Lav_SINE_FREQUENCY, 0));
-	ERRCHECK(Lav_simulationSetOutputObject(simulation, node));
+	ERRCHECK(Lav_createSineNode(simulation, &node));
+	ERRCHECK(Lav_nodeSetFloatProperty(node, Lav_SINE_FREQUENCY, 0));
+	ERRCHECK(Lav_simulationSetOutputNode(simulation, node));
 	for(unsigned int i = 0; i < 500; i++) {
-		ERRCHECK(Lav_objectSetFloatProperty(node, Lav_SINE_FREQUENCY, (float)i));
+		ERRCHECK(Lav_nodeSetFloatProperty(node, Lav_SINE_FREQUENCY, (float)i));
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(2000));

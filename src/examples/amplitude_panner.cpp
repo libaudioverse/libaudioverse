@@ -31,16 +31,16 @@ void main(int argc, char** args) {
 		return;
 	}
 	LavSimulation* simulation;
-	LavObject* fileNode, *panNode, *limit;
+	LavNode* fileNode, *panNode, *limit;
 	ERRCHECK(Lav_initialize());
 	ERRCHECK(Lav_createSimulationForDevice(-1, channels, 44100, 1024, 2, &simulation));
-	ERRCHECK(Lav_createFileObject(simulation, args[1], &fileNode));
-	ERRCHECK(Lav_createAmplitudePannerObject(simulation, &panNode));
-	ERRCHECK(Lav_amplitudePannerObjectConfigureStandardMap(panNode, channels));
-	ERRCHECK(Lav_objectSetInput(panNode, 0, fileNode, 0));
-	ERRCHECK(Lav_createHardLimiterObject(simulation, channels, &limit));
-	for(unsigned int i = 0; i < channels; i++) ERRCHECK(Lav_objectSetInput(limit, i, panNode, i));
-	ERRCHECK(Lav_simulationSetOutputObject(simulation, limit));
+	ERRCHECK(Lav_createFileNode(simulation, args[1], &fileNode));
+	ERRCHECK(Lav_createAmplitudePannerNode(simulation, &panNode));
+	ERRCHECK(Lav_amplitudePannerNodeConfigureStandardMap(panNode, channels));
+	ERRCHECK(Lav_nodeSetInput(panNode, 0, fileNode, 0));
+	ERRCHECK(Lav_createHardLimiterNode(simulation, channels, &limit));
+	for(unsigned int i = 0; i < channels; i++) ERRCHECK(Lav_nodeSetInput(limit, i, panNode, i));
+	ERRCHECK(Lav_simulationSetOutputNode(simulation, limit));
 	int shouldContinue = 1;
 	printf("Enter pairs of numbers separated by whitespace, where the first is azimuth (anything) and the second\n"
 "is elevation (-90 to 90).\n"
@@ -61,8 +61,8 @@ void main(int argc, char** args) {
 		}
 		else if(elevOrAz == 1) {
 			sscanf(command, "%f", &elev);
-			ERRCHECK(Lav_objectSetFloatProperty(panNode, Lav_PANNER_ELEVATION, elev));
-			ERRCHECK(Lav_objectSetFloatProperty(panNode, Lav_PANNER_AZIMUTH, az));
+			ERRCHECK(Lav_nodeSetFloatProperty(panNode, Lav_PANNER_ELEVATION, elev));
+			ERRCHECK(Lav_nodeSetFloatProperty(panNode, Lav_PANNER_AZIMUTH, az));
 			elevOrAz = 0;
 			continue;
 		}

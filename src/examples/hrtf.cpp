@@ -23,17 +23,17 @@ void main(int argc, char** args) {
 		return;
 	}
 	LavSimulation* simulation;
-	LavObject* fileNode, *hrtfNode, *limit;
+	LavNode* fileNode, *hrtfNode, *limit;
 	ERRCHECK(Lav_initialize());
 	ERRCHECK(Lav_createSimulationForDevice(-1, 2, 44100, 1024, 2, &simulation));
-	ERRCHECK(Lav_createFileObject(simulation, args[1], &fileNode));
-	ERRCHECK(Lav_createHrtfObject(simulation, args[2], &hrtfNode));
+	ERRCHECK(Lav_createFileNode(simulation, args[1], &fileNode));
+	ERRCHECK(Lav_createHrtfNode(simulation, args[2], &hrtfNode));
 
-	ERRCHECK(Lav_objectSetInput(hrtfNode, 0, fileNode, 0));
-	ERRCHECK(Lav_createHardLimiterObject(simulation, 2, &limit));
-	ERRCHECK(Lav_objectSetInput(limit, 0, hrtfNode, 0));
-	ERRCHECK(Lav_objectSetInput(limit, 1, hrtfNode, 1));
-	ERRCHECK(Lav_simulationSetOutputObject(simulation, limit));
+	ERRCHECK(Lav_nodeSetInput(hrtfNode, 0, fileNode, 0));
+	ERRCHECK(Lav_createHardLimiterNode(simulation, 2, &limit));
+	ERRCHECK(Lav_nodeSetInput(limit, 0, hrtfNode, 0));
+	ERRCHECK(Lav_nodeSetInput(limit, 1, hrtfNode, 1));
+	ERRCHECK(Lav_simulationSetOutputNode(simulation, limit));
 	int shouldContinue = 1;
 	printf("Enter pairs of numbers separated by whitespace, where the first is azimuth (anything) and the second\n"
 "is elevation (-90 to 90).\n"
@@ -54,8 +54,8 @@ void main(int argc, char** args) {
 		}
 		else if(elevOrAz == 1) {
 			sscanf(command, "%f", &elev);
-			ERRCHECK(Lav_objectSetFloatProperty(hrtfNode, Lav_PANNER_ELEVATION, elev));
-			ERRCHECK(Lav_objectSetFloatProperty(hrtfNode, Lav_PANNER_AZIMUTH, az));
+			ERRCHECK(Lav_nodeSetFloatProperty(hrtfNode, Lav_PANNER_ELEVATION, elev));
+			ERRCHECK(Lav_nodeSetFloatProperty(hrtfNode, Lav_PANNER_AZIMUTH, az));
 			elevOrAz = 0;
 			continue;
 		}

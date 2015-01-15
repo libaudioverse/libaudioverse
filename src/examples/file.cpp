@@ -16,7 +16,7 @@ if((x) != Lav_ERROR_NONE) {\
 }\
 } while(0)\
 
-void endOfFileCallback(LavObject* ignoredObject, void* ignored) {
+void endOfFileCallback(LavNode* ignoredObject, void* ignored) {
 	printf("End of file reached.\n");
 }
 
@@ -27,20 +27,20 @@ void main(int argc, char** args) {
 	}
 
 	char* path = args[1];
-	LavObject *node;
+	LavNode *node;
 	LavSimulation* simulation;
 	ERRCHECK(Lav_initialize());
 	ERRCHECK(Lav_createSimulationForDevice(-1, 2, 44100, 1024, 2, &simulation));
-	ERRCHECK(Lav_createFileObject(simulation, path, &node));
-	LavObject *limit;
+	ERRCHECK(Lav_createFileNode(simulation, path, &node));
+	LavNode *limit;
 	unsigned int fileChannels;
-	ERRCHECK(Lav_objectGetOutputCount(node, &fileChannels));
-	ERRCHECK(Lav_createHardLimiterObject(simulation, fileChannels, &limit));
+	ERRCHECK(Lav_nodeGetOutputCount(node, &fileChannels));
+	ERRCHECK(Lav_createHardLimiterNode(simulation, fileChannels, &limit));
 	for(unsigned int i = 0; i < fileChannels; i++) {
-		ERRCHECK(Lav_objectSetInput(limit, i, node, i));
+		ERRCHECK(Lav_nodeSetInput(limit, i, node, i));
 	}
-	ERRCHECK(Lav_objectSetEvent(node, Lav_FILE_END_EVENT, endOfFileCallback, nullptr));
-	ERRCHECK(Lav_simulationSetOutputObject(simulation, limit));
+	ERRCHECK(Lav_nodeSetEvent(node, Lav_FILE_END_EVENT, endOfFileCallback, nullptr));
+	ERRCHECK(Lav_simulationSetOutputNode(simulation, limit));
 
 	//enter the transducer loop.
 	char command[1024];
@@ -55,10 +55,10 @@ void main(int argc, char** args) {
 		while(*start == ' ') start+=1; //skip spaces.
 		sscanf(start, "%f", &value);
 		switch(command[0]) {
-			case 'p': Lav_objectSetFloatProperty(node, Lav_FILE_PITCH_BEND, value); break;
-			case 'v': Lav_objectSetFloatProperty(node, Lav_OBJECT_MUL, value); break;
-			case 's': Lav_objectSetDoubleProperty(node, Lav_FILE_POSITION, value); break;
-			case 'a': isPlaying = ! isPlaying; Lav_objectSetIntProperty(node, Lav_OBJECT_STATE, isPlaying == false ? Lav_OBJSTATE_PAUSED: Lav_OBJSTATE_PLAYING); break;
+			case 'p': Lav_nodeSetFloatProperty(node, Lav_FILE_PITCH_BEND, value); break;
+			case 'v': Lav_nodeSetFloatProperty(node, Lav_NODE_MUL, value); break;
+			case 's': Lav_nodeSetDoubleProperty(node, Lav_FILE_POSITION, value); break;
+			case 'a': isPlaying = ! isPlaying; Lav_nodeSetIntProperty(node, Lav_NODE_STATE, isPlaying == false ? Lav_NODESTATE_PAUSED: Lav_NODESTATE_PLAYING); break;
 			default: printf("Unrecognized command.\n"); break;
 		}
 	}

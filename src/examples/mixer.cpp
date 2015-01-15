@@ -17,10 +17,10 @@ if((x) != Lav_ERROR_NONE) {\
 }\
 } while(0)\
 
-LavObject* makeNode(LavSimulation* simulation, char* file) {
+LavNode* makeNode(LavSimulation* simulation, char* file) {
 	LavError err = Lav_ERROR_NONE;
-	LavObject *retval;
-	err = Lav_createFileObject(simulation, file, &retval);
+	LavNode *retval;
+	err = Lav_createFileNode(simulation, file, &retval);
 	if(err != Lav_ERROR_NONE) {
 		printf("Error: %i", err);
 		return NULL;
@@ -35,20 +35,20 @@ void main(int argc, char** args) {
 	}
 
 	LavSimulation* simulation;
-	LavObject** nodes;
+	LavNode** nodes;
 	ERRCHECK(Lav_initialize());
 	ERRCHECK(Lav_createSimulationForDevice(-1, 2, 44100, 1024, 2, &simulation));
-	nodes = new LavObject*[argc-1];
+	nodes = new LavNode*[argc-1];
 	for(int i = 0; i < argc-1; i++) {
-		LavObject* n = makeNode(simulation, args[i+1]);
+		LavNode* n = makeNode(simulation, args[i+1]);
 		if(n == NULL) return; //makeNode prints errors already.
 		nodes[i] = n;
 	}
 	unsigned int channels;
-	Lav_objectGetOutputCount(nodes[0], &channels);
+	Lav_nodeGetOutputCount(nodes[0], &channels);
 	for(int i = 0; i < argc-1; i++) {
 		unsigned int outCount;
-		Lav_objectGetOutputCount(nodes[i], &outCount);
+		Lav_nodeGetOutputCount(nodes[i], &outCount);
 		if(outCount != channels) {
 			printf("All files must have the same channel count.");
 			return;
@@ -56,18 +56,18 @@ void main(int argc, char** args) {
 	}
 
 	//so far, so good. Make a mixer.
-	LavObject* mixer, *limit;
-	ERRCHECK(Lav_createMixerObject(simulation, argc-1, channels, &mixer));
-	ERRCHECK(Lav_createHardLimiterObject(simulation, channels, &limit));
+	LavNode* mixer, *limit;
+	ERRCHECK(Lav_createMixerNode(simulation, argc-1, channels, &mixer));
+	ERRCHECK(Lav_createHardLimiterNode(simulation, channels, &limit));
 	unsigned int mixInputCount;
-	ERRCHECK(Lav_objectGetInputCount(mixer, &mixInputCount));
+	ERRCHECK(Lav_nodeGetInputCount(mixer, &mixInputCount));
 	for(unsigned int input = 0; input < mixInputCount; input++) {
-		ERRCHECK(Lav_objectSetInput(mixer, input, nodes[input/channels], input%channels));
+		ERRCHECK(Lav_nodeSetInput(mixer, input, nodes[input/channels], input%channels));
 	}
 	for(unsigned int i = 0; i < channels; i++) {
-		ERRCHECK(Lav_objectSetInput(limit, i, mixer, i));
+		ERRCHECK(Lav_nodeSetInput(limit, i, mixer, i));
 	}
-	ERRCHECK(Lav_simulationSetOutputObject(simulation, limit));
+	ERRCHECK(Lav_simulationSetOutputNode(simulation, limit));
 	int shouldContinue = 1;
 	char command[512] = "";
 	printf("Enter q to quit.");
