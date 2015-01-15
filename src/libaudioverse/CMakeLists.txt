@@ -25,9 +25,9 @@ simulation.cpp
 #logging.cpp
 
 #utilities: file reading, platform-specific code, stateful filters that can't be represented as kernels, etc:
-#utils/file_reader.cpp
-#utils/hrtf.cpp
-#utils/resampler.cpp
+utils/file_reader.cpp
+utils/hrtf.cpp
+utils/resampler.cpp
 
 #classes and functionality for DSp that are stateful, and miscellaneous DSP-related math functions.
 #dsp/ringmod.cpp
