@@ -16,13 +16,13 @@ add_library(libaudioverse SHARED
 #the core infrastructure.
 node.cpp
 #properties.cpp
-#functiontables.cpp
-#initialization.cpp
-#termination.cpp
-#memory.cpp
+functiontables.cpp
+initialization.cpp
+termination.cpp
+memory.cpp
 #events.cpp
 simulation.cpp
-#logging.cpp
+logging.cpp
 
 #utilities: file reading, platform-specific code, stateful filters that can't be represented as kernels, etc:
 utils/file_reader.cpp
