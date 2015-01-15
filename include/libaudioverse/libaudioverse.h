@@ -305,7 +305,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_pullNodeSetAudioCallback(LavNode* node, LavPull
 //graph listeners: a way to intercept the graph.
 typedef void (*LavGraphListenerNodeListeningCallback)(LavNode* node, unsigned int frames, unsigned int channels, float* buffer, void* userdata);
 Lav_PUBLIC_FUNCTION LavError Lav_createGraphListenerNode(LavSimulation* simulation, unsigned int channels, LavNode** destination);
-Lav_PUBLIC_FUNCTION LavError Lav_graphListenerNodeSetListeningCallback(LavNode* node, LavGraphListenernodeListeningCallback callback, void* userdata);
+Lav_PUBLIC_FUNCTION LavError Lav_graphListenerNodeSetListeningCallback(LavNode* node, LavGraphListenerNodeListeningCallback callback, void* userdata);
 
 //custom nodes.
 //the callback does the processing if set, otherwise outputs are zeroed.

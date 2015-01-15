@@ -2,7 +2,7 @@
 This file is part of Libaudioverse, a library for 3D and environmental audio simulation, and is released under the terms of the Gnu General Public License Version 3 or (at your option) any later version.
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #pragma once
-#include "libaudioverse.h"
+#include "../libaudioverse.h"
 #include "properties.hpp"
 #include "events.hpp"
 #include <map>
@@ -90,10 +90,10 @@ class LavNode: public std::enable_shared_from_this<LavNode> { //enable_shared_fr
 	std::vector<LavInputDescriptor> input_descriptors;
 	std::vector<float*> outputs;
 	bool is_processing = false, is_suspended = false;
-	int type = Lav_OBJTYPE_GENERIC;
+	int type = Lav_NODETYPE_GENERIC;
 	unsigned int num_inputs = 0, num_outputs = 0, block_size = 0;
 	//used to make no-op state changes free.
-	int prev_state = Lav_OBJSTATE_PLAYING;
+	int prev_state = Lav_NODESTATE_PLAYING;
 
 	//we are never allowed to copy.
 	LavNode(const LavNode&) = delete;

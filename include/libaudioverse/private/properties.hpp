@@ -7,7 +7,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <vector>
 #include <limits>
 #include <algorithm>
-#include "libaudioverse.h"
+#include "../libaudioverse.h"
 #include "errors.hpp"
 
 union LavPropertyValue {

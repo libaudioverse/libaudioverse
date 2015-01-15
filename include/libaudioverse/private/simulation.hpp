@@ -12,7 +12,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <tuple>
 #include <map>
 #include <random>
-#include "libaudioverse.h"
+#include "../libaudioverse.h"
 
 class LavNode;
 class LavDevice;

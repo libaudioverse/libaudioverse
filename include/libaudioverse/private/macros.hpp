@@ -4,7 +4,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include <mutex>
 #include <new>
-#include "libaudioverse.h"
+#include "../libaudioverse.h"
 #include "errors.hpp" //needed by the standard catchblock macro, below.
 
 //use __LINE__ for a quick unique variable.
