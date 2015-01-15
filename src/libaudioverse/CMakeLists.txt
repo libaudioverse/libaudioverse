@@ -1,7 +1,7 @@
-#add_custom_command(
-#OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/metadata/metadata.cpp"
-#COMMAND python "${CMAKE_CURRENT_SOURCE_DIR}/metadata/metadata.py" #"${CMAKE_CURRENT_BINARY_DIR}/metadata/metadata.cpp"
-#DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/metadata/metadata.t" "${CMAKE_CURRENT_SOURCE_DIR}/metadata/metadata.py" #"${CMAKE_CURRENT_SOURCE_DIR}/metadata/metadata.y")
+add_custom_command(
+OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/metadata/metadata.cpp"
+COMMAND python "${CMAKE_CURRENT_SOURCE_DIR}/metadata/metadata.py" "${CMAKE_CURRENT_BINARY_DIR}/metadata/metadata.cpp"
+DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/metadata/metadata.t" "${CMAKE_CURRENT_SOURCE_DIR}/metadata/metadata.py" "${CMAKE_CURRENT_SOURCE_DIR}/metadata/metadata.y")
 
 add_custom_command(
 OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/data/default_hrtf.cpp"
@@ -34,7 +34,7 @@ dsp/ringmod.cpp
 dsp/iir.cpp
 
 #the metadata store
-#metadata/metadata.cpp
+metadata/metadata.cpp
 
 #mathematical kernels for common dsp operations.
 kernels/convolution.cpp
