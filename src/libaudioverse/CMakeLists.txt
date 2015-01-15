@@ -3,14 +3,14 @@
 #COMMAND python "${CMAKE_CURRENT_SOURCE_DIR}/metadata/metadata.py" #"${CMAKE_CURRENT_BINARY_DIR}/metadata/metadata.cpp"
 #DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/metadata/metadata.t" "${CMAKE_CURRENT_SOURCE_DIR}/metadata/metadata.py" #"${CMAKE_CURRENT_SOURCE_DIR}/metadata/metadata.y")
 
-#add_custom_command(
-#OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/data/default_hrtf.cpp"
-#COMMAND python "${CMAKE_SOURCE_DIR}/scripts/convert_to_cpp_file.py" 
-#"default_hrtf"
-#"${CMAKE_SOURCE_DIR}/default_hrtf.hrtf"
-#"${CMAKE_CURRENT_BINARY_DIR}/data/default_hrtf.cpp"
-#DEPENDS "${CMAKE_SOURCE_DIR}/scripts/convert_to_cpp_file.py"
-#"${CMAKE_SOURCE_DIR}/default_hrtf.hrtf")
+add_custom_command(
+OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/data/default_hrtf.cpp"
+COMMAND python "${CMAKE_SOURCE_DIR}/scripts/convert_to_cpp_file.py" 
+"default_hrtf"
+"${CMAKE_SOURCE_DIR}/default_hrtf.hrtf"
+"${CMAKE_CURRENT_BINARY_DIR}/data/default_hrtf.cpp"
+DEPENDS "${CMAKE_SOURCE_DIR}/scripts/convert_to_cpp_file.py"
+"${CMAKE_SOURCE_DIR}/default_hrtf.hrtf")
 
 add_library(libaudioverse SHARED
 #the core infrastructure.
@@ -82,8 +82,8 @@ kernels/multiplying.cpp
 #3d/sources.cpp
 
 #c files containing embedded tables and data that don't change.
-#data/mixing_matrices.cpp
-#data/default_hrtf.cpp
+data/mixing_matrices.cpp
+data/default_hrtf.cpp
 )
 TARGET_LINK_LIBRARIES(libaudioverse ${libaudioverse_required_libraries})
 
