@@ -72,10 +72,10 @@ implementations/feedback_delay_network.cpp
 #objects/iir.cpp
 
 #physical outputs, etc.
-#audio_backends/common.cpp
-#audio_backends/public.cpp
-#audio_backends/winmm.cpp
-#audio_backends/openal.cpp
+audio_backends/common.cpp
+audio_backends/public.cpp
+audio_backends/winmm.cpp
+audio_backends/openal.cpp
 
 #the 3D abstraction on top of libaudioverse.
 #3d/simpleenvironment.cpp
