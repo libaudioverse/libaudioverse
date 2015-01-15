@@ -2,21 +2,21 @@
 	@property
 	def {{prop['name']}}(self):
 {%if prop['type'] == 'int' and 'value_enum' in prop%}
-		val = _lav.object_get_int_property(self.handle, _libaudioverse.{{enumerant}})
+		val = _lav.node_get_int_property(self.handle, _libaudioverse.{{enumerant}})
 		return {{prop['value_enum']|without_lav|underscores_to_camelcase(True)}}(val)
 {%elif prop['type'] == 'boolean'%}
-		return bool(_lav.object_get_int_property(self.handle, _libaudioverse.{{enumerant}}))
+		return bool(_lav.node_get_int_property(self.handle, _libaudioverse.{{enumerant}}))
 {%elif 'array' not in prop['type']%}
-		return _lav.object_get_{{prop['type']}}_property(self.handle, _libaudioverse.{{enumerant}})
+		return _lav.node_get_{{prop['type']}}_property(self.handle, _libaudioverse.{{enumerant}})
 {%elif prop['type'] == 'float_array'%}
 		retval = []
-		for i in xrange(_lav.object_get_float_array_property_length(self.handle, _libaudioverse.{{enumerant}})):
-			retval.append(_lav.object_read_float_array_property(self.handle, _libaudioverse.{{enumerant}}, i))
+		for i in xrange(_lav.node_get_float_array_property_length(self.handle, _libaudioverse.{{enumerant}})):
+			retval.append(_lav.node_read_float_array_property(self.handle, _libaudioverse.{{enumerant}}, i))
 		return tuple(retval)
 {%elif prop['type'] == 'int_array'%}
 		retval = []
-		for i in xrange(_lav.object_get_int_array_property_length(self.handle, _libaudioverse.{{enumerant}})):
-			retval.append(_lav.object_read_int_array_property(self.handle, _libaudioverse.{{enumerant}}, i))
+		for i in xrange(_lav.node_get_int_array_property_length(self.handle, _libaudioverse.{{enumerant}})):
+			retval.append(_lav.node_read_int_array_property(self.handle, _libaudioverse.{{enumerant}}, i))
 		return tuple(retval)
 {%endif%}
 
@@ -30,29 +30,29 @@
 			val = val.value
 {%endif%}
 {%if prop['type'] == 'int'%}
-		_lav.object_set_int_property(self.handle, _libaudioverse.{{enumerant}}, int(val))
+		_lav.node_set_int_property(self.handle, _libaudioverse.{{enumerant}}, int(val))
 {%elif prop['type'] == 'boolean'%}
-		_lav.object_set_int_property(self.handle, _libaudioverse.{{enumerant}}, int(bool(val)))
+		_lav.node_set_int_property(self.handle, _libaudioverse.{{enumerant}}, int(bool(val)))
 {%elif prop['type'] == 'float' or prop['type'] == 'double'%}
-		_lav.object_set_{{prop['type']}}_property(self.handle, _libaudioverse.{{enumerant}}, float(val))
+		_lav.node_set_{{prop['type']}}_property(self.handle, _libaudioverse.{{enumerant}}, float(val))
 {%elif prop['type'] == 'float3'%}
 		arg_tuple = tuple(val)
 		if len(arg_tuple) != 3:
 			raise  ValueError('Expected a list or list-like object of 3 floats')
-		_lav.object_set_float3_property(self.handle, _libaudioverse.{{enumerant}}, *(float(i) for i in arg_tuple))
+		_lav.node_set_float3_property(self.handle, _libaudioverse.{{enumerant}}, *(float(i) for i in arg_tuple))
 {%elif prop['type'] == 'float6'%}
 		arg_tuple = tuple(val)
 		if len(arg_tuple) != 6:
 			raise ValueError('Expected a list or list-like object of 6 floats')
-		_lav.object_set_float6_property(self.handle, _libaudioverse.{{enumerant}}, *(float(i) for i in arg_tuple))
+		_lav.node_set_float6_property(self.handle, _libaudioverse.{{enumerant}}, *(float(i) for i in arg_tuple))
 {%elif prop['type'] == 'float_array'%}
 		if not isinstance(val, collections.Sized):
 			raise ValueError('expected an iterable with known size')
-		_lav.object_replace_float_array_property(self.handle, _libaudioverse.{{enumerant}}, len(val), val)
+		_lav.node_replace_float_array_property(self.handle, _libaudioverse.{{enumerant}}, len(val), val)
 {%elif prop['type'] == 'int_array'%}
 		if not isinstance(val, collections.Sized):
 			raise ValueError('expected an iterable with known size')
-		_lav.object_replace.Int_array_property(self.handle, _libaudioverse.{{enumerant}}, len(val), val)
+		_lav.node_replace.Int_array_property(self.handle, _libaudioverse.{{enumerant}}, len(val), val)
 {%endif%}
 {%endif%}
 {%endmacro%}

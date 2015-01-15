@@ -10,9 +10,9 @@ import struct
 
 libaudioverse.initialize()
 sim = libaudioverse.Simulation()
-w1 = libaudioverse.Sine(sim)
-w2 = libaudioverse.Sine(sim)
-listener = libaudioverse.GraphListener(sim, 2) #This passes through, and can--in this case--take the place of mixers.
+w1 = libaudioverse.SineNode(sim)
+w2 = libaudioverse.SineNode(sim)
+listener = libaudioverse.GraphListenerNode(sim, 2) #This passes through, and can--in this case--take the place of mixers.
 listener.inputs[0] = w1, 0
 listener.inputs[1] = w2, 0
 
@@ -29,9 +29,9 @@ def callback(obj, frames, channels, buffer):
 listener.set_listening_callback(callback)
 
 print "beginning synthesis and playing for 5 seconds..."
-sim.output_object = listener
+sim.output_node= listener
 time.sleep(5.0)
-sim.output_object = None
+sim.output_node= None
 libaudioverse.shutdown()
 
 print "Writing audio data to out.wav in the current directory:"

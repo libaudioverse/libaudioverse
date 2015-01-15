@@ -4,15 +4,15 @@ import collections
 libaudioverse.initialize()
 
 sim = libaudioverse.Simulation(device_index = -1)
-world = libaudioverse.World(sim, "mit.hrtf")
-source = libaudioverse.Source(sim, world)
+world = libaudioverse.SimpleEnvironmentNode(sim, "default")
+source = libaudioverse.SourceNode(sim, world)
 print """Enter a path to a sound file.
 For best results, this should be mono.  If not, only the first (usually left) channel will be used."""
 filepath = raw_input()
-f = libaudioverse.File(sim, filepath)
+f = libaudioverse.FileNode(sim, filepath)
 f.looping = True
 source.inputs[0] = f, 0
-sim.output_object = world
+sim.output_node= world
 print """Enter python expressions that evaluate to 3-tuples (x, y, z).
 Positive x is to your right, positive y is above you, and positive z is behind you.
 Enter quit to quit."""

@@ -101,7 +101,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_multifileNodePlay(LavNode* node, char* path) {
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_multifileObjectStopAll(LavNode* obj) {
+Lav_PUBLIC_FUNCTION LavError Lav_multifileNodeStopAll(LavNode* obj) {
 	PUB_BEGIN
 	LOCK(*obj);
 	if(obj->getType() != Lav_NODETYPE_MULTIFILE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);

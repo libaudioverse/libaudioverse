@@ -5,7 +5,7 @@ nodes:
    Lav_NODE_STATE: {name: state, type: int, default: Lav_NODESTATE_PLAYING, value_enum: Lav_NODE_STATES}
    Lav_NODE_AUTORESET: {name: autoreset, type: boolean, default: 1}
    Lav_NODE_MUL: {name: mul, type: float, default: 1.0, range: [-INFINITY, INFINITY]}
-  doc_name: Generic Properties Common to All Objects
+  doc_name: Generic Properties Common to All Nodes
  Lav_NODETYPE_SINE:
   properties:
    Lav_SINE_FREQUENCY: {name: frequency, type: float, default: 440.0, range: [0, INFINITY]}
@@ -43,7 +43,7 @@ nodes:
    Lav_PANNER_SKIP_LFE: {name: skip_lfe, type: boolean, default: 1}
    Lav_PANNER_SKIP_CENTER: {name: skip_center, type: boolean, default: 1}
   extra_functions:
-   Lav_amplitudePannerObjectConfigureStandardMap: {name: configure_standard_map}
+   Lav_amplitudePannerNodeConfigureStandardMap: {name: configure_standard_map}
   doc_name: Amplitude Panner
  Lav_NODETYPE_MULTIPANNER:
   properties:
@@ -88,9 +88,9 @@ nodes:
   events:
    Lav_PUSH_AUDIO_EVENT: {name: audio, multifiring_protection: true}
    Lav_PUSH_OUT_EVENT: {name: out}
-  doc_name: Push Object
+  doc_name: Push Node
   extra_functions:
-   Lav_pushObjectFeed: {name: feed}
+   Lav_pushNodeFeed: {name: feed}
  Lav_NODETYPE_BIQUAD:
   properties:
    Lav_BIQUAD_FILTER_TYPE: {name: filter_type, type: int, default: Lav_BIQUAD_TYPE_LOWPASS, value_enum: Lav_BIQUAD_TYPES}
@@ -100,13 +100,13 @@ nodes:
   doc_name: Biquad Filter
  Lav_NODETYPE_PULL:
   callbacks: [audio]
-  doc_name: Pull Object
+  doc_name: Pull Node
  Lav_NODETYPE_GRAPH_LISTENER:
   callbacks: [listening]
   doc_name: graph Listener
  Lav_NODETYPE_CUSTOM:
   callbacks: [processing]
-  doc_name: Custom Object
+  doc_name: Custom Node
  Lav_NODETYPE_RINGMOD:
   doc_name: Ring Modulator
  Lav_NODETYPE_FEEDBACK_DELAY_NETWORK:
@@ -114,20 +114,20 @@ nodes:
    Lav_FDN_INTERPOLATION_TIME: {name: interpolation_time, type: float, range:[0.001, INFINITY], default: 0.001}
    Lav_FDN_MAX_DELAY: {name: delay_max, type: float, read_only: true}
   extra_functions:
-   Lav_feedbackDelayNetworkObjectSetFeedbackMatrix: {name: set_feedback_matrix}
-   Lav_feedbackDelayNetworkObjectSetOutputGains: {name: set_output_gains}
-   Lav_feedbackDelayNetworkObjectSetDelays: {name: set_delays}
-   Lav_feedbackDelayNetworkObjectSetFeedbackDelayMatrix: {name: set_feedback_delay_matrix}
+   Lav_feedbackDelayNetworkNodeSetFeedbackMatrix: {name: set_feedback_matrix}
+   Lav_feedbackDelayNetworkNodeSetOutputGains: {name: set_output_gains}
+   Lav_feedbackDelayNetworkNodeSetDelays: {name: set_delays}
+   Lav_feedbackDelayNetworkNodeSetFeedbackDelayMatrix: {name: set_feedback_delay_matrix}
   doc_name: Feedback Delay Network
  Lav_NODETYPE_MULTIFILE:
-  doc_name: Multifile Object
+  doc_name: Multifile Node
   extra_functions:
-   Lav_multifileObjectPlay: {name: play}
-   Lav_multifileObjectStopAll: {name: stop_all}
+   Lav_multifileNodePlay: {name: play}
+   Lav_multifileNodeStopAll: {name: stop_all}
  Lav_NODETYPE_IIR:
   doc_name: IIR Filter
   extra_functions:
-   Lav_iirObjectSetCoefficients: {name: set_coefficients}
+   Lav_iirNodeSetCoefficients: {name: set_coefficients}
 additional_important_enums:
  - Lav_LOGGING_LEVELS
  - Lav_PROPERTY_TYPES

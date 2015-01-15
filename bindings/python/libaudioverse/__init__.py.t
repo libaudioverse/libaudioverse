@@ -87,7 +87,7 @@ Note also that we are not inheriting from MutableSequence because we cannot supp
 		self.for_node= for_node
 
 	def __len__(self):
-		return _lav.object_get_input_count(self.for_node.handle)
+		return _lav.node_get_input_count(self.for_node.handle)
 
 	def __getitem__(self, key):
 		input = self.for_node._get_input(key)
@@ -114,7 +114,7 @@ class _EventCallbackWrapper(object):
 		self.slot = slot
 		self.callback = callback
 		self.fptr = _libaudioverse.LavEventCallback(self)
-		_lav.object_set_event(for_node.handle, slot, self.fptr, None)
+		_lav.node_set_event(for_node.handle, slot, self.fptr, None)
 
 	def __call__(self, node, userdata):
 		actual_node= self.node_weakref()
@@ -204,7 +204,7 @@ Calling this on an audio output device will cause the audio thread to skip ahead
 	def output_node(self, val):
 		if not (isinstance(val, GenericNode) or val is None):
 			raise TypeError("Expected subclass of Libaudioverse.GenericNode")
-		_lav.simulation_set_output_object(self.handle, val.handle if val is not None else val)
+		_lav.simulation_set_output_node(self.handle, val.handle if val is not None else val)
 		self._output_node= val
 
 	#context manager support.
@@ -252,17 +252,17 @@ class GenericNode(object):
 	def __init__(self, handle, simulation):
 		self.handle = handle
 		self.simulation = simulation
-		self._inputs = [None]*_lav.object_get_input_count(handle)
+		self._inputs = [None]*_lav.node_get_input_count(handle)
 		self._events= dict()
 		self._callbacks = dict()
 		self._properties = dict()
 		self._dynamic_properties =  set()
-		property_count = _lav.object_get_property_count(self.handle)
-		property_array = _lav.object_get_property_indices(self.handle)
+		property_count = _lav.node_get_property_count(self.handle)
+		property_array = _lav.node_get_property_indices(self.handle)
 		for i in xrange(property_count):
-			name = _lav.object_get_property_name(self.handle, property_array[i])
+			name = _lav.node_get_property_name(self.handle, property_array[i])
 			self._properties[name] = property_array[i]
-			if _lav.object_get_property_has_dynamic_range(self.handle, property_array[i]) != 0:
+			if _lav.node_get_property_has_dynamic_range(self.handle, property_array[i]) != 0:
 				self._dynamic_properties.add(name)
 
 	def get_property_names(self):
@@ -273,21 +273,21 @@ class GenericNode(object):
 		if name not in self._properties:
 			raise ValueError(name + " is not a property on this instance.")
 		index = self._properties[name]
-		type = PropertyTypes(_lav.object_get_property_type(self.handle, index))
+		type = PropertyTypes(_lav.node_get_property_type(self.handle, index))
 		range = None
-		has_dynamic_range = bool(_lav.object_get_property_has_dynamic_range(self.handle, index))
+		has_dynamic_range = bool(_lav.node_get_property_has_dynamic_range(self.handle, index))
 		if type == PropertyTypes.int:
-			range = _lav.object_get_int_property_range(self.handle, index)
+			range = _lav.node_get_int_property_range(self.handle, index)
 		elif type == PropertyTypes.float:
-			range = _lav.object_get_float_property_range()
+			range = _lav.node_get_float_property_range()
 		elif type == PropertyTypes.double:
-			range = _lav.object_get_double_property_range(self.handle, index)
+			range = _lav.node_get_double_property_range(self.handle, index)
 		return PropertyInfo(name = name, type = type, range = range, has_dynamic_range = has_dynamic_range)
 
-{%for enumerant, prop in metadata['objects']['Lav_OBJTYPE_GENERIC']['properties'].iteritems()%}
+{%for enumerant, prop in metadata['nodes']['Lav_NODETYPE_GENERIC']['properties'].iteritems()%}
 {{macros.implement_property(enumerant, prop)}}
 {%endfor%}
-{%for enumerant, info in metadata['objects']['Lav_OBJTYPE_GENERIC'].get('events', dict()).iteritems()%}
+{%for enumerant, info in metadata['nodes']['Lav_NODETYPE_GENERIC'].get('events', dict()).iteritems()%}
 {{macros.implement_event(info['name'], "_libaudioverse." + enumerant)}}
 {%endfor%}
 
@@ -306,7 +306,7 @@ class GenericNode(object):
 		return InputProxy(self)
 
 	def _check_input_resize(self):
-		new_input_count = _lav.object_get_input_count(self.handle)
+		new_input_count = _lav.node_get_input_count(self.handle)
 		new_input_list = self._inputs
 		if new_input_count < len(self._inputs):
 			new_input_list = self._inputs[0:new_input_count]
@@ -322,30 +322,30 @@ class GenericNode(object):
 		handle = node.handle
 		#We need to check and make sure this is still valid.
 		#It's possible our parent(s) resized their outputs and that libaudioverse killed this connection.
-		if handle != _lav.object_get_input_object(self.handle, key):
+		if handle != _lav.node_get_input_object(self.handle, key):
 			self._inputs[key] = None
 			return None
 		return node, slot
 
 	def _set_input(self, key, node, inp):
 		if node is None:
-			_lav.object_set_input(self.handle, key, None, 0)
+			_lav.node_set_input(self.handle, key, None, 0)
 			self._inputs[key] = (None, 0)
 		else:
-			_lav.object_set_input(self.handle, key, node.handle, inp)
+			_lav.node_set_input(self.handle, key, node.handle, inp)
 			self._inputs[key] = (node, inp)
 
 	@property
 	def output_count(self):
 		"""Get the number of outputs that this object has."""
-		return _lav.object_get_output_count(self.handle)
+		return _lav.node_get_output_count(self.handle)
 
 	def reset(self):
-		_lav.object_reset(self)
+		_lav.node_reset(self)
 
-{%for object_name in constants.iterkeys()|prefix_filter("Lav_OBJTYPE_")|remove_filter("Lav_OBJTYPE_GENERIC")%}
-{%set friendly_name = object_name|strip_prefix("Lav_OBJTYPE_")|lower|underscores_to_camelcase(True)%}
-{%set constructor_name = "Lav_create" + friendly_name + "Object"%}
+{%for node_name in constants.iterkeys()|prefix_filter("Lav_NODETYPE_")|remove_filter("Lav_NODETYPE_GENERIC")%}
+{%set friendly_name = node_name|strip_prefix("Lav_NODETYPE_")|lower|underscores_to_camelcase(True)%}
+{%set constructor_name = "Lav_create" + friendly_name + "Node"%}
 {%set constructor_arg_names = functions[constructor_name].input_args|map(attribute='name')|map('camelcase_to_underscores')|list-%}
 class {{friendly_name}}Node(GenericNode):
 	def __init__(self{%if constructor_arg_names|length > 0%}, {%endif%}{{constructor_arg_names|join(', ')}}):
@@ -355,16 +355,16 @@ class {{friendly_name}}Node(GenericNode):
 	def __del__(self):
 		super({{friendly_name}}Node, self).__del__()
 
-{%for enumerant, prop in metadata['objects'].get(object_name, dict()).get('properties', dict()).iteritems()%}
+{%for enumerant, prop in metadata['nodes'].get(node_name, dict()).get('properties', dict()).iteritems()%}
 {{macros.implement_property(enumerant, prop)}}
 
 {%endfor%}
-{%for enumerant, info in metadata['objects'].get(object_name, dict()).get('events', dict()).iteritems()%}
+{%for enumerant, info in metadata['nodes'].get(node_name, dict()).get('events', dict()).iteritems()%}
 {{macros.implement_event(info['name'], "_libaudioverse." + enumerant)}}
 
 {%endfor%}
 
-{%for func_name, func_info in metadata['objects'].get(object_name, dict()).get('extra_functions', dict()).iteritems()%}
+{%for func_name, func_info in metadata['nodes'].get(node_name, dict()).get('extra_functions', dict()).iteritems()%}
 {%set friendly_func_name = func_info['name']%}
 {%set func = functions[func_name]%}
 {%set lav_func = func.name|without_lav|camelcase_to_underscores%}
@@ -373,9 +373,9 @@ class {{friendly_name}}Node(GenericNode):
 
 {%endfor%}
 
-{%for callback_name in metadata['objects'].get(object_name, dict()).get('callbacks', [])%}
-{%set libaudioverse_function_name = "_lav."+friendly_name|camelcase_to_underscores+"_object_set_"+callback_name+"_callback"%}
-{%set ctypes_name = "_libaudioverse.Lav"+friendly_name+"Object"+callback_name|underscores_to_camelcase(True)+"Callback"%}
+{%for callback_name in metadata['nodes'].get(node_name, dict()).get('callbacks', [])%}
+{%set libaudioverse_function_name = "_lav."+friendly_name|camelcase_to_underscores+"_node_set_"+callback_name+"_callback"%}
+{%set ctypes_name = "_libaudioverse.Lav"+friendly_name+"Node"+callback_name|underscores_to_camelcase(True)+"Callback"%}
 	def get_{{callback_name}}(self):
 		cb = self._callbacks.get("{{callback_name}}", None)
 		if cb is None:

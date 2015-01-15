@@ -68,7 +68,7 @@ void LavBiquadNode::process() {
 	}
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_createBiquadObject(LavSimulation* sim, unsigned int channels, LavNode** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createBiquadNode(LavSimulation* sim, unsigned int channels, LavNode** destination) {
 	PUB_BEGIN
 	LOCK(*sim);
 	*destination = outgoingPointer<LavNode>(createBiquadNode(incomingPointer<LavSimulation>(sim), channels));

@@ -339,7 +339,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeGetOutputCount(LavNode* node, unsigned int*
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetInputObject(LavNode *node, unsigned int slot, LavNode** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetInputNode(LavNode *node, unsigned int slot, LavNode** destination) {
 	PUB_BEGIN
 	auto node_ptr = incomingPointer<LavNode>(node);
 	LOCK(*node);
