@@ -23,5 +23,5 @@ class LavEnvironmentBase: public LavSubgraphNode {
 	//Register a source for updates.  Subclasses should only hold a weak_ptr to the source and should allow it to die.
 	virtual void registerSourceForUpdates(std::shared_ptr<LavSourceNode> source) = 0;
 	//must return an appropriate panner object for this environment.
-	virtual std::shared_ptr<LavNode> createPannerObject() = 0;
+	virtual std::shared_ptr<LavNode> createPannerNode() = 0;
 };

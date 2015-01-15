@@ -78,8 +78,8 @@ audio_backends/winmm.cpp
 audio_backends/openal.cpp
 
 #the 3D abstraction on top of libaudioverse.
-#3d/simpleenvironment.cpp
-#3d/sources.cpp
+3d/simpleenvironment.cpp
+3d/sources.cpp
 
 #c files containing embedded tables and data that don't change.
 data/mixing_matrices.cpp

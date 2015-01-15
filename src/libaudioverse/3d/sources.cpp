@@ -2,31 +2,30 @@
 This file is part of Libaudioverse, a library for 3D and environmental audio simulation, and is released under the terms of the Gnu General Public License Version 3 or (at your option) any later version.
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 
-#include <libaudioverse/3d/private_sources.hpp>
-#include <libaudioverse/3d/private_environmentbase.hpp>
-#include <libaudioverse/private_properties.hpp>
-#include <libaudioverse/private_macros.hpp>
-#include <libaudioverse/private_constants.hpp>
-#include <libaudioverse/private_simulation.hpp>
-#include <libaudioverse/private_creators.hpp>
-#include <libaudioverse/private_memory.hpp>
+#include <libaudioverse/3d/sources.hpp>
+#include <libaudioverse/3d/environmentbase.hpp>
+#include <libaudioverse/private/properties.hpp>
+#include <libaudioverse/private/macros.hpp>
+#include <libaudioverse/private/constants.hpp>
+#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/creators.hpp>
+#include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/libaudioverse3d.h>
-#include <libaudioverse/private_errors.hpp>
+#include <libaudioverse/private/errors.hpp>
 #include <math.h>
 #include <stdlib.h>
 #include <glm/glm.hpp>
 #include <limits>
 #include <memory>
 
-
-LavSourceObject::LavSourceObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavEnvironmentBase> manager): LavSubgraphObject(Lav_OBJTYPE_SOURCE, simulation) {
-	panner_object = manager->createPannerObject();
-	configureSubgraph(panner_object, nullptr); //we input to the panner, and output to nothing (because the manager grabs hold of the panner directly).
+LavSourceNode::LavSourceNode(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavEnvironmentBase> manager): LavSubgraphNode(Lav_NODETYPE_SOURCE, simulation) {
+	panner_node = manager->createPannerNode();
+	configureSubgraph(panner_node, nullptr); //we input to the panner, and output to nothing (because the manager grabs hold of the panner directly).
 	this->manager = manager;
 	getProperty(Lav_SOURCE_PANNER_STRATEGY).setPostChangedCallback([this] () {
-		this->panner_object->getProperty(Lav_PANNER_STRATEGY).setIntValue(this->getProperty(Lav_SOURCE_PANNER_STRATEGY).getIntValue());
+		this->panner_node->getProperty(Lav_PANNER_STRATEGY).setIntValue(this->getProperty(Lav_SOURCE_PANNER_STRATEGY).getIntValue());
 	});
 	//we have to read off these defaults manually, and it must always be the last thing in the constructor.
 	getProperty(Lav_SOURCE_DISTANCE_MODEL).setIntValue(manager->getProperty(Lav_ENVIRONMENT_DEFAULT_DISTANCE_MODEL).getIntValue());
@@ -35,10 +34,10 @@ LavSourceObject::LavSourceObject(std::shared_ptr<LavSimulation> simulation, std:
 	getProperty(Lav_SOURCE_SIZE).setFloatValue(manager->getProperty(Lav_ENVIRONMENT_DEFAULT_SIZE).getFloatValue());
 }
 
-std::shared_ptr<LavObject> createSourceObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavEnvironmentBase> manager) {
-	auto temp = std::shared_ptr<LavSourceObject>(new LavSourceObject(simulation, manager), LavObjectDeleter);
+std::shared_ptr<LavNode> createSourceNode(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavEnvironmentBase> manager) {
+	auto temp = std::shared_ptr<LavSourceNode>(new LavSourceNode(simulation, manager), LavNodeDeleter);
 	manager->registerSourceForUpdates(temp);
-	simulation->associateObject(temp);
+	simulation->associateNode(temp);
 	return temp;
 }
 
@@ -57,7 +56,7 @@ float calculateGainForDistanceModel(int model, float distance, float maxDistance
 	return retval;
 }
 
-void LavSourceObject::update(LavEnvironment environment) {
+void LavSourceNode::update(LavEnvironment environment) {
 	//first, extract the vector of our position.
 	const float* pos = getProperty(Lav_3D_POSITION).getFloat3Value();
 	glm::vec4 npos = environment.world_to_listener_transform*glm::vec4(pos[0], pos[1], pos[2], 1.0f);
@@ -75,15 +74,15 @@ void LavSourceObject::update(LavEnvironment environment) {
 	float gain = calculateGainForDistanceModel(distanceModel, distance, maxDistance, referenceDistance);
 
 	//set the panner.
-	panner_object->getProperty(Lav_PANNER_AZIMUTH).setFloatValue(azimuth);
-	panner_object->getProperty(Lav_PANNER_ELEVATION).setFloatValue(elevation);
-	panner_object ->getProperty(Lav_OBJECT_MUL).setFloatValue(gain);
+	panner_node->getProperty(Lav_PANNER_AZIMUTH).setFloatValue(azimuth);
+	panner_node->getProperty(Lav_PANNER_ELEVATION).setFloatValue(elevation);
+	panner_node ->getProperty(Lav_NODE_MUL).setFloatValue(gain);
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_createSourceObject(LavSimulation* simulation, LavObject* environment, LavObject** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createSourceNode(LavSimulation* simulation, LavNode* environment, LavNode** destination) {
 	PUB_BEGIN
 	LOCK(*simulation);
-	auto retval = createSourceObject(incomingPointer<LavSimulation>(simulation), incomingPointer<LavEnvironmentBase>(environment));
-	*destination = outgoingPointer<LavObject>(retval);
+	auto retval = createSourceNode(incomingPointer<LavSimulation>(simulation), incomingPointer<LavEnvironmentBase>(environment));
+	*destination = outgoingPointer<LavNode>(retval);
 	PUB_END
 }
