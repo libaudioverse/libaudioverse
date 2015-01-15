@@ -15,7 +15,7 @@ DEPENDS "${CMAKE_SOURCE_DIR}/scripts/convert_to_cpp_file.py"
 add_library(libaudioverse SHARED
 #the core infrastructure.
 node.cpp
-#properties.cpp
+properties.cpp
 functiontables.cpp
 initialization.cpp
 termination.cpp
