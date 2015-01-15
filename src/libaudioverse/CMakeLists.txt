@@ -51,25 +51,25 @@ implementations/crossfadingdelayline.cpp
 implementations/feedback_delay_network.cpp
 
 #specific node types.
-objects/sine.cpp
-objects/file.cpp
-objects/hard_limiter.cpp
-objects/hrtf.cpp
-objects/mixer.cpp
-objects/delay.cpp
-objects/amplitude_panner.cpp
-objects/push.cpp
-objects/biquad.cpp
-objects/pull.cpp
-objects/graph_listener.cpp
-objects/custom.cpp
-objects/ringmod.cpp
-objects/multipanner.cpp
-objects/feedback_delay_network.cpp
-objects/multifile.cpp
-objects/square.cpp
-objects/noise.cpp
-objects/iir.cpp
+#objects/sine.cpp
+#objects/file.cpp
+#objects/hard_limiter.cpp
+#objects/hrtf.cpp
+#objects/mixer.cpp
+#objects/delay.cpp
+#objects/amplitude_panner.cpp
+#objects/push.cpp
+#objects/biquad.cpp
+#objects/pull.cpp
+#objects/graph_listener.cpp
+#objects/custom.cpp
+#objects/ringmod.cpp
+#objects/multipanner.cpp
+#objects/feedback_delay_network.cpp
+#objects/multifile.cpp
+#objects/square.cpp
+#objects/noise.cpp
+#objects/iir.cpp
 
 #physical outputs, etc.
 audio_backends/common.cpp
@@ -78,8 +78,8 @@ audio_backends/winmm.cpp
 audio_backends/openal.cpp
 
 #the 3D abstraction on top of libaudioverse.
-3d/simpleenvironment.cpp
-3d/sources.cpp
+#3d/simpleenvironment.cpp
+#3d/sources.cpp
 
 #c files containing embedded tables and data that don't change.
 data/mixing_matrices.cpp
