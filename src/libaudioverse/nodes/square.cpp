@@ -6,44 +6,44 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdlib.h>
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
-#include <libaudioverse/private_objects.hpp>
-#include <libaudioverse/private_simulation.hpp>
-#include <libaudioverse/private_properties.hpp>
-#include <libaudioverse/private_functiontables.hpp>
-#include <libaudioverse/private_dspmath.hpp>
-#include <libaudioverse/private_macros.hpp>
-#include <libaudioverse/private_memory.hpp>
+#include <libaudioverse/private/node.hpp>
+#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/properties.hpp>
+#include <libaudioverse/private/functiontables.hpp>
+#include <libaudioverse/private/dspmath.hpp>
+#include <libaudioverse/private/macros.hpp>
+#include <libaudioverse/private/memory.hpp>
 #include <limits>
 
 /**Note.  We can't use floats. There's some instability with the accumulator model that was here before that shows up as audible artifacts.*/
-class LavSquareObject: public LavObject {
+class LavSquareNode: public LavNode {
 	public:
-	LavSquareObject(std::shared_ptr<LavSimulation> simulation);
+	LavSquareNode(std::shared_ptr<LavSimulation> simulation);
 	void recomputeCounters();
 	virtual void process();
 	int wave_length, on_for, counter = 0;
 };
 
-LavSquareObject::LavSquareObject(std::shared_ptr<LavSimulation> simulation): LavObject(Lav_OBJTYPE_SQUARE, simulation, 0, 1) {
+LavSquareNode::LavSquareNode(std::shared_ptr<LavSimulation> simulation): LavNode(Lav_NODETYPE_SQUARE, simulation, 0, 1) {
 	getProperty(Lav_SQUARE_FREQUENCY).setPostChangedCallback([=] (){recomputeCounters();});
 	getProperty(Lav_SQUARE_DUTY_CYCLE).setPostChangedCallback([=] (){recomputeCounters();});
 	recomputeCounters();
 }
 
-std::shared_ptr<LavObject> createSquareObject(std::shared_ptr<LavSimulation> simulation) {
-	std::shared_ptr<LavSquareObject> retval = std::shared_ptr<LavSquareObject>(new LavSquareObject(simulation), LavObjectDeleter);
-	simulation->associateObject(retval);
+std::shared_ptr<LavNode> createSquareNode(std::shared_ptr<LavSimulation> simulation) {
+	std::shared_ptr<LavSquareNode> retval = std::shared_ptr<LavSquareNode>(new LavSquareNode(simulation), LavNodeDeleter);
+	simulation->associateNode(retval);
 	return retval;
 }
 
-void LavSquareObject::recomputeCounters() {
+void LavSquareNode::recomputeCounters() {
 	float freq= getProperty(Lav_SQUARE_FREQUENCY).getFloatValue();
 	float dutyCycle = getProperty(Lav_SQUARE_DUTY_CYCLE).getFloatValue();
 	wave_length = (int)(simulation->getSr()/freq);
 	on_for=(int)(wave_length*dutyCycle);
 }
 
-void LavSquareObject::process() {
+void LavSquareNode::process() {
 	for(int i= 0; i < block_size; i++) {
 		outputs[0][i] = counter < on_for ? 1.0f : 0.0f;
 		counter++;
@@ -53,10 +53,10 @@ void LavSquareObject::process() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createSquareObject(LavSimulation* simulation, LavObject **destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createSquareNode(LavSimulation* simulation, LavNode **destination) {
 	PUB_BEGIN
 	LOCK(*simulation);
-	auto retval = createSquareObject(incomingPointer<LavSimulation>(simulation));
-	*destination = outgoingPointer<LavObject>(retval);
+	auto retval = createSquareNode(incomingPointer<LavSimulation>(simulation));
+	*destination = outgoingPointer<LavNode>(retval);
 	PUB_END
 }

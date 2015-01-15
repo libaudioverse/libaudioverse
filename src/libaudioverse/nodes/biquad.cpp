@@ -3,22 +3,22 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
-#include <libaudioverse/private_simulation.hpp>
-#include <libaudioverse/private_objects.hpp>
-#include <libaudioverse/private_properties.hpp>
-#include <libaudioverse/private_macros.hpp>
-#include <libaudioverse/private_memory.hpp>
-#include <libaudioverse/private_kernels.hpp>
+#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/node.hpp>
+#include <libaudioverse/private/properties.hpp>
+#include <libaudioverse/private/macros.hpp>
+#include <libaudioverse/private/memory.hpp>
+#include <libaudioverse/private/kernels.hpp>
 #include <limits>
 #include <memory>
 #include <algorithm>
 #include <utility>
 #include <vector>
-#include <libaudioverse/private_iir.hpp>
+#include <libaudioverse/private/iir.hpp>
 
-class LavBiquadObject: public LavObject {
+class LavBiquadNode: public LavNode {
 	public:
-	LavBiquadObject(std::shared_ptr<LavSimulation> sim, unsigned int channels);
+	LavBiquadNode(std::shared_ptr<LavSimulation> sim, unsigned int channels);
 	void process();
 	void reconfigure();
 	private:
@@ -26,7 +26,7 @@ class LavBiquadObject: public LavObject {
 	int prev_type;
 };
 
-LavBiquadObject::LavBiquadObject(std::shared_ptr<LavSimulation> sim, unsigned int channels): LavObject(Lav_OBJTYPE_BIQUAD, sim, channels, channels) {
+LavBiquadNode::LavBiquadNode(std::shared_ptr<LavSimulation> sim, unsigned int channels): LavNode(Lav_NODETYPE_BIQUAD, sim, channels, channels) {
 	biquads.resize(channels);
 	//configure all of them.
 	prev_type = getProperty(Lav_BIQUAD_FILTER_TYPE).getIntValue();
@@ -38,13 +38,13 @@ LavBiquadObject::LavBiquadObject(std::shared_ptr<LavSimulation> sim, unsigned in
 	}
 }
 
-std::shared_ptr<LavObject> createBiquadObject(std::shared_ptr<LavSimulation> sim, unsigned int channels) {
-	auto retval = std::shared_ptr<LavBiquadObject>(new LavBiquadObject(sim, channels), LavObjectDeleter);
-	sim->associateObject(retval);
+std::shared_ptr<LavNode> createBiquadNode(std::shared_ptr<LavSimulation> sim, unsigned int channels) {
+	auto retval = std::shared_ptr<LavBiquadNode>(new LavBiquadNode(sim, channels), LavNodeDeleter);
+	sim->associateNode(retval);
 	return retval;
 }
 
-void LavBiquadObject::reconfigure() {
+void LavBiquadNode::reconfigure() {
 	int type = getProperty(Lav_BIQUAD_FILTER_TYPE).getIntValue();
 	float sr = simulation->getSr();
 	float frequency = getProperty(Lav_BIQUAD_FREQUENCY).getFloatValue();
@@ -57,7 +57,7 @@ void LavBiquadObject::reconfigure() {
 	prev_type = type;
 }
 
-void LavBiquadObject::process() {
+void LavBiquadNode::process() {
 	//doing this this way may make the algorithm morecache- friendly on some compilers/systems.
 	//It also avoids a large number of extraneous lookups in the vctor.
 	for(int j = 0; j < biquads.size(); j++) {
@@ -68,10 +68,10 @@ void LavBiquadObject::process() {
 	}
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_createBiquadObject(LavSimulation* sim, unsigned int channels, LavObject** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createBiquadObject(LavSimulation* sim, unsigned int channels, LavNode** destination) {
 	PUB_BEGIN
 	LOCK(*sim);
-	*destination = outgoingPointer<LavObject>(createBiquadObject(incomingPointer<LavSimulation>(sim), channels));
+	*destination = outgoingPointer<LavNode>(createBiquadNode(incomingPointer<LavSimulation>(sim), channels));
 	PUB_END
 }
 

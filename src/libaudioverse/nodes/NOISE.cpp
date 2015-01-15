@@ -6,20 +6,20 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdlib.h>
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
-#include <libaudioverse/private_objects.hpp>
-#include <libaudioverse/private_simulation.hpp>
-#include <libaudioverse/private_properties.hpp>
-#include <libaudioverse/private_functiontables.hpp>
-#include <libaudioverse/private_dspmath.hpp>
-#include <libaudioverse/private_macros.hpp>
-#include <libaudioverse/private_memory.hpp>
-#include <libaudioverse/private_iir.hpp>
+#include <libaudioverse/private/node.hpp>
+#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/properties.hpp>
+#include <libaudioverse/private/functiontables.hpp>
+#include <libaudioverse/private/dspmath.hpp>
+#include <libaudioverse/private/macros.hpp>
+#include <libaudioverse/private/memory.hpp>
+#include <libaudioverse/private/iir.hpp>
 #include <limits>
 #include <random>
 
-class LavNoiseObject: public LavObject {
+class LavNoiseNode: public LavNode {
 	public:
-	LavNoiseObject(std::shared_ptr<LavSimulation> simulation);
+	LavNoiseNode(std::shared_ptr<LavSimulation> simulation);
 	virtual void process();
 	void white();
 	void pink();
@@ -32,7 +32,7 @@ class LavNoiseObject: public LavObject {
 };
 
 //we give the random number generator a fixed seed for debugging purposes.
-LavNoiseObject::LavNoiseObject(std::shared_ptr<LavSimulation> simulation): LavObject(Lav_OBJTYPE_NOISE, simulation, 0, 1),
+LavNoiseNode::LavNoiseNode(std::shared_ptr<LavSimulation> simulation): LavNode(Lav_NODETYPE_NOISE, simulation, 0, 1),
 random_number_generator(1234), uniform_distribution(-1.0f, 1.0f)  {
 	/**We have to configure the pinkifier.
 This was originally taken from Spectral Audio processing by JOS.*/
@@ -54,13 +54,13 @@ This was originally taken from Spectral Audio processing by JOS.*/
 	brownifier.setGain(12.0);
 }
 
-std::shared_ptr<LavObject> createNoiseObject(std::shared_ptr<LavSimulation> simulation) {
-	std::shared_ptr<LavNoiseObject> retval = std::shared_ptr<LavNoiseObject>(new LavNoiseObject(simulation), LavObjectDeleter);
-	simulation->associateObject(retval);
+std::shared_ptr<LavNode> createNoiseNode(std::shared_ptr<LavSimulation> simulation) {
+	std::shared_ptr<LavNoiseNode> retval = std::shared_ptr<LavNoiseNode>(new LavNoiseNode(simulation), LavNodeDeleter);
+	simulation->associateNode(retval);
 	return retval;
 }
 
-void LavNoiseObject::white() {
+void LavNoiseNode::white() {
 	for(int i = 0; i < block_size; i++) {
 		float noiseSample = 0.0f;
 		//use the central limit theorem to generate white noise.
@@ -72,7 +72,7 @@ void LavNoiseObject::white() {
 	}
 }
 
-void LavNoiseObject::pink() {
+void LavNoiseNode::pink() {
 	white();
 	for(int i = 0; i < block_size; i++) outputs[0][i] =pinkifier.tick(outputs[0][i]);
 	//pass over the output buffer and find the max sample.
@@ -83,7 +83,7 @@ void LavNoiseObject::pink() {
 	for(int i = 0; i < block_size; i++) outputs[0][i]/=pink_max;
 }
 
-void LavNoiseObject::brown() {
+void LavNoiseNode::brown() {
 	white();
 	for(int i= 0; i < block_size; i++) outputs[0][i]=brownifier.tick(outputs[0][i]);
 	//do something to make brown noise here...
@@ -95,7 +95,7 @@ void LavNoiseObject::brown() {
 	for(int i = 0; i < block_size; i++) outputs[0][i]/=brown_max;
 }
 
-void LavNoiseObject::process() {
+void LavNoiseNode::process() {
 	int type = getProperty(Lav_NOISE_NOISE_TYPE).getIntValue();
 	switch(type) {
 		case Lav_NOISE_TYPE_WHITE: white(); break;
@@ -106,10 +106,10 @@ void LavNoiseObject::process() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createNoiseObject(LavSimulation* simulation, LavObject **destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createNoiseNode(LavSimulation* simulation, LavNode **destination) {
 	PUB_BEGIN
 	LOCK(*simulation);
-	auto retval = createNoiseObject(incomingPointer<LavSimulation>(simulation));
-	*destination = outgoingPointer<LavObject>(retval);
+	auto retval = createNoiseNode(incomingPointer<LavSimulation>(simulation));
+	*destination = outgoingPointer<LavNode>(retval);
 	PUB_END
 }

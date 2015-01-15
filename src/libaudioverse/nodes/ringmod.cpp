@@ -3,13 +3,13 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
-#include <libaudioverse/private_simulation.hpp>
-#include <libaudioverse/private_resampler.hpp>
-#include <libaudioverse/private_objects.hpp>
-#include <libaudioverse/private_properties.hpp>
-#include <libaudioverse/private_macros.hpp>
-#include <libaudioverse/private_memory.hpp>
-#include <libaudioverse/private_kernels.hpp>
+#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/resampler.hpp>
+#include <libaudioverse/private/node.hpp>
+#include <libaudioverse/private/properties.hpp>
+#include <libaudioverse/private/macros.hpp>
+#include <libaudioverse/private/memory.hpp>
+#include <libaudioverse/private/kernels.hpp>
 #include <limits>
 #include <memory>
 #include <algorithm>
@@ -17,30 +17,30 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <vector>
 #include <lambdatask/threadsafe_queue.hpp>
 
-class LavRingmodObject: public LavObject {
+class LavRingmodNode: public LavNode {
 	public:
-	LavRingmodObject(std::shared_ptr<LavSimulation> sim);
+	LavRingmodNode(std::shared_ptr<LavSimulation> sim);
 	void process();
 };
 
-LavRingmodObject::LavRingmodObject(std::shared_ptr<LavSimulation> sim): LavObject(Lav_OBJTYPE_PULL, sim, 2, 1) {
+LavRingmodNode::LavRingmodNode(std::shared_ptr<LavSimulation> sim): LavNode(Lav_NODETYPE_RINGMOD, sim, 2, 1) {
 }
 
-std::shared_ptr<LavObject> createRingmodObject(std::shared_ptr<LavSimulation> sim) {
-	auto retval = std::shared_ptr<LavRingmodObject>(new LavRingmodObject(sim), LavObjectDeleter);
-	sim->associateObject(retval);
+std::shared_ptr<LavNode> createRingmodNode(std::shared_ptr<LavSimulation> sim) {
+	auto retval = std::shared_ptr<LavRingmodNode>(new LavRingmodNode(sim), LavNodeDeleter);
+	sim->associateNode(retval);
 	return retval;
 }
 
-void LavRingmodObject::process() {
+void LavRingmodNode::process() {
 	multiplicationKernel(block_size, inputs[0], inputs[1], outputs[0]);
 }
 
 //begin public api.
 
-Lav_PUBLIC_FUNCTION LavError Lav_createRingmodObject(LavSimulation* sim, LavObject** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createRingmodNode(LavSimulation* sim, LavNode** destination) {
 	PUB_BEGIN
 	LOCK(*sim);
-	*destination = outgoingPointer<LavObject>(createRingmodObject(incomingPointer<LavSimulation>(sim)));
+	*destination = outgoingPointer<LavNode>(createRingmodNode(incomingPointer<LavSimulation>(sim)));
 	PUB_END
 }

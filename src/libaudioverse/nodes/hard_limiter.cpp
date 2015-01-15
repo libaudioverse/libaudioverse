@@ -6,28 +6,28 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdlib.h>
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
-#include <libaudioverse/private_objects.hpp>
-#include <libaudioverse/private_simulation.hpp>
-#include <libaudioverse/private_macros.hpp>
-#include <libaudioverse/private_memory.hpp>
+#include <libaudioverse/private/node.hpp>
+#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/macros.hpp>
+#include <libaudioverse/private/memory.hpp>
 #include <memory>
 
-class LavHardLimiterObject: public LavObject {
+class LavHardLimiterNode: public LavNode {
 	public:
-	LavHardLimiterObject(std::shared_ptr<LavSimulation> simulation, unsigned int numInputs);
+	LavHardLimiterNode(std::shared_ptr<LavSimulation> simulation, unsigned int numInputs);
 	virtual void process();
 };
 
-LavHardLimiterObject::LavHardLimiterObject(std::shared_ptr<LavSimulation> simulation, unsigned int numInputs): LavObject(Lav_OBJTYPE_HARD_LIMITER, simulation, numInputs, numInputs) {
+LavHardLimiterNode::LavHardLimiterNode(std::shared_ptr<LavSimulation> simulation, unsigned int numInputs): LavNode(Lav_NODETYPE_HARD_LIMITER, simulation, numInputs, numInputs) {
 }
 
-std::shared_ptr<LavObject>createHardLimiterObject(std::shared_ptr<LavSimulation> simulation, unsigned int numChannels) {
-	auto retval = std::shared_ptr<LavHardLimiterObject>(new LavHardLimiterObject(simulation, numChannels), LavObjectDeleter);
-	simulation->associateObject(retval);
+std::shared_ptr<LavNode>createHardLimiterNode(std::shared_ptr<LavSimulation> simulation, unsigned int numChannels) {
+	auto retval = std::shared_ptr<LavHardLimiterNode>(new LavHardLimiterNode(simulation, numChannels), LavNodeDeleter);
+	simulation->associateNode(retval);
 	return retval;
 }
 
-void LavHardLimiterObject::process() {
+void LavHardLimiterNode::process() {
 	for(unsigned int i = 0; i < block_size; i++) {
 		for(unsigned int o = 0; o < num_outputs; o++) {
 			if(inputs[o][i] > 1.0f) {
@@ -45,10 +45,10 @@ void LavHardLimiterObject::process() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterObject(LavSimulation* simulation, unsigned int numChannels, LavObject** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterNode(LavSimulation* simulation, unsigned int numChannels, LavNode** destination) {
 	PUB_BEGIN
 	LOCK(*simulation);
-	auto retval = createHardLimiterObject(incomingPointer<LavSimulation>(simulation), numChannels);
-	*destination = outgoingPointer<LavObject>(retval);
+	auto retval = createHardLimiterNode(incomingPointer<LavSimulation>(simulation), numChannels);
+	*destination = outgoingPointer<LavNode>(retval);
 	PUB_END
 }

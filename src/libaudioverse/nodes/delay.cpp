@@ -3,12 +3,12 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
-#include <libaudioverse/private_simulation.hpp>
-#include <libaudioverse/private_objects.hpp>
-#include <libaudioverse/private_properties.hpp>
-#include <libaudioverse/private_macros.hpp>
-#include <libaudioverse/private_memory.hpp>
-#include <libaudioverse/private_dspmath.hpp>
+#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/node.hpp>
+#include <libaudioverse/private/properties.hpp>
+#include <libaudioverse/private/macros.hpp>
+#include <libaudioverse/private/memory.hpp>
+#include <libaudioverse/private/dspmath.hpp>
 #include <libaudioverse/implementations/delayline.hpp>
 #include <vector>
 #include <limits>
@@ -16,9 +16,9 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <algorithm>
 #include <math.h>
 
-class LavDelayObject: public LavObject {
+class LavDelayNode: public LavNode {
 	public:
-	LavDelayObject(std::shared_ptr<LavSimulation> simulation, float maxDelay, unsigned int lineCount);
+	LavDelayNode(std::shared_ptr<LavSimulation> simulation, float maxDelay, unsigned int lineCount);
 	void process();
 	protected:
 	void delayChanged();
@@ -27,7 +27,7 @@ class LavDelayObject: public LavObject {
 	std::vector<LavCrossfadingDelayLine> lines;
 };
 
-LavDelayObject::LavDelayObject(std::shared_ptr<LavSimulation> simulation, float maxDelay, unsigned int lineCount): LavObject(Lav_OBJTYPE_DELAY, simulation, lineCount, lineCount) {
+LavDelayNode::LavDelayNode(std::shared_ptr<LavSimulation> simulation, float maxDelay, unsigned int lineCount): LavNode(Lav_NODETYPE_DELAY, simulation, lineCount, lineCount) {
 	if(lineCount == 0) throw LavErrorException(Lav_ERROR_RANGE);
 	for(unsigned int i = 0; i < lineCount; i++) lines.emplace_back(maxDelay, simulation->getSr());
 	getProperty(Lav_DELAY_DELAY).setFloatRange(0.0f, maxDelay);
@@ -39,22 +39,23 @@ LavDelayObject::LavDelayObject(std::shared_ptr<LavSimulation> simulation, float 
 	getProperty(Lav_DELAY_DELAY_MAX).setFloatValue(maxDelay);
 }
 
-std::shared_ptr<LavObject> createDelayObject(std::shared_ptr<LavSimulation> simulation, float maxDelay, unsigned int lineCount) {
-	auto tmp = std::shared_ptr<LavDelayObject>(new LavDelayObject(simulation, maxDelay, lineCount), LavObjectDeleter);
-	simulation->associateObject(tmp);
+std::shared_ptr<LavNode> createDelayNode(std::shared_ptr<LavSimulation> simulation, float maxDelay, unsigned int lineCount) {
+	auto tmp = std::shared_ptr<LavDelayNode>(new LavDelayNode(simulation, maxDelay, lineCount), LavNodeDeleter);
+	simulation->associateNode(tmp);
 	return tmp;
 }
-void LavDelayObject::recomputeDelta() {
+
+void LavDelayNode::recomputeDelta() {
 	float time = getProperty(Lav_DELAY_INTERPOLATION_TIME).getFloatValue();
 	for(auto &line: lines) line.setInterpolationTime(time);
 }
 
-void LavDelayObject::delayChanged() {
+void LavDelayNode::delayChanged() {
 	float newDelay = getProperty(Lav_DELAY_DELAY).getFloatValue();
 	for(auto &line: lines) line.setDelay(newDelay);
 }
 
-void LavDelayObject::process() {
+void LavDelayNode::process() {
 	float feedback = getProperty(Lav_DELAY_FEEDBACK).getFloatValue();
 	//optimize the common case of not having feedback.
 	//the only difference between these blocks is in the advance line.
@@ -79,9 +80,9 @@ void LavDelayObject::process() {
 }
 
 //begin public api
-Lav_PUBLIC_FUNCTION LavError Lav_createDelayObject(LavSimulation* simulation, float maxDelay, unsigned int lineCount, LavObject** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createDelayNode(LavSimulation* simulation, float maxDelay, unsigned int lineCount, LavNode** destination) {
 	PUB_BEGIN
-	auto d = createDelayObject(incomingPointer<LavSimulation>(simulation), maxDelay, lineCount);
+	auto d = createDelayNode(incomingPointer<LavSimulation>(simulation), maxDelay, lineCount);
 	*destination = outgoingPointer(d);
 	PUB_END
 }

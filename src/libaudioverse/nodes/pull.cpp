@@ -3,13 +3,13 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
-#include <libaudioverse/private_simulation.hpp>
-#include <libaudioverse/private_resampler.hpp>
-#include <libaudioverse/private_objects.hpp>
-#include <libaudioverse/private_properties.hpp>
-#include <libaudioverse/private_macros.hpp>
-#include <libaudioverse/private_memory.hpp>
-#include <libaudioverse/private_kernels.hpp>
+#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/resampler.hpp>
+#include <libaudioverse/private/node.hpp>
+#include <libaudioverse/private/properties.hpp>
+#include <libaudioverse/private/macros.hpp>
+#include <libaudioverse/private/memory.hpp>
+#include <libaudioverse/private/kernels.hpp>
 #include <limits>
 #include <memory>
 #include <algorithm>
@@ -17,7 +17,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <vector>
 #include <lambdatask/threadsafe_queue.hpp>
 
-class LavPullObject: public LavObject {
+class LavPullObject: public LavNode {
 	public:
 	LavPullObject(std::shared_ptr<LavSimulation> sim, unsigned int inputSr, unsigned int channels);
 	~LavPullObject();
@@ -25,11 +25,11 @@ class LavPullObject: public LavObject {
 	unsigned int input_sr = 0, channels = 0;
 	std::shared_ptr<LavResampler> resampler = nullptr;
 	float* incoming_buffer = nullptr, *resampled_buffer = nullptr;
-	LavPullObjectAudioCallback callback = nullptr;
+	LavPullNodeAudioCallback callback = nullptr;
 	void* callback_userdata = nullptr;
 };
 
-LavPullObject::LavPullObject(std::shared_ptr<LavSimulation> sim, unsigned int inputSr, unsigned int channels): LavObject(Lav_OBJTYPE_PULL, sim, 0, channels) {
+LavPullObject::LavPullObject(std::shared_ptr<LavSimulation> sim, unsigned int inputSr, unsigned int channels): LavNode(Lav_NODETYPE_PULL, sim, 0, channels) {
 	this->channels = channels;
 	input_sr = inputSr;
 	resampler = std::make_shared<LavResampler>(sim->getBlockSize(), channels, inputSr, (int)sim->getSr());
@@ -38,9 +38,9 @@ LavPullObject::LavPullObject(std::shared_ptr<LavSimulation> sim, unsigned int in
 	resampled_buffer = LavAllocFloatArray(channels*sim->getBlockSize());
 }
 
-std::shared_ptr<LavObject> createPullObject(std::shared_ptr<LavSimulation> sim, unsigned int inputSr, unsigned int channels) {
-	auto retval = std::shared_ptr<LavPullObject>(new LavPullObject(sim, inputSr, channels), LavObjectDeleter);
-	sim->associateObject(retval);
+std::shared_ptr<LavNode> createPullNode(std::shared_ptr<LavSimulation> sim, unsigned int inputSr, unsigned int channels) {
+	auto retval = std::shared_ptr<LavPullObject>(new LavPullObject(sim, inputSr, channels), LavNodeDeleter);
+	sim->associateNode(retval);
 	return retval;
 }
 
@@ -72,18 +72,18 @@ void LavPullObject::process() {
 
 //begin public api.
 
-Lav_PUBLIC_FUNCTION LavError Lav_createPullObject(LavSimulation* simulation, unsigned int sr, unsigned int channels, LavObject** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createPullNode(LavSimulation* simulation, unsigned int sr, unsigned int channels, LavNode** destination) {
 	PUB_BEGIN
 	LOCK(*simulation);
-	*destination = outgoingPointer<LavObject>(createPullObject(incomingPointer<LavSimulation>(simulation), sr, channels));
+	*destination = outgoingPointer<LavNode>(createPullNode(incomingPointer<LavSimulation>(simulation), sr, channels));
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_pullObjectSetAudioCallback(LavObject* object, LavPullObjectAudioCallback callback, void* userdata) {
+Lav_PUBLIC_FUNCTION LavError Lav_pullNodeSetAudioCallback(LavNode* node, LavPullNodeAudioCallback callback, void* userdata) {
 	PUB_BEGIN
-	LOCK(*object);
-	if(object->getType() != Lav_OBJTYPE_PULL) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
-	((LavPullObject*)object)->callback = callback;
-	((LavPullObject*)object)->callback_userdata = userdata;
+	LOCK(*node);
+	if(node->getType() != Lav_NODETYPE_PULL) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
+	((LavPullObject*)node)->callback = callback;
+	((LavPullObject*)node)->callback_userdata = userdata;
 	PUB_END
 }

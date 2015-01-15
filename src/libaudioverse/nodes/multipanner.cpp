@@ -3,36 +3,36 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
-#include <libaudioverse/private_simulation.hpp>
-#include <libaudioverse/private_objects.hpp>
-#include <libaudioverse/private_properties.hpp>
-#include <libaudioverse/private_macros.hpp>
-#include <libaudioverse/private_memory.hpp>
-#include <libaudioverse/objects/panner.hpp>
-#include <libaudioverse/private_constants.hpp>
-#include <libaudioverse/private_creators.hpp>
-#include <libaudioverse/private_hrtf.hpp>
+#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/node.hpp>
+#include <libaudioverse/private/properties.hpp>
+#include <libaudioverse/private/macros.hpp>
+#include <libaudioverse/private/memory.hpp>
+#include <libaudioverse/nodes/panner.hpp>
+#include <libaudioverse/private/constants.hpp>
+#include <libaudioverse/private/creators.hpp>
+#include <libaudioverse/private/hrtf.hpp>
 #include <limits>
 #include <memory>
 #include <algorithm>
 #include <utility>
 #include <vector>
 
-class LavMultipannerObject: public LavSubgraphObject {
+class LavMultipannerObject: public LavSubgraphNode {
 	public:
 	LavMultipannerObject(std::shared_ptr<LavSimulation> sim, std::shared_ptr<LavHrtfData> hrtf);
-	std::shared_ptr<LavObject> hrtfPanner = nullptr, amplitudePanner = nullptr, inputMixer = nullptr, outputMixer = nullptr;
+	std::shared_ptr<LavNode> hrtfPanner = nullptr, amplitudePanner = nullptr, inputMixer = nullptr, outputMixer = nullptr;
 	void forwardAzimuth();
 	void forwardElevation();
 	void forwardShouldCrossfade();
 	void strategyChanged();
 };
 
-LavMultipannerObject::LavMultipannerObject(std::shared_ptr<LavSimulation> sim, std::shared_ptr<LavHrtfData> hrtf): LavSubgraphObject(Lav_OBJTYPE_MULTIPANNER, sim)  {
-	hrtfPanner = createHrtfObject(sim, hrtf);
-	amplitudePanner = createAmplitudePannerObject(sim);
-	inputMixer = createMixerObject(sim, 1, 1);
-	outputMixer = createMixerObject(sim, 1, 8);
+LavMultipannerObject::LavMultipannerObject(std::shared_ptr<LavSimulation> sim, std::shared_ptr<LavHrtfData> hrtf): LavSubgraphNode(Lav_NODETYPE_MULTIPANNER, sim)  {
+	hrtfPanner = createHrtfNode(sim, hrtf);
+	amplitudePanner = createAmplitudePannerNode(sim);
+	inputMixer = createMixerNode(sim, 1, 1);
+	outputMixer = createMixerNode(sim, 1, 8);
 	hrtfPanner->setInput(0, inputMixer, 0);
 	amplitudePanner->setInput(0, inputMixer, 0);
 	configureSubgraph(inputMixer, outputMixer);
@@ -44,9 +44,9 @@ LavMultipannerObject::LavMultipannerObject(std::shared_ptr<LavSimulation> sim, s
 	strategyChanged();
 }
 
-std::shared_ptr<LavObject> createMultipannerObject(std::shared_ptr<LavSimulation> sim, std::shared_ptr<LavHrtfData> hrtf) {
-	auto retval = std::shared_ptr<LavMultipannerObject>(new LavMultipannerObject(sim, hrtf), LavObjectDeleter);
-	sim->associateObject(retval);
+std::shared_ptr<LavNode> createMultipannerNode(std::shared_ptr<LavSimulation> sim, std::shared_ptr<LavHrtfData> hrtf) {
+	auto retval = std::shared_ptr<LavMultipannerObject>(new LavMultipannerObject(sim, hrtf), LavNodeDeleter);
+	sim->associateNode(retval);
 	return retval;
 }
 
@@ -76,15 +76,15 @@ void LavMultipannerObject::strategyChanged() {
 		hookHrtf = true;
 		break;
 		case Lav_PANNING_STRATEGY_STEREO:
-		std::dynamic_pointer_cast<LavAmplitudePannerObject>(amplitudePanner)->configureStandardChannelMap(2);
+		std::dynamic_pointer_cast<LavAmplitudePannerNode>(amplitudePanner)->configureStandardChannelMap(2);
 		hookAmplitude = true;
 		break;
 		case Lav_PANNING_STRATEGY_SURROUND51:
-		std::dynamic_pointer_cast<LavAmplitudePannerObject>(amplitudePanner)->configureStandardChannelMap(6);
+		std::dynamic_pointer_cast<LavAmplitudePannerNode>(amplitudePanner)->configureStandardChannelMap(6);
 		hookAmplitude = true;
 		break;
 		case Lav_PANNING_STRATEGY_SURROUND71:
-		std::dynamic_pointer_cast<LavAmplitudePannerObject>(amplitudePanner)->configureStandardChannelMap(8);
+		std::dynamic_pointer_cast<LavAmplitudePannerNode>(amplitudePanner)->configureStandardChannelMap(8);
 		hookAmplitude=true;
 		break;
 	}
@@ -102,7 +102,7 @@ void LavMultipannerObject::strategyChanged() {
 	}
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_createMultipannerObject(LavSimulation* sim, char* hrtfPath, LavObject** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createMultipannerNode(LavSimulation* sim, char* hrtfPath, LavNode** destination) {
 	PUB_BEGIN
 	LOCK(*sim);
 	std::shared_ptr<LavHrtfData> hrtf = std::make_shared<LavHrtfData>();
@@ -111,6 +111,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createMultipannerObject(LavSimulation* sim, cha
 	} else {
 		hrtf->loadFromFile(hrtfPath, sim->getSr());
 	}
-	*destination = outgoingPointer<LavObject>(createMultipannerObject(incomingPointer<LavSimulation>(sim), hrtf));
+	*destination = outgoingPointer<LavNode>(createMultipannerNode(incomingPointer<LavSimulation>(sim), hrtf));
 	PUB_END
 }

@@ -3,13 +3,13 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
-#include <libaudioverse/private_simulation.hpp>
-#include <libaudioverse/private_resampler.hpp>
-#include <libaudioverse/private_objects.hpp>
-#include <libaudioverse/private_properties.hpp>
-#include <libaudioverse/private_macros.hpp>
-#include <libaudioverse/private_memory.hpp>
-#include <libaudioverse/private_kernels.hpp>
+#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/resampler.hpp>
+#include <libaudioverse/private/node.hpp>
+#include <libaudioverse/private/properties.hpp>
+#include <libaudioverse/private/macros.hpp>
+#include <libaudioverse/private/memory.hpp>
+#include <libaudioverse/private/kernels.hpp>
 #include <limits>
 #include <memory>
 #include <algorithm>
@@ -17,10 +17,10 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <vector>
 #include <lambdatask/threadsafe_queue.hpp>
 
-class LavPushObject: public LavObject {
+class LavPushNode: public LavNode {
 	public:
-	LavPushObject(std::shared_ptr<LavSimulation> sim, unsigned int inputSr, unsigned int channels);
-	~LavPushObject();
+	LavPushNode(std::shared_ptr<LavSimulation> sim, unsigned int inputSr, unsigned int channels);
+	~LavPushNode();
 	void process();
 	void feed(unsigned int length, float* buffer);
 	unsigned int input_sr = 0;
@@ -34,7 +34,7 @@ class LavPushObject: public LavObject {
 	bool fired_out_callback = false;
 };
 
-LavPushObject::LavPushObject(std::shared_ptr<LavSimulation> sim, unsigned int inputSr, unsigned int channels): LavObject(Lav_OBJTYPE_PUSH, sim, 0, channels) {
+LavPushNode::LavPushNode(std::shared_ptr<LavSimulation> sim, unsigned int inputSr, unsigned int channels): LavNode(Lav_NODETYPE_PUSH, sim, 0, channels) {
 	input_sr = inputSr;
 	resampler = std::make_shared<LavResampler>(push_frames, channels, inputSr, (int)sim->getSr());
 	this->push_channels = channels;
@@ -42,17 +42,18 @@ LavPushObject::LavPushObject(std::shared_ptr<LavSimulation> sim, unsigned int in
 	push_buffer = LavAllocFloatArray(push_frames*channels);
 }
 
-std::shared_ptr<LavObject> createPushObject(std::shared_ptr<LavSimulation> sim, unsigned int inputSr, unsigned int channels) {
-	auto retval = std::shared_ptr<LavPushObject>(new LavPushObject(sim, inputSr, channels), LavObjectDeleter);
-	sim->associateObject(retval);
+std::shared_ptr<LavNode> createPushNode(std::shared_ptr<LavSimulation> sim, unsigned int inputSr, unsigned int channels) {
+	auto retval = std::shared_ptr<LavPushNode>(new LavPushNode(sim, inputSr, channels), LavNodeDeleter);
+	sim->associateNode(retval);
 	return retval;
 }
-LavPushObject::~LavPushObject() {
+
+LavPushNode::~LavPushNode() {
 	LavFreeFloatArray(workspace);
 	LavFreeFloatArray(push_buffer);
 }
 
-void LavPushObject::process() {
+void LavPushNode::process() {
 	memset(workspace, 0, sizeof(float)*push_channels*block_size);
 	unsigned int got = resampler->write(workspace, simulation->getBlockSize());
 	if(got < simulation->getBlockSize()) {
@@ -77,7 +78,7 @@ void LavPushObject::process() {
 	}
 }
 
-void LavPushObject::feed(unsigned int length, float* buffer) {
+void LavPushNode::feed(unsigned int length, float* buffer) {
 	fired_out_callback = false;
 	if(length%push_channels != 0) throw LavErrorException(Lav_ERROR_RANGE);
 	unsigned int frames = length/push_channels;
@@ -96,17 +97,17 @@ void LavPushObject::feed(unsigned int length, float* buffer) {
 
 //begin public api.
 
-Lav_PUBLIC_FUNCTION LavError Lav_createPushObject(LavSimulation* simulation, unsigned int sr, unsigned int channels, LavObject** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createPushNode(LavSimulation* simulation, unsigned int sr, unsigned int channels, LavNode** destination) {
 	PUB_BEGIN
 	LOCK(*simulation);
-	*destination = outgoingPointer<LavObject>(createPushObject(incomingPointer<LavSimulation>(simulation), sr, channels));
+	*destination = outgoingPointer<LavNode>(createPushNode(incomingPointer<LavSimulation>(simulation), sr, channels));
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_pushObjectFeed(LavObject* handle, unsigned int length, float* buffer) {
+Lav_PUBLIC_FUNCTION LavError Lav_pushNodeFeed(LavNode* handle, unsigned int length, float* buffer) {
 	PUB_BEGIN
 	LOCK(*handle);
-	if(handle->getType() != Lav_OBJTYPE_PUSH) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
-	((LavPushObject*)handle)->feed(length, buffer);
+	if(handle->getType() != Lav_NODETYPE_PUSH) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
+	((LavPushNode*)handle)->feed(length, buffer);
 	PUB_END
 }

@@ -3,13 +3,13 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
-#include <libaudioverse/private_simulation.hpp>
-#include <libaudioverse/private_resampler.hpp>
-#include <libaudioverse/private_objects.hpp>
-#include <libaudioverse/private_properties.hpp>
-#include <libaudioverse/private_macros.hpp>
-#include <libaudioverse/private_memory.hpp>
-#include <libaudioverse/private_kernels.hpp>
+#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/resampler.hpp>
+#include <libaudioverse/private/node.hpp>
+#include <libaudioverse/private/properties.hpp>
+#include <libaudioverse/private/macros.hpp>
+#include <libaudioverse/private/memory.hpp>
+#include <libaudioverse/private/kernels.hpp>
 #include <limits>
 #include <memory>
 #include <algorithm>
@@ -17,33 +17,33 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <vector>
 #include <lambdatask/threadsafe_queue.hpp>
 
-class LavGraphListenerObject: public LavObject {
+class LavGraphListenerNode: public LavNode {
 	public:
-	LavGraphListenerObject(std::shared_ptr<LavSimulation> sim, unsigned int channels);
-	~LavGraphListenerObject();
+	LavGraphListenerNode(std::shared_ptr<LavSimulation> sim, unsigned int channels);
+	~LavGraphListenerNode();
 	void process();
-	LavGraphListenerObjectListeningCallback callback = nullptr;
+	LavGraphListenerNodeListeningCallback callback = nullptr;
 	float* outgoing_buffer = nullptr;
 	void* callback_userdata = nullptr;
 	unsigned int channels = 0;
 };
 
-LavGraphListenerObject::LavGraphListenerObject(std::shared_ptr<LavSimulation> sim, unsigned int channels): LavObject(Lav_OBJTYPE_GRAPH_LISTENER, sim, channels, channels) {
+LavGraphListenerNode::LavGraphListenerNode(std::shared_ptr<LavSimulation> sim, unsigned int channels): LavNode(Lav_NODETYPE_GRAPH_LISTENER, sim, channels, channels) {
 	outgoing_buffer = LavAllocFloatArray(channels*sim->getBlockSize());
 	this->channels = channels;
 }
 
-std::shared_ptr<LavObject> createGraphListenerObject(std::shared_ptr<LavSimulation> sim, unsigned int channels) {
-	auto retval = std::shared_ptr<LavGraphListenerObject>(new LavGraphListenerObject(sim, channels), LavObjectDeleter);
-	sim->associateObject(retval);
+std::shared_ptr<LavNode> createGraphListenerNode(std::shared_ptr<LavSimulation> sim, unsigned int channels) {
+	auto retval = std::shared_ptr<LavGraphListenerNode>(new LavGraphListenerNode(sim, channels), LavNodeDeleter);
+	sim->associateNode(retval);
 	return retval;
 }
 
-LavGraphListenerObject::~LavGraphListenerObject() {
+LavGraphListenerNode::~LavGraphListenerNode() {
 	LavFreeFloatArray(outgoing_buffer);
 }
 
-void LavGraphListenerObject::process() {
+void LavGraphListenerNode::process() {
 	if(callback == nullptr) return;
 	for(unsigned int i = 0; i < block_size; i++) {
 		for(unsigned int j = 0; j < channels; j++) {
@@ -56,19 +56,19 @@ void LavGraphListenerObject::process() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createGraphListenerObject(LavSimulation* simulation, unsigned int channels, LavObject** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createGraphListenerNode(LavSimulation* simulation, unsigned int channels, LavNode** destination) {
 	PUB_BEGIN
 	LOCK(*simulation);
-	*destination = outgoingPointer<LavObject>(createGraphListenerObject(incomingPointer<LavSimulation>(simulation), channels));
+	*destination = outgoingPointer<LavNode>(createGraphListenerNode(incomingPointer<LavSimulation>(simulation), channels));
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_graphListenerObjectSetListeningCallback(LavObject* obj, LavGraphListenerObjectListeningCallback callback, void* userdata) {
+Lav_PUBLIC_FUNCTION LavError Lav_graphListenerNodeSetListeningCallback(LavNode* node, LavGraphListenerNodeListeningCallback callback, void* userdata) {
 	PUB_BEGIN
-	LOCK(*obj);
-	if(obj->getType() != Lav_OBJTYPE_GRAPH_LISTENER) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
-	LavGraphListenerObject* obj2=(LavGraphListenerObject*)obj;
-	obj2->callback = callback;
-	obj2->callback_userdata = userdata;
+	LOCK(*node);
+	if(node->getType() != Lav_NODETYPE_GRAPH_LISTENER) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
+	LavGraphListenerNode* node2=(LavGraphListenerNode*)node;
+	node2->callback = callback;
+	node2->callback_userdata = userdata;
 	PUB_END
 }

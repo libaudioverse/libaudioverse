@@ -3,13 +3,13 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
-#include <libaudioverse/private_simulation.hpp>
-#include <libaudioverse/private_resampler.hpp>
-#include <libaudioverse/private_objects.hpp>
-#include <libaudioverse/private_properties.hpp>
-#include <libaudioverse/private_macros.hpp>
-#include <libaudioverse/private_memory.hpp>
-#include <libaudioverse/private_kernels.hpp>
+#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/resampler.hpp>
+#include <libaudioverse/private/node.hpp>
+#include <libaudioverse/private/properties.hpp>
+#include <libaudioverse/private/macros.hpp>
+#include <libaudioverse/private/memory.hpp>
+#include <libaudioverse/private/kernels.hpp>
 #include <limits>
 #include <memory>
 #include <algorithm>
@@ -17,26 +17,26 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <vector>
 #include <lambdatask/threadsafe_queue.hpp>
 
-class LavCustomObject: public LavObject {
+class LavCustomNode: public LavNode {
 	public:
-	LavCustomObject(std::shared_ptr<LavSimulation> sim, unsigned int inputs, unsigned int outputs);
+	LavCustomNode(std::shared_ptr<LavSimulation> sim, unsigned int inputs, unsigned int outputs);
 	void process();
-	LavCustomObjectProcessingCallback callback = nullptr;
+	LavCustomNodeProcessingCallback callback = nullptr;
 	void* callback_userdata = nullptr;
 };
 
-LavCustomObject::LavCustomObject(std::shared_ptr<LavSimulation> sim, unsigned int inputs, unsigned int outputs): LavObject(Lav_OBJTYPE_CUSTOM, sim, inputs, outputs) {
+LavCustomNode::LavCustomNode(std::shared_ptr<LavSimulation> sim, unsigned int inputs, unsigned int outputs): LavNode(Lav_NODETYPE_CUSTOM, sim, inputs, outputs) {
 }
 
-std::shared_ptr<LavObject> createCustomObject(std::shared_ptr<LavSimulation> sim, unsigned int inputs, unsigned int outputs) {
-	auto retval = std::shared_ptr<LavCustomObject>(new LavCustomObject(sim, inputs, outputs), LavObjectDeleter);
-	sim->associateObject(retval);
+std::shared_ptr<LavNode> createCustomNode(std::shared_ptr<LavSimulation> sim, unsigned int inputs, unsigned int outputs) {
+	auto retval = std::shared_ptr<LavCustomNode>(new LavCustomNode(sim, inputs, outputs), LavNodeDeleter);
+	sim->associateNode(retval);
 	return retval;
 }
 
-void LavCustomObject::process() {
+void LavCustomNode::process() {
 	if(callback == nullptr) {
-		LavObject::process();
+		LavNode::process();
 		return;
 	}
 	callback(this, block_size, getInputCount(), &inputs[0], getOutputCount(), &outputs[0], callback_userdata);
@@ -44,19 +44,19 @@ void LavCustomObject::process() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createCustomObject(LavSimulation* simulation, unsigned int inputs, unsigned int outputs, LavObject** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createCustomNode(LavSimulation* simulation, unsigned int inputs, unsigned int outputs, LavNode** destination) {
 	PUB_BEGIN
 	LOCK(*simulation);
-	*destination = outgoingPointer<LavObject>(createCustomObject(incomingPointer<LavSimulation>(simulation), inputs, outputs));
+	*destination = outgoingPointer<LavNode>(createCustomNode(incomingPointer<LavSimulation>(simulation), inputs, outputs));
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_customObjectSetProcessingCallback(LavObject* obj, LavCustomObjectProcessingCallback callback, void* userdata) {
+Lav_PUBLIC_FUNCTION LavError Lav_customNodeSetProcessingCallback(LavNode* node, LavCustomNodeProcessingCallback callback, void* userdata) {
 	PUB_BEGIN
-	LOCK(*obj);
-	if(obj->getType() != Lav_OBJTYPE_CUSTOM) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
-	LavCustomObject* obj2=(LavCustomObject*)obj;
-	obj2->callback = callback;
-	obj2->callback_userdata = userdata;
+	LOCK(*node);
+	if(node->getType() != Lav_NODETYPE_CUSTOM) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
+	LavCustomNode* node2=(LavCustomNode*)node;
+	node2->callback = callback;
+	node2->callback_userdata = userdata;
 	PUB_END
 }

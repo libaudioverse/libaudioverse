@@ -6,25 +6,25 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdlib.h>
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
-#include <libaudioverse/private_objects.hpp>
-#include <libaudioverse/private_simulation.hpp>
-#include <libaudioverse/private_properties.hpp>
-#include <libaudioverse/private_functiontables.hpp>
-#include <libaudioverse/private_dspmath.hpp>
-#include <libaudioverse/private_macros.hpp>
-#include <libaudioverse/private_memory.hpp>
+#include <libaudioverse/private/node.hpp>
+#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/properties.hpp>
+#include <libaudioverse/private/functiontables.hpp>
+#include <libaudioverse/private/dspmath.hpp>
+#include <libaudioverse/private/macros.hpp>
+#include <libaudioverse/private/memory.hpp>
 #include <limits>
-#include <libaudioverse/private_iir.hpp>
+#include <libaudioverse/private/iir.hpp>
 
-class LavIirObject: public LavObject {
+class LavIirNode: public LavNode {
 	public:
-	LavIirObject(std::shared_ptr<LavSimulation> simulation, int channels);
+	LavIirNode(std::shared_ptr<LavSimulation> simulation, int channels);
 	virtual void process();
 	void setCoefficients(int numeratorLength, double* numerator, int denominatorLength, double* denominator, int shouldClearHistory);
 	std::vector<LavIIRFilter> filters;
 };
 
-LavIirObject::LavIirObject(std::shared_ptr<LavSimulation> simulation, int channels): LavObject(Lav_OBJTYPE_IIR, simulation, channels, channels) {
+LavIirNode::LavIirNode(std::shared_ptr<LavSimulation> simulation, int channels): LavNode(Lav_NODETYPE_IIR, simulation, channels, channels) {
 	if(channels <= 0) throw LavErrorException(Lav_ERROR_RANGE);
 	filters.resize(channels);
 	double defaultNumerator[] = {1.0};
@@ -32,20 +32,20 @@ LavIirObject::LavIirObject(std::shared_ptr<LavSimulation> simulation, int channe
 	setCoefficients(1, defaultNumerator, 2, defaultDenominator, 1);
 }
 
-std::shared_ptr<LavObject> createIirObject(std::shared_ptr<LavSimulation> simulation, int channels) {
-	std::shared_ptr<LavIirObject> retval = std::shared_ptr<LavIirObject>(new LavIirObject(simulation, channels), LavObjectDeleter);
-	simulation->associateObject(retval);
+std::shared_ptr<LavNode> createIirNode(std::shared_ptr<LavSimulation> simulation, int channels) {
+	std::shared_ptr<LavIirNode> retval = std::shared_ptr<LavIirNode>(new LavIirNode(simulation, channels), LavNodeDeleter);
+	simulation->associateNode(retval);
 	return retval;
 }
 
-void LavIirObject::process() {
+void LavIirNode::process() {
 	for(int i = 0; i < filters.size(); i++) {
 		auto &f =filters[i];
 		for(int j = 0; j < block_size; j++) outputs[i][j] = f.tick(inputs[i][j]);
 	}
 }
 
-void LavIirObject::setCoefficients(int numeratorLength, double* numerator, int denominatorLength, double* denominator, int shouldClearHistory) {
+void LavIirNode::setCoefficients(int numeratorLength, double* numerator, int denominatorLength, double* denominator, int shouldClearHistory) {
 	for(auto &i: filters) {
 		i.configure(numeratorLength, numerator, denominatorLength, denominator);
 		if(shouldClearHistory !=0) i.clearHistories();
@@ -54,18 +54,18 @@ void LavIirObject::setCoefficients(int numeratorLength, double* numerator, int d
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createIirObject(LavSimulation* simulation, int channels, LavObject **destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createIirNode(LavSimulation* simulation, int channels, LavNode **destination) {
 	PUB_BEGIN
 	LOCK(*simulation);
-	auto retval = createIirObject(incomingPointer<LavSimulation>(simulation), channels);
-	*destination = outgoingPointer<LavObject>(retval);
+	auto retval = createIirNode(incomingPointer<LavSimulation>(simulation), channels);
+	*destination = outgoingPointer<LavNode>(retval);
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_iirObjectSetCoefficients(LavObject* obj, int numeratorLength, double* numerator, int denominatorLength, double* denominator, int shouldClearHistory) {
+Lav_PUBLIC_FUNCTION LavError Lav_iirNodeSetCoefficients(LavNode* node, int numeratorLength, double* numerator, int denominatorLength, double* denominator, int shouldClearHistory) {
 	PUB_BEGIN
-	LOCK(*obj);
-	if(obj->getType() != Lav_OBJTYPE_IIR) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
-	((LavIirObject*)obj)->setCoefficients(numeratorLength, numerator, denominatorLength, denominator, shouldClearHistory);
+	LOCK(*node);
+	if(node->getType() != Lav_NODETYPE_IIR) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
+	((LavIirNode*)node)->setCoefficients(numeratorLength, numerator, denominatorLength, denominator, shouldClearHistory);
 	PUB_END
 }

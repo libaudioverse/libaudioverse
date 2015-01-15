@@ -3,23 +3,23 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
-#include <libaudioverse/private_simulation.hpp>
-#include <libaudioverse/private_objects.hpp>
-#include <libaudioverse/private_properties.hpp>
-#include <libaudioverse/private_macros.hpp>
-#include <libaudioverse/private_hrtf.hpp>
-#include <libaudioverse/private_memory.hpp>
-#include <libaudioverse/private_kernels.hpp>
+#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/node.hpp>
+#include <libaudioverse/private/properties.hpp>
+#include <libaudioverse/private/macros.hpp>
+#include <libaudioverse/private/hrtf.hpp>
+#include <libaudioverse/private/memory.hpp>
+#include <libaudioverse/private/kernels.hpp>
 #include <limits>
 #include <functional>
 #include <algorithm>
 #include <memory>
 #include <math.h>
 
-class LavHrtfObject: public LavObject {
+class LavHrtfNode: public LavNode {
 	public:
-	LavHrtfObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf);
-	~LavHrtfObject();
+	LavHrtfNode(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf);
+	~LavHrtfNode();
 	virtual void process();
 	void reset();
 	private:
@@ -29,8 +29,8 @@ class LavHrtfObject: public LavObject {
 	float prev_azimuth = 0.0f, prev_elevation = 0.0f;
 };
 
-LavHrtfObject::LavHrtfObject(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf): LavObject(Lav_OBJTYPE_HRTF, simulation, 1, 2) {
-	type = Lav_OBJTYPE_HRTF;
+LavHrtfNode::LavHrtfNode(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf): LavNode(Lav_NODETYPE_HRTF, simulation, 1, 2) {
+	type = Lav_NODETYPE_HRTF;
 	this->hrtf = hrtf;
 	left_response = LavAllocFloatArray(hrtf->getLength()*sizeof(float));
 	right_response = LavAllocFloatArray(hrtf->getLength()*sizeof(float));
@@ -44,7 +44,7 @@ LavHrtfObject::LavHrtfObject(std::shared_ptr<LavSimulation> simulation, std::sha
 	prev_elevation = getProperty(Lav_PANNER_ELEVATION).getFloatValue();
 }
 
-LavHrtfObject::~LavHrtfObject() {
+LavHrtfNode::~LavHrtfNode() {
 	LavFreeFloatArray(history);
 	LavFreeFloatArray(left_response);
 	LavFreeFloatArray(right_response);
@@ -52,13 +52,13 @@ LavHrtfObject::~LavHrtfObject() {
 	LavFreeFloatArray(old_right_response);
 }
 
-std::shared_ptr<LavObject>createHrtfObject(std::shared_ptr<LavSimulation>simulation, std::shared_ptr<LavHrtfData> hrtf) {
-	auto retval = std::shared_ptr<LavHrtfObject>(new LavHrtfObject(simulation, hrtf), LavObjectDeleter);
-	simulation->associateObject(retval);
+std::shared_ptr<LavNode>createHrtfNode(std::shared_ptr<LavSimulation>simulation, std::shared_ptr<LavHrtfData> hrtf) {
+	auto retval = std::shared_ptr<LavHrtfNode>(new LavHrtfNode(simulation, hrtf), LavNodeDeleter);
+	simulation->associateNode(retval);
 	return retval;
 }
 
-void LavHrtfObject::process() {
+void LavHrtfNode::process() {
 	//calculating the hrir is expensive, do it only if needed.
 	bool didRecompute = false;
 	bool allowCrossfade = getProperty(Lav_PANNER_SHOULD_CROSSFADE).getIntValue();
@@ -99,13 +99,13 @@ void LavHrtfObject::process() {
 	}
 }
 
-void LavHrtfObject::reset() {
+void LavHrtfNode::reset() {
 	memset(history, 0, sizeof(float)*history_length);
 }
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createHrtfObject(LavSimulation* simulation, const char* hrtfPath, LavObject** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createHrtfNode(LavSimulation* simulation, const char* hrtfPath, LavNode** destination) {
 	PUB_BEGIN
 	auto hrtf = std::make_shared<LavHrtfData>();
 	if(std::string(hrtfPath) != "default") {
@@ -114,7 +114,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createHrtfObject(LavSimulation* simulation, con
 		hrtf->loadFromDefault(simulation->getSr());
 	}
 	LOCK(*simulation);
-	auto retval = createHrtfObject(incomingPointer<LavSimulation>(simulation), hrtf);
-	*destination = outgoingPointer<LavObject>(retval);
+	auto retval = createHrtfNode(incomingPointer<LavSimulation>(simulation), hrtf);
+	*destination = outgoingPointer<LavNode>(retval);
 	PUB_END
 }

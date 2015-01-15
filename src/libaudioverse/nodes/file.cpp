@@ -3,23 +3,23 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 
 /**Reads an entire file into memory and plays it with support for dopler and seeking.*/
-#include <libaudioverse/private_simulation.hpp>
-#include <libaudioverse/private_objects.hpp>
-#include <libaudioverse/private_file.hpp>
+#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/node.hpp>
+#include <libaudioverse/private/file.hpp>
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
-#include <libaudioverse/private_macros.hpp>
-#include <libaudioverse/private_dspmath.hpp>
-#include <libaudioverse/private_properties.hpp>
-#include <libaudioverse/private_memory.hpp>
+#include <libaudioverse/private/macros.hpp>
+#include <libaudioverse/private/dspmath.hpp>
+#include <libaudioverse/private/properties.hpp>
+#include <libaudioverse/private/memory.hpp>
 #include <limits>
 #include <memory>
 #include <math.h>
 
-class LavFileObject: public LavObject {
+class LavFileNode: public LavNode {
 	public:
-	LavFileObject(std::shared_ptr<LavSimulation> simulation, const char* path, unsigned int channels);
-	~LavFileObject();
+	LavFileNode(std::shared_ptr<LavSimulation> simulation, const char* path, unsigned int channels);
+	~LavFileNode();
 	virtual void process();
 	void seek(); //property callback.
 	protected:
@@ -34,7 +34,7 @@ class LavFileObject: public LavObject {
 
 //the third parameter is a hint: we need to know how many channels, we only expose objects through the create functions, so the create function can find this out.
 //todo: when objects support resizing their inputs and outputs, as they will inevitably support this, rewrite to use that functionality.
-LavFileObject::LavFileObject(std::shared_ptr<LavSimulation> simulation, const char* path, unsigned int channels): LavObject(Lav_OBJTYPE_FILE, simulation, 0, channels) {
+LavFileNode::LavFileNode(std::shared_ptr<LavSimulation> simulation, const char* path, unsigned int channels): LavNode(Lav_NODETYPE_FILE, simulation, 0, channels) {
 	file.open(path);
 	buffer = LavAllocFloatArray(file.getSampleCount());
 	file.readAll(buffer);
@@ -45,19 +45,19 @@ LavFileObject::LavFileObject(std::shared_ptr<LavSimulation> simulation, const ch
 	frame_count = file.getFrameCount();
 }
 
-LavFileObject::~LavFileObject() {
+LavFileNode::~LavFileNode() {
 	LavFreeFloatArray(buffer);
 }
 
-std::shared_ptr<LavObject> createFileObject(std::shared_ptr<LavSimulation> simulation, const char* path) {
+std::shared_ptr<LavNode> createFileNode(std::shared_ptr<LavSimulation> simulation, const char* path) {
 	auto f = LavFileReader();
 	f.open(path);
-	auto retval = std::shared_ptr<LavFileObject>(new LavFileObject(simulation, path, f.getChannelCount()), LavObjectDeleter);
-	simulation->associateObject(retval);
+	auto retval = std::shared_ptr<LavFileNode>(new LavFileNode(simulation, path, f.getChannelCount()), LavNodeDeleter);
+	simulation->associateNode(retval);
 	return retval;
 }
 
-void LavFileObject::seek() {
+void LavFileNode::seek() {
 	if(is_processing) return;
 	double pos = getProperty(Lav_FILE_POSITION).getDoubleValue();
 	offset = 0.0f;
@@ -65,7 +65,7 @@ void LavFileObject::seek() {
 	has_ended = false;
 }
 
-void LavFileObject::process() {
+void LavFileNode::process() {
 	bool isLooping = (bool)getProperty(Lav_FILE_LOOPING).getIntValue();
 	if(has_ended) {
 		if(isLooping) {
@@ -74,7 +74,7 @@ void LavFileObject::process() {
 			has_ended = false;
 		}
 		else {
-			LavObject::process();
+			LavNode::process();
 			return;
 		}
 	}
@@ -119,10 +119,10 @@ void LavFileObject::process() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createFileObject(LavSimulation* simulation, const char* path, LavObject** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavSimulation* simulation, const char* path, LavNode** destination) {
 	PUB_BEGIN
 	LOCK(*simulation);
-	auto retval = createFileObject(incomingPointer<LavSimulation>(simulation), path);
-	*destination = outgoingPointer<LavObject>(retval);
+	auto retval = createFileNode(incomingPointer<LavSimulation>(simulation), path);
+	*destination = outgoingPointer<LavNode>(retval);
 	PUB_END
 }

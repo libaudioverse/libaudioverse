@@ -3,14 +3,14 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
-#include <libaudioverse/private_simulation.hpp>
-#include <libaudioverse/private_objects.hpp>
-#include <libaudioverse/private_properties.hpp>
-#include <libaudioverse/private_macros.hpp>
-#include <libaudioverse/private_memory.hpp>
+#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/node.hpp>
+#include <libaudioverse/private/properties.hpp>
+#include <libaudioverse/private/macros.hpp>
+#include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/implementations/panner.hpp>
-#include <libaudioverse/objects/panner.hpp>
-#include <libaudioverse/private_constants.hpp>
+#include <libaudioverse/nodes/panner.hpp>
+#include <libaudioverse/private/constants.hpp>
 #include <limits>
 #include <memory>
 #include <algorithm>
@@ -24,21 +24,20 @@ float standard_map_71[] = {-22.5f, 22.5f, -150.0f, 150.0f, -110.0f, 110.0f};
 //This class needs to be public because of the multipanner, which needs to make a method call against it directly.
 //see include/libaudioverse/objects/panner.hpp.
 
-LavAmplitudePannerObject::LavAmplitudePannerObject(std::shared_ptr<LavSimulation> simulation): LavObject(Lav_OBJTYPE_AMPLITUDE_PANNER, simulation, 1, 0) {
+LavAmplitudePannerNode::LavAmplitudePannerNode(std::shared_ptr<LavSimulation> simulation): LavNode(Lav_NODETYPE_AMPLITUDE_PANNER, simulation, 1, 0) {
 	getProperty(Lav_PANNER_CHANNEL_MAP).setPostChangedCallback([this](){recomputeChannelMap();});
 	getProperty(Lav_PANNER_SKIP_LFE).setPostChangedCallback([this] () {recomputeChannelMap();});
 	getProperty(Lav_PANNER_SKIP_CENTER).setPostChangedCallback([this] (){recomputeChannelMap();});
 	recomputeChannelMap();
 }
 
-
-std::shared_ptr<LavObject>createAmplitudePannerObject(std::shared_ptr<LavSimulation> simulation) {
-	auto retval = std::shared_ptr<LavAmplitudePannerObject>(new LavAmplitudePannerObject(simulation), LavObjectDeleter);
-	simulation->associateObject(retval);
+std::shared_ptr<LavNode>createAmplitudePannerNode(std::shared_ptr<LavSimulation> simulation) {
+	auto retval = std::shared_ptr<LavAmplitudePannerNode>(new LavAmplitudePannerNode(simulation), LavNodeDeleter);
+	simulation->associateNode(retval);
 	return retval;
 }
 
-void LavAmplitudePannerObject::recomputeChannelMap() {
+void LavAmplitudePannerNode::recomputeChannelMap() {
 	panner.reset();
 	bool skipLfe = getProperty(Lav_PANNER_SKIP_LFE).getIntValue() == 1;
 	bool skipCenter = getProperty(Lav_PANNER_SKIP_CENTER).getIntValue() == 1;
@@ -57,12 +56,12 @@ void LavAmplitudePannerObject::recomputeChannelMap() {
 	}
 }
 
-void LavAmplitudePannerObject::process() {
+void LavAmplitudePannerNode::process() {
 	float azimuth = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
 	panner.pan(azimuth, block_size, inputs[0], outputs.size(), &outputs[0]);
 }
 
-void LavAmplitudePannerObject::configureStandardChannelMap(unsigned int channels) {
+void LavAmplitudePannerNode::configureStandardChannelMap(unsigned int channels) {
 	switch(channels) {
 		case 2:
 		getProperty(Lav_PANNER_CHANNEL_MAP).replaceFloatArray(2, standard_map_stereo);
@@ -80,19 +79,19 @@ void LavAmplitudePannerObject::configureStandardChannelMap(unsigned int channels
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createAmplitudePannerObject(LavSimulation* simulation, LavObject** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createAmplitudePannerNode(LavSimulation* simulation, LavNode** destination) {
 	PUB_BEGIN
 	LOCK(*simulation);
-	auto retval = createAmplitudePannerObject(incomingPointer<LavSimulation>(simulation));
-	*destination = outgoingPointer<LavObject>(retval);
+	auto retval = createAmplitudePannerNode(incomingPointer<LavSimulation>(simulation));
+	*destination = outgoingPointer<LavNode>(retval);
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_amplitudePannerObjectConfigureStandardMap(LavObject* obj, unsigned int channels) {
+Lav_PUBLIC_FUNCTION LavError Lav_amplitudePannerNodeConfigureStandardMap(LavNode* node, unsigned int channels) {
 	PUB_BEGIN
 	if(channels != 2 && channels != 6 && channels != 8) throw LavErrorException(Lav_ERROR_RANGE);
-	LOCK(*obj);
-	if(obj->getType() != Lav_OBJTYPE_AMPLITUDE_PANNER) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
-	((LavAmplitudePannerObject*)obj)->configureStandardChannelMap(channels);
+	LOCK(*node);
+	if(node->getType() != Lav_NODETYPE_AMPLITUDE_PANNER) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
+	((LavAmplitudePannerNode*)node)->configureStandardChannelMap(channels);
 	PUB_END
 }
