@@ -36,9 +36,6 @@ class LavSimulation {
 	virtual float getSr() { return sr;}
 	virtual int getTickCount() {return tick_count;}
 
-	//this is called whenever the graph changes.
-	void invalidatePlan();
-
 	//these make us meet the basic lockable concept.
 	void lock() {mutex.lock();}
 	void unlock() {mutex.unlock();}
@@ -57,16 +54,6 @@ class LavSimulation {
 
 
 	protected:
-	//reexecute planning logic.
-	void replan();
-	//visit all nodes in the order they need to be visited if we were processing the graph.
-	virtual void visitAllNodesInProcessOrder(std::function<void(std::shared_ptr<LavNode>)> visitor);
-	//visit all nodes in the order they must be visited to prepare for and process obj for a block of audio.  This is not the same as all parents: this call respects suspended.
-	virtual void visitForProcessing(std::shared_ptr<LavNode> obj, std::function<void(std::shared_ptr<LavNode>)> visitor);
-	std::function<void(void)> preprocessing_hook;
-	//the execution plan.
-	std::vector<std::shared_ptr<LavNode>> plan;
-	std::vector<std::weak_ptr<LavNode>> weak_plan;
 	unsigned int block_size = 0, mixahead = 0, is_started = 0;
 	float sr = 0.0f;
 	//if nodes die, they automatically need to be removed.  We can do said removal on next process.

@@ -79,24 +79,24 @@ LavNode::LavNode(int type, std::shared_ptr<LavSimulation> simulation, unsigned i
 	}
 
 	computeInputBuffers(); //at the moment, this is going to just make them all 0, but it takes effect once parents are added.
-
-	//state changes must invalidate objects.
-	getProperty(Lav_NODE_STATE).setPostChangedCallback([this]() {
-		if(getProperty(Lav_NODE_STATE).getIntValue() == prev_state) return;
-		this->simulation->invalidatePlan();
-		prev_state = getProperty(Lav_NODE_STATE).getIntValue();
-	});
 }
 
 LavNode::~LavNode() {
 	for(auto i: outputs) {
 		LavFreeFloatArray(i);
 	}
-	simulation->invalidatePlan();
 }
 
 void LavNode::tick() {
 	if(last_processed== simulation->getTickCount()) return; //we processed this tick already.
+	zeroOutputs(); //we always do this because sometimes we're not going to actually do anything else.
+	if(getState() == Lav_NODESTATE_PAUSED) return; //nothing to do, for we are paused.
+	willProcessParents();
+	//tick all alive parents.
+	for(int i = 0; i < getParentCount(); i++) {
+		auto n = getParentNode(i);
+		if(n) n->tick();
+	}
 	is_processing = true;
 	computeInputBuffers();
 	num_inputs = inputs.size();
@@ -116,6 +116,10 @@ void LavNode::tick() {
 
 /*Default Processing function.*/
 void LavNode::process() {
+	zeroOutputs();
+}
+
+void LavNode::zeroOutputs() {
 	for(unsigned int i = 0; i < outputs.size(); i++) {
 		memset(outputs[i], 0, block_size*sizeof(float));
 	}
@@ -139,7 +143,6 @@ void LavNode::setParent(unsigned int input, std::shared_ptr<LavNode> parent, uns
 	if(doesEdgePreserveAcyclicity(this, parent.get())) throw LavErrorException(Lav_ERROR_CAUSES_CYCLE);
 	input_descriptors[input].parent = parent;
 	input_descriptors[input].output = parentOutput;
-	simulation->invalidatePlan();
 }
 
 std::shared_ptr<LavNode> LavNode::getParentNode(unsigned int input) {
@@ -243,7 +246,6 @@ void LavNode::resize(unsigned int newInputCount, unsigned int newOutputCount) {
 			outputs[i] = LavAllocFloatArray(simulation->getBlockSize());
 		}
 	}
-	simulation->invalidatePlan();
 }
 
 //LavSubgraphNode
@@ -254,7 +256,6 @@ LavSubgraphNode::LavSubgraphNode(int type, std::shared_ptr<LavSimulation> simula
 void LavSubgraphNode::configureSubgraph(std::shared_ptr<LavNode> input, std::shared_ptr<LavNode> output) {
 	subgraph_input = input;
 	subgraph_output = output;
-	simulation->invalidatePlan();
 }
 
 void LavSubgraphNode::computeInputBuffers() {

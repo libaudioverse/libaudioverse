@@ -56,8 +56,10 @@ class LavNode: public std::enable_shared_from_this<LavNode> { //enable_shared_fr
 
 	//do not override. Handles the processing protocol (updating some globals and calling process) if needed for this tick, otherwise does nothing.
 	void tick();
-	//override this one instead.
+	//override this one instead. Default implementation merely zeros the outputs.
 	virtual void process();
+	//zero the outputs.
+	virtual void zeroOutputs();
 
 	//this is called at some point in the processing logic which is guaranteed to be before this node's parents are processed and after the device is locked.
 	//additionally, a parent will have its willProcessParents called after this node.

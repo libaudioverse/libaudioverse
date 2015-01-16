@@ -41,37 +41,13 @@ void LavSimulation::getBlock(float* out, unsigned int channels, bool mayApplyMix
 		memset(out, 0, sizeof(float)*channels*block_size);
 		goto end;
 	}
-	//try to restore the plan, at least unless it is invalidated.
-	if(planInvalidated == false) {
-		for(auto i: weak_plan) {
-			auto j= i.lock();
-	if(j== nullptr) {
-				planInvalidated = true;
-				break;	
-			}
-			plan.push_back(j);
-		}
+	//this is now simple: tick the output node; tick everything with a state of always playing.
+	if(output_node) output_node->tick();
+	for(auto n: nodes) {
+		auto n_s =n.lock();
+		if(n_s && n_s->getState()==Lav_NODESTATE_ALWAYS_PLAYING) n_s->tick();
 	}
-	//this is here because the above block can also invalidate the plan.
-	//replan, if needed.
-	if(planInvalidated) {
-		replan();
-		planInvalidated = false;
-		weak_plan.clear();
-		std::copy(plan.begin(), plan.end(), std::inserter(weak_plan, weak_plan.end()));
-	}
-	//visit all nodesin reverse order.
-	//a nodeto the right in the vector depends on some subset of objects to its left, but never anything to its right.
-	for(auto i = plan.rbegin(); i != plan.rend(); i++) {
-		(*i)->willProcessParents();
-	}
-	//visit all nodes in order, and do the processing.
-	for(auto obj: plan) {
-		obj->tick();
-	}
-	//we're done with the strong plan, so kill it.
-	//this lets objects delete.
-	plan.clear();
+
 	if(output_node== nullptr || output_node->getState() == Lav_NODESTATE_PAUSED) { //fast path, just zero.
 		memset(out, 0, sizeof(float)*block_size*channels);
 		goto end;
@@ -109,7 +85,6 @@ LavError LavSimulation::associateNode(std::shared_ptr<LavNode> node) {
 
 LavError LavSimulation::setOutputNode(std::shared_ptr<LavNode> node) {
 	output_node= node;
-	invalidatePlan();
 	return Lav_ERROR_NONE;
 }
 
@@ -152,49 +127,6 @@ float* LavSimulation::getMixingMatrix(unsigned int inChannels, unsigned int outC
 	std::tuple<unsigned int, unsigned int> key(inChannels, outChannels);
 	if(mixing_matrices.count(key) != 0) return mixing_matrices[key];
 	else return nullptr;
-}
-
-void LavSimulation::invalidatePlan() {
-	planInvalidated = true;
-}
-
-void LavSimulation::replan() {
-	plan.clear();
-	visitAllNodesInProcessOrder([this] (std::shared_ptr<LavNode> n) {
-		plan.push_back(n);
-	});
-}
-
-void LavSimulation::visitAllNodesInProcessOrder(std::function<void(std::shared_ptr<LavNode>)> visitor) {
-	std::set<std::shared_ptr<LavNode>> seen;
-	auto visitorWrapped = [&](std::shared_ptr<LavNode> n) {
-		if(seen.count(n)) return;
-		visitor(n);
-		seen.insert(n);
-	};
-	if(output_node) {
-		visitForProcessing(output_node, visitorWrapped);
-	}
-	//visit the rest: Lav_NODESTATE_ALWAYS_PLAYING.
-	for(auto& i: nodes) {
-		std::shared_ptr<LavNode> j = i.lock();
-		if(j == nullptr) return; //this is dead.
-		if(j->getState() == Lav_NODESTATE_ALWAYS_PLAYING) {
-			visitForProcessing(j, visitorWrapped);
-		}
-	}
-}
-
-void LavSimulation::visitForProcessing(std::shared_ptr<LavNode> node, std::function<void(std::shared_ptr<LavNode>)> visitor) {
-	//if node is null, bail out.  This is the base case.
-	if(node == nullptr) return;
-	//if the node is paused, we also bail out: this object and its parents are not needed.
-	if(node->getState() == Lav_NODESTATE_PAUSED) return;
-	//we call ourselves on all parents of node, and then pass node to visitor.  This is essentially depth-first search.
-	for(unsigned int i = 0; i < node->getParentCount(); i++) {
-		visitForProcessing(node->getParentNode(i), visitor);
-	}
-	visitor(node);
 }
 
 //Default callback implementation.
