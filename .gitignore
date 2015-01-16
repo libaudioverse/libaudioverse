@@ -13,3 +13,5 @@ build/
 !default_hrtf.hrtf
 venv/
 *.ogg
+#unfortunately, unlike the diffuse dataset, the regular MIT dataset is very, very large and needs to be ignored.
+mit kemar dataset/
