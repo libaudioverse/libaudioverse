@@ -52,7 +52,6 @@ class LavSimulation {
 	void registerDefaultMixingMatrices();
 	float* getMixingMatrix(unsigned int inChannels, unsigned int outChannels);
 
-
 	protected:
 	unsigned int block_size = 0, mixahead = 0, is_started = 0;
 	float sr = 0.0f;
@@ -67,9 +66,6 @@ class LavSimulation {
 
 	//our output, if any.
 	std::shared_ptr<LavDevice> device = nullptr;
-
-	//the field to mark plans as invalid.
-	bool planInvalidated = true;
 
 	//the registered mixing matrices for this simulation.
 	std::map<std::tuple<unsigned int, unsigned int>, float*> mixing_matrices;
