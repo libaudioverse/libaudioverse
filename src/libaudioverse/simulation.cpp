@@ -35,6 +35,8 @@ LavSimulation::~LavSimulation() {
 
 //Yes, this uses goto. Yes, goto is evil. We need a single point of exit.
 void LavSimulation::getBlock(float* out, unsigned int channels, bool mayApplyMixingMatrix) {
+	//get a strong output node.
+	auto output_node = this->output_node.lock();
 	if(channels == 0) return;
 	//if paused, memset 0s.
 	if(is_started == 0) {
@@ -89,7 +91,7 @@ LavError LavSimulation::setOutputNode(std::shared_ptr<LavNode> node) {
 }
 
 std::shared_ptr<LavNode> LavSimulation::getOutputNode() {
-	return output_node;
+	return output_node.lock();
 }
 
 void LavSimulation::enqueueTask(std::function<void(void)> cb) {

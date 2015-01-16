@@ -57,7 +57,7 @@ class LavSimulation {
 	float sr = 0.0f;
 	//if nodes die, they automatically need to be removed.  We can do said removal on next process.
 	std::set<std::weak_ptr<LavNode>, std::owner_less<std::weak_ptr<LavNode>>> nodes;
-	std::shared_ptr<LavNode> output_node = nullptr;
+	std::weak_ptr<LavNode> output_node;
 	std::recursive_mutex mutex;
 
 	lambdatask::ThreadsafeQueue<std::function<void(void)>>  tasks;
