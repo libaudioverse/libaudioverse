@@ -30,6 +30,7 @@ void main(int argc, char** args) {
 	ERRCHECK(Lav_createSimulationForDevice(-1, 2, 44100, 1024, 3, &simulation));
 	ERRCHECK(Lav_createSimpleEnvironmentNode(simulation, hrtfFile, &world));
 	ERRCHECK(Lav_createFileNode(simulation, soundFile, &node));
+	ERRCHECK(Lav_nodeSetIntProperty(world, Lav_ENVIRONMENT_DEFAULT_PANNER_STRATEGY, Lav_PANNING_STRATEGY_HRTF));
 	ERRCHECK(Lav_createSourceNode(simulation, world, &source));
 	ERRCHECK(Lav_nodeSetInput(source, 0, node, 0));
 	const int resolution = 1000, length = 3000; //length in ms.
