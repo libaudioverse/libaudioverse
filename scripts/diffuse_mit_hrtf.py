@@ -1,4 +1,4 @@
-"""Loads the MIT KEMAR HRTF dataset.  This dataset is much too large to be included here, but can be downloaded from MIT for those who want it."""
+"""Loads the Diffused MIT KEMAR HRTF dataset included with this repository and converts it to a .hrtf file.  Pass the path to the data as the parameter to this script."""
 import numpy
 import scipy.io.wavfile as wavfile
 from glob import glob
@@ -14,8 +14,7 @@ if len(sys.argv) != 3:
 
 root_path = sys.argv[1]
 output_file = sys.argv[2]
-#grab only left ear responses.
-all_wavefiles = glob(root_path + '/*/L*.wav')
+all_wavefiles = glob(root_path + '/*/*.wav')
 print "Enumerated wave files:", len(all_wavefiles), "found."
 print "Reading data."
 
@@ -25,7 +24,7 @@ for i in all_wavefiles:
 	name = os.path.split(i)[1]
 	read_wavefiles[name] = wavfile.read(i)
 
-print "Performing basic sanity checks: expected mono responses at 44100 hz."
+print "Performing basic sanity checks: expected 2-channel, 44100 HZ files."
 samplerate = 44100
 hrir_length = None
 
@@ -33,8 +32,8 @@ for i, j in read_wavefiles.iteritems():
 	if j[0] != samplerate:
 		print "File", i, "is not", samplerate, "HZ."
 		exit()
-	if len(j[1].shape) > 1:
-		print "File", i, "is not a mono HRIR datapoint."
+	if j[1].shape[1] != 2:
+		print "File", i, "is not a stereo HRIR datapoint."
 		exit()
 	if hrir_length is None:
 		hrir_length = j[1].shape[0]
@@ -42,10 +41,18 @@ for i, j in read_wavefiles.iteritems():
 		print "File", i, "has a different length; expected", hrir_length, "got", j[0].shape[0]
 
 print "Sanity checks passed.  Continuing."
+print "Separating channels."
+
+#we can discard samplerates at this point.
+for i, j in dict(read_wavefiles).iteritems():
+	arr = j[1]
+	#Note: this is numpy slicing syntax.
+	read_wavefiles[i] = (arr[:, 0], arr[:, 1])
 
 print "Extracting angles."
+
 hrirs = dict()
-pattern = re.compile(r"L(-{0,1}\d+)e(\d+)a\.wav")
+pattern = re.compile(r"H(-{0,1}\d+)e(\d+)a\.wav")
 
 for i, j in read_wavefiles.iteritems():
 	extracted = pattern.match(i)
@@ -53,11 +60,19 @@ for i, j in read_wavefiles.iteritems():
 	azimuth = extracted.group(2)
 	elevation = int(elevation)
 	azimuth = int(azimuth)
-	hrirs[(elevation, (azimuth+180)%360)] = j
+	hrirs[(elevation, azimuth)] = j
 
-print "Unwrapping HRIR into 1d arrays."
+print "Expanding 180-degree stereo responses to 360-degree mono responses."
 for i, j in dict(hrirs).iteritems():
-	hrirs[i]=j[1]
+	#0 and 180 are special: we average these instead.
+	if i[1] in set([0, 180]):
+		response = [(a+b)/2.0 for a, b in zip(j[0], j[1])]
+		hrirs[i] = response
+		continue
+	#otherwise, we have two responses.  The first is at the current angle, and is taken as the right channel.
+	#the second is 360 minus the current angle, and is the left channel from this file.
+	hrirs[i] = list(j[1]) #the first response.
+	hrirs[(i[0], 360-i[1])] = list(j[0]) #the second response.
 
 print "Converting to normalized floating-point values."
 all_data = itertools.chain.from_iterable(hrirs.itervalues())
