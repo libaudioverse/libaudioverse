@@ -100,6 +100,11 @@ void LavNode::tick() {
 	is_processing = false;
 }
 
+//cleans up stuff.
+void LavNode::doMaintenance() {
+	//nothing, for now. This is needed for the upcoming refactor.
+}
+
 /*Default Processing function.*/
 void LavNode::process() {
 	zeroOutputs();

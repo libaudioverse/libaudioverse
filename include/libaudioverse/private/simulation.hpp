@@ -35,7 +35,7 @@ class LavSimulation {
 	virtual LavError setOutputNode(std::shared_ptr<LavNode> node);
 	virtual float getSr() { return sr;}
 	virtual int getTickCount() {return tick_count;}
-
+	virtual void doMaintenance(); //cleans up dead weak pointers, etc.
 	//these make us meet the basic lockable concept.
 	void lock() {mutex.lock();}
 	void unlock() {mutex.unlock();}
@@ -73,4 +73,6 @@ class LavSimulation {
 	//used to apply mixing matrices when downmixing.
 	float* mixing_matrix_workspace = nullptr;
 	int tick_count = 0; //counts ticks.  This is part of node processing.
+	int maintenance_start = 0; //also part of node processing. Used to stagger calls to doMaintenance on nodes so that we're not randomly spiking the tick length.
+	int maintenance_rate = 5; //call on every 5th object.
 };

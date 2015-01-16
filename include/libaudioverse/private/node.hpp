@@ -59,7 +59,9 @@ class LavNode: public std::enable_shared_from_this<LavNode> { //enable_shared_fr
 	virtual void process();
 	//zero the outputs.
 	virtual void zeroOutputs();
-
+	//Does some cleanup and the like.
+	//This is also an override point for subclasses that may need to do cleanup periodically in order to remain performant; in that case, they *must* call the base. Or else.
+	virtual void doMaintenance();
 	//this is called at some point in the processing logic which is guaranteed to be before this node's parents are processed and after the device is locked.
 	//additionally, a parent will have its willProcessParents called after this node.
 	//that is, nothing else will touch this node but the mixer thread, and the next thing to be called (at some point in future) is willProcess.

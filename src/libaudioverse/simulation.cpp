@@ -49,7 +49,6 @@ void LavSimulation::getBlock(float* out, unsigned int channels, bool mayApplyMix
 		auto n_s =n.lock();
 		if(n_s && n_s->getState()==Lav_NODESTATE_ALWAYS_PLAYING) n_s->tick();
 	}
-
 	if(output_node== nullptr || output_node->getState() == Lav_NODESTATE_PAUSED) { //fast path, just zero.
 		memset(out, 0, sizeof(float)*block_size*channels);
 		goto end;
@@ -68,6 +67,27 @@ void LavSimulation::getBlock(float* out, unsigned int channels, bool mayApplyMix
 	delete[] outputPointers;
 	end:
 	tick_count++;
+	//give objects a chance to do maintenance, i.e. clean up dead weak pointers and the like.
+	int maintenance_counter = maintenance_start;
+	for(auto n: nodes) {
+		auto n2 = n.lock();
+		if(n2 && maintenance_counter%maintenance_rate) n2->doMaintenance();
+		maintenance_counter++;
+	}
+	maintenance_start++;
+	//cleans up dead weak pointers, mostly. Other stuff.
+	if(maintenance_rate%maintenance_start == 0) doMaintenance();
+	maintenance_start++;
+}
+
+void LavSimulation::doMaintenance() {
+	decltype(nodes) to_remove;
+	for(auto &n: nodes) {
+		if(n.lock() == nullptr) to_remove.insert(n);
+	}
+	for(auto &n: to_remove) {
+		nodes.erase(n);
+	}
 }
 
 LavError LavSimulation::start() {
