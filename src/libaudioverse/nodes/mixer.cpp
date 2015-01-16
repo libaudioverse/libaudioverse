@@ -53,9 +53,7 @@ void LavMixerNode::process() {
 	}
 	//outputs are zeroed for us as a guarantee of inheriting from LavNode.
 	for(unsigned int i = 0; i < num_inputs; i++) {
-		//if this is the zerobuffer, we can save block_size adds, vector accesses, etc.
-		if(inputs[i] == zerobuffer) continue;
-			additionKernel(block_size, outputs[i%inputsPerParent], inputs[i], outputs[i%inputsPerParent]);
+		additionKernel(block_size, outputs[i%inputsPerParent], inputs[i], outputs[i%inputsPerParent]);
 	}
 }
 

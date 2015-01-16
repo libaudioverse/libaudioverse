@@ -27,7 +27,6 @@ class LavNode: public std::enable_shared_from_this<LavNode> { //enable_shared_fr
 	LavNode(int type, std::shared_ptr<LavSimulation> simulation, unsigned int numInputs, unsigned int numOutputs);
 	virtual ~LavNode();
 
-	virtual void computeInputBuffers();//update what we point to due to parent changes.
 	virtual int getType();
 	//The private version of inputs.
 	//For most nodes, inputs are parents.  There are a few special cases, mostly involving subgraphs.
@@ -84,7 +83,7 @@ class LavNode: public std::enable_shared_from_this<LavNode> { //enable_shared_fr
 	virtual void reset();
 	protected:
 	//this should definitely be protected, and should never be touched by anything that's not a subclass.
-	virtual void resize(unsigned int newInputsCount, unsigned int newOutputsCount);
+	virtual void resize(int newInputCount, int newOutputCount);
 	std::shared_ptr<LavSimulation> simulation = nullptr;
 	std::map<int, LavProperty> properties;
 	std::map<int, LavEvent> events;
@@ -108,8 +107,7 @@ class LavSubgraphNode: public LavNode {
 	public:
 	LavSubgraphNode(int type, std::shared_ptr<LavSimulation> simulation);
 	virtual void process();
-	//we do no processing and forward onto another node.  Therefore, we do not compute input buffers.
-	virtual void computeInputBuffers();
+
 	//Best to override this too.
 	//otherwise, mul gets applied inappropriately.
 	virtual void doProcessProtocol();

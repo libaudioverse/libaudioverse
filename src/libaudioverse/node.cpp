@@ -38,33 +38,7 @@ bool doesEdgePreserveAcyclicity(LavNode* start, LavNode* end) {
 	return bfs(end);
 }
 
-
-void LavNode::computeInputBuffers() {
-	//point our inputs either at a zeroed buffer or the output of our parent.
-	for(unsigned int i = 0; i < input_descriptors.size(); i++) {
-		auto parent = input_descriptors[i].parent.lock();
-		auto output = input_descriptors[i].output;
-		if(parent != nullptr && parent->getState() != Lav_NODESTATE_PAUSED) {
-			if(output >= parent->getOutputCount()) { //the parent node no longer has this output, probably due to resizing.
-				setParent(i, nullptr, 0); //so we clear this parent.
-			}
-			inputs[i] = parent->getOutputPointer(output);
-		}
-		else {
-			inputs[i] = zerobuffer;
-		}
-	}
-}
-
 LavNode::LavNode(int type, std::shared_ptr<LavSimulation> simulation, unsigned int numInputs, unsigned int numOutputs): type(type) {
-	//allocations:
-	input_descriptors.resize(numInputs, LavInputDescriptor(nullptr, 0));
-	inputs.resize(numInputs, nullptr);
-	outputs.resize(numOutputs);
-	for(auto i = outputs.begin(); i != outputs.end(); i++) {
-		*i = LavAllocFloatArray(sizeof(float)*simulation->getBlockSize());
-	}
-
 	this->simulation= simulation;
 	//request properties from the metadata module.
 	properties = makePropertyTable(type);
@@ -78,7 +52,8 @@ LavNode::LavNode(int type, std::shared_ptr<LavSimulation> simulation, unsigned i
 		events[i.first].associateNode(this);
 	}
 
-	computeInputBuffers(); //at the moment, this is going to just make them all 0, but it takes effect once parents are added.
+	//allocations can be done simply by redirecting through resize after our initialization step.
+	resize(numInputs, numOutputs);
 }
 
 LavNode::~LavNode() {
@@ -89,6 +64,8 @@ LavNode::~LavNode() {
 
 void LavNode::tick() {
 	if(last_processed== simulation->getTickCount()) return; //we processed this tick already.
+	//Incrementing this counter here prevents duplication of zeroing outputs if we're in the paused state.
+	last_processed = simulation->getTickCount();
 	zeroOutputs(); //we always do this because sometimes we're not going to actually do anything else.
 	if(getState() == Lav_NODESTATE_PAUSED) return; //nothing to do, for we are paused.
 	willProcessParents();
@@ -97,8 +74,18 @@ void LavNode::tick() {
 		auto n = getParentNode(i);
 		if(n) n->tick();
 	}
+	//copy parent outputs to our inputs, as needed.
+	for(int i = 0; i < input_descriptors.size(); i++) {
+		auto p = input_descriptors[i].parent.lock();
+		auto index = input_descriptors[i].output;
+		if(p == nullptr || p->getOutputCount() <= index) {
+			//zero and break out because this connection is dead.
+			memset(inputs[i], 0, sizeof(float)*simulation->getBlockSize());
+			continue;
+		}	
+		std::copy(p->getOutputPointer(index), p->getOutputPointer(index)+simulation->getBlockSize(), inputs[i]);
+	}
 	is_processing = true;
-	computeInputBuffers();
 	num_inputs = inputs.size();
 	num_outputs = outputs.size();
 	block_size = simulation->getBlockSize();
@@ -111,7 +98,6 @@ void LavNode::tick() {
 		}
 	}
 	is_processing = false;
-	last_processed = simulation->getTickCount();
 }
 
 /*Default Processing function.*/
@@ -228,12 +214,14 @@ void LavNode::reset() {
 }
 
 //protected resize function.
-void LavNode::resize(unsigned int newInputCount, unsigned int newOutputCount) {
-	//inputs is easy, because we didn't allocate any memory outside of the vector interface.
+void LavNode::resize(int newInputCount, int newOutputCount) {
+	int oldInputCount = inputs.size();
+	for(int i = oldInputCount-1; i >= newInputCount; i--) LavFreeFloatArray(inputs[i]);
 	inputs.resize(newInputCount, nullptr);
+	for(int i = oldInputCount; i < newInputCount; i++) inputs[i]=LavAllocFloatArray(simulation->getBlockSize());
 	input_descriptors.resize(newInputCount, LavInputDescriptor(nullptr, 0));
-	//but outputs has a special case.
-	unsigned int oldOutputCount = outputs.size();
+
+	int oldOutputCount = outputs.size();
 	if(newOutputCount < oldOutputCount) { //we need to free some arrays.
 		for(auto i = newOutputCount; i < oldOutputCount; i++) {
 			LavFreeFloatArray(outputs[i]);
@@ -256,9 +244,6 @@ LavSubgraphNode::LavSubgraphNode(int type, std::shared_ptr<LavSimulation> simula
 void LavSubgraphNode::configureSubgraph(std::shared_ptr<LavNode> input, std::shared_ptr<LavNode> output) {
 	subgraph_input = input;
 	subgraph_output = output;
-}
-
-void LavSubgraphNode::computeInputBuffers() {
 }
 
 void LavSubgraphNode::doProcessProtocol() {
