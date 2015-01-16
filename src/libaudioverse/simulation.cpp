@@ -67,7 +67,7 @@ void LavSimulation::getBlock(float* out, unsigned int channels, bool mayApplyMix
 	}
 	//visit all nodes in order, and do the processing.
 	for(auto obj: plan) {
-		obj->doProcessProtocol();
+		obj->tick();
 	}
 	//we're done with the strong plan, so kill it.
 	//this lets objects delete.

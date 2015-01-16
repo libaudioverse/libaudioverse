@@ -95,7 +95,7 @@ LavNode::~LavNode() {
 	simulation->invalidatePlan();
 }
 
-void LavNode::doProcessProtocol() {
+void LavNode::tick() {
 	if(last_processed== simulation->getTickCount()) return; //we processed this tick already.
 	is_processing = true;
 	computeInputBuffers();

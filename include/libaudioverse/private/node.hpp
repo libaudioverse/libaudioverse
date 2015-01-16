@@ -54,8 +54,8 @@ class LavNode: public std::enable_shared_from_this<LavNode> { //enable_shared_fr
 	//equivalent to reading lav_NODE_STATE.
 	virtual int getState();
 
-	//do not override. Handles the processing protocol: updating some globals and calling process.
-	void doProcessProtocol();
+	//do not override. Handles the processing protocol (updating some globals and calling process) if needed for this tick, otherwise does nothing.
+	void tick();
 	//override this one instead.
 	virtual void process();
 
