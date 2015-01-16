@@ -21,7 +21,6 @@ class LavMixerNode: public LavNode {
 };
 
 LavMixerNode::LavMixerNode(std::shared_ptr<LavSimulation> simulation, unsigned int maxParents, unsigned int inputsPerParent): LavNode(Lav_NODETYPE_MIXER, simulation, inputsPerParent*maxParents, inputsPerParent) {
-	type = Lav_NODETYPE_MIXER;
 	getProperty(Lav_MIXER_INPUTS_PER_PARENT).setIntRange(inputsPerParent, inputsPerParent);
 	getProperty(Lav_MIXER_INPUTS_PER_PARENT).setIntValue(inputsPerParent);
 	getProperty(Lav_MIXER_MAX_PARENTS).setIntValue(maxParents);
@@ -52,7 +51,7 @@ void LavMixerNode::process() {
 		}
 		return;
 	}
-	LavNode::process();
+	//outputs are zeroed for us as a guarantee of inheriting from LavNode.
 	for(unsigned int i = 0; i < num_inputs; i++) {
 		//if this is the zerobuffer, we can save block_size adds, vector accesses, etc.
 		if(inputs[i] == zerobuffer) continue;
