@@ -96,6 +96,7 @@ LavNode::~LavNode() {
 }
 
 void LavNode::doProcessProtocol() {
+	if(last_processed== simulation->getTickCount()) return; //we processed this tick already.
 	is_processing = true;
 	computeInputBuffers();
 	num_inputs = inputs.size();
