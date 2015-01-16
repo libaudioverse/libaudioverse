@@ -33,12 +33,13 @@ LavSimulation::~LavSimulation() {
 	backgroundTaskThread.join();
 }
 
+//Yes, this uses goto. Yes, goto is evil. We need a single point of exit.
 void LavSimulation::getBlock(float* out, unsigned int channels, bool mayApplyMixingMatrix) {
 	if(channels == 0) return;
 	//if paused, memset 0s.
 	if(is_started == 0) {
 		memset(out, 0, sizeof(float)*channels*block_size);
-		return;
+		goto end;
 	}
 	//try to restore the plan, at least unless it is invalidated.
 	if(planInvalidated == false) {
@@ -73,7 +74,7 @@ void LavSimulation::getBlock(float* out, unsigned int channels, bool mayApplyMix
 	plan.clear();
 	if(output_node== nullptr || output_node->getState() == Lav_NODESTATE_PAUSED) { //fast path, just zero.
 		memset(out, 0, sizeof(float)*block_size*channels);
-		return;
+		goto end;
 	}
 
 	float *mixingMatrix = getMixingMatrix(output_node->getOutputCount(), channels);
@@ -87,6 +88,8 @@ void LavSimulation::getBlock(float* out, unsigned int channels, bool mayApplyMix
 		interleaveSamples(channels, getBlockSize(), output_node->getOutputCount(), outputPointers, out);
 	}
 	delete[] outputPointers;
+	end:
+	tick_count++;
 }
 
 LavError LavSimulation::start() {

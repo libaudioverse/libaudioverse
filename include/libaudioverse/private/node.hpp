@@ -94,6 +94,7 @@ class LavNode: public std::enable_shared_from_this<LavNode> { //enable_shared_fr
 	unsigned int num_inputs = 0, num_outputs = 0, block_size = 0;
 	//used to make no-op state changes free.
 	int prev_state = Lav_NODESTATE_PLAYING;
+	int last_processed = -1; //-1 so that it's not equal to the simulation's tick counter, which starts at 0.
 
 	//we are never allowed to copy.
 	LavNode(const LavNode&) = delete;

@@ -34,6 +34,7 @@ class LavSimulation {
 	virtual std::shared_ptr<LavNode> getOutputNode();
 	virtual LavError setOutputNode(std::shared_ptr<LavNode> node);
 	virtual float getSr() { return sr;}
+	virtual int getTickCount() {return tick_count;}
 
 	//this is called whenever the graph changes.
 	void invalidatePlan();
@@ -88,4 +89,5 @@ class LavSimulation {
 	unsigned int largest_seen_mixing_matrix_input = 0;
 	//used to apply mixing matrices when downmixing.
 	float* mixing_matrix_workspace = nullptr;
+	int tick_count = 0; //counts ticks.  This is part of node processing.
 };

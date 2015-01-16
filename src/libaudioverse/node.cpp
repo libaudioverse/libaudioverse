@@ -110,6 +110,7 @@ void LavNode::doProcessProtocol() {
 		}
 	}
 	is_processing = false;
+	last_processed = simulation->getTickCount();
 }
 
 /*Default Processing function.*/
