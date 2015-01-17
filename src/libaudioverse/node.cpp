@@ -17,8 +17,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdlib.h>
 #include <string.h>
 
-float zerobuffer[Lav_MAX_BLOCK_SIZE] = {0}; //this is a shared buffer for the "no parent" case.
-
 /**The following function verifies that, given two objects, an edge between them will not cause a cycle.
 The edge is directed from start to end.*/
 bool doesEdgePreserveAcyclicity(LavNode* start, LavNode* end) {

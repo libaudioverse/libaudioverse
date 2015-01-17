@@ -19,7 +19,6 @@ typedef void LavNode;
 /**Make sure that we are marshalling enums as integers in the public API for both c and c++.
 Note that, internally, it's safe to use enums directly.  But marshalling out to some languages with the enum type is potentially dangerous: the standard does not designate what an enum is internally represented as, so we rely on the implicit conversion.*/
 typedef int LavError;
-typedef int LavLimits;
 typedef int LavPropertyType;
 typedef int LavNodeType;
 
@@ -46,10 +45,6 @@ typedef int LavNodeType;
 #undef EXTERN_FUNCTION
 #define EXTERN_FUNCTION
 #endif
-
-enum Lav_LIMITS {
-	Lav_MAX_BLOCK_SIZE = 1024,
-};
 
 enum Lav_ERRORS {
 	Lav_ERROR_NONE = 0, //everything is OK.
