@@ -74,7 +74,6 @@ void LavFileNode::process() {
 			has_ended = false;
 		}
 		else {
-			LavNode::process();
 			return;
 		}
 	}
@@ -87,8 +86,8 @@ void LavFileNode::process() {
 				offset = 0;
 			}
 			else {
-				for(unsigned int j = 0; j < num_outputs; j++) {
-					outputs[j][i] = 0.0f;
+				for(unsigned int j = 0; j < num_output_buffers; j++) {
+					output_buffers[j][i] = 0.0f;
 				}
 				switch_to_ended = true;
 				continue;
@@ -99,10 +98,10 @@ void LavFileNode::process() {
 		if(samp2 >= frame_count) samp2--;
 		const float weight1 = 1-offset;
 		const float weight2 = offset;
-		for(unsigned int j = 0; j < num_outputs; j++) {
-			const unsigned int ind1 = samp1*num_outputs+j;
-			const unsigned int ind2 = samp2*num_outputs+j;
-			outputs[j][i] = weight1*buffer[ind1]+weight2*buffer[ind2];
+		for(unsigned int j = 0; j < num_output_buffers; j++) {
+			const unsigned int ind1 = samp1*num_output_buffers+j;
+			const unsigned int ind2 = samp2*num_output_buffers+j;
+			output_buffers[j][i] = weight1*buffer[ind1]+weight2*buffer[ind2];
 		}		
 	offset += delta*pitch_bend;
 	position += (unsigned int)offset;

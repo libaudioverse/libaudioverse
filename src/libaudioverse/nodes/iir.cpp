@@ -41,7 +41,7 @@ std::shared_ptr<LavNode> createIirNode(std::shared_ptr<LavSimulation> simulation
 void LavIirNode::process() {
 	for(int i = 0; i < filters.size(); i++) {
 		auto &f =filters[i];
-		for(int j = 0; j < block_size; j++) outputs[i][j] = f.tick(inputs[i][j]);
+		for(int j = 0; j < block_size; j++) output_buffers[i][j] = f.tick(input_buffers[i][j]);
 	}
 }
 

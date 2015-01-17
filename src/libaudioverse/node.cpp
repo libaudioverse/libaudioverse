@@ -20,23 +20,10 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 /**The following function verifies that, given two objects, an edge between them will not cause a cycle.
 The edge is directed from start to end.*/
 bool doesEdgePreserveAcyclicity(LavNode* start, LavNode* end) {
-	std::set<LavNode*> checked;
-	//this is a lambda trick to prevent needing to pass a third parameter around.
-	std::function<bool(LavNode*)> bfs;
-	bfs = [&](LavNode* what) {
-		if(what == nullptr) return false; //the simplest base case: we were called on null.
-		if(what == start) return true; //Travelling from end, we managed to reach start.
-		if(checked.count(what)) return false; //we already checked this object and the graph is guaranteed to be static.
-		for(unsigned int i = 0; i < what->getParentCount(); i++) {
-			LavNode* par = what->getParentNode(i).get();
-			if(bfs(par)) return true;
-		}
-		return false;
-	};
-	return bfs(end);
+	return true; //lie, for now.
 }
 
-LavNode::LavNode(int type, std::shared_ptr<LavSimulation> simulation, unsigned int numInputs, unsigned int numOutputs): type(type) {
+LavNode::LavNode(int type, std::shared_ptr<LavSimulation> simulation, unsigned int numInputBuffers, unsigned int numOutputBuffers): type(type) {
 	this->simulation= simulation;
 	//request properties from the metadata module.
 	properties = makePropertyTable(type);
@@ -51,11 +38,14 @@ LavNode::LavNode(int type, std::shared_ptr<LavSimulation> simulation, unsigned i
 	}
 
 	//allocations can be done simply by redirecting through resize after our initialization step.
-	resize(numInputs, numOutputs);
+	resize(numInputBuffers, numOutputBuffers);
 }
 
 LavNode::~LavNode() {
-	for(auto i: outputs) {
+	for(auto i: output_buffers) {
+		LavFreeFloatArray(i);
+	}
+	for(auto i: input_buffers) {
 		LavFreeFloatArray(i);
 	}
 }
@@ -64,34 +54,20 @@ void LavNode::tick() {
 	if(last_processed== simulation->getTickCount()) return; //we processed this tick already.
 	//Incrementing this counter here prevents duplication of zeroing outputs if we're in the paused state.
 	last_processed = simulation->getTickCount();
-	zeroOutputs(); //we always do this because sometimes we're not going to actually do anything else.
+	zeroOutputBuffers(); //we always do this because sometimes we're not going to actually do anything else.
 	if(getState() == Lav_NODESTATE_PAUSED) return; //nothing to do, for we are paused.
 	willProcessParents();
 	//tick all alive parents.
-	for(int i = 0; i < getParentCount(); i++) {
-		auto n = getParentNode(i);
-		if(n) n->tick();
-	}
-	//copy parent outputs to our inputs, as needed.
-	for(int i = 0; i < input_descriptors.size(); i++) {
-		auto p = input_descriptors[i].parent.lock();
-		auto index = input_descriptors[i].output;
-		if(p == nullptr || p->getOutputCount() <= index) {
-			//zero and break out because this connection is dead.
-			memset(inputs[i], 0, sizeof(float)*simulation->getBlockSize());
-			continue;
-		}	
-		std::copy(p->getOutputPointer(index), p->getOutputPointer(index)+simulation->getBlockSize(), inputs[i]);
-	}
+	//todo: rewrite this to understand the new idea of connections.
 	is_processing = true;
-	num_inputs = inputs.size();
-	num_outputs = outputs.size();
+	num_input_buffers = input_buffers.size();
+	num_output_buffers = output_buffers.size();
 	block_size = simulation->getBlockSize();
 	process();
 	float mul = getProperty(Lav_NODE_MUL).getFloatValue();
 	if(mul != 1.0f) {
-		for(unsigned int i = 0; i < getOutputCount(); i++) {
-			float* output = getOutputPointer(i);
+		for(unsigned int i = 0; i < getOutputBufferCount(); i++) {
+			float* output = getOutputBufferPointer(i);
 			scalarMultiplicationKernel(block_size, mul, output, output);
 		}
 	}
@@ -105,12 +81,12 @@ void LavNode::doMaintenance() {
 
 /*Default Processing function.*/
 void LavNode::process() {
-	zeroOutputs();
+	zeroOutputBuffers();
 }
 
-void LavNode::zeroOutputs() {
-	for(unsigned int i = 0; i < outputs.size(); i++) {
-		memset(outputs[i], 0, block_size*sizeof(float));
+void LavNode::zeroOutputBuffers() {
+	for(unsigned int i = 0; i < output_buffers.size(); i++) {
+		memset(output_buffers[i], 0, block_size*sizeof(float));
 	}
 }
 
@@ -125,58 +101,17 @@ int LavNode::getState() {
 	return getProperty(Lav_NODE_STATE).getIntValue();
 }
 
-void LavNode::setParent(unsigned int input, std::shared_ptr<LavNode> parent, unsigned int parentOutput) {
-	if(input >= input_descriptors.size()) throw LavErrorException(Lav_ERROR_RANGE);
-	if(parent != nullptr && parentOutput >= parent->getOutputCount()) throw LavErrorException(Lav_ERROR_RANGE);
-	//check acyclicity.
-	if(doesEdgePreserveAcyclicity(this, parent.get())) throw LavErrorException(Lav_ERROR_CAUSES_CYCLE);
-	input_descriptors[input].parent = parent;
-	input_descriptors[input].output = parentOutput;
+unsigned int LavNode::getOutputBufferCount() {
+	return output_buffers.size();
 }
 
-std::shared_ptr<LavNode> LavNode::getParentNode(unsigned int input) {
-	if(input >= input_descriptors.size()) throw LavErrorException(Lav_ERROR_RANGE);
-	return input_descriptors[input].parent.lock();
+float* LavNode::getOutputBufferPointer(unsigned int output) {
+	if(output > output_buffers.size()) throw LavErrorException(Lav_ERROR_RANGE);
+	return output_buffers[output];
 }
 
-unsigned int LavNode::getParentOutput(unsigned int input) {
-	if(input >= input_descriptors.size()) throw LavErrorException(Lav_ERROR_RANGE);
-	auto parent = input_descriptors[input].parent.lock();
-	return parent != nullptr ? input_descriptors[input].output : 0;
-}
-
-unsigned int LavNode::getParentCount() {
-	return input_descriptors.size();
-}
-
-void LavNode::setInput(unsigned int input, std::shared_ptr<LavNode> node, unsigned int output) {
-	setParent(input, node, output);
-	if(getProperty(Lav_NODE_AUTORESET).getIntValue()) reset();
-}
-
-std::shared_ptr<LavNode> LavNode::getInputNode(unsigned int input) {
-	return getParentNode(input);
-}
-
-unsigned int LavNode::getInputOutput(unsigned int input) {
-	return getParentOutput(input);
-}
-
-unsigned int LavNode::getInputCount() {
-	return getParentCount();
-}
-
-unsigned int LavNode::getOutputCount() {
-	return outputs.size();
-}
-
-float* LavNode::getOutputPointer(unsigned int output) {
-	if(output > outputs.size()) throw LavErrorException(Lav_ERROR_RANGE);
-	return outputs[output];
-}
-
-void LavNode::getOutputPointers(float** dest) {
-	for(unsigned int i = 0; i < getOutputCount(); i++) dest[i] = getOutputPointer(i);
+void LavNode::getOutputBufferPointers(float** dest) {
+	for(unsigned int i = 0; i < getOutputBufferCount(); i++) dest[i] = getOutputBufferPointer(i);
 }
 
 std::shared_ptr<LavSimulation> LavNode::getSimulation() {
@@ -186,18 +121,6 @@ std::shared_ptr<LavSimulation> LavNode::getSimulation() {
 LavProperty& LavNode::getProperty(int slot) {
 	if(properties.count(slot) == 0) throw LavErrorException(Lav_ERROR_RANGE);
 	else return properties[slot];
-}
-
-std::vector<int> LavNode::getPropertyIndices() {
-	std::vector<int> res;
-	for(auto i = properties.begin(); i != properties.end(); i++) {
-		res.push_back(i->first);
-	}
-	return res;
-}
-
-int LavNode::getPropertyCount() {
-	return properties.size();
 }
 
 LavEvent& LavNode::getEvent(int which) {
@@ -218,23 +141,22 @@ void LavNode::reset() {
 
 //protected resize function.
 void LavNode::resize(int newInputCount, int newOutputCount) {
-	int oldInputCount = inputs.size();
-	for(int i = oldInputCount-1; i >= newInputCount; i--) LavFreeFloatArray(inputs[i]);
-	inputs.resize(newInputCount, nullptr);
-	for(int i = oldInputCount; i < newInputCount; i++) inputs[i]=LavAllocFloatArray(simulation->getBlockSize());
-	input_descriptors.resize(newInputCount, LavInputDescriptor(nullptr, 0));
+	int oldInputCount = input_buffers.size();
+	for(int i = oldInputCount-1; i >= newInputCount; i--) LavFreeFloatArray(input_buffers[i]);
+	input_buffers.resize(newInputCount, nullptr);
+	for(int i = oldInputCount; i < newInputCount; i++) input_buffers[i]=LavAllocFloatArray(simulation->getBlockSize());
 
-	int oldOutputCount = outputs.size();
+	int oldOutputCount = output_buffers.size();
 	if(newOutputCount < oldOutputCount) { //we need to free some arrays.
 		for(auto i = newOutputCount; i < oldOutputCount; i++) {
-			LavFreeFloatArray(outputs[i]);
+			LavFreeFloatArray(output_buffers[i]);
 		}
 	}
 	//do the resize.
-	outputs.resize(newOutputCount, nullptr);
+	output_buffers.resize(newOutputCount, nullptr);
 	if(newOutputCount > oldOutputCount) { //we need to allocate some more arrays.
 		for(auto i = oldOutputCount; i < newOutputCount; i++) {
-			outputs[i] = LavAllocFloatArray(simulation->getBlockSize());
+			output_buffers[i] = LavAllocFloatArray(simulation->getBlockSize());
 		}
 	}
 }
@@ -249,62 +171,6 @@ void LavSubgraphNode::configureSubgraph(std::shared_ptr<LavNode> input, std::sha
 	subgraph_output = output;
 }
 
-void LavSubgraphNode::doProcessProtocol() {
-	//empty. Don't do anything for a subgraph.
-}
-
-void LavSubgraphNode::process() {
-	//empty because we can forward onto the output object.
-}
-
-void LavSubgraphNode::setParent(unsigned int par, std::shared_ptr<LavNode> node, unsigned int output) {
-	throw LavErrorException(Lav_ERROR_INTERNAL);
-}
-
-std::shared_ptr<LavNode> LavSubgraphNode::getParentNode(unsigned int par) {
-	if(par >= getParentCount()) throw LavErrorException(Lav_ERROR_RANGE);
-	return subgraph_output;
-}
-
-unsigned int LavSubgraphNode::getParentOutput(unsigned int par) {
-	if(par >= getParentCount()) throw LavErrorException(Lav_ERROR_RANGE);
-	return par; //it's a one-for-one correspondance.
-}
-
-unsigned int LavSubgraphNode::getParentCount() {
-	return subgraph_output ? subgraph_output->getParentCount() : 0;
-}
-
-void LavSubgraphNode::setInput(unsigned int input, std::shared_ptr<LavNode> node, unsigned int output) {
-	if(input >= getInputCount()) throw LavErrorException(Lav_ERROR_RANGE);
-	subgraph_input->setInput(input, node, output);
-}
-
-std::shared_ptr<LavNode> LavSubgraphNode::getInputNode(unsigned int input) {
-	if(input >= getInputCount()) throw LavErrorException(Lav_ERROR_RANGE);
-	return subgraph_input->getInputNode(input);
-}
-
-unsigned int LavSubgraphNode::getInputOutput(unsigned int input) {
-	if(input >= getInputCount()) throw LavErrorException(Lav_ERROR_RANGE);
-	return subgraph_input->getInputOutput(input);
-}
-
-unsigned int LavSubgraphNode::getInputCount() {
-	if(subgraph_input == nullptr) return 0;
-	return subgraph_input->getInputCount();
-}
-
-unsigned int LavSubgraphNode::getOutputCount() {
-	if(subgraph_output) return subgraph_output->getOutputCount();
-	else return 0;
-}
-
-float* LavSubgraphNode::getOutputPointer(unsigned int output) {
-	if(subgraph_output) return subgraph_output->getOutputPointer(output);
-	else return nullptr;
-}
-
 //begin public api
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetType(LavNode* node, int* destination) {
 	PUB_BEGIN
@@ -316,41 +182,13 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeGetType(LavNode* node, int* destination) {
 
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetInputCount(LavNode* node, unsigned int* destination) {
 	PUB_BEGIN
-	auto node_ptr = incomingPointer<LavNode>(node);
-	LOCK(*node);
-	*destination = node->getInputCount();
+	//todo:rewrite to handle the "new" idea of inputs.
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetOutputCount(LavNode* node, unsigned int* destination) {
 	PUB_BEGIN
-	auto node_ptr = incomingPointer<LavNode>(node);
-	LOCK(*node);
-	*destination = node->getOutputCount();
-	PUB_END
-}
-
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetInputNode(LavNode *node, unsigned int slot, LavNode** destination) {
-	PUB_BEGIN
-	auto node_ptr = incomingPointer<LavNode>(node);
-	LOCK(*node);
-	*destination = outgoingPointer<LavNode>(node->getInputNode(slot));
-	PUB_END
-}
-
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetInputOutput(LavNode* node, unsigned int slot, unsigned int* destination) {
-	PUB_BEGIN
-	auto node_ptr = incomingPointer<LavNode>(node);
-	LOCK(*node);
-	*destination = node->getInputOutput(slot);
-	PUB_END
-}
-
-Lav_PUBLIC_FUNCTION LavError Lav_nodeSetInput(LavNode *node, unsigned int input, LavNode* parent, unsigned int output) {
-	PUB_BEGIN
-	auto node_ptr = incomingPointer<LavNode>(node);
-	LOCK(*node);
-	node->setInput(input, parent ? incomingPointer<LavNode>(parent) : nullptr, output);
+	//todo:rewrite to handle the "new" idea of outputs.
 	PUB_END
 }
 
@@ -505,26 +343,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeGetDoublePropertyRange(LavNode* node, int s
 	PROP_PREAMBLE(node, slot, Lav_PROPERTYTYPE_DOUBLE);
 	*destination_lower = prop.getDoubleMin();
 	*destination_upper = prop.getDoubleMax();
-	PUB_END
-}
-
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetPropertyCount(LavNode* node, int* destination) {
-	PUB_BEGIN
-	LOCK(*node);
-	*destination = node->getPropertyCount();
-	PUB_END
-}
-
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetPropertyIndices(LavNode* node, int** destination) {
-	PUB_BEGIN
-	auto node_ptr = incomingPointer<LavNode>(node);
-	LOCK(*node);
-	std::vector<int> indices = node->getPropertyIndices();
-	int* result = new int[indices.size()+1]; //so we can terminate with 0.
-	std::copy(indices.begin(), indices.end(), result);
-	result[indices.size()] = 0;
-	*destination = outgoingPointer<int>(std::shared_ptr<int>(result,
-	[](int* ptr) {delete[] ptr;}));
 	PUB_END
 }
 

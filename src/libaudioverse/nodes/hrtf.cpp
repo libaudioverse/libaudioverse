@@ -78,24 +78,24 @@ void LavHrtfNode::process() {
 	//roll back the history...
 	std::copy(end-hrtf->getLength(), end, history);
 	//stick our input on the end...
-	std::copy(inputs[0], inputs[0]+block_size, start);
+	std::copy(input_buffers[0], input_buffers[0]+block_size, start);
 	//finally, do the usual convolution loop.
 	if(didRecompute) {
 		if(allowCrossfade) {
-			crossfadeConvolutionKernel(history, block_size, outputs[0], hrtfLength, old_left_response, left_response);
-			crossfadeConvolutionKernel(history, block_size, outputs[1], hrtfLength, old_right_response, right_response);
+			crossfadeConvolutionKernel(history, block_size, output_buffers[0], hrtfLength, old_left_response, left_response);
+			crossfadeConvolutionKernel(history, block_size, output_buffers[1], hrtfLength, old_right_response, right_response);
 		}
 		else {
-			convolutionKernel(history, block_size, outputs[0], hrtf->getLength(), left_response);
-			convolutionKernel(history, block_size, outputs[1], hrtf->getLength(), right_response);
+			convolutionKernel(history, block_size, output_buffers[0], hrtf->getLength(), left_response);
+			convolutionKernel(history, block_size, output_buffers[1], hrtf->getLength(), right_response);
 		}
 		//note: putting these anywhere in the didnt-recompute path causes things to never move.
 		prev_elevation = current_elevation;
 		prev_azimuth = current_azimuth;
 	}
 	else {
-		convolutionKernel(history, block_size, outputs[0], hrtf->getLength(), left_response);
-		convolutionKernel(history, block_size, outputs[1], hrtf->getLength(), right_response);
+		convolutionKernel(history, block_size, output_buffers[0], hrtf->getLength(), left_response);
+		convolutionKernel(history, block_size, output_buffers[1], hrtf->getLength(), right_response);
 	}
 }
 

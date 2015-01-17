@@ -65,7 +65,7 @@ void LavPullObject::process() {
 	//this is simply uninterweaving, but taking advantage of the fact that we have a different output destination.
 	for(unsigned int i = 0; i < block_size*channels; i+=channels) {
 		for(unsigned int j = 0; j < channels; j++) {
-			outputs[j][i/channels] = resampled_buffer[i+j];
+			output_buffers[j][i/channels] = resampled_buffer[i+j];
 		}
 	}
 }

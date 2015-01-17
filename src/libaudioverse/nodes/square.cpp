@@ -45,7 +45,7 @@ void LavSquareNode::recomputeCounters() {
 
 void LavSquareNode::process() {
 	for(int i= 0; i < block_size; i++) {
-		outputs[0][i] = counter < on_for ? 1.0f : 0.0f;
+		output_buffers[0][i] = counter < on_for ? 1.0f : 0.0f;
 		counter++;
 		counter%= wave_length;
 	}

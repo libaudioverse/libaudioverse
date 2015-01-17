@@ -68,31 +68,31 @@ void LavNoiseNode::white() {
 		for(int j = 0; j < 20; j++) noiseSample += uniform_distribution(random_number_generator);
 		//divide by 20 to get it back into range.
 		noiseSample /= 20.0f;
-		outputs[0][i] = noiseSample;
+		output_buffers[0][i] = noiseSample;
 	}
 }
 
 void LavNoiseNode::pink() {
 	white();
-	for(int i = 0; i < block_size; i++) outputs[0][i] =pinkifier.tick(outputs[0][i]);
+	for(int i = 0; i < block_size; i++) output_buffers[0][i] =pinkifier.tick(output_buffers[0][i]);
 	//pass over the output buffer and find the max sample.
 	for(int i = 0; i < block_size; i++) {
-		if(fabs(outputs[0][i]) > pink_max) pink_max= fabs(outputs[0][i]);
+		if(fabs(output_buffers[0][i]) > pink_max) pink_max= fabs(output_buffers[0][i]);
 	}
 	if(getProperty(Lav_NOISE_SHOULD_NORMALIZE).getIntValue() == 0 || pink_max == 0.0f) return;
-	for(int i = 0; i < block_size; i++) outputs[0][i]/=pink_max;
+	for(int i = 0; i < block_size; i++) output_buffers[0][i]/=pink_max;
 }
 
 void LavNoiseNode::brown() {
 	white();
-	for(int i= 0; i < block_size; i++) outputs[0][i]=brownifier.tick(outputs[0][i]);
+	for(int i= 0; i < block_size; i++) output_buffers[0][i]=brownifier.tick(output_buffers[0][i]);
 	//do something to make brown noise here...
 	//pass over the output buffer and find the max sample.
 	for(int i = 0; i < block_size; i++) {
-		if(fabs(outputs[0][i]) > brown_max) brown_max= fabs(outputs[0][i]);
+		if(fabs(output_buffers[0][i]) > brown_max) brown_max= fabs(output_buffers[0][i]);
 	}
 	if(getProperty(Lav_NOISE_SHOULD_NORMALIZE).getIntValue() == 0 || brown_max == 0.0f) return;
-	for(int i = 0; i < block_size; i++) outputs[0][i]/=brown_max;
+	for(int i = 0; i < block_size; i++) output_buffers[0][i]/=brown_max;
 }
 
 void LavNoiseNode::process() {

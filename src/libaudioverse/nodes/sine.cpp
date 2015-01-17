@@ -43,7 +43,7 @@ void LavSineNode::process() {
 		const unsigned int samp2 = start+1;
 		const float weight1 = offset;
 		const float weight2 = 1-offset;
-		outputs[0][i] = sineTable[samp1]*weight1+sineTable[samp2]*weight2;
+		output_buffers[0][i] = sineTable[samp1]*weight1+sineTable[samp2]*weight2;
 		offset += table_delta*freq;
 		start += (int)floorf(offset);
 		start %= sineTableLength;

@@ -55,7 +55,6 @@ nodes/sine.cpp
 nodes/file.cpp
 nodes/hard_limiter.cpp
 nodes/hrtf.cpp
-nodes/mixer.cpp
 nodes/delay.cpp
 nodes/amplitude_panner.cpp
 nodes/push.cpp
@@ -64,9 +63,9 @@ nodes/pull.cpp
 nodes/graph_listener.cpp
 nodes/custom.cpp
 nodes/ringmod.cpp
-nodes/multipanner.cpp
+#nodes/multipanner.cpp
 nodes/feedback_delay_network.cpp
-nodes/multifile.cpp
+#nodes/multifile.cpp
 nodes/square.cpp
 nodes/noise.cpp
 nodes/iir.cpp
@@ -78,8 +77,8 @@ audio_backends/winmm.cpp
 audio_backends/openal.cpp
 
 #the 3D abstraction on top of libaudioverse.
-3d/simpleenvironment.cpp
-3d/sources.cpp
+#3d/simpleenvironment.cpp
+#3d/sources.cpp
 
 #c files containing embedded tables and data that don't change.
 data/mixing_matrices.cpp

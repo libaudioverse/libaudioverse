@@ -44,14 +44,15 @@ LavGraphListenerNode::~LavGraphListenerNode() {
 }
 
 void LavGraphListenerNode::process() {
-	if(callback == nullptr) return;
-	for(unsigned int i = 0; i < block_size; i++) {
-		for(unsigned int j = 0; j < channels; j++) {
-			outgoing_buffer[i*channels+j] = inputs[j][i];
-			outputs[j][i] = inputs[j][i];
+	if(callback) {
+		for(unsigned int i = 0; i < block_size; i++) {
+			for(unsigned int j = 0; j < channels; j++) {
+				outgoing_buffer[i*channels+j] = input_buffers[j][i];
+			}
 		}
+		callback(this, block_size, channels, outgoing_buffer, callback_userdata);
 	}
-	callback(this, block_size, channels, outgoing_buffer, callback_userdata);
+	for(int i= 0; i < num_output_buffers; i++) std::copy(input_buffers[i], input_buffers[i]+block_size, output_buffers[i]);
 }
 
 //begin public api

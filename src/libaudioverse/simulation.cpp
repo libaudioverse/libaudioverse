@@ -54,15 +54,15 @@ void LavSimulation::getBlock(float* out, unsigned int channels, bool mayApplyMix
 		goto end;
 	}
 
-	float *mixingMatrix = getMixingMatrix(output_node->getOutputCount(), channels);
-	float** outputPointers = new float*[output_node->getOutputCount()];
-	output_node->getOutputPointers(outputPointers);
+	float *mixingMatrix = getMixingMatrix(output_node->getOutputBufferCount(), channels);
+	float** outputPointers = new float*[output_node->getOutputBufferCount()];
+	output_node->getOutputBufferPointers(outputPointers);
 	if(mixingMatrix && mayApplyMixingMatrix) {
-		interleaveSamples(channels, getBlockSize(), output_node->getOutputCount(), outputPointers, mixing_matrix_workspace);
-		applyMixingMatrix(output_node->getOutputCount()*block_size, mixing_matrix_workspace, out, output_node->getOutputCount(), channels, mixingMatrix);
+		interleaveSamples(channels, getBlockSize(), output_node->getOutputBufferCount(), outputPointers, mixing_matrix_workspace);
+		applyMixingMatrix(output_node->getOutputBufferCount()*block_size, mixing_matrix_workspace, out, output_node->getOutputBufferCount(), channels, mixingMatrix);
 	}
 	else {
-		interleaveSamples(channels, getBlockSize(), output_node->getOutputCount(), outputPointers, out);
+		interleaveSamples(channels, getBlockSize(), output_node->getOutputBufferCount(), outputPointers, out);
 	}
 	delete[] outputPointers;
 	end:

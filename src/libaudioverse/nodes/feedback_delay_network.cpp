@@ -46,9 +46,9 @@ std::shared_ptr<LavNode> createFeedbackDelayNetworkNode(std::shared_ptr<LavSimul
 void LavFeedbackDelayNetworkNode::process() {
 	for(int i = 0; i < block_size; i++) {
 		network->computeFrame(lastOutput);
-		for(unsigned int j = 0; j < getOutputCount(); j++) {
-			nextInput[j] = inputs[j][i];
-			outputs[j][i] = lastOutput[j]*gains[j];
+		for(unsigned int j = 0; j < num_output_buffers; j++) {
+			nextInput[j] = input_buffers[j][i];
+			output_buffers[j][i] = lastOutput[j]*gains[j];
 		}
 		network->advance(nextInput, lastOutput);
 	}

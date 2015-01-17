@@ -198,11 +198,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeGetType(LavNode* node, int* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetInputCount(LavNode* node, unsigned int* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetOutputCount(LavNode* node, unsigned int* destination);
 
-/**Input management.*/
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetInputNode(LavNode *node, unsigned int slot, LavNode** destination);
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetInputOutput(LavNode* node, unsigned int slot, unsigned int* destination);
-Lav_PUBLIC_FUNCTION LavError Lav_nodeSetInput(LavNode *node, unsigned int input, LavNode* parent, unsigned int output);
-
 /**Resets a property to its default value, for any type.*/
 Lav_PUBLIC_FUNCTION LavError Lav_nodeResetProperty(LavNode *node, int slot);
 
@@ -226,11 +221,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeGetIntPropertyRange(LavNode* node, int slot
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetFloatPropertyRange(LavNode* node, int slot, float* destination_lower, float* destination_upper);
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetDoublePropertyRange(LavNode* node, int slot, double* destination_lower, double* destination_upper);
 
-/**Get the count of properties on an node.*/
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetPropertyCount(LavNode* node, int* destination);
-/**Get the indices of all properties on an node as an array of ints, that is all properties with numeric index less than 0.  Allocates memory; free with Lav_free.*/
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetPropertyIndices(LavNode* node, int** destination);
-/**Get the name of a property.  Again, allocates memory.*/
+
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetPropertyName(LavNode* node, int slot, char** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetPropertyType(LavNode* node, int slot, int* destination);
 /**Properties with dynamic ranges may change the endpoints of their range at any time and for any reason.

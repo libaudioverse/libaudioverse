@@ -69,7 +69,7 @@ void LavPushNode::process() {
 	for(unsigned int i = 0; i < push_channels*block_size; i++) {
 		unsigned int output = i%push_channels;
 		unsigned int position = i/push_channels;
-		outputs[output][position] = workspace[i];
+		output_buffers[output][position] = workspace[i];
 	}
 	float threshold = getProperty(Lav_PUSH_THRESHOLD).getFloatValue();
 	float remaining = resampler->estimateAvailableFrames()/(float)simulation->getSr();

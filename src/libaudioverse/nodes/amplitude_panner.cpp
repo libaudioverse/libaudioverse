@@ -58,7 +58,7 @@ void LavAmplitudePannerNode::recomputeChannelMap() {
 
 void LavAmplitudePannerNode::process() {
 	float azimuth = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
-	panner.pan(azimuth, block_size, inputs[0], outputs.size(), &outputs[0]);
+	panner.pan(azimuth, block_size, input_buffers[0], num_output_buffers, &output_buffers[0]);
 }
 
 void LavAmplitudePannerNode::configureStandardChannelMap(unsigned int channels) {

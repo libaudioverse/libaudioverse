@@ -63,7 +63,7 @@ void LavBiquadNode::process() {
 	for(int j = 0; j < biquads.size(); j++) {
 		LavIIRFilter &bq = biquads[j];
 		for(unsigned int i = 0; i < block_size; i++) {
-			outputs[j][i] = bq.tick(inputs[j][i]);
+			output_buffers[j][i] = bq.tick(input_buffers[j][i]);
 		}
 	}
 }

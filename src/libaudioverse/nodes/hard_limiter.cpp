@@ -29,16 +29,16 @@ std::shared_ptr<LavNode>createHardLimiterNode(std::shared_ptr<LavSimulation> sim
 
 void LavHardLimiterNode::process() {
 	for(unsigned int i = 0; i < block_size; i++) {
-		for(unsigned int o = 0; o < num_outputs; o++) {
-			if(inputs[o][i] > 1.0f) {
-				outputs[o][i] = 1.0f;
+		for(unsigned int o = 0; o < num_output_buffers; o++) {
+			if(input_buffers[o][i] > 1.0f) {
+				output_buffers[o][i] = 1.0f;
 				continue;
 			}
-			else if(inputs[o][i] < -1.0f) {
-				outputs[o][i] = -1.0f;
+			else if(input_buffers[o][i] < -1.0f) {
+				output_buffers[o][i] = -1.0f;
 				continue;
 			}
-			outputs[o][i] = inputs[o][i];
+			output_buffers[o][i] = input_buffers[o][i];
 		}
 	}
 }

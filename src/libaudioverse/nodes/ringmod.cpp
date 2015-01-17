@@ -33,7 +33,7 @@ std::shared_ptr<LavNode> createRingmodNode(std::shared_ptr<LavSimulation> sim) {
 }
 
 void LavRingmodNode::process() {
-	multiplicationKernel(block_size, inputs[0], inputs[1], outputs[0]);
+	multiplicationKernel(block_size, input_buffers[0], input_buffers[1], output_buffers[0]);
 }
 
 //begin public api.
