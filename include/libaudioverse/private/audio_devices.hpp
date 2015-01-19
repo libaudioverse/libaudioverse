@@ -17,7 +17,7 @@ class LavDevice {
 	protected:
 	LavDevice() = default;
 	virtual ~LavDevice();
-	virtual void init(std::function<void(float*)> getBuffer, unsigned int inputBufferFrames,  unsigned int inputBufferChannels, unsigned int inputBufferSr, unsigned int outputChannels, unsigned int outputSr, unsigned int mixAhead); //second step fn initialization. We can't just fall through to dhe constructor.
+	virtual void init(std::function<void(float*)> getBuffer, unsigned int inputBufferFrames,  unsigned int inputBufferChannels, unsigned int inputBufferSr, unsigned int outputChannels, unsigned int outputSr, unsigned int mixAhead); //second step fn initialization. We can't just fall through to the constructor.
 	virtual void start(); //final step in initialization via subclasses: starts the background thread.
 	virtual void stop(); //stop the output.
 	//these hooks are run in the background thread, and should be overridden in subclasses.
