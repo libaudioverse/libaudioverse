@@ -16,16 +16,21 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 class LavNode;
 class LavDevice;
+class LavInputConnection;
 
 /*When thrown on the background thread, terminates it.*/
 class LavThreadTerminationException {
 };
 
-class LavSimulation {
+class LavSimulation: public std::enable_shared_from_this<LavSimulation>  {
 	public:
 	LavSimulation(unsigned int sr, unsigned int blockSize, unsigned int mixahead);
+	//needed because the LavInputConnection needs us to use shared_from_this.
+	void completeInitialization();
 	virtual ~LavSimulation();
 	virtual void getBlock(float* out, unsigned int channels, bool mayApplyMixingMatrix = true);
+	std::shared_ptr<LavInputConnection> getFinalOutputConnection();
+
 	//this is in frames of audio data.
 	virtual unsigned int getBlockSize() { return block_size;}
 	virtual LavError start();
@@ -52,6 +57,11 @@ class LavSimulation {
 	const float* getMixingMatrix(unsigned int inChannels, unsigned int outChannels);
 
 	protected:
+	//the connection to which nodes connect themselves if their output should be audible.
+	std::shared_ptr<LavInputConnection> final_output_connection;
+	//pointers to output buffers that the above connection can write to.
+	std::vector<float*> final_outputs;
+
 	unsigned int block_size = 0, mixahead = 0, is_started = 0;
 	float sr = 0.0f;
 	//if nodes die, they automatically need to be removed.  We can do said removal on next process.

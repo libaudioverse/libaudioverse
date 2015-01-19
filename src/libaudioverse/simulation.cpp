@@ -4,6 +4,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/private/simulation.hpp>
 #include <libaudioverse/private/node.hpp>
+#include <libaudioverse/private/connections.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/kernels.hpp>
@@ -26,6 +27,9 @@ LavSimulation::LavSimulation(unsigned int sr, unsigned int blockSize, unsigned i
 	backgroundTaskThread = std::thread([this]() {backgroundTaskThreadFunction();});
 	start();
 }
+void LavSimulation::completeInitialization() {
+	final_output_connection =std::make_shared<LavInputConnection>(this->shared_from_this(), nullptr, 0, 0);
+}
 
 LavSimulation::~LavSimulation() {
 	//enqueue a task which will stop the background thread.
@@ -45,6 +49,10 @@ void LavSimulation::doMaintenance() {
 	for(auto &n: to_remove) {
 		nodes.erase(n);
 	}
+}
+
+std::shared_ptr<LavInputConnection> LavSimulation::getFinalOutputConnection() {
+	return final_output_connection;
 }
 
 LavError LavSimulation::start() {
