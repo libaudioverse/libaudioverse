@@ -52,6 +52,7 @@ class LavNode: public std::enable_shared_from_this<LavNode> { //enable_shared_fr
 	virtual void process();
 	//zero the output buffers.
 	virtual void zeroOutputBuffers();
+	virtual void zeroInputBuffers();
 	//Does some cleanup and the like.
 	//This is also an override point for subclasses that may need to do cleanup periodically in order to remain performant; in that case, they *must* call the base. Or else.
 	virtual void doMaintenance();

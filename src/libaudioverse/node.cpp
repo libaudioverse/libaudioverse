@@ -58,8 +58,12 @@ void LavNode::tick() {
 	zeroOutputBuffers(); //we always do this because sometimes we're not going to actually do anything else.
 	if(getState() == Lav_NODESTATE_PAUSED) return; //nothing to do, for we are paused.
 	willProcessParents();
-	//tick all alive parents.
-	//todo: rewrite this to understand the new idea of connections.
+	zeroInputBuffers();
+	//tick all alive parents, collecting their outputs onto ours.
+	//by using the getInputConnection and getInputConnectionCount functions, we allow subgraphs to override effectively.
+	for(int i = 0; i < getInputConnectionCount(); i++) {
+		getInputConnection(i)->add(true); //for now, always apply the mixing matrix.
+	}
 	is_processing = true;
 	num_input_buffers = input_buffers.size();
 	num_output_buffers = output_buffers.size();
@@ -88,6 +92,12 @@ void LavNode::process() {
 void LavNode::zeroOutputBuffers() {
 	for(unsigned int i = 0; i < output_buffers.size(); i++) {
 		memset(output_buffers[i], 0, block_size*sizeof(float));
+	}
+}
+
+void LavNode::zeroInputBuffers() {
+	for(int i = 0; i < input_buffers.size(); i++) {
+		memset(input_buffers[i], 0, sizeof(float)*simulation->getBlockSize());
 	}
 }
 
