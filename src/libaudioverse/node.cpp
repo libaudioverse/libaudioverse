@@ -67,7 +67,7 @@ void LavNode::tick() {
 	float mul = getProperty(Lav_NODE_MUL).getFloatValue();
 	if(mul != 1.0f) {
 		for(unsigned int i = 0; i < getOutputBufferCount(); i++) {
-			float* output = getOutputBufferPointer(i);
+			float* output = getOutputBufferArray()[i];
 			scalarMultiplicationKernel(block_size, mul, output, output);
 		}
 	}
@@ -105,13 +105,9 @@ unsigned int LavNode::getOutputBufferCount() {
 	return output_buffers.size();
 }
 
-float* LavNode::getOutputBufferPointer(unsigned int output) {
-	if(output > output_buffers.size()) throw LavErrorException(Lav_ERROR_RANGE);
-	return output_buffers[output];
-}
-
-void LavNode::getOutputBufferPointers(float** dest) {
-	for(unsigned int i = 0; i < getOutputBufferCount(); i++) dest[i] = getOutputBufferPointer(i);
+float** LavNode::getOutputBufferArray() {
+	//vectors are guaranteed to be contiguous in most if not all implementations as well as (possibly, no source handy) the C++11 standard.
+	return &output_buffers[0];
 }
 
 std::shared_ptr<LavSimulation> LavNode::getSimulation() {

@@ -28,9 +28,7 @@ class LavNode: public std::enable_shared_from_this<LavNode> { //enable_shared_fr
 
 	virtual unsigned int getOutputBufferCount();
 	//Note that this isn't shared ptr.  The output pointers for a node are managed by the node itself and we need to be able to allocate/deallocate them for SSE, as well as work with arrays.  Don't hold on to output pointers.
-	virtual float* getOutputBufferPointer(unsigned int output);
-	//this is guaranteed to be written in terms of getOutputPointer, so subclasses can override the former:
-	virtual void getOutputBufferPointers(float** dest);
+	float** getOutputBufferArray();
 
 	//equivalent to reading lav_NODE_STATE.
 	virtual int getState();

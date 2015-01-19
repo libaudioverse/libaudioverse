@@ -7,7 +7,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <string.h>
 #include <algorithm>
 
-void applyMixingMatrix(int sampleCount, int inputChannels, float** inputs, int outputChannels, float** outputs, float* mixingMatrix) {
+void applyMixingMatrix(int sampleCount, int inputChannels, float** inputs, int outputChannels, float** outputs, const float* mixingMatrix) {
 	//loop over the matrix rows. Apply multiplicationAdditionKernel.
 	for(int i= 0; i < outputChannels; i++) {
 		for(int j = 0; j < inputChannels; j++) {
