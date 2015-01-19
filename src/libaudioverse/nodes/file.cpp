@@ -43,6 +43,7 @@ LavFileNode::LavFileNode(std::shared_ptr<LavSimulation> simulation, const char* 
 	max_position = file.getFrameCount()/(float)file.getSr();
 	getProperty(Lav_FILE_POSITION).setDoubleRange(0.0f, max_position);
 	frame_count = file.getFrameCount();
+	appendOutputConnection(0, channels);
 }
 
 LavFileNode::~LavFileNode() {

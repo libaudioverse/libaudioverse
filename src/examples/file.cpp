@@ -33,15 +33,10 @@ void main(int argc, char** args) {
 	ERRCHECK(Lav_createSimulationForDevice(-1, 2, 44100, 1024, 2, &simulation));
 	ERRCHECK(Lav_createFileNode(simulation, path, &node));
 	LavNode *limit;
-	unsigned int fileChannels;
-	ERRCHECK(Lav_nodeGetOutputCount(node, &fileChannels));
-	ERRCHECK(Lav_createHardLimiterNode(simulation, fileChannels, &limit));
-	for(unsigned int i = 0; i < fileChannels; i++) {
-		ERRCHECK(Lav_nodeSetInput(limit, i, node, i));
-	}
+	ERRCHECK(Lav_createHardLimiterNode(simulation, 2, &limit));
+	ERRCHECK(Lav_nodeConnect(node, 0, limit, 0));
 	ERRCHECK(Lav_nodeSetEvent(node, Lav_FILE_END_EVENT, endOfFileCallback, nullptr));
-	ERRCHECK(Lav_simulationSetOutputNode(simulation, limit));
-
+	ERRCHECK(Lav_nodeConnectSimulation(limit, 0));
 	//enter the transducer loop.
 	char command[1024];
 	printf("Commands: q(q)uit, (s)eek, (v)olume, (p)itch bend\n");
