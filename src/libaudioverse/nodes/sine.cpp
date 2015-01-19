@@ -28,6 +28,7 @@ LavSineNode::LavSineNode(std::shared_ptr<LavSimulation> simulation): LavNode(Lav
 	table_delta = sineTableLength/simulation->getSr();
 	start = 0;
 	offset = 0;
+	appendOutputConnection(0, 1);
 }
 
 std::shared_ptr<LavNode> createSineNode(std::shared_ptr<LavSimulation> simulation) {
