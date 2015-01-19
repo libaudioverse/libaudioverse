@@ -28,7 +28,7 @@ class LavOpenALDevice: public  LavDevice {
 	public:
 	virtual void startup_hook();
 	virtual void shutdown_hook();
-	LavOpenALDevice(std::function<void(float*)> getBuffer, unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixAhead, std::string which);
+	LavOpenALDevice(std::function<void(float*, int)> getBuffer, unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixAhead, std::string which);
 	void sendingThreadFunction();
 	ALCdevice* device = nullptr;
 	ALCcontext *context = nullptr;
@@ -43,7 +43,7 @@ class LavOpenALDevice: public  LavDevice {
 	unsigned int sending_thread_sleep_time = 0;
 };
 
-LavOpenALDevice::LavOpenALDevice(std::function<void(float*)> getBuffer, unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixAhead, std::string which) {
+LavOpenALDevice::LavOpenALDevice(std::function<void(float*, int)> getBuffer, unsigned int sr, unsigned int channels, unsigned int blockSize, unsigned int mixAhead, std::string which) {
 	auto lg = std::lock_guard<std::mutex>(*openal_linearizer);
 	unsigned int outChannels = channels;
 	device = alcOpenDevice(which.c_str());
@@ -83,7 +83,7 @@ LavOpenALDevice::LavOpenALDevice(std::function<void(float*)> getBuffer, unsigned
 	block = new float[samples_per_buffer];
 	outgoing = new short[samples_per_buffer];
 	sending_thread_sleep_time = (unsigned int)(((float)blockSize/sr)*1000);
-	init(getBuffer, blockSize, channels, sr, channels, sr, mixAhead);
+	init(getBuffer, blockSize, sr, channels, sr, mixAhead);
 	start();
 }
 
@@ -156,7 +156,7 @@ class LavOpenALDeviceFactory: public LavDeviceFactory {
 	virtual std::vector<std::string> getOutputNames();
 	virtual std::vector<float> getOutputLatencies();
 	virtual std::vector<int> getOutputMaxChannels();
-	virtual std::shared_ptr<LavDevice> createDevice(std::function<void(float*)> getBlock, int index, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead);
+	virtual std::shared_ptr<LavDevice> createDevice(std::function<void(float*, int)> getBlock, int index, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead);
 	std::string getName();
 	private:
 	std::vector<std::string> names;
@@ -211,7 +211,7 @@ std::vector<std::string> LavOpenALDeviceFactory::getOutputNames() {
 	return names;
 }
 
-std::shared_ptr<LavDevice> LavOpenALDeviceFactory::createDevice(std::function<void(float*)> getBuffer, int index, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead) {
+std::shared_ptr<LavDevice> LavOpenALDeviceFactory::createDevice(std::function<void(float*, int)> getBuffer, int index, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead) {
 	std::string name;
 	if(index < -1 || index >= (int)names.size()) throw LavErrorException(Lav_ERROR_RANGE);
 	if(index == -1) {

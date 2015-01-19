@@ -85,7 +85,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSimulationForDevice(int index, unsigned i
 	auto sim = std::make_shared<LavSimulation>(sr, blockSize, mixAhead);
 	//this can in theory invalidate while the callback is still needed:
 	auto weak_sim = std::weak_ptr<LavSimulation>(sim);
-	auto audioFunction = [=](float* out) {
+	auto audioFunction = [=](float* out, int channels) {
 		auto strong_sim = weak_sim.lock();
 		if(strong_sim == nullptr) {
 			memset(out, 0, sizeof(float)*channels*blockSize);

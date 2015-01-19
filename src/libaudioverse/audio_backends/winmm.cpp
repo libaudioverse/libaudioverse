@@ -53,7 +53,8 @@ WAVEFORMATEXTENSIBLE makeFormat(unsigned int channels, unsigned int sr, bool isE
 class LavWinmmDevice: public  LavDevice {
 	public:
 	//channels is what user requested, maxChannels is what the device can support at most.
-	LavWinmmDevice(std::function<void(float*)> getBuffer, unsigned int blockSize, unsigned int channels, unsigned int maxChannels, unsigned int mixAhead, UINT_PTR which, unsigned int sourceSr, unsigned int targetSr);
+	//maxChannels comes from the LavDeviceFactory subclass and is cached; thus the parameter here.
+	LavWinmmDevice(std::function<void(float*, int)> getBuffer, unsigned int blockSize, unsigned int channels, unsigned int maxChannels, unsigned int mixAhead, UINT_PTR which, unsigned int sourceSr, unsigned int targetSr);
 	virtual void startup_hook();
 	virtual void shutdown_hook();
 	void winmm_mixer();
@@ -65,7 +66,7 @@ class LavWinmmDevice: public  LavDevice {
 	std::atomic_flag winmm_mixing_flag;
 };
 
-LavWinmmDevice::LavWinmmDevice(std::function<void(float*)> getBuffer, unsigned int blockSize, unsigned int channels, unsigned int maxChannels, unsigned int mixAhead, UINT_PTR which, unsigned int sourceSr, unsigned int targetSr) {
+LavWinmmDevice::LavWinmmDevice(std::function<void(float*, int)> getBuffer, unsigned int blockSize, unsigned int channels, unsigned int maxChannels, unsigned int mixAhead, UINT_PTR which, unsigned int sourceSr, unsigned int targetSr) {
 	WAVEFORMATEXTENSIBLE format = {0};
 	mixAhead += 1;
 	winmm_headers.resize(mixAhead);
@@ -97,7 +98,7 @@ LavWinmmDevice::LavWinmmDevice(std::function<void(float*)> getBuffer, unsigned i
 		if(res != MMSYSERR_NOERROR) throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
 		outChannels = 2;
 	}
-	init(getBuffer, blockSize, channels, sourceSr, outChannels, targetSr, mixAhead);
+	init(getBuffer, blockSize, sourceSr, outChannels, targetSr, mixAhead);
 	for(unsigned int i = 0; i < audio_data.size(); i++) audio_data[i] = new short[output_buffer_size];
 	//we can go ahead and set up the headers.
 	for(unsigned int i = 0; i < winmm_headers.size(); i++) {
@@ -153,7 +154,7 @@ class LavWinmmDeviceFactory: public LavDeviceFactory {
 	virtual std::vector<std::string> getOutputNames();
 	virtual std::vector<float> getOutputLatencies();
 	virtual std::vector<int> getOutputMaxChannels();
-	virtual std::shared_ptr<LavDevice> createDevice(std::function<void(float*)> getBuffer, int index, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead);
+	virtual std::shared_ptr<LavDevice> createDevice(std::function<void(float*, int)> getBuffer, int index, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead);
 	virtual unsigned int getOutputCount();
 	virtual bool scan();
 	std::string getName();
@@ -180,7 +181,7 @@ std::vector<int> LavWinmmDeviceFactory::getOutputMaxChannels() {
 	return max_channels;
 }
 
-std::shared_ptr<LavDevice> LavWinmmDeviceFactory::createDevice(std::function<void(float*)> getBuffer, int index, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead) {
+std::shared_ptr<LavDevice> LavWinmmDeviceFactory::createDevice(std::function<void(float*, int)> getBuffer, int index, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead) {
 	//first, we need to do sanity checks.
 	if(index < -1 || index > (int)names.size()) throw LavErrorException(Lav_ERROR_RANGE);
 	std::shared_ptr<LavDevice> device = std::make_shared<LavWinmmDevice>(getBuffer, blockSize, channels, index != -1 ? max_channels[index] : mapper_max_channels, mixAhead, index == -1 ? WAVE_MAPPER : index, sr, index == -1 ? mapper_sr : srs[index]);

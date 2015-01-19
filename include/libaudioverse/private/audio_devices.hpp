@@ -17,7 +17,8 @@ class LavDevice {
 	protected:
 	LavDevice() = default;
 	virtual ~LavDevice();
-	virtual void init(std::function<void(float*)> getBuffer, unsigned int inputBufferFrames,  unsigned int inputBufferChannels, unsigned int inputBufferSr, unsigned int outputChannels, unsigned int outputSr, unsigned int mixAhead); //second step fn initialization. We can't just fall through to the constructor.
+	//function parameters: output buffer, number of channels to write.
+	virtual void init(std::function<void(float*, int)> getBuffer, unsigned int inputBufferFrames, unsigned int inputBufferSr, unsigned int channels, unsigned int outputSr, unsigned int mixAhead); //second step fn initialization. We can't just fall through to the constructor.
 	virtual void start(); //final step in initialization via subclasses: starts the background thread.
 	virtual void stop(); //stop the output.
 	//these hooks are run in the background thread, and should be overridden in subclasses.
@@ -25,13 +26,12 @@ class LavDevice {
 	virtual void shutdown_hook();
 	virtual void zeroOrNextBuffer(float* where);
 	virtual void mixingThreadFunction();
-	unsigned int input_channels = 0, output_channels = 0;
+	unsigned int channels = 0;
 	unsigned int mix_ahead = 0;
 	unsigned int input_buffer_size, output_buffer_size, input_buffer_frames, output_buffer_frames;
 	unsigned int input_sr = 0;
 	unsigned int output_sr = 0;
 	bool is_resampling = false;
-	float* mixing_matrix = nullptr;
 	bool should_apply_mixing_matrix = false;
 	unsigned int next_output_buffer = 0;
 	unsigned int callback_buffer_index = 0;
@@ -40,7 +40,7 @@ class LavDevice {
 	std::atomic<int>* buffer_statuses = nullptr;
 	std::atomic_flag mixing_thread_continue;
 	std::thread mixing_thread;
-	std::function<void(float*)> get_buffer;
+	std::function<void(float*, int)> get_buffer;
 	bool started = false;
 };
 
@@ -53,7 +53,7 @@ class LavDeviceFactory {
 	virtual std::vector<float> getOutputLatencies() = 0;
 	virtual std::vector<int> getOutputMaxChannels() = 0;
 
-	virtual std::shared_ptr<LavDevice> createDevice(std::function<void(float*)> getBuffer, int index, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead) = 0;
+	virtual std::shared_ptr<LavDevice> createDevice(std::function<void(float*, int)> getBuffer, int index, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead) = 0;
 	virtual unsigned int getOutputCount();
 	virtual std::string getName();
 	protected:

@@ -6,7 +6,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/resampler.hpp>
 #include <libaudioverse/private/data.hpp>
 #include <libaudioverse/private/errors.hpp>
-#include <libaudioverse/private/kernels.hpp>
 #include <string>
 #include <vector>
 #include <functional>
@@ -21,35 +20,22 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 /**Code common to all backends, i.e. enumeration.*/
 
 //these are the two steps in initialization, and are consequently put before the destructor.
-void LavDevice::init(std::function<void(float*)> getBuffer, unsigned int inputBufferFrames,  unsigned int inputBufferChannels, unsigned int inputBufferSr, unsigned int outputChannels, unsigned int outputSr, unsigned int mixAhead) {
+void LavDevice::init(std::function<void(float*, int)> getBuffer, unsigned int inputBufferFrames, unsigned int inputBufferSr, unsigned int channels, unsigned int outputSr, unsigned int mixAhead) {
 	input_buffer_frames = inputBufferFrames;
-	input_channels = inputBufferChannels;
 	mix_ahead = mixAhead;
-	input_buffer_size = inputBufferFrames*inputBufferChannels;
+	input_buffer_size = inputBufferFrames*channels;
 	input_sr = inputBufferSr;
 	output_sr = outputSr;
-	output_channels = outputChannels;
+	this->channels = channels;
 	buffer_statuses = new std::atomic<int>[mixAhead+1];
 	get_buffer = getBuffer;
 	for(unsigned int i = 0; i < mixAhead + 1; i++) buffer_statuses[i].store(0);
-	if(input_channels != output_channels) {
-		float* match = nullptr;
-		for(LavMixingMatrixInfo* i = mixing_matrix_list; i->pointer; i++) {
-			if(i->in_channels == input_channels && i->out_channels == output_channels) {
-				match = i->pointer;
-				break;
-			}
-		}
-		if(match == nullptr) throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
-		mixing_matrix = match;
-		should_apply_mixing_matrix = true;
-	}
 	if(input_sr != output_sr) is_resampling = true;
 	output_buffer_frames = input_buffer_frames;
 	if(output_sr != input_sr) {
 		output_buffer_frames = (unsigned int)(output_buffer_frames*(double)output_sr)/input_sr;
 	}
-	output_buffer_size = output_buffer_frames*output_channels;
+	output_buffer_size = output_buffer_frames*channels;
 	buffers = new float*[mix_ahead];
 	for(unsigned int i = 0; i < mix_ahead+1; i++) {
 		buffers[i] = new float[output_buffer_size];
@@ -98,11 +84,11 @@ void LavDevice::shutdown_hook() {
 
 void LavDevice::mixingThreadFunction() {
 	bool hasFilledQueueFirstTime = false;
-	LavResampler resampler(input_buffer_frames, input_channels, input_sr, output_sr);
+	LavResampler resampler(input_buffer_frames, channels, input_sr, output_sr);
 	unsigned int currentBuffer = 0;
 	unsigned int sleepFor = (unsigned int)(((double)input_buffer_frames/input_sr)*1000);
 	float* currentBlock = new float[input_buffer_size]();
-	float* resampledBlock= new float[output_buffer_frames*input_channels]();
+	float* resampledBlock= new float[output_buffer_frames*channels]();
 	while(mixing_thread_continue.test_and_set()) {
 		if(buffer_statuses[currentBuffer].load()) { //we've done this one, but the callback hasn't gotten to it yet.
 			if(hasFilledQueueFirstTime == false) {
@@ -113,26 +99,21 @@ void LavDevice::mixingThreadFunction() {
 			continue;
 		}
 		if(is_resampling == false) {
-			get_buffer(currentBlock);
+			get_buffer(currentBlock, channels);
 		}
 		else { //we need to resample.
 			unsigned int got = 0;
 			while(got < output_buffer_frames) {
-				get_buffer(currentBlock);
+				get_buffer(currentBlock, channels);
 				resampler.read(currentBlock);
 				got += resampler.write(resampledBlock+got, output_buffer_frames-got);
 			}
 		}
-		if(should_apply_mixing_matrix) {
-//			applyMixingMatrix(output_buffer_frames*input_channels, is_resampling == false ? currentBlock : resampledBlock, buffers[currentBuffer], input_channels, output_channels, mixing_matrix);
+		if(is_resampling == false) {
+			std::copy(currentBlock, currentBlock+output_buffer_size, buffers[currentBuffer]);
 		}
 		else {
-			if(is_resampling == false) {
-				std::copy(currentBlock, currentBlock+output_buffer_size, buffers[currentBuffer]);
-			}
-			else {
-				std::copy(resampledBlock, resampledBlock+output_buffer_size, buffers[currentBuffer]);
-			}
+			std::copy(resampledBlock, resampledBlock+output_buffer_size, buffers[currentBuffer]);
 		}
 		buffer_statuses[currentBuffer].store(1); //mark it as ready.
 		currentBuffer ++;
