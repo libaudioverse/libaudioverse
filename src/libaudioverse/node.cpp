@@ -121,6 +121,14 @@ float** LavNode::getOutputBufferArray() {
 	return &output_buffers[0];
 }
 
+int LavNode::getInputBufferCount() {
+	return input_buffers.size();
+}
+
+float** LavNode::getInputBufferArray() {
+	return &input_buffers[0];
+}
+
 int LavNode::getInputConnectionCount() {
 	return input_connections.size();
 }

@@ -31,6 +31,9 @@ class LavNode: public std::enable_shared_from_this<LavNode> { //enable_shared_fr
 	//Note that this isn't shared ptr.  The output pointers for a node are managed by the node itself and we need to be able to allocate/deallocate them for SSE, as well as work with arrays.  Don't hold on to output pointers.
 	float** getOutputBufferArray();
 
+	virtual int getInputBufferCount();
+	virtual float** getInputBufferArray();
+
 	//equivalent to reading lav_NODE_STATE.
 	virtual int getState();
 
