@@ -39,6 +39,38 @@ LavSimulation::~LavSimulation() {
 
 //Yes, this uses goto. Yes, goto is evil. We need a single point of exit.
 void LavSimulation::getBlock(float* out, unsigned int channels, bool mayApplyMixingMatrix) {
+	if(out == nullptr || channels == 0) goto end; //nothing to do.
+	//configure our connection to the number of channels requested.
+	final_output_connection->reconfigure(0, channels);
+	//append buffers to the final_outputs vector until it's big enough.
+	//in a sane application, we'll never go above 8 channels so keeping them around is no big deal.
+	while(final_outputs.size() < channels) final_outputs.push_back(LavAllocFloatArray(block_size));
+	//zero the outputs we need.
+	for(int i= 0; i < channels; i++) memset(final_outputs[i], 0, sizeof(float)*block_size);
+	//write, applying mixing matrices as needed.
+	final_output_connection->addNodeless(&final_outputs[0], true);
+	//interleave the samples.
+	interleaveSamples(channels, block_size, channels, &final_outputs[0], out);
+	//handle the always playing nodes.
+	//recall that nodes will only allow themselves to tick once in each block.
+	for(auto &i: nodes) {
+		auto i_s = i.lock();
+		if(i_s== nullptr) continue;
+		if(i_s->getState()!=Lav_NODESTATE_ALWAYS_PLAYING) continue;
+		i_s->tick();
+	}
+	end:
+	int maintenance_count=maintenance_start;
+	for(auto &i: nodes) {
+		auto i_s=i.lock();
+		if(i_s == nullptr) continue;
+		if(maintenance_count % maintenance_rate== 0) i_s->doMaintenance();
+		maintenance_count++;
+	}
+	maintenance_start++;
+	//and ourselves.
+	if(maintenance_start%maintenance_rate == 0) doMaintenance();
+	tick_count ++;
 }
 
 void LavSimulation::doMaintenance() {
