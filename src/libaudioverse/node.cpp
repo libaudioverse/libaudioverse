@@ -7,6 +7,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/node.hpp>
+#include <libaudioverse/private/connections.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/simulation.hpp>
 #include <libaudioverse/private/macros.hpp>
@@ -108,6 +109,35 @@ unsigned int LavNode::getOutputBufferCount() {
 float** LavNode::getOutputBufferArray() {
 	//vectors are guaranteed to be contiguous in most if not all implementations as well as (possibly, no source handy) the C++11 standard.
 	return &output_buffers[0];
+}
+
+int LavNode::getInputConnectionCount() {
+	return input_connections.size();
+}
+
+int LavNode::getOutputConnectionCount() {
+	return output_connections.size();
+}
+
+std::shared_ptr<LavInputConnection> LavNode::getInputConnection(int which) {
+	if(which >= getInputConnectionCount() || which < 0) throw LavErrorException(Lav_ERROR_RANGE);
+	return std::shared_ptr<LavInputConnection>(this->shared_from_this(), &input_connections[which]);
+}
+
+std::shared_ptr<LavOutputConnection> LavNode::getOutputConnection(int which) {
+	if(which < 0 || which >= getOutputConnectionCount()) throw LavErrorException(Lav_ERROR_RANGE);
+	return std::shared_ptr<LavOutputConnection>(this->shared_from_this(), &output_connections[which]);
+}
+
+void LavNode::connect(int output, std::shared_ptr<LavNode> toNode, int input) {
+	auto outputConnection =getOutputConnection(output);
+	auto inputConnection = toNode->getInputConnection(input);
+	makeConnection(outputConnection, inputConnection);
+}
+
+void LavNode::clearConnections(int which) {
+	auto o =getOutputConnection(which);
+	o->clear();
 }
 
 std::shared_ptr<LavSimulation> LavNode::getSimulation() {

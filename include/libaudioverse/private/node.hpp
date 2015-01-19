@@ -5,6 +5,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "../libaudioverse.h"
 #include "properties.hpp"
 #include "events.hpp"
+#include "connections.hpp"
 #include <map>
 #include <memory>
 #include <vector>
@@ -32,6 +33,18 @@ class LavNode: public std::enable_shared_from_this<LavNode> { //enable_shared_fr
 
 	//equivalent to reading lav_NODE_STATE.
 	virtual int getState();
+
+	//public view of connections.
+	int getInputConnectionCount();
+	int getOutputConnectionCount();
+	//these next two return shared pointers which "alias" this object.
+	std::shared_ptr<LavInputConnection> getInputConnection(int which);
+	std::shared_ptr<LavOutputConnection> getOutputConnection(int which);
+
+	//make a connection from an output of this node to an input of another.
+	void connect(int output, std::shared_ptr<LavNode> toNode, int input);
+	//called on an output, this function terminates all connections for which it is involved.
+	void clearConnections(int which);
 
 	//do not override. Handles the processing protocol (updating some globals and calling process) if needed for this tick, otherwise does nothing.
 	void tick();
@@ -70,6 +83,8 @@ class LavNode: public std::enable_shared_from_this<LavNode> { //enable_shared_fr
 	std::vector<float*> input_buffers;
 	std::vector<LavInputDescriptor> input_descriptors;
 	std::vector<float*> output_buffers;
+	std::vector<LavInputConnection> input_connections;
+	std::vector<LavOutputConnection> output_connections;
 	bool is_processing = false, is_suspended = false;
 	int type = Lav_NODETYPE_GENERIC;
 	int num_input_buffers = 0, num_output_buffers = 0, block_size = 0;
