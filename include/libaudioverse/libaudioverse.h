@@ -190,6 +190,10 @@ Every call to Lav_simulationBeginAtomicBlock must be matched with a call to Lav_
 Lav_PUBLIC_FUNCTION LavError Lav_simulationBeginAtomicBlock(LavSimulation *simulation);
 Lav_PUBLIC_FUNCTION LavError Lav_simulationEndAtomicBlock(LavSimulation* simulation);
 
+/**Connect two nodes.*/
+Lav_PUBLIC_FUNCTION LavError Lav_nodeConnect(LavNode* node, int output, LavNode* dest, int input);
+/**Kill all connections involving the output specified.*/
+Lav_PUBLIC_FUNCTION LavError Lav_nodeDisconnect(LavNode* node, int output);
 
 /**Query node type.*/
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetType(LavNode* node, int* destination);

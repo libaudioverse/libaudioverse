@@ -135,7 +135,7 @@ void LavNode::connect(int output, std::shared_ptr<LavNode> toNode, int input) {
 	makeConnection(outputConnection, inputConnection);
 }
 
-void LavNode::clearConnections(int which) {
+void LavNode::disconnect(int which) {
 	auto o =getOutputConnection(which);
 	o->clear();
 }
@@ -198,6 +198,21 @@ void LavSubgraphNode::configureSubgraph(std::shared_ptr<LavNode> input, std::sha
 }
 
 //begin public api
+
+Lav_PUBLIC_FUNCTION LavError Lav_nodeConnect(LavNode* node, int output, LavNode* dest, int input) {
+	PUB_BEGIN
+	LOCK(*node);
+	node->connect(output, incomingPointer<LavNode>(dest), input);
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_nodeDisconnect(LavNode* node, int output) {
+	PUB_BEGIN
+	LOCK(*node);
+	node->disconnect(output);
+	PUB_END
+}
+
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetType(LavNode* node, int* destination) {
 	PUB_BEGIN
 	auto node_ptr = incomingPointer<LavNode>(node);
