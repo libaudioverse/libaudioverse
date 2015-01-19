@@ -26,6 +26,8 @@ class LavCustomNode: public LavNode {
 };
 
 LavCustomNode::LavCustomNode(std::shared_ptr<LavSimulation> sim, unsigned int inputs, unsigned int outputs): LavNode(Lav_NODETYPE_CUSTOM, sim, inputs, outputs) {
+	appendInputConnection(0, inputs);
+	appendOutputConnection(0, outputs);
 }
 
 std::shared_ptr<LavNode> createCustomNode(std::shared_ptr<LavSimulation> sim, unsigned int inputs, unsigned int outputs) {

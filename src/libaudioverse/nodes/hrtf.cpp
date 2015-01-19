@@ -42,6 +42,8 @@ LavHrtfNode::LavHrtfNode(std::shared_ptr<LavSimulation> simulation, std::shared_
 	hrtf->computeCoefficientsStereo(0.0f, 0.0f, left_response, right_response);
 	prev_azimuth = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
 	prev_elevation = getProperty(Lav_PANNER_ELEVATION).getFloatValue();
+	appendInputConnection(0, 1);
+	appendOutputConnection(0, 2);
 }
 
 LavHrtfNode::~LavHrtfNode() {

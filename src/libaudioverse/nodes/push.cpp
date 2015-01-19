@@ -40,6 +40,7 @@ LavPushNode::LavPushNode(std::shared_ptr<LavSimulation> sim, unsigned int inputS
 	this->push_channels = channels;
 	workspace = LavAllocFloatArray(push_channels*simulation->getBlockSize());
 	push_buffer = LavAllocFloatArray(push_frames*channels);
+	appendOutputConnection(0, channels);
 }
 
 std::shared_ptr<LavNode> createPushNode(std::shared_ptr<LavSimulation> sim, unsigned int inputSr, unsigned int channels) {

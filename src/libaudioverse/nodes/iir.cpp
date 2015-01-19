@@ -30,6 +30,8 @@ LavIirNode::LavIirNode(std::shared_ptr<LavSimulation> simulation, int channels):
 	double defaultNumerator[] = {1.0};
 	double defaultDenominator[] = {1.0, 0.0}; //identity filter.
 	setCoefficients(1, defaultNumerator, 2, defaultDenominator, 1);
+	appendInputConnection(0, channels);
+	appendOutputConnection(0, channels);
 }
 
 std::shared_ptr<LavNode> createIirNode(std::shared_ptr<LavSimulation> simulation, int channels) {

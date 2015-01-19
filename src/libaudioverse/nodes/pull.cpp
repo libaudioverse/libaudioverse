@@ -36,6 +36,7 @@ LavPullObject::LavPullObject(std::shared_ptr<LavSimulation> sim, unsigned int in
 	this->channels = channels;
 	incoming_buffer = LavAllocFloatArray(channels*simulation->getBlockSize());
 	resampled_buffer = LavAllocFloatArray(channels*sim->getBlockSize());
+	appendOutputConnection(0, channels);
 }
 
 std::shared_ptr<LavNode> createPullNode(std::shared_ptr<LavSimulation> sim, unsigned int inputSr, unsigned int channels) {

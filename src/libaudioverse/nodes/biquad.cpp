@@ -36,6 +36,8 @@ LavBiquadNode::LavBiquadNode(std::shared_ptr<LavSimulation> sim, unsigned int ch
 		if(i->first < STANDARD_PROPERTIES_BEGIN) continue; //this is a standard property.
 		properties[i->first].setPostChangedCallback([this]() {reconfigure();});
 	}
+	appendInputConnection(0, channels);
+	appendOutputConnection(0, channels);
 }
 
 std::shared_ptr<LavNode> createBiquadNode(std::shared_ptr<LavSimulation> sim, unsigned int channels) {

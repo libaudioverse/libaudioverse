@@ -37,6 +37,8 @@ LavDelayNode::LavDelayNode(std::shared_ptr<LavSimulation> simulation, float maxD
 	delayChanged();
 	//finally, set the read-only max delay.
 	getProperty(Lav_DELAY_DELAY_MAX).setFloatValue(maxDelay);
+	appendInputConnection(0, lineCount);
+	appendOutputConnection(0, lineCount);
 }
 
 std::shared_ptr<LavNode> createDelayNode(std::shared_ptr<LavSimulation> simulation, float maxDelay, unsigned int lineCount) {

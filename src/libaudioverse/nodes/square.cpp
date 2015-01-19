@@ -28,6 +28,7 @@ LavSquareNode::LavSquareNode(std::shared_ptr<LavSimulation> simulation): LavNode
 	getProperty(Lav_SQUARE_FREQUENCY).setPostChangedCallback([=] (){recomputeCounters();});
 	getProperty(Lav_SQUARE_DUTY_CYCLE).setPostChangedCallback([=] (){recomputeCounters();});
 	recomputeCounters();
+	appendOutputConnection(0, 1);
 }
 
 std::shared_ptr<LavNode> createSquareNode(std::shared_ptr<LavSimulation> simulation) {

@@ -52,6 +52,7 @@ This was originally taken from Spectral Audio processing by JOS.*/
 	//if users need to have the noise on the range-1.0 to 1.0, they can use should_normalize=Truewhich works for all but absurdly small block sizes.
 	pinkifier.setGain(4.0);
 	brownifier.setGain(12.0);
+	appendOutputConnection(0, 1);
 }
 
 std::shared_ptr<LavNode> createNoiseNode(std::shared_ptr<LavSimulation> simulation) {
