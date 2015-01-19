@@ -28,12 +28,15 @@ LavAmplitudePannerNode::LavAmplitudePannerNode(std::shared_ptr<LavSimulation> si
 	getProperty(Lav_PANNER_CHANNEL_MAP).setPostChangedCallback([this](){recomputeChannelMap();});
 	getProperty(Lav_PANNER_SKIP_LFE).setPostChangedCallback([this] () {recomputeChannelMap();});
 	getProperty(Lav_PANNER_SKIP_CENTER).setPostChangedCallback([this] (){recomputeChannelMap();});
-	recomputeChannelMap();
+	appendInputConnection(0, 1);
+	appendOutputConnection(0, 0);
 }
 
 std::shared_ptr<LavNode>createAmplitudePannerNode(std::shared_ptr<LavSimulation> simulation) {
 	auto retval = std::shared_ptr<LavAmplitudePannerNode>(new LavAmplitudePannerNode(simulation), LavNodeDeleter);
 	simulation->associateNode(retval);
+	//needed because the inputs/outputs logic needs shared_from_this to be working.
+	retval->recomputeChannelMap();
 	return retval;
 }
 
@@ -46,6 +49,7 @@ void LavAmplitudePannerNode::recomputeChannelMap() {
 	if(skipLfe && channelMap.getFloatArrayLength() > 2) max++;
 	if(skipCenter && channelMap.getFloatArrayLength() > 2) max++;
 	resize(1, max);
+	getOutputConnection(0)->reconfigure(0, max);
 	unsigned int index = 0;
 	for(unsigned int i = 0; i < max; i++) {
 		if(i == 2 && skipCenter) continue;

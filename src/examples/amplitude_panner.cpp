@@ -37,10 +37,10 @@ void main(int argc, char** args) {
 	ERRCHECK(Lav_createFileNode(simulation, args[1], &fileNode));
 	ERRCHECK(Lav_createAmplitudePannerNode(simulation, &panNode));
 	ERRCHECK(Lav_amplitudePannerNodeConfigureStandardMap(panNode, channels));
-	ERRCHECK(Lav_nodeSetInput(panNode, 0, fileNode, 0));
+	ERRCHECK(Lav_nodeConnect(fileNode, 0, panNode, 0));
 	ERRCHECK(Lav_createHardLimiterNode(simulation, channels, &limit));
-	for(unsigned int i = 0; i < channels; i++) ERRCHECK(Lav_nodeSetInput(limit, i, panNode, i));
-	ERRCHECK(Lav_simulationSetOutputNode(simulation, limit));
+	ERRCHECK(Lav_nodeConnect(panNode, 0, limit, 0));
+	ERRCHECK(Lav_nodeConnectSimulation(limit, 0));
 	int shouldContinue = 1;
 	printf("Enter pairs of numbers separated by whitespace, where the first is azimuth (anything) and the second\n"
 "is elevation (-90 to 90).\n"
