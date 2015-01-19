@@ -47,9 +47,10 @@ class LavNode: public std::enable_shared_from_this<LavNode> { //enable_shared_fr
 	virtual void appendInputConnection(int start, int count);
 	virtual void appendOutputConnection(int start, int count);
 
-
 	//make a connection from an output of this node to an input of another.
 	void connect(int output, std::shared_ptr<LavNode> toNode, int input);
+	//make a connection from an output of this node to the simulation.
+	void connectSimulation(int which);
 	//called on an output, this function terminates all connections for which it is involved.
 	void disconnect(int which);
 

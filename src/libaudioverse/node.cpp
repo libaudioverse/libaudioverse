@@ -161,6 +161,12 @@ void LavNode::connect(int output, std::shared_ptr<LavNode> toNode, int input) {
 	makeConnection(outputConnection, inputConnection);
 }
 
+void LavNode::connectSimulation(int which) {
+	auto outputConnection=getOutputConnection(which);
+	auto inputConnection = simulation->getFinalOutputConnection();
+	makeConnection(outputConnection, inputConnection);
+}
+
 void LavNode::disconnect(int which) {
 	auto o =getOutputConnection(which);
 	o->clear();
@@ -229,6 +235,13 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeConnect(LavNode* node, int output, LavNode*
 	PUB_BEGIN
 	LOCK(*node);
 	node->connect(output, incomingPointer<LavNode>(dest), input);
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_nodeConnectSimulation(LavNode* node, int output) {
+	PUB_BEGIN
+	LOCK(*node);
+	node->connectSimulation(output);
 	PUB_END
 }
 

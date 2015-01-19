@@ -190,6 +190,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_simulationEndAtomicBlock(LavSimulation* simulat
 
 /**Connect two nodes.*/
 Lav_PUBLIC_FUNCTION LavError Lav_nodeConnect(LavNode* node, int output, LavNode* dest, int input);
+/**Connect the specified output to the simulation.*/
+Lav_PUBLIC_FUNCTION LavError Lav_nodeConnectSimulation(LavNode* node, int output);
 /**Kill all connections involving the output specified.*/
 Lav_PUBLIC_FUNCTION LavError Lav_nodeDisconnect(LavNode* node, int output);
 
