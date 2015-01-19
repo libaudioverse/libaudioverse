@@ -28,12 +28,10 @@ void main(int argc, char** args) {
 	ERRCHECK(Lav_createSimulationForDevice(-1, 2, 44100, 1024, 2, &simulation));
 	ERRCHECK(Lav_createFileNode(simulation, args[1], &fileNode));
 	ERRCHECK(Lav_createHrtfNode(simulation, args[2], &hrtfNode));
-
-	ERRCHECK(Lav_nodeSetInput(hrtfNode, 0, fileNode, 0));
+	ERRCHECK(Lav_nodeConnect(fileNode, 0, hrtfNode, 0));
 	ERRCHECK(Lav_createHardLimiterNode(simulation, 2, &limit));
-	ERRCHECK(Lav_nodeSetInput(limit, 0, hrtfNode, 0));
-	ERRCHECK(Lav_nodeSetInput(limit, 1, hrtfNode, 1));
-	ERRCHECK(Lav_simulationSetOutputNode(simulation, limit));
+	ERRCHECK(Lav_nodeConnect(hrtfNode, 0, limit, 0));
+	ERRCHECK(Lav_nodeConnectSimulation(limit, 0));
 	int shouldContinue = 1;
 	printf("Enter pairs of numbers separated by whitespace, where the first is azimuth (anything) and the second\n"
 "is elevation (-90 to 90).\n"
