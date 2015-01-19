@@ -50,7 +50,7 @@ class LavSimulation {
 	void registerMixingMatrix(unsigned int inChannels, unsigned int outChannels, float* matrix);
 	void resetMixingMatrix(unsigned int inChannels, unsigned int outChannels);
 	void registerDefaultMixingMatrices();
-	float* getMixingMatrix(unsigned int inChannels, unsigned int outChannels);
+	const float* getMixingMatrix(unsigned int inChannels, unsigned int outChannels);
 
 	protected:
 	unsigned int block_size = 0, mixahead = 0, is_started = 0;

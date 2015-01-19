@@ -102,7 +102,7 @@ void LavSimulation::registerDefaultMixingMatrices() {
 	for(LavMixingMatrixInfo* i = mixing_matrix_list; i->pointer; i++) registerMixingMatrix(i->in_channels, i->out_channels, i->pointer);
 }
 
-float* LavSimulation::getMixingMatrix(unsigned int inChannels, unsigned int outChannels) {
+const float* LavSimulation::getMixingMatrix(unsigned int inChannels, unsigned int outChannels) {
 	std::tuple<unsigned int, unsigned int> key(inChannels, outChannels);
 	if(mixing_matrices.count(key) != 0) return mixing_matrices[key];
 	else return nullptr;
