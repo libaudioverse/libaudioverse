@@ -46,7 +46,6 @@ It's also much higher quality.*/
 void staticResamplerKernel(int inputSr, int outputSr, int inputLength, float* input, int* outputLengthDestination, float** outputDestination, bool makeMultipleOfFour = true);
 
 /*Apply a mixing matrix.
-This is not in place and expects interleaved samples; it is typically the last stage in the mixing pipeline.
-
-The matrix is in row-major order.  The input samples are broken into inChannels sized vectors and multiplied to produce outChannel-sized vectors.*/
-void applyMixingMatrix(unsigned int inSampleCount, float* inSamples, float* outSamples, unsigned int inChannels, unsigned int outChannels, float* matrix);
+The matrix rows represent output channels and the columns input channels.
+The result is that each output buffer is the sum of the input buffers multiplied by the scalars in the matrix row representing it.*/
+void applyMixingMatrix(int sampleCount, int inputChannels, float** inputs, int outputChannels, float** outputs, float* mixingMatrix);

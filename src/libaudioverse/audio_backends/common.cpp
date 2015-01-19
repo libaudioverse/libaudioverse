@@ -124,7 +124,7 @@ void LavDevice::mixingThreadFunction() {
 			}
 		}
 		if(should_apply_mixing_matrix) {
-			applyMixingMatrix(output_buffer_frames*input_channels, is_resampling == false ? currentBlock : resampledBlock, buffers[currentBuffer], input_channels, output_channels, mixing_matrix);
+//			applyMixingMatrix(output_buffer_frames*input_channels, is_resampling == false ? currentBlock : resampledBlock, buffers[currentBuffer], input_channels, output_channels, mixing_matrix);
 		}
 		else {
 			if(is_resampling == false) {
