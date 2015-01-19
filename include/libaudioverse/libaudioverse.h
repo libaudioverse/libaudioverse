@@ -176,8 +176,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSimulationForDevice(int index, unsigned i
 Combine it with Lav_simulationReadBlock to make use of it.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createReadSimulation(unsigned int sr, unsigned int blockSize, LavSimulation** destination);
 
-Lav_PUBLIC_FUNCTION LavError Lav_simulationSetOutputNode(LavSimulation* simulation, LavNode* node);
-Lav_PUBLIC_FUNCTION LavError Lav_simulationGetOutputNode(LavSimulation* simulation, LavNode** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlockSize(LavSimulation* simulation, int* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlock(LavSimulation* simulation, unsigned int channels, int mayApplyMixingMatrix, float* buffer);
 Lav_PUBLIC_FUNCTION LavError Lav_simulationGetSr(LavSimulation* simulation, int* destination);

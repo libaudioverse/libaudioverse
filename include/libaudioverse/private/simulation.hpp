@@ -31,8 +31,7 @@ class LavSimulation {
 	virtual LavError start();
 	virtual LavError stop();
 	virtual LavError associateNode(std::shared_ptr<LavNode> node);
-	virtual std::shared_ptr<LavNode> getOutputNode();
-	virtual LavError setOutputNode(std::shared_ptr<LavNode> node);
+
 	virtual float getSr() { return sr;}
 	virtual int getTickCount() {return tick_count;}
 	virtual void doMaintenance(); //cleans up dead weak pointers, etc.
@@ -57,7 +56,6 @@ class LavSimulation {
 	float sr = 0.0f;
 	//if nodes die, they automatically need to be removed.  We can do said removal on next process.
 	std::set<std::weak_ptr<LavNode>, std::owner_less<std::weak_ptr<LavNode>>> nodes;
-	std::weak_ptr<LavNode> output_node;
 	std::recursive_mutex mutex;
 
 	lambdatask::ThreadsafeQueue<std::function<void(void)>>  tasks;

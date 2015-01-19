@@ -62,15 +62,6 @@ LavError LavSimulation::associateNode(std::shared_ptr<LavNode> node) {
 	return Lav_ERROR_NONE;
 }
 
-LavError LavSimulation::setOutputNode(std::shared_ptr<LavNode> node) {
-	output_node= node;
-	return Lav_ERROR_NONE;
-}
-
-std::shared_ptr<LavNode> LavSimulation::getOutputNode() {
-	return output_node.lock();
-}
-
 void LavSimulation::enqueueTask(std::function<void(void)> cb) {
 	tasks.enqueue(cb);
 }
@@ -122,20 +113,6 @@ void LavSimulation::backgroundTaskThreadFunction() {
 }
 
 //begin public API
-
-Lav_PUBLIC_FUNCTION LavError Lav_simulationSetOutputNode(LavSimulation* simulation, LavNode* node) {
-	PUB_BEGIN
-	LOCK(*simulation);
-	simulation->setOutputNode(incomingPointer<LavNode>(node));
-	PUB_END
-}
-
-Lav_PUBLIC_FUNCTION LavError Lav_simulationGetOutputNode(LavSimulation* simulation, LavNode** destination) {
-	PUB_BEGIN
-	LOCK(*simulation);
-	*destination = outgoingPointer<LavNode>(simulation->getOutputNode());
-	PUB_END
-}
 
 Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlock(LavSimulation* simulation, unsigned int channels, int mayApplyMixingMatrix, float* destination) {
 	PUB_BEGIN
