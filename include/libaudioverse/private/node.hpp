@@ -40,6 +40,10 @@ class LavNode: public std::enable_shared_from_this<LavNode> { //enable_shared_fr
 	//these next two return shared pointers which "alias" this object.
 	std::shared_ptr<LavInputConnection> getInputConnection(int which);
 	std::shared_ptr<LavOutputConnection> getOutputConnection(int which);
+	//intended to be used by subclasses to add input and output connections.
+	virtual void appendInputConnection(int start, int count);
+	virtual void appendOutputConnection(int start, int count);
+
 
 	//make a connection from an output of this node to an input of another.
 	void connect(int output, std::shared_ptr<LavNode> toNode, int input);

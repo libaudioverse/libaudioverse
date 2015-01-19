@@ -139,6 +139,14 @@ std::shared_ptr<LavOutputConnection> LavNode::getOutputConnection(int which) {
 	return std::shared_ptr<LavOutputConnection>(this->shared_from_this(), &output_connections[which]);
 }
 
+void LavNode::appendInputConnection(int start, int count) {
+	input_connections.emplace_back(simulation, this, start, count);
+}
+
+void LavNode::appendOutputConnection(int start, int count) {
+	output_connections.emplace_back(simulation, this, start, count);
+}
+
 void LavNode::connect(int output, std::shared_ptr<LavNode> toNode, int input) {
 	auto outputConnection =getOutputConnection(output);
 	auto inputConnection = toNode->getInputConnection(input);
