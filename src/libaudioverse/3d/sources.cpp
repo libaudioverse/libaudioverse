@@ -21,6 +21,10 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <memory>
 
 LavSourceNode::LavSourceNode(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavEnvironmentBase> manager): LavSubgraphNode(Lav_NODETYPE_SOURCE, simulation) {
+	input = createGainNode(simulation);
+	input->resize(1, 1);
+	input->appendInputConnection(0, 1);
+	input->appendOutputConnection(0, 1);
 	panner_node = manager->createPannerNode();
 	this->manager = manager;
 	getProperty(Lav_SOURCE_PANNER_STRATEGY).setPostChangedCallback([this] () {
@@ -31,6 +35,8 @@ LavSourceNode::LavSourceNode(std::shared_ptr<LavSimulation> simulation, std::sha
 	getProperty(Lav_SOURCE_MAX_DISTANCE).setFloatValue(manager->getProperty(Lav_ENVIRONMENT_DEFAULT_MAX_DISTANCE).getFloatValue());
 	getProperty(Lav_SOURCE_PANNER_STRATEGY).setIntValue(manager->getProperty(Lav_ENVIRONMENT_DEFAULT_PANNER_STRATEGY).getIntValue());
 	getProperty(Lav_SOURCE_SIZE).setFloatValue(manager->getProperty(Lav_ENVIRONMENT_DEFAULT_SIZE).getFloatValue());
+	input->connect(0, panner_node, 0);
+	configureSubgraph(input, nullptr);
 }
 
 std::shared_ptr<LavNode> createSourceNode(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavEnvironmentBase> manager) {

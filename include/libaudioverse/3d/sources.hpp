@@ -12,6 +12,6 @@ class LavSourceNode: public LavSubgraphNode {
 	LavSourceNode(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavEnvironmentBase> world);
 	void update(LavEnvironment env);
 	private:
-	std::shared_ptr<LavNode> panner_node;
+	std::shared_ptr<LavNode> panner_node, input;
 	std::shared_ptr<LavEnvironmentBase> manager;
 };
