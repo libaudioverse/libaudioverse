@@ -12,7 +12,6 @@ std::shared_ptr<LavNode> createAttenuatorNode(std::shared_ptr<LavSimulation> sim
 std::shared_ptr<LavNode> createFileNode(std::shared_ptr<LavSimulation> simulation, const char* path);
 std::shared_ptr<LavNode> createHardLimiterNode(std::shared_ptr<LavSimulation> simulation, unsigned int numChannels);
 std::shared_ptr<LavNode> createHrtfNode(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf);
-std::shared_ptr<LavNode> createMixerNode(std::shared_ptr<LavSimulation> simulation, unsigned int maxParents, unsigned int inputsPerParent);
 std::shared_ptr<LavNode> createSineNode(std::shared_ptr<LavSimulation> Simulation);
 std::shared_ptr<LavNode> createSquareNode(std::shared_ptr<LavSimulation> simulation);
 std::shared_ptr<LavNode> createNoiseNode(std::shared_ptr<LavSimulation> simulation);
@@ -27,3 +26,5 @@ std::shared_ptr<LavNode> createFeedbackDelayNetworkNode(std::shared_ptr<LavSimul
 std::shared_ptr<LavNode> createMultifileNode(std::shared_ptr<LavSimulation> simulation, int channels, int maxSimultaneousFiles);
 
 std::shared_ptr<LavNode> createIirNode(std::shared_ptr<LavSimulation> simulation, int channels);
+
+std::shared_ptr<LavNode> createGainNode(std::shared_ptr<LavSimulation> sim);

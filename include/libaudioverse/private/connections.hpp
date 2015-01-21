@@ -31,6 +31,8 @@ class LavOutputConnection {
 	void reconfigure(int newStart, int newCount);
 	void clear();
 	void connectHalf(std::shared_ptr<LavInputConnection> inputConnection);
+	int getStart() {return start;}
+	int getCount() {return count;}
 	private:
 	LavNode* node = nullptr;
 	int start, count;
@@ -48,6 +50,8 @@ class LavInputConnection {
 	void reconfigure(int start, int count);
 	void connectHalf(std::shared_ptr<LavOutputConnection>outputConnection);
 	void forgetConnection(LavOutputConnection* which);
+	int getStart() {return start;}
+	int getCount() {return count;}
 	private:
 	LavNode* node;
 	int start, count;

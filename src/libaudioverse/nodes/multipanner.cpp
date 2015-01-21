@@ -21,7 +21,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 class LavMultipannerObject: public LavSubgraphNode {
 	public:
 	LavMultipannerObject(std::shared_ptr<LavSimulation> sim, std::shared_ptr<LavHrtfData> hrtf);
-	std::shared_ptr<LavNode> hrtfPanner = nullptr, amplitudePanner = nullptr, inputMixer = nullptr, outputMixer = nullptr;
+	std::shared_ptr<LavNode> hrtf_panner = nullptr, amplitude_panner = nullptr, input= nullptr, output= nullptr;
 	void forwardAzimuth();
 	void forwardElevation();
 	void forwardShouldCrossfade();
@@ -29,8 +29,18 @@ class LavMultipannerObject: public LavSubgraphNode {
 };
 
 LavMultipannerObject::LavMultipannerObject(std::shared_ptr<LavSimulation> sim, std::shared_ptr<LavHrtfData> hrtf): LavSubgraphNode(Lav_NODETYPE_MULTIPANNER, sim)  {
-	hrtfPanner = createHrtfNode(sim, hrtf);
-	amplitudePanner = createAmplitudePannerNode(sim);
+	hrtf_panner = createHrtfNode(sim, hrtf);
+	amplitude_panner = createAmplitudePannerNode(sim);
+	input=createGainNode(simulation);
+	output= createGainNode(simulation);
+	input->resize(1, 1);
+	input->appendInputConnection(0, 1);
+	input->appendOutputConnection(0, 1);
+
+	output->appendInputConnection(0, 0);
+	output->appendOutputConnection(0, 0);
+
+	configureSubgraph(input, output);
 	getProperty(Lav_PANNER_AZIMUTH).setPostChangedCallback([this](){forwardAzimuth();});
 	getProperty(Lav_PANNER_ELEVATION).setPostChangedCallback([this](){forwardElevation();});
 	getProperty(Lav_PANNER_SHOULD_CROSSFADE).setPostChangedCallback([this](){forwardShouldCrossfade();});
@@ -46,20 +56,20 @@ std::shared_ptr<LavNode> createMultipannerNode(std::shared_ptr<LavSimulation> si
 
 void LavMultipannerObject::forwardAzimuth() {
 	float az = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
-	hrtfPanner->getProperty(Lav_PANNER_AZIMUTH).setFloatValue(az);
-	amplitudePanner->getProperty(Lav_PANNER_AZIMUTH).setFloatValue(az);
+	hrtf_panner->getProperty(Lav_PANNER_AZIMUTH).setFloatValue(az);
+	amplitude_panner->getProperty(Lav_PANNER_AZIMUTH).setFloatValue(az);
 }
 
 void LavMultipannerObject::forwardElevation() {
 	float elev = getProperty(Lav_PANNER_ELEVATION).getFloatValue();
-	hrtfPanner->getProperty(Lav_PANNER_ELEVATION).setFloatValue(elev);
-	amplitudePanner->getProperty(Lav_PANNER_ELEVATION).setFloatValue(elev);
+	hrtf_panner->getProperty(Lav_PANNER_ELEVATION).setFloatValue(elev);
+	amplitude_panner->getProperty(Lav_PANNER_ELEVATION).setFloatValue(elev);
 }
 
 void LavMultipannerObject::forwardShouldCrossfade() {
 	int cf = getProperty(Lav_PANNER_SHOULD_CROSSFADE).getIntValue();
-	hrtfPanner->getProperty(Lav_PANNER_SHOULD_CROSSFADE).setIntValue(cf);
-	amplitudePanner->getProperty(Lav_PANNER_SHOULD_CROSSFADE).setIntValue(cf);
+	hrtf_panner->getProperty(Lav_PANNER_SHOULD_CROSSFADE).setIntValue(cf);
+	amplitude_panner->getProperty(Lav_PANNER_SHOULD_CROSSFADE).setIntValue(cf);
 }
 
 void LavMultipannerObject::strategyChanged() {
@@ -70,22 +80,32 @@ void LavMultipannerObject::strategyChanged() {
 		hookHrtf = true;
 		break;
 		case Lav_PANNING_STRATEGY_STEREO:
-		std::dynamic_pointer_cast<LavAmplitudePannerNode>(amplitudePanner)->configureStandardChannelMap(2);
+		std::dynamic_pointer_cast<LavAmplitudePannerNode>(amplitude_panner)->configureStandardChannelMap(2);
 		hookAmplitude = true;
 		break;
 		case Lav_PANNING_STRATEGY_SURROUND51:
-		std::dynamic_pointer_cast<LavAmplitudePannerNode>(amplitudePanner)->configureStandardChannelMap(6);
+		std::dynamic_pointer_cast<LavAmplitudePannerNode>(amplitude_panner)->configureStandardChannelMap(6);
 		hookAmplitude = true;
 		break;
 		case Lav_PANNING_STRATEGY_SURROUND71:
-		std::dynamic_pointer_cast<LavAmplitudePannerNode>(amplitudePanner)->configureStandardChannelMap(8);
+		std::dynamic_pointer_cast<LavAmplitudePannerNode>(amplitude_panner)->configureStandardChannelMap(8);
 		hookAmplitude=true;
 		break;
 	}
 	if(hookAmplitude) {
-
+		hrtf_panner->disconnect(0); //disconnect hrtf.
+		int newOutputSize = amplitude_panner->getInputConnection(0)->getCount();
+		output->resize(newOutputSize, newOutputSize);
+		output->getInputConnection(0)->reconfigure(0, newOutputSize);
+		output->getOutputConnection(0)->reconfigure(0, newOutputSize);
+		amplitude_panner->connect(0, output, 0);
 	}
 	if(hookHrtf) {
+		amplitude_panner->disconnect(0);
+		output->resize(2, 2);
+		output->getInputConnection(0)->reconfigure(0, 2);
+		output->getOutputConnection(0)->reconfigure(0, 2);
+		hrtf_panner->connect(0, output, 0);
 	}
 }
 
