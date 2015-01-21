@@ -83,9 +83,11 @@ class LavNode: public std::enable_shared_from_this<LavNode> { //enable_shared_fr
 
 	//Override hook for resetting.
 	virtual void reset();
-	protected:
-	//this should definitely be protected, and should never be touched by anything that's not a subclass.
+
+	//change number of input and output buffers.
 	virtual void resize(int newInputCount, int newOutputCount);
+
+	protected:
 	std::shared_ptr<LavSimulation> simulation = nullptr;
 	std::map<int, LavProperty> properties;
 	std::map<int, LavEvent> events;

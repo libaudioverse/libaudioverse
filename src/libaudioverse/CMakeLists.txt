@@ -70,6 +70,7 @@ nodes/feedback_delay_network.cpp
 nodes/square.cpp
 nodes/noise.cpp
 nodes/iir.cpp
+nodes/gain.cpp
 
 #physical outputs, etc.
 audio_backends/common.cpp

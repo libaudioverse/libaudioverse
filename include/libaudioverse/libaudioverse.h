@@ -107,6 +107,7 @@ enum Lav_NODETYPES{
 	Lav_NODETYPE_SQUARE = 19,
 	Lav_NODETYPE_NOISE = 20,
 	Lav_NODETYPE_IIR =21,
+	Lav_NODETYPE_GAIN= 22,
 };
 
 /**Node states.*/
@@ -323,6 +324,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_createIirNode(LavSimulation* simulation, int ch
 The numerator can be anything, but the denominator must have a nonzero first coefficient, and you must use both.
 For a filter without a denominator, use the FIR node-among other things, FIR filters can use floats, whereas this uses doubles internally.*/
 Lav_PUBLIC_FUNCTION LavError Lav_iirNodeSetCoefficients(LavNode* node, int numeratorLength, double* numerator, int denominatorLength, double* denominator, int shouldClearHistory);
+
+//has 1 input and 1 output with channels channels. Passes the input through to the output unchanged. Intended for global volume and similar.
+Lav_PUBLIC_FUNCTION LavError Lav_createGainNode(LavSimulation* sim, int channels, LavNode** destination);
 
 #ifdef __cplusplus
 }
