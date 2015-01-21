@@ -229,6 +229,36 @@ void LavSubgraphNode::configureSubgraph(std::shared_ptr<LavNode> input, std::sha
 	subgraph_output = output;
 }
 
+int LavSubgraphNode::getInputConnectionCount() {
+	if(subgraph_input) return subgraph_input->getInputConnectionCount();
+	else return 0;
+}
+
+int LavSubgraphNode::getOutputConnectionCount() {
+	if(subgraph_output) return subgraph_output->getOutputConnectionCount();
+	else return 0;
+}
+
+std::shared_ptr<LavInputConnection> LavSubgraphNode::getInputConnection(int which) {
+	if(which < 0|| which >= getInputConnectionCount()) throw LavErrorException(Lav_ERROR_RANGE);
+	else return subgraph_input->getInputConnection(which);
+}
+
+std::shared_ptr<LavOutputConnection> LavSubgraphNode::getOutputConnection(int which) {
+	if(which < 0 || which >= getOutputConnectionCount()) throw LavErrorException(Lav_ERROR_RANGE);
+	else return subgraph_output->getOutputConnection(which);
+}
+
+void LavSubgraphNode::connect(int output, std::shared_ptr<LavNode> node, int input) {
+	if(output < 0 || output >= getOutputConnectionCount()) throw LavErrorException(Lav_ERROR_RANGE);
+	else subgraph_output->connect(output, node, input);
+}
+
+void LavSubgraphNode::connectSimulation(int which) {
+	if(which < 0 || which >= getOutputConnectionCount()) throw LavErrorException(Lav_ERROR_RANGE);
+	else subgraph_output->connectSimulation(which);
+}
+
 //begin public api
 
 Lav_PUBLIC_FUNCTION LavError Lav_nodeConnect(LavNode* node, int output, LavNode* dest, int input) {

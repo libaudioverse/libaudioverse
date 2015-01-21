@@ -12,13 +12,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 class LavProperty;
 
-class LavInputDescriptor {
-	public:
-	LavInputDescriptor(std::shared_ptr<LavNode> p, unsigned int o): parent(p), output(o) {}
-	std::weak_ptr<LavNode> parent;
-	unsigned int output = 0;
-};
-
 /**Things all Libaudioverse nodes have.*/
 class LavNode: public std::enable_shared_from_this<LavNode> { //enable_shared_from_this is for event infrastructure.
 	public:
@@ -92,7 +85,6 @@ class LavNode: public std::enable_shared_from_this<LavNode> { //enable_shared_fr
 	std::map<int, LavProperty> properties;
 	std::map<int, LavEvent> events;
 	std::vector<float*> input_buffers;
-	std::vector<LavInputDescriptor> input_descriptors;
 	std::vector<float*> output_buffers;
 	std::vector<LavInputConnection> input_connections;
 	std::vector<LavOutputConnection> output_connections;
@@ -112,9 +104,15 @@ class LavNode: public std::enable_shared_from_this<LavNode> { //enable_shared_fr
 class LavSubgraphNode: public LavNode {
 	public:
 	LavSubgraphNode(int type, std::shared_ptr<LavSimulation> simulation);
-
-	//todo:rewrite the overrides here to make subgraphs work again once new connections are fully online.
 	virtual void configureSubgraph(std::shared_ptr<LavNode> input, std::shared_ptr<LavNode> output);
+	//getInputConnection forwards onto the input node; getOutputConnection forwards onto the output node. There is no way to connect anything to the subgraph itself, only its internals.
+	//This would be a problem, but we decided to eliminate public graph crawling. If it becomes necessary, this can be rewritten without affecting other parts of the library.
+	int getInputConnectionCount();
+	int getOutputConnectionCount();
+	std::shared_ptr<LavInputConnection> getInputConnection(int which);
+	std::shared_ptr<LavOutputConnection> getOutputConnection(int which);
+	void connect(int output, std::shared_ptr<LavNode> node, int input);
+	void connectSimulation(int which);
 	protected:
 	std::shared_ptr<LavNode> subgraph_input, subgraph_output;
 };
