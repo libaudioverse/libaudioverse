@@ -52,7 +52,7 @@ void main(int argc, char** args) {
 			if(*i != nullptr) continue;
 			LavNode* newSource;
 			ERRCHECK(Lav_createSourceNode(simulation, world, &newSource));
-			ERRCHECK(Lav_nodeConnect(sineNode, 0, newSource, 0));
+			ERRCHECK(Lav_nodeConnect(sineObj, 0, newSource, 0));
 			*i = newSource;
 		}
 		clock_t startTime = clock();

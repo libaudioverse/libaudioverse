@@ -22,7 +22,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 LavSourceNode::LavSourceNode(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavEnvironmentBase> manager): LavSubgraphNode(Lav_NODETYPE_SOURCE, simulation) {
 	panner_node = manager->createPannerNode();
-	configureSubgraph(panner_node, nullptr); //we input to the panner, and output to nothing (because the manager grabs hold of the panner directly).
 	this->manager = manager;
 	getProperty(Lav_SOURCE_PANNER_STRATEGY).setPostChangedCallback([this] () {
 		this->panner_node->getProperty(Lav_PANNER_STRATEGY).setIntValue(this->getProperty(Lav_SOURCE_PANNER_STRATEGY).getIntValue());

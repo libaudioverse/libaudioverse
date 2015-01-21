@@ -31,12 +31,6 @@ class LavMultipannerObject: public LavSubgraphNode {
 LavMultipannerObject::LavMultipannerObject(std::shared_ptr<LavSimulation> sim, std::shared_ptr<LavHrtfData> hrtf): LavSubgraphNode(Lav_NODETYPE_MULTIPANNER, sim)  {
 	hrtfPanner = createHrtfNode(sim, hrtf);
 	amplitudePanner = createAmplitudePannerNode(sim);
-	inputMixer = createMixerNode(sim, 1, 1);
-	outputMixer = createMixerNode(sim, 1, 8);
-	hrtfPanner->setInput(0, inputMixer, 0);
-	amplitudePanner->setInput(0, inputMixer, 0);
-	configureSubgraph(inputMixer, outputMixer);
-	//We have to make property forwarders.
 	getProperty(Lav_PANNER_AZIMUTH).setPostChangedCallback([this](){forwardAzimuth();});
 	getProperty(Lav_PANNER_ELEVATION).setPostChangedCallback([this](){forwardElevation();});
 	getProperty(Lav_PANNER_SHOULD_CROSSFADE).setPostChangedCallback([this](){forwardShouldCrossfade();});
@@ -89,16 +83,9 @@ void LavMultipannerObject::strategyChanged() {
 		break;
 	}
 	if(hookAmplitude) {
-		outputMixer->setInput(0, nullptr, 0);
-		outputMixer->setInput(1, nullptr, 0);
-		for(unsigned int i = 0; i < amplitudePanner->getOutputCount(); i++) {
-			outputMixer->setInput(i, amplitudePanner, i);
-		}
+
 	}
 	if(hookHrtf) {
-		for(unsigned int i = 0; i < 8; i++) outputMixer->setInput(i, nullptr, 0);
-		outputMixer->setInput(0, hrtfPanner, 0);
-		outputMixer->setInput(1, hrtfPanner, 1);
 	}
 }
 

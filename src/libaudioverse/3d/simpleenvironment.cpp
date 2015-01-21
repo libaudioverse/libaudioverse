@@ -21,18 +21,13 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 LavSimpleEnvironmentNode::LavSimpleEnvironmentNode(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf): LavEnvironmentBase(Lav_NODETYPE_SIMPLE_ENVIRONMENT, simulation)  {
 	this->hrtf = hrtf;
-	mixer = createMixerNode(simulation, 1, 8);
 	limiter = createHardLimiterNode(simulation, 8);
-	for(int i = 0; i < 8; i++) {
-		limiter->setInput(i, mixer, i);
-	}
 
 	environment.world_to_listener_transform = glm::lookAt(
 		glm::vec3(0.0f, 0.0f, 0.0f),
 		glm::vec3(0.0f, 0.0f, -1.0f),
 		glm::vec3(0.0f, 1.0f, 0.0f));
 
-	configureSubgraph(nullptr, limiter);
 }
 
 std::shared_ptr<LavSimpleEnvironmentNode> createSimpleEnvironmentNode(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf) {
@@ -70,11 +65,6 @@ std::shared_ptr<LavNode> LavSimpleEnvironmentNode::createPannerNode() {
 	auto pan = createMultipannerNode(simulation, hrtf);
 	unsigned int slot = panners.size();
 	panners.push_back(pan);
-	//expand the mixer by one parent.
-	mixer->getProperty(Lav_MIXER_MAX_PARENTS).setIntValue(panners.size());
-	for(unsigned int i = 0; i < 8; i++) {
-		mixer->setInput(slot*8+i, pan, i);
-	}
 	return pan;
 }
 
