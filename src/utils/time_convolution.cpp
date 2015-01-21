@@ -41,8 +41,8 @@ void main(int argc, char** args) {
 	ERRCHECK(Lav_createReadSimulation(44100, BLOCK_SIZE, &simulation));
 	ERRCHECK(Lav_createSimpleEnvironmentNode(simulation, args[1], &world));
 	ERRCHECK(Lav_nodeSetIntProperty(world, Lav_ENVIRONMENT_DEFAULT_PANNER_STRATEGY, Lav_PANNING_STRATEGY_HRTF));
-	ERRCHECK(Lav_simulationSetOutputNode(simulation, world));
 	ERRCHECK(Lav_createSineNode(simulation, &sineObj));
+	ERRCHECK(Lav_nodeConnectSimulation(world, 0));
 	while(timeDelta < SECONDS) {
 		numSources += 10;
 		printf("Preparing to test with %u sources...\n", numSources);
@@ -52,7 +52,7 @@ void main(int argc, char** args) {
 			if(*i != nullptr) continue;
 			LavNode* newSource;
 			ERRCHECK(Lav_createSourceNode(simulation, world, &newSource));
-			ERRCHECK(Lav_nodeSetInput(newSource, 0, sineObj, 0));
+			ERRCHECK(Lav_nodeConnect(sineNode, 0, newSource, 0));
 			*i = newSource;
 		}
 		clock_t startTime = clock();

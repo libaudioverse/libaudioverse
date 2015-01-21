@@ -32,10 +32,10 @@ void main(int argc, char** args) {
 	ERRCHECK(Lav_createFileNode(simulation, soundFile, &node));
 	ERRCHECK(Lav_nodeSetIntProperty(world, Lav_ENVIRONMENT_DEFAULT_PANNER_STRATEGY, Lav_PANNING_STRATEGY_HRTF));
 	ERRCHECK(Lav_createSourceNode(simulation, world, &source));
-	ERRCHECK(Lav_nodeSetInput(source, 0, node, 0));
+	ERRCHECK(Lav_nodeConnect(node, 0, source, 0));
 	const int resolution = 1000, length = 3000; //length in ms.
 	const float width = 30.0;
-	Lav_simulationSetOutputNode(simulation, world);
+	ERRCHECK(Lav_nodeConnectSimulation(world, 0));
 	//do a square over and over.
 	while(1) {
 		for(int i = 0; i < resolution; i++) {
