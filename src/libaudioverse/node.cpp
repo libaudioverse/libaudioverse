@@ -259,6 +259,11 @@ void LavSubgraphNode::connectSimulation(int which) {
 	else subgraph_output->connectSimulation(which);
 }
 
+void LavSubgraphNode::disconnect(int which) {
+	if(subgraph_output) subgraph_output->disconnect(which);
+	else throw LavErrorException(Lav_ERROR_RANGE);
+}
+
 //begin public api
 
 Lav_PUBLIC_FUNCTION LavError Lav_nodeConnect(LavNode* node, int output, LavNode* dest, int input) {

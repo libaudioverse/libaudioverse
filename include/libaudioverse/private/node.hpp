@@ -113,6 +113,7 @@ class LavSubgraphNode: public LavNode {
 	std::shared_ptr<LavOutputConnection> getOutputConnection(int which);
 	void connect(int output, std::shared_ptr<LavNode> node, int input);
 	void connectSimulation(int which);
+	void disconnect(int which);
 	protected:
 	std::shared_ptr<LavNode> subgraph_input, subgraph_output;
 };
