@@ -25,7 +25,8 @@ LavSimpleEnvironmentNode::LavSimpleEnvironmentNode(std::shared_ptr<LavSimulation
 	output->resize(8, 8);
 	output->appendInputConnection(0, 8);
 	output->appendOutputConnection(0, 8);
-	configureSubgraph(nullptr, output);
+	appendOutputConnection(0, 8);
+	setOutputNode(output);
 	environment.world_to_listener_transform = glm::lookAt(
 		glm::vec3(0.0f, 0.0f, 0.0f),
 		glm::vec3(0.0f, 0.0f, -1.0f),

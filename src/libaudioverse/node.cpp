@@ -112,7 +112,7 @@ int LavNode::getState() {
 	return getProperty(Lav_NODE_STATE).getIntValue();
 }
 
-unsigned int LavNode::getOutputBufferCount() {
+int LavNode::getOutputBufferCount() {
 	return output_buffers.size();
 }
 
@@ -224,18 +224,16 @@ void LavNode::resize(int newInputCount, int newOutputCount) {
 LavSubgraphNode::LavSubgraphNode(int type, std::shared_ptr<LavSimulation> simulation): LavNode(type, simulation, 0, 0) {
 }
 
-void LavSubgraphNode::configureSubgraph(std::shared_ptr<LavNode> input, std::shared_ptr<LavNode> output) {
-	subgraph_input = input;
-	subgraph_output = output;
+void LavSubgraphNode::setInputNode(std::shared_ptr<LavNode> node) {
+	subgraph_input= node;
+}
+
+void LavSubgraphNode::setOutputNode(std::shared_ptr<LavNode> node) {
+	subgraph_output=node;
 }
 
 int LavSubgraphNode::getInputConnectionCount() {
 	if(subgraph_input) return subgraph_input->getInputConnectionCount();
-	else return 0;
-}
-
-int LavSubgraphNode::getOutputConnectionCount() {
-	if(subgraph_output) return subgraph_output->getOutputConnectionCount();
 	else return 0;
 }
 
@@ -244,24 +242,23 @@ std::shared_ptr<LavInputConnection> LavSubgraphNode::getInputConnection(int whic
 	else return subgraph_input->getInputConnection(which);
 }
 
-std::shared_ptr<LavOutputConnection> LavSubgraphNode::getOutputConnection(int which) {
-	if(which < 0 || which >= getOutputConnectionCount()) throw LavErrorException(Lav_ERROR_RANGE);
-	else return subgraph_output->getOutputConnection(which);
+int LavSubgraphNode::getOutputBufferCount() {
+if(subgraph_output) return subgraph_output->getOutputBufferCount();
+	else return 0;
 }
 
-void LavSubgraphNode::connect(int output, std::shared_ptr<LavNode> node, int input) {
-	if(output < 0 || output >= getOutputConnectionCount()) throw LavErrorException(Lav_ERROR_RANGE);
-	else subgraph_output->connect(output, node, input);
+float** LavSubgraphNode::getOutputBufferArray() {
+	if(subgraph_output) return subgraph_output->getOutputBufferArray();
+	return nullptr;
 }
 
-void LavSubgraphNode::connectSimulation(int which) {
-	if(which < 0 || which >= getOutputConnectionCount()) throw LavErrorException(Lav_ERROR_RANGE);
-	else subgraph_output->connectSimulation(which);
-}
-
-void LavSubgraphNode::disconnect(int which) {
-	if(subgraph_output) subgraph_output->disconnect(which);
-	else throw LavErrorException(Lav_ERROR_RANGE);
+void LavSubgraphNode::tick() {
+	if(last_processed== simulation->getTickCount()) return;
+	if(getState() != Lav_NODESTATE_PAUSED) {
+		willProcessParents();
+		if(subgraph_output) subgraph_output->tick();
+	}
+	last_processed= simulation->getTickCount();
 }
 
 //begin public api

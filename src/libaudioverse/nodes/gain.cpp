@@ -47,5 +47,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createGainNode(LavSimulation* sim, int channels
 	retval->resize(channels, channels);
 	retval->appendInputConnection(0, channels);
 	retval->appendOutputConnection(0, channels);
+	*destination =outgoingPointer<LavNode>(retval);
 	PUB_END
 }

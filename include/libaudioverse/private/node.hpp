@@ -20,9 +20,9 @@ class LavNode: public std::enable_shared_from_this<LavNode> { //enable_shared_fr
 
 	virtual int getType();
 
-	virtual unsigned int getOutputBufferCount();
+	virtual int getOutputBufferCount();
 	//Note that this isn't shared ptr.  The output pointers for a node are managed by the node itself and we need to be able to allocate/deallocate them for SSE, as well as work with arrays.  Don't hold on to output pointers.
-	float** getOutputBufferArray();
+	virtual float** getOutputBufferArray();
 
 	virtual int getInputBufferCount();
 	virtual float** getInputBufferArray();
@@ -31,25 +31,25 @@ class LavNode: public std::enable_shared_from_this<LavNode> { //enable_shared_fr
 	virtual int getState();
 
 	//public view of connections.
-	int getInputConnectionCount();
-	int getOutputConnectionCount();
+	virtual int getInputConnectionCount();
+	virtual int getOutputConnectionCount();
 	//these next two return shared pointers which "alias" this object.
-	std::shared_ptr<LavInputConnection> getInputConnection(int which);
-	std::shared_ptr<LavOutputConnection> getOutputConnection(int which);
+	virtual std::shared_ptr<LavInputConnection> getInputConnection(int which);
+	virtual std::shared_ptr<LavOutputConnection> getOutputConnection(int which);
 	//intended to be used by subclasses to add input and output connections.
 	virtual void appendInputConnection(int start, int count);
 	virtual void appendOutputConnection(int start, int count);
 
 	//make a connection from an output of this node to an input of another.
-	void connect(int output, std::shared_ptr<LavNode> toNode, int input);
+	virtual void connect(int output, std::shared_ptr<LavNode> toNode, int input);
 	//make a connection from an output of this node to the simulation.
-	void connectSimulation(int which);
+	virtual void connectSimulation(int which);
 	//called on an output, this function terminates all connections for which it is involved.
-	void disconnect(int which);
+	virtual void disconnect(int which);
 
 	//do not override. Handles the processing protocol (updating some globals and calling process) if needed for this tick, otherwise does nothing.
-	void tick();
-	//override this one instead. Default implementation merely zeros the outputs.
+	virtual void tick();
+		//override this one instead. Default implementation merely zeros the outputs.
 	virtual void process();
 	//zero the output buffers.
 	virtual void zeroOutputBuffers();
@@ -100,20 +100,27 @@ class LavNode: public std::enable_shared_from_this<LavNode> { //enable_shared_fr
 	LavNode& operator=(const LavNode&) = delete;
 };
 
-//needed for things that wish to encapsulate and manage nodes that the public API isn't supposed to see.
+/*needed for things that wish to encapsulate and manage nodes that the public API isn't supposed to see.
+Usage: append output connections as normal and configure as normal.
+The subgraph node forwards most calls onto the current output object, including those for getting output arrays. Consequently, the subgraph node has the same number of output buffers as the output object-and the output object may be changed.
+The properties mul and (todo) add are forwarded onto the output node before every block.
+Changing the input node is defined behavior: it will break horribly and unpredictably.
+Changing the output node is safe so long as the connections on the subgraph are reconfigured, same as for any other resize.*/
 class LavSubgraphNode: public LavNode {
 	public:
 	LavSubgraphNode(int type, std::shared_ptr<LavSimulation> simulation);
-	virtual void configureSubgraph(std::shared_ptr<LavNode> input, std::shared_ptr<LavNode> output);
-	//getInputConnection forwards onto the input node; getOutputConnection forwards onto the output node. There is no way to connect anything to the subgraph itself, only its internals.
-	//This would be a problem, but we decided to eliminate public graph crawling. If it becomes necessary, this can be rewritten without affecting other parts of the library.
-	int getInputConnectionCount();
-	int getOutputConnectionCount();
-	std::shared_ptr<LavInputConnection> getInputConnection(int which);
-	std::shared_ptr<LavOutputConnection> getOutputConnection(int which);
-	void connect(int output, std::shared_ptr<LavNode> node, int input);
-	void connectSimulation(int which);
-	void disconnect(int which);
+	virtual void setInputNode(std::shared_ptr<LavNode> node);
+	virtual void setOutputNode(std::shared_ptr<LavNode> node);
+	//these all forward onto the input node.
+	int getInputConnectionCount() override;
+	std::shared_ptr<LavInputConnection> getInputConnection(int which) override;
+	//these forward onto the output node, making connections to the subgraph magically work.
+	int getOutputBufferCount() override;
+	float** getOutputBufferArray() override;
+
+	//this override is to make processing work properly. We must do a willProcessParents on ourselves and then forward to the output, if any.
+	void tick() override;
+
 	protected:
 	std::shared_ptr<LavNode> subgraph_input, subgraph_output;
 };

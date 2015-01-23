@@ -36,7 +36,7 @@ LavSourceNode::LavSourceNode(std::shared_ptr<LavSimulation> simulation, std::sha
 	getProperty(Lav_SOURCE_PANNER_STRATEGY).setIntValue(manager->getProperty(Lav_ENVIRONMENT_DEFAULT_PANNER_STRATEGY).getIntValue());
 	getProperty(Lav_SOURCE_SIZE).setFloatValue(manager->getProperty(Lav_ENVIRONMENT_DEFAULT_SIZE).getFloatValue());
 	input->connect(0, panner_node, 0);
-	configureSubgraph(input, nullptr);
+	setInputNode(input);
 }
 
 std::shared_ptr<LavNode> createSourceNode(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavEnvironmentBase> manager) {

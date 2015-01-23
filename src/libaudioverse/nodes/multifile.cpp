@@ -32,7 +32,7 @@ LavMultifileNode::LavMultifileNode(std::shared_ptr<LavSimulation> simulation, in
 	this->channels = channels;
 	this->max_simultaneous_files = maxSimultaneousFiles;
 	this->mixer =createMixerNode(simulation, maxSimultaneousFiles, channels);
-	configureSubgraph(nullptr, mixer);
+	setOutputNode(mixer);
 	this->file_nodes.resize(maxSimultaneousFiles);
 	for(int i = 0; i < file_nodes.size(); i++) file_nodes[i] = nullptr;
 }
