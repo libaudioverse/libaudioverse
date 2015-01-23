@@ -37,6 +37,7 @@ LavMultipannerObject::LavMultipannerObject(std::shared_ptr<LavSimulation> sim, s
 	input->appendOutputConnection(0, 1);
 	input->connect(0, hrtf_panner, 0);
 	input->connect(0, amplitude_panner, 0);
+
 	appendOutputConnection(0, 0);
 	setInputNode(input);
 	getProperty(Lav_PANNER_AZIMUTH).setPostChangedCallback([this](){forwardAzimuth();});
