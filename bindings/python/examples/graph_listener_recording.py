@@ -12,9 +12,11 @@ libaudioverse.initialize()
 sim = libaudioverse.Simulation()
 w1 = libaudioverse.SineNode(sim)
 w2 = libaudioverse.SineNode(sim)
-listener = libaudioverse.GraphListenerNode(sim, 2) #This passes through, and can--in this case--take the place of mixers.
-listener.inputs[0] = w1, 0
-listener.inputs[1] = w2, 0
+listener = libaudioverse.GraphListenerNode(sim, 2)
+merger=libaudioverse.ChannelMergerNode(sim, 2)
+w1.connect(0, merger, 0)
+w2.connect(0, merger, 1)
+merger.connect(0, listener, 0)
 
 #settings for binaural beats: 300 and 305.
 w1.frequency = 300
@@ -29,7 +31,7 @@ def callback(obj, frames, channels, buffer):
 listener.set_listening_callback(callback)
 
 print "beginning synthesis and playing for 5 seconds..."
-sim.output_node= listener
+listener.connect_simulation(0)
 time.sleep(5.0)
 sim.output_node= None
 libaudioverse.shutdown()

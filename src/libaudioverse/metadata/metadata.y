@@ -125,9 +125,9 @@ nodes:
   doc_name: IIR Filter
   extra_functions:
    Lav_iirNodeSetCoefficients: {name: set_coefficients}
- Lav_NODETYPE_CHANNEL_SPLIT:
+ Lav_NODETYPE_CHANNEL_SPLITTER:
   doc_name: Channel Splitter
- Lav_NODETYPE_CHANNEL_MERGE:
+ Lav_NODETYPE_CHANNEL_MERGER:
   doc_name: Channel Merger
 additional_important_enums:
  - Lav_LOGGING_LEVELS

@@ -31,8 +31,8 @@ std::shared_ptr<LavNode> createSplitMergeNode(std::shared_ptr<LavSimulation> sim
 	return retval;
 }
 
-std::shared_ptr<LavNode> createChannelSplitNode(std::shared_ptr<LavSimulation> simulation, int channels) {
-	auto retval= createSplitMergeNode(simulation, Lav_NODETYPE_CHANNEL_SPLIT);
+std::shared_ptr<LavNode> createChannelSplitterNode(std::shared_ptr<LavSimulation> simulation, int channels) {
+	auto retval= createSplitMergeNode(simulation, Lav_NODETYPE_CHANNEL_SPLITTER);
 	retval->resize(channels, 0);
 	for(int i =0; i < channels; i++) retval->appendOutputConnection(i, 1);
 	retval->appendInputConnection(0, channels);
@@ -40,8 +40,8 @@ std::shared_ptr<LavNode> createChannelSplitNode(std::shared_ptr<LavSimulation> s
 	return retval;
 }
 
-std::shared_ptr<LavNode> createChannelMergeNode(std::shared_ptr<LavSimulation> simulation, int channels) {
-	auto retval = createSplitMergeNode(simulation, Lav_NODETYPE_CHANNEL_MERGE);
+std::shared_ptr<LavNode> createChannelMergerNode(std::shared_ptr<LavSimulation> simulation, int channels) {
+	auto retval = createSplitMergeNode(simulation, Lav_NODETYPE_CHANNEL_MERGER);
 	retval->resize(channels, 0);
 	retval->appendOutputConnection(0, channels);
 	for(int i = 0; i < channels; i++) retval->appendInputConnection(i, 1);
@@ -59,18 +59,18 @@ float** LavSplitMergeNode::getOutputBufferArray() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createChannelSplitNode(LavSimulation* simulation, int channels, LavNode** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createChannelSplitterNode(LavSimulation* simulation, int channels, LavNode** destination) {
 	PUB_BEGIN
 	LOCK(*simulation);
-	auto retval = createChannelSplitNode(incomingPointer<LavSimulation>(simulation), channels);
+	auto retval = createChannelSplitterNode(incomingPointer<LavSimulation>(simulation), channels);
 	*destination = outgoingPointer(retval);
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_createChannelMergeNode(LavSimulation* simulation, int channels, LavNode** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createChannelMergerNode(LavSimulation* simulation, int channels, LavNode** destination) {
 	PUB_BEGIN
 	LOCK(*simulation);
-	auto retval = createChannelMergeNode(incomingPointer<LavSimulation>(simulation), channels);
+	auto retval = createChannelMergerNode(incomingPointer<LavSimulation>(simulation), channels);
 	*destination = outgoingPointer(retval);
 	PUB_END
 }
