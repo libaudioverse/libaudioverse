@@ -48,9 +48,11 @@ std::shared_ptr<LavNode> createCustomNode(std::shared_ptr<LavSimulation> sim, un
 
 void LavCustomNode::process() {
 	if(callback != nullptr) {
-		callback(this, block_size, num_input_buffers, &input_buffers[0], num_output_buffers, &output_buffers[0], callback_userdata);
+		callback(this, block_size, num_input_buffers, getInputBufferArray(), num_output_buffers, getOutputBufferArray(), callback_userdata);
 	}
-	for(int i= 0; i < num_output_buffers; i++) std::copy(input_buffers[i], input_buffers[i]+block_size, output_buffers[i]);
+	else {
+		for(int i= 0; i < num_output_buffers; i++) std::copy(input_buffers[i], input_buffers[i]+block_size, output_buffers[i]);
+	}
 }
 
 //begin public api
