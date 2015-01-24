@@ -23,7 +23,7 @@ class LavMultifileNode: public LavSubgraphNode {
 	~LavMultifileNode();
 	void play(std::string file);
 	void stopAll();
-	std::shared_ptr<LavNode> mixer = nullptr;
+	std::shared_ptr<LavNode> gain = nullptr;
 	int channels, max_simultaneous_files;
 	std::vector<std::shared_ptr<LavNode>> file_nodes;
 };
@@ -31,8 +31,11 @@ class LavMultifileNode: public LavSubgraphNode {
 LavMultifileNode::LavMultifileNode(std::shared_ptr<LavSimulation> simulation, int channels, int maxSimultaneousFiles): LavSubgraphNode(Lav_NODETYPE_MULTIFILE, simulation) {
 	this->channels = channels;
 	this->max_simultaneous_files = maxSimultaneousFiles;
-	this->mixer =createMixerNode(simulation, maxSimultaneousFiles, channels);
-	setOutputNode(mixer);
+	this->gain=createGainNode(simulation);
+	gain->resize(channels, channels);
+	gain->appendInputConnection(0, channels);
+	gain->appendOutputConnection(0, channels);
+	setOutputNode(gain);
 	this->file_nodes.resize(maxSimultaneousFiles);
 	for(int i = 0; i < file_nodes.size(); i++) file_nodes[i] = nullptr;
 }
@@ -60,28 +63,25 @@ void LavMultifileNode::play(std::string file) {
 	if(found_empty_slot== false) return; //we're beyond the limit.
 	//make a file node, put it in the slot.
 	auto node = createFileNode(simulation, file.c_str());
-	for(int i = 0; i < channels; i++) {
-		if(i >= node->getOutputCount()) mixer->setInput(empty_slot*channels+i, nullptr, 0);
-		else mixer->setInput(empty_slot*channels+i, node, i);
-	}
+	node->connect(0, gain, 0);
 	//we need to hook up a clearing event.  We do this here.
 	std::weak_ptr<LavMultifileNode> weakref = std::static_pointer_cast<LavMultifileNode>(this->shared_from_this());
 	auto &ev = node->getEvent(Lav_FILE_END_EVENT);
 	ev.setHandler([=](LavNode* node, void* userdata) {
 		auto strongref = weakref.lock();
 		if(strongref == nullptr) return; //no more strong reference for us to work with.
-		LOCK(*strongref); //we lock it so we can safely manipulate our mixer.
-		for(int i = 0; i < channels; i++) {
-			strongref->mixer->setInput(empty_slot*channels+i, nullptr, 0); //must go through strongref. We don't want to actually capture the mixer.
-		}
+		LOCK(*strongref);
+		strongref->file_nodes[empty_slot]->disconnect(0); //unhook it.
 		strongref->file_nodes[empty_slot] = nullptr; //this slot has again become available.
 	});
 	file_nodes[empty_slot] = node;
 }
 
 void LavMultifileNode::stopAll() {
-	for(int i = 0; i < file_nodes.size(); i++) file_nodes[i]=nullptr;
-	for(int i = 0; i < mixer->getInputCount(); i++) mixer->setInput(i, nullptr, 0);
+	for(int i = 0; i < file_nodes.size(); i++) {
+		file_nodes[i]->disconnect(0);
+		file_nodes[i]=nullptr;
+	}
 }
 
 //begin public api

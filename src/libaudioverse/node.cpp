@@ -292,15 +292,17 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeGetType(LavNode* node, int* destination) {
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetInputCount(LavNode* node, unsigned int* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetInputConnectionCount(LavNode* node, unsigned int* destination) {
 	PUB_BEGIN
-	//todo:rewrite to handle the "new" idea of inputs.
+	LOCK(*node);
+	*destination =node->getInputConnectionCount();
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetOutputCount(LavNode* node, unsigned int* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetOutputConnectionCount(LavNode* node, unsigned int* destination) {
 	PUB_BEGIN
-	//todo:rewrite to handle the "new" idea of outputs.
+	LOCK(*node);
+	*destination = node->getOutputConnectionCount();
 	PUB_END
 }
 

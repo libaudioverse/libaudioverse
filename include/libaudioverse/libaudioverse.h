@@ -91,7 +91,6 @@ enum Lav_NODETYPES{
 	Lav_NODETYPE_FILE = 3,
 	Lav_NODETYPE_HRTF = 4,
 	Lav_NODETYPE_SINE = 5,
-	Lav_NODETYPE_MIXER = 6,
 	Lav_NODETYPE_HARD_LIMITER = 7,
 	Lav_NODETYPE_DELAY = 8,
 	Lav_NODETYPE_AMPLITUDE_PANNER = 9,
@@ -200,8 +199,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeDisconnect(LavNode* node, int output);
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetType(LavNode* node, int* destination);
 
 /**Query maximum number of inputs and outputs.*/
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetInputCount(LavNode* node, unsigned int* destination);
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetOutputCount(LavNode* node, unsigned int* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetInputConnectionCount(LavNode* node, unsigned int* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetOutputConnectionCount(LavNode* node, unsigned int* destination);
 
 /**Resets a property to its default value, for any type.*/
 Lav_PUBLIC_FUNCTION LavError Lav_nodeResetProperty(LavNode *node, int slot);
@@ -274,7 +273,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createNoiseNode(LavSimulation* simulation, LavN
 
 Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavSimulation *sim, const char* path, LavNode **destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createHrtfNode(LavSimulation *simulation, const char* hrtfPath, LavNode **destination);
-Lav_PUBLIC_FUNCTION LavError Lav_createMixerNode(LavSimulation* sim, unsigned int maxParents, unsigned int inputsPerParent, LavNode **destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterNode(LavSimulation* sim, unsigned int numInputs, LavNode** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createDelayNode(LavSimulation* sim, float maxDelay, unsigned int lineCount, LavNode** destination);
 

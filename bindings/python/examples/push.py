@@ -20,7 +20,8 @@ def out_callback(obj):
 p.threshold = 0.1
 p.audio_event = audio_callback
 p.out_event = out_callback
-sim.output_node= p
+
+p.connect_simulation(0)
 
 time.sleep(10.0)
 libaudioverse.shutdown()

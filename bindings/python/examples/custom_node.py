@@ -15,8 +15,7 @@ w1=libaudioverse.SineNode(sim)
 w2=libaudioverse.SineNode(sim)
 w1.frequency = 300
 w2.frequency = 20
-ringmod_node.inputs[0] = w1, 0
-ringmod_node.inputs[1] = w2, 0
-sim.output_node= ringmod_node
+w1.connect(0, ringmod_node, 0)
+w2.connect(0, ringmod_node, 1)
 
 time.sleep(5.0)

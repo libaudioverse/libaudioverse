@@ -16,7 +16,7 @@ def finished(obj):
 
 filenode.end_event = finished
 
-sim.output_node= filenode
+filenode.connect_simulation(0)
 
 commands = """Commands:
 play

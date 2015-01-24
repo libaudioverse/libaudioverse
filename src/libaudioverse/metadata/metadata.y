@@ -52,11 +52,6 @@ nodes:
    Lav_PANNER_SHOULD_CROSSFADE: {name: should_crossfade, type: boolean, default: 1}
    Lav_PANNER_STRATEGY: {name: strategy, default: Lav_PANNING_STRATEGY_STEREO, type: int, value_enum: Lav_PANNING_STRATEGIES}
   doc_name: Multipanner
- Lav_NODETYPE_MIXER:
-  properties:
-   Lav_MIXER_MAX_PARENTS: {name: max_parents, type: int, default: 0, range: [0, MAX_INT]}
-   Lav_MIXER_INPUTS_PER_PARENT: {name: inputs_per_parent, type: int, default: 0, range: [0, 0]}
-  doc_name: Mixer
  Lav_NODETYPE_SIMPLE_ENVIRONMENT:
   properties:
    Lav_3D_POSITION: {name: position, type: float3, default: [0.0, 0.0, 0.0]}

@@ -5,15 +5,15 @@ import time
 
 libaudioverse.initialize()
 sim = libaudioverse.Simulation(device_index = -1)
-print "Enter a file path.  For best results, this should be a"
-print "mono file; if not, only the first (usually left) channel will be used."
+print "Enter a file path."
 path = raw_input()
 path = os.path.abspath(path)
 fnode = libaudioverse.FileNode(sim, path)
 fnode.looping = True
 panner = libaudioverse.HrtfNode(sim, "default")
-panner.inputs[0] = fnode, 0
-sim.output_node=panner
+fnode.connect(0, panner, 0)
+panner.connect_simulation(0)
+
 print """Beginning evaluation.
 Enter any python expression that returns a tuple of numbers.  The first is azimuth and the second is elevation.  Azimuth may be anything, but elevation must be on the range -90 to 90.
 Enter quit to quit.

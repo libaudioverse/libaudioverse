@@ -66,7 +66,7 @@ nodes/custom.cpp
 nodes/ringmod.cpp
 nodes/multipanner.cpp
 nodes/feedback_delay_network.cpp
-#nodes/multifile.cpp
+nodes/multifile.cpp
 nodes/square.cpp
 nodes/noise.cpp
 nodes/iir.cpp

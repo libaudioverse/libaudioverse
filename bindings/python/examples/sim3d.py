@@ -6,13 +6,14 @@ libaudioverse.initialize()
 sim = libaudioverse.Simulation(device_index = -1)
 world = libaudioverse.SimpleEnvironmentNode(sim, "default")
 source = libaudioverse.SourceNode(sim, world)
-print """Enter a path to a sound file.
-For best results, this should be mono.  If not, only the first (usually left) channel will be used."""
+print "Enter a path to a sound file."
 filepath = raw_input()
 f = libaudioverse.FileNode(sim, filepath)
 f.looping = True
-source.inputs[0] = f, 0
-sim.output_node= world
+
+f.connect(0, source, 0)
+world.connect_simulation(0)
+
 print """Enter python expressions that evaluate to 3-tuples (x, y, z).
 Positive x is to your right, positive y is above you, and positive z is behind you.
 Enter quit to quit."""
