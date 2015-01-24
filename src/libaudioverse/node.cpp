@@ -61,8 +61,9 @@ void LavNode::tick() {
 	zeroInputBuffers();
 	//tick all alive parents, collecting their outputs onto ours.
 	//by using the getInputConnection and getInputConnectionCount functions, we allow subgraphs to override effectively.
+	bool needsMixing = getProperty(Lav_NODE_CHANNEL_INTERPRETATION).getIntValue()==Lav_CHANNEL_INTERPRETATION_SPEAKERS;
 	for(int i = 0; i < getInputConnectionCount(); i++) {
-		getInputConnection(i)->add(true); //for now, always apply the mixing matrix.
+		getInputConnection(i)->add(needsMixing);
 	}
 	is_processing = true;
 	num_input_buffers = input_buffers.size();
@@ -74,6 +75,12 @@ void LavNode::tick() {
 		for(unsigned int i = 0; i < getOutputBufferCount(); i++) {
 			float* output = getOutputBufferArray()[i];
 			scalarMultiplicationKernel(block_size, mul, output, output);
+		}
+	}
+	float add=getProperty(Lav_NODE_ADD).getFloatValue();
+	if(add != 0.0f) {
+		for(int i = 0; i < getOutputBufferCount(); i++) {
+			scalarAdditionKernel(block_size, add, getOutputBufferArray()[i], getOutputBufferArray()[i]);
 		}
 	}
 	is_processing = false;

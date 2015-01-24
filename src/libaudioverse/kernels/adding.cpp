@@ -12,6 +12,10 @@ void additionKernelSimple(int length, float* a1, float* a2, float* dest) {
 	for(int i = 0; i < length; i++) dest[i]=a1[i]+a2[i];
 }
 
+void scalarAdditionKernelSimple(int length, float c, float* a1, float* dest) {
+	for(int i=0; i < length; i++) dest[i]=c+a1[i];
+}
+
 #if defined(LIBAUDIOVERSE_USE_SSE2)
 void additionKernel(int length, float* a1, float* a2, float* dest) {
 	int neededLength = (length/4)*4;
@@ -24,9 +28,27 @@ void additionKernel(int length, float* a1, float* a2, float* dest) {
 	}
 	additionKernelSimple(length-neededLength, a1+neededLength, a2+neededLength, dest+neededLength);
 }
+
+void scalarAdditionKernel(int length, float c, float* a1, float* dest) {
+	__m128 cr = _mm_load1_ps(&c);
+	int blocks = length/4;
+	for(int i = 0; i < blocks*4; i+=4) {
+		__m128 r1=_mm_load_ps(a1+i);
+		__m128 r2= _mm_load_ps(dest+i);
+		r1 = _mm_add_ps(r1, r2);
+		_mm_store_ps(dest+i, r1);
+	}
+	scalarAdditionKernelSimple(length-blocks*4, c, a1, dest);
+}
+
 #else
 void additionKernel(int length, float* a1, float* a2, float* dest) {
 	additionKernelSimple(length, a1, a2, dest);
 }
+
+void scalarAdditionKernel(int length, float c, float* a1, float* dest) {
+	scalarAdditionKernelSimple(length, c, a1, dest);
+}
+
 #endif
 
