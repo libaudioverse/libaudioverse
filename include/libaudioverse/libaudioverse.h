@@ -107,6 +107,8 @@ enum Lav_NODETYPES{
 	Lav_NODETYPE_NOISE = 20,
 	Lav_NODETYPE_IIR =21,
 	Lav_NODETYPE_GAIN= 22,
+	Lav_NODETYPE_CHANNEL_SPLIT = 23,
+	Lav_NODETYPE_CHANNEL_MERGE = 24,
 };
 
 /**Node states.*/
@@ -325,6 +327,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_iirNodeSetCoefficients(LavNode* node, int numer
 
 //has 1 input and 1 output with channels channels. Passes the input through to the output unchanged. Intended for global volume and similar.
 Lav_PUBLIC_FUNCTION LavError Lav_createGainNode(LavSimulation* sim, int channels, LavNode** destination);
+
+Lav_PUBLIC_FUNCTION LavError Lav_createChannelSplitNode(LavSimulation* simulation, int channels, LavNode** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createChannelMergeNode(LavSimulation* simulation, int channels, LavNode** destination);
 
 #ifdef __cplusplus
 }
