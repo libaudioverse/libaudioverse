@@ -71,40 +71,6 @@ def shutdown():
 	_initialized = False
 	_lav.shutdown()
 
-#A list-like thing that knows how to manipulate inputs.
-class InputProxy(collections.Sequence):
-	"""Manipulate inputs for some specific node.
-This works exactly like a python list, save that concatenation is not allowed.  The elements are tuples: (parent, output) or, should no parent be set for a slot, None.
-
-To link a parent to an output, use  node.parents[num] = (myparent, output).
-To clear a parent, assign None.
-
-Note that these objects are always up to date with their associated libaudioverse node but that iterators to them will become outdated if anything changes the graph.
-
-Note also that we are not inheriting from MutableSequence because we cannot support __del__ and insert, but that the above advertised functionality still works anyway."""
-
-	def __init__(self, for_node):
-		self.for_node= for_node
-
-	def __len__(self):
-		return _lav.node_get_input_count(self.for_node.handle)
-
-	def __getitem__(self, key):
-		input = self.for_node._get_input(key)
-		if input is None:
-			return None
-		return input
-
-	def __setitem__(self, key, val):
-		if val is None:
-			self.for_node._set_input(key, None, 0)
-			return
-		if len(val) != 2:
-			raise TypeError("Expected list of length 2 or None.")
-		if not isinstance(val[0], GenericNode):
-			raise TypeError("val[0]: is not a Libaudioverse node.")
-		self.for_node._set_input(key, val[0], val[1])
-
 class _EventCallbackWrapper(object):
 	"""Wraps events into something sane.  Do not use externally."""
 
@@ -195,18 +161,6 @@ Calling this on an audio output device will cause the audio thread to skip ahead
 		_lav.simulation_get_block(self.handle, channels, may_apply_mixing_matrix, buff_ptr)
 		return list(buff)
 
-	@property
-	def output_node(self):
-		"""The node assigned to this property is the node which will play through the device."""
-		return self._output_node
-
-	@output_node.setter
-	def output_node(self, val):
-		if not (isinstance(val, GenericNode) or val is None):
-			raise TypeError("Expected subclass of Libaudioverse.GenericNode")
-		_lav.simulation_set_output_node(self.handle, val.handle if val is not None else val)
-		self._output_node= val
-
 	#context manager support.
 	def __enter__(self):
 		_lav.simulation_begin_atomic_block(self.handle)
@@ -252,7 +206,6 @@ class GenericNode(object):
 	def __init__(self, handle, simulation):
 		self.handle = handle
 		self.simulation = simulation
-		self._inputs = [None]*_lav.node_get_input_count(handle)
 		self._events= dict()
 		self._callbacks = dict()
 		self._properties = dict()
@@ -298,47 +251,6 @@ class GenericNode(object):
 		if getattr(self, 'handle', None) is not None:
 			_lav.free(self.handle)
 		self.handle = None
-
-	@property
-	def inputs(self):
-		"""Returns an InputProxy, an object that acts like a list of tuples.  The first item of each tuple is the parent object and the second item is the output to which we are connected."""
-		self._check_input_resize()
-		return InputProxy(self)
-
-	def _check_input_resize(self):
-		new_input_count = _lav.node_get_input_count(self.handle)
-		new_input_list = self._inputs
-		if new_input_count < len(self._inputs):
-			new_input_list = self._inputs[0:new_input_count]
-		elif new_input_count > len(self._inputs):
-			additional_inputs = [None]*(new_input_count-len(self._inputs))
-			new_input_list = new_input_list + additional_inputs
-		self._inputs = new_input_list
-
-	def _get_input(self, key):
-		if self._inputs[key] is None:
-			return None
-		node, slot = self._inputs[key]
-		handle = node.handle
-		#We need to check and make sure this is still valid.
-		#It's possible our parent(s) resized their outputs and that libaudioverse killed this connection.
-		if handle != _lav.node_get_input_object(self.handle, key):
-			self._inputs[key] = None
-			return None
-		return node, slot
-
-	def _set_input(self, key, node, inp):
-		if node is None:
-			_lav.node_set_input(self.handle, key, None, 0)
-			self._inputs[key] = (None, 0)
-		else:
-			_lav.node_set_input(self.handle, key, node.handle, inp)
-			self._inputs[key] = (node, inp)
-
-	@property
-	def output_count(self):
-		"""Get the number of outputs that this object has."""
-		return _lav.node_get_output_count(self.handle)
 
 	def reset(self):
 		_lav.node_reset(self)
