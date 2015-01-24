@@ -301,7 +301,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_graphListenerNodeSetListeningCallback(LavNode* 
 //custom nodes.
 //the callback does the processing if set, otherwise outputs are zeroed.
 typedef void (*LavCustomNodeProcessingCallback)(LavNode* node, unsigned int frames, unsigned int numInputs, float** inputs, unsigned int numOutputs, float** outputs, void* userdata);
-Lav_PUBLIC_FUNCTION LavError Lav_createCustomNode(LavSimulation* simulation, unsigned int inputs, unsigned int outputs, LavNode** destination);
+//if inputsAreIndividual is nonzero, then each input gets an input connection. Same for outputsAreIndividual.
+//inputs and outputs themselves are channel counts.
+Lav_PUBLIC_FUNCTION LavError Lav_createCustomNode(LavSimulation* simulation, unsigned int inputs, unsigned int outputs, int inputsAreIndividual, int outputsAreIndividual, LavNode** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_customNodeSetProcessingCallback(LavNode* node, LavCustomNodeProcessingCallback callback, void* userdata);
 
 Lav_PUBLIC_FUNCTION LavError Lav_createRingmodNode(LavSimulation* sim, LavNode** destination);

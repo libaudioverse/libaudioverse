@@ -19,19 +19,29 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 class LavCustomNode: public LavNode {
 	public:
-	LavCustomNode(std::shared_ptr<LavSimulation> sim, unsigned int inputs, unsigned int outputs);
+	LavCustomNode(std::shared_ptr<LavSimulation> sim, unsigned int inputs, unsigned int outputs, bool inputsAreIndividual, bool outputsAreIndividual);
 	void process();
 	LavCustomNodeProcessingCallback callback = nullptr;
 	void* callback_userdata = nullptr;
 };
 
-LavCustomNode::LavCustomNode(std::shared_ptr<LavSimulation> sim, unsigned int inputs, unsigned int outputs): LavNode(Lav_NODETYPE_CUSTOM, sim, inputs, outputs) {
-	appendInputConnection(0, inputs);
-	appendOutputConnection(0, outputs);
+LavCustomNode::LavCustomNode(std::shared_ptr<LavSimulation> sim, unsigned int inputs, unsigned int outputs, bool inputsAreIndividual, bool outputsAreIndividual): LavNode(Lav_NODETYPE_CUSTOM, sim, inputs, outputs) {
+	if(inputsAreIndividual) {
+		for(int i= 0; i < inputs; i++) appendInputConnection(i, 1);
+	}
+	else {
+		appendInputConnection(0, inputs);
+	}
+	if(outputsAreIndividual) {
+		for(int i= 0; i < outputs; i++) appendOutputConnection(i, 1);
+	}
+	else {
+		appendOutputConnection(0, outputs);
+	}
 }
 
-std::shared_ptr<LavNode> createCustomNode(std::shared_ptr<LavSimulation> sim, unsigned int inputs, unsigned int outputs) {
-	auto retval = std::shared_ptr<LavCustomNode>(new LavCustomNode(sim, inputs, outputs), LavNodeDeleter);
+std::shared_ptr<LavNode> createCustomNode(std::shared_ptr<LavSimulation> sim, unsigned int inputs, unsigned int outputs, bool inputsAreIndividual, bool outputsAreIndividual) {
+	auto retval = std::shared_ptr<LavCustomNode>(new LavCustomNode(sim, inputs, outputs, inputsAreIndividual, outputsAreIndividual), LavNodeDeleter);
 	sim->associateNode(retval);
 	return retval;
 }
@@ -45,10 +55,10 @@ void LavCustomNode::process() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createCustomNode(LavSimulation* simulation, unsigned int inputs, unsigned int outputs, LavNode** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createCustomNode(LavSimulation* simulation, unsigned int inputs, unsigned int outputs, int inputsAreIndividual, int outputsAreIndividual, LavNode** destination) {
 	PUB_BEGIN
 	LOCK(*simulation);
-	*destination = outgoingPointer<LavNode>(createCustomNode(incomingPointer<LavSimulation>(simulation), inputs, outputs));
+	*destination = outgoingPointer<LavNode>(createCustomNode(incomingPointer<LavSimulation>(simulation), inputs, outputs, inputsAreIndividual, outputsAreIndividual));
 	PUB_END
 }
 
