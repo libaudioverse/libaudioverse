@@ -8,7 +8,7 @@ def ringmod(obj, frames, input_count, inputs, output_count, outputs):
 	for i in xrange(frames):
 		outputs[0][i] = inputs[0][i]*inputs[1][i]
 
-ringmod_node= libaudioverse.CustomNode(sim, 2, 1, True, False)
+ringmod_node= libaudioverse.CustomNode(sim, 2, 1, 1, 1)
 ringmod_node.set_processing_callback(ringmod)
 
 w1=libaudioverse.SineNode(sim)
