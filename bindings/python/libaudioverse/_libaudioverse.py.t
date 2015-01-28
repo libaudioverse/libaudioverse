@@ -5,13 +5,15 @@ import os
 import sys
 
 #this is a windows hack.
-#we want it to find out libsndfile before the system one, so we do this.
-if hasattr(sys, 'frozen'):
+#we want it to find out libsndfile before the system one in frozen executables, so we do this.
+#If it fails, we fall back to the system.
+#this latter point is what makes NVDA add-ons work right: they use the preloading a dll trick on Windows.
+try:
 	path = os.path.join(os.path.abspath(os.path.dirname(sys.executable)), 'libaudioverse')
 	libsndfile_module = ctypes.cdll.LoadLibrary(os.path.join(path, 'libsndfile-1.dll'))
 	libaudioverse_module = ctypes.cdll.LoadLibrary(os.path.join(path, 'libaudioverse.dll'))
-else:
-	libsndfile = ctypes.cdll.LoadLibrary(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'libsndfile-1.dll'))
+except:
+	libsndfile_module = ctypes.cdll.LoadLibrary(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'libsndfile-1.dll'))
 	libaudioverse_module = ctypes.cdll.LoadLibrary(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'libaudioverse.dll'))
 
 {%for name, val in constants.iteritems() -%}
