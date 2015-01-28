@@ -252,6 +252,7 @@ class GenericNode(object):
 		for i in self._output_nodes[output]:
 			n, o =i
 			n._input_nodes[o].remove((self, output))
+		self._output_nodes[output].clear()
 		if (self, output) in self.simulation._connected_nodes:
 			self.simulation._connected_nodes.remove((self, output))
 
