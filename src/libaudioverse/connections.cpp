@@ -17,6 +17,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <memory>
 #include <stdlib.h>
 #include <string.h>
+#include <vector>
 
 LavOutputConnection::LavOutputConnection(std::shared_ptr<LavSimulation> simulation, LavNode* node, int start, int count) {
 	this->simulation = simulation;
@@ -59,6 +60,23 @@ void LavOutputConnection::connectHalf(std::shared_ptr<LavInputConnection> inputC
 	connected_to.insert(inputConnection);
 }
 
+LavNode* LavOutputConnection::getNode() {
+	return node;
+}
+
+std::vector<LavNode*> LavOutputConnection::getConnectedNodes() {
+	std::vector<LavNode*> retval;
+	for(auto &i: connected_to) {
+		auto i_s= i.lock();
+		if(i_s==nullptr) continue;
+		auto n = i_s->getNode();
+		//the simulation uses an input connection without a node via the nodeless functions.
+		if(n) retval.push_back(n);
+	}
+	return retval;
+}
+
+
 LavInputConnection::LavInputConnection(std::shared_ptr<LavSimulation> simulation, LavNode* node, int start, int count) {
 	this->simulation = simulation;
 	this->node= node;
@@ -99,6 +117,20 @@ void LavInputConnection::forgetConnection(LavOutputConnection* which) {
 	}
 }
 
+LavNode* LavInputConnection::getNode() {
+	return node;
+}
+
+std::vector<LavNode*> LavInputConnection::getConnectedNodes() {
+	std::vector<LavNode*> retval;
+	for(auto &i: connected_to) {
+		auto i_s= i.lock();
+		if(i_s == nullptr) continue;
+		auto n= i_s->getNode();
+		retval.push_back(n);
+	}
+	return retval;
+}
 
 void makeConnection(std::shared_ptr<LavOutputConnection> output, std::shared_ptr<LavInputConnection> input) {
 	output->connectHalf(input);

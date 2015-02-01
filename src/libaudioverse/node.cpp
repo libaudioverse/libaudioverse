@@ -18,10 +18,20 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdlib.h>
 #include <string.h>
 
-/**The following function verifies that, given two objects, an edge between them will not cause a cycle.
-The edge is directed from start to end.*/
+/**Given two nodes, determine if connecting an output of start to an input of end causes a cycle.*/
 bool doesEdgePreserveAcyclicity(LavNode* start, LavNode* end) {
-	return true; //lie, for now.
+	//A cycle exists if end is directly or indirectly conneccted to an input of start.
+	//To that end, we use recursion as follows.
+	//if we are called with start==end, it's a cycle.
+	if(start==end) return false;
+	//Otherwise, move start back by iterating over all nodes connected to end.
+	//the rationale for this is that we want to seeee if an indirect connection from anything we're pulling from to our end causes a cycle.  if it doesn't, we're good.
+	for(int i =0; i < start->getInputConnectionCount(); i++) {
+		for(auto j: end->getInputConnection(i)->getConnectedNodes()) {
+			if(doesEdgePreserveAcyclicity(j, end) == false) return false;
+		}
+	}
+	return true;
 }
 
 LavNode::LavNode(int type, std::shared_ptr<LavSimulation> simulation, unsigned int numInputBuffers, unsigned int numOutputBuffers): type(type) {
@@ -163,6 +173,7 @@ void LavNode::appendOutputConnection(int start, int count) {
 }
 
 void LavNode::connect(int output, std::shared_ptr<LavNode> toNode, int input) {
+	if(doesEdgePreserveAcyclicity(this, toNode.get()) == false) throw LavErrorException(Lav_ERROR_CAUSES_CYCLE);
 	auto outputConnection =getOutputConnection(output);
 	auto inputConnection = toNode->getInputConnection(input);
 	makeConnection(outputConnection, inputConnection);

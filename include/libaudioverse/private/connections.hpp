@@ -4,6 +4,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include <memory>
 #include <set>
+#include <vector>
 
 class LavNode;
 class LavSimulation;
@@ -33,6 +34,8 @@ class LavOutputConnection {
 	void connectHalf(std::shared_ptr<LavInputConnection> inputConnection);
 	int getStart() {return start;}
 	int getCount() {return count;}
+	LavNode* getNode();
+	std::vector<LavNode*> getConnectedNodes();
 	private:
 	LavNode* node = nullptr;
 	int start, count;
@@ -52,6 +55,8 @@ class LavInputConnection {
 	void forgetConnection(LavOutputConnection* which);
 	int getStart() {return start;}
 	int getCount() {return count;}
+	LavNode* getNode();
+	std::vector<LavNode*> getConnectedNodes();
 	private:
 	LavNode* node;
 	int start, count;
