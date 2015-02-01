@@ -24,11 +24,11 @@ bool doesEdgePreserveAcyclicity(LavNode* start, LavNode* end) {
 	//To that end, we use recursion as follows.
 	//if we are called with start==end, it's a cycle.
 	if(start==end) return false;
-	//Otherwise, move start back by iterating over all nodes connected to end.
-	//the rationale for this is that we want to seeee if an indirect connection from anything we're pulling from to our end causes a cycle.  if it doesn't, we're good.
-	for(int i =0; i < start->getInputConnectionCount(); i++) {
+	//Otherwise, move end back a level.
+	//the rationale for this is that we want to seeee if an indirect connection from anything we're pulling from to our end causes a cycle.  If it doesn't, we're good.
+	for(int i =0; i < end->getInputConnectionCount(); i++) {
 		for(auto j: end->getInputConnection(i)->getConnectedNodes()) {
-			if(doesEdgePreserveAcyclicity(j, end) == false) return false;
+			if(doesEdgePreserveAcyclicity(start, j) == false) return false;
 		}
 	}
 	return true;
