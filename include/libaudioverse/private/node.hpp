@@ -9,6 +9,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <map>
 #include <memory>
 #include <vector>
+#include <set>
 
 class LavProperty;
 
@@ -80,6 +81,8 @@ class LavNode: public std::enable_shared_from_this<LavNode> { //enable_shared_fr
 	//change number of input and output buffers.
 	virtual void resize(int newInputCount, int newOutputCount);
 
+	//Return a set containing all nodes upon which we depend.
+	std::set<std::shared_ptr<LavNode>> getDependencies();
 	protected:
 	std::shared_ptr<LavSimulation> simulation = nullptr;
 	std::map<int, LavProperty> properties;

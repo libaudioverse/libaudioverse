@@ -17,19 +17,19 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <memory>
 #include <stdlib.h>
 #include <string.h>
+#include <set>
+#include <vector>
 
 /**Given two nodes, determine if connecting an output of start to an input of end causes a cycle.*/
-bool doesEdgePreserveAcyclicity(LavNode* start, LavNode* end) {
+bool doesEdgePreserveAcyclicity(std::shared_ptr<LavNode> start, std::shared_ptr<LavNode> end) {
 	//A cycle exists if end is directly or indirectly conneccted to an input of start.
 	//To that end, we use recursion as follows.
 	//if we are called with start==end, it's a cycle.
 	if(start==end) return false;
 	//Otherwise, move end back a level.
 	//the rationale for this is that we want to seeee if an indirect connection from anything we're pulling from to our end causes a cycle.  If it doesn't, we're good.
-	for(int i =0; i < end->getInputConnectionCount(); i++) {
-		for(auto j: end->getInputConnection(i)->getConnectedNodes()) {
-			if(doesEdgePreserveAcyclicity(start, j) == false) return false;
-		}
+	for(auto n: end->getDependencies()) {
+		if(doesEdgePreserveAcyclicity(start, n) == false) return false;
 	}
 	return true;
 }
@@ -173,7 +173,7 @@ void LavNode::appendOutputConnection(int start, int count) {
 }
 
 void LavNode::connect(int output, std::shared_ptr<LavNode> toNode, int input) {
-	if(doesEdgePreserveAcyclicity(this, toNode.get()) == false) throw LavErrorException(Lav_ERROR_CAUSES_CYCLE);
+	if(doesEdgePreserveAcyclicity(this->shared_from_this(), toNode) == false) throw LavErrorException(Lav_ERROR_CAUSES_CYCLE);
 	auto outputConnection =getOutputConnection(output);
 	auto inputConnection = toNode->getInputConnection(input);
 	makeConnection(outputConnection, inputConnection);
@@ -235,6 +235,17 @@ void LavNode::resize(int newInputCount, int newOutputCount) {
 			output_buffers[i] = LavAllocFloatArray(simulation->getBlockSize());
 		}
 	}
+}
+
+std::set<std::shared_ptr<LavNode>> LavNode::getDependencies() {
+	std::set<std::shared_ptr<LavNode>> retval;
+	for(int i = 0; i < getInputConnectionCount(); i++) {
+		auto j = getInputConnection(i)->getConnectedNodes();
+		for(auto p: j) {
+			retval.insert(p->shared_from_this());
+		}
+	}
+	return retval;
 }
 
 //LavSubgraphNode
