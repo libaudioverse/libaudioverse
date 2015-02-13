@@ -148,8 +148,6 @@ See the manual for specifics on how output objects work.  A brief summary is giv
 		else:
 			handle = _lav.create_read_simulation(sample_rate, block_size)
 		self.handle = handle
-		self._output_node= None
-		self._connected_nodes= set()
 
 	def get_block(self, channels, may_apply_mixing_matrix = True):
 		"""Returns a block of data.
@@ -211,12 +209,6 @@ class GenericNode(object):
 		self._callbacks = dict()
 		self.input_connection_count=_lav.node_get_input_connection_count(self)
 		self.output_connection_count = _lav.node_get_output_connection_count(self)
-		self._input_nodes =dict()
-		self._output_nodes = dict()
-		for i in xrange(self.input_connection_count):
-			self._input_nodes[i] =set()
-		for i in xrange(self.output_connection_count):
-			self._output_nodes[i]=set()
 
 	def get_property_names(self):
 		return self._properties.keys()
@@ -239,22 +231,12 @@ class GenericNode(object):
 
 	def connect(self, output, node, input):
 		_lav.node_connect(self, output, node, input)
-		#if that fails, we get an exception. If not, we set this up.
-		self._output_nodes[output].add((node, input))
-		node._input_nodes[input].add((self, output))
 
 	def connect_simulation(self, output):
 		_lav.node_connect_simulation(self, output)
-		self.simulation._connected_nodes.add((self, output))
 
 	def disconnect(self, output):
 		_lav.node_disconnect(self, output)
-		for i in self._output_nodes[output]:
-			n, o =i
-			n._input_nodes[o].remove((self, output))
-		self._output_nodes[output].clear()
-		if (self, output) in self.simulation._connected_nodes:
-			self.simulation._connected_nodes.remove((self, output))
 
 {%for enumerant, prop in metadata['nodes']['Lav_NODETYPE_GENERIC']['properties'].iteritems()%}
 {{macros.implement_property(enumerant, prop)}}
