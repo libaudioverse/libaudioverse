@@ -148,6 +148,7 @@ See the manual for specifics on how output objects work.  A brief summary is giv
 		else:
 			handle = _lav.create_read_simulation(sample_rate, block_size)
 		self.handle = handle
+		self._inputs= set()
 
 	def get_block(self, channels, may_apply_mixing_matrix = True):
 		"""Returns a block of data.
@@ -209,6 +210,8 @@ class GenericNode(object):
 		self._callbacks = dict()
 		self.input_connection_count=_lav.node_get_input_connection_count(self)
 		self.output_connection_count = _lav.node_get_output_connection_count(self)
+		self._inputs=set()
+		self._outputs= collections.defaultdict(set)
 
 	def get_property_names(self):
 		return self._properties.keys()
@@ -231,12 +234,22 @@ class GenericNode(object):
 
 	def connect(self, output, node, input):
 		_lav.node_connect(self, output, node, input)
+		self._outputs[output].add((output, weakref.ref))
+		node._inputs.add((output, self))
 
 	def connect_simulation(self, output):
 		_lav.node_connect_simulation(self, output)
+		self.simulation._inputs.add(self)
 
 	def disconnect(self, output):
 		_lav.node_disconnect(self, output)
+		for i in self._outputs[output]:
+			input, weak =i
+			obj=weak.get()
+			if obj is not None and (output, self) in obj._inputs:
+				obj._inputs.remove((output, self))
+		if self in self.simulation._inputs:
+			self.simulation._inputs.remove(self)
 
 {%for enumerant, prop in metadata['nodes']['Lav_NODETYPE_GENERIC']['properties'].iteritems()%}
 {{macros.implement_property(enumerant, prop)}}
