@@ -272,7 +272,7 @@ std::shared_ptr<LavInputConnection> LavSubgraphNode::getInputConnection(int whic
 }
 
 int LavSubgraphNode::getOutputBufferCount() {
-if(subgraph_output) return subgraph_output->getOutputBufferCount();
+	if(subgraph_output) return subgraph_output->getOutputBufferCount();
 	else return 0;
 }
 
@@ -283,11 +283,26 @@ float** LavSubgraphNode::getOutputBufferArray() {
 
 void LavSubgraphNode::tick() {
 	if(last_processed== simulation->getTickCount()) return;
-	if(getState() != Lav_NODESTATE_PAUSED) {
-		willProcessParents();
-		if(subgraph_output) subgraph_output->tick();
+	last_processed=simulation->getTickCount();
+	if(getState() == Lav_NODESTATE_PAUSED) return;
+	willProcessParents();
+	if(subgraph_output == nullptr) return;
+	subgraph_output->tick();
+	//Handle our add and mul, on top of the output object of the subgraph.
+	//We prefer this over forwarding because this allows the subgraph to change all internal volumes without them being overridden by the user.
+	float mul = getProperty(Lav_NODE_MUL).getFloatValue();
+	if(mul != 1.0f) {
+		for(unsigned int i = 0; i < subgraph_output->getOutputBufferCount(); i++) {
+			float* output = subgraph_output->getOutputBufferArray()[i];
+			scalarMultiplicationKernel(simulation->getBlockSize(), mul, output, output);
+		}
 	}
-	last_processed= simulation->getTickCount();
+	float add=getProperty(Lav_NODE_ADD).getFloatValue();
+	if(add != 0.0f) {
+		for(int i = 0; i < subgraph_output->getOutputBufferCount(); i++) {
+			scalarAdditionKernel(simulation->getBlockSize(), add, subgraph_output->getOutputBufferArray()[i], getOutputBufferArray()[i]);
+		}
+	}
 }
 
 //begin public api
