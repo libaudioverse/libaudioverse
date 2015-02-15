@@ -7,8 +7,9 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <string.h>
 
 void convolutionKernel(float* input, unsigned int outputSampleCount, float* output, unsigned int responseLength, float* response) {
-	memset(output, 0, sizeof(float)*outputSampleCount);
-	for(int i = 0; i < responseLength; i++) {
+	scalarMultiplicationKernel(outputSampleCount, response[responseLength-1], input, output);
+	input++;
+	for(int i = 1; i < responseLength; i++) {
 		float c=response[responseLength-i-1];
 	//3/4 of the time we do this. But sometimes i is divisible by 4, and we can offload to the potentially sse kernel.
 		if(i%4) {
