@@ -13,21 +13,17 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/dspmath.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/memory.hpp>
+#include <libaudioverse/private/constants.hpp>
 #include <limits>
 
 class LavSineNode: public LavNode {
 	public:
 	LavSineNode(std::shared_ptr<LavSimulation> simulation);
 	virtual void process();
-	float table_delta;
-	unsigned int start ;
-	float offset;
+	float phase = 0;
 };
 
 LavSineNode::LavSineNode(std::shared_ptr<LavSimulation> simulation): LavNode(Lav_NODETYPE_SINE, simulation, 0, 1) {
-	table_delta = sineTableLength/simulation->getSr();
-	start = 0;
-	offset = 0;
 	appendOutputConnection(0, 1);
 }
 
@@ -39,17 +35,12 @@ std::shared_ptr<LavNode> createSineNode(std::shared_ptr<LavSimulation> simulatio
 
 void LavSineNode::process() {
 	float freq = getProperty(Lav_SINE_FREQUENCY).getFloatValue();
+	float phaseDelta=freq/simulation->getSr();
 	for(unsigned int i = 0; i< block_size; i++) {
-		const unsigned int samp1 = start;
-		const unsigned int samp2 = start+1;
-		const float weight1 = offset;
-		const float weight2 = 1-offset;
-		output_buffers[0][i] = sineTable[samp1]*weight1+sineTable[samp2]*weight2;
-		offset += table_delta*freq;
-		start += (int)floorf(offset);
-		start %= sineTableLength;
-		offset = fmod(offset, 1.0f);
+		output_buffers[0][i] = sinf(2*phase*PI);
+		phase+=phaseDelta;
 	}
+	phase -=floorf(phase);
 }
 
 //begin public api

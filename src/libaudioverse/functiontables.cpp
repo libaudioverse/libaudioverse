@@ -12,17 +12,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 /**As a property of these tables, the last sample of the array must be the same as the first, and length must not include the last sample.
 
 Justification: this greatly simplifies interpolating between samples when the end of the array is coming up, completely removing some operations and simplifying weight calculations.*/
-float sineTable[44101];
-const unsigned int sineTableLength = 44100;
-#define PI (3.14159f)
-
-void computeSineTable() {
-	for(unsigned int i = 0; i < sineTableLength; i++) {
-		sineTable[i] = sinf((2*PI*i)/sineTableLength); //sine wave of frequency 1 for 1 second.
-	}
-	sineTable[sineTableLength] = sineTable[0]; //make sure the last sample mirrors the first.
-}
 
 void initializeFunctionTables() {
-	computeSineTable();
 }
