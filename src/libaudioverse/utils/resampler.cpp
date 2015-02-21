@@ -16,7 +16,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 LavResampler::LavResampler(int inputFrameCount, int inputChannels, int inputSr, int outputSr): input_frame_count(inputFrameCount), input_channels(inputChannels), input_sr(inputSr), output_sr(outputSr) {
 	delta = (float)inputSr/(float)outputSr;
-	spx_resampler = speex_resampler_init(inputChannels, inputSr, outputSr, SPEEX_RESAMPLER_QUALITY_MAX, &spx_error);
+	spx_resampler = speex_resampler_init(inputChannels, inputSr, outputSr, 1, &spx_error);
 	if(spx_resampler==nullptr) throw LavErrorException(Lav_ERROR_MEMORY);
 }
 
@@ -51,6 +51,9 @@ int LavResampler::write(float* dest, int maxFrameCount) {
 			offset = 0;
 		}
 	}
+	//Unfortunately, the speex resampler clips. We therefore attenuate by a very small amount.  This number was determined experimentaly.
+	dest -=count*input_channels;
+	for(int i=0; i < count*input_channels; i++) dest[i]*=0.94;
 	return count;
 }
 
