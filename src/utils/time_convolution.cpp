@@ -13,8 +13,9 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <string.h>
 #include <vector>
 
-#define SECONDS 5
 #define BLOCK_SIZE 1024
+#define NUM_SOURCES 250
+#define NUM_TIMES 50
 float storage[BLOCK_SIZE*2] = {0};
 
 #define ERRCHECK(x) do {\
@@ -36,7 +37,6 @@ void main(int argc, char** args) {
 	std::vector<LavNode*> sources;
 	LavNode* sineObj;
 	unsigned int numSources = 0;
-	float timeDelta = 0.0f;
 
 	//some setup: create a world and a simulation.
 	ERRCHECK(Lav_createReadSimulation(44100, BLOCK_SIZE, &simulation));
@@ -44,27 +44,26 @@ void main(int argc, char** args) {
 	ERRCHECK(Lav_nodeSetIntProperty(world, Lav_ENVIRONMENT_DEFAULT_PANNER_STRATEGY, Lav_PANNING_STRATEGY_HRTF));
 	ERRCHECK(Lav_createSineNode(simulation, &sineObj));
 	ERRCHECK(Lav_nodeConnectSimulation(world, 0));
-	while(timeDelta < SECONDS) {
-		numSources += 10;
-		printf("Preparing to test with %u sources...\n", numSources);
-		sources.resize(numSources, nullptr);
-		//anywhere there's a null pointer, replace it with a source.
-		for(auto i = sources.begin(); i != sources.end(); i++) {
-			if(*i != nullptr) continue;
-			LavNode* newSource;
-			ERRCHECK(Lav_createSourceNode(simulation, world, &newSource));
-			ERRCHECK(Lav_nodeConnect(sineObj, 0, newSource, 0));
-			*i = newSource;
-		}
-		timeDelta = timeit([&] () {
-			for(unsigned int i = 0; i < SECONDS*44100; i+=BLOCK_SIZE) {
-				Lav_simulationGetBlock(simulation, 2, 1, storage);
-			}
-		});
-		printf("Done.  Took %f seconds to process.\n", timeDelta);
+	printf("Running %u times with %u sources\n", NUM_TIMES, NUM_SOURCES);
+	sources.resize(NUM_SOURCES, nullptr);
+	//anywhere there's a null pointer, replace it with a source.
+	for(auto i = sources.begin(); i != sources.end(); i++) {
+		LavNode* newSource;
+		ERRCHECK(Lav_createSourceNode(simulation, world, &newSource));
+		ERRCHECK(Lav_nodeConnect(sineObj, 0, newSource, 0));
+		*i = newSource;
 	}
+	float t = timeit([&] () {
+		Lav_simulationGetBlock(simulation, 2, 1, storage);
+	}, NUM_TIMES);
 	for(auto i: sources) {
 		ERRCHECK(Lav_free(i));
 	}
 	Lav_shutdown();
+	printf("Took %f seconds\n", t);
+	//Compute estimate of how many per second.
+	t/=NUM_SOURCES*NUM_TIMES;
+	float blocksPerSec =44100/1024;
+	float estimate = 1.0f/t/blocksPerSec;
+	printf("Estimate: %f sources maximum\n", estimate);
 }

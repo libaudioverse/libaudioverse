@@ -13,7 +13,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <string.h>
 #include <vector>
 
-#define SECONDS 5
+#define NUM_LINES 250
+#define NUM_TIMES 50
 #define BLOCK_SIZE 1024
 float storage[BLOCK_SIZE*2] = {0};
 
@@ -31,32 +32,27 @@ void main(int argc, char** args) {
 	std::vector<LavNode*> lines;
 	LavNode* sineObj;
 	unsigned int numLines = 0;
-	float timeDelta = 0.0f;
 
 	ERRCHECK(Lav_createReadSimulation(44100, BLOCK_SIZE, &simulation));
 	ERRCHECK(Lav_createSineNode(simulation, &sineObj));
-	while(timeDelta < SECONDS) {
-		numLines += 100;
-		printf("Preparing to test with %u lines...\n", numLines);
-		lines.resize(numLines, nullptr);
-		//anywhere there's a null pointer, replace it with a new line.
-		for(auto i = lines.begin(); i != lines.end(); i++) {
-			LavNode* newObj;
-			if(*i == nullptr) {
-				ERRCHECK(Lav_createDelayNode(simulation, 1.0, 1, &newObj));
-				*i = newObj;
-				ERRCHECK(Lav_nodeSetIntProperty(newObj, Lav_NODE_STATE, Lav_NODESTATE_ALWAYS_PLAYING));
-				ERRCHECK(Lav_nodeSetFloatProperty(newObj, Lav_DELAY_DELAY, 0.5f));
-				ERRCHECK(Lav_nodeConnect(sineObj, 0, newObj, 0));
-			}
-		}
-		printf("Beginning test...\n");
-		timeDelta= timeit([&] () {
-			for(unsigned int i = 0; i < SECONDS*44100; i+=BLOCK_SIZE) {
-				Lav_simulationGetBlock(simulation, 2, 1, storage);
-			}
-		});
-		printf("Done.  Took %f seconds to process.\n", timeDelta);
+
+	lines.resize(NUM_LINES, nullptr);
+	for(auto i = lines.begin(); i != lines.end(); i++) {
+		LavNode* newObj;
+		ERRCHECK(Lav_createDelayNode(simulation, 1.0, 1, &newObj));
+		*i = newObj;
+		ERRCHECK(Lav_nodeSetIntProperty(newObj, Lav_NODE_STATE, Lav_NODESTATE_ALWAYS_PLAYING));
+		ERRCHECK(Lav_nodeSetFloatProperty(newObj, Lav_DELAY_DELAY, 0.5f));
+		ERRCHECK(Lav_nodeConnect(sineObj, 0, newObj, 0));
 	}
+	float t= timeit([&] () {
+		Lav_simulationGetBlock(simulation, 2, 1, storage);
+	}, NUM_TIMES);
 	Lav_shutdown();
+	printf("Took %f seconds\n", t);
+	//Compute estimate of how many per second.
+	t/=NUM_LINES*NUM_TIMES;
+	float blocksPerSec =44100/1024;
+	float estimate = 1.0f/t/blocksPerSec;
+	printf("Estimate: %f lines maximum\n", estimate);
 }
