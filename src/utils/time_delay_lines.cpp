@@ -3,6 +3,7 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 
 /**Given a file, produces 5 seconds of audio output at 44100 HZ.  Rather than playing it, however, this program prints how long it took and the estimated number that can be run in one thread in realtime.*/
+#include "time_helper.hpp"
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/libaudioverse3d.h>
@@ -49,13 +50,12 @@ void main(int argc, char** args) {
 				ERRCHECK(Lav_nodeConnect(sineObj, 0, newObj, 0));
 			}
 		}
-		clock_t startTime = clock();
 		printf("Beginning test...\n");
-		for(unsigned int i = 0; i < SECONDS*44100; i+=BLOCK_SIZE) {
-			Lav_simulationGetBlock(simulation, 2, 1, storage);
-		}
-		clock_t endTime = clock();
-		timeDelta = (endTime-startTime)/(float)CLOCKS_PER_SEC;
+		timeDelta= timeit([&] () {
+			for(unsigned int i = 0; i < SECONDS*44100; i+=BLOCK_SIZE) {
+				Lav_simulationGetBlock(simulation, 2, 1, storage);
+			}
+		});
 		printf("Done.  Took %f seconds to process.\n", timeDelta);
 	}
 	Lav_shutdown();

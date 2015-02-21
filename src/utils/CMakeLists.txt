@@ -1,5 +1,5 @@
 macro(util name)
-add_executable(${name} ${name}.cpp)
+add_executable(${name} ${name}.cpp time_helper.cpp)
 TARGET_LINK_LIBRARIES(${name} libaudioverse)
 foreach( OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES} )
     string( TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG )
