@@ -8,6 +8,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <limits>
 #include <algorithm>
 #include <utility>
+#include "../speex_resampler.h"
 
 /**A resampler.
 
@@ -20,15 +21,12 @@ class LavResampler {
 	int write(float* dest, int maxFrameCount);
 	//this copies, the buffer can be reused.
 	void read(float* source);
-	//note the estimate: this is not necessarily sample-accurate due to fp issues.
+	//note the estimate: this is not necessarily sample-accurate. It's a rough estimate, primarily for the push node.
 	int estimateAvailableFrames();
 	private:
-	void writeFrame(float* input, float* dest);
-	float *last_frame = nullptr;
-	float *frame1 = nullptr, *frame2 = nullptr;
-	float current_offset = 0;
-	int current_pos = -1;//special sentinal value.
 	float delta = 0.0f;
 	std::list<float*> queue, done_queue;
-	int input_frame_count, input_channels, input_sr, output_sr;
+	int offset=0, input_frame_count, input_channels, input_sr, output_sr;
+	SpeexResamplerState* spx_resampler= nullptr;
+	int spx_error= 0;
 };
