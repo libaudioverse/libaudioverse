@@ -12,6 +12,7 @@ COMMAND python "${CMAKE_SOURCE_DIR}/scripts/convert_to_cpp_file.py"
 DEPENDS "${CMAKE_SOURCE_DIR}/scripts/convert_to_cpp_file.py"
 "${CMAKE_SOURCE_DIR}/default_hrtf.hrtf")
 
+add_definitions(-DOUTSIDE_SPEEX -DRANDOM_PREFIX=LIBAUDIOVERSE_SPEEX -DFLOATING_POINT)
 add_library(libaudioverse SHARED
 #the core infrastructure.
 connections.cpp
@@ -24,6 +25,9 @@ memory.cpp
 events.cpp
 simulation.cpp
 logging.cpp
+
+#Speex resampler.
+speex_resample.c
 
 #utilities: file reading, platform-specific code, stateful filters that can't be represented as kernels, etc:
 utils/file_reader.cpp
