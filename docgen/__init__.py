@@ -12,10 +12,11 @@ def make_property_table():
 	context = dict()
 	context.update(get_info.all_info)
 	template = env.get_template("object_reference.t")
-	sorted_objects = context['metadata'].items()
-	sorted_objects.sort(key = lambda x: x[1]['doc_name'].lower())
-	sorted_objects = [i[0] for i in sorted_objects]
-	sorted_objects.remove('Lav_OBJTYPE_GENERIC')
-	sorted_objects = ['Lav_OBJTYPE_GENERIC'] + sorted_objects
-	context['sorted_objects'] = sorted_objects
+	sorted_nodes= context['metadata']['nodes'].items()
+	sorted_nodes.sort(key = lambda x: x[1]['doc_name'].lower())
+	sorted_nodes= [i[0] for i in sorted_nodes]
+	sorted_nodes.remove('Lav_NODETYPE_GENERIC')
+	sorted_nodes = ['Lav_NODETYPE_GENERIC'] + sorted_nodes
+	context['sorted_nodes'] = sorted_nodes
+	context['nodes'] = context['metadata']['nodes']
 	return template.render(context)
