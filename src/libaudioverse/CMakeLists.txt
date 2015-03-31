@@ -1,7 +1,6 @@
 #This always runs which is what we need.
 add_custom_target(metadata
-COMMAND python "${CMAKE_CURRENT_SOURCE_DIR}/metadata/metadata.py" "${CMAKE_CURRENT_BINARY_DIR}/metadata/metadata.cpp")
-
+COMMAND python "${CMAKE_SOURCE_DIR}/metadata/metadata.py" "${CMAKE_CURRENT_BINARY_DIR}/metadata.cpp")
 
 add_custom_command(
 OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/data/default_hrtf.cpp"
@@ -15,7 +14,8 @@ DEPENDS "${CMAKE_SOURCE_DIR}/scripts/convert_to_cpp_file.py"
 add_definitions(-DOUTSIDE_SPEEX -DRANDOM_PREFIX=LIBAUDIOVERSE_SPEEX -DFLOATING_POINT)
 
 #We must marke metadata.cpp as generated.
-set_property(SOURCE "$CMAKE_CURRENT_SOURCE_DIR}/metadata/metadata.cpp" PROPERTY GENERATED TRUE)
+set_property(SOURCE "${CMAKE_CURRENT_BINARY_DIR}/metadata.cpp" PROPERTY GENERATED TRUE)
+
 add_library(libaudioverse SHARED
 #the core infrastructure.
 connections.cpp
@@ -42,7 +42,8 @@ dsp/ringmod.cpp
 dsp/iir.cpp
 
 #the metadata store
-metadata/metadata.cpp
+#It appears that CMake dies hard if this isn't an absolute path.
+"${CMAKE_CURRENT_BINARY_DIR}/metadata.cpp"
 
 #mathematical kernels for common dsp operations.
 kernels/convolution.cpp

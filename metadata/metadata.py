@@ -3,7 +3,7 @@ import os.path
 import os
 import jinja2
 import sys
-sys.path = [os.path.join(os.path.dirname(__file__), '../../../')] + sys.path
+sys.path = [os.path.join(os.path.dirname(__file__), '..')] + sys.path
 import bindings.get_info
 
 if len(sys.argv) != 2:
