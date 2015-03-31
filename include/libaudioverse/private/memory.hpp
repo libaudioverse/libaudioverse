@@ -14,9 +14,19 @@ Asking for an entry that is not present gives a null pointer.
 
 the reason that this is not a class is because there can only ever be one.  This serves the explicit purpose of allowing us to give pointers to and receive pointers from things outside Libaudioverse; therefore, it's a global and some helper functions.
 
-This also implements Lav_free, which works the same for all pointers.*/
+This also implements Lav_free, which works the same for all pointers, and the object handle interfaces.
+*/
+
+
+class LavExternalObject: public std::enable_shared_from_this<LavExternalObject>  {
+	public:
+	virtual ~LavExternalObject() {}
+	bool isExternal = false;
+	int handle = 0;
+};
 
 extern std::map<void*, std::shared_ptr<void>> *external_ptrs;
+extern std::map<int, std::shared_ptr<LavExternalObject>> *external_handles;
 extern std::mutex *memory_lock;
 
 template <class t>

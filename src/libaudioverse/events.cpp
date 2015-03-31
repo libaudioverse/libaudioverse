@@ -41,7 +41,7 @@ void LavEvent::fire() {
 	if(no_multifire && is_firing.load() == 1) return;
 	is_firing.store(1);
 	//we need to hold local copies of both the node and data in case they are changed between firing and processing by the simulation.
-	auto node= std::weak_ptr<LavNode>(associated_node->shared_from_this());
+	auto node= std::weak_ptr<LavNode>(std::static_pointer_cast<LavNode>(associated_node->shared_from_this()));
 	void* userdata = user_data;
 	//fire a lambda that uses these by copy.
 	associated_simulation->enqueueTask([=]() {

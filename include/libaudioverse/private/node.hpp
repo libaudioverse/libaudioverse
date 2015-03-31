@@ -6,6 +6,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "properties.hpp"
 #include "events.hpp"
 #include "connections.hpp"
+#include "memory.hpp"
 #include <map>
 #include <memory>
 #include <vector>
@@ -14,7 +15,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 class LavProperty;
 
 /**Things all Libaudioverse nodes have.*/
-class LavNode: public std::enable_shared_from_this<LavNode> { //enable_shared_from_this is for event infrastructure.
+class LavNode: public LavExternalObject { //enable_shared_from_this is for event infrastructure.
 	public:
 	LavNode(int type, std::shared_ptr<LavSimulation> simulation, unsigned int numInputBuffers, unsigned int numOutputBuffers);
 	virtual ~LavNode();

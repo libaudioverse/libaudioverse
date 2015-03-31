@@ -13,6 +13,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <map>
 #include <random>
 #include "../libaudioverse.h"
+#include "memory.hpp"
 
 class LavNode;
 class LavDevice;
@@ -22,7 +23,7 @@ class LavInputConnection;
 class LavThreadTerminationException {
 };
 
-class LavSimulation: public std::enable_shared_from_this<LavSimulation>  {
+class LavSimulation: public LavExternalObject {
 	public:
 	LavSimulation(unsigned int sr, unsigned int blockSize, unsigned int mixahead);
 	//needed because the LavInputConnection needs us to use shared_from_this.

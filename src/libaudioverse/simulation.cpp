@@ -29,7 +29,7 @@ LavSimulation::LavSimulation(unsigned int sr, unsigned int blockSize, unsigned i
 	start();
 }
 void LavSimulation::completeInitialization() {
-	final_output_connection =std::make_shared<LavInputConnection>(this->shared_from_this(), nullptr, 0, 0);
+	final_output_connection =std::make_shared<LavInputConnection>(std::static_pointer_cast<LavSimulation>(this->shared_from_this()), nullptr, 0, 0);
 }
 
 LavSimulation::~LavSimulation() {

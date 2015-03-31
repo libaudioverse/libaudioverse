@@ -173,7 +173,7 @@ void LavNode::appendOutputConnection(int start, int count) {
 }
 
 void LavNode::connect(int output, std::shared_ptr<LavNode> toNode, int input) {
-	if(doesEdgePreserveAcyclicity(this->shared_from_this(), toNode) == false) throw LavErrorException(Lav_ERROR_CAUSES_CYCLE);
+	if(doesEdgePreserveAcyclicity(std::static_pointer_cast<LavNode>(this->shared_from_this()), toNode) == false) throw LavErrorException(Lav_ERROR_CAUSES_CYCLE);
 	auto outputConnection =getOutputConnection(output);
 	auto inputConnection = toNode->getInputConnection(input);
 	makeConnection(outputConnection, inputConnection);
@@ -242,7 +242,7 @@ std::set<std::shared_ptr<LavNode>> LavNode::getDependencies() {
 	for(int i = 0; i < getInputConnectionCount(); i++) {
 		auto j = getInputConnection(i)->getConnectedNodes();
 		for(auto p: j) {
-			retval.insert(p->shared_from_this());
+			retval.insert(std::static_pointer_cast<LavNode>(p->shared_from_this()));
 		}
 	}
 	return retval;
