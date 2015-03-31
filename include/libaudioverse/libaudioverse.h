@@ -16,11 +16,8 @@ class LavSimulation;
 typedef void LavSimulation;
 typedef void LavNode;
 #endif
-/**Make sure that we are marshalling enums as integers in the public API for both c and c++.
-Note that, internally, it's safe to use enums directly.  But marshalling out to some languages with the enum type is potentially dangerous: the standard does not designate what an enum is internally represented as, so we rely on the implicit conversion.*/
 typedef int LavError;
-typedef int LavPropertyType;
-typedef int LavNodeType;
+typedef int LavHandle;
 
 /**Does whatever is appropriate on a given platform to expose a Libaudioverse function publically.*/
 #ifdef _MSC_VER
@@ -53,6 +50,7 @@ enum Lav_ERRORS {
 	Lav_ERROR_INVALID_SLOT, //one of the functions taking a slot got passed an invalid number.
 	Lav_ERROR_NULL_POINTER, //you passed a NULL pointer into something that shouldn't have it.
 	Lav_ERROR_MEMORY, //a memory problem which probably isn't the fault of the application.
+	Lav_ERROR_INVALID_HANDLE,
 	Lav_ERROR_RANGE, //out of range function parameter.
 	Lav_ERROR_CANNOT_INIT_AUDIO, //We couldn't initialize the audio library or open a device
 	Lav_ERROR_FILE, //error to do with files.
