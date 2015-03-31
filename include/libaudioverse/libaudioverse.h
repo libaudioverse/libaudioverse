@@ -47,75 +47,76 @@ typedef int LavNodeType;
 #endif
 
 enum Lav_ERRORS {
-	Lav_ERROR_NONE = 0, //everything is OK.
-	Lav_ERROR_UNKNOWN = 1, //We know something has gone wrong, but can't figure out what.
-	Lav_ERROR_TYPE_MISMATCH = 2, //Tried to get/set something with the wrong type, i.e. properties.
-	Lav_ERROR_INVALID_SLOT = 3, //one of the functions taking a slot got passed an invalid number.
-	Lav_ERROR_NULL_POINTER = 4, //you passed a NULL pointer into something that shouldn't have it.
-	Lav_ERROR_MEMORY = 5, //a memory problem which probably isn't the fault of the application.
-	Lav_ERROR_RANGE = 6, //out of range function parameter.
-	Lav_ERROR_CANNOT_INIT_AUDIO = 7, //We couldn't initialize the audio library or open a device
-	Lav_ERROR_FILE = 8, //error to do with files.
-	Lav_ERROR_FILE_NOT_FOUND = 9, //specifically, we couldn't find a file.
+	Lav_ERROR_NONE, //everything is OK.
+	Lav_ERROR_UNKNOWN, //We know something has gone wrong, but can't figure out what.
+	Lav_ERROR_TYPE_MISMATCH, //Tried to get/set something with the wrong type, i.e. properties.
+	Lav_ERROR_INVALID_SLOT, //one of the functions taking a slot got passed an invalid number.
+	Lav_ERROR_NULL_POINTER, //you passed a NULL pointer into something that shouldn't have it.
+	Lav_ERROR_MEMORY, //a memory problem which probably isn't the fault of the application.
+	Lav_ERROR_RANGE, //out of range function parameter.
+	Lav_ERROR_CANNOT_INIT_AUDIO, //We couldn't initialize the audio library or open a device
+	Lav_ERROR_FILE, //error to do with files.
+	Lav_ERROR_FILE_NOT_FOUND, //specifically, we couldn't find a file.
 
-	Lav_ERROR_HRTF_INVALID = 10,
+	Lav_ERROR_HRTF_INVALID,
 
 	/**This one is odd.  It is what is thrown if you pass a node with the wrong "shape" to a function, most notably source creation.*/
-	Lav_ERROR_SHAPE = 11,
+	Lav_ERROR_SHAPE,
 
-	Lav_ERROR_CANNOT_CROSS_DEVICES = 12, //an attempto either create a parent-child connect with nodes from different devices or to set an output with an node from a different device.
-	Lav_ERROR_NO_OUTPUTS = 13, //we expected the node to have outputs here, but it didn't.
-	Lav_ERROR_LIMIT_EXCEEDED = 14,
-	Lav_ERROR_CAUSES_CYCLE = 15,
-	Lav_ERROR_PROPERTY_IS_READ_ONLY = 16,
+	Lav_ERROR_CANNOT_CROSS_DEVICES, //an attempto either create a parent-child connect with nodes from different devices or to set an output with an node from a different device.
+	Lav_ERROR_NO_OUTPUTS, //we expected the node to have outputs here, but it didn't.
+	Lav_ERROR_LIMIT_EXCEEDED,
+	Lav_ERROR_CAUSES_CYCLE,
+	Lav_ERROR_PROPERTY_IS_READ_ONLY,
+
 	Lav_ERROR_INTERNAL= 999,
 };
 
 /**These are property types, either int, float, double, vector of 3 floats, vector of 6 floats, string, or int/float array of any length.*/
 enum Lav_PROPERTY_TYPES {
-	Lav_PROPERTYTYPE_INT = 1,
-	Lav_PROPERTYTYPE_FLOAT = 2,
-	Lav_PROPERTYTYPE_DOUBLE = 3,
-	Lav_PROPERTYTYPE_STRING = 4,
-	Lav_PROPERTYTYPE_FLOAT3 = 5,
-	Lav_PROPERTYTYPE_FLOAT6 = 6,
-	Lav_PROPERTYTYPE_FLOAT_ARRAY = 7,
-	Lav_PROPERTYTYPE_INT_ARRAY = 8,
+	Lav_PROPERTYTYPE_INT,
+	Lav_PROPERTYTYPE_FLOAT,
+	Lav_PROPERTYTYPE_DOUBLE,
+	Lav_PROPERTYTYPE_STRING,
+	Lav_PROPERTYTYPE_FLOAT3,
+	Lav_PROPERTYTYPE_FLOAT6,
+	Lav_PROPERTYTYPE_FLOAT_ARRAY,
+	Lav_PROPERTYTYPE_INT_ARRAY,
 };
 
 /**These are used to tag nodes with their type, so that external languages may see them.*/
 enum Lav_NODETYPES{
-	Lav_NODETYPE_GENERIC = 0, //this is not something you should ever see outside the library, and basically means none.
-	Lav_NODETYPE_SIMPLE_ENVIRONMENT= 1,
-	Lav_NODETYPE_SOURCE = 2,
-	Lav_NODETYPE_FILE = 3,
-	Lav_NODETYPE_HRTF = 4,
-	Lav_NODETYPE_SINE = 5,
-	Lav_NODETYPE_HARD_LIMITER = 7,
-	Lav_NODETYPE_DELAY = 8,
-	Lav_NODETYPE_AMPLITUDE_PANNER = 9,
-	Lav_NODETYPE_PUSH = 10,
-	Lav_NODETYPE_BIQUAD = 11,
-	Lav_NODETYPE_PULL = 12,
-	Lav_NODETYPE_GRAPH_LISTENER = 13,
-	Lav_NODETYPE_CUSTOM = 14,
-	Lav_NODETYPE_RINGMOD = 15,
-	Lav_NODETYPE_MULTIPANNER = 16,
-	Lav_NODETYPE_FEEDBACK_DELAY_NETWORK = 17,
-	Lav_NODETYPE_MULTIFILE = 18,
-	Lav_NODETYPE_SQUARE = 19,
-	Lav_NODETYPE_NOISE = 20,
-	Lav_NODETYPE_IIR =21,
-	Lav_NODETYPE_GAIN= 22,
-	Lav_NODETYPE_CHANNEL_SPLITTER = 23,
-	Lav_NODETYPE_CHANNEL_MERGER = 24,
+	Lav_NODETYPE_GENERIC, //this is not something you should ever see outside the library, and basically means none.
+	Lav_NODETYPE_SIMPLE_ENVIRONMENT,
+	Lav_NODETYPE_SOURCE,
+	Lav_NODETYPE_FILE,
+	Lav_NODETYPE_HRTF,
+	Lav_NODETYPE_SINE,
+	Lav_NODETYPE_HARD_LIMITER,
+	Lav_NODETYPE_DELAY,
+	Lav_NODETYPE_AMPLITUDE_PANNER,
+	Lav_NODETYPE_PUSH,
+	Lav_NODETYPE_BIQUAD,
+	Lav_NODETYPE_PULL,
+	Lav_NODETYPE_GRAPH_LISTENER,
+	Lav_NODETYPE_CUSTOM,
+	Lav_NODETYPE_RINGMOD,
+	Lav_NODETYPE_MULTIPANNER,
+	Lav_NODETYPE_FEEDBACK_DELAY_NETWORK,
+	Lav_NODETYPE_MULTIFILE,
+	Lav_NODETYPE_SQUARE,
+	Lav_NODETYPE_NOISE,
+	Lav_NODETYPE_IIR,
+	Lav_NODETYPE_GAIN,
+	Lav_NODETYPE_CHANNEL_SPLITTER,
+	Lav_NODETYPE_CHANNEL_MERGER,
 };
 
 /**Node states.*/
 enum Lav_NODE_STATES {
-	Lav_NODESTATE_PAUSED = 0,
-	Lav_NODESTATE_PLAYING = 1,
-	Lav_NODESTATE_ALWAYS_PLAYING = 2
+	Lav_NODESTATE_PAUSED,
+	Lav_NODESTATE_PLAYING,
+	Lav_NODESTATE_ALWAYS_PLAYING,
 };
 
 /**Logging levels.*/

@@ -60,16 +60,21 @@ def extract_enums():
 	#now, we note that we can find--for a specific enum e--:
 	#name = e.name, values are in e.values as e.values[index].value and names in e.values[index]name
 	#note that minimal interpretation is needed so that we can have negated constants-pycparser is for interpreters, not this, and so represents them as a unary minus in the ast.
-	#also, we don't support enums with implicitly defined constants.
 	constants_by_enum = OrderedDict()
+	implicit_value =0
 	for enum in enum_list:
 		constants_by_enum[enum.name] = dict()
 		for enum_value in enum.values.enumerators:
 			val = enum_value.value
-			if isinstance(val, Constant):
-				constants_by_enum[enum.name][enum_value.name] = int(enum_value.value.value)
+			if val is None:
+				constants_by_enum[enum.name][enum_value.name]=implicit_value
+			elif isinstance(val, Constant):
+				implicit_value = int(enum_value.value.value)
+				constants_by_enum[enum.name][enum_value.name] = implicit_value
 			elif isinstance(val, UnaryOp) and val.op == '-':
-				constants_by_enum[enum.name][enum_value.name] = int('-' + val.expr.value)
+				implicit_value = int('-' + val.expr.value)
+				constants_by_enum[enum.name][enum_value.name] = implicit_value
+			implicit_value+=1
 	return constants_by_enum
 
 def extract_typedefs():
