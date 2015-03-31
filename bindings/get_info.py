@@ -1,4 +1,15 @@
-"""Extracts nodes of interest from a pycparser parse of bindings.h run through a platform-specific preprocessor, and then calls jinja2 on the passed argument."""
+"""Extracts nodes of interest from a pycparser parse of bindings.h run through a platform-specific preprocessor and compares it with the metadata in metadata.y.
+
+The information extracted by this module is placed in all_info, a dict with the following keys.
+functions: A set of function instances. Keys are the names.
+typedefs: A set of type instances describing the final form of typedefs.
+constants: An extracted list of all constants.  This is a flat representation computed by reading all enumerations.
+constants_by_enum:Same as constants, but grouped by the enumeration and placed in dictionaries; keys are enumeration names.
+important_enums: The enums which metadata marks as important in some way.
+metadata: The parsed yaml document itself as a dict.
+"""
+
+
 
 from pycparser import *
 #we need to be able to compare with isinstance, unfortunately. Grab all of these too.
