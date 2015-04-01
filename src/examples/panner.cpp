@@ -30,8 +30,8 @@ void main(int argc, char** args) {
 		printf("Cannot work with %d channels", channels);
 		return;
 	}
-	LavSimulation* simulation;
-	LavNode* fileNode, *panNode, *limit;
+	LavHandle simulation;
+	LavHandle fileNode, panNode, limit;
 	ERRCHECK(Lav_initialize());
 	ERRCHECK(Lav_createSimulationForDevice(-1, channels, 44100, 1024, 2, &simulation));
 	ERRCHECK(Lav_createFileNode(simulation, args[1], &fileNode));

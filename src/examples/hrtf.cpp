@@ -22,8 +22,8 @@ void main(int argc, char** args) {
 		printf("Usage: %s <sound file> <hrtf file>", args[0]);
 		return;
 	}
-	LavSimulation* simulation;
-	LavNode* fileNode, *hrtfNode, *limit;
+	LavHandle simulation;
+	LavHandle fileNode, hrtfNode, limit;
 	ERRCHECK(Lav_initialize());
 	ERRCHECK(Lav_createSimulationForDevice(-1, 2, 44100, 1024, 2, &simulation));
 	ERRCHECK(Lav_createFileNode(simulation, args[1], &fileNode));

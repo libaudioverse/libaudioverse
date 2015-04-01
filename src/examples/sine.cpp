@@ -18,8 +18,8 @@ if((x) != Lav_ERROR_NONE) {\
 } while(0)\
 
 void main() {
-	LavSimulation* simulation;
-	LavNode* node;
+	LavHandle simulation;
+	LavHandle node;
 	ERRCHECK(Lav_initialize());
 	ERRCHECK(Lav_createSimulationForDevice(-1, 2, 44100, 1024, 2, &simulation));
 	ERRCHECK(Lav_createSineNode(simulation, &node));

@@ -24,8 +24,8 @@ void main(int argc, char** args) {
 		return;
 	}
 	char *soundFile = args[1], *hrtfFile = args[2];
-	LavSimulation* simulation = nullptr;
-	LavNode* node, *world, *source;
+	LavHandle simulation = 0;
+	LavHandle node, world, source;
 	ERRCHECK(Lav_initialize());
 	ERRCHECK(Lav_createSimulationForDevice(-1, 2, 44100, 1024, 3, &simulation));
 	ERRCHECK(Lav_createSimpleEnvironmentNode(simulation, hrtfFile, &world));

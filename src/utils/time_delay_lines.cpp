@@ -28,17 +28,17 @@ if((x) != Lav_ERROR_NONE) {\
 
 void main(int argc, char** args) {
 	ERRCHECK(Lav_initialize());
-	LavSimulation* simulation;
-	std::vector<LavNode*> lines;
-	LavNode* sineObj;
+	LavHandle simulation;
+	std::vector<LavHandle> lines;
+	LavHandle sineObj;
 	unsigned int numLines = 0;
 
 	ERRCHECK(Lav_createReadSimulation(44100, BLOCK_SIZE, &simulation));
 	ERRCHECK(Lav_createSineNode(simulation, &sineObj));
 
-	lines.resize(NUM_LINES, nullptr);
+	lines.resize(NUM_LINES, 0);
 	for(auto i = lines.begin(); i != lines.end(); i++) {
-		LavNode* newObj;
+		LavHandle newObj;
 		ERRCHECK(Lav_createDelayNode(simulation, 1.0, 1, &newObj));
 		*i = newObj;
 		ERRCHECK(Lav_nodeSetIntProperty(newObj, Lav_NODE_STATE, Lav_NODESTATE_ALWAYS_PLAYING));

@@ -16,7 +16,7 @@ if((x) != Lav_ERROR_NONE) {\
 }\
 } while(0)\
 
-void endOfFileCallback(LavNode* ignoredObject, void* ignored) {
+void endOfFileCallback(LavHandle ignoredObject, void* ignored) {
 	printf("End of file reached.\n");
 }
 
@@ -27,12 +27,12 @@ void main(int argc, char** args) {
 	}
 
 	char* path = args[1];
-	LavNode *node;
-	LavSimulation* simulation;
+	LavHandle node;
+	LavHandle simulation;
 	ERRCHECK(Lav_initialize());
 	ERRCHECK(Lav_createSimulationForDevice(-1, 2, 44100, 1024, 2, &simulation));
 	ERRCHECK(Lav_createFileNode(simulation, path, &node));
-	LavNode *limit;
+	LavHandle limit;
 	ERRCHECK(Lav_createHardLimiterNode(simulation, 2, &limit));
 	ERRCHECK(Lav_nodeConnect(node, 0, limit, 0));
 	ERRCHECK(Lav_nodeSetEvent(node, Lav_FILE_END_EVENT, endOfFileCallback, nullptr));
