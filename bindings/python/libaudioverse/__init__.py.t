@@ -263,7 +263,7 @@ class GenericNode(object):
 			#undocumented python thing: if __del__ is called at process exit, globals of this module are None.
 			return
 		if getattr(self, 'handle', None) is not None:
-			_lav.free(self.handle)
+			_lav.free_handle(self.handle)
 		self.handle = None
 
 	def reset(self):
