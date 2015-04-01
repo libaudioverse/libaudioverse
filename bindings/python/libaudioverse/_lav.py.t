@@ -22,7 +22,7 @@ def make_error_from_code(err):
 
 {%macro autopointerize(arglist)%}
 {%for arg in arglist%}
-{%if arg.type.indirection > 0%}
+{%if arg.type.indirection > 0 or arg.type.base == 'LavHandle'%}
 	{{arg.name}} = getattr({{arg.name}}, 'handle', {{arg.name}})
 {%endif%}
 {%if arg.type.indirection == 1 and not arg.type.base == 'char'%}
