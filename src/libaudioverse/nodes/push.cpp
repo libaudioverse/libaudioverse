@@ -98,17 +98,19 @@ void LavPushNode::feed(unsigned int length, float* buffer) {
 
 //begin public api.
 
-Lav_PUBLIC_FUNCTION LavError Lav_createPushNode(LavSimulation* simulation, unsigned int sr, unsigned int channels, LavNode** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createPushNode(LavHandle simulationHandle, unsigned int sr, unsigned int channels, LavHandle* destination) {
 	PUB_BEGIN
+	auto simulation =incomingObject<LavSimulation>(simulationHandle);
 	LOCK(*simulation);
-	*destination = outgoingPointer<LavNode>(createPushNode(incomingPointer<LavSimulation>(simulation), sr, channels));
+	*destination = outgoingObject<LavNode>(createPushNode(simulation, sr, channels));
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_pushNodeFeed(LavNode* handle, unsigned int length, float* buffer) {
+Lav_PUBLIC_FUNCTION LavError Lav_pushNodeFeed(LavHandle nodeHandle, unsigned int length, float* buffer) {
 	PUB_BEGIN
-	LOCK(*handle);
-	if(handle->getType() != Lav_NODETYPE_PUSH) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
-	((LavPushNode*)handle)->feed(length, buffer);
+	auto node=incomingObject<LavNode>(nodeHandle);
+	LOCK(*node);
+	if(node->getType() != Lav_NODETYPE_PUSH) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
+	std::static_pointer_cast<LavPushNode>(node)->feed(length, buffer);
 	PUB_END
 }

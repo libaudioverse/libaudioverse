@@ -47,7 +47,7 @@ void LavSimulation::getBlock(float* out, unsigned int channels, bool mayApplyMix
 	//in a sane application, we'll never go above 8 channels so keeping them around is no big deal.
 	while(final_outputs.size() < channels) final_outputs.push_back(LavAllocFloatArray(block_size));
 	//zero the outputs we need.
-	for(int i= 0; i < channels; i++) memset(final_outputs[i], 0, sizeof(float)*block_size);
+	for(unsigned int i= 0; i < channels; i++) memset(final_outputs[i], 0, sizeof(float)*block_size);
 	//write, applying mixing matrices as needed.
 	final_output_connection->addNodeless(&final_outputs[0], true);
 	//interleave the samples.
@@ -155,22 +155,25 @@ void LavSimulation::backgroundTaskThreadFunction() {
 
 //begin public API
 
-Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlock(LavSimulation* simulation, unsigned int channels, int mayApplyMixingMatrix, float* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlock(LavHandle simulationHandle, unsigned int channels, int mayApplyMixingMatrix, float* destination) {
 	PUB_BEGIN
+	auto simulation = incomingObject<LavSimulation>(simulationHandle);
 	LOCK(*simulation);
 	simulation->getBlock(destination, channels, mayApplyMixingMatrix != 0);
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlockSize(LavSimulation* simulation, int* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlockSize(LavHandle simulationHandle, int* destination) {
 	PUB_BEGIN
+	auto simulation =incomingObject<LavSimulation>(simulationHandle);
 	LOCK(*simulation);
 	*destination = simulation->getBlockSize();
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_simulationGetSr(LavSimulation* simulation, int* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_simulationGetSr(LavHandle simulationHandle, int* destination) {
 	PUB_BEGIN
+	auto simulation =incomingObject<LavSimulation>(simulationHandle);
 	LOCK(*simulation);
 	*destination = (int)simulation->getSr();
 	PUB_END
@@ -178,14 +181,16 @@ Lav_PUBLIC_FUNCTION LavError Lav_simulationGetSr(LavSimulation* simulation, int*
 
 //atomic blocks
 
-Lav_PUBLIC_FUNCTION LavError Lav_simulationBeginAtomicBlock(LavSimulation *simulation) {
+Lav_PUBLIC_FUNCTION LavError Lav_simulationBeginAtomicBlock(LavHandle simulationHandle) {
 	PUB_BEGIN
+	auto simulation = incomingObject<LavSimulation>(simulationHandle);
 	simulation->lock();
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_simulationEndAtomicBlock(LavSimulation* simulation) {
+Lav_PUBLIC_FUNCTION LavError Lav_simulationEndAtomicBlock(LavHandle simulationHandle) {
 	PUB_BEGIN
+	auto simulation = incomingObject<LavSimulation>(simulationHandle);
 	simulation->unlock();
 	PUB_END
 }

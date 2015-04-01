@@ -48,7 +48,7 @@ std::shared_ptr<LavNode> createFeedbackDelayNetworkNode(std::shared_ptr<LavSimul
 void LavFeedbackDelayNetworkNode::process() {
 	for(int i = 0; i < block_size; i++) {
 		network->computeFrame(lastOutput);
-		for(unsigned int j = 0; j < num_output_buffers; j++) {
+		for(int j = 0; j < num_output_buffers; j++) {
 			nextInput[j] = input_buffers[j][i];
 			output_buffers[j][i] = lastOutput[j]*gains[j];
 		}
@@ -78,44 +78,53 @@ void LavFeedbackDelayNetworkNode::setFeedbackDelayMatrix(int length, float* valu
 
 //begin public api.
 
-Lav_PUBLIC_FUNCTION LavError Lav_createFeedbackDelayNetworkNode(LavSimulation* sim, float maxDelay, int lines, LavNode** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createFeedbackDelayNetworkNode(LavHandle simulationHandle, float maxDelay, int lines, LavHandle* destination) {
 	PUB_BEGIN
-	LOCK(*sim);
-	*destination = outgoingPointer<LavNode>(createFeedbackDelayNetworkNode(
-	incomingPointer<LavSimulation>(sim), maxDelay, lines));
+	auto simulation =incomingObject<LavSimulation>(simulationHandle);
+	LOCK(*simulation);
+	*destination = outgoingObject<LavNode>(createFeedbackDelayNetworkNode(
+	simulation, maxDelay, lines));
 	PUB_END
 }
 
 #define FDN_OR_ERROR if(node->getType() != Lav_NODETYPE_FEEDBACK_DELAY_NETWORK) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
 
-Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetFeedbackMatrix(LavNode* node, int count, float* values) {
+Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetFeedbackMatrix(LavHandle nodeHandle, int count, float* values) {
 	PUB_BEGIN
+	auto node=incomingObject<LavNode>(nodeHandle);
 	LOCK(*node);
 	FDN_OR_ERROR
-	((LavFeedbackDelayNetworkNode*)node)->setFeedbackMatrix(count, values);
+	auto fdn=std::static_pointer_cast<LavFeedbackDelayNetworkNode>(node);
+	fdn->setFeedbackMatrix(count, values);
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetOutputGains(LavNode* node, int count, float* values) {
+Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetOutputGains(LavHandle nodeHandle, int count, float* values) {
 	PUB_BEGIN
+	auto node=incomingObject<LavNode>(nodeHandle);
 	LOCK(*node);
 	FDN_OR_ERROR
-	((LavFeedbackDelayNetworkNode*)node)->setOutputGains(count, values);
+	auto fdn = std::static_pointer_cast<LavFeedbackDelayNetworkNode>(node);
+	fdn->setOutputGains(count, values);
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetDelays(LavNode* node, int count, float* values) {
+Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetDelays(LavHandle nodeHandle, int count, float* values) {
 	PUB_BEGIN
+	auto node= incomingObject<LavNode>(nodeHandle);
 	LOCK(*node);
 	FDN_OR_ERROR
-	((LavFeedbackDelayNetworkNode*)node)->setDelays(count, values);
+	auto fdn=std::static_pointer_cast<LavFeedbackDelayNetworkNode>(node);
+	fdn->setDelays(count, values);
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetFeedbackDelayMatrix(LavNode* node, int count, float* values) {
+Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetFeedbackDelayMatrix(LavHandle nodeHandle, int count, float* values) {
 	PUB_BEGIN
+	auto node = incomingObject<LavNode>(nodeHandle);
 	LOCK(*node);
 	FDN_OR_ERROR
-	((LavFeedbackDelayNetworkNode*)node)->setFeedbackDelayMatrix(count, values);
+	auto fdn=std::static_pointer_cast<LavFeedbackDelayNetworkNode>(node);
+	fdn->setFeedbackDelayMatrix(count, values);
 	PUB_END
 }

@@ -82,7 +82,7 @@ void LavNode::tick() {
 	process();
 	float mul = getProperty(Lav_NODE_MUL).getFloatValue();
 	if(mul != 1.0f) {
-		for(unsigned int i = 0; i < getOutputBufferCount(); i++) {
+		for(int i = 0; i < getOutputBufferCount(); i++) {
 			float* output = getOutputBufferArray()[i];
 			scalarMultiplicationKernel(block_size, mul, output, output);
 		}
@@ -113,7 +113,7 @@ void LavNode::zeroOutputBuffers() {
 }
 
 void LavNode::zeroInputBuffers() {
-	for(int i = 0; i < input_buffers.size(); i++) {
+	for(unsigned int i = 0; i < input_buffers.size(); i++) {
 		memset(input_buffers[i], 0, sizeof(float)*simulation->getBlockSize());
 	}
 }
@@ -292,7 +292,7 @@ void LavSubgraphNode::tick() {
 	//We prefer this over forwarding because this allows the subgraph to change all internal volumes without them being overridden by the user.
 	float mul = getProperty(Lav_NODE_MUL).getFloatValue();
 	if(mul != 1.0f) {
-		for(unsigned int i = 0; i < subgraph_output->getOutputBufferCount(); i++) {
+		for(int i = 0; i < subgraph_output->getOutputBufferCount(); i++) {
 			float* output = subgraph_output->getOutputBufferArray()[i];
 			scalarMultiplicationKernel(simulation->getBlockSize(), mul, output, output);
 		}
@@ -307,51 +307,58 @@ void LavSubgraphNode::tick() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeConnect(LavNode* node, int output, LavNode* dest, int input) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeConnect(LavHandle nodeHandle, int output, LavHandle destHandle, int input) {
 	PUB_BEGIN
+	auto node= incomingObject<LavNode>(nodeHandle);
+	auto dest = incomingObject<LavNode>(destHandle);
 	LOCK(*node);
-	node->connect(output, incomingPointer<LavNode>(dest), input);
+	node->connect(output, dest, input);
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeConnectSimulation(LavNode* node, int output) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeConnectSimulation(LavHandle nodeHandle, int output) {
 	PUB_BEGIN
+	auto node = incomingObject<LavNode>(nodeHandle);
 	LOCK(*node);
 	node->connectSimulation(output);
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeDisconnect(LavNode* node, int output) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeDisconnect(LavHandle nodeHandle, int output) {
 	PUB_BEGIN
+	auto node = incomingObject<LavNode>(nodeHandle);
 	LOCK(*node);
 	node->disconnect(output);
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetType(LavNode* node, int* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetType(LavHandle nodeHandle, int* destination) {
 	PUB_BEGIN
-	auto node_ptr = incomingPointer<LavNode>(node);
+	auto node = incomingObject<LavNode>(nodeHandle);
 	LOCK(*node);
 	*destination = node->getType();
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetInputConnectionCount(LavNode* node, unsigned int* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetInputConnectionCount(LavHandle nodeHandle, unsigned int* destination) {
 	PUB_BEGIN
+	auto node = incomingObject<LavNode>(nodeHandle);
 	LOCK(*node);
 	*destination =node->getInputConnectionCount();
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetOutputConnectionCount(LavNode* node, unsigned int* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetOutputConnectionCount(LavHandle nodeHandle, unsigned int* destination) {
 	PUB_BEGIN
+	auto node = incomingObject<LavNode>(nodeHandle);
 	LOCK(*node);
 	*destination = node->getOutputConnectionCount();
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeReset(LavNode* node) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeReset(LavHandle nodeHandle) {
 	PUB_BEGIN
+	auto node = incomingObject<LavNode>(nodeHandle);
 	LOCK(*node);
 	node->reset();
 	PUB_END
@@ -361,105 +368,105 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeReset(LavNode* node) {
 //this is here because properties do not "know" about objects and only objects have properties; also, it made properties.cpp have to "know" about simulations and objects.
 
 //this works for getters and setters to lock the object and set a variable prop to be a pointer-like thing to a property.
-#define PROP_PREAMBLE(n, s, t) auto node_ptr = incomingPointer<LavNode>(n);\
-LOCK(*(n));\
-auto &prop = (n)->getProperty((s));\
+#define PROP_PREAMBLE(n, s, t) auto node_ptr = incomingObject<LavNode>(n);\
+LOCK(*node_ptr);\
+auto &prop = node_ptr->getProperty((s));\
 if(prop.getType() != (t)) {\
 throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);\
 }
 
 #define READONLY_CHECK if(prop.isReadOnly()) throw LavErrorException(Lav_ERROR_PROPERTY_IS_READ_ONLY);
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeResetProperty(LavNode *node, int slot) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeResetProperty(LavHandle nodeHandle, int slot) {
 	PUB_BEGIN
-	auto node_ptr = incomingPointer<LavNode>(node);
-	LOCK(*node);
-	auto prop = node->getProperty(slot);
+	auto node_ptr = incomingObject<LavNode>(nodeHandle);
+	LOCK(*node_ptr);
+	auto prop = node_ptr->getProperty(slot);
 	READONLY_CHECK
 	prop.reset();
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeSetIntProperty(LavNode* node, int slot, int value) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeSetIntProperty(LavHandle nodeHandle, int slot, int value) {
 	PUB_BEGIN
-	PROP_PREAMBLE(node, slot, Lav_PROPERTYTYPE_INT);
+	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_INT);
 	READONLY_CHECK
 	prop.setIntValue(value);
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeSetFloatProperty(LavNode *node, int slot, float value) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeSetFloatProperty(LavHandle nodeHandle, int slot, float value) {
 	PUB_BEGIN
-	PROP_PREAMBLE(node, slot, Lav_PROPERTYTYPE_FLOAT);
+	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_FLOAT);
 	READONLY_CHECK
 	prop.setFloatValue(value);
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeSetDoubleProperty(LavNode *node, int slot, double value) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeSetDoubleProperty(LavHandle nodeHandle, int slot, double value) {
 	PUB_BEGIN
-	PROP_PREAMBLE(node, slot, Lav_PROPERTYTYPE_DOUBLE);
+	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_DOUBLE);
 	READONLY_CHECK
 	prop.setDoubleValue(value);
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeSetStringProperty(LavNode*node, int slot, char* value) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeSetStringProperty(LavHandle nodeHandle, int slot, char* value) {
 	PUB_BEGIN
-	PROP_PREAMBLE(node, slot, Lav_PROPERTYTYPE_STRING);
+	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_STRING);
 	READONLY_CHECK
 	prop.setStringValue(value);
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeSetFloat3Property(LavNode* node, int slot, float v1, float v2, float v3) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeSetFloat3Property(LavHandle nodeHandle, int slot, float v1, float v2, float v3) {
 	PUB_BEGIN
-	PROP_PREAMBLE(node, slot, Lav_PROPERTYTYPE_FLOAT3);
+	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_FLOAT3);
 	READONLY_CHECK
 	prop.setFloat3Value(v1, v2, v3);
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeSetFloat6Property(LavNode* node, int slot, float v1, float v2, float v3, float v4, float v5, float v6) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeSetFloat6Property(LavHandle nodeHandle, int slot, float v1, float v2, float v3, float v4, float v5, float v6) {
 	PUB_BEGIN
-	PROP_PREAMBLE(node, slot, Lav_PROPERTYTYPE_FLOAT6);
+	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_FLOAT6);
 	READONLY_CHECK
 	prop.setFloat6Value(v1, v2, v3, v4, v5, v6);
 	return Lav_ERROR_NONE;
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetIntProperty(LavNode*node, int slot, int *destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetIntProperty(LavHandle nodeHandle, int slot, int *destination) {
 	PUB_BEGIN
-	PROP_PREAMBLE(node, slot, Lav_PROPERTYTYPE_INT);
+	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_INT);
 	*destination = prop.getIntValue();
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetFloatProperty(LavNode* node, int slot, float *destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetFloatProperty(LavHandle nodeHandle, int slot, float *destination) {
 	PUB_BEGIN
-	PROP_PREAMBLE(node, slot, Lav_PROPERTYTYPE_FLOAT);
+	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_FLOAT);
 	*destination = prop.getFloatValue();
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetDoubleProperty(LavNode*node, int slot, double *destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetDoubleProperty(LavHandle nodeHandle, int slot, double *destination) {
 	PUB_BEGIN
-	PROP_PREAMBLE(node, slot, Lav_PROPERTYTYPE_DOUBLE);
+	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_DOUBLE);
 	*destination = prop.getDoubleValue();
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetStringProperty(LavNode* node, int slot, const char** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetStringProperty(LavHandle nodeHandle, int slot, const char** destination) {
 	PUB_BEGIN
-	PROP_PREAMBLE(node, slot, Lav_PROPERTYTYPE_STRING);
+	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_STRING);
 	*destination = prop.getStringValue();
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetFloat3Property(LavNode* node, int slot, float* v1, float* v2, float* v3) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetFloat3Property(LavHandle nodeHandle, int slot, float* v1, float* v2, float* v3) {
 	PUB_BEGIN
-	PROP_PREAMBLE(node, slot, Lav_PROPERTYTYPE_FLOAT3);
+	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_FLOAT3);
 	auto val = prop.getFloat3Value();
 	*v1 = val[0];
 	*v2 = val[1];
@@ -467,9 +474,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeGetFloat3Property(LavNode* node, int slot, 
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetFloat6Property(LavNode* node, int slot, float* v1, float* v2, float* v3, float* v4, float* v5, float* v6) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetFloat6Property(LavHandle nodeHandle, int slot, float* v1, float* v2, float* v3, float* v4, float* v5, float* v6) {
 	PUB_BEGIN
-	PROP_PREAMBLE(node, slot, Lav_PROPERTYTYPE_FLOAT6);
+	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_FLOAT6);
 	auto val = prop.getFloat6Value();
 	*v1 = val[0];
 	*v2 = val[1];
@@ -480,43 +487,44 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeGetFloat6Property(LavNode* node, int slot, 
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetIntPropertyRange(LavNode* node, int slot, int* destination_lower, int* destination_upper) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetIntPropertyRange(LavHandle nodeHandle, int slot, int* destination_lower, int* destination_upper) {
 	PUB_BEGIN
-	PROP_PREAMBLE(node, slot, Lav_PROPERTYTYPE_INT);
+	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_INT);
 	*destination_lower = prop.getIntMin();
 	*destination_upper = prop.getIntMax();
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetFloatPropertyRange(LavNode* node, int slot, float* destination_lower, float* destination_upper) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetFloatPropertyRange(LavHandle nodeHandle, int slot, float* destination_lower, float* destination_upper) {
 	PUB_BEGIN
-	PROP_PREAMBLE(node, slot, Lav_PROPERTYTYPE_FLOAT);
+	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_FLOAT);
 	*destination_lower = prop.getFloatMin();
 	*destination_upper = prop.getFloatMax();
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetDoublePropertyRange(LavNode* node, int slot, double* destination_lower, double* destination_upper) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetDoublePropertyRange(LavHandle nodeHandle, int slot, double* destination_lower, double* destination_upper) {
 	PUB_BEGIN
-	PROP_PREAMBLE(node, slot, Lav_PROPERTYTYPE_DOUBLE);
+	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_DOUBLE);
 	*destination_lower = prop.getDoubleMin();
 	*destination_upper = prop.getDoubleMax();
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetPropertyType(LavNode* node, int slot, int* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetPropertyType(LavHandle nodeHandle, int slot, int* destination) {
 	PUB_BEGIN
+	auto node= incomingObject<LavNode>(nodeHandle);
 	LOCK(*node);
 	auto &prop = node->getProperty(slot);
 	*destination = prop.getType();
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetPropertyName(LavNode* node, int slot, char** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetPropertyName(LavHandle nodeHandle, int slot, char** destination) {
 	PUB_BEGIN
-	auto node_ptr = incomingPointer<LavNode>(node);
-	LOCK(*node);
-	auto prop = node->getProperty(slot);
+	auto node_ptr = incomingObject<LavNode>(nodeHandle);
+	LOCK(*node_ptr);
+	auto prop = node_ptr->getProperty(slot);
 	const char* n = prop.getName();
 	char* dest = new char[strlen(n)+1]; //+1 for extra NULL.
 	strcpy(dest, n);
@@ -525,8 +533,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeGetPropertyName(LavNode* node, int slot, ch
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetPropertyHasDynamicRange(LavNode* node, int slot, int* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetPropertyHasDynamicRange(LavHandle nodeHandle, int slot, int* destination) {
 	PUB_BEGIN
+	auto node = incomingObject<LavNode>(nodeHandle);
 	LOCK(*node);
 	auto &prop = node->getProperty(slot);
 	*destination = prop.getHasDynamicRange();
@@ -535,32 +544,32 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeGetPropertyHasDynamicRange(LavNode* node, i
 
 //array properties.
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeReplaceFloatArrayProperty(LavNode* node, int slot, unsigned int length, float* values) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeReplaceFloatArrayProperty(LavHandle nodeHandle, int slot, unsigned int length, float* values) {
 	PUB_BEGIN
-	PROP_PREAMBLE(node, slot, Lav_PROPERTYTYPE_FLOAT_ARRAY);
+	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_FLOAT_ARRAY);
 	READONLY_CHECK
 	prop.replaceFloatArray(length, values);
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeReadFloatArrayProperty(LavNode* node, int slot, unsigned int index, float* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeReadFloatArrayProperty(LavHandle nodeHandle, int slot, unsigned int index, float* destination) {
 	PUB_BEGIN
-	PROP_PREAMBLE(node, slot, Lav_PROPERTYTYPE_FLOAT_ARRAY);
+	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_FLOAT_ARRAY);
 	*destination = prop.readFloatArray(index);
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError  Lav_nodeWriteFloatArrayProperty(LavNode* node, int slot, unsigned int start, unsigned int stop, float* values) {
+Lav_PUBLIC_FUNCTION LavError  Lav_nodeWriteFloatArrayProperty(LavHandle nodeHandle, int slot, unsigned int start, unsigned int stop, float* values) {
 	PUB_BEGIN
-	PROP_PREAMBLE(node, slot, Lav_PROPERTYTYPE_FLOAT_ARRAY);
+	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_FLOAT_ARRAY);
 	READONLY_CHECK
 	prop.writeFloatArray(start, stop, values);
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetFloatArrayPropertyDefault(LavNode* node, int slot, unsigned int* destinationLength, float** destinationArray) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetFloatArrayPropertyDefault(LavHandle nodeHandle, int slot, unsigned int* destinationLength, float** destinationArray) {
 	PUB_BEGIN
-	PROP_PREAMBLE(node, slot, Lav_PROPERTYTYPE_FLOAT_ARRAY);
+	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_FLOAT_ARRAY);
 	auto def = prop.getFloatArrayDefault();
 	if(def.size() == 0) {
 		*destinationLength = 0;
@@ -576,39 +585,39 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeGetFloatArrayPropertyDefault(LavNode* node,
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetFloatArrayPropertyLength(LavNode* node, int slot, unsigned int* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetFloatArrayPropertyLength(LavHandle nodeHandle, int slot, unsigned int* destination) {
 	PUB_BEGIN
-	PROP_PREAMBLE(node, slot, Lav_PROPERTYTYPE_FLOAT_ARRAY);
+	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_FLOAT_ARRAY);
 	*destination = prop.getFloatArrayLength();
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeReplaceIntArrayProperty(LavNode* node, int slot, unsigned int length, int* values) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeReplaceIntArrayProperty(LavHandle nodeHandle, int slot, unsigned int length, int* values) {
 	PUB_BEGIN
-	PROP_PREAMBLE(node, slot, Lav_PROPERTYTYPE_INT_ARRAY);
+	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_INT_ARRAY);
 	READONLY_CHECK
 	prop.replaceIntArray(length, values);
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeReadIntArrayProperty(LavNode* node, int slot, unsigned int index, int* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeReadIntArrayProperty(LavHandle nodeHandle, int slot, unsigned int index, int* destination) {
 	PUB_BEGIN
-	PROP_PREAMBLE(node, slot, Lav_PROPERTYTYPE_INT_ARRAY);
+	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_INT_ARRAY);
 	*destination = prop.readIntArray(index);
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError  Lav_nodeWriteIntArrayProperty(LavNode* node, int slot, unsigned int start, unsigned int stop, int* values) {
+Lav_PUBLIC_FUNCTION LavError  Lav_nodeWriteIntArrayProperty(LavHandle nodeHandle, int slot, unsigned int start, unsigned int stop, int* values) {
 	PUB_BEGIN
-	PROP_PREAMBLE(node, slot, Lav_PROPERTYTYPE_INT_ARRAY);
+	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_INT_ARRAY);
 	READONLY_CHECK
 	prop.writeIntArray(start, stop, values);
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetIntArrayPropertyDefault(LavNode* node, int slot, unsigned int* destinationLength, int** destinationArray) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetIntArrayPropertyDefault(LavHandle nodeHandle, int slot, unsigned int* destinationLength, int** destinationArray) {
 	PUB_BEGIN
-	PROP_PREAMBLE(node, slot, Lav_PROPERTYTYPE_INT_ARRAY);
+	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_INT_ARRAY);
 	auto def = prop.getIntArrayDefault();
 	if(def.size() == 0) {
 		*destinationLength = 0;
@@ -624,18 +633,18 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeGetIntArrayPropertyDefault(LavNode* node, i
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetIntArrayPropertyLength(LavNode* node, int slot, int* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetIntArrayPropertyLength(LavHandle nodeHandle, int slot, int* destination) {
 	PUB_BEGIN
-	PROP_PREAMBLE(node, slot, Lav_PROPERTYTYPE_INT_ARRAY);
+	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_INT_ARRAY);
 	*destination = prop.getIntArrayLength();
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetArrayPropertyLengthRange(LavNode* node, int slot, unsigned int* destinationMin, unsigned int* destinationMax) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetArrayPropertyLengthRange(LavHandle nodeHandle, int slot, unsigned int* destinationMin, unsigned int* destinationMax) {
 	PUB_BEGIN
-	auto ptr = incomingPointer<LavNode>(node);
-	LOCK(*node);
-	auto &prop = node->getProperty(slot);
+	auto ptr = incomingObject<LavNode>(nodeHandle);
+	LOCK(*ptr);
+	auto &prop = ptr->getProperty(slot);
 	int type = prop.getType();
 	if(type != Lav_PROPERTYTYPE_FLOAT_ARRAY || type != Lav_PROPERTYTYPE_INT_ARRAY) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
 	PUB_END
@@ -643,29 +652,29 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeGetArrayPropertyLengthRange(LavNode* node, 
 
 //callback setup/configure/retrieval.
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetEventHandler(LavNode* node, int event, LavEventCallback *destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetEventHandler(LavHandle nodeHandle, int event, LavEventCallback *destination) {
 	PUB_BEGIN
-	auto ptr = incomingPointer<LavNode>(node);
-	LOCK(*node);
-	*destination = node->getEvent(event).getExternalHandler();
-	PUB_END
-}
-
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetEventUserDataPointer(LavNode* node, int event, void** destination) {
-	PUB_BEGIN
-	auto ptr = incomingPointer<LavNode>(node);
-	LOCK(*node);
-	*destination = node->getEvent(event).getUserData();
-	PUB_END
-}
-
-Lav_PUBLIC_FUNCTION LavError Lav_nodeSetEvent(LavNode* node, int event, LavEventCallback handler, void* userData) {
-	PUB_BEGIN
-	auto ptr = incomingPointer<LavNode>(node);
+	auto ptr = incomingObject<LavNode>(nodeHandle);
 	LOCK(*ptr);
-	auto &ev = node->getEvent(event);
+	*destination = ptr->getEvent(event).getExternalHandler();
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetEventUserDataPointer(LavHandle nodeHandle, int event, void** destination) {
+	PUB_BEGIN
+	auto ptr = incomingObject<LavNode>(nodeHandle);
+	LOCK(*ptr);
+	*destination = ptr->getEvent(event).getUserData();
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_nodeSetEvent(LavHandle nodeHandle, int event, LavEventCallback handler, void* userData) {
+	PUB_BEGIN
+	auto ptr = incomingObject<LavNode>(nodeHandle);
+	LOCK(*ptr);
+	auto &ev = ptr->getEvent(event);
 	if(handler) {
-		ev.setHandler([=](LavNode* o, void* d) { handler(o, d);});
+		ev.setHandler([=](LavNode* o, void* d) { handler(o->externalObjectHandle, d);});
 		ev.setExternalHandler(handler);
 		ev.setUserData(userData);
 	} else {

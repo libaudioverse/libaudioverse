@@ -9,6 +9,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <functional>
 
 class LavSimulation;
+class LavNode;
 
 class LavEvent {
 	public:

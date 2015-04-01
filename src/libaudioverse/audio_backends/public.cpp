@@ -79,7 +79,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_deviceGetChannels(unsigned int index, unsigned 
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_createSimulationForDevice(int index, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead, LavSimulation** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createSimulationForDevice(int index, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead, LavHandle* destination) {
 	PUB_BEGIN
 	//don't use defaults, use user options.
 	auto sim = std::make_shared<LavSimulation>(sr, blockSize, mixAhead);
@@ -98,15 +98,15 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSimulationForDevice(int index, unsigned i
 	};
 	auto dev = chosen_factory->createDevice(audioFunction, index, channels, sr, blockSize, mixAhead);
 	sim->associateDevice(dev);
-	*destination = outgoingPointer<LavSimulation>(sim);
+	*destination = outgoingObject<LavSimulation>(sim);
 	PUB_END
 }
 
 //the special case of a device without an output.
-Lav_PUBLIC_FUNCTION LavError Lav_createReadSimulation(unsigned int sr, unsigned int blockSize, LavSimulation** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createReadSimulation(unsigned int sr, unsigned int blockSize, LavHandle* destination) {
 	PUB_BEGIN
 	auto shared = std::make_shared<LavSimulation>(sr, blockSize, 0);
 	shared->completeInitialization();
-	*destination = outgoingPointer(shared);
+	*destination = outgoingObject(shared);
 	PUB_END
 }

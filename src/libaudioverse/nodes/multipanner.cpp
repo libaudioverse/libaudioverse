@@ -103,15 +103,18 @@ void LavMultipannerObject::strategyChanged() {
 	}
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_createMultipannerNode(LavSimulation* sim, char* hrtfPath, LavNode** destination) {
+//begin public api
+
+Lav_PUBLIC_FUNCTION LavError Lav_createMultipannerNode(LavHandle simulationHandle, char* hrtfPath, LavHandle* destination) {
 	PUB_BEGIN
-	LOCK(*sim);
+	auto simulation = incomingObject<LavSimulation>(simulationHandle);
+	LOCK(*simulation);
 	std::shared_ptr<LavHrtfData> hrtf = std::make_shared<LavHrtfData>();
 	if(std::string(hrtfPath) == "default") {
-		hrtf->loadFromDefault(sim->getSr());
+		hrtf->loadFromDefault(simulation->getSr());
 	} else {
-		hrtf->loadFromFile(hrtfPath, sim->getSr());
+		hrtf->loadFromFile(hrtfPath, simulation->getSr());
 	}
-	*destination = outgoingPointer<LavNode>(createMultipannerNode(incomingPointer<LavSimulation>(sim), hrtf));
+	*destination = outgoingObject<LavNode>(createMultipannerNode(simulation, hrtf));
 	PUB_END
 }

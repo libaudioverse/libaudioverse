@@ -53,7 +53,7 @@ template<class t>
 int outgoingObject(std::shared_ptr<t> what) {
 	if(what->isExternalObject == false) {
 		auto guard=std::lock_guard<std::mutex>(memory_lock);
-		what->isExternal=true;
+		what->isExternalObject =true;
 		what->externalObjectHandle=max_handle.fetch_add(1);
 	}
 	return what->externalObjectHandle;
@@ -61,7 +61,7 @@ int outgoingObject(std::shared_ptr<t> what) {
 
 template<class t>
 std::shared_ptr<t> incomingObject(int handle) {
-	if(external_handles.count(handle)) return dynamic_pointer_cast<t>(external_handles.at(handle));
+	if(external_handles.count(handle)) return std::dynamic_pointer_cast<t>(external_handles.at(handle));
 	else return nullptr;
 }
 

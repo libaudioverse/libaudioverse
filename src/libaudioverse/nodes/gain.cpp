@@ -33,20 +33,21 @@ std::shared_ptr<LavNode> createGainNode(std::shared_ptr<LavSimulation> sim) {
 }
 
 void LavGainNode::process() {
-	for(int i = 0; i < input_buffers.size(); i++) {
+	for(unsigned int i = 0; i < input_buffers.size(); i++) {
 		std::copy(input_buffers[i], input_buffers[i]+block_size, output_buffers[i]);
 	}
 }
 
 //begin public api.
 
-Lav_PUBLIC_FUNCTION LavError Lav_createGainNode(LavSimulation* sim, int channels, LavNode** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createGainNode(LavHandle simulationHandle, int channels, LavHandle* destination) {
 	PUB_BEGIN
-	LOCK(*sim);
-	auto retval= createGainNode(incomingPointer<LavSimulation>(sim));
+	auto simulation = incomingObject<LavSimulation>(simulationHandle);
+	LOCK(*simulation);
+	auto retval= createGainNode(simulation);
 	retval->resize(channels, channels);
 	retval->appendInputConnection(0, channels);
 	retval->appendOutputConnection(0, channels);
-	*destination =outgoingPointer<LavNode>(retval);
+	*destination =outgoingObject<LavNode>(retval);
 	PUB_END
 }

@@ -47,10 +47,11 @@ void LavHardLimiterNode::process() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterNode(LavSimulation* simulation, unsigned int numChannels, LavNode** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterNode(LavHandle simulationHandle, unsigned int numChannels, LavHandle* destination) {
 	PUB_BEGIN
+	auto simulation =incomingObject<LavSimulation>(simulationHandle);
 	LOCK(*simulation);
-	auto retval = createHardLimiterNode(incomingPointer<LavSimulation>(simulation), numChannels);
-	*destination = outgoingPointer<LavNode>(retval);
+	auto retval = createHardLimiterNode(simulation, numChannels);
+	*destination = outgoingObject<LavNode>(retval);
 	PUB_END
 }

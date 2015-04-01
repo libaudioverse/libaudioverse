@@ -54,10 +54,11 @@ void LavSquareNode::process() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createSquareNode(LavSimulation* simulation, LavNode **destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createSquareNode(LavHandle simulationHandle, LavHandle* destination) {
 	PUB_BEGIN
+	auto simulation = incomingObject<LavSimulation>(simulationHandle);
 	LOCK(*simulation);
-	auto retval = createSquareNode(incomingPointer<LavSimulation>(simulation));
-	*destination = outgoingPointer<LavNode>(retval);
+	auto retval = createSquareNode(simulation);
+	*destination = outgoingObject<LavNode>(retval);
 	PUB_END
 }

@@ -107,10 +107,11 @@ void LavNoiseNode::process() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createNoiseNode(LavSimulation* simulation, LavNode **destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createNoiseNode(LavHandle simulationHandle, LavHandle* destination) {
 	PUB_BEGIN
+	auto simulation =incomingObject<LavSimulation>(simulationHandle);
 	LOCK(*simulation);
-	auto retval = createNoiseNode(incomingPointer<LavSimulation>(simulation));
-	*destination = outgoingPointer<LavNode>(retval);
+	auto retval = createNoiseNode(simulation);
+	*destination = outgoingObject<LavNode>(retval);
 	PUB_END
 }

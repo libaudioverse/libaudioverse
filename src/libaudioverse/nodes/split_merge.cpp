@@ -59,18 +59,20 @@ float** LavSplitMergeNode::getOutputBufferArray() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createChannelSplitterNode(LavSimulation* simulation, int channels, LavNode** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createChannelSplitterNode(LavHandle simulationHandle, int channels, LavHandle* destination) {
 	PUB_BEGIN
+	auto simulation = incomingObject<LavSimulation>(simulationHandle);
 	LOCK(*simulation);
-	auto retval = createChannelSplitterNode(incomingPointer<LavSimulation>(simulation), channels);
-	*destination = outgoingPointer(retval);
+	auto retval = createChannelSplitterNode(simulation, channels);
+	*destination = outgoingObject(retval);
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_createChannelMergerNode(LavSimulation* simulation, int channels, LavNode** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createChannelMergerNode(LavHandle simulationHandle, int channels, LavHandle* destination) {
 	PUB_BEGIN
+	auto simulation = incomingObject<LavSimulation>(simulationHandle);
 	LOCK(*simulation);
-	auto retval = createChannelMergerNode(incomingPointer<LavSimulation>(simulation), channels);
-	*destination = outgoingPointer(retval);
+	auto retval = createChannelMergerNode(simulation, channels);
+	*destination = outgoingObject(retval);
 	PUB_END
 }

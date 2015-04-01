@@ -119,10 +119,11 @@ void LavFileNode::process() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavSimulation* simulation, const char* path, LavNode** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavHandle simulationHandle, const char* path, LavHandle* destination) {
 	PUB_BEGIN
+	auto simulation =incomingObject<LavSimulation>(simulationHandle);
 	LOCK(*simulation);
-	auto retval = createFileNode(incomingPointer<LavSimulation>(simulation), path);
-	*destination = outgoingPointer<LavNode>(retval);
+	auto retval = createFileNode(simulation, path);
+	*destination = outgoingObject<LavNode>(retval);
 	PUB_END
 }

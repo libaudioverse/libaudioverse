@@ -41,9 +41,10 @@ void LavRingmodNode::process() {
 
 //begin public api.
 
-Lav_PUBLIC_FUNCTION LavError Lav_createRingmodNode(LavSimulation* sim, LavNode** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createRingmodNode(LavHandle simulationHandle, LavHandle* destination) {
 	PUB_BEGIN
-	LOCK(*sim);
-	*destination = outgoingPointer<LavNode>(createRingmodNode(incomingPointer<LavSimulation>(sim)));
+	auto simulation = incomingObject<LavSimulation>(simulationHandle);
+	LOCK(*simulation);
+	*destination = outgoingObject<LavNode>(createRingmodNode(simulation));
 	PUB_END
 }

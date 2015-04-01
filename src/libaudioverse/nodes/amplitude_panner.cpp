@@ -83,19 +83,21 @@ void LavAmplitudePannerNode::configureStandardChannelMap(unsigned int channels) 
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createAmplitudePannerNode(LavSimulation* simulation, LavNode** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createAmplitudePannerNode(LavHandle simulationHandle, LavHandle* destination) {
 	PUB_BEGIN
+	auto simulation = incomingObject<LavSimulation>(simulationHandle);
 	LOCK(*simulation);
-	auto retval = createAmplitudePannerNode(incomingPointer<LavSimulation>(simulation));
-	*destination = outgoingPointer<LavNode>(retval);
+	auto retval = createAmplitudePannerNode(simulation);
+	*destination = outgoingObject(retval);
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_amplitudePannerNodeConfigureStandardMap(LavNode* node, unsigned int channels) {
+Lav_PUBLIC_FUNCTION LavError Lav_amplitudePannerNodeConfigureStandardMap(LavHandle nodeHandle, unsigned int channels) {
 	PUB_BEGIN
 	if(channels != 2 && channels != 6 && channels != 8) throw LavErrorException(Lav_ERROR_RANGE);
+	auto node= incomingObject<LavNode>(nodeHandle);
 	LOCK(*node);
 	if(node->getType() != Lav_NODETYPE_AMPLITUDE_PANNER) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
-	((LavAmplitudePannerNode*)node)->configureStandardChannelMap(channels);
+	std::static_pointer_cast<LavAmplitudePannerNode>(node)->configureStandardChannelMap(channels);
 	PUB_END
 }

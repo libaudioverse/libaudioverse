@@ -45,10 +45,11 @@ void LavSineNode::process() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavSimulation* simulation, LavNode **destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavHandle simulationHandle, LavHandle* destination) {
 	PUB_BEGIN
+	auto simulation = incomingObject<LavSimulation>(simulationHandle);
 	LOCK(*simulation);
-	auto retval = createSineNode(incomingPointer<LavSimulation>(simulation));
-	*destination = outgoingPointer<LavNode>(retval);
+	auto retval = createSineNode(simulation);
+	*destination = outgoingObject<LavNode>(retval);
 	PUB_END
 }

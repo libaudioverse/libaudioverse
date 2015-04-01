@@ -26,7 +26,7 @@ class LavCustomNode: public LavNode {
 };
 
 LavCustomNode::LavCustomNode(std::shared_ptr<LavSimulation> sim, unsigned int inputs, unsigned int channelsPerInput, unsigned int outputs, unsigned int channelsPerOutput): LavNode(Lav_NODETYPE_CUSTOM, sim, inputs*channelsPerInput, outputs*channelsPerOutput) {
-	for(int i= 0; i < inputs; i++) appendInputConnection(i*channelsPerInput, channelsPerInput);
+	for(unsigned int i= 0; i < inputs; i++) appendInputConnection(i*channelsPerInput, channelsPerInput);
 	for(int i= 0; i < outputs; i++) appendOutputConnection(i*channelsPerOutput, channelsPerOutput);
 }
 
@@ -38,7 +38,7 @@ std::shared_ptr<LavNode> createCustomNode(std::shared_ptr<LavSimulation> sim, un
 
 void LavCustomNode::process() {
 	if(callback != nullptr) {
-		callback(this, block_size, num_input_buffers, getInputBufferArray(), num_output_buffers, getOutputBufferArray(), callback_userdata);
+		callback(externalObjectHandle, block_size, num_input_buffers, getInputBufferArray(), num_output_buffers, getOutputBufferArray(), callback_userdata);
 	}
 	else {
 		for(int i= 0; i < num_output_buffers; i++) std::copy(input_buffers[i], input_buffers[i]+block_size, output_buffers[i]);
@@ -47,18 +47,20 @@ void LavCustomNode::process() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createCustomNode(LavSimulation* simulation, unsigned int inputs, unsigned int channelsPerInput, unsigned int outputs, unsigned int channelsPerOutput, LavNode** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createCustomNode(LavHandle simulationHandle, unsigned int inputs, unsigned int channelsPerInput, unsigned int outputs, unsigned int channelsPerOutput, LavHandle* destination) {
 	PUB_BEGIN
+	auto simulation=incomingObject<LavSimulation>(simulationHandle);
 	LOCK(*simulation);
-	*destination = outgoingPointer<LavNode>(createCustomNode(incomingPointer<LavSimulation>(simulation), inputs, channelsPerInput, outputs, channelsPerOutput));
+	*destination = outgoingObject<LavNode>(createCustomNode(simulation, inputs, channelsPerInput, outputs, channelsPerOutput));
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_customNodeSetProcessingCallback(LavNode* node, LavCustomNodeProcessingCallback callback, void* userdata) {
+Lav_PUBLIC_FUNCTION LavError Lav_customNodeSetProcessingCallback(LavHandle nodeHandle, LavCustomNodeProcessingCallback callback, void* userdata) {
 	PUB_BEGIN
+	auto node= incomingObject<LavNode>(nodeHandle);
 	LOCK(*node);
 	if(node->getType() != Lav_NODETYPE_CUSTOM) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
-	LavCustomNode* node2=(LavCustomNode*)node;
+	auto node2 = std::static_pointer_cast<LavCustomNode>(node);
 	node2->callback = callback;
 	node2->callback_userdata = userdata;
 	PUB_END

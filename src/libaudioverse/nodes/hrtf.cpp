@@ -107,16 +107,17 @@ void LavHrtfNode::reset() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createHrtfNode(LavSimulation* simulation, const char* hrtfPath, LavNode** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createHrtfNode(LavHandle simulationHandle, const char* hrtfPath, LavHandle* destination) {
 	PUB_BEGIN
+	auto simulation = incomingObject<LavSimulation>(simulationHandle);
+	LOCK(*simulation);
 	auto hrtf = std::make_shared<LavHrtfData>();
 	if(std::string(hrtfPath) != "default") {
 		hrtf->loadFromFile(hrtfPath, simulation->getSr());
 	} else {
 		hrtf->loadFromDefault(simulation->getSr());
 	}
-	LOCK(*simulation);
-	auto retval = createHrtfNode(incomingPointer<LavSimulation>(simulation), hrtf);
-	*destination = outgoingPointer<LavNode>(retval);
+	auto retval = createHrtfNode(simulation, hrtf);
+	*destination = outgoingObject<LavNode>(retval);
 	PUB_END
 }

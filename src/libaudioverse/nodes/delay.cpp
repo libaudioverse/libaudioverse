@@ -82,9 +82,11 @@ void LavDelayNode::process() {
 }
 
 //begin public api
-Lav_PUBLIC_FUNCTION LavError Lav_createDelayNode(LavSimulation* simulation, float maxDelay, unsigned int lineCount, LavNode** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createDelayNode(LavHandle simulationHandle, float maxDelay, unsigned int lineCount, LavHandle* destination) {
 	PUB_BEGIN
-	auto d = createDelayNode(incomingPointer<LavSimulation>(simulation), maxDelay, lineCount);
-	*destination = outgoingPointer(d);
+	auto simulation =incomingObject<LavSimulation>(simulationHandle);
+	LOCK(*simulation);
+	auto d = createDelayNode(simulation, maxDelay, lineCount);
+	*destination = outgoingObject(d);
 	PUB_END
 }

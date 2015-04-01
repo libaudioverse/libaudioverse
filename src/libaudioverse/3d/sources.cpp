@@ -84,10 +84,11 @@ void LavSourceNode::update(LavEnvironment environment) {
 	panner_node ->getProperty(Lav_NODE_MUL).setFloatValue(gain);
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_createSourceNode(LavSimulation* simulation, LavNode* environment, LavNode** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createSourceNode(LavHandle simulationHandle, LavHandle environmentHandle, LavHandle* destination) {
 	PUB_BEGIN
+	auto simulation = incomingObject<LavSimulation>(simulationHandle);
 	LOCK(*simulation);
-	auto retval = createSourceNode(incomingPointer<LavSimulation>(simulation), incomingPointer<LavEnvironmentBase>(environment));
-	*destination = outgoingPointer<LavNode>(retval);
+	auto retval = createSourceNode(simulation, incomingObject<LavEnvironmentBase>(environmentHandle));
+	*destination = outgoingObject<LavNode>(retval);
 	PUB_END
 }

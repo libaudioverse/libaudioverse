@@ -76,8 +76,9 @@ void LavSimpleEnvironmentNode::registerSourceForUpdates(std::shared_ptr<LavSourc
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createSimpleEnvironmentNode(LavSimulation* simulation, const char*hrtfPath, LavNode** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createSimpleEnvironmentNode(LavHandle simulationHandle, const char*hrtfPath, LavHandle* destination) {
 	PUB_BEGIN
+	auto simulation = incomingObject<LavSimulation>(simulationHandle);
 	LOCK(*simulation);
 	auto hrtf = std::make_shared<LavHrtfData>();
 	if(std::string(hrtfPath) != "default") {
@@ -85,7 +86,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSimpleEnvironmentNode(LavSimulation* simu
 	} else {
 		hrtf->loadFromDefault(simulation->getSr());
 	}
-	auto retval = createSimpleEnvironmentNode(incomingPointer<LavSimulation>(simulation), hrtf);
-	*destination = outgoingPointer<LavNode>(retval);
+	auto retval = createSimpleEnvironmentNode(simulation, hrtf);
+	*destination = outgoingObject<LavNode>(retval);
 	PUB_END
 }

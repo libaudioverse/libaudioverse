@@ -47,30 +47,32 @@ LavGraphListenerNode::~LavGraphListenerNode() {
 
 void LavGraphListenerNode::process() {
 	if(callback) {
-		for(unsigned int i = 0; i < block_size; i++) {
+		for(int i = 0; i < block_size; i++) {
 			for(unsigned int j = 0; j < channels; j++) {
 				outgoing_buffer[i*channels+j] = input_buffers[j][i];
 			}
 		}
-		callback(this, block_size, channels, outgoing_buffer, callback_userdata);
+		callback(this->externalObjectHandle, block_size, channels, outgoing_buffer, callback_userdata);
 	}
 	for(int i= 0; i < num_output_buffers; i++) std::copy(input_buffers[i], input_buffers[i]+block_size, output_buffers[i]);
 }
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createGraphListenerNode(LavSimulation* simulation, unsigned int channels, LavNode** destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createGraphListenerNode(LavHandle simulationHandle, unsigned int channels, LavHandle* destination) {
 	PUB_BEGIN
+	auto simulation = incomingObject<LavSimulation>(simulationHandle);
 	LOCK(*simulation);
-	*destination = outgoingPointer<LavNode>(createGraphListenerNode(incomingPointer<LavSimulation>(simulation), channels));
+	*destination = outgoingObject<LavNode>(createGraphListenerNode(simulation, channels));
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_graphListenerNodeSetListeningCallback(LavNode* node, LavGraphListenerNodeListeningCallback callback, void* userdata) {
+Lav_PUBLIC_FUNCTION LavError Lav_graphListenerNodeSetListeningCallback(LavHandle nodeHandle, LavGraphListenerNodeListeningCallback callback, void* userdata) {
 	PUB_BEGIN
+	auto node = incomingObject<LavNode>(nodeHandle);
 	LOCK(*node);
 	if(node->getType() != Lav_NODETYPE_GRAPH_LISTENER) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
-	LavGraphListenerNode* node2=(LavGraphListenerNode*)node;
+	auto node2= std::static_pointer_cast<LavGraphListenerNode>(node);
 	node2->callback = callback;
 	node2->callback_userdata = userdata;
 	PUB_END
