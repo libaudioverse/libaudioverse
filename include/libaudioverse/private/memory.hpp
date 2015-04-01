@@ -55,6 +55,7 @@ int outgoingObject(std::shared_ptr<t> what) {
 		auto guard=std::lock_guard<std::mutex>(memory_lock);
 		what->isExternalObject =true;
 		what->externalObjectHandle=max_handle.fetch_add(1);
+		external_handles[what->externalObjectHandle] = what;
 	}
 	return what->externalObjectHandle;
 }
