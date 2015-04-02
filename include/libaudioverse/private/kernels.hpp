@@ -41,10 +41,9 @@ Note: this writes to exactly and only 2 outputs.  Zero the others first.
 
 void amplitudePanKernel(float azimuth, float elevation, unsigned int inputLength, float* input, unsigned int numChannels, float** outputs, float* channelAngles, int* channelIndices);
 
-/**Note: this cannot be made to work on streams; we have a dedicated class for that.  This is also much, much slower and is intended for datasets, not output.
-
-It's also much higher quality.*/
-void staticResamplerKernel(int inputSr, int outputSr, int inputLength, float* input, int* outputLengthDestination, float** outputDestination, bool makeMultipleOfFour = true);
+/**Resamples a block of audio data.
+This is slow and inefficient.  Frequent calls will cause heap fragmentation.  This is as high quality as possible. Intended use is one-off data that must be converted.*/
+void staticResamplerKernel(int inputSr, int outputSr, int channels, int frames, float* data, int *framesOut, float** dataOut);
 
 /*Apply a mixing matrix.
 The matrix rows represent output channels and the columns input channels.

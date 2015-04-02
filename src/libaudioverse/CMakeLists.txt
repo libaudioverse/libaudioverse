@@ -20,6 +20,7 @@ add_library(libaudioverse SHARED
 #the core infrastructure.
 connections.cpp
 node.cpp
+buffer.cpp
 properties.cpp
 functiontables.cpp
 initialization.cpp

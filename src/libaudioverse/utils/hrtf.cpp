@@ -137,7 +137,7 @@ void LavHrtfData::loadFromBuffer(unsigned int length, char* buffer, unsigned int
 	for(unsigned int elev = 0; elev < elev_count; elev++) {
 		for(unsigned int azimuth = 0; azimuth < azimuth_counts[elev]; azimuth++) {
 			memcpy(tempBuffer, iterator, sizeof(float)*before_hrir_length);
-			staticResamplerKernel(samplerate, forSr, before_hrir_length, tempBuffer, &final_hrir_length, &hrirs[elev][azimuth]);
+			staticResamplerKernel(samplerate, forSr, 1, before_hrir_length, tempBuffer, &final_hrir_length, &hrirs[elev][azimuth]);
 			iterator+=before_hrir_length*sizeof(float);
 		}
 	}

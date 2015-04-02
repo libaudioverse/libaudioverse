@@ -14,12 +14,16 @@ class LavBuffer: public LavExternalObject {
 	int getLength();
 	double getDuration();
 	int getChannels();
-	void setContents(int channels, int sr, int length, float* data);
+	//This can be used outside the lock; the only thing it does is read simulation's sr value which can never change by definition.
+	void setContents(int channels, int sr, int frames, float* inputData);
 	//Writes uninterleaved data resampled appropriately for the simulation being used.
-	void writeData(int frames, float** buffers);
+	//This remixes according to the built-in Libaudioverse remixing rules as necessary.
+	//Returns count of written frames.
+	int writeData(int startFrame, int channels, int frames, float** outputs);
 	private:
-	int channels;
-	int frames;
-	int sr;
-	float* data;
+	int channels = 0;
+	int frames = 0;
+	int sr = 0;
+	float* data = nullptr, *data_end = nullptr;
+	std::shared_ptr<LavSimulation> simulation;
 };
