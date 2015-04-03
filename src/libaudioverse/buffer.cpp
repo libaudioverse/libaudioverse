@@ -3,6 +3,7 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 
 #include <libaudioverse/libaudioverse.h>
+#include <libaudioverse/private/file.hpp>
 #include <libaudioverse/private/buffer.hpp>
 #include <libaudioverse/private/simulation.hpp>
 #include <libaudioverse/private/kernels.hpp>
@@ -34,7 +35,7 @@ int LavBuffer::getChannels() {
 	return channels;
 }
 
-void LavBuffer::setContents(int channels, int sr, int frames, float* inputData) {
+void LavBuffer::setContents(int sr, int channels, int frames, float* inputData) {
 	int simulationSr= (int)simulation->getSr();
 	staticResamplerKernel(sr, simulationSr, channels, frames, inputData, &(this->frames), &data);
 	if(data==nullptr) throw LavErrorException(Lav_ERROR_MEMORY);
@@ -85,3 +86,31 @@ Lav_PUBLIC_FUNCTION LavError Lav_createBuffer(LavHandle simulationHandle, LavHan
 	*destination = outgoingObject(createBuffer(simulation));
 	PUB_END
 }
+
+Lav_PUBLIC_FUNCTION LavError Lav_createBufferFromFile(LavHandle simulationHandle, const char* path, LavHandle* destination) {
+	PUB_BEGIN
+	//because we are creating a buffer here, we can use this knowledge to not hold locks.
+	auto simulation = incomingObject<LavSimulation>(simulationHandle);
+	std::shared_ptr<LavBuffer> buff;
+	LavFileReader f{};
+	f.open(path);
+	float* data = LavAllocFloatArray(f.getSampleCount());
+	f.readAll(data);
+	{
+		LOCK(*simulation);
+		buff=createBuffer(simulation);
+		buff->setContents(f.getSr(), f.getChannelCount(), f.getSampleCount()/f.getChannelCount(), data);
+	}
+	LavFreeFloatArray(data);
+	*destination = outgoingObject(buff);
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_bufferSetContents(LavHandle bufferHandle, int sr, int channels, int frames, float* data) {
+	PUB_BEGIN
+	auto buff=incomingObject<LavBuffer>(bufferHandle);
+	LOCK(*buff);
+	buff->setContents(sr, channels, frames, data);
+	PUB_END
+}
+
