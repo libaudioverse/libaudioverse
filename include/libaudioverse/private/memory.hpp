@@ -51,6 +51,8 @@ t* outgoingPointer(std::shared_ptr<t> ptr) {
 
 template<class t>
 int outgoingObject(std::shared_ptr<t> what) {
+	//null is a special case for which we pass out 0.
+	if(what == nullptr) return 0;
 	if(what->isExternalObject == false) {
 		auto guard=std::lock_guard<std::mutex>(memory_lock);
 		what->isExternalObject =true;
@@ -61,7 +63,8 @@ int outgoingObject(std::shared_ptr<t> what) {
 }
 
 template<class t>
-std::shared_ptr<t> incomingObject(int handle) {
+std::shared_ptr<t> incomingObject(int handle, bool allowNull =false) {
+	if(allowNull&& handle==0) return nullptr;
 	if(external_handles.count(handle)) {
 		auto res=std::dynamic_pointer_cast<t>(external_handles.at(handle));
 		if(res == nullptr) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);

@@ -114,8 +114,6 @@ class LavProperty {
 	//Buffer properties.
 	std::shared_ptr<LavBuffer> getBufferValue();
 	void setBufferValue(std::shared_ptr<LavBuffer> b);
-	std::shared_ptr<LavBuffer> getBufferDefault();
-	void setBufferDefault(std::shared_ptr<LavBuffer> b);
 
 	//set the callback...
 	void setPostChangedCallback(std::function<void(void)> cb);
@@ -130,7 +128,7 @@ class LavProperty {
 	std::string name, string_value, default_string_value;
 	std::vector<float> farray_value, default_farray_value;
 	std::vector<int> iarray_value, default_iarray_value;
-	std::shared_ptr<LavBuffer> buffer_value, default_buffer_value;
+	std::shared_ptr<LavBuffer> buffer_value = nullptr;
 	unsigned int min_array_length = 0, max_array_length = std::numeric_limits<unsigned int>::max();
 	std::function<void(void)> post_changed_callback;
 	bool read_only = false;

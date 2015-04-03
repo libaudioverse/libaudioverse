@@ -13,6 +13,7 @@ void LavProperty::reset() {
 	string_value = default_string_value;
 	farray_value = default_farray_value;
 	iarray_value = default_iarray_value;
+	buffer_value=nullptr;
 }
 
 int LavProperty::getType() {
@@ -306,14 +307,6 @@ void LavProperty::setBufferValue(std::shared_ptr<LavBuffer> b) {
 	buffer_value=b;
 }
 
-std::shared_ptr<LavBuffer> LavProperty::getBufferDefault() {
-	return default_buffer_value;
-}
-
-void LavProperty::setBufferDefault(std::shared_ptr<LavBuffer> b) {
-	default_buffer_value=b;
-}
-
 void LavProperty::setPostChangedCallback(std::function<void(void)> cb) {
 	post_changed_callback = cb;
 }
@@ -406,7 +399,6 @@ LavProperty* createFloatArrayProperty(const char* name, unsigned int minLength, 
 
 LavProperty* createBufferProperty(const char* name) {
 	LavProperty* prop=new LavProperty(Lav_PROPERTYTYPE_BUFFER);
-	prop->setBufferDefault(nullptr);
 	prop->reset();
 	return prop;
 }

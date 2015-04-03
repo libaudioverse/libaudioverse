@@ -21,7 +21,7 @@ std::map<int, std::shared_ptr<LavExternalObject>> external_handles;
 std::atomic<int> max_handle;
 
 void initializeMemoryModule() {
-	max_handle.store(0);
+	max_handle.store(1);
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_free(void* ptr) {
