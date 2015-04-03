@@ -103,6 +103,7 @@ enum Lav_NODETYPES{
 	Lav_NODETYPE_GAIN,
 	Lav_NODETYPE_CHANNEL_SPLITTER,
 	Lav_NODETYPE_CHANNEL_MERGER,
+	Lav_NODETYPE_BUFFER,
 };
 
 /**Node states.*/
@@ -337,6 +338,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createGainNode(LavHandle simulationHandle, int 
 
 Lav_PUBLIC_FUNCTION LavError Lav_createChannelSplitterNode(LavHandle simulationHandle, int channels, LavHandle* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createChannelMergerNode(LavHandle simulationHandle, int channels, LavHandle* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createBufferNode(LavHandle simulationHandle, LavHandle* destination);
 
 #ifdef __cplusplus
 }

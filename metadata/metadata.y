@@ -129,6 +129,10 @@ nodes:
   doc_name: Channel Splitter
  Lav_NODETYPE_CHANNEL_MERGER:
   doc_name: Channel Merger
+ Lav_NODETYPE_BUFFER:
+  doc_name: Buffer Node
+  properties:
+   Lav_BUFFER_BUFFER: {name: buffer, type: buffer}
 additional_important_enums:
  - Lav_LOGGING_LEVELS
  - Lav_PROPERTY_TYPES

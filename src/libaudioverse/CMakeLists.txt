@@ -81,6 +81,7 @@ nodes/noise.cpp
 nodes/iir.cpp
 nodes/gain.cpp
 nodes/split_merge.cpp #contains two nodes under the same class.
+nodes/buffer.cpp
 
 #physical outputs, etc.
 audio_backends/common.cpp

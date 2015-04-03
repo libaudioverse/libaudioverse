@@ -39,7 +39,8 @@ void LavBuffer::loadFromArray(int sr, int channels, int frames, float* inputData
 	int simulationSr= (int)simulation->getSr();
 	staticResamplerKernel(sr, simulationSr, channels, frames, inputData, &(this->frames), &data);
 	if(data==nullptr) throw LavErrorException(Lav_ERROR_MEMORY);
-	data_end=data+this->frames*this->channels;
+	data_end=data+this->frames*channels;
+	this->channels = channels;
 }
 
 int LavBuffer::writeData(int startFrame, int channels, int frames, float** outputs) {

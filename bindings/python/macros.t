@@ -6,7 +6,7 @@
 		return {{prop['value_enum']|without_lav|underscores_to_camelcase(True)}}(val)
 {%elif prop['type'] == 'boolean'%}
 		return bool(_lav.node_get_int_property(self.handle, _libaudioverse.{{enumerant}}))
-{%elif 'array' not in prop['type']%}
+{%elif prop['type'] in ['float', 'double', 'float3', 'float6']%}
 		return _lav.node_get_{{prop['type']}}_property(self.handle, _libaudioverse.{{enumerant}})
 {%elif prop['type'] == 'float_array'%}
 		retval = []
@@ -18,8 +18,8 @@
 		for i in xrange(_lav.node_get_int_array_property_length(self.handle, _libaudioverse.{{enumerant}})):
 			retval.append(_lav.node_read_int_array_property(self.handle, _libaudioverse.{{enumerant}}, i))
 		return tuple(retval)
-{%elif prop['type']== 'buffer'%}
-		return getattr(self, '_{{prop['name']}}', None)
+{%elif prop['type'] == 'buffer'%}
+		return getattr(self, '_{{prop['name']}}_buffer', None)
 {%endif%}
 
 {%if prop.get('read_only', False) == False%}
@@ -57,11 +57,11 @@
 		_lav.node_replace.Int_array_property(self.handle, _libaudioverse.{{enumerant}}, len(val), val)
 {%elif prop['type'] == 'buffer'%}
 		if val is None:
-			_lav.node_set_buffer_properety(self, _libaudioverse.{{enumerant}}, 0)
-			self._{{prop['name']}} = None
+			_lav.node_set_buffer_property(self, _libaudioverse.{{enumerant}}, 0)
+			self._{{prop['name']}}_buffer = None
 		elif isinstance(val, Buffer):
 			_lav.node_set_buffer_property(self, _libaudioverse.{{enumerant}}, val)
-			self._{{prop['name']}}=val
+			self._{{prop['name']}}_buffer = val
 		else: raise ValueError("Expected None or a Buffer.")
 {%endif%}
 {%endif%}

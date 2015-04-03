@@ -132,6 +132,10 @@ enum Lav_FEEDBACK_DELAY_NETWORK_PROPERTIES {
 	Lav_FDN_INTERPOLATION_TIME = -2,
 };
 
+enum Lav_BUFFER_PROPERTIES {
+	Lav_BUFFER_BUFFER=-1,
+};
+
 #ifdef __cplusplus
 }
 #endif
