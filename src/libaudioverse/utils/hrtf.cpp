@@ -36,11 +36,11 @@ void reverse_endianness(char* buffer, unsigned int count, unsigned int window) {
 static_assert(sizeof(float) == 4, "Sizeof float is not 4; cannot safely work with hrtfs");
 
 LavHrtfData::~LavHrtfData() {
-	if(temporary_buffer1) delete[] temporary_buffer1;
-	if(temporary_buffer2) delete[] temporary_buffer2;
+	if(temporary_buffer1) LavFreeFloatArray(temporary_buffer1);
+	if(temporary_buffer2) LavFreeFloatArray(temporary_buffer2);
 	if(hrirs == nullptr) return; //we never loaded one.
 	for(unsigned int i = 0; i < elev_count; i++) {
-		for(unsigned int j = 0; j < azimuth_counts[i]; j++) delete[] hrirs[i][j];
+		for(unsigned int j = 0; j < azimuth_counts[i]; j++) LavFreeFloatArray(hrirs[i][j]);
 		delete[] hrirs[i];
 	}
 	delete[] hrirs;
@@ -82,7 +82,7 @@ void LavHrtfData::loadFromBuffer(unsigned int length, char* buffer, unsigned int
 	int32_t endianness_marker =convi(buffer);
 	if(endianness_marker != 1) reverse_endianness(buffer, length, 4);
 	//read it again; if it is still not 1, something has gone badly wrong.
-	endianness_marker = convi(buffer);;
+	endianness_marker = convi(buffer);
 	if(endianness_marker != 1) throw LavErrorException(Lav_ERROR_HRTF_INVALID);
 
 	char* iterator = buffer;
@@ -132,7 +132,7 @@ void LavHrtfData::loadFromBuffer(unsigned int length, char* buffer, unsigned int
 
 	//the above gives us what amounts to a 2d array.  The first dimension represents elevation.  The second dimension represents azimuth going clockwise.
 	//fill it.
-	float* tempBuffer = new float[before_hrir_length]();
+	float* tempBuffer = LavAllocFloatArray(before_hrir_length);
 	int final_hrir_length = 0;
 	for(unsigned int elev = 0; elev < elev_count; elev++) {
 		for(unsigned int azimuth = 0; azimuth < azimuth_counts[elev]; azimuth++) {
@@ -143,12 +143,12 @@ void LavHrtfData::loadFromBuffer(unsigned int length, char* buffer, unsigned int
 	}
 	hrir_length = final_hrir_length;
 	samplerate = forSr;
-	delete[] tempBuffer;
+	LavFreeFloatArray(tempBuffer);
 
-	if(temporary_buffer1) delete[] temporary_buffer1;
-	if(temporary_buffer2) delete[] temporary_buffer2;
-	temporary_buffer1 = new float[hrir_length];
-	temporary_buffer2 = new float[hrir_length];
+	if(temporary_buffer1) LavFreeFloatArray(temporary_buffer1);
+	if(temporary_buffer2) LavFreeFloatArray(temporary_buffer2);
+	temporary_buffer1 = LavAllocFloatArray(hrir_length);
+	temporary_buffer2 = LavAllocFloatArray(hrir_length);
 }
 
 //a complete HRTF for stereo is four calls to this function.
