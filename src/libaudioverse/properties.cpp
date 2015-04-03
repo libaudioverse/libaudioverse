@@ -298,6 +298,22 @@ void LavProperty::setStringDefault(const char* s) {
 	default_string_value = s;
 }
 
+std::shared_ptr<LavBuffer> LavProperty::getBufferValue() {
+	return buffer_value;
+}
+
+void LavProperty::setBufferValue(std::shared_ptr<LavBuffer> b) {
+	buffer_value=b;
+}
+
+std::shared_ptr<LavBuffer> LavProperty::getBufferDefault() {
+	return default_buffer_value;
+}
+
+void LavProperty::setBufferDefault(std::shared_ptr<LavBuffer> b) {
+	default_buffer_value=b;
+}
+
 void LavProperty::setPostChangedCallback(std::function<void(void)> cb) {
 	post_changed_callback = cb;
 }
@@ -385,5 +401,12 @@ LavProperty* createFloatArrayProperty(const char* name, unsigned int minLength, 
 	prop->setFloatArrayDefault(new_default);
 	prop->setName(name);
 	prop->reset();	
+	return prop;
+}
+
+LavProperty* createBufferProperty(const char* name) {
+	LavProperty* prop=new LavProperty(Lav_PROPERTYTYPE_BUFFER);
+	prop->setBufferDefault(nullptr);
+	prop->reset();
 	return prop;
 }

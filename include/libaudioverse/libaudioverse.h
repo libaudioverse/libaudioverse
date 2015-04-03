@@ -74,6 +74,7 @@ enum Lav_PROPERTY_TYPES {
 	Lav_PROPERTYTYPE_FLOAT6,
 	Lav_PROPERTYTYPE_FLOAT_ARRAY,
 	Lav_PROPERTYTYPE_INT_ARRAY,
+	Lav_PROPERTYTYPE_BUFFER,
 };
 
 /**These are used to tag nodes with their type, so that external languages may see them.*/

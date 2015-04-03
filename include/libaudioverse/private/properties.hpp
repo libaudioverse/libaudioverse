@@ -7,6 +7,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <vector>
 #include <limits>
 #include <algorithm>
+#include <memory>
 #include "../libaudioverse.h"
 #include "errors.hpp"
 
@@ -21,6 +22,9 @@ union LavPropertyValue {
 //quick range check helper...
 //this disables on readonly because it is expected that the library can handle that itself, and bumping ranges for writes on readonly properties would be annoying.
 #define RC(val, fld) if((val > maximum_value.fld || val < minimum_value.fld) && read_only == false) throw LavErrorException(Lav_ERROR_RANGE)
+
+//for the shared pointer:
+class LavBuffer;
 
 class LavProperty {
 	public:
@@ -107,6 +111,12 @@ class LavProperty {
 	const char* getStringDefault();
 	void setStringDefault(const char* s);
 
+	//Buffer properties.
+	std::shared_ptr<LavBuffer> getBufferValue();
+	void setBufferValue(std::shared_ptr<LavBuffer> b);
+	std::shared_ptr<LavBuffer> getBufferDefault();
+	void setBufferDefault(std::shared_ptr<LavBuffer> b);
+
 	//set the callback...
 	void setPostChangedCallback(std::function<void(void)> cb);
 
@@ -120,6 +130,7 @@ class LavProperty {
 	std::string name, string_value, default_string_value;
 	std::vector<float> farray_value, default_farray_value;
 	std::vector<int> iarray_value, default_iarray_value;
+	std::shared_ptr<LavBuffer> buffer_value, default_buffer_value;
 	unsigned int min_array_length = 0, max_array_length = std::numeric_limits<unsigned int>::max();
 	std::function<void(void)> post_changed_callback;
 	bool read_only = false;
@@ -135,3 +146,4 @@ LavProperty* createFloat6Property(const char* name, float default[6]);
 LavProperty* createStringProperty(const char* name, const char* default);
 LavProperty* createIntArrayProperty(const char* name, unsigned int minLength, unsigned int maxLength, unsigned int defaultLength, int* defaultData);
 LavProperty* createFloatArrayProperty(const char* name, unsigned int minLength, unsigned int maxLength, unsigned int defaultLength, float* defaultData);
+LavProperty* createBufferProperty(const char* name);
