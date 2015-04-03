@@ -5,6 +5,7 @@ import weakref
 import collections
 import ctypes
 import enum
+import functools
 
 def find_datafiles():
 	import glob
@@ -123,7 +124,22 @@ The position in the list is the needed device index for Simulation.__iniit__."""
 		infos.append(info)
 	return infos
 
-class Simulation(object):
+@functools.total_ordering
+class _HandleComparer(object):
+
+	def __eq__(self, other):
+		if not isinstance(other, _HandleComparer): return False
+		return self.handle == other.handle
+
+	def __lt__(self, other):
+		#Things that aren't subclasses are less than us.
+		if not isinstance(other, _HandleComparer): returnTrue
+		return self.handle < other.handle
+
+	def __hash__(self):
+		return self.handle.__hash__()
+
+class Simulation(_HandleComparer):
 	"""Represents a running simulation.  All libaudioverse nodes must be passed a simulation at creation time and cannot migrate between them.  Furthermore, it is an error to try to connect objects from different simulations.
 
 Instances of this class are context managers.  Using the with statement on an instance of this class invoke's Libaudioverse's atomic block support."""
@@ -200,7 +216,7 @@ Note that this only communicates info.  If changes happen after you requested th
 
 #This is the class hierarchy.
 #GenericNode is at the bottom, and we should never see one; and GenericObject should hold most implementation.
-class GenericNode(object):
+class GenericNode(_HandleComparer):
 	"""A Libaudioverse object."""
 
 	def __init__(self, handle, simulation):
