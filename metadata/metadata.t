@@ -68,6 +68,8 @@ void initializeMetadata() {
 	float defaultData[] = {<%prop['default'] | join(', ')%>};
 	tempProp = createFloatArrayProperty("<%prop['name']%>", minLength, maxLength, defaultLength, defaultData);
 	{%endif%}
+	{%elif prop['type'] == 'buffer'%}
+	tempProp=createBufferProperty("<%prop['name']%>");
 	{%endif%}
 	tempProp->setReadOnly(<%"true" if prop.get('read_only', False) else "false"%>);
 	tempProp->setHasDynamicRange(<%"true" if prop.get('is_dynamic', False) else "false"%>);

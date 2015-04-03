@@ -18,6 +18,8 @@
 		for i in xrange(_lav.node_get_int_array_property_length(self.handle, _libaudioverse.{{enumerant}})):
 			retval.append(_lav.node_read_int_array_property(self.handle, _libaudioverse.{{enumerant}}, i))
 		return tuple(retval)
+{%elif prop['type']== 'buffer'%}
+		return getattr(self, '_{{prop['name']}}', None)
 {%endif%}
 
 {%if prop.get('read_only', False) == False%}
@@ -53,6 +55,14 @@
 		if not isinstance(val, collections.Sized):
 			raise ValueError('expected an iterable with known size')
 		_lav.node_replace.Int_array_property(self.handle, _libaudioverse.{{enumerant}}, len(val), val)
+{%elif prop['type'] == 'buffer'%}
+		if val is None:
+			_lav.node_set_buffer_properety(self, _libaudioverse.{{enumerant}}, 0)
+			self._{{prop['name']}} = None
+		elif isinstance(val, Buffer):
+			_lav.node_set_buffer_property(self, _libaudioverse.{{enumerant}}, val)
+			self._{{prop['name']}}=val
+		else: raise ValueError("Expected None or a Buffer.")
 {%endif%}
 {%endif%}
 {%endmacro%}
