@@ -13,6 +13,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/metadata.hpp>
 #include <libaudioverse/private/kernels.hpp>
+#include <libaudioverse/private/buffer.hpp>
 #include <algorithm>
 #include <memory>
 #include <stdlib.h>
@@ -650,8 +651,22 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeGetArrayPropertyLengthRange(LavHandle nodeH
 	PUB_END
 }
 
-//callback setup/configure/retrieval.
+Lav_PUBLIC_FUNCTION LavError Lav_nodeSetBufferProperty(LavHandle nodeHandle, int slot, LavHandle bufferHandle) {
+	PUB_BEGIN
+	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_BUFFER);
+	auto buff=incomingObject<LavBuffer>(bufferHandle, true);
+	prop.setBufferValue(buff);
+	PUB_END
+}
 
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetBufferProperty(LavHandle nodeHandle, int slot, LavHandle* destination) {
+	PUB_BEGIN
+	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_BUFFER);
+	*destination = outgoingObject(prop.getBufferValue());
+	PUB_END
+}
+
+//callback setup/configure/retrieval.
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetEventHandler(LavHandle nodeHandle, int event, LavEventCallback *destination) {
 	PUB_BEGIN
 	auto ptr = incomingObject<LavNode>(nodeHandle);
