@@ -15,22 +15,24 @@ Asking for an entry that is not present gives a null pointer.
 
 the reason that this is not a class is because there can only ever be one.  This serves the explicit purpose of allowing us to give pointers to and receive pointers from things outside Libaudioverse; therefore, it's a global and some helper functions.
 
-	This also implements Lav_free, which works the same for all pointers, and the object handle interfaces, most notably Lav_freeHandle.
+This also implements Lav_free, which works the same for all pointers, and the object handle interfaces, most notably Lav_freeHandle.
 */
 
-
-class LavExternalObject: public std::enable_shared_from_this<LavExternalObject>  {
-	public:
-	virtual ~LavExternalObject() {}
-	bool isExternalObject = false;
-	int externalObjectHandle = 0;
-};
+class LavExternalObject;//declared in this header below the globals.
 
 extern std::map<void*, std::shared_ptr<void>> external_ptrs;
 extern std::map<int, std::shared_ptr<LavExternalObject>> external_handles;
 extern std::mutex memory_lock;
 //max handle we've used for an outgoing object. Ensures no duplication.
 extern std::atomic<int> max_handle;
+
+class LavExternalObject: public std::enable_shared_from_this<LavExternalObject>  {
+	public:
+	LavExternalObject() {externalObjectHandle = max_handle.fetch_add(1);}
+	virtual ~LavExternalObject() {}
+	bool isExternalObject = false;
+	int externalObjectHandle;
+};
 
 template <class t>
 std::shared_ptr<t> incomingPointer(void* ptr) {
@@ -56,7 +58,6 @@ int outgoingObject(std::shared_ptr<t> what) {
 	if(what->isExternalObject == false) {
 		auto guard=std::lock_guard<std::mutex>(memory_lock);
 		what->isExternalObject =true;
-		what->externalObjectHandle=max_handle.fetch_add(1);
 		external_handles[what->externalObjectHandle] = what;
 	}
 	return what->externalObjectHandle;
