@@ -16,27 +16,31 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <atomic>
 #include <functional>
 
-std::map<void*, std::shared_ptr<void>> external_ptrs;
-std::mutex memory_lock;
-std::map<int, std::shared_ptr<LavExternalObject>> external_handles;
-std::atomic<int> max_handle;
+std::map<void*, std::shared_ptr<void>> *external_ptrs;
+std::mutex *memory_lock;
+std::map<int, std::shared_ptr<LavExternalObject>> *external_handles;
+std::atomic<int> *max_handle;
 
 void initializeMemoryModule() {
-	max_handle.store(1);
+	memory_lock=new std::mutex();
+	max_handle = new std::atomic<int>();
+	max_handle->store(1);
+	external_ptrs= new std::map<void*, std::shared_ptr<void>>();
+	external_handles=new std::map<int, std::shared_ptr<LavExternalObject>>();
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_free(void* ptr) {
 	PUB_BEGIN
-	auto guard = std::lock_guard<std::mutex>(memory_lock);
-	if(external_ptrs.count(ptr)) external_ptrs.erase(ptr);
+	auto guard = std::lock_guard<std::mutex>(*memory_lock);
+	if(external_ptrs->count(ptr)) external_ptrs->erase(ptr);
 	else throw LavErrorException(Lav_ERROR_INVALID_HANDLE);
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_freeHandle(LavHandle h) {
 	PUB_BEGIN
-	auto guard=std::lock_guard<std::mutex>(memory_lock);
-	if(external_handles.count(h)) external_handles.erase(h);
+	auto guard=std::lock_guard<std::mutex>(*memory_lock);
+	if(external_handles->count(h)) external_handles->erase(h);
 	else throw LavErrorException(Lav_ERROR_INVALID_HANDLE);
 	PUB_END
 }
