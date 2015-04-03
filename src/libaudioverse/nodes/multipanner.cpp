@@ -47,7 +47,7 @@ LavMultipannerObject::LavMultipannerObject(std::shared_ptr<LavSimulation> sim, s
 }
 
 std::shared_ptr<LavNode> createMultipannerNode(std::shared_ptr<LavSimulation> sim, std::shared_ptr<LavHrtfData> hrtf) {
-	auto retval = std::shared_ptr<LavMultipannerObject>(new LavMultipannerObject(sim, hrtf), LavNodeDeleter);
+	auto retval = std::shared_ptr<LavMultipannerObject>(new LavMultipannerObject(sim, hrtf), LavObjectDeleter);
 	sim->associateNode(retval);
 	//this call must be here because it involves shared_from_this.
 	retval->strategyChanged();

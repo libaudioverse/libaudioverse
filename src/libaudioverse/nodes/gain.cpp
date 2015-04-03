@@ -27,7 +27,7 @@ LavGainNode::LavGainNode(std::shared_ptr<LavSimulation> sim): LavNode(Lav_NODETY
 }
 
 std::shared_ptr<LavNode> createGainNode(std::shared_ptr<LavSimulation> sim) {
-	auto retval = std::shared_ptr<LavGainNode>(new LavGainNode(sim), LavNodeDeleter);
+	auto retval = std::shared_ptr<LavGainNode>(new LavGainNode(sim), LavObjectDeleter);
 	sim->associateNode(retval);
 	return retval;
 }

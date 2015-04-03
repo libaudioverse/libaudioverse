@@ -8,9 +8,14 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/kernels.hpp>
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/errors.hpp>
+#include <libaudioverse/private/macros.hpp>
 
 LavBuffer::LavBuffer(std::shared_ptr<LavSimulation> simulation) {
 	this->simulation = simulation;
+}
+
+std::shared_ptr<LavBuffer> createBuffer(std::shared_ptr<LavSimulation>simulation) {
+	return std::shared_ptr<LavBuffer>(new LavBuffer(simulation), LavObjectDeleter);
 }
 
 LavBuffer::~LavBuffer() {
@@ -69,4 +74,14 @@ int LavBuffer::writeData(int startFrame, int channels, int frames, float** outpu
 		}
 	}
 	return count;
+}
+
+//begin public api
+
+Lav_PUBLIC_FUNCTION LavError Lav_createBuffer(LavHandle simulationHandle, LavHandle* destination) {
+	PUB_BEGIN
+	auto simulation = incomingObject<LavSimulation>(simulationHandle);
+	LOCK(*simulation);
+	*destination = outgoingObject(createBuffer(simulation));
+	PUB_END
 }

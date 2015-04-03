@@ -40,7 +40,7 @@ LavPullNode::LavPullNode(std::shared_ptr<LavSimulation> sim, unsigned int inputS
 }
 
 std::shared_ptr<LavNode> createPullNode(std::shared_ptr<LavSimulation> sim, unsigned int inputSr, unsigned int channels) {
-	auto retval = std::shared_ptr<LavPullNode>(new LavPullNode(sim, inputSr, channels), LavNodeDeleter);
+	auto retval = std::shared_ptr<LavPullNode>(new LavPullNode(sim, inputSr, channels), LavObjectDeleter);
 	sim->associateNode(retval);
 	return retval;
 }

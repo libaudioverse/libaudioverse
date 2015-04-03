@@ -40,7 +40,7 @@ LavFeedbackDelayNetworkNode::~LavFeedbackDelayNetworkNode() {
 }
 
 std::shared_ptr<LavNode> createFeedbackDelayNetworkNode(std::shared_ptr<LavSimulation> simulation, float maxDelay, int lines) {
-	auto retval = std::shared_ptr<LavFeedbackDelayNetworkNode>(new LavFeedbackDelayNetworkNode(simulation, maxDelay, lines), LavNodeDeleter);
+	auto retval = std::shared_ptr<LavFeedbackDelayNetworkNode>(new LavFeedbackDelayNetworkNode(simulation, maxDelay, lines), LavObjectDeleter);
 	simulation->associateNode(retval);
 	return retval;
 }

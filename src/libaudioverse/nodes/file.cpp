@@ -53,7 +53,7 @@ LavFileNode::~LavFileNode() {
 std::shared_ptr<LavNode> createFileNode(std::shared_ptr<LavSimulation> simulation, const char* path) {
 	auto f = LavFileReader();
 	f.open(path);
-	auto retval = std::shared_ptr<LavFileNode>(new LavFileNode(simulation, path, f.getChannelCount()), LavNodeDeleter);
+	auto retval = std::shared_ptr<LavFileNode>(new LavFileNode(simulation, path, f.getChannelCount()), LavObjectDeleter);
 	simulation->associateNode(retval);
 	return retval;
 }

@@ -41,7 +41,7 @@ LavBiquadNode::LavBiquadNode(std::shared_ptr<LavSimulation> sim, unsigned int ch
 }
 
 std::shared_ptr<LavNode> createBiquadNode(std::shared_ptr<LavSimulation> sim, unsigned int channels) {
-	auto retval = std::shared_ptr<LavBiquadNode>(new LavBiquadNode(sim, channels), LavNodeDeleter);
+	auto retval = std::shared_ptr<LavBiquadNode>(new LavBiquadNode(sim, channels), LavObjectDeleter);
 	sim->associateNode(retval);
 	return retval;
 }

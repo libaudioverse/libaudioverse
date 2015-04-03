@@ -94,5 +94,4 @@ float* LavAllocFloatArray(unsigned int size);
 void LavFreeFloatArray(float* ptr);
 
 //custom deleter for smart pointer that guarantees thread safety.
-class LavNode;
-void LavNodeDeleter(LavNode *obj);
+void LavObjectDeleter(LavExternalObject*obj);

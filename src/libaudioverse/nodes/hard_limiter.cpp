@@ -24,7 +24,7 @@ LavHardLimiterNode::LavHardLimiterNode(std::shared_ptr<LavSimulation> simulation
 }
 
 std::shared_ptr<LavNode>createHardLimiterNode(std::shared_ptr<LavSimulation> simulation, unsigned int numChannels) {
-	auto retval = std::shared_ptr<LavHardLimiterNode>(new LavHardLimiterNode(simulation, numChannels), LavNodeDeleter);
+	auto retval = std::shared_ptr<LavHardLimiterNode>(new LavHardLimiterNode(simulation, numChannels), LavObjectDeleter);
 	simulation->associateNode(retval);
 	return retval;
 }

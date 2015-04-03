@@ -66,8 +66,14 @@ void LavFreeFloatArray(float* ptr) {
 	#endif
 }
 
-void LavNodeDeleter(LavNode*node) {
-	auto sim = node->getSimulation();
-	LOCK(*sim);
-	delete node;
+void LavObjectDeleter(LavExternalObject*obj) {
+	int handle=obj->externalObjectHandle;
+	//special case of nodes, which must be deleted while holding the simulation lock.
+	auto n= dynamic_cast<LavNode*>(obj);
+	if(n) {
+		auto sim = n->getSimulation();
+		LOCK(*sim);
+		delete obj;
+	}
+	else delete obj;
 }

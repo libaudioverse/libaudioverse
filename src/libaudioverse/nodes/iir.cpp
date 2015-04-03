@@ -35,7 +35,7 @@ LavIirNode::LavIirNode(std::shared_ptr<LavSimulation> simulation, int channels):
 }
 
 std::shared_ptr<LavNode> createIirNode(std::shared_ptr<LavSimulation> simulation, int channels) {
-	std::shared_ptr<LavIirNode> retval = std::shared_ptr<LavIirNode>(new LavIirNode(simulation, channels), LavNodeDeleter);
+	std::shared_ptr<LavIirNode> retval = std::shared_ptr<LavIirNode>(new LavIirNode(simulation, channels), LavObjectDeleter);
 	simulation->associateNode(retval);
 	return retval;
 }

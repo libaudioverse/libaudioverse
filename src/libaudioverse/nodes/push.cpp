@@ -44,7 +44,7 @@ LavPushNode::LavPushNode(std::shared_ptr<LavSimulation> sim, unsigned int inputS
 }
 
 std::shared_ptr<LavNode> createPushNode(std::shared_ptr<LavSimulation> sim, unsigned int inputSr, unsigned int channels) {
-	auto retval = std::shared_ptr<LavPushNode>(new LavPushNode(sim, inputSr, channels), LavNodeDeleter);
+	auto retval = std::shared_ptr<LavPushNode>(new LavPushNode(sim, inputSr, channels), LavObjectDeleter);
 	sim->associateNode(retval);
 	return retval;
 }
