@@ -17,6 +17,18 @@ LavBuffer::~LavBuffer() {
 	if(data) LavFreeFloatArray(data);
 }
 
+int LavBuffer::getLength() {
+	return frames;
+}
+
+double LavBuffer::getDuration() {
+	return frames / simulation->getSr();
+}
+
+int LavBuffer::getChannels() {
+	return channels;
+}
+
 void LavBuffer::setContents(int channels, int sr, int frames, float* inputData) {
 	int simulationSr= (int)simulation->getSr();
 	staticResamplerKernel(sr, simulationSr, channels, frames, inputData, &(this->frames), &data);
