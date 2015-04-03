@@ -55,7 +55,7 @@ LavHrtfNode::~LavHrtfNode() {
 }
 
 std::shared_ptr<LavNode>createHrtfNode(std::shared_ptr<LavSimulation>simulation, std::shared_ptr<LavHrtfData> hrtf) {
-	auto retval = std::shared_ptr<LavHrtfNode>(new LavHrtfNode(simulation, hrtf), LavObjectDeleter);
+	auto retval = std::shared_ptr<LavHrtfNode>(new LavHrtfNode(simulation, hrtf), LavObjectDeleter(simulation));
 	simulation->associateNode(retval);
 	return retval;
 }

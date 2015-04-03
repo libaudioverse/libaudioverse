@@ -16,7 +16,7 @@ LavBuffer::LavBuffer(std::shared_ptr<LavSimulation> simulation) {
 }
 
 std::shared_ptr<LavBuffer> createBuffer(std::shared_ptr<LavSimulation>simulation) {
-	return std::shared_ptr<LavBuffer>(new LavBuffer(simulation), LavObjectDeleter);
+	return std::shared_ptr<LavBuffer>(new LavBuffer(simulation), LavObjectDeleter(simulation));
 }
 
 LavBuffer::~LavBuffer() {

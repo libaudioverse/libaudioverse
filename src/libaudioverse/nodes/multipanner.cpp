@@ -46,9 +46,9 @@ LavMultipannerObject::LavMultipannerObject(std::shared_ptr<LavSimulation> sim, s
 	getProperty(Lav_PANNER_STRATEGY).setPostChangedCallback([this](){strategyChanged();});
 }
 
-std::shared_ptr<LavNode> createMultipannerNode(std::shared_ptr<LavSimulation> sim, std::shared_ptr<LavHrtfData> hrtf) {
-	auto retval = std::shared_ptr<LavMultipannerObject>(new LavMultipannerObject(sim, hrtf), LavObjectDeleter);
-	sim->associateNode(retval);
+std::shared_ptr<LavNode> createMultipannerNode(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf) {
+	auto retval = std::shared_ptr<LavMultipannerObject>(new LavMultipannerObject(simulation, hrtf), LavObjectDeleter(simulation));
+	simulation->associateNode(retval);
 	//this call must be here because it involves shared_from_this.
 	retval->strategyChanged();
 	return retval;

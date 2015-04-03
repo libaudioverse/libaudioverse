@@ -30,7 +30,7 @@ LavBufferNode::LavBufferNode(std::shared_ptr<LavSimulation> simulation): LavNode
 }
 
 std::shared_ptr<LavNode> createBufferNode(std::shared_ptr<LavSimulation> simulation) {
-	std::shared_ptr<LavBufferNode> retval = std::shared_ptr<LavBufferNode>(new LavBufferNode(simulation), LavObjectDeleter);
+	std::shared_ptr<LavBufferNode> retval = std::shared_ptr<LavBufferNode>(new LavBufferNode(simulation), LavObjectDeleter(simulation));
 	simulation->associateNode(retval);
 	return retval;
 }

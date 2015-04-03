@@ -35,9 +35,9 @@ LavGraphListenerNode::LavGraphListenerNode(std::shared_ptr<LavSimulation> sim, u
 	appendOutputConnection(0, channels);
 }
 
-std::shared_ptr<LavNode> createGraphListenerNode(std::shared_ptr<LavSimulation> sim, unsigned int channels) {
-	auto retval = std::shared_ptr<LavGraphListenerNode>(new LavGraphListenerNode(sim, channels), LavObjectDeleter);
-	sim->associateNode(retval);
+std::shared_ptr<LavNode> createGraphListenerNode(std::shared_ptr<LavSimulation> simulation, unsigned int channels) {
+	auto retval = std::shared_ptr<LavGraphListenerNode>(new LavGraphListenerNode(simulation, channels), LavObjectDeleter(simulation));
+	simulation->associateNode(retval);
 	return retval;
 }
 

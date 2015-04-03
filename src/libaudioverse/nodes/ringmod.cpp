@@ -29,9 +29,9 @@ LavRingmodNode::LavRingmodNode(std::shared_ptr<LavSimulation> sim): LavNode(Lav_
 	appendOutputConnection(0, 1);
 }
 
-std::shared_ptr<LavNode> createRingmodNode(std::shared_ptr<LavSimulation> sim) {
-	auto retval = std::shared_ptr<LavRingmodNode>(new LavRingmodNode(sim), LavObjectDeleter);
-	sim->associateNode(retval);
+std::shared_ptr<LavNode> createRingmodNode(std::shared_ptr<LavSimulation> simulation) {
+	auto retval = std::shared_ptr<LavRingmodNode>(new LavRingmodNode(simulation), LavObjectDeleter(simulation));
+	simulation->associateNode(retval);
 	return retval;
 }
 

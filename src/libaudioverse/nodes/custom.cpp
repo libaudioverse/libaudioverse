@@ -30,9 +30,9 @@ LavCustomNode::LavCustomNode(std::shared_ptr<LavSimulation> sim, unsigned int in
 	for(int i= 0; i < outputs; i++) appendOutputConnection(i*channelsPerOutput, channelsPerOutput);
 }
 
-std::shared_ptr<LavNode> createCustomNode(std::shared_ptr<LavSimulation> sim, unsigned int inputs, unsigned int channelsPerInput, unsigned int outputs,  unsigned int channelsPerOutput) {
-	auto retval = std::shared_ptr<LavCustomNode>(new LavCustomNode(sim, inputs, channelsPerInput, outputs, channelsPerOutput), LavObjectDeleter);
-	sim->associateNode(retval);
+std::shared_ptr<LavNode> createCustomNode(std::shared_ptr<LavSimulation> simulation, unsigned int inputs, unsigned int channelsPerInput, unsigned int outputs,  unsigned int channelsPerOutput) {
+	auto retval = std::shared_ptr<LavCustomNode>(new LavCustomNode(simulation, inputs, channelsPerInput, outputs, channelsPerOutput), LavObjectDeleter(simulation));
+	simulation->associateNode(retval);
 	return retval;
 }
 

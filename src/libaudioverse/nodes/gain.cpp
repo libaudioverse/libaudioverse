@@ -26,9 +26,9 @@ class LavGainNode: public LavNode {
 LavGainNode::LavGainNode(std::shared_ptr<LavSimulation> sim): LavNode(Lav_NODETYPE_GAIN, sim, 0, 0) {
 }
 
-std::shared_ptr<LavNode> createGainNode(std::shared_ptr<LavSimulation> sim) {
-	auto retval = std::shared_ptr<LavGainNode>(new LavGainNode(sim), LavObjectDeleter);
-	sim->associateNode(retval);
+std::shared_ptr<LavNode> createGainNode(std::shared_ptr<LavSimulation> simulation) {
+	auto retval = std::shared_ptr<LavGainNode>(new LavGainNode(simulation), LavObjectDeleter(simulation));
+	simulation->associateNode(retval);
 	return retval;
 }
 

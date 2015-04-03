@@ -42,7 +42,7 @@ LavDelayNode::LavDelayNode(std::shared_ptr<LavSimulation> simulation, float maxD
 }
 
 std::shared_ptr<LavNode> createDelayNode(std::shared_ptr<LavSimulation> simulation, float maxDelay, unsigned int lineCount) {
-	auto tmp = std::shared_ptr<LavDelayNode>(new LavDelayNode(simulation, maxDelay, lineCount), LavObjectDeleter);
+	auto tmp = std::shared_ptr<LavDelayNode>(new LavDelayNode(simulation, maxDelay, lineCount), LavObjectDeleter(simulation));
 	simulation->associateNode(tmp);
 	return tmp;
 }

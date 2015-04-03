@@ -34,7 +34,7 @@ LavSimpleEnvironmentNode::LavSimpleEnvironmentNode(std::shared_ptr<LavSimulation
 }
 
 std::shared_ptr<LavSimpleEnvironmentNode> createSimpleEnvironmentNode(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf) {
-	auto retval = std::shared_ptr<LavSimpleEnvironmentNode>(new LavSimpleEnvironmentNode(simulation, hrtf), LavObjectDeleter);
+	auto retval = std::shared_ptr<LavSimpleEnvironmentNode>(new LavSimpleEnvironmentNode(simulation, hrtf), LavObjectDeleter(simulation));
 	simulation->associateNode(retval);
 	return retval;
 }

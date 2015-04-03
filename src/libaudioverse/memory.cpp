@@ -14,6 +14,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdlib.h>
 #include <inttypes.h>
 #include <atomic>
+#include <functional>
 
 std::map<void*, std::shared_ptr<void>> external_ptrs;
 std::mutex memory_lock;
@@ -66,14 +67,9 @@ void LavFreeFloatArray(float* ptr) {
 	#endif
 }
 
-void LavObjectDeleter(LavExternalObject*obj) {
-	int handle=obj->externalObjectHandle;
-	//special case of nodes, which must be deleted while holding the simulation lock.
-	auto n= dynamic_cast<LavNode*>(obj);
-	if(n) {
-		auto sim = n->getSimulation();
-		LOCK(*sim);
+std::function<void(LavExternalObject*)> LavObjectDeleter(std::shared_ptr<LavSimulation> simulation) {
+	return [=](LavExternalObject* obj) {
+		LOCK(*simulation);
 		delete obj;
-	}
-	else delete obj;
+	};
 }

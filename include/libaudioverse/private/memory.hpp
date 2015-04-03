@@ -7,6 +7,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <string.h>
 #include <mutex>
 #include <atomic>
+#include <functional>
 //contains some various memory-related bits and pieces, as well as the smart pointer marshalling.
 
 /**This is a standalone component that knows how to hold onto smart pointers, avoid accidentally duplicating entries, and cast the entries before giving them to us.
@@ -19,6 +20,7 @@ This also implements Lav_free, which works the same for all pointers, and the ob
 */
 
 class LavExternalObject;//declared in this header below the globals.
+class LavSimulation;
 
 extern std::map<void*, std::shared_ptr<void>> external_ptrs;
 extern std::map<int, std::shared_ptr<LavExternalObject>> external_handles;
@@ -95,4 +97,5 @@ float* LavAllocFloatArray(unsigned int size);
 void LavFreeFloatArray(float* ptr);
 
 //custom deleter for smart pointer that guarantees thread safety.
-void LavObjectDeleter(LavExternalObject*obj);
+std::function<void(LavExternalObject*)> LavObjectDeleter(std::shared_ptr<LavSimulation> simulation);
+

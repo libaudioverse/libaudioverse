@@ -40,7 +40,7 @@ LavSourceNode::LavSourceNode(std::shared_ptr<LavSimulation> simulation, std::sha
 }
 
 std::shared_ptr<LavNode> createSourceNode(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavEnvironmentBase> manager) {
-	auto temp = std::shared_ptr<LavSourceNode>(new LavSourceNode(simulation, manager), LavObjectDeleter);
+	auto temp = std::shared_ptr<LavSourceNode>(new LavSourceNode(simulation, manager), LavObjectDeleter(simulation));
 	manager->registerSourceForUpdates(temp);
 	simulation->associateNode(temp);
 	return temp;

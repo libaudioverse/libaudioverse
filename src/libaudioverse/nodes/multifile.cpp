@@ -44,7 +44,7 @@ LavMultifileNode::~LavMultifileNode() {
 }
 
 std::shared_ptr<LavNode> createMultifileNode(std::shared_ptr<LavSimulation> simulation, int channels, int maxSimultaneousFiles) {
-	auto retval =std::shared_ptr<LavMultifileNode>(new LavMultifileNode(simulation, channels, maxSimultaneousFiles), LavObjectDeleter);
+	auto retval =std::shared_ptr<LavMultifileNode>(new LavMultifileNode(simulation, channels, maxSimultaneousFiles), LavObjectDeleter(simulation));
 	simulation->associateNode(retval);
 	return retval;
 }

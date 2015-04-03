@@ -32,7 +32,7 @@ LavSquareNode::LavSquareNode(std::shared_ptr<LavSimulation> simulation): LavNode
 }
 
 std::shared_ptr<LavNode> createSquareNode(std::shared_ptr<LavSimulation> simulation) {
-	std::shared_ptr<LavSquareNode> retval = std::shared_ptr<LavSquareNode>(new LavSquareNode(simulation), LavObjectDeleter);
+	std::shared_ptr<LavSquareNode> retval = std::shared_ptr<LavSquareNode>(new LavSquareNode(simulation), LavObjectDeleter(simulation));
 	simulation->associateNode(retval);
 	return retval;
 }

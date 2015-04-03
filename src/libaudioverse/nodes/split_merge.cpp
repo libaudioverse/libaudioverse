@@ -27,7 +27,7 @@ LavSplitMergeNode::LavSplitMergeNode(std::shared_ptr<LavSimulation> simulation, 
 }
 
 std::shared_ptr<LavNode> createSplitMergeNode(std::shared_ptr<LavSimulation> simulation, int type) {
-	auto retval = std::shared_ptr<LavSplitMergeNode>(new LavSplitMergeNode(simulation, type), LavObjectDeleter);
+	auto retval = std::shared_ptr<LavSplitMergeNode>(new LavSplitMergeNode(simulation, type), LavObjectDeleter(simulation));
 	return retval;
 }
 

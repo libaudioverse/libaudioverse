@@ -28,7 +28,7 @@ LavSineNode::LavSineNode(std::shared_ptr<LavSimulation> simulation): LavNode(Lav
 }
 
 std::shared_ptr<LavNode> createSineNode(std::shared_ptr<LavSimulation> simulation) {
-	std::shared_ptr<LavSineNode> retval = std::shared_ptr<LavSineNode>(new LavSineNode(simulation), LavObjectDeleter);
+	std::shared_ptr<LavSineNode> retval = std::shared_ptr<LavSineNode>(new LavSineNode(simulation), LavObjectDeleter(simulation));
 	simulation->associateNode(retval);
 	return retval;
 }
