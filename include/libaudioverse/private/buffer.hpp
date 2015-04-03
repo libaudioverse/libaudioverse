@@ -15,7 +15,7 @@ class LavBuffer: public LavExternalObject {
 	double getDuration();
 	int getChannels();
 	//This can be used outside the lock; the only thing it does is read simulation's sr value which can never change by definition.
-	void setContents(int sr, int channels, int frames, float* inputData);
+	void loadFromArray(int sr, int channels, int frames, float* inputData);
 	//Writes uninterleaved data resampled appropriately for the simulation being used.
 	//This remixes according to the built-in Libaudioverse remixing rules as necessary.
 	//Returns count of written frames.

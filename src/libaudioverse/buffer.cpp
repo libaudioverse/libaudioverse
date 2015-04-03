@@ -35,7 +35,7 @@ int LavBuffer::getChannels() {
 	return channels;
 }
 
-void LavBuffer::setContents(int sr, int channels, int frames, float* inputData) {
+void LavBuffer::loadFromArray(int sr, int channels, int frames, float* inputData) {
 	int simulationSr= (int)simulation->getSr();
 	staticResamplerKernel(sr, simulationSr, channels, frames, inputData, &(this->frames), &data);
 	if(data==nullptr) throw LavErrorException(Lav_ERROR_MEMORY);
@@ -87,30 +87,26 @@ Lav_PUBLIC_FUNCTION LavError Lav_createBuffer(LavHandle simulationHandle, LavHan
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_createBufferFromFile(LavHandle simulationHandle, const char* path, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_bufferLoadFromFile(LavHandle bufferHandle, const char* path) {
 	PUB_BEGIN
-	//because we are creating a buffer here, we can use this knowledge to not hold locks.
-	auto simulation = incomingObject<LavSimulation>(simulationHandle);
-	std::shared_ptr<LavBuffer> buff;
+	auto buff =incomingObject<LavBuffer>(bufferHandle);
 	LavFileReader f{};
 	f.open(path);
 	float* data = LavAllocFloatArray(f.getSampleCount());
 	f.readAll(data);
 	{
-		LOCK(*simulation);
-		buff=createBuffer(simulation);
-		buff->setContents(f.getSr(), f.getChannelCount(), f.getSampleCount()/f.getChannelCount(), data);
+		LOCK(*buff);
+		buff->loadFromArray(f.getSr(), f.getChannelCount(), f.getSampleCount()/f.getChannelCount(), data);
 	}
 	LavFreeFloatArray(data);
-	*destination = outgoingObject(buff);
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_bufferSetContents(LavHandle bufferHandle, int sr, int channels, int frames, float* data) {
+Lav_PUBLIC_FUNCTION LavError Lav_bufferLoadFromArray(LavHandle bufferHandle, int sr, int channels, int frames, float* data) {
 	PUB_BEGIN
 	auto buff=incomingObject<LavBuffer>(bufferHandle);
 	LOCK(*buff);
-	buff->setContents(sr, channels, frames, data);
+	buff->loadFromArray(sr, channels, frames, data);
 	PUB_END
 }
 

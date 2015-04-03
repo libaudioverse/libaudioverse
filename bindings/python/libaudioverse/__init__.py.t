@@ -184,6 +184,21 @@ Calling this on an audio output device will cause the audio thread to skip ahead
 	def __exit__(self, type, value, traceback):
 		_lav.simulation_end_atomic_block(self.handle)
 
+#Buffer objects.
+class Buffer(_HandleComparer):
+	"""An audio buffer.
+
+Use load_from_file to read a file or load_from_array to load an iterable."""
+
+	def __init__(self, simulation):
+		self.handle=_lav.create_buffer(simulation)
+
+	def load_from_file(self, path):
+		_lav.buffer_load_from_file(self, path)
+
+	def load_from_array(sr, channels, frames, data):
+		_lav.buffer_load_from_array(sr, channels, frames, data)
+
 #These are the enums which are needed publicly, i.e. distance model, etc.
 {%for name in important_enums%}
 {%set constants = constants_by_enum[name]%}
