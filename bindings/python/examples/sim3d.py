@@ -8,10 +8,14 @@ world = libaudioverse.SimpleEnvironmentNode(sim, "default")
 source = libaudioverse.SourceNode(sim, world)
 print "Enter a path to a sound file."
 filepath = raw_input()
-f = libaudioverse.FileNode(sim, filepath)
-f.looping = True
+n = libaudioverse.BufferNode(sim)
+b = libaudioverse.Buffer(sim)
+b.load_from_file(filepath)
+n.buffer = b
+n.connect(0, source, 0)
 
-f.connect(0, source, 0)
+n.looping = True
+
 world.connect_simulation(0)
 
 print """Enter python expressions that evaluate to 3-tuples (x, y, z).
