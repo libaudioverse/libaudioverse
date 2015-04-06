@@ -10,6 +10,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/errors.hpp>
 #include <libaudioverse/private/macros.hpp>
+#include <algorithm>
 
 LavBuffer::LavBuffer(std::shared_ptr<LavSimulation> simulation) {
 	this->simulation = simulation;
@@ -44,38 +45,35 @@ void LavBuffer::loadFromArray(int sr, int channels, int frames, float* inputData
 }
 
 int LavBuffer::writeData(int startFrame, int channels, int frames, float** outputs) {
-	int count =0;
-	const float* matrix = simulation->getMixingMatrix(this->channels, channels);
-	const float* dataOffset=data+(this->channels*startFrame);
-	//request past end check.
-	if(dataOffset >= data_end) return 0;
-	if(channels==this->channels || matrix==nullptr) { //just a copy with a twist.
-		for(int i =0; i < channels; i++) {
-			for(int j=0; j < channels; j++) {
-				if(j < this->channels) outputs[j][i] = dataOffset[j];
-				else outputs[j][i] =0.0f;
-			}
-			dataOffset+=this->channels;
-			count +=1;
-			if(dataOffset>= data_end) break;
-		}
-	}
-	else { //we have a mixing matrix and the channels are different.
-		//We have to do this by hand because we're un-interleaving things at the same time we apply the mixing matrix.
-		for(int i=0; i < frames; i++) {
-			for(int j= 0; j < channels; j++) {
-				//the jth row of the mixing matrix multiplied by this frame is the output value for the jth output.
-				outputs[j][i] = 0.0f;
-				for(int k=0; k < this->channels; k++) {
-					outputs[j][i] += dataOffset[j]*matrix[j*this->channels+k];
-				}
-			}
-			count++;
-			dataOffset+= this->channels;
-			if(dataOffset >= data_end) break;
-		}
+	//we know that writeChannel always returns the same value for all channels and the same startFrame and frames.
+	int count = 0;
+	for(int i=0; i < channels; i++) {
+		count = writeChannel(startFrame, i, channels, frames, outputs[i]);
+		if(count == 0) break;
 	}
 	return count;
+}
+
+int LavBuffer::writeChannel(int startFrame, int channel, int maxChannels, int frames, float* dest) {
+	if(channel >=maxChannels) return 0; //bad, very bad.
+	const float* matrix= simulation->getMixingMatrix(this->channels, maxChannels);
+	float* readFrom =data+startFrame*this->channels;
+	int willWrite = this->frames-startFrame;
+	if(willWrite <= 0) return 0;
+	if(willWrite > frames) willWrite = frames;
+	if(channel>= this->channels && matrix== nullptr) return willWrite; //we wrote according to the drop channels rule and our destination is supposed to be zeroed.
+	else if(matrix) {
+		for(int i=0; i < willWrite; i++) {
+			for(int j = 0; j < this->channels; j++) {
+				dest[i] += readFrom[i*this->channels+j]*matrix[channel*this->channels+j];
+			}
+		}
+		return willWrite;
+	}
+	else {
+		for(int i=0; i < willWrite; i++) dest[i] = readFrom[i*this->channels+channel];
+		return willWrite;
+	}
 }
 
 //begin public api

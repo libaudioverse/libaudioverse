@@ -20,6 +20,9 @@ class LavBuffer: public LavExternalObject {
 	//This remixes according to the built-in Libaudioverse remixing rules as necessary.
 	//Returns count of written frames.
 	int writeData(int startFrame, int channels, int frames, float** outputs);
+	//Writes an output channel.  It is assumed the array is already zeroed.
+	//maxChannels is the maximum channels of the node using this function. Buffers know how to upmix and downmix using the Libaudioverse rules.
+	int writeChannel(int startFrame, int channel, int maxChannels, int frames, float* dest);
 
 	//meet lockable concept:
 	void lock() {simulation->lock();}
