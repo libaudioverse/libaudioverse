@@ -23,6 +23,12 @@ class LavBuffer: public LavExternalObject {
 	//Writes an output channel.  It is assumed the array is already zeroed.
 	//maxChannels is the maximum channels of the node using this function. Buffers know how to upmix and downmix using the Libaudioverse rules.
 	int writeChannel(int startFrame, int channel, int maxChannels, int frames, float* dest);
+	//The following two functions do not check if the requested frame is past the end for efficiency.
+	//It is possible the compiler would optimize this, but running Lav in debug mode is already really painful and the trade-off here is worth it.
+	//a single sample without mixing:
+	float getSample(int frame, int channel);
+	//And with mixing:
+	float getSampleWithMixingMatrix(int frame, int channels, int maxChannels);
 
 	//meet lockable concept:
 	void lock() {simulation->lock();}

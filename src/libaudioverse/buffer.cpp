@@ -76,6 +76,21 @@ int LavBuffer::writeChannel(int startFrame, int channel, int maxChannels, int fr
 	}
 }
 
+float LavBuffer::getSample(int frame, int channel) {
+	return data[frame*channels+channel];
+}
+
+float LavBuffer::getSampleWithMixingMatrix(int frame, int channel, int maxChannels) {
+	auto mat =simulation->getMixingMatrix(channels, maxChannels);
+	if(mat) {
+		float res= 0.0;
+		for(int i=0; i < channels; i++) res += data[frame*channels+i]*mat[channels*channel+i];
+		return res;
+	}
+	else if(channel < channels) return data[frame*channels+channel];
+	else return 0.0;
+}
+
 //begin public api
 
 Lav_PUBLIC_FUNCTION LavError Lav_createBuffer(LavHandle simulationHandle, LavHandle* destination) {

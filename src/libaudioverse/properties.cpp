@@ -14,6 +14,7 @@ void LavProperty::reset() {
 	farray_value = default_farray_value;
 	iarray_value = default_iarray_value;
 	buffer_value=nullptr;
+	if(post_changed_callback) post_changed_callback();
 }
 
 int LavProperty::getType() {
@@ -305,6 +306,7 @@ std::shared_ptr<LavBuffer> LavProperty::getBufferValue() {
 
 void LavProperty::setBufferValue(std::shared_ptr<LavBuffer> b) {
 	buffer_value=b;
+	if(post_changed_callback) post_changed_callback();
 }
 
 void LavProperty::setPostChangedCallback(std::function<void(void)> cb) {
