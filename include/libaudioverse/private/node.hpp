@@ -20,8 +20,6 @@ class LavNode: public LavExternalObject { //enable_shared_from_this is for event
 	LavNode(int type, std::shared_ptr<LavSimulation> simulation, unsigned int numInputBuffers, unsigned int numOutputBuffers);
 	virtual ~LavNode();
 
-	virtual int getType();
-
 	virtual int getOutputBufferCount();
 	//Note that this isn't shared ptr.  The output pointers for a node are managed by the node itself and we need to be able to allocate/deallocate them for SSE, as well as work with arrays.  Don't hold on to output pointers.
 	virtual float** getOutputBufferArray();
@@ -93,7 +91,6 @@ class LavNode: public LavExternalObject { //enable_shared_from_this is for event
 	std::vector<LavInputConnection> input_connections;
 	std::vector<LavOutputConnection> output_connections;
 	bool is_processing = false, is_suspended = false;
-	int type = Lav_OBJTYPE_GENERIC_NODE;
 	int num_input_buffers = 0, num_output_buffers = 0, block_size = 0;
 	//used to make no-op state changes free.
 	int prev_state = Lav_NODESTATE_PLAYING;

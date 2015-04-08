@@ -12,7 +12,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/macros.hpp>
 #include <algorithm>
 
-LavBuffer::LavBuffer(std::shared_ptr<LavSimulation> simulation) {
+LavBuffer::LavBuffer(std::shared_ptr<LavSimulation> simulation): LavExternalObject(Lav_OBJTYPE_BUFFER) {
 	this->simulation = simulation;
 }
 

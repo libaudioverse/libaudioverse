@@ -35,7 +35,7 @@ bool doesEdgePreserveAcyclicity(std::shared_ptr<LavNode> start, std::shared_ptr<
 	return true;
 }
 
-LavNode::LavNode(int type, std::shared_ptr<LavSimulation> simulation, unsigned int numInputBuffers, unsigned int numOutputBuffers): type(type) {
+LavNode::LavNode(int type, std::shared_ptr<LavSimulation> simulation, unsigned int numInputBuffers, unsigned int numOutputBuffers): LavExternalObject(type) {
 	this->simulation= simulation;
 	//request properties from the metadata module.
 	properties = makePropertyTable(type);
@@ -120,10 +120,6 @@ void LavNode::zeroInputBuffers() {
 }
 
 void LavNode::willProcessParents() {
-}
-
-int LavNode::getType() {
-	return type;
 }
 
 int LavNode::getState() {

@@ -30,13 +30,11 @@ extern std::atomic<int> *max_handle;
 
 class LavExternalObject: public std::enable_shared_from_this<LavExternalObject>  {
 	public:
-	LavExternalObject() {
-		externalObjectHandle = max_handle->fetch_add(1);
-		refcount.store(0);
-	}
-	virtual ~LavExternalObject() {}
+	LavExternalObject(int type);
+	virtual ~LavExternalObject();
+	int getType();
 	bool isExternalObject = false, isFirstExternalAccess = false;
-	int externalObjectHandle;
+	int externalObjectHandle, type;
 	std::atomic<int> refcount;
 };
 

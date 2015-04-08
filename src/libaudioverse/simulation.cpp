@@ -18,7 +18,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <tuple>
 #include <map>
 
-LavSimulation::LavSimulation(unsigned int sr, unsigned int blockSize, unsigned int mixahead) {
+LavSimulation::LavSimulation(unsigned int sr, unsigned int blockSize, unsigned int mixahead): LavExternalObject(Lav_OBJTYPE_SIMULATION) {
 	if(blockSize%4 || blockSize== 0) throw LavErrorException(Lav_ERROR_RANGE); //only afe to have this be a multiple of four.
 	this->sr = (float)sr;
 	this->block_size = blockSize;

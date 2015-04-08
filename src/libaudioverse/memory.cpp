@@ -29,6 +29,19 @@ void initializeMemoryModule() {
 	external_handles=new std::map<int, std::shared_ptr<LavExternalObject>>();
 }
 
+LavExternalObject::LavExternalObject(int type) {
+	externalObjectHandle = max_handle->fetch_add(1);
+	this->type=type;
+	refcount.store(0);
+}
+
+LavExternalObject::~LavExternalObject() {
+}
+
+int LavExternalObject::getType() {
+	return type;
+}
+
 float* LavAllocFloatArray(unsigned int size) {
 	#if LIBAUDIOVERSE_MALLOC_ALIGNMENT == 1
 	return (float*)calloc(size*sizeof(float), 1);
