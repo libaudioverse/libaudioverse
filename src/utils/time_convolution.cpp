@@ -57,7 +57,7 @@ void main(int argc, char** args) {
 		Lav_simulationGetBlock(simulation, 2, 1, storage);
 	}, NUM_TIMES);
 	for(auto i: sources) {
-		ERRCHECK(Lav_freeHandle(i));
+		ERRCHECK(Lav_handleDecRef(i));
 	}
 	Lav_shutdown();
 	printf("Took %f seconds\n", t);
