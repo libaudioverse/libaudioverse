@@ -30,6 +30,11 @@ class {{name|without_lav|underscores_to_camelcase(True)}}(enum.IntEnum):
 #registry of classes to be resurrected if we see a handle and don't already have one.
 _types_to_classes = dict()
 
+#magically resurrect an object from a handle.
+#this needs infrastructure still, so we can't yet.
+def _resurrect(handle):
+	pass
+
 #this makes sure that callback objects do not die.
 _global_events= collections.defaultdict(set)
 
@@ -214,6 +219,7 @@ Use load_from_file to read a file or load_from_array to load an iterable."""
 
 	def init_with_handle(self, handle):
 		self.handle = handle
+		self.simulation = _resurrect(_lav.buffer_get_simulation(self.handle))
 
 	def load_from_file(self, path):
 		_lav.buffer_load_from_file(self, path)
@@ -253,6 +259,7 @@ class GenericNode(_HandleComparer):
 
 	def init_with_handle(self, handle):
 		self.handle = handle
+		self.simulation = _resurrect(self.handle)
 		self._events= dict()
 		self._callbacks = dict()
 		self.input_connection_count=_lav.node_get_input_connection_count(self)
