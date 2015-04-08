@@ -17,6 +17,16 @@ def find_datafiles():
 	return [('libaudioverse', dlls)]
 
 
+#Everything below here might need the important enums, anemly Lav_OBJECT_TYPES:
+{%for name in important_enums%}
+{%set constants = constants_by_enum[name]%}
+{%set constants_prefix = common_prefix(constants.keys())%}
+class {{name|without_lav|underscores_to_camelcase(True)}}(enum.IntEnum):
+{%for i, j in constants.iteritems()%}
+	{{i|strip_prefix(constants_prefix)|lower}} = {{j}}
+{%endfor%}
+{%endfor%}
+
 #this makes sure that callback objects do not die.
 _global_events= collections.defaultdict(set)
 
@@ -199,15 +209,6 @@ Use load_from_file to read a file or load_from_array to load an iterable."""
 	def load_from_array(sr, channels, frames, data):
 		_lav.buffer_load_from_array(sr, channels, frames, data)
 
-#These are the enums which are needed publicly, i.e. distance model, etc.
-{%for name in important_enums%}
-{%set constants = constants_by_enum[name]%}
-{%set constants_prefix = common_prefix(constants.keys())%}
-class {{name|without_lav|underscores_to_camelcase(True)}}(enum.IntEnum):
-{%for i, j in constants.iteritems()%}
-	{{i|strip_prefix(constants_prefix)|lower}} = {{j}}
-{%endfor%}
-{%endfor%}
 
 class PropertyInfo(object):
 	"""Gives info about a property.
