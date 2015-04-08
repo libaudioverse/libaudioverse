@@ -329,14 +329,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeDisconnect(LavHandle nodeHandle, int output
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetType(LavHandle nodeHandle, int* destination) {
-	PUB_BEGIN
-	auto node = incomingObject<LavNode>(nodeHandle);
-	LOCK(*node);
-	*destination = node->getType();
-	PUB_END
-}
-
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetInputConnectionCount(LavHandle nodeHandle, unsigned int* destination) {
 	PUB_BEGIN
 	auto node = incomingObject<LavNode>(nodeHandle);

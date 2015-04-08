@@ -137,6 +137,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_handleDecRef(LavHandle handle);
 This is to avoid an issue with bindings that need to know if they should increment counts.*/
 Lav_PUBLIC_FUNCTION LavError Lav_handleGetAndClearFirstAccess(LavHandle handle, int* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_handleGetRefCount(LavHandle handle, int* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_handleGetType(LavHandle handle, int* destination);
 
 /**Shuts down the library.
 
@@ -211,7 +212,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeConnectSimulation(LavHandle nodeHandle, int
 Lav_PUBLIC_FUNCTION LavError Lav_nodeDisconnect(LavHandle nodeHandle, int output);
 
 /**Query node type.*/
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetType(LavHandle nodeHandle, int* destination);
 
 /**Query maximum number of inputs and outputs.*/
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetInputConnectionCount(LavHandle nodeHandle, unsigned int* destination);

@@ -117,3 +117,10 @@ Lav_PUBLIC_FUNCTION LavError Lav_handleGetRefCount(LavHandle handle, int* destin
 	*destination =e->refcount.load();
 	PUB_END
 }
+
+Lav_PUBLIC_FUNCTION LavError Lav_handleGetType(LavHandle handle, int* destination) {
+	PUB_BEGIN
+	auto e = incomingObject<LavExternalObject>(handle);
+	*destination = e->getType();
+	PUB_END
+}
