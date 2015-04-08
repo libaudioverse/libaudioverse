@@ -30,10 +30,20 @@ class {{name|without_lav|underscores_to_camelcase(True)}}(enum.IntEnum):
 #registry of classes to be resurrected if we see a handle and don't already have one.
 _types_to_classes = dict()
 
+#Instances that already exist.
+_weak_handle_lookup = weakref.WeakValueDictionary()
+#Holds a mapping of handles to states.
+_object_states = dict()
+
 #magically resurrect an object from a handle.
-#this needs infrastructure still, so we can't yet.
 def _resurrect(handle):
-	pass
+	obj = _weak_handle_lookup.get(handle, None)
+	if obj is None:
+		cls = _types_to_classes[ObjectTypes(_lav.handle_get_type(handle))]
+		obj = cls.__new__()
+		obj.init_with_handle(handle)
+	_weak_handle_lookup[handle] = obj
+	return obj
 
 #this makes sure that callback objects do not die.
 _global_events= collections.defaultdict(set)
@@ -67,6 +77,7 @@ use None to clear."""
 
 def get_logging_callback():
 	"""Returns the logging callback."""
+
 	return _logging_callback
 
 def set_logging_level(level):
