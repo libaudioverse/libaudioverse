@@ -24,6 +24,10 @@ LavBuffer::~LavBuffer() {
 	if(data) LavFreeFloatArray(data);
 }
 
+std::shared_ptr<LavSimulation> LavBuffer::getSimulation() {
+	return simulation;
+}
+
 int LavBuffer::getLength() {
 	return frames;
 }
@@ -100,6 +104,12 @@ Lav_PUBLIC_FUNCTION LavError Lav_createBuffer(LavHandle simulationHandle, LavHan
 	*destination = outgoingObject(createBuffer(simulation));
 	PUB_END
 }
+Lav_PUBLIC_FUNCTION LavError Lav_bufferGetSimulation(LavHandle handle, LavHandle* destination) {
+	PUB_BEGIN
+	auto b= incomingObject<LavBuffer>(handle);
+	*destination = outgoingObject(b->getSimulation());
+	PUB_END
+}
 
 Lav_PUBLIC_FUNCTION LavError Lav_bufferLoadFromFile(LavHandle bufferHandle, const char* path) {
 	PUB_BEGIN
@@ -123,4 +133,3 @@ Lav_PUBLIC_FUNCTION LavError Lav_bufferLoadFromArray(LavHandle bufferHandle, int
 	buff->loadFromArray(sr, channels, frames, data);
 	PUB_END
 }
-

@@ -11,6 +11,7 @@ class LavBuffer: public LavExternalObject {
 	public:
 	LavBuffer(std::shared_ptr<LavSimulation> simulation);
 	~LavBuffer();
+	std::shared_ptr<LavSimulation> getSimulation();
 	int getLength();
 	double getDuration();
 	int getChannels();

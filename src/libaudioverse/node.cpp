@@ -304,6 +304,13 @@ void LavSubgraphNode::tick() {
 
 //begin public api
 
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetSimulation(LavHandle handle, LavHandle* destination) {
+	PUB_BEGIN
+auto n = incomingObject<LavNode>(handle);
+	*destination = outgoingObject(n->getSimulation());
+	PUB_END
+}
+
 Lav_PUBLIC_FUNCTION LavError Lav_nodeConnect(LavHandle nodeHandle, int output, LavHandle destHandle, int input) {
 	PUB_BEGIN
 	auto node= incomingObject<LavNode>(nodeHandle);
