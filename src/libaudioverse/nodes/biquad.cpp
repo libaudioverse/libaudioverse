@@ -26,7 +26,7 @@ class LavBiquadNode: public LavNode {
 	int prev_type;
 };
 
-LavBiquadNode::LavBiquadNode(std::shared_ptr<LavSimulation> sim, unsigned int channels): LavNode(Lav_NODETYPE_BIQUAD, sim, channels, channels) {
+LavBiquadNode::LavBiquadNode(std::shared_ptr<LavSimulation> sim, unsigned int channels): LavNode(Lav_OBJTYPE_BIQUAD_NODE, sim, channels, channels) {
 	biquads.resize(channels);
 	//configure all of them.
 	prev_type = getProperty(Lav_BIQUAD_FILTER_TYPE).getIntValue();

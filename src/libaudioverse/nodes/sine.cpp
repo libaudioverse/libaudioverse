@@ -23,7 +23,7 @@ class LavSineNode: public LavNode {
 	float phase = 0;
 };
 
-LavSineNode::LavSineNode(std::shared_ptr<LavSimulation> simulation): LavNode(Lav_NODETYPE_SINE, simulation, 0, 1) {
+LavSineNode::LavSineNode(std::shared_ptr<LavSimulation> simulation): LavNode(Lav_OBJTYPE_SINE_NODE, simulation, 0, 1) {
 	appendOutputConnection(0, 1);
 }
 

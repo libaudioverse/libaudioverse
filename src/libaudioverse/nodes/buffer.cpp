@@ -29,7 +29,7 @@ class LavBufferNode: public LavNode {
 	double offset=0.0;
 };
 
-LavBufferNode::LavBufferNode(std::shared_ptr<LavSimulation> simulation): LavNode(Lav_NODETYPE_BUFFER, simulation, 0, 1) {
+LavBufferNode::LavBufferNode(std::shared_ptr<LavSimulation> simulation): LavNode(Lav_OBJTYPE_BUFFER_NODE, simulation, 0, 1) {
 	appendOutputConnection(0, 1);
 	getProperty(Lav_BUFFER_BUFFER).setPostChangedCallback([&] () {bufferChanged();});
 	getProperty(Lav_BUFFER_POSITION).setPostChangedCallback([&] () {positionChanged();});
@@ -60,7 +60,6 @@ void LavBufferNode::bufferChanged() {
 	getProperty(Lav_BUFFER_POSITION).setDoubleValue(0.0); //the callback handles changing everything else.
 	getProperty(Lav_BUFFER_POSITION).setDoubleRange(0.0, maxPosition);
 	buffer_length = newBufferLength;
-	printf("%i\n", newBufferLength);
 }
 
 void LavBufferNode::positionChanged() {

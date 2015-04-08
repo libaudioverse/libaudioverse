@@ -23,7 +23,7 @@ class LavGainNode: public LavNode {
 	void process();
 };
 
-LavGainNode::LavGainNode(std::shared_ptr<LavSimulation> sim): LavNode(Lav_NODETYPE_GAIN, sim, 0, 0) {
+LavGainNode::LavGainNode(std::shared_ptr<LavSimulation> sim): LavNode(Lav_OBJTYPE_GAIN_NODE, sim, 0, 0) {
 }
 
 std::shared_ptr<LavNode> createGainNode(std::shared_ptr<LavSimulation> simulation) {

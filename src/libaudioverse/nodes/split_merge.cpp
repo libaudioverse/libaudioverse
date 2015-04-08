@@ -32,7 +32,7 @@ std::shared_ptr<LavNode> createSplitMergeNode(std::shared_ptr<LavSimulation> sim
 }
 
 std::shared_ptr<LavNode> createChannelSplitterNode(std::shared_ptr<LavSimulation> simulation, int channels) {
-	auto retval= createSplitMergeNode(simulation, Lav_NODETYPE_CHANNEL_SPLITTER);
+	auto retval= createSplitMergeNode(simulation, Lav_OBJTYPE_CHANNEL_SPLITTER_NODE);
 	retval->resize(channels, 0);
 	for(int i =0; i < channels; i++) retval->appendOutputConnection(i, 1);
 	retval->appendInputConnection(0, channels);
@@ -41,7 +41,7 @@ std::shared_ptr<LavNode> createChannelSplitterNode(std::shared_ptr<LavSimulation
 }
 
 std::shared_ptr<LavNode> createChannelMergerNode(std::shared_ptr<LavSimulation> simulation, int channels) {
-	auto retval = createSplitMergeNode(simulation, Lav_NODETYPE_CHANNEL_MERGER);
+	auto retval = createSplitMergeNode(simulation, Lav_OBJTYPE_CHANNEL_MERGER_NODE);
 	retval->resize(channels, 0);
 	retval->appendOutputConnection(0, channels);
 	for(int i = 0; i < channels; i++) retval->appendInputConnection(i, 1);

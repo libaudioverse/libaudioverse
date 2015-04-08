@@ -24,7 +24,7 @@ class LavIirNode: public LavNode {
 	std::vector<LavIIRFilter> filters;
 };
 
-LavIirNode::LavIirNode(std::shared_ptr<LavSimulation> simulation, int channels): LavNode(Lav_NODETYPE_IIR, simulation, channels, channels) {
+LavIirNode::LavIirNode(std::shared_ptr<LavSimulation> simulation, int channels): LavNode(Lav_OBJTYPE_IIR_NODE, simulation, channels, channels) {
 	if(channels <= 0) throw LavErrorException(Lav_ERROR_RANGE);
 	filters.resize(channels);
 	double defaultNumerator[] = {1.0};
@@ -69,7 +69,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_iirNodeSetCoefficients(LavHandle nodeHandle, in
 	PUB_BEGIN
 	auto node = incomingObject<LavNode>(nodeHandle);
 	LOCK(*node);
-	if(node->getType() != Lav_NODETYPE_IIR) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
+	if(node->getType() != Lav_OBJTYPE_IIR_NODE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
 	std::static_pointer_cast<LavIirNode>(node)->setCoefficients(numeratorLength, numerator, denominatorLength, denominator, shouldClearHistory);
 	PUB_END
 }

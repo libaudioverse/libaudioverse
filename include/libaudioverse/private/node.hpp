@@ -93,7 +93,7 @@ class LavNode: public LavExternalObject { //enable_shared_from_this is for event
 	std::vector<LavInputConnection> input_connections;
 	std::vector<LavOutputConnection> output_connections;
 	bool is_processing = false, is_suspended = false;
-	int type = Lav_NODETYPE_GENERIC;
+	int type = Lav_OBJTYPE_GENERIC_NODE;
 	int num_input_buffers = 0, num_output_buffers = 0, block_size = 0;
 	//used to make no-op state changes free.
 	int prev_state = Lav_NODESTATE_PLAYING;

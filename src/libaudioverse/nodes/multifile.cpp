@@ -28,7 +28,7 @@ class LavMultifileNode: public LavSubgraphNode {
 	std::vector<std::shared_ptr<LavNode>> file_nodes;
 };
 
-LavMultifileNode::LavMultifileNode(std::shared_ptr<LavSimulation> simulation, int channels, int maxSimultaneousFiles): LavSubgraphNode(Lav_NODETYPE_MULTIFILE, simulation) {
+LavMultifileNode::LavMultifileNode(std::shared_ptr<LavSimulation> simulation, int channels, int maxSimultaneousFiles): LavSubgraphNode(Lav_OBJTYPE_MULTIFILE_NODE, simulation) {
 	this->channels = channels;
 	this->max_simultaneous_files = maxSimultaneousFiles;
 	this->gain=createGainNode(simulation);
@@ -98,7 +98,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_multifileNodePlay(LavHandle nodeHandle, char* p
 	PUB_BEGIN
 	auto node= incomingObject<LavNode>(nodeHandle);
 	LOCK(*node);
-	if(node->getType() != Lav_NODETYPE_MULTIFILE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
+	if(node->getType() != Lav_OBJTYPE_MULTIFILE_NODE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
 	std::static_pointer_cast<LavMultifileNode>(node)->play(path);
 	PUB_END
 }
@@ -107,7 +107,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_multifileNodeStopAll(LavHandle nodeHandle) {
 	PUB_BEGIN
 	auto node=incomingObject<LavNode>(nodeHandle);
 	LOCK(*node);
-	if(node->getType() != Lav_NODETYPE_MULTIFILE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
+	if(node->getType() != Lav_OBJTYPE_MULTIFILE_NODE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
 	std::static_pointer_cast<LavMultifileNode>(node)->stopAll();
 	PUB_END
 }

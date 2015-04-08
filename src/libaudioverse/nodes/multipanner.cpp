@@ -28,7 +28,7 @@ class LavMultipannerObject: public LavSubgraphNode {
 	void strategyChanged();
 };
 
-LavMultipannerObject::LavMultipannerObject(std::shared_ptr<LavSimulation> sim, std::shared_ptr<LavHrtfData> hrtf): LavSubgraphNode(Lav_NODETYPE_MULTIPANNER, sim)  {
+LavMultipannerObject::LavMultipannerObject(std::shared_ptr<LavSimulation> sim, std::shared_ptr<LavHrtfData> hrtf): LavSubgraphNode(Lav_OBJTYPE_MULTIPANNER_NODE, sim)  {
 	hrtf_panner = createHrtfNode(sim, hrtf);
 	amplitude_panner = createAmplitudePannerNode(sim);
 	input=createGainNode(simulation);

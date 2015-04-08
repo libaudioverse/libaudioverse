@@ -25,7 +25,7 @@ class LavCustomNode: public LavNode {
 	void* callback_userdata = nullptr;
 };
 
-LavCustomNode::LavCustomNode(std::shared_ptr<LavSimulation> sim, unsigned int inputs, unsigned int channelsPerInput, unsigned int outputs, unsigned int channelsPerOutput): LavNode(Lav_NODETYPE_CUSTOM, sim, inputs*channelsPerInput, outputs*channelsPerOutput) {
+LavCustomNode::LavCustomNode(std::shared_ptr<LavSimulation> sim, unsigned int inputs, unsigned int channelsPerInput, unsigned int outputs, unsigned int channelsPerOutput): LavNode(Lav_OBJTYPE_CUSTOM_NODE, sim, inputs*channelsPerInput, outputs*channelsPerOutput) {
 	for(unsigned int i= 0; i < inputs; i++) appendInputConnection(i*channelsPerInput, channelsPerInput);
 	for(int i= 0; i < outputs; i++) appendOutputConnection(i*channelsPerOutput, channelsPerOutput);
 }
@@ -59,7 +59,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_customNodeSetProcessingCallback(LavHandle nodeH
 	PUB_BEGIN
 	auto node= incomingObject<LavNode>(nodeHandle);
 	LOCK(*node);
-	if(node->getType() != Lav_NODETYPE_CUSTOM) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
+	if(node->getType() != Lav_OBJTYPE_CUSTOM_NODE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
 	auto node2 = std::static_pointer_cast<LavCustomNode>(node);
 	node2->callback = callback;
 	node2->callback_userdata = userdata;

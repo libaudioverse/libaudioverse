@@ -18,7 +18,7 @@ class LavHardLimiterNode: public LavNode {
 	virtual void process();
 };
 
-LavHardLimiterNode::LavHardLimiterNode(std::shared_ptr<LavSimulation> simulation, unsigned int numInputs): LavNode(Lav_NODETYPE_HARD_LIMITER, simulation, numInputs, numInputs) {
+LavHardLimiterNode::LavHardLimiterNode(std::shared_ptr<LavSimulation> simulation, unsigned int numInputs): LavNode(Lav_OBJTYPE_HARD_LIMITER_NODE, simulation, numInputs, numInputs) {
 	appendInputConnection(0, numInputs);
 	appendOutputConnection(0, numInputs);
 }

@@ -19,7 +19,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <algorithm>
 #include <vector>
 
-LavSimpleEnvironmentNode::LavSimpleEnvironmentNode(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf): LavEnvironmentBase(Lav_NODETYPE_SIMPLE_ENVIRONMENT, simulation)  {
+LavSimpleEnvironmentNode::LavSimpleEnvironmentNode(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf): LavEnvironmentBase(Lav_OBJTYPE_SIMPLE_ENVIRONMENT_NODE, simulation)  {
 	this->hrtf = hrtf;
 	output = createGainNode(simulation);
 	output->resize(8, 8);

@@ -5,6 +5,7 @@ import jinja2
 import sys
 sys.path = [os.path.join(os.path.dirname(__file__), '..')] + sys.path
 import bindings.get_info
+import re
 
 if len(sys.argv) != 2:
 	print"Invalid usage: do not have destination"
@@ -26,13 +27,13 @@ extensions = ['jinja2.ext.loopcontrols'])
 #the map we have here is actually very verbose, and can be flattened into something easily iterable.
 #we can then take advantage of either std::pair or std::tuple as the keys.
 joined_properties = []
-for nodekey, nodeinfo in [(i, metadata['nodes'].get(i, dict())) for i in bindings.get_info.constants.iterkeys() if i.startswith("Lav_NODETYPE_")]:
+for nodekey, nodeinfo in [(i, metadata['nodes'].get(i, dict())) for i in bindings.get_info.constants.iterkeys() if re.match("Lav_OBJTYPE_(\w+_*)+_NODE", i)]:
 	#add everything from the object itself.
 	for propkey, propinfo in nodeinfo.get('properties', dict()).iteritems():
 		joined_properties.append((nodekey, propkey, propinfo))
 	#if we're not suppressing inheritence, we follow this up with everything from lav_OBJTYPE_GENERIC.
 	if not nodeinfo.get('suppress_implied_inherit', False):
-		for propkey, propinfo in metadata['nodes']['Lav_NODETYPE_GENERIC']['properties'].iteritems():
+		for propkey, propinfo in metadata['nodes']['Lav_OBJTYPE_GENERIC_NODE']['properties'].iteritems():
 			joined_properties.append((nodekey, propkey, propinfo))
 
 #this is the same logic, but for callbacks.

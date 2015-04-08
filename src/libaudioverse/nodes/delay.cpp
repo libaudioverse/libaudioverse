@@ -27,7 +27,7 @@ class LavDelayNode: public LavNode {
 	std::vector<LavCrossfadingDelayLine> lines;
 };
 
-LavDelayNode::LavDelayNode(std::shared_ptr<LavSimulation> simulation, float maxDelay, unsigned int lineCount): LavNode(Lav_NODETYPE_DELAY, simulation, lineCount, lineCount) {
+LavDelayNode::LavDelayNode(std::shared_ptr<LavSimulation> simulation, float maxDelay, unsigned int lineCount): LavNode(Lav_OBJTYPE_DELAY_NODE, simulation, lineCount, lineCount) {
 	if(lineCount == 0) throw LavErrorException(Lav_ERROR_RANGE);
 	for(unsigned int i = 0; i < lineCount; i++) lines.emplace_back(maxDelay, simulation->getSr());
 	getProperty(Lav_DELAY_DELAY).setFloatRange(0.0f, maxDelay);

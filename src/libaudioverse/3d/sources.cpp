@@ -20,7 +20,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <limits>
 #include <memory>
 
-LavSourceNode::LavSourceNode(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavEnvironmentBase> manager): LavSubgraphNode(Lav_NODETYPE_SOURCE, simulation) {
+LavSourceNode::LavSourceNode(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavEnvironmentBase> manager): LavSubgraphNode(Lav_OBJTYPE_SOURCE_NODE, simulation) {
 	input = createGainNode(simulation);
 	input->resize(1, 1);
 	input->appendInputConnection(0, 1);

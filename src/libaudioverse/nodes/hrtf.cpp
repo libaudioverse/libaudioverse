@@ -29,8 +29,8 @@ class LavHrtfNode: public LavNode {
 	float prev_azimuth = 0.0f, prev_elevation = 0.0f;
 };
 
-LavHrtfNode::LavHrtfNode(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf): LavNode(Lav_NODETYPE_HRTF, simulation, 1, 2) {
-	type = Lav_NODETYPE_HRTF;
+LavHrtfNode::LavHrtfNode(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf): LavNode(Lav_OBJTYPE_HRTF_NODE, simulation, 1, 2) {
+	type = Lav_OBJTYPE_HRTF_NODE;
 	this->hrtf = hrtf;
 	left_response = LavAllocFloatArray(hrtf->getLength()*sizeof(float));
 	right_response = LavAllocFloatArray(hrtf->getLength()*sizeof(float));

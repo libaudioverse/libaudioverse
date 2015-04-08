@@ -29,6 +29,10 @@ def prefix_filter(l, prefix):
 	"""Expects l, an iterable of strings, and a prefix.  Returns a list consisting of all strings in l that begin with prefix."""
 	return filter(lambda x: x.startswith(prefix), l)
 
+def regexp_filter(l, regexp):
+	return filter(lambda x: re.match(regexp, x) is not None, l)
+
+
 def remove_filter(l, item):
 	"""Returns l without all instances of item."""
 	return filter(lambda x: x != item, l)
@@ -36,6 +40,10 @@ def remove_filter(l, item):
 def strip_prefix(s, prefix):
 	assert s.startswith(prefix)
 	return s[len(prefix):]
+
+def strip_suffix(s, suffix):
+	assert s.endswith(suffix)
+	return s[0:-len(suffix)]
 
 def common_prefix(l):
 	return os.path.commonprefix(l)
@@ -46,7 +54,9 @@ def get_jinja2_filters():
 		'underscores_to_camelcase': underscores_to_camelcase,
 		'remove_filter': remove_filter,
 		'prefix_filter': prefix_filter,
+		'regexp_filter': regexp_filter,
 		'strip_prefix': strip_prefix,
+		'strip_suffix': strip_suffix,
 	}
 
 def get_jinja2_functions():

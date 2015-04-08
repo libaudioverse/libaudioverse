@@ -28,7 +28,7 @@ class LavGraphListenerNode: public LavNode {
 	unsigned int channels = 0;
 };
 
-LavGraphListenerNode::LavGraphListenerNode(std::shared_ptr<LavSimulation> sim, unsigned int channels): LavNode(Lav_NODETYPE_GRAPH_LISTENER, sim, channels, channels) {
+LavGraphListenerNode::LavGraphListenerNode(std::shared_ptr<LavSimulation> sim, unsigned int channels): LavNode(Lav_OBJTYPE_GRAPH_LISTENER_NODE, sim, channels, channels) {
 	outgoing_buffer = LavAllocFloatArray(channels*sim->getBlockSize());
 	this->channels = channels;
 	appendInputConnection(0, channels);
@@ -71,7 +71,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_graphListenerNodeSetListeningCallback(LavHandle
 	PUB_BEGIN
 	auto node = incomingObject<LavNode>(nodeHandle);
 	LOCK(*node);
-	if(node->getType() != Lav_NODETYPE_GRAPH_LISTENER) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
+	if(node->getType() != Lav_OBJTYPE_GRAPH_LISTENER_NODE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
 	auto node2= std::static_pointer_cast<LavGraphListenerNode>(node);
 	node2->callback = callback;
 	node2->callback_userdata = userdata;

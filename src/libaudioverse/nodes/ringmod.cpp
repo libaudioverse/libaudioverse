@@ -23,7 +23,7 @@ class LavRingmodNode: public LavNode {
 	void process();
 };
 
-LavRingmodNode::LavRingmodNode(std::shared_ptr<LavSimulation> sim): LavNode(Lav_NODETYPE_RINGMOD, sim, 2, 1) {
+LavRingmodNode::LavRingmodNode(std::shared_ptr<LavSimulation> sim): LavNode(Lav_OBJTYPE_RINGMOD_NODE, sim, 2, 1) {
 	appendInputConnection(0, 1);
 	appendInputConnection(1, 1);
 	appendOutputConnection(0, 1);

@@ -24,7 +24,7 @@ class LavSquareNode: public LavNode {
 	int wave_length, on_for, counter = 0;
 };
 
-LavSquareNode::LavSquareNode(std::shared_ptr<LavSimulation> simulation): LavNode(Lav_NODETYPE_SQUARE, simulation, 0, 1) {
+LavSquareNode::LavSquareNode(std::shared_ptr<LavSimulation> simulation): LavNode(Lav_OBJTYPE_SQUARE_NODE, simulation, 0, 1) {
 	getProperty(Lav_SQUARE_FREQUENCY).setPostChangedCallback([=] (){recomputeCounters();});
 	getProperty(Lav_SQUARE_DUTY_CYCLE).setPostChangedCallback([=] (){recomputeCounters();});
 	recomputeCounters();

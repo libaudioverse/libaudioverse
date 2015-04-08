@@ -34,7 +34,7 @@ class LavPushNode: public LavNode {
 	bool fired_out_callback = false;
 };
 
-LavPushNode::LavPushNode(std::shared_ptr<LavSimulation> sim, unsigned int inputSr, unsigned int channels): LavNode(Lav_NODETYPE_PUSH, sim, 0, channels) {
+LavPushNode::LavPushNode(std::shared_ptr<LavSimulation> sim, unsigned int inputSr, unsigned int channels): LavNode(Lav_OBJTYPE_PUSH_NODE, sim, 0, channels) {
 	input_sr = inputSr;
 	resampler = std::make_shared<LavResampler>(push_frames, channels, inputSr, (int)sim->getSr());
 	this->push_channels = channels;
@@ -110,7 +110,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_pushNodeFeed(LavHandle nodeHandle, unsigned int
 	PUB_BEGIN
 	auto node=incomingObject<LavNode>(nodeHandle);
 	LOCK(*node);
-	if(node->getType() != Lav_NODETYPE_PUSH) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
+	if(node->getType() != Lav_OBJTYPE_PUSH_NODE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
 	std::static_pointer_cast<LavPushNode>(node)->feed(length, buffer);
 	PUB_END
 }

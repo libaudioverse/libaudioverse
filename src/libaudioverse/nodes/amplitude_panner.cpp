@@ -24,7 +24,7 @@ float standard_map_71[] = {-22.5f, 22.5f, -150.0f, 150.0f, -110.0f, 110.0f};
 //This class needs to be public because of the multipanner, which needs to make a method call against it directly.
 //see include/libaudioverse/objects/panner.hpp.
 
-LavAmplitudePannerNode::LavAmplitudePannerNode(std::shared_ptr<LavSimulation> simulation): LavNode(Lav_NODETYPE_AMPLITUDE_PANNER, simulation, 1, 0) {
+LavAmplitudePannerNode::LavAmplitudePannerNode(std::shared_ptr<LavSimulation> simulation): LavNode(Lav_OBJTYPE_AMPLITUDE_PANNER_NODE, simulation, 1, 0) {
 	getProperty(Lav_PANNER_CHANNEL_MAP).setPostChangedCallback([this](){recomputeChannelMap();});
 	getProperty(Lav_PANNER_SKIP_LFE).setPostChangedCallback([this] () {recomputeChannelMap();});
 	getProperty(Lav_PANNER_SKIP_CENTER).setPostChangedCallback([this] (){recomputeChannelMap();});
@@ -97,7 +97,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_amplitudePannerNodeConfigureStandardMap(LavHand
 	if(channels != 2 && channels != 6 && channels != 8) throw LavErrorException(Lav_ERROR_RANGE);
 	auto node= incomingObject<LavNode>(nodeHandle);
 	LOCK(*node);
-	if(node->getType() != Lav_NODETYPE_AMPLITUDE_PANNER) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
+	if(node->getType() != Lav_OBJTYPE_AMPLITUDE_PANNER_NODE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
 	std::static_pointer_cast<LavAmplitudePannerNode>(node)->configureStandardChannelMap(channels);
 	PUB_END
 }

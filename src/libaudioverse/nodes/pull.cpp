@@ -29,7 +29,7 @@ class LavPullNode: public LavNode {
 	void* callback_userdata = nullptr;
 };
 
-LavPullNode::LavPullNode(std::shared_ptr<LavSimulation> sim, unsigned int inputSr, unsigned int channels): LavNode(Lav_NODETYPE_PULL, sim, 0, channels) {
+LavPullNode::LavPullNode(std::shared_ptr<LavSimulation> sim, unsigned int inputSr, unsigned int channels): LavNode(Lav_OBJTYPE_PULL_NODE, sim, 0, channels) {
 	this->channels = channels;
 	input_sr = inputSr;
 	resampler = std::make_shared<LavResampler>(sim->getBlockSize(), channels, inputSr, (int)sim->getSr());
@@ -85,7 +85,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_pullNodeSetAudioCallback(LavHandle nodeHandle, 
 	PUB_BEGIN
 	auto node = incomingObject<LavNode>(nodeHandle);
 	LOCK(*node);
-	if(node->getType() != Lav_NODETYPE_PULL) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
+	if(node->getType() != Lav_OBJTYPE_PULL_NODE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
 	auto p = std::static_pointer_cast<LavPullNode>(node);
 	p->callback = callback;
 	p->callback_userdata = userdata;

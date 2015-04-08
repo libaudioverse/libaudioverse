@@ -34,7 +34,7 @@ class LavFileNode: public LavNode {
 
 //the third parameter is a hint: we need to know how many channels, we only expose objects through the create functions, so the create function can find this out.
 //todo: when objects support resizing their inputs and outputs, as they will inevitably support this, rewrite to use that functionality.
-LavFileNode::LavFileNode(std::shared_ptr<LavSimulation> simulation, const char* path, unsigned int channels): LavNode(Lav_NODETYPE_FILE, simulation, 0, channels) {
+LavFileNode::LavFileNode(std::shared_ptr<LavSimulation> simulation, const char* path, unsigned int channels): LavNode(Lav_OBJTYPE_FILE_NODE, simulation, 0, channels) {
 	file.open(path);
 	buffer = LavAllocFloatArray(file.getSampleCount());
 	file.readAll(buffer);

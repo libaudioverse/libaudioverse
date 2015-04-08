@@ -19,7 +19,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <math.h>
 
 LavFeedbackDelayNetworkNode::LavFeedbackDelayNetworkNode(std::shared_ptr<LavSimulation> simulation, float maxDelay, int lines):
-LavNode(Lav_NODETYPE_FEEDBACK_DELAY_NETWORK, simulation, lines, lines) {
+LavNode(Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK_NODE, simulation, lines, lines) {
 	max_delay = maxDelay;
 	line_count = lines;
 	network = new LavFeedbackDelayNetwork(lines, maxDelay, simulation->getSr());
@@ -87,7 +87,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createFeedbackDelayNetworkNode(LavHandle simula
 	PUB_END
 }
 
-#define FDN_OR_ERROR if(node->getType() != Lav_NODETYPE_FEEDBACK_DELAY_NETWORK) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
+#define FDN_OR_ERROR if(node->getType() != Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK_NODE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
 
 Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetFeedbackMatrix(LavHandle nodeHandle, int count, float* values) {
 	PUB_BEGIN

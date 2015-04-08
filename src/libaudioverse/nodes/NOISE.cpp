@@ -32,7 +32,7 @@ class LavNoiseNode: public LavNode {
 };
 
 //we give the random number generator a fixed seed for debugging purposes.
-LavNoiseNode::LavNoiseNode(std::shared_ptr<LavSimulation> simulation): LavNode(Lav_NODETYPE_NOISE, simulation, 0, 1),
+LavNoiseNode::LavNoiseNode(std::shared_ptr<LavSimulation> simulation): LavNode(Lav_OBJTYPE_NOISE_NODE, simulation, 0, 1),
 random_number_generator(1234), uniform_distribution(-1.0f, 1.0f)  {
 	/**We have to configure the pinkifier.
 This was originally taken from Spectral Audio processing by JOS.*/

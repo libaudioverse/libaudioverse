@@ -282,18 +282,18 @@ class GenericNode(_HandleComparer):
 		if self in self.simulation._inputs:
 			self.simulation._inputs.remove(self)
 
-{%for enumerant, prop in metadata['nodes']['Lav_NODETYPE_GENERIC']['properties'].iteritems()%}
+{%for enumerant, prop in metadata['nodes']['Lav_OBJTYPE_GENERIC_NODE']['properties'].iteritems()%}
 {{macros.implement_property(enumerant, prop)}}
 {%endfor%}
-{%for enumerant, info in metadata['nodes']['Lav_NODETYPE_GENERIC'].get('events', dict()).iteritems()%}
+{%for enumerant, info in metadata['nodes']['Lav_OBJTYPE_GENERIC_NODE'].get('events', dict()).iteritems()%}
 {{macros.implement_event(info['name'], "_libaudioverse." + enumerant)}}
 {%endfor%}
 
 	def reset(self):
 		_lav.node_reset(self)
 
-{%for node_name in constants.iterkeys()|prefix_filter("Lav_NODETYPE_")|remove_filter("Lav_NODETYPE_GENERIC")%}
-{%set friendly_name = node_name|strip_prefix("Lav_NODETYPE_")|lower|underscores_to_camelcase(True)%}
+{%for node_name in constants.iterkeys()|regexp_filter("Lav_OBJTYPE_\w+_NODE")|remove_filter("Lav_OBJTYPE_GENERIC_NODE")%}
+{%set friendly_name = node_name|strip_prefix("Lav_OBJTYPE_")|strip_suffix("_NODE")|lower|underscores_to_camelcase(True)%}
 {%set constructor_name = "Lav_create" + friendly_name + "Node"%}
 {%set constructor_arg_names = functions[constructor_name].input_args|map(attribute='name')|map('camelcase_to_underscores')|list-%}
 class {{friendly_name}}Node(GenericNode):
