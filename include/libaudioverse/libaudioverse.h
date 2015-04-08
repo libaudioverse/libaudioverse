@@ -64,7 +64,6 @@ enum Lav_ERRORS {
 	Lav_ERROR_INTERNAL= 999,
 };
 
-/**These are property types, either int, float, double, vector of 3 floats, vector of 6 floats, string, or int/float array of any length.*/
 enum Lav_PROPERTY_TYPES {
 	Lav_PROPERTYTYPE_INT,
 	Lav_PROPERTYTYPE_FLOAT,
@@ -126,8 +125,14 @@ Lav_PUBLIC_FUNCTION LavError Lav_initialize();
 
 /**Free any pointer that libaudioverse gives you.  If something goes wrong, namely that the pointer isn't from Libaudioverse in the first place, this tries to fail gracefully and give you an error, but don't rely on this.*/
 Lav_PUBLIC_FUNCTION LavError Lav_free(void* obj);
-/**Same for handles.*/
-Lav_PUBLIC_FUNCTION LavError Lav_freeHandle(LavHandle h);
+
+/**Handle refcounts.*/
+Lav_PUBLIC_FUNCTION LavError Lav_handleIncRef(LavHandle handle);
+Lav_PUBLIC_FUNCTION LavError Lav_handleDecRef(LavHandle handle);
+/**Every handle has a first external access bit which is cleared by this function.
+This is to avoid an issue with bindings that need to know if they should increment counts.*/
+Lav_PUBLIC_FUNCTION LavError Lav_handleGetAndClearFirstAccess(LavHandle handle, int* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_handleGetRefCount(LavHandle handle, int* destination);
 
 /**Shuts down the library.
 

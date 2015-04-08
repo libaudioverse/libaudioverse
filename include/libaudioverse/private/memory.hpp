@@ -30,10 +30,14 @@ extern std::atomic<int> *max_handle;
 
 class LavExternalObject: public std::enable_shared_from_this<LavExternalObject>  {
 	public:
-	LavExternalObject() {externalObjectHandle = max_handle->fetch_add(1);}
+	LavExternalObject() {
+		externalObjectHandle = max_handle->fetch_add(1);
+		refcount.store(0);
+	}
 	virtual ~LavExternalObject() {}
-	bool isExternalObject = false;
+	bool isExternalObject = false, isFirstExternalAccess = false;
 	int externalObjectHandle;
+	std::atomic<int> refcount;
 };
 
 template <class t>
@@ -60,6 +64,8 @@ int outgoingObject(std::shared_ptr<t> what) {
 	if(what->isExternalObject == false) {
 		auto guard=std::lock_guard<std::mutex>(*memory_lock);
 		what->isExternalObject =true;
+		what->isFirstExternalAccess = true;
+		what->refcount.fetch_add(1);
 		(*external_handles)[what->externalObjectHandle] = what;
 	}
 	return what->externalObjectHandle;

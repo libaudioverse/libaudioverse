@@ -29,23 +29,6 @@ void initializeMemoryModule() {
 	external_handles=new std::map<int, std::shared_ptr<LavExternalObject>>();
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_free(void* ptr) {
-	PUB_BEGIN
-	auto guard = std::lock_guard<std::mutex>(*memory_lock);
-	if(external_ptrs->count(ptr)) external_ptrs->erase(ptr);
-	else throw LavErrorException(Lav_ERROR_INVALID_HANDLE);
-	PUB_END
-}
-
-Lav_PUBLIC_FUNCTION LavError Lav_freeHandle(LavHandle h) {
-	PUB_BEGIN
-	auto guard=std::lock_guard<std::mutex>(*memory_lock);
-	if(external_handles->count(h)) external_handles->erase(h);
-	else throw LavErrorException(Lav_ERROR_INVALID_HANDLE);
-	PUB_END
-}
-
-
 float* LavAllocFloatArray(unsigned int size) {
 	#if LIBAUDIOVERSE_MALLOC_ALIGNMENT == 1
 	return (float*)calloc(size*sizeof(float), 1);
@@ -76,4 +59,48 @@ std::function<void(LavExternalObject*)> LavObjectDeleter(std::shared_ptr<LavSimu
 		LOCK(*simulation);
 		delete obj;
 	};
+}
+
+//begin public api
+
+Lav_PUBLIC_FUNCTION LavError Lav_free(void* ptr) {
+	PUB_BEGIN
+	auto guard = std::lock_guard<std::mutex>(*memory_lock);
+	if(external_ptrs->count(ptr)) external_ptrs->erase(ptr);
+	else throw LavErrorException(Lav_ERROR_INVALID_HANDLE);
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_handleIncRef(LavHandle handle) {
+	PUB_BEGIN
+	auto e = incomingObject<LavExternalObject>(handle);
+	e->refcount.fetch_add(1);
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_handleDecRef(LavHandle handle) {
+	PUB_BEGIN
+	auto e = incomingObject<LavExternalObject>(handle);
+	e->refcount.fetch_add(-1);
+	int rc = e->refcount.load();
+	if(rc == 0) {
+		auto guard=std::lock_guard<std::mutex>(*memory_lock);
+		external_handles->erase(e->externalObjectHandle);
+	}
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_handleGetAndClearFirstAccess(LavHandle handle, int* destination) {
+	PUB_BEGIN
+	auto e = incomingObject<LavExternalObject>(handle);
+	*destination = e->isFirstExternalAccess;
+	e->isFirstExternalAccess = false;
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_handleGetRefCount(LavHandle handle, int* destination) {
+	PUB_BEGIN
+	auto e =incomingObject<LavExternalObject>(handle);
+	*destination =e->refcount.load();
+	PUB_END
 }
