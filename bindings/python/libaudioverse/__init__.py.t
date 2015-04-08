@@ -356,4 +356,3 @@ class {{friendly_name}}Node(GenericNode):
 {%endfor%}
 _types_to_classes[ObjectTypes.{{friendly_name | camelcase_to_underscores}}_node] = {{friendly_name}}Node
 {%endfor%}
-
