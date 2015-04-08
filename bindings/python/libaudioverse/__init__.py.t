@@ -176,6 +176,9 @@ See the manual for specifics on how output objects work.  A brief summary is giv
 			handle = _lav.create_simulation_for_device(device_index, channels, sample_rate, block_size, mix_ahead)
 		else:
 			handle = _lav.create_read_simulation(sample_rate, block_size)
+		self.init_with_handle(handle)
+
+	def init_with_handle(self, handle):
 		self.handle = handle
 		self._inputs= set()
 
@@ -206,7 +209,11 @@ class Buffer(_HandleComparer):
 Use load_from_file to read a file or load_from_array to load an iterable."""
 
 	def __init__(self, simulation):
-		self.handle=_lav.create_buffer(simulation)
+		handle=_lav.create_buffer(simulation)
+		self.init_with_handle(handle)
+
+	def init_with_handle(self, handle):
+		self.handle = handle
 
 	def load_from_file(self, path):
 		_lav.buffer_load_from_file(self, path)
@@ -241,9 +248,11 @@ Note that this only communicates info.  If changes happen after you requested th
 class GenericNode(_HandleComparer):
 	"""A Libaudioverse object."""
 
-	def __init__(self, handle, simulation):
+	def __init__(self, handle):
+		self.init_with_handle(handle)
+
+	def init_with_handle(self, handle):
 		self.handle = handle
-		self.simulation = simulation
 		self._events= dict()
 		self._callbacks = dict()
 		self.input_connection_count=_lav.node_get_input_connection_count(self)
@@ -307,7 +316,7 @@ _types_to_classes[ObjectTypes.generic_node] = GenericNode
 {%set constructor_arg_names = functions[constructor_name].input_args|map(attribute='name')|map('camelcase_to_underscores')|list-%}
 class {{friendly_name}}Node(GenericNode):
 	def __init__(self{%if constructor_arg_names|length > 0%}, {%endif%}{{constructor_arg_names|join(', ')}}):
-		super({{friendly_name}}Node, self).__init__(_lav.{{constructor_name|without_lav|camelcase_to_underscores}}({{constructor_arg_names|join(', ')}}), {{constructor_arg_names[0]}})
+		super({{friendly_name}}Node, self).__init__(_lav.{{constructor_name|without_lav|camelcase_to_underscores}}({{constructor_arg_names|join(', ')}}))
 
 {%for enumerant, prop in metadata['nodes'].get(node_name, dict()).get('properties', dict()).iteritems()%}
 {{macros.implement_property(enumerant, prop)}}
