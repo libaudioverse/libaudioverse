@@ -17,7 +17,7 @@ def find_datafiles():
 	return [('libaudioverse', dlls)]
 
 
-#Everything below here might need the important enums, anemly Lav_OBJECT_TYPES:
+#Everything below here might need the important enums, namely Lav_OBJECT_TYPES:
 {%for name in important_enums%}
 {%set constants = constants_by_enum[name]%}
 {%set constants_prefix = common_prefix(constants.keys())%}
@@ -26,6 +26,9 @@ class {{name|without_lav|underscores_to_camelcase(True)}}(enum.IntEnum):
 	{{i|strip_prefix(constants_prefix)|lower}} = {{j}}
 {%endfor%}
 {%endfor%}
+
+#registry of classes to be resurrected if we see a handle and don't already have one.
+_types_to_classes = dict()
 
 #this makes sure that callback objects do not die.
 _global_events= collections.defaultdict(set)
@@ -194,6 +197,8 @@ Calling this on an audio output device will cause the audio thread to skip ahead
 	def __exit__(self, type, value, traceback):
 		_lav.simulation_end_atomic_block(self.handle)
 
+_types_to_classes[ObjectTypes.simulation] = Simulation
+
 #Buffer objects.
 class Buffer(_HandleComparer):
 	"""An audio buffer.
@@ -209,6 +214,7 @@ Use load_from_file to read a file or load_from_array to load an iterable."""
 	def load_from_array(sr, channels, frames, data):
 		_lav.buffer_load_from_array(sr, channels, frames, data)
 
+_types_to_classes[ObjectTypes.buffer] = Buffer
 
 class PropertyInfo(object):
 	"""Gives info about a property.
@@ -293,6 +299,8 @@ class GenericNode(_HandleComparer):
 	def reset(self):
 		_lav.node_reset(self)
 
+_types_to_classes[ObjectTypes.generic_node] = GenericNode
+
 {%for node_name in constants.iterkeys()|regexp_filter("Lav_OBJTYPE_\w+_NODE")|remove_filter("Lav_OBJTYPE_GENERIC_NODE")%}
 {%set friendly_name = node_name|strip_prefix("Lav_OBJTYPE_")|strip_suffix("_NODE")|lower|underscores_to_camelcase(True)%}
 {%set constructor_name = "Lav_create" + friendly_name + "Node"%}
@@ -346,6 +354,6 @@ class {{friendly_name}}Node(GenericNode):
 		#As this is just for GC and the getter, we don't deal with the overhead of an object, and just use tuples.
 		self._callbacks["{{callback_name}}"] = (callback, wrapper, ctypes_callback)
 {%endfor%}
-
+_types_to_classes[ObjectTypes.{{friendly_name | camelcase_to_underscores}}_node] = {{friendly_name}}Node
 {%endfor%}
 
