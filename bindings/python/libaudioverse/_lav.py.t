@@ -30,7 +30,7 @@ class _HandleBox(object):
 		first_access= _libaudioverse.LavHandle()
 		_libaudioverse.Lav_handleGetAndClearFirstAccess(handle, ctypes.byref(first_access))
 		if not first_access:
-			handle_inc_ref(handle)
+			_libaudioverse.Lav_handleIncRef(handle)
 
 	def __eq__(self, other):
 		if not isinstance(other, _HandleBox): return False

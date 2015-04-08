@@ -72,8 +72,8 @@ def extract_enums():
 	#name = e.name, values are in e.values as e.values[index].value and names in e.values[index]name
 	#note that minimal interpretation is needed so that we can have negated constants-pycparser is for interpreters, not this, and so represents them as a unary minus in the ast.
 	constants_by_enum = OrderedDict()
-	implicit_value =0
 	for enum in enum_list:
+		implicit_value = 0
 		constants_by_enum[enum.name] = dict()
 		for enum_value in enum.values.enumerators:
 			val = enum_value.value

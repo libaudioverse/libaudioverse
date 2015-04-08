@@ -6,6 +6,7 @@ import collections
 import ctypes
 import enum
 import functools
+import threading
 
 def find_datafiles():
 	import glob
@@ -34,13 +35,14 @@ _types_to_classes = dict()
 _weak_handle_lookup = weakref.WeakValueDictionary()
 #Holds a mapping of handles to states.
 _object_states = dict()
+_object_states_lock = threading.Lock()
 
 #magically resurrect an object from a handle.
 def _resurrect(handle):
 	obj = _weak_handle_lookup.get(handle, None)
 	if obj is None:
 		cls = _types_to_classes[ObjectTypes(_lav.handle_get_type(handle))]
-		obj = cls.__new__()
+		obj = cls.__new__(cls)
 		obj.init_with_handle(handle)
 	_weak_handle_lookup[handle] = obj
 	return obj
@@ -193,21 +195,29 @@ See the manual for specifics on how output objects work.  A brief summary is giv
 		else:
 			handle = _lav.create_read_simulation(sample_rate, block_size)
 		self.init_with_handle(handle)
+		_weak_handle_lookup[self.handle] = self
 
 	def init_with_handle(self, handle):
-		self.handle = handle
-		self._inputs= set()
+		with _object_states_lock:
+			if handle not in _object_states:
+				_object_states[handle] = dict()
+				_object_states[handle]['lock'] = threading.Lock()
+				_object_states[handle]['inputs'] = set()
+			self._state = _object_states[handle]
+			self.handle = handle
+			self._lock = self._state['lock']
 
 	def get_block(self, channels, may_apply_mixing_matrix = True):
 		"""Returns a block of data.
 Calling this on an audio output device will cause the audio thread to skip ahead a block, so don't do that."""
-		length = _lav.simulation_get_block_size(self.handle)*channels
-		buff = (ctypes.c_float*length)()
-		#circumvent automatic conversion of iterables.
-		buff_ptr = ctypes.POINTER(ctypes.c_float)()
-		buff_ptr.contents = buff
-		_lav.simulation_get_block(self.handle, channels, may_apply_mixing_matrix, buff_ptr)
-		return list(buff)
+		with self._lock:
+			length = _lav.simulation_get_block_size(self.handle)*channels
+			buff = (ctypes.c_float*length)()
+			#circumvent automatic conversion of iterables.
+			buff_ptr = ctypes.POINTER(ctypes.c_float)()
+			buff_ptr.contents = buff
+			_lav.simulation_get_block(self.handle, channels, may_apply_mixing_matrix, buff_ptr)
+			return list(buff)
 
 	#context manager support.
 	def __enter__(self):
@@ -227,10 +237,17 @@ Use load_from_file to read a file or load_from_array to load an iterable."""
 	def __init__(self, simulation):
 		handle=_lav.create_buffer(simulation)
 		self.init_with_handle(handle)
+		_weak_handle_lookup[self.handle] = self
 
 	def init_with_handle(self, handle):
-		self.handle = handle
-		self.simulation = _resurrect(_lav.buffer_get_simulation(self.handle))
+		with _object_states_lock:
+			if handle not in _object_states:
+				_object_states[handle] = dict()
+				_object_states[handle]['lock'] = threading.Lock()
+				_object_states[handle]['simulation'] = _resurrect(_lav.buffer_get_simulation(handle))
+			self._state=_object_states[handle]
+			self._lock = self._state['lock']
+			self.handle = handle
 
 	def load_from_file(self, path):
 		_lav.buffer_load_from_file(self, path)
@@ -267,54 +284,67 @@ class GenericNode(_HandleComparer):
 
 	def __init__(self, handle):
 		self.init_with_handle(handle)
+		_weak_handle_lookup[self.handle] = self
 
 	def init_with_handle(self, handle):
 		self.handle = handle
-		self.simulation = _resurrect(self.handle)
-		self._events= dict()
-		self._callbacks = dict()
-		self.input_connection_count=_lav.node_get_input_connection_count(self)
-		self.output_connection_count = _lav.node_get_output_connection_count(self)
-		self._inputs=set()
-		self._outputs= collections.defaultdict(set)
+		with _object_states_lock:
+			if handle not in _object_states:
+				_object_states[handle] = dict()
+				self._state = _object_states[handle]
+				self._state['simulation'] = _resurrect(_lav.node_get_simulation(self.handle))
+				self._state['events'] = dict()
+				self._state['callbacks'] = dict()
+				self._state['input_connection_count'] =_lav.node_get_input_connection_count(self)
+				self._state['output_connection_count'] = _lav.node_get_output_connection_count(self)
+				self._state['inputs'] =set()
+				self._state['outputs'] = collections.defaultdict(set)
+				self._state['lock'] = threading.Lock()
+			else:
+				self._state=_object_states[handle]
+			self._lock = self._state['lock']
 
 	def get_property_names(self):
 		return self._properties.keys()
 
 	def get_property_info(self, name):
 		"""Return info for the property named name."""
-		if name not in self._properties:
-			raise ValueError(name + " is not a property on this instance.")
-		index = self._properties[name]
-		type = PropertyTypes(_lav.node_get_property_type(self.handle, index))
-		range = None
-		has_dynamic_range = bool(_lav.node_get_property_has_dynamic_range(self.handle, index))
-		if type == PropertyTypes.int:
-			range = _lav.node_get_int_property_range(self.handle, index)
-		elif type == PropertyTypes.float:
-			range = _lav.node_get_float_property_range()
-		elif type == PropertyTypes.double:
-			range = _lav.node_get_double_property_range(self.handle, index)
-		return PropertyInfo(name = name, type = type, range = range, has_dynamic_range = has_dynamic_range)
+		with self._lock:
+			if name not in self._properties:
+				raise ValueError(name + " is not a property on this instance.")
+			index = self._properties[name]
+			type = PropertyTypes(_lav.node_get_property_type(self.handle, index))
+			range = None
+			has_dynamic_range = bool(_lav.node_get_property_has_dynamic_range(self.handle, index))
+			if type == PropertyTypes.int:
+				range = _lav.node_get_int_property_range(self.handle, index)
+			elif type == PropertyTypes.float:
+				range = _lav.node_get_float_property_range()
+			elif type == PropertyTypes.double:
+				range = _lav.node_get_double_property_range(self.handle, index)
+			return PropertyInfo(name = name, type = type, range = range, has_dynamic_range = has_dynamic_range)
 
 	def connect(self, output, node, input):
-		_lav.node_connect(self, output, node, input)
-		self._outputs[output].add((output, weakref.ref))
-		node._inputs.add((output, self))
+		with self._lock:
+			_lav.node_connect(self, output, node, input)
+			self._state['outputs'][output].add((output, weakref.ref))
+			node._state['inputs'].add((output, self))
 
 	def connect_simulation(self, output):
-		_lav.node_connect_simulation(self, output)
-		self.simulation._inputs.add(self)
+		with self._lock:
+			_lav.node_connect_simulation(self, output)
+			self._state['simulation']._state['inputs'].add(self)
 
 	def disconnect(self, output):
-		_lav.node_disconnect(self, output)
-		for i in self._outputs[output]:
-			input, weak =i
-			obj=weak.get()
-			if obj is not None and (output, self) in obj._inputs:
-				obj._inputs.remove((output, self))
-		if self in self.simulation._inputs:
-			self.simulation._inputs.remove(self)
+		with self._lock:
+			_lav.node_disconnect(self, output)
+			for i in self._outputs[output]:
+				input, weak =i
+				obj=weak.get()
+				if obj is not None and (output, self) in obj._inputs:
+					obj._inputs.remove((output, self))
+			if self in self._state['simulation']._state['inputs']:
+				self._state['simulation']._state['inputs'].remove(self)
 
 {%for enumerant, prop in metadata['nodes']['Lav_OBJTYPE_GENERIC_NODE']['properties'].iteritems()%}
 {{macros.implement_property(enumerant, prop)}}
@@ -358,28 +388,30 @@ class {{friendly_name}}Node(GenericNode):
 {%set libaudioverse_function_name = "_lav."+friendly_name|camelcase_to_underscores+"_node_set_"+callback_name+"_callback"%}
 {%set ctypes_name = "_libaudioverse.Lav"+friendly_name+"Node"+callback_name|underscores_to_camelcase(True)+"Callback"%}
 	def get_{{callback_name}}(self):
-		cb = self._callbacks.get("{{callback_name}}", None)
-		if cb is None:
-			return None
-		else:
-			return cb[0]
+		with self._lock:
+			cb = self._state['callbacks'].get("{{callback_name}}", None)
+			if cb is None:
+				return None
+			else:
+				return cb[0]
 
 	def set_{{callback_name}}_callback(self, callback, additional_args = None, additional_kwargs = None):
-		if callback is None:
-			#delete the key, clear the callback with Libaudioverse.
-			{{libaudioverse_function_name}}(self.handle, None, None)
-			del self._callbacks[{{callback_name}}]
-			return
-		if additional_args is None:
-			additionnal_args = ()
-		if additional_kwargs is None:
-			additional_kwargs = dict()
-		wrapper = _CallbackWrapper(self, callback, additional_args, additional_kwargs)
-		ctypes_callback = {{ctypes_name}}(wrapper)
-		{{libaudioverse_function_name}}(self.handle, ctypes_callback, None)
-		#if we get here, we hold both objects; we succeeded in setting because no exception was thrown.
-		#As this is just for GC and the getter, we don't deal with the overhead of an object, and just use tuples.
-		self._callbacks["{{callback_name}}"] = (callback, wrapper, ctypes_callback)
+		with self._lock:
+			if callback is None:
+				#delete the key, clear the callback with Libaudioverse.
+				{{libaudioverse_function_name}}(self.handle, None, None)
+				del self._state['callbacks'][{{callback_name}}]
+				return
+			if additional_args is None:
+				additionnal_args = ()
+			if additional_kwargs is None:
+				additional_kwargs = dict()
+			wrapper = _CallbackWrapper(self, callback, additional_args, additional_kwargs)
+			ctypes_callback = {{ctypes_name}}(wrapper)
+			{{libaudioverse_function_name}}(self.handle, ctypes_callback, None)
+			#if we get here, we hold both objects; we succeeded in setting because no exception was thrown.
+			#As this is just for GC and the getter, we don't deal with the overhead of an object, and just use tuples.
+			self._state['callbacks']["{{callback_name}}"] = (callback, wrapper, ctypes_callback)
 {%endfor%}
 _types_to_classes[ObjectTypes.{{friendly_name | camelcase_to_underscores}}_node] = {{friendly_name}}Node
 {%endfor%}
