@@ -24,7 +24,7 @@ import yaml
 #base is int, etc.
 #indirection is the number of *s. int* is 1, etc.
 class TypeInfo(object):
-	def __init__(self, base, indirection):
+	def __init__(self, base, indirection, typedef_from = None):
 		self.base = base
 		self.indirection = indirection
 

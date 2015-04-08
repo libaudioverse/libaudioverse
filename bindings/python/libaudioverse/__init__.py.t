@@ -289,14 +289,6 @@ class GenericNode(_HandleComparer):
 {{macros.implement_event(info['name'], "_libaudioverse." + enumerant)}}
 {%endfor%}
 
-	def __del__(self):
-		if _lav is None:
-			#undocumented python thing: if __del__ is called at process exit, globals of this module are None.
-			return
-		if getattr(self, 'handle', None) is not None:
-			_lav.free_handle(self.handle)
-		self.handle = None
-
 	def reset(self):
 		_lav.node_reset(self)
 
@@ -307,10 +299,6 @@ class GenericNode(_HandleComparer):
 class {{friendly_name}}Node(GenericNode):
 	def __init__(self{%if constructor_arg_names|length > 0%}, {%endif%}{{constructor_arg_names|join(', ')}}):
 		super({{friendly_name}}Node, self).__init__(_lav.{{constructor_name|without_lav|camelcase_to_underscores}}({{constructor_arg_names|join(', ')}}), {{constructor_arg_names[0]}})
-
-	#This has to be here. Killing this is bad. It is not a no-op.
-	def __del__(self):
-		super({{friendly_name}}Node, self).__del__()
 
 {%for enumerant, prop in metadata['nodes'].get(node_name, dict()).get('properties', dict()).iteritems()%}
 {{macros.implement_property(enumerant, prop)}}

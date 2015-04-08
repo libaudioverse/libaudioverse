@@ -3,6 +3,7 @@
 #among other things, the implementation heree enables calling functions with keyword arguments and raises exceptions on error, rather than dealing with ctypes directly.
 import ctypes
 import collections
+import functools
 import _libaudioverse
 
 #These are not from libaudioverse.
@@ -20,10 +21,38 @@ def make_error_from_code(err):
 	"""Internal use.  Translates libaudioverse error codes into exceptions."""
 	return errors_to_exceptions.get(err, PythonBindingsCouldNotTranslateErrorCodeError)()
 
+#Handle marshalling and automatic refcount stuff:
+@functools.total_ordering
+class _HandleBox(object):
+
+	def __init__(self, handle):
+		self.handle=handle
+		first_access= _libaudioverse.LavHandle()
+		_libaudioverse.Lav_handleGetAndClearFirstAccess(handle, ctypes.byref(first_access))
+		if not first_access:
+			handle_inc_ref(handle)
+
+	def __eq__(self, other):
+		if not isinstance(other, _HandleBox): return False
+		else: return self.handle == other.handle
+
+	def __lt__(self, other):
+		if not isinstance(other, _HandleBox): return True #other classes are "less" than us.
+		return self.handle < other.handle
+
+	def __del__(self):
+		#Guard against interpreter shutdown.
+		if self.handle is None or _libaudioverse is None: return
+		_libaudioverse.Lav_handleDecRef(self.handle)
+		self.handle = None
+
+def reverse_handle(handle):
+	return _HandleBox(handle)
+
 {%macro autopointerize(arglist)%}
 {%for arg in arglist%}
-{%if arg.type.indirection > 0 or arg.type.base == 'LavHandle'%}
-	{{arg.name}} = getattr({{arg.name}}, 'handle', {{arg.name}})
+{%if arg.type.base == 'LavHandle'%}
+	{{arg.name}} = getattr({{arg.name}}.handle, 'handle', {{arg.name}}.handle)
 {%endif%}
 {%if arg.type.indirection == 1 and not arg.type.base == 'char'%}
 	if isinstance({{arg.name}}, collections.Sized):
@@ -56,8 +85,13 @@ def {{friendly_name}}({{input_arg_names|join(', ')}}):
 	if err != _libaudioverse.Lav_ERROR_NONE:
 		raise make_error_from_code(err)
 	retval = []
-{%for i in output_arg_names%}
-	retval.append(getattr({{i}}, 'value', {{i}}))
+{%for i in func_info.output_args%}
+{%if i.type.base=='LavHandle' and i.type.indirection == 1%}
+	handle = {{i.name}}.value
+	retval.append(reverse_handle(handle))
+{%else%}
+	retval.append(getattr({{i.name}}, 'value', {{i.name}}))
+{%endif%}
 {%endfor%}
 	return tuple(retval) if len(retval) > 1 else retval[0]
 {%endif%}
