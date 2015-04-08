@@ -36,14 +36,12 @@ LavBufferNode::LavBufferNode(std::shared_ptr<LavSimulation> simulation): LavNode
 }
 
 std::shared_ptr<LavNode> createBufferNode(std::shared_ptr<LavSimulation> simulation) {
-	printf("Buffer node created\n");
 	std::shared_ptr<LavBufferNode> retval = std::shared_ptr<LavBufferNode>(new LavBufferNode(simulation), LavObjectDeleter(simulation));
 	simulation->associateNode(retval);
 	return retval;
 }
 
 void LavBufferNode::bufferChanged() {
-	printf("Buffer changed...\n");
 	auto buff= getProperty(Lav_BUFFER_BUFFER).getBufferValue();
 	double maxPosition= 0.0;
 	int newChannels= 0;
@@ -53,7 +51,6 @@ void LavBufferNode::bufferChanged() {
 		getOutputConnection(0)->reconfigure(0, 1);
 	}
 	else {
-		printf("Have a buffer\n");
 		newChannels = buff->getChannels() > 0 ? buff->getChannels() : 1;
 		resize(0, newChannels);
 		getOutputConnection(0)->reconfigure(0, newChannels);
