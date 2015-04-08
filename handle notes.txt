@@ -1,0 +1,18 @@
+I'm writing this down heree so I don't forget.
+
+handles need:
+Lav_getRefcount(LavHandle h, int* count): Returns a handle's reference count.  For debugging.
+Lav_incref(LavHandle h): Increments a handle's reference count by 1.
+
+ When handles are first made external, mark them as unaccessed.  Then:
+Lav_getAndClearFirstAccess(LavHandle h, int first): Gets and clears the first access bit on a handle.
+
+Lav_free: Decrements a handle's reference count.  If zero, make it no longer external.
+
+The outgoingObject template then marks all nonexternal objects as first-time external and gives them a reference count of 1.
+
+When a handle is freed, enqueue or call the global callback for unreachable handle.  This tells apps that it is now impossible for the Libaudioverse handle to be reached in any way.  Without this functionality, it is not inconceivable that we might see the same handle even after our last Lav_free, and since we need value-based comparison instead of identity-based comparisons, the external app will need to know that the handle is gone.
+
+Most bindings will then place all mutable state that they need to keep track of in a global, thread-safe data structure and can be ensured that their global state will remain available to them until it is literally impossible for another object to be made from this handle.  Records in this data structure then get removed by the handle is freed callback.
+
+Finally, instead of using handles as ints, wrap them in small objects that hold only the handle.  Give these objects the language's equivalent of a finalizer.
