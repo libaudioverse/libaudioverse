@@ -40,6 +40,9 @@ class _HandleBox(object):
 		if not isinstance(other, _HandleBox): return True #other classes are "less" than us.
 		return self.handle < other.handle
 
+	def __hash__(self):
+		return self.handle.__hash__()
+
 	def __del__(self):
 		#Guard against interpreter shutdown.
 		if self.handle is None or _libaudioverse is None: return
