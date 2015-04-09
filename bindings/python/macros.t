@@ -72,7 +72,7 @@
 {%macro implement_event(name, index)%}
 	@property
 	def {{name}}_event(self):
-		evt = self._events.get({{index}}, None)
+		evt = self._state['events'].get({{index}}, None)
 		if evt is None:
 			return
 		return (evt.callback, evt.extra_arguments)
@@ -85,6 +85,6 @@
 			val_tuple = (val, ())
 		cb, extra_args = val_tuple
 		event_obj = _EventCallbackWrapper(self, {{index}}, cb, extra_args)
-		self._events[{{index}}] = event_obj
-		_global_events[self.handle].add(event_obj)
+		self._state['events'][{{index}}] = event_obj
+		_global_events[self.handle.handle].add(event_obj)
 {%endmacro%}

@@ -38,13 +38,13 @@ for nodekey, nodeinfo in [(i, metadata['nodes'].get(i, dict())) for i in binding
 
 #this is the same logic, but for callbacks.
 joined_events = []
-for nodekey, nodeinfo in [(i, metadata['nodes'].get(i, dict())) for i in bindings.get_info.constants.iterkeys() if i.startswith("Lav_NODETYPE_")]:
+for nodekey, nodeinfo in [(i, metadata['nodes'].get(i, dict())) for i in bindings.get_info.constants.iterkeys() if re.match("Lav_OBJTYPE_(\w+_*)+_NODE", i)]:
 	#add everything from the object itself.
 	for eventkey, eventinfo in nodeinfo.get('events', dict()).iteritems():
 		joined_events.append((nodekey, eventkey, eventinfo))
 	#if we're not suppressing inheritence, we follow this up with everything from lav_OBJTYPE_GENERIC.
 	if not nodeinfo.get('suppress_implied_inherit', False):
-		for eventkey, eventinfo in metadata['nodes']['Lav_NODETYPE_GENERIC'].get('events', dict()).iteritems():
+		for eventkey, eventinfo in metadata['nodes']['Lav_OBJTYPE_GENERIC_NODE'].get('events', dict()).iteritems():
 			joined_events.append((nodekey, eventkey, eventinfo))
 
 #the template will convert the types into enums via judicious use of if statements-we use it like augmented c, and prefer to do refactoring only there when possible.
