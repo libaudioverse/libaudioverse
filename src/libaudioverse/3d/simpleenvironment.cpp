@@ -21,11 +21,13 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 LavSimpleEnvironmentNode::LavSimpleEnvironmentNode(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf): LavEnvironmentBase(Lav_OBJTYPE_SIMPLE_ENVIRONMENT_NODE, simulation)  {
 	this->hrtf = hrtf;
+	int channels = getProperty(Lav_ENVIRONMENT_OUTPUT_CHANNELS).getIntValue();
+	getProperty(Lav_ENVIRONMENT_OUTPUT_CHANNELS).setPostChangedCallback([&] () {outputChannelsChanged();});
 	output = createGainNode(simulation);
-	output->resize(8, 8);
-	output->appendInputConnection(0, 8);
-	output->appendOutputConnection(0, 8);
-	appendOutputConnection(0, 8);
+	output->resize(channels, channels);
+	output->appendInputConnection(0, channels);
+	output->appendOutputConnection(0, channels);
+	appendOutputConnection(0, channels);
 	setOutputNode(output);
 	environment.world_to_listener_transform = glm::lookAt(
 		glm::vec3(0.0f, 0.0f, 0.0f),
@@ -72,6 +74,14 @@ std::shared_ptr<LavNode> LavSimpleEnvironmentNode::createPannerNode() {
 
 void LavSimpleEnvironmentNode::registerSourceForUpdates(std::shared_ptr<LavSourceNode> source) {
 	sources.insert(source);
+}
+
+void LavSimpleEnvironmentNode::outputChannelsChanged() {
+	int channels = getProperty(Lav_ENVIRONMENT_OUTPUT_CHANNELS).getIntValue();
+	output->resize(channels, channels);
+	getOutputConnection(0)->reconfigure(0, channels);
+	output->getOutputConnection(0)->reconfigure(0, channels);
+	output->getInputConnection(0)->reconfigure(0, channels);
 }
 
 //begin public api

@@ -6,7 +6,7 @@
 		return {{prop['value_enum']|without_lav|underscores_to_camelcase(True)}}(val)
 {%elif prop['type'] == 'boolean'%}
 		return bool(_lav.node_get_int_property(self.handle, _libaudioverse.{{enumerant}}))
-{%elif prop['type'] in ['float', 'double', 'float3', 'float6']%}
+{%elif prop['type'] in ['int', 'float', 'double', 'float3', 'float6']%}
 		return _lav.node_get_{{prop['type']}}_property(self.handle, _libaudioverse.{{enumerant}})
 {%elif prop['type'] == 'float_array'%}
 		with self._lock:

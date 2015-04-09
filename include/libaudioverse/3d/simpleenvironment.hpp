@@ -18,6 +18,7 @@ class LavSimpleEnvironmentNode: public LavEnvironmentBase {
 	//call update on all sources.
 	virtual void willProcessParents();
 	std::shared_ptr<LavNode> createPannerNode();
+	virtual void outputChannelsChanged();
 	private:
 	//while these may be parents (through virtue of the panners we give out), they also have to hold a reference to us-and that reference must be strong.
 	//the world is more capable of handling a source that dies than a source a world that dies.
