@@ -77,6 +77,8 @@ void LavSourceNode::update(LavEnvironment environment) {
 	float maxDistance = getProperty(Lav_SOURCE_MAX_DISTANCE).getFloatValue();
 	float referenceDistance = getProperty(Lav_SOURCE_SIZE).getFloatValue();
 	float gain = calculateGainForDistanceModel(distanceModel, distance, maxDistance, referenceDistance);
+	//Add in our mul.
+	gain *= getProperty(Lav_NODE_MUL).getFloatValue();
 
 	//set the panner.
 	panner_node->getProperty(Lav_PANNER_AZIMUTH).setFloatValue(azimuth);
