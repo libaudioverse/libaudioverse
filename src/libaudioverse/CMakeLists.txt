@@ -24,7 +24,6 @@ buffer.cpp
 properties.cpp
 functiontables.cpp
 initialization.cpp
-termination.cpp
 memory.cpp
 events.cpp
 simulation.cpp

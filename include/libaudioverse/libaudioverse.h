@@ -126,6 +126,12 @@ enum Lav_LOGGING_LEVELS {
 
 /**Initialize Libaudioverse.*/
 Lav_PUBLIC_FUNCTION LavError Lav_initialize();
+/**Shuts down the library.
+
+After a call to this function, any Libaudioverse handles are invalid.
+So too are any pointers that Libaudioverse gave you, of any form.*/
+Lav_PUBLIC_FUNCTION LavError Lav_shutdown();
+Lav_PUBLIC_FUNCTION LavError Lav_isInitialized(int* destination);
 
 /**Free any pointer that libaudioverse gives you.  If something goes wrong, namely that the pointer isn't from Libaudioverse in the first place, this tries to fail gracefully and give you an error, but don't rely on this.*/
 Lav_PUBLIC_FUNCTION LavError Lav_free(void* obj);
@@ -139,11 +145,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_handleGetAndClearFirstAccess(LavHandle handle, 
 Lav_PUBLIC_FUNCTION LavError Lav_handleGetRefCount(LavHandle handle, int* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_handleGetType(LavHandle handle, int* destination);
 
-/**Shuts down the library.
 
-After a call to this function, any Libaudioverse handles are invalid.
-So too are any pointers that Libaudioverse gave you, of any form.*/
-Lav_PUBLIC_FUNCTION LavError Lav_shutdown();
 
 /**Configure and query logging.
 

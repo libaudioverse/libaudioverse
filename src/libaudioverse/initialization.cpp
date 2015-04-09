@@ -10,6 +10,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/metadata.hpp>
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/audio_devices.hpp>
+#include <libaudioverse/private/logging.hpp>
 
 typedef void (*initfunc_t)();
 
@@ -23,7 +24,21 @@ initfunc_t initializers[] = {
 	initializeDeviceFactory,
 	initializeMetadata,
 };
+
+typedef void (*shutdownfunc_t)();
+
+//These run in the order specified in this array with no parallelism.
+//If adding new functionality here, simply add it and follow the above typedef.
+//Errors will be returned as appropriate.
+//Termination never fails.
+//logging must always be last.
+shutdownfunc_t shutdown_funcs[] = {
+shutdownMemoryModule,
+shutdownLogging,
+};
+
 unsigned int isInitialized = 0;
+
 
 Lav_PUBLIC_FUNCTION LavError Lav_initialize() {
 	PUB_BEGIN
@@ -34,5 +49,20 @@ Lav_PUBLIC_FUNCTION LavError Lav_initialize() {
 		initializers[i]();
 	}
 	isInitialized = 1;
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_shutdown() {
+	PUB_BEGIN
+	for(int i = 0; i < sizeof(shutdown_funcs)/sizeof(shutdown_funcs[0]); i++) {
+		shutdown_funcs[i]();
+	}
+	isInitialized = 0;
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_isInitialized(int* destination) {
+	PUB_BEGIN
+	*destination = isInitialized;
 	PUB_END
 }
