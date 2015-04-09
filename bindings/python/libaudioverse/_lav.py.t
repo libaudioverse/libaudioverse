@@ -46,7 +46,10 @@ class _HandleBox(object):
 	def __del__(self):
 		#Guard against interpreter shutdown.
 		if self.handle is None or _libaudioverse is None: return
-		_libaudioverse.Lav_handleDecRef(self.handle)
+		is_initialized=ctypes.c_int()
+		_libaudioverse.Lav_isInitialized(ctypes.byref(is_initialized))
+		if is_initialized:
+			_libaudioverse.Lav_handleDecRef(self.handle)
 		self.handle = None
 
 def reverse_handle(handle):
