@@ -29,6 +29,13 @@ void initializeMemoryModule() {
 	external_handles=new std::map<int, std::shared_ptr<LavExternalObject>>();
 }
 
+void shutdownMemoryModule() {
+	delete external_handles;
+	delete external_ptrs;
+	delete max_handle;
+	delete memory_lock;
+}
+
 LavExternalObject::LavExternalObject(int type) {
 	externalObjectHandle = max_handle->fetch_add(1);
 	this->type=type;

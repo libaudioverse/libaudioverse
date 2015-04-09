@@ -84,6 +84,7 @@ std::shared_ptr<t> incomingObject(int handle, bool allowNull =false) {
 }
 
 void initializeMemoryModule();
+void shutdownMemoryModule();
 
 /**This template uses memcpy to perform a safe type pun and avoid violating strict aliasing.*/
 template<class t>
