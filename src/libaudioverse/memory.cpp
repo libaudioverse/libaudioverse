@@ -20,6 +20,7 @@ std::map<void*, std::shared_ptr<void>> *external_ptrs;
 std::mutex *memory_lock;
 std::map<int, std::shared_ptr<LavExternalObject>> *external_handles;
 std::atomic<int> *max_handle;
+LavHandleDestroyedCallback handle_destroyed_callback = nullptr;
 
 void initializeMemoryModule() {
 	memory_lock=new std::mutex();
@@ -43,6 +44,7 @@ LavExternalObject::LavExternalObject(int type) {
 }
 
 LavExternalObject::~LavExternalObject() {
+	if(isExternalObject && handle_destroyed_callback) handle_destroyed_callback(externalObjectHandle);
 }
 
 int LavExternalObject::getType() {
@@ -129,5 +131,12 @@ Lav_PUBLIC_FUNCTION LavError Lav_handleGetType(LavHandle handle, int* destinatio
 	PUB_BEGIN
 	auto e = incomingObject<LavExternalObject>(handle);
 	*destination = e->getType();
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_setHandleDestroyedCallback(LavHandleDestroyedCallback cb) {
+	PUB_BEGIN
+	LOCK(*memory_lock);
+	handle_destroyed_callback=cb;
 	PUB_END
 }

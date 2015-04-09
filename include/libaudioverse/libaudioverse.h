@@ -156,6 +156,11 @@ Lav_PUBLIC_FUNCTION LavError Lav_getLoggingCallback(LavLoggingCallback* destinat
 Lav_PUBLIC_FUNCTION LavError Lav_setLoggingLevel(int level);
 Lav_PUBLIC_FUNCTION LavError Lav_getLoggingLevel(int* destination);
 
+/**Configure the handle destroyed callback.  Also may be used before initialization.
+This exists only for bindings.  If you use this in your C program, you may have design issues.*/
+typedef void (*LavHandleDestroyedCallback)(LavHandle which);
+Lav_PUBLIC_FUNCTION LavError Lav_setHandleDestroyedCallback(LavHandleDestroyedCallback cb);
+
 //devices...
 /**
 Index -1 is special.  Any attempts to query about index -1 will fail.
