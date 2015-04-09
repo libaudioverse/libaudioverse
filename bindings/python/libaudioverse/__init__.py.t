@@ -35,7 +35,10 @@ _types_to_classes = dict()
 _weak_handle_lookup = weakref.WeakValueDictionary()
 #Holds a mapping of handles to states.
 _object_states = dict()
-_object_states_lock = threading.Lock()
+#This has to be recursive.
+#We could be in the middle of an operation that causes resurrection and/or initialization.
+#Then the gc collects a _HandleBox, a refcount goes to 0, and we see _handle_destroyed in the same thread.
+_object_states_lock = threading.RLock()
 
 #magically resurrect an object from a handle.
 def _resurrect(handle):
@@ -46,6 +49,16 @@ def _resurrect(handle):
 		obj.init_with_handle(handle)
 	_weak_handle_lookup[handle] = obj
 	return obj
+
+#This is the callback for handle destruction.
+#This can only be called after both sides have no more references to the object in question.
+def _handle_destroyed(handle):
+	with _object_states_lock:
+		if handle in _object_states:
+			del _object_states[handle]
+
+_handle_destroyed_callback=_libaudioverse.LavHandleDestroyedCallback(_handle_destroyed)
+_libaudioverse.Lav_setHandleDestroyedCallback(_handle_destroyed_callback)
 
 #this makes sure that callback objects do not die.
 _global_events= collections.defaultdict(set)
@@ -200,11 +213,11 @@ See the manual for specifics on how output objects work.  A brief summary is giv
 
 	def init_with_handle(self, handle):
 		with _object_states_lock:
-			if handle not in _object_states:
-				_object_states[handle] = dict()
-				_object_states[handle]['lock'] = threading.Lock()
-				_object_states[handle]['inputs'] = set()
-			self._state = _object_states[handle]
+			if handle.handle not in _object_states:
+				_object_states[handle.handle] = dict()
+				_object_states[handle.handle]['lock'] = threading.Lock()
+				_object_states[handle.handle]['inputs'] = set()
+			self._state = _object_states[handle.handle]
 			self.handle = handle
 			self._lock = self._state['lock']
 
@@ -242,11 +255,11 @@ Use load_from_file to read a file or load_from_array to load an iterable."""
 
 	def init_with_handle(self, handle):
 		with _object_states_lock:
-			if handle not in _object_states:
-				_object_states[handle] = dict()
-				_object_states[handle]['lock'] = threading.Lock()
-				_object_states[handle]['simulation'] = _resurrect(_lav.buffer_get_simulation(handle))
-			self._state=_object_states[handle]
+			if handle.handle not in _object_states:
+				_object_states[handle.handle] = dict()
+				_object_states[handle.handle]['lock'] = threading.Lock()
+				_object_states[handle.handle]['simulation'] = _resurrect(_lav.buffer_get_simulation(handle))
+			self._state=_object_states[handle.handle]
 			self._lock = self._state['lock']
 			self.handle = handle
 
@@ -290,9 +303,9 @@ class GenericNode(_HandleComparer):
 	def init_with_handle(self, handle):
 		self.handle = handle
 		with _object_states_lock:
-			if handle not in _object_states:
-				_object_states[handle] = dict()
-				self._state = _object_states[handle]
+			if handle.handle not in _object_states:
+				_object_states[handle.handle] = dict()
+				self._state = _object_states[handle.handle]
 				self._state['simulation'] = _resurrect(_lav.node_get_simulation(self.handle))
 				self._state['events'] = dict()
 				self._state['callbacks'] = dict()

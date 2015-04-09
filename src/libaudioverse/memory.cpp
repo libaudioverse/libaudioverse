@@ -16,10 +16,10 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <atomic>
 #include <functional>
 
-std::map<void*, std::shared_ptr<void>> *external_ptrs;
-std::mutex *memory_lock;
-std::map<int, std::shared_ptr<LavExternalObject>> *external_handles;
-std::atomic<int> *max_handle;
+std::map<void*, std::shared_ptr<void>> *external_ptrs = nullptr;
+std::mutex *memory_lock = nullptr;
+std::map<int, std::shared_ptr<LavExternalObject>> *external_handles = nullptr;
+std::atomic<int> *max_handle = nullptr;
 LavHandleDestroyedCallback handle_destroyed_callback = nullptr;
 
 void initializeMemoryModule() {
@@ -136,7 +136,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_handleGetType(LavHandle handle, int* destinatio
 
 Lav_PUBLIC_FUNCTION LavError Lav_setHandleDestroyedCallback(LavHandleDestroyedCallback cb) {
 	PUB_BEGIN
-	LOCK(*memory_lock);
+	if(memory_lock) memory_lock->lock();
 	handle_destroyed_callback=cb;
+	if(memory_lock) memory_lock->unlock();
 	PUB_END
 }
