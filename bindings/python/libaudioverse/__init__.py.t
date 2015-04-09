@@ -107,7 +107,8 @@ class _EventCallbackWrapper(object):
 	"""Wraps events into something sane.  Do not use externally."""
 
 	def __init__(self, for_node, slot, callback, additional_args):
-		self.node_weakref = weakref.ref(for_node)
+		#We have to hold onto the int representation.
+		self.node_handle = for_node.handle.handle
 		self.additional_arguments = additional_args
 		self.slot = slot
 		self.callback = callback
@@ -115,9 +116,9 @@ class _EventCallbackWrapper(object):
 		_lav.node_set_event(for_node.handle, slot, self.fptr, None)
 
 	def __call__(self, node, userdata):
-		actual_node= self.node_weakref()
-		if actual_node is None:
-			return
+		#Throw it in a _HandleBox, and then resurrect.
+		#This is safe because we're in a callback and nodes cannot be deleted from callbacks.
+		actual_node= _resurrect(_lav._HandleBox(self.node_handle))
 		self.callback(actual_node, *self.additional_arguments)
 
 class _CallbackWrapper(object):
@@ -126,10 +127,10 @@ class _CallbackWrapper(object):
 		self.additional_args = additional_args
 		self.additional_kwargs = additional_kwargs
 		self.cb = cb
-		self.node_weakref = weakref.ref(node)
+		self.node_handle = node.handle.handle
 
 	def __call__(self, *args):
-		needed_args = (self.node_weakref(),)+args[1:-1] #be sure to eliminate userdata, which is always the last argument.
+		needed_args = (_resurrect(_HandleBox(self.node_handle)), )+args[1:-1] #be sure to eliminate userdata, which is always the last argument.
 		return self.cb(*needed_args, **self.additional_kwargs)
 
 class DeviceInfo(object):
