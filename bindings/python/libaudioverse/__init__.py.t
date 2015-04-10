@@ -301,8 +301,8 @@ class GenericNode(_HandleComparer):
 		_weak_handle_lookup[self.handle] = self
 
 	def init_with_handle(self, handle):
-		self.handle = handle
 		with _object_states_lock:
+			self.handle = handle
 			if handle.handle not in _object_states:
 				_object_states[handle.handle] = dict()
 				self._state = _object_states[handle.handle]
@@ -314,26 +314,30 @@ class GenericNode(_HandleComparer):
 				self._state['inputs'] =set()
 				self._state['outputs'] = collections.defaultdict(set)
 				self._state['lock'] = threading.Lock()
+				self._state['properties'] = dict()
+{%for enumerant, prop in metadata['nodes']['Lav_OBJTYPE_GENERIC_NODE']['properties'].iteritems()%}
+				self._state['properties']["{{prop['name']}}"] = _libaudioverse.{{enumerant}}
+{%endfor%}
 			else:
 				self._state=_object_states[handle]
 			self._lock = self._state['lock']
 
 	def get_property_names(self):
-		return self._properties.keys()
+		return self._state['properties'].keys()
 
 	def get_property_info(self, name):
 		"""Return info for the property named name."""
 		with self._lock:
-			if name not in self._properties:
+			if name not in self._state['properties']:
 				raise ValueError(name + " is not a property on this instance.")
-			index = self._properties[name]
+			index = self._state['properties'][name]
 			type = PropertyTypes(_lav.node_get_property_type(self.handle, index))
 			range = None
 			has_dynamic_range = bool(_lav.node_get_property_has_dynamic_range(self.handle, index))
 			if type == PropertyTypes.int:
 				range = _lav.node_get_int_property_range(self.handle, index)
 			elif type == PropertyTypes.float:
-				range = _lav.node_get_float_property_range()
+				range = _lav.node_get_float_property_range(self.handle, index)
 			elif type == PropertyTypes.double:
 				range = _lav.node_get_double_property_range(self.handle, index)
 			return PropertyInfo(name = name, type = type, range = range, has_dynamic_range = has_dynamic_range)
@@ -376,11 +380,24 @@ _types_to_classes[ObjectTypes.generic_node] = GenericNode
 {%set friendly_name = node_name|strip_prefix("Lav_OBJTYPE_")|strip_suffix("_NODE")|lower|underscores_to_camelcase(True)%}
 {%set constructor_name = "Lav_create" + friendly_name + "Node"%}
 {%set constructor_arg_names = functions[constructor_name].input_args|map(attribute='name')|map('camelcase_to_underscores')|list-%}
+{%set property_dict = metadata['nodes'].get(node_name, dict()).get('properties', dict())%}
 class {{friendly_name}}Node(GenericNode):
 	def __init__(self{%if constructor_arg_names|length > 0%}, {%endif%}{{constructor_arg_names|join(', ')}}):
 		super({{friendly_name}}Node, self).__init__(_lav.{{constructor_name|without_lav|camelcase_to_underscores}}({{constructor_arg_names|join(', ')}}))
 
-{%for enumerant, prop in metadata['nodes'].get(node_name, dict()).get('properties', dict()).iteritems()%}
+{%if property_dict | length > 0%}
+	def init_with_handle(self, handle):
+		with _object_states_lock:
+			#our super implementation adds us, so remember if we weren't there.
+			should_add_properties = handle.handle not in _object_states
+			super({{friendly_name}}Node, self).init_with_handle(handle)
+			if should_add_properties:
+{%for enumerant, prop in property_dict.iteritems()%}
+				self._state['properties']["{{prop['name']}}"] = _libaudioverse.{{enumerant}}
+{%endfor%}
+{%endif%}
+
+{%for enumerant, prop in property_dict.iteritems()%}
 {{macros.implement_property(enumerant, prop)}}
 
 {%endfor%}
