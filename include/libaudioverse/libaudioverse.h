@@ -205,8 +205,17 @@ Every call to Lav_simulationBeginAtomicBlock must be matched with a call to Lav_
 Lav_PUBLIC_FUNCTION LavError Lav_simulationBeginAtomicBlock(LavHandle simulationHandle);
 Lav_PUBLIC_FUNCTION LavError Lav_simulationEndAtomicBlock(LavHandle simulationHandle);
 
+/**The block callback.
+This can be used in some situations for precise timing.
+This callback is called with a handle to the simulation and a double.  The double is the time in seconds since the beginning of the block at which this callback was first called.
+For audio output devices, this callback is called in the mixing thread.  If it blocks, audio stops. Don't.
+It is safe to call Libaudioverse from this callback.
+To clear, use null as the callback.*/
+typedef void (*LavBlockCallback)(LavHandle handle, double time, void* userdata);
+Lav_PUBLIC_FUNCTION LavError Lav_simulationSetBlockCallback(LavHandle simulation, LavBlockCallback callback, void* userdata);
+
 /**Buffers.
-Buffers are immutable chunks of audio data from any source.  A variety of nodes to work with buffers exist.*/
+Buffers are chunks of audio data from any source.  A variety of nodes to work with buffers exist.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createBuffer(LavHandle simulationHandle, LavHandle* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_bufferGetSimulation(LavHandle handle, LavHandle* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_bufferLoadFromFile(LavHandle bufferHandle, const char* path);

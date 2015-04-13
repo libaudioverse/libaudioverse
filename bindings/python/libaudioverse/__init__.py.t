@@ -143,7 +143,7 @@ class _CallbackWrapper(object):
 		self.node_handle = node.handle.handle
 
 	def __call__(self, *args):
-		needed_args = (_resurrect(_HandleBox(self.node_handle)), )+args[1:-1] #be sure to eliminate userdata, which is always the last argument.
+		needed_args = (_resurrect(_lav._HandleBox(self.node_handle)), )+args[1:-1] #be sure to eliminate userdata, which is always the last argument.
 		return self.cb(*needed_args, **self.additional_kwargs)
 
 class DeviceInfo(object):
@@ -217,6 +217,7 @@ See the manual for specifics on how output objects work.  A brief summary is giv
 				_object_states[handle.handle] = dict()
 				_object_states[handle.handle]['lock'] = threading.Lock()
 				_object_states[handle.handle]['inputs'] = set()
+				_object_states[handle.handle]['block_callback'] = None
 			self._state = _object_states[handle.handle]
 			self.handle = handle
 			self._lock = self._state['lock']
@@ -239,6 +240,21 @@ Calling this on an audio output device will cause the audio thread to skip ahead
 
 	def __exit__(self, type, value, traceback):
 		_lav.simulation_end_atomic_block(self.handle)
+
+	def set_block_callback(self, callback, additional_args=None, additional_kwargs=None):
+		with self._lock:
+			if callback is not None:
+				wrapper = _CallbackWrapper(self, callback, additional_args if additional_args is not None else (), additional_kwargs if additional_kwargs is not None else dict())
+				ctypes_callback=_libaudioverse.LavBlockCallback(wrapper)
+				_lav.simulation_set_block_callback(self, ctypes_callback, None)
+				self._state['block_callback'] = (callback, wrapper, ctypes_callback)
+			else:
+				_lav.simulation_set_block_callback(self, None)
+				self._state['block_callback'] = None
+
+	def get_block_callback(self):
+		with self._lock:
+			return self._state['block_callback'][0]
 
 _types_to_classes[ObjectTypes.simulation] = Simulation
 

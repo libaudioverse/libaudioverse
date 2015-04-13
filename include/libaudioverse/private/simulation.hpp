@@ -57,6 +57,9 @@ class LavSimulation: public LavExternalObject {
 	void registerDefaultMixingMatrices();
 	const float* getMixingMatrix(unsigned int inChannels, unsigned int outChannels);
 
+	//Set the block callback.
+	virtual void setBlockCallback(LavBlockCallback cb, void* userdata);
+
 	protected:
 	//the connection to which nodes connect themselves if their output should be audible.
 	std::shared_ptr<LavInputConnection> final_output_connection;
@@ -84,4 +87,9 @@ class LavSimulation: public LavExternalObject {
 	int tick_count = 0; //counts ticks.  This is part of node processing.
 	int maintenance_start = 0; //also part of node processing. Used to stagger calls to doMaintenance on nodes so that we're not randomly spiking the tick length.
 	int maintenance_rate = 5; //call on every 5th object.
+
+	//support for the block callback.
+	double block_callback_time = 0.0;
+	LavBlockCallback block_callback = nullptr;
+	void* block_callback_userdata =nullptr;
 };

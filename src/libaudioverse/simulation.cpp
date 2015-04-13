@@ -41,6 +41,7 @@ LavSimulation::~LavSimulation() {
 //Yes, this uses goto. Yes, goto is evil. We need a single point of exit.
 void LavSimulation::getBlock(float* out, unsigned int channels, bool mayApplyMixingMatrix) {
 	if(out == nullptr || channels == 0) goto end; //nothing to do.
+	if(block_callback) block_callback(outgoingObject(this->shared_from_this()), block_callback_time, block_callback_userdata);
 	//configure our connection to the number of channels requested.
 	final_output_connection->reconfigure(0, channels);
 	//append buffers to the final_outputs vector until it's big enough.
@@ -60,6 +61,7 @@ void LavSimulation::getBlock(float* out, unsigned int channels, bool mayApplyMix
 		if(i_s->getState()!=Lav_NODESTATE_ALWAYS_PLAYING) continue;
 		i_s->tick();
 	}
+	block_callback_time +=block_size/sr;
 	end:
 	int maintenance_count=maintenance_start;
 	for(auto &i: nodes) {
@@ -153,6 +155,12 @@ void LavSimulation::backgroundTaskThreadFunction() {
 	}
 }
 
+void LavSimulation::setBlockCallback(LavBlockCallback callback, void* userdata) {
+	block_callback = callback;
+	block_callback_time = 0.0;
+	block_callback_userdata=userdata;
+}
+
 //begin public API
 
 Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlock(LavHandle simulationHandle, unsigned int channels, int mayApplyMixingMatrix, float* destination) {
@@ -192,5 +200,11 @@ Lav_PUBLIC_FUNCTION LavError Lav_simulationEndAtomicBlock(LavHandle simulationHa
 	PUB_BEGIN
 	auto simulation = incomingObject<LavSimulation>(simulationHandle);
 	simulation->unlock();
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_simulationSetBlockCallback(LavHandle handle, LavBlockCallback callback, void* userdata) {
+	PUB_BEGIN
+incomingObject<LavSimulation>(handle)->setBlockCallback(callback, userdata);
 	PUB_END
 }
