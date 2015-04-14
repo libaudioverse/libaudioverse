@@ -372,11 +372,11 @@ class GenericNode(_HandleComparer):
 	def disconnect(self, output):
 		with self._lock:
 			_lav.node_disconnect(self, output)
-			for i in self._outputs[output]:
+			for i in self._state['outputs'][output]:
 				input, weak =i
 				obj=weak.get()
-				if obj is not None and (output, self) in obj._inputs:
-					obj._inputs.remove((output, self))
+				if obj is not None and (output, self) in obj._state['inputs']:
+					obj._state['inputs'].remove((output, self))
 			if self in self._state['simulation']._state['inputs']:
 				self._state['simulation']._state['inputs'].remove(self)
 
