@@ -15,7 +15,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <algorithm>
 #include <utility>
 #include <vector>
-#include <lambdatask/threadsafe_queue.hpp>
 
 class LavRingmodNode: public LavNode {
 	public:

@@ -2,7 +2,7 @@ cmake_MINIMUM_REQUIRED(VERSION 2.8)
 
 project(Libaudioverse)
 include_directories("${CMAKE_SOURCE_DIR}/include")
-include_directories("${CMAKE_SOURCE_DIR}/lambdatask/include")
+include_directories("${CMAKE_SOURCE_DIR}/powercores/include")
 
 #Which CPU extensions to enable?
 option(LIBAUDIOVERSE_USE_SSE2 "Use SSE2" ON)

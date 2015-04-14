@@ -7,13 +7,13 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <string>
 #include <atomic>
 #include <thread>
-#include <lambdatask/threadsafe_queue.hpp>
+#include <powercores/threadsafe_queue.hpp>
 #include <stdarg.h>
 #include <stdio.h>
 
 class LavLogMessage {
 	public:
-	LavLogMessage() = default; //makes lambdatask happy, but in regards to functionality we don't use.
+	LavLogMessage() = default; //makes powercores happy, but in regards to functionality we don't use.
 	LavLogMessage(int l, std::string msg, bool isFinal = false): level(l), message(msg), is_final(isFinal) {}
 	int level = 0;
 	std::string message;
@@ -31,7 +31,7 @@ class LavLogger {
 	LavLoggingCallback getLoggingCallback();
 	private:
 	void loggingThreadFunction();
-	lambdatask::ThreadsafeQueue<LavLogMessage> log_queue;
+	powercores::ThreadsafeQueue<LavLogMessage> log_queue;
 	std::thread logging_thread;
 	std::mutex config_mutex;
 	LavLoggingCallback callback = nullptr;

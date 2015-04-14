@@ -1,9 +1,9 @@
 [submodule "glm"]
 	path = glm
 	url = https://github.com/g-truc/glm.git
-[submodule "lambdatask"]
-	path = lambdatask
-	url = https://github.com/camlorn/lambdatask.git
 [submodule "OpenAL-Soft"]
 	path = OpenAL-Soft
 	url = git@github.com:camlorn/OpenAL-Soft.git
+[submodule "powercores"]
+	path = powercores
+	url = git@github.com:camlorn/powercores
