@@ -66,7 +66,7 @@ void LavHrtfNode::process() {
 	bool allowCrossfade = getProperty(Lav_PANNER_SHOULD_CROSSFADE).getIntValue();
 	float current_azimuth = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
 	float current_elevation = getProperty(Lav_PANNER_ELEVATION).getFloatValue();
-	if(fabs(current_elevation-prev_elevation) > 2.0f || fabs(current_azimuth-prev_azimuth) > 2.0f) {
+	if(fabs(current_elevation-prev_elevation) > 0.5f || fabs(current_azimuth-prev_azimuth) > 0.5f) {
 		if(allowCrossfade) {
 			std::copy(left_response, left_response+hrtf->getLength(), old_left_response);
 			std::copy(right_response, right_response+hrtf->getLength(), old_right_response);
