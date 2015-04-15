@@ -39,15 +39,15 @@ LavHrtfData::~LavHrtfData() {
 	if(temporary_buffer1) LavFreeFloatArray(temporary_buffer1);
 	if(temporary_buffer2) LavFreeFloatArray(temporary_buffer2);
 	if(hrirs == nullptr) return; //we never loaded one.
-	for(unsigned int i = 0; i < elev_count; i++) {
-		for(unsigned int j = 0; j < azimuth_counts[i]; j++) LavFreeFloatArray(hrirs[i][j]);
+	for(int i = 0; i < elev_count; i++) {
+		for(int j = 0; j < azimuth_counts[i]; j++) LavFreeFloatArray(hrirs[i][j]);
 		delete[] hrirs[i];
 	}
 	delete[] hrirs;
 	delete[] azimuth_counts;
 }
 
-unsigned int LavHrtfData::getLength() {
+int LavHrtfData::getLength() {
 	return hrir_length;
 }
 
@@ -103,15 +103,15 @@ void LavHrtfData::loadFromBuffer(unsigned int length, char* buffer, unsigned int
 	iterator += window_size;
 
 	//this is the first "dynamic" piece of information.
-	azimuth_counts = new unsigned int[elev_count];
-	for(unsigned int i = 0; i < elev_count; i++) {
+	azimuth_counts = new int[elev_count];
+	for(int i = 0; i < elev_count; i++) {
 		azimuth_counts[i] = convi(iterator);
 		iterator += window_size;
 	}
 
 	//sanity check: we must have as many hrirs as the sum of the above array.
 	int32_t sum_sanity_check = 0;
-	for(unsigned int i = 0; i < elev_count; i++) sum_sanity_check +=azimuth_counts[i];
+	for(int i = 0; i < elev_count; i++) sum_sanity_check +=azimuth_counts[i];
 	if(sum_sanity_check != hrir_count) throw LavErrorException(Lav_ERROR_HRTF_INVALID);
 
 	int before_hrir_length = convi(iterator);
@@ -126,7 +126,7 @@ void LavHrtfData::loadFromBuffer(unsigned int length, char* buffer, unsigned int
 	//last step.  Initialize the HRIR array.
 	hrirs = new float**[elev_count];
 	//do the azimuth dimension.
-	for(unsigned int i = 0; i < elev_count; i++) {
+	for(int i = 0; i < elev_count; i++) {
 		hrirs[i] = new float*[azimuth_counts[i]];
 	}
 
@@ -134,8 +134,8 @@ void LavHrtfData::loadFromBuffer(unsigned int length, char* buffer, unsigned int
 	//fill it.
 	float* tempBuffer = LavAllocFloatArray(before_hrir_length);
 	int final_hrir_length = 0;
-	for(unsigned int elev = 0; elev < elev_count; elev++) {
-		for(unsigned int azimuth = 0; azimuth < azimuth_counts[elev]; azimuth++) {
+	for(int elev = 0; elev < elev_count; elev++) {
+		for(int azimuth = 0; azimuth < azimuth_counts[elev]; azimuth++) {
 			memcpy(tempBuffer, iterator, sizeof(float)*before_hrir_length);
 			staticResamplerKernel(samplerate, forSr, 1, before_hrir_length, tempBuffer, &final_hrir_length, &hrirs[elev][azimuth]);
 			iterator+=before_hrir_length*sizeof(float);
@@ -178,7 +178,7 @@ void LavHrtfData::computeCoefficientsMono(float elevation, float azimuth, float*
 	//this is relative to whatever index happens to be "0", that is it is an offset from the 0 index.  We have to offset it upwards so it's not negative.
 	int elevationIndexOffset = degreesPerElevation ? abs(min_elevation)/degreesPerElevation : 0;
 	elevationIndex[0] += elevationIndexOffset;
-	elevationIndex[1] = std::min(elevationIndex[0]+1, max_elevation);
+	elevationIndex[1] = std::min(elevationIndex[0]+1, elev_count-1);
 	double elevationWeights[2];
 	float ringmoddedElevation = ringmodf(elevation, degreesPerElevation);
 	if(ringmoddedElevation < 0) ringmoddedElevation =degreesPerElevation-ringmoddedElevation;
@@ -195,10 +195,10 @@ void LavHrtfData::computeCoefficientsMono(float elevation, float azimuth, float*
 	for(int i = 0; i < 2; i++) {
 		//ElevationIndex lets us get an array of azimuth coefficients.  Go ahead and pull it out now, so we can conceptually forget about all the above variables.
 		float** azimuths = hrirs[elevationIndex[i]];
-		unsigned int azimuthCount = azimuth_counts[elevationIndex[i]];
+		int azimuthCount = azimuth_counts[elevationIndex[i]];
 		float degreesPerAzimuth = 360.0f/azimuthCount;
-		unsigned int azimuthIndex1, azimuthIndex2;
-		azimuthIndex1 = (unsigned int)floorf(azimuth/degreesPerAzimuth);
+		int azimuthIndex1, azimuthIndex2;
+		azimuthIndex1 = (int)floorf(azimuth/degreesPerAzimuth);
 		azimuthIndex2 = azimuthIndex1+1;
 		float azimuthWeight1, azimuthWeight2;
 		//this is the same logic as a bunch of other places, with a minor variation.
@@ -209,7 +209,7 @@ void LavHrtfData::computeCoefficientsMono(float elevation, float azimuth, float*
 		azimuthIndex2 = ringmodi(azimuthIndex2, azimuthCount);
 
 		//this is probably the only part of this that can't go wrong, assuming the above calculations are all correct.  Interpolate between the two azimuths.
-		for(unsigned int j = 0; j < hrir_length; j++) {
+		for(int j = 0; j < hrir_length; j++) {
 			out[j] += elevationWeights[i]*(azimuthWeight1*azimuths[azimuthIndex1][j]+azimuthWeight2*azimuths[azimuthIndex2][j]);
 		}
 	}

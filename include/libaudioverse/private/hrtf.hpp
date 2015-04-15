@@ -20,12 +20,12 @@ class LavHrtfData {
 	void loadFromBuffer(unsigned int length, char* buffer, unsigned int forSr);
 
 	//get the hrir's length.
-	unsigned int getLength();
+	int getLength();
 	private:
-	unsigned int elev_count = 0, hrir_count = 0, hrir_length = 0;
+	int elev_count = 0, hrir_count = 0, hrir_length = 0;
 	int min_elevation = 0, max_elevation = 0;
-	unsigned int *azimuth_counts = nullptr;
-	unsigned int samplerate = 0;
+	int *azimuth_counts = nullptr;
+	int samplerate = 0;
 	float ***hrirs = nullptr;
 	//used for crossfading so we don't clobber the heap.
 	float *temporary_buffer1 = nullptr, *temporary_buffer2 = nullptr;
