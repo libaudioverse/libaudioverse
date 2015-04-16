@@ -15,13 +15,13 @@ ENDIF()
 #sets up compiler flags for things: sse, vc++ silencing, etc.
 include("cmake_include/compiler_flags.txt")
 
-include("vendoring/openalsoft.txt")
+#include("vendoring/openalsoft.txt")
 include("vendoring/libsndfile.txt")
 include("vendoring/glm.txt")
 include("vendoring/kissfft.txt")
 
 #All the libraries we need to link with:
-SET(libaudioverse_required_libraries ${libsndfile_name} ${OPENAL_NAME} kissfft)
+SET(libaudioverse_required_libraries ${libsndfile_name} kissfft winmm)
 add_subdirectory(src)
 
 #this makes the bindings generation step always run after a Libaudioverse build.

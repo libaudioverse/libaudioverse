@@ -24,7 +24,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 //list from greatest to least priority.
 LavDeviceFactoryCreationFunction possible_backends[] = {
 	createWinmmDeviceFactory,
-	createOpenALDeviceFactory,
+//	createOpenALDeviceFactory,
 };
 LavDeviceFactory* chosen_factory = nullptr;
 
