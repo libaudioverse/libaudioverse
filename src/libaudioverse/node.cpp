@@ -81,18 +81,33 @@ void LavNode::tick() {
 	num_output_buffers = output_buffers.size();
 	block_size = simulation->getBlockSize();
 	process();
-	for(int i = 0; i < getOutputBufferCount(); i++) {
-		float* output = getOutputBufferArray()[i];
-		for(int j = 0; j < block_size; j++) {
-			float mul = getProperty(Lav_NODE_MUL).getFloatValue();
-			output[j]*=mul;
+	auto &mulProp = getProperty(Lav_NODE_MUL), &addProp = getProperty(Lav_NODE_ADD);
+	if(mulProp.getFloatValue() != 1.0 || mulProp.needsARate()) {
+		for(int i = 0; i < getOutputBufferCount(); i++) {
+			float* output = getOutputBufferArray()[i];
+			if(mulProp.needsARate() ==false) {
+				scalarMultiplicationKernel(block_size, mulProp.getFloatValue(), output, output);
+			}
+			else {
+				for(int j = 0; j < block_size; j++) {
+					float mul = mulProp.getFloatValue();
+					output[j]*=mul;
+				}
+			}
 		}
 	}
-	for(int i = 0; i < getOutputBufferCount(); i++) {
-		float* output = getOutputBufferArray()[i];
-		for(int j = 0; j < block_size; j++) {
-			float add=getProperty(Lav_NODE_ADD).getFloatValue(j);
-			output[j] += add;
+	if(addProp.getFloatValue() !=0.0 || addProp.needsARate()) {
+		for(int i = 0; i < getOutputBufferCount(); i++) {
+			float* output = getOutputBufferArray()[i];
+			if(addProp.needsARate() == false) {
+				scalarAdditionKernel(block_size, mulProp.getFloatValue(), output, output);
+			}
+			else {
+				for(int j = 0; j < block_size; j++) {
+					float add=addProp.getFloatValue(j);
+					output[j] += add;
+				}
+			}
 		}
 	}
 	is_processing = false;

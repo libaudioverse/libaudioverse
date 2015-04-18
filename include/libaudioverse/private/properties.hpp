@@ -118,6 +118,11 @@ class LavProperty {
 	//set the callback...
 	void setPostChangedCallback(std::function<void(void)> cb);
 
+	//Can we assume that the value for i=0 in the get* functions is the value for the whole block?
+	//In other words, can we optimize the application by not computing the same thing over and over?
+	//Very important for add and mul.
+	bool needsARate();
+
 	//get/set dynamic range status.
 	bool getHasDynamicRange();
 	void setHasDynamicRange(bool v);

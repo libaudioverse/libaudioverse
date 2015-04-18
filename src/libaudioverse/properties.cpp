@@ -313,6 +313,10 @@ void LavProperty::setPostChangedCallback(std::function<void(void)> cb) {
 	post_changed_callback = cb;
 }
 
+bool LavProperty::needsARate() {
+	return false;
+}
+
 bool LavProperty::getHasDynamicRange() {
 	return has_dynamic_range;
 }
