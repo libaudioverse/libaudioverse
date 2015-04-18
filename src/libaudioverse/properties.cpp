@@ -85,7 +85,7 @@ void LavProperty::setIntRange(int a, int b) {
 }
 
 
-float LavProperty::getFloatValue() {
+float LavProperty::getFloatValue(int i) {
 	return value.fval;
 }
 
@@ -116,7 +116,7 @@ void LavProperty::setFloatRange(float a, float b) {
 }
 
 //doubles...
-double LavProperty::getDoubleValue() {
+double LavProperty::getDoubleValue(int i) {
 	return value.dval;
 }
 
@@ -143,7 +143,7 @@ void LavProperty::setDoubleDefault(double v) {
 	default_value.dval = v;
 }
 
-const float* LavProperty::getFloat3Value() {
+const float* LavProperty::getFloat3Value(int i) {
 	return value.f3val;
 }
 
@@ -173,7 +173,7 @@ void LavProperty::setFloat3Default(float v1, float v2, float v3) {
 	default_value.f3val[2] = v3;
 }
 
-const float* LavProperty::getFloat6Value() {
+const float* LavProperty::getFloat6Value(int i) {
 	return value.f6val;
 }
 

@@ -81,17 +81,18 @@ void LavNode::tick() {
 	num_output_buffers = output_buffers.size();
 	block_size = simulation->getBlockSize();
 	process();
-	float mul = getProperty(Lav_NODE_MUL).getFloatValue();
-	if(mul != 1.0f) {
-		for(int i = 0; i < getOutputBufferCount(); i++) {
-			float* output = getOutputBufferArray()[i];
-			scalarMultiplicationKernel(block_size, mul, output, output);
+	for(int i = 0; i < getOutputBufferCount(); i++) {
+		float* output = getOutputBufferArray()[i];
+		for(int j = 0; j < block_size; j++) {
+			float mul = getProperty(Lav_NODE_MUL).getFloatValue();
+			output[j]*=mul;
 		}
 	}
-	float add=getProperty(Lav_NODE_ADD).getFloatValue();
-	if(add != 0.0f) {
-		for(int i = 0; i < getOutputBufferCount(); i++) {
-			scalarAdditionKernel(block_size, add, getOutputBufferArray()[i], getOutputBufferArray()[i]);
+	for(int i = 0; i < getOutputBufferCount(); i++) {
+		float* output = getOutputBufferArray()[i];
+		for(int j = 0; j < block_size; j++) {
+			float add=getProperty(Lav_NODE_ADD).getFloatValue(j);
+			output[j] += add;
 		}
 	}
 	is_processing = false;

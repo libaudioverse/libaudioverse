@@ -52,7 +52,7 @@ class LavProperty {
 	void setIntRange(int a, int b);
 
 	//floats...
-	float getFloatValue();
+	float getFloatValue(int i = 0);
 	void setFloatValue(float v);
 	float getFloatDefault();
 	void setFloatDefault(float v);
@@ -61,7 +61,7 @@ class LavProperty {
 	void setFloatRange(float a, float b);
 
 	//doubles...
-	double getDoubleValue();
+	double getDoubleValue(int i = 0);
 	void setDoubleValue(double v);
 	double getDoubleMin();
 	double getDoubleMax();
@@ -69,7 +69,7 @@ class LavProperty {
 	void setDoubleDefault(double v);
 
 	//float3 vectors.
-	const float* getFloat3Value();
+	const float* getFloat3Value(int i = 0);
 	const float* getFloat3Default();
 	void setFloat3Value(const float* const v);
 	void setFloat3Value(float v1, float v2, float v3);
@@ -77,7 +77,7 @@ class LavProperty {
 	void setFloat3Default(float v1, float v2, float v3);
 
 	//float6 vectors.
-	const float* getFloat6Value();
+	const float* getFloat6Value(int i = 0);
 	const float* getFloat6Default();
 	void setFloat6Value(const float* const v);
 	void setFloat6Value(float v1, float v2, float v3, float v4, float v5, float v6);
