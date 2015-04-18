@@ -20,6 +20,7 @@ class LavSineNode: public LavNode {
 	public:
 	LavSineNode(std::shared_ptr<LavSimulation> simulation);
 	virtual void process();
+	virtual void reset() override;
 	float phase = 0;
 };
 
@@ -41,6 +42,10 @@ void LavSineNode::process() {
 		phase+=phaseDelta;
 	}
 	phase -=floorf(phase);
+}
+
+void LavSineNode::reset() {
+	phase=0.0;
 }
 
 //begin public api
