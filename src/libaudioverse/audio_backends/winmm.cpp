@@ -185,6 +185,7 @@ std::shared_ptr<LavDevice> LavWinmmDeviceFactory::createDevice(std::function<voi
 	//first, we need to do sanity checks.
 	if(index < -1 || index > (int)names.size()) throw LavErrorException(Lav_ERROR_RANGE);
 	std::shared_ptr<LavDevice> device = std::make_shared<LavWinmmDevice>(getBuffer, blockSize, channels, index != -1 ? max_channels[index] : mapper_max_channels, mixAhead, index == -1 ? WAVE_MAPPER : index, sr, index == -1 ? mapper_sr : srs[index]);
+	created_devices.push_back(device);
 	return device;
 }
 

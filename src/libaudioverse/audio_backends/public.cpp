@@ -42,6 +42,11 @@ void initializeDeviceFactory() {
 	throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
 }
 
+void shutdownDeviceFactory() {
+	if(chosen_factory) delete chosen_factory;
+}
+
+
 //begin public api.
 
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetCount(unsigned int* destination) {

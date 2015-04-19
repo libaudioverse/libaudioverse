@@ -122,6 +122,13 @@ void LavDevice::mixingThreadFunction() {
 	shutdown_hook();
 }
 
+LavDeviceFactory::~LavDeviceFactory() {
+	for(auto p: created_devices) {
+		auto strong = p.lock();
+		if(strong) strong->stop();
+	}
+}
+
 unsigned int LavDeviceFactory::getOutputCount() {
 	return (unsigned int)output_count;
 }

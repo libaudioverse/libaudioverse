@@ -223,6 +223,7 @@ std::shared_ptr<LavDevice> LavOpenALDeviceFactory::createDevice(std::function<vo
 	if(((channels == 1 || channels == 2
 || channels == 6 ||channels == 8) && sr != 0 && blockSize != 0) == false)throw LavErrorException(Lav_ERROR_RANGE);
 	auto backend = std::make_shared<LavOpenALDevice>(getBuffer, sr, channels, blockSize, mixAhead, name);
+	created_devices.push_back(backend);
 	return backend;
 }
 

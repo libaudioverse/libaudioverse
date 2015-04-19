@@ -42,12 +42,13 @@ class LavDevice {
 	std::thread mixing_thread;
 	std::function<void(float*, int)> get_buffer;
 	bool started = false;
+	friend class LavDeviceFactory;
 };
 
 class LavDeviceFactory {
 	public:
 	LavDeviceFactory() = default;
-	virtual ~LavDeviceFactory() {}
+	virtual ~LavDeviceFactory();
 	virtual std::vector<std::string> getOutputNames() = 0;
 	//returns -1.0f for unknown.
 	virtual std::vector<float> getOutputLatencies() = 0;
@@ -57,6 +58,7 @@ class LavDeviceFactory {
 	virtual unsigned int getOutputCount();
 	virtual std::string getName();
 	protected:
+	std::vector<std::weak_ptr<LavDevice>> created_devices;
 	int output_count = 0;
 };
 
@@ -66,4 +68,4 @@ LavDeviceFactory* createOpenALDeviceFactory();
 
 //finally, the function that initializes all of this.
 void initializeDeviceFactory();
-
+void shutdownDeviceFactory();
