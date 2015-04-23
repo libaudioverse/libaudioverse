@@ -56,6 +56,10 @@ void LavProperty::setTag(int t) {
 	tag = t;
 }
 
+double LavProperty::getSr() {
+	return node->getSimulation()->getSr();
+}
+
 bool LavProperty::isReadOnly() {
 	return read_only;
 }

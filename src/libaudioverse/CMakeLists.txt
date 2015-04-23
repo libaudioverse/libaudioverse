@@ -82,6 +82,10 @@ nodes/gain.cpp
 nodes/split_merge.cpp #contains two nodes under the same class.
 nodes/buffer.cpp
 
+#automators
+automators/automators.cpp
+automators/linear_ramp.cpp
+
 #physical outputs, etc.
 audio_backends/common.cpp
 audio_backends/public.cpp

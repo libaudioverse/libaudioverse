@@ -45,6 +45,7 @@ class LavProperty {
 	void setTag(int t);
 	bool isReadOnly();
 	void setReadOnly(bool what);
+	double getSr();
 
 	//yes, really. This is as uggly as it looks.
 	int getIntValue();
