@@ -21,7 +21,7 @@ std::shared_ptr<LavBuffer> createBuffer(std::shared_ptr<LavSimulation>simulation
 }
 
 LavBuffer::~LavBuffer() {
-	if(data) LavFreeFloatArray(data);
+	if(data) LavFreeArray(data);
 }
 
 std::shared_ptr<LavSimulation> LavBuffer::getSimulation() {
@@ -116,13 +116,13 @@ Lav_PUBLIC_FUNCTION LavError Lav_bufferLoadFromFile(LavHandle bufferHandle, cons
 	auto buff =incomingObject<LavBuffer>(bufferHandle);
 	LavFileReader f{};
 	f.open(path);
-	float* data = LavAllocFloatArray(f.getSampleCount());
+	float* data = LavAllocArray<float>(f.getSampleCount());
 	f.readAll(data);
 	{
 		LOCK(*buff);
 		buff->loadFromArray(f.getSr(), f.getChannelCount(), f.getSampleCount()/f.getChannelCount(), data);
 	}
-	LavFreeFloatArray(data);
+	LavFreeArray(data);
 	PUB_END
 }
 

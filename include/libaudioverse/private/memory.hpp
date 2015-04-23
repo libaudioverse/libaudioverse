@@ -99,8 +99,24 @@ t safeConvertMemory(char* b) {
 These return and free pointers to zero-initialized memory aligned on the appropriate boundary for the enabled SIMD extensions, if any.  If no SIMD extensions are enabled, these gracefully fall back to normal calloc/free.
 */
 
-float* LavAllocFloatArray(unsigned int size);
-void LavFreeFloatArray(float* ptr);
+template<class t>
+t* LavAllocArray(unsigned int size) {
+	#if LIBAUDIOVERSE_MALLOC_ALIGNMENT == 1
+	return (t*)calloc(size*sizeof(t), 1);
+	#else
+	//otherwise, we have this bit of fun.
+	void* p1;
+	void** p2;
+	int offset = LIBAUDIOVERSE_MALLOC_ALIGNMENT-1+sizeof(void*);
+	p1 = calloc(size*sizeof(float)+offset, 1);
+	if(p1 == nullptr) return nullptr;
+	p2 = (void**)(((intptr_t)(p1)+offset)&~(LIBAUDIOVERSE_MALLOC_ALIGNMENT-1));
+	p2[-1]=p1;
+	return (t*)p2;
+	#endif
+}
+
+void LavFreeArray(void* ptr);
 
 //custom deleter for smart pointer that guarantees thread safety.
 std::function<void(LavExternalObject*)> LavObjectDeleter(std::shared_ptr<LavSimulation> simulation);

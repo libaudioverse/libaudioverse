@@ -46,7 +46,7 @@ void LavSimulation::getBlock(float* out, unsigned int channels, bool mayApplyMix
 	final_output_connection->reconfigure(0, channels);
 	//append buffers to the final_outputs vector until it's big enough.
 	//in a sane application, we'll never go above 8 channels so keeping them around is no big deal.
-	while(final_outputs.size() < channels) final_outputs.push_back(LavAllocFloatArray(block_size));
+	while(final_outputs.size() < channels) final_outputs.push_back(LavAllocArray<float>(block_size));
 	//zero the outputs we need.
 	for(unsigned int i= 0; i < channels; i++) memset(final_outputs[i], 0, sizeof(float)*block_size);
 	//write, applying mixing matrices as needed.

@@ -62,10 +62,10 @@ LavNode::LavNode(int type, std::shared_ptr<LavSimulation> simulation, unsigned i
 
 LavNode::~LavNode() {
 	for(auto i: output_buffers) {
-		LavFreeFloatArray(i);
+		LavFreeArray(i);
 	}
 	for(auto i: input_buffers) {
-		LavFreeFloatArray(i);
+		LavFreeArray(i);
 	}
 }
 
@@ -246,21 +246,21 @@ void LavNode::reset() {
 //protected resize function.
 void LavNode::resize(int newInputCount, int newOutputCount) {
 	int oldInputCount = input_buffers.size();
-	for(int i = oldInputCount-1; i >= newInputCount; i--) LavFreeFloatArray(input_buffers[i]);
+	for(int i = oldInputCount-1; i >= newInputCount; i--) LavFreeArray(input_buffers[i]);
 	input_buffers.resize(newInputCount, nullptr);
-	for(int i = oldInputCount; i < newInputCount; i++) input_buffers[i]=LavAllocFloatArray(simulation->getBlockSize());
+	for(int i = oldInputCount; i < newInputCount; i++) input_buffers[i]=LavAllocArray<float>(simulation->getBlockSize());
 
 	int oldOutputCount = output_buffers.size();
 	if(newOutputCount < oldOutputCount) { //we need to free some arrays.
 		for(auto i = newOutputCount; i < oldOutputCount; i++) {
-			LavFreeFloatArray(output_buffers[i]);
+			LavFreeArray(output_buffers[i]);
 		}
 	}
 	//do the resize.
 	output_buffers.resize(newOutputCount, nullptr);
 	if(newOutputCount > oldOutputCount) { //we need to allocate some more arrays.
 		for(auto i = oldOutputCount; i < newOutputCount; i++) {
-			output_buffers[i] = LavAllocFloatArray(simulation->getBlockSize());
+			output_buffers[i] = LavAllocArray<float>(simulation->getBlockSize());
 		}
 	}
 }

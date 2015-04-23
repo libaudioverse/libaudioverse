@@ -28,7 +28,7 @@ class LavGraphListenerNode: public LavNode {
 };
 
 LavGraphListenerNode::LavGraphListenerNode(std::shared_ptr<LavSimulation> sim, unsigned int channels): LavNode(Lav_OBJTYPE_GRAPH_LISTENER_NODE, sim, channels, channels) {
-	outgoing_buffer = LavAllocFloatArray(channels*sim->getBlockSize());
+	outgoing_buffer = LavAllocArray<float>(channels*sim->getBlockSize());
 	this->channels = channels;
 	appendInputConnection(0, channels);
 	appendOutputConnection(0, channels);
@@ -41,7 +41,7 @@ std::shared_ptr<LavNode> createGraphListenerNode(std::shared_ptr<LavSimulation> 
 }
 
 LavGraphListenerNode::~LavGraphListenerNode() {
-	LavFreeFloatArray(outgoing_buffer);
+	LavFreeArray(outgoing_buffer);
 }
 
 void LavGraphListenerNode::process() {

@@ -32,6 +32,7 @@ class LavProperty {
 	LavProperty() = default;
 	LavProperty(const LavProperty&) = default;
 	explicit LavProperty(int property_type);
+	~LavProperty();
 	void associateNode(LavNode* node);
 	void associateSimulation(std::shared_ptr<LavSimulation> simulation);
 
@@ -74,7 +75,7 @@ class LavProperty {
 	void setDoubleDefault(double v);
 
 	//float3 vectors.
-	const float* getFloat3Value(int i = 0);
+	const float* getFloat3Value();
 	const float* getFloat3Default();
 	void setFloat3Value(const float* const v);
 	void setFloat3Value(float v1, float v2, float v3);
@@ -82,7 +83,7 @@ class LavProperty {
 	void setFloat3Default(float v1, float v2, float v3);
 
 	//float6 vectors.
-	const float* getFloat6Value(int i = 0);
+	const float* getFloat6Value();
 	const float* getFloat6Default();
 	void setFloat6Value(const float* const v);
 	void setFloat6Value(float v1, float v2, float v3, float v4, float v5, float v6);
@@ -148,6 +149,10 @@ class LavProperty {
 	bool has_dynamic_range = false;
 	LavNode* node;
 	std::shared_ptr<LavSimulation> simulation;
+
+	//These are for automation and node connections:
+	double* automation_buffer = nullptr;
+	int block_size= 0;
 };
 
 //helper methods to quickly make properties.

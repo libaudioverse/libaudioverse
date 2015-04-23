@@ -36,11 +36,11 @@ void reverse_endianness(char* buffer, unsigned int count, unsigned int window) {
 static_assert(sizeof(float) == 4, "Sizeof float is not 4; cannot safely work with hrtfs");
 
 LavHrtfData::~LavHrtfData() {
-	if(temporary_buffer1) LavFreeFloatArray(temporary_buffer1);
-	if(temporary_buffer2) LavFreeFloatArray(temporary_buffer2);
+	if(temporary_buffer1) LavFreeArray(temporary_buffer1);
+	if(temporary_buffer2) LavFreeArray(temporary_buffer2);
 	if(hrirs == nullptr) return; //we never loaded one.
 	for(int i = 0; i < elev_count; i++) {
-		for(int j = 0; j < azimuth_counts[i]; j++) LavFreeFloatArray(hrirs[i][j]);
+		for(int j = 0; j < azimuth_counts[i]; j++) LavFreeArray(hrirs[i][j]);
 		delete[] hrirs[i];
 	}
 	delete[] hrirs;
@@ -132,7 +132,7 @@ void LavHrtfData::loadFromBuffer(unsigned int length, char* buffer, unsigned int
 
 	//the above gives us what amounts to a 2d array.  The first dimension represents elevation.  The second dimension represents azimuth going clockwise.
 	//fill it.
-	float* tempBuffer = LavAllocFloatArray(before_hrir_length);
+	float* tempBuffer = LavAllocArray<float>(before_hrir_length);
 	int final_hrir_length = 0;
 	for(int elev = 0; elev < elev_count; elev++) {
 		for(int azimuth = 0; azimuth < azimuth_counts[elev]; azimuth++) {
@@ -143,12 +143,12 @@ void LavHrtfData::loadFromBuffer(unsigned int length, char* buffer, unsigned int
 	}
 	hrir_length = final_hrir_length;
 	samplerate = forSr;
-	LavFreeFloatArray(tempBuffer);
+	LavFreeArray(tempBuffer);
 
-	if(temporary_buffer1) LavFreeFloatArray(temporary_buffer1);
-	if(temporary_buffer2) LavFreeFloatArray(temporary_buffer2);
-	temporary_buffer1 = LavAllocFloatArray(hrir_length);
-	temporary_buffer2 = LavAllocFloatArray(hrir_length);
+	if(temporary_buffer1) LavFreeArray(temporary_buffer1);
+	if(temporary_buffer2) LavFreeArray(temporary_buffer2);
+	temporary_buffer1 = LavAllocArray<float>(hrir_length);
+	temporary_buffer2 = LavAllocArray<float>(hrir_length);
 }
 
 //a complete HRTF for stereo is two calls to this function.

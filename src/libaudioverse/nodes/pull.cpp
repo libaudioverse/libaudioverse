@@ -33,8 +33,8 @@ LavPullNode::LavPullNode(std::shared_ptr<LavSimulation> sim, unsigned int inputS
 	input_sr = inputSr;
 	resampler = std::make_shared<LavResampler>(sim->getBlockSize(), channels, inputSr, (int)sim->getSr());
 	this->channels = channels;
-	incoming_buffer = LavAllocFloatArray(channels*simulation->getBlockSize());
-	resampled_buffer = LavAllocFloatArray(channels*sim->getBlockSize());
+	incoming_buffer = LavAllocArray<float>(channels*simulation->getBlockSize());
+	resampled_buffer = LavAllocArray<float>(channels*sim->getBlockSize());
 	appendOutputConnection(0, channels);
 }
 
@@ -45,8 +45,8 @@ std::shared_ptr<LavNode> createPullNode(std::shared_ptr<LavSimulation> simulatio
 }
 
 LavPullNode::~LavPullNode() {
-	LavFreeFloatArray(incoming_buffer);
-	LavFreeFloatArray(resampled_buffer);
+	LavFreeArray(incoming_buffer);
+	LavFreeArray(resampled_buffer);
 }
 
 void LavPullNode::process() {

@@ -23,9 +23,9 @@ LavNode(Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK_NODE, simulation, lines, lines) {
 	max_delay = maxDelay;
 	line_count = lines;
 	network = new LavFeedbackDelayNetwork(lines, maxDelay, simulation->getSr());
-	lastOutput = LavAllocFloatArray(lines);
-	nextInput = LavAllocFloatArray(lines);
-	gains = LavAllocFloatArray(lines);
+	lastOutput = LavAllocArray<float>(lines);
+	nextInput = LavAllocArray<float>(lines);
+	gains = LavAllocArray<float>(lines);
 	for(int i = 0; i < lines; i++) gains[i] = 1.0f;
 	getProperty(Lav_FDN_MAX_DELAY).setFloatValue(maxDelay);
 	appendInputConnection(0, lines);
@@ -34,9 +34,9 @@ LavNode(Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK_NODE, simulation, lines, lines) {
 
 LavFeedbackDelayNetworkNode::~LavFeedbackDelayNetworkNode() {
 	delete network;
-	LavFreeFloatArray(lastOutput);
-	LavFreeFloatArray(nextInput);
-	LavFreeFloatArray(gains);
+	LavFreeArray(lastOutput);
+	LavFreeArray(nextInput);
+	LavFreeArray(gains);
 }
 
 std::shared_ptr<LavNode> createFeedbackDelayNetworkNode(std::shared_ptr<LavSimulation> simulation, float maxDelay, int lines) {

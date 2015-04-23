@@ -11,8 +11,16 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 LavProperty::LavProperty(int property_type): type(property_type) {}
 
+LavProperty::~LavProperty() {
+	if(automation_buffer) LavFreeArray(automation_buffer);
+}
+
 void LavProperty::associateNode(LavNode* node) {
 	this->node = node;
+	block_size=node->getSimulation()->getBlockSize();
+	if(type == Lav_PROPERTYTYPE_DOUBLE || type== Lav_PROPERTYTYPE_FLOAT) {
+		automation_buffer = LavAllocArray<double>(block_size);
+	}
 }
 
 void LavProperty::associateSimulation(std::shared_ptr<LavSimulation> simulation) {
@@ -158,7 +166,7 @@ void LavProperty::setDoubleDefault(double v) {
 	default_value.dval = v;
 }
 
-const float* LavProperty::getFloat3Value(int i) {
+const float* LavProperty::getFloat3Value() {
 	return value.f3val;
 }
 
@@ -188,7 +196,7 @@ void LavProperty::setFloat3Default(float v1, float v2, float v3) {
 	default_value.f3val[2] = v3;
 }
 
-const float* LavProperty::getFloat6Value(int i) {
+const float* LavProperty::getFloat6Value() {
 	return value.f6val;
 }
 
