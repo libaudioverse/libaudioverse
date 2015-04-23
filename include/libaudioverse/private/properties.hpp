@@ -12,9 +12,9 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "errors.hpp"
 
 union LavPropertyValue {
-	float fval;
+	float fval; //Actual value is in automation_buffer, kept for range checking.
 	int ival;
-	double dval;
+	double dval; //Also in automation_buffer, kept for range checking.
 	float f3val[3]; //vectors.
 	float f6val[6]; //orientations.
 };

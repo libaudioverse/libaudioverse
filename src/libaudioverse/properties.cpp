@@ -33,6 +33,10 @@ void LavProperty::reset() {
 	farray_value = default_farray_value;
 	iarray_value = default_iarray_value;
 	buffer_value=nullptr;
+	if(automation_buffer) {
+		double v=type==Lav_PROPERTYTYPE_FLOAT ? default_value.fval : default_value.dval;
+		std::fill(automation_buffer, automation_buffer+block_size, v);
+	}
 	if(post_changed_callback) post_changed_callback();
 }
 
@@ -109,12 +113,12 @@ void LavProperty::setIntRange(int a, int b) {
 
 
 float LavProperty::getFloatValue(int i) {
-	return value.fval;
+	return automation_buffer[i];
 }
 
 void LavProperty::setFloatValue(float v) {
 	RC(v, fval);
-	value.fval = v;
+	std::fill(automation_buffer, automation_buffer+block_size, v);
 	if(post_changed_callback) post_changed_callback();
 }
 
@@ -140,12 +144,12 @@ void LavProperty::setFloatRange(float a, float b) {
 
 //doubles...
 double LavProperty::getDoubleValue(int i) {
-	return value.dval;
+	return automation_buffer[i];
 }
 
 void LavProperty::setDoubleValue(double v) {
 	RC(v, dval);
-	value.dval = v;
+	std::fill(automation_buffer, automation_buffer+block_size, v);
 	if(post_changed_callback) post_changed_callback();
 }
 

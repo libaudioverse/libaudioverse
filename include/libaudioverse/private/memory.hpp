@@ -108,7 +108,7 @@ t* LavAllocArray(unsigned int size) {
 	void* p1;
 	void** p2;
 	int offset = LIBAUDIOVERSE_MALLOC_ALIGNMENT-1+sizeof(void*);
-	p1 = calloc(size*sizeof(float)+offset, 1);
+	p1 = calloc(size*sizeof(t)+offset, 1);
 	if(p1 == nullptr) return nullptr;
 	p2 = (void**)(((intptr_t)(p1)+offset)&~(LIBAUDIOVERSE_MALLOC_ALIGNMENT-1));
 	p2[-1]=p1;
