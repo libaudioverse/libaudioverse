@@ -47,9 +47,11 @@ class LavNode: public LavExternalObject { //enable_shared_from_this is for event
 	//called on an output, this function terminates all connections for which it is involved.
 	virtual void disconnect(int which);
 
+	//Ticks all properties.
+	virtual void tickProperties();
 	//do not override. Handles the processing protocol (updating some globals and calling process) if needed for this tick, otherwise does nothing.
 	virtual void tick();
-		//override this one instead. Default implementation merely zeros the outputs.
+	//override this one instead. Default implementation merely zeros the outputs.
 	virtual void process();
 	//zero the output buffers.
 	virtual void zeroOutputBuffers();

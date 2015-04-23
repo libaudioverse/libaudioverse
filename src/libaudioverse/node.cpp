@@ -42,6 +42,13 @@ LavNode::LavNode(int type, std::shared_ptr<LavSimulation> simulation, unsigned i
 	//and events.
 	events = makeEventTable(type);
 
+	//Associate properties to this node:
+	for(auto i: properties) {
+		auto &prop = properties[i.first];
+		prop.associateNode(this);
+		prop.associateSimulation(simulation);
+	}
+
 	//Loop through callbacks, associating them with our simulation.
 	//map iterators dont' give references, only operator[].
 	for(auto i: events) {
@@ -62,12 +69,20 @@ LavNode::~LavNode() {
 	}
 }
 
+void LavNode::tickProperties() {
+	for(auto &i: properties) {
+		i.second.tick();
+	}
+}
+
 void LavNode::tick() {
 	if(last_processed== simulation->getTickCount()) return; //we processed this tick already.
 	//Incrementing this counter here prevents duplication of zeroing outputs if we're in the paused state.
 	last_processed = simulation->getTickCount();
 	zeroOutputBuffers(); //we always do this because sometimes we're not going to actually do anything else.
 	if(getState() == Lav_NODESTATE_PAUSED) return; //nothing to do, for we are paused.
+	//tick properties, bringing them in line for this block.
+	tickProperties();
 	willProcessParents();
 	zeroInputBuffers();
 	//tick all alive parents, collecting their outputs onto ours.
@@ -298,6 +313,7 @@ void LavSubgraphNode::tick() {
 	if(last_processed== simulation->getTickCount()) return;
 	last_processed=simulation->getTickCount();
 	if(getState() == Lav_NODESTATE_PAUSED) return;
+	tickProperties();
 	willProcessParents();
 	if(subgraph_output == nullptr) return;
 	subgraph_output->tick();

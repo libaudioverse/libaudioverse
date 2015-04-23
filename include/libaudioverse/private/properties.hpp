@@ -23,14 +23,18 @@ union LavPropertyValue {
 //this disables on readonly because it is expected that the library can handle that itself, and bumping ranges for writes on readonly properties would be annoying.
 #define RC(val, fld) if((val > maximum_value.fld || val < minimum_value.fld) && read_only == false) throw LavErrorException(Lav_ERROR_RANGE)
 
-//for the shared pointer:
 class LavBuffer;
+class LavSimulation;
+class LavNode;
 
 class LavProperty {
 	public:
 	LavProperty() = default;
 	LavProperty(const LavProperty&) = default;
 	explicit LavProperty(int property_type);
+	void associateNode(LavNode* node);
+	void associateSimulation(std::shared_ptr<LavSimulation> simulation);
+
 	void reset();
 	int getType();
 	void setType(int t);
@@ -123,6 +127,9 @@ class LavProperty {
 	//Very important for add and mul.
 	bool needsARate();
 
+	//Advance time for this property 
+	void tick();
+
 	//get/set dynamic range status.
 	bool getHasDynamicRange();
 	void setHasDynamicRange(bool v);
@@ -138,6 +145,8 @@ class LavProperty {
 	std::function<void(void)> post_changed_callback;
 	bool read_only = false;
 	bool has_dynamic_range = false;
+	LavNode* node;
+	std::shared_ptr<LavSimulation> simulation;
 };
 
 //helper methods to quickly make properties.

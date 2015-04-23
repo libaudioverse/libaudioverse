@@ -4,10 +4,20 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/automators.hpp>
+#include <libaudioverse/private/node.hpp>
+#include <libaudioverse/private/simulation.hpp>
 #include <stdlib.h>
 #include <string.h>
 
 LavProperty::LavProperty(int property_type): type(property_type) {}
+
+void LavProperty::associateNode(LavNode* node) {
+	this->node = node;
+}
+
+void LavProperty::associateSimulation(std::shared_ptr<LavSimulation> simulation) {
+	this->simulation = simulation;
+}
 
 void LavProperty::reset() {
 	value = default_value;
@@ -316,6 +326,9 @@ void LavProperty::setPostChangedCallback(std::function<void(void)> cb) {
 
 bool LavProperty::needsARate() {
 	return false;
+}
+
+void LavProperty::tick() {
 }
 
 bool LavProperty::getHasDynamicRange() {
