@@ -12,15 +12,11 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 LavProperty::LavProperty(int property_type): type(property_type) {}
 
 LavProperty::~LavProperty() {
-	if(automation_buffer) LavFreeArray(automation_buffer);
 }
 
 void LavProperty::associateNode(LavNode* node) {
 	this->node = node;
 	block_size=node->getSimulation()->getBlockSize();
-	if(type == Lav_PROPERTYTYPE_DOUBLE || type== Lav_PROPERTYTYPE_FLOAT) {
-		automation_buffer = LavAllocArray<double>(block_size);
-	}
 }
 
 void LavProperty::associateSimulation(std::shared_ptr<LavSimulation> simulation) {
@@ -33,10 +29,7 @@ void LavProperty::reset() {
 	farray_value = default_farray_value;
 	iarray_value = default_iarray_value;
 	buffer_value=nullptr;
-	if(automation_buffer) {
-		double v=type==Lav_PROPERTYTYPE_FLOAT ? default_value.fval : default_value.dval;
-		std::fill(automation_buffer, automation_buffer+block_size, v);
-	}
+
 	if(post_changed_callback) post_changed_callback();
 }
 
@@ -113,12 +106,12 @@ void LavProperty::setIntRange(int a, int b) {
 
 
 float LavProperty::getFloatValue(int i) {
-	return automation_buffer[i];
+	return value.fval;
 }
 
 void LavProperty::setFloatValue(float v) {
 	RC(v, fval);
-	std::fill(automation_buffer, automation_buffer+block_size, v);
+	value.fval = v;
 	if(post_changed_callback) post_changed_callback();
 }
 
@@ -144,12 +137,12 @@ void LavProperty::setFloatRange(float a, float b) {
 
 //doubles...
 double LavProperty::getDoubleValue(int i) {
-	return automation_buffer[i];
+	return value.dval;
 }
 
 void LavProperty::setDoubleValue(double v) {
 	RC(v, dval);
-	std::fill(automation_buffer, automation_buffer+block_size, v);
+	value.dval = v;
 	if(post_changed_callback) post_changed_callback();
 }
 

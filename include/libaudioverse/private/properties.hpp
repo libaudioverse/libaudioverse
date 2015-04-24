@@ -151,8 +151,8 @@ class LavProperty {
 	std::shared_ptr<LavSimulation> simulation;
 
 	//These are for automation and node connections:
-	double* automation_buffer = nullptr;
 	int block_size= 0;
+	double time = 0.0;
 };
 
 //helper methods to quickly make properties.
