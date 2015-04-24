@@ -11,51 +11,26 @@ The name for this component is borrowed from Webaudio.  This file only contains 
 
 Adding new automators is similar to nodes: create a file, define the class, create a creation function.
 
-We put the creeation functions for automators in this file.*/
+We put the creeation functions for automators in this file.
+
+An automator itself must be equivalent a pure function with some parameters. bound.
+Put another way, multiple calls to start *must* be supported.
+Furthermore, all automators must have a well-defined final value.
+
+Subclasses should set duration in their constructors, should they need to continue past their scheduled time.*/
 
 class LavAutomator {
 	public:
-	//delayTime is how long until we should execute the automator.
-	LavAutomator(LavProperty* p, double delayTime);
+	LavAutomator(LavProperty* p, double endTime);
 	virtual ~LavAutomator();
 
-	//The delay time is how long we will wait before touching this automator.
-	//This should be set immediately after a call to start in order to wait.
-	double getDelayTime();
-	void setDelayTime(double t);
-
-	//called just before this event will happen.
-	//It is assumed this function will read the property we are attached to and compute internal values as needed.
-	//earlyness is how long until we are scheduled, in samples.
-	virtual void start(double currentValue, int earlyness) = 0;
-
-	//Write samples to the buffer specified.
-	//Return number of samples written.
-	//This function is not allowed to fail, and returning 0 indicates that this automator is completed.
-	//We use double for convenience.
-	//This should advance the time by length samples.
-	virtual int writeValues(int length, double* destination);
-
-	//Get the next value that would be written.
-	virtual double getNext() = 0;
-
-	//Advance by some amount of time in seconds.
-	virtual void advance(double time) = 0;
-
-	//Whether or not we need A-rate processing.
-	//Any automator that detects that it can do block-rate processing should call setNeedsARate(false).
-	bool getNeedsARate();
-	void setNeedsARate(bool v);
-
-	//Is this automator completed?
-	bool getCompleted();
-
-	//Mark this automator as completed.
-	void setCompleted(bool v);
+	//default implementation: initial_value and initial_time are set.
+	virtual void start(double initialValue, double initialTime) ;
+	virtual double getValueAtTime(double time) = 0;
+	virtual double getFinalValue() = 0;
+	virtual double getDuration();
 
 	protected:
-	bool completed = false, needs_arate = true;
-	double delay_time = 0.0;
+	double initial_value = 0.0, initial_time = 0.0, end_time = 0.0, duration = 0.0;
 	LavProperty* property = nullptr;
-	double sr;
 };

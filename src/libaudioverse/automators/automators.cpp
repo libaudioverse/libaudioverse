@@ -5,45 +5,17 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/automators.hpp>
 #include <libaudioverse/private/properties.hpp>
 
-LavAutomator::LavAutomator(LavProperty* p, double delayTime): property(p), delay_time(delayTime) {
-		sr = p->getSr();
+LavAutomator::LavAutomator(LavProperty* p, double endTime): property(p), end_time(endTime) {
 }
 
 LavAutomator::~LavAutomator() {
 }
 
-double LavAutomator::getDelayTime() {
-	return delay_time;
+void LavAutomator::start(double initialValue, double initialTime) {
+	initial_value = initialValue;
+	initial_time = initialTime;
 }
 
-void LavAutomator::setDelayTime(double t) {
-	delay_time = t;
-}
-
-int LavAutomator::writeValues(int length, double* destination) {
-	int count = 0;
-	while(getCompleted() == false && length > 0) {
-		*destination = getNext();
-		advance(1/sr);
-		destination++;
-		length--;
-		count++;
-	}
-	return count;
-}
-
-bool LavAutomator::getNeedsARate() {
-	return needs_arate;
-}
-
-void LavAutomator::setNeedsARate(bool v) {
-	needs_arate = v;
-}
-
-bool LavAutomator::getCompleted() {
-	return completed;
-}
-
-void LavAutomator::setCompleted(bool v) {
-	completed = v;
+double LavAutomator::getDuration() {
+return 0.0;
 }

@@ -6,31 +6,25 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 class LavLinearRampAutomator: LavAutomator {
 	public:
-	LavLinearRampAutomator(double final_value, LavProperty* p, double delayTime);
-	virtual double getNext() override;
-	virtual void start(double currentValue, int earlyness) override;
-	virtual void advance(double time) override;
-	double current_value, delta, final_value;
-	int ticks;
+	LavLinearRampAutomator(LavProperty* p, double endTime, double finalValue);
+	virtual void start(double initialTime, double initialValue) override;
+	virtual double  getValueAtTime(double time) override;
+	virtual double getFinalValue();
+	double delta, final_value;
 };
 
-LavLinearRampAutomator::LavLinearRampAutomator(double finalValue, LavProperty* p, double delayTime): LavAutomator(p, delayTime)  {
-	final_value = finalValue;
+LavLinearRampAutomator::LavLinearRampAutomator(LavProperty* p, double endTime, double finalValue): LavAutomator(p, endTime), final_value(finalValue) {
 }
 
-void LavLinearRampAutomator::start(double currentValue, int earlyness) {
-	current_value = currentValue;
-	delta = (final_value-current_value)/earlyness*sr;
-	ticks = earlyness;
+void LavLinearRampAutomator::start(double initialValue, double initialTime) {
+	LavAutomator::start(initialValue, initialTime);
+	delta = (final_value-initial_value)/(end_time-initial_time);
 }
 
-void LavLinearRampAutomator::advance(double time) {
-	current_value += delta;
-	ticks--;
-	if(ticks == 0) setCompleted(true);
+double LavLinearRampAutomator::getValueAtTime(double time) {
+	return initial_value+(time-initial_time)*delta;
 }
 
-double LavLinearRampAutomator::getNext() {
-	return current_value;
+double LavLinearRampAutomator::getFinalValue() {
+	return final_value;
 }
-
