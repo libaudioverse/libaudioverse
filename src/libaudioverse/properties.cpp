@@ -73,6 +73,21 @@ double LavProperty::getTime() {
 	return time;
 }
 
+void LavProperty::advanceAutomatorToTime(double t) {
+	if(current_automator_value && current_automator_key < t) {
+		delete current_automator_value;
+		current_automator_value= nullptr;
+	}
+	auto next=automators.lower_bound(t);
+	if(next != automators.end()) {
+		current_automator_key = next->first;
+		current_automator_value = next->second;
+	}
+	for(auto i = automators.begin(); i != next; i++) delete i->second;
+	automators.erase(automators.begin(), next);
+	if(next != automators.end()) automators.erase(next, next); //we kill this record,It'll die with current_automator_value.
+}
+
 bool LavProperty::isReadOnly() {
 	return read_only;
 }
@@ -116,18 +131,7 @@ void LavProperty::setIntRange(int a, int b) {
 float LavProperty::getFloatValue(int i) {
 	if(current_automator_value == nullptr && automators.size() == 0) return value.fval;
 	//is this automator out?
-	if(current_automator_value && current_automator_key < time+i*sr) {
-		delete current_automator_value;
-		current_automator_value= nullptr;
-	}
-	auto next=automators.lower_bound(time+i*sr);
-	if(next != automators.end()) {
-		current_automator_key = next->first;
-		current_automator_value = next->second;
-	}
-	for(auto i = automators.begin(); i != next; i++) delete i->second;
-	automators.erase(automators.begin(), next);
-	automators.erase(next, next); //we kill this record,It'll die with current_automator_value.
+	advanceAutomatorToTime(time+i*sr);
 	//If we still don't have an automator, fval.
 	if(current_automator_value == nullptr) return value.fval;
 	//otherwise, we use the automator.
@@ -163,19 +167,7 @@ void LavProperty::setFloatRange(float a, float b) {
 //doubles...
 double LavProperty::getDoubleValue(int i) {
 	if(current_automator_value == nullptr && automators.size() == 0) return value.dval;
-	//is this automator out?
-	if(current_automator_value && current_automator_key < time+i*sr) {
-		delete current_automator_value;
-		current_automator_value= nullptr;
-	}
-	auto next=automators.lower_bound(time+i*sr);
-	if(next != automators.end()) {
-		current_automator_key = next->first;
-		current_automator_value = next->second;
-	}
-	for(auto i = automators.begin(); i != next; i++) delete i->second;
-	automators.erase(automators.begin(), next);
-	automators.erase(next, next); //we kill this record,It'll die with current_automator_value.
+	advanceAutomatorToTime(time+i*sr);
 	//If we still don't have an automator, fval.
 	if(current_automator_value == nullptr) return value.dval;
 	//otherwise, we use the automator.

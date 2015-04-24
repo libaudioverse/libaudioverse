@@ -51,6 +51,8 @@ class LavProperty {
 	double getSr();
 	double getTime();
 
+	void advanceAutomatorToTime(double t);
+
 	//yes, really. This is as uggly as it looks.
 	int getIntValue();
 	void setIntValue(int v);
