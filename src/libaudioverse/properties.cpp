@@ -17,6 +17,7 @@ LavProperty::~LavProperty() {
 void LavProperty::associateNode(LavNode* node) {
 	this->node = node;
 	block_size=node->getSimulation()->getBlockSize();
+	sr = node->getSimulation()->getSr();
 }
 
 void LavProperty::associateSimulation(std::shared_ptr<LavSimulation> simulation) {
@@ -29,7 +30,10 @@ void LavProperty::reset() {
 	farray_value = default_farray_value;
 	iarray_value = default_iarray_value;
 	buffer_value=nullptr;
-
+	automators.clear();
+	if(current_automator_value) delete current_automator_value;
+	current_automator_value = nullptr;
+	current_automator_key = 0.0;
 	if(post_changed_callback) post_changed_callback();
 }
 
@@ -63,6 +67,10 @@ void LavProperty::setTag(int t) {
 
 double LavProperty::getSr() {
 	return node->getSimulation()->getSr();
+}
+
+double LavProperty::getTime() {
+	return time;
 }
 
 bool LavProperty::isReadOnly() {
@@ -106,7 +114,24 @@ void LavProperty::setIntRange(int a, int b) {
 
 
 float LavProperty::getFloatValue(int i) {
-	return value.fval;
+	if(current_automator_value == nullptr && automators.size() == 0) return value.fval;
+	//is this automator out?
+	if(current_automator_value && current_automator_key < time+i*sr) {
+		delete current_automator_value;
+		current_automator_value= nullptr;
+	}
+	auto next=automators.lower_bound(time+i*sr);
+	if(next != automators.end()) {
+		current_automator_key = next->first;
+		current_automator_value = next->second;
+	}
+	for(auto i = automators.begin(); i != next; i++) delete i->second;
+	automators.erase(automators.begin(), next);
+	automators.erase(next, next); //we kill this record,It'll die with current_automator_value.
+	//If we still don't have an automator, fval.
+	if(current_automator_value == nullptr) return value.fval;
+	//otherwise, we use the automator.
+	return current_automator_value->getValueAtTime(time+block_size*sr);
 }
 
 void LavProperty::setFloatValue(float v) {
@@ -137,7 +162,24 @@ void LavProperty::setFloatRange(float a, float b) {
 
 //doubles...
 double LavProperty::getDoubleValue(int i) {
-	return value.dval;
+	if(current_automator_value == nullptr && automators.size() == 0) return value.dval;
+	//is this automator out?
+	if(current_automator_value && current_automator_key < time+i*sr) {
+		delete current_automator_value;
+		current_automator_value= nullptr;
+	}
+	auto next=automators.lower_bound(time+i*sr);
+	if(next != automators.end()) {
+		current_automator_key = next->first;
+		current_automator_value = next->second;
+	}
+	for(auto i = automators.begin(); i != next; i++) delete i->second;
+	automators.erase(automators.begin(), next);
+	automators.erase(next, next); //we kill this record,It'll die with current_automator_value.
+	//If we still don't have an automator, fval.
+	if(current_automator_value == nullptr) return value.dval;
+	//otherwise, we use the automator.
+	return current_automator_value->getValueAtTime(time+block_size*sr);
 }
 
 void LavProperty::setDoubleValue(double v) {
@@ -338,6 +380,15 @@ bool LavProperty::needsARate() {
 }
 
 void LavProperty::tick() {
+	//We know this is safe because nothing can read past the block.
+	if(type == Lav_PROPERTYTYPE_FLOAT) {
+		value.fval = getFloatValue(block_size-1);
+	}
+	else if(type == Lav_PROPERTYTYPE_DOUBLE) {
+		value.dval = getDoubleValue(block_size-1);
+	}
+	//Time advances 
+	time += block_size*sr;
 }
 
 bool LavProperty::getHasDynamicRange() {

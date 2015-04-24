@@ -8,6 +8,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <limits>
 #include <algorithm>
 #include <memory>
+#include <map>
 #include "../libaudioverse.h"
 #include "errors.hpp"
 
@@ -26,6 +27,7 @@ union LavPropertyValue {
 class LavBuffer;
 class LavSimulation;
 class LavNode;
+class LavAutomator;
 
 class LavProperty {
 	public:
@@ -47,6 +49,7 @@ class LavProperty {
 	bool isReadOnly();
 	void setReadOnly(bool what);
 	double getSr();
+	double getTime();
 
 	//yes, really. This is as uggly as it looks.
 	int getIntValue();
@@ -58,6 +61,9 @@ class LavProperty {
 	void setIntRange(int a, int b);
 
 	//floats...
+	//Within one block and two reads r1 and r2, such that i1 happens-before i2:
+	//The index of r1 must be strictly less than or equal to the index of r2.
+	//This condition may be lifted in future.
 	float getFloatValue(int i = 0);
 	void setFloatValue(float v);
 	float getFloatDefault();
@@ -67,6 +73,9 @@ class LavProperty {
 	void setFloatRange(float a, float b);
 
 	//doubles...
+	//As with getFloatValue, within one block and two reads r1 and r2, such that i1 happens-before i2:
+	//The index of r1 must be strictly less than or equal to the index of r2.
+	//This condition may be lifted in future.
 	double getDoubleValue(int i = 0);
 	void setDoubleValue(double v);
 	double getDoubleMin();
@@ -152,7 +161,11 @@ class LavProperty {
 
 	//These are for automation and node connections:
 	int block_size= 0;
-	double time = 0.0;
+	double time = 0.0, sr = 0.0;
+	std::map<double, LavAutomator*> automators;
+	//We extract these from the map for efficiency.
+	LavAutomator* current_automator_value = nullptr;
+	double current_automator_key = 0.0;
 };
 
 //helper methods to quickly make properties.
