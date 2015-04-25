@@ -368,7 +368,7 @@ void LavProperty::setPostChangedCallback(std::function<void(void)> cb) {
 }
 
 bool LavProperty::needsARate() {
-	return false;
+	return automators.empty()== false || current_automator_value != nullptr;
 }
 
 void LavProperty::tick() {
