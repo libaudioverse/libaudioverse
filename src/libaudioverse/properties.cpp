@@ -159,6 +159,8 @@ void LavProperty::setIntRange(int a, int b) {
 float LavProperty::getFloatValue(int i) {
 	updateAutomatorIndex(time+i/sr);
 	if(automator_index < automators.size()) return automators[automator_index]->getValue(time+i/sr);
+	//Note that fval doesn't "fix" itself until the next tick.
+	else if(automators.size() != 0) return automators[automators.size()-1]->getFinalValue();
 	else return value.fval;
 }
 
@@ -193,6 +195,7 @@ void LavProperty::setFloatRange(float a, float b) {
 double LavProperty::getDoubleValue(int i) {
 	updateAutomatorIndex(time+i/sr);
 	if(automator_index < automators.size()) return automators[automator_index]->getValue(time+i/sr);
+	else if(automators.size()!=0) return automators[automators.size()-1]->getFinalValue();
 	else return value.fval;
 }
 
