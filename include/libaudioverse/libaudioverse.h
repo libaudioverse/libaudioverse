@@ -293,7 +293,7 @@ These apply only to float and double properties. Times are relative to "now" in 
 If setting up complex timelines, do it inside an atomic block.
 */
 //Linear ramp to value starting after the last event and ending at time t.
-Lav_PUBLIC_FUNCTION LavError Lav_node_LinearRampToValue(LavHandle nodeHandle, int slot, double time, double value);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeLinearRampToValue(LavHandle nodeHandle, int slot, double time, double value);
 
 /**events.
 Unlike callbacks, which are dedicated on a per-node basis, events fire in a background thread. It is safe to call the Libaudioverse API from a firing event.

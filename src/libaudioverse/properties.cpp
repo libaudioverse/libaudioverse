@@ -74,22 +74,11 @@ double LavProperty::getTime() {
 }
 
 void LavProperty::advanceAutomatorToTime(double t) {
-	if(current_automator_value && current_automator_key < t) {
-		delete current_automator_value;
-		current_automator_value= nullptr;
-	}
-	auto next=automators.lower_bound(t);
-	if(next != automators.end()) {
-		current_automator_key = next->first;
-		current_automator_value = next->second;
-	}
-	for(auto i = automators.begin(); i != next; i++) delete i->second;
-	automators.erase(automators.begin(), next);
-	if(next != automators.end()) automators.erase(next, next); //we kill this record,It'll die with current_automator_value.
+//empty for now. The old one was buggy.
 }
 
 void LavProperty::scheduleAutomator(LavAutomator* automator, double time) {
-	if(type!=Lav_PROPERTYTYPE_FLOAT || type != Lav_PROPERTYTYPE_DOUBLE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
+	if(type!=Lav_PROPERTYTYPE_FLOAT && type != Lav_PROPERTYTYPE_DOUBLE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
 	automators[time] = automator;
 }
 

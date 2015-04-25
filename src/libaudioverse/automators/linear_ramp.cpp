@@ -34,7 +34,7 @@ double LavLinearRampAutomator::getFinalValue() {
 
 //begin public api.
 
-Lav_PUBLIC_FUNCTION LavError Lav_node_LinearRampToValue(LavHandle nodeHandle, int slot, double time, double value) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeLinearRampToValue(LavHandle nodeHandle, int slot, double time, double value) {
 	PUB_BEGIN
 	auto node = incomingObject<LavNode>(nodeHandle);
 	LOCK(*node);
