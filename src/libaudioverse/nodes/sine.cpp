@@ -21,7 +21,7 @@ class LavSineNode: public LavNode {
 	LavSineNode(std::shared_ptr<LavSimulation> simulation);
 	virtual void process();
 	virtual void reset() override;
-	float phase = 0;
+	double phase = 0;
 };
 
 LavSineNode::LavSineNode(std::shared_ptr<LavSimulation> simulation): LavNode(Lav_OBJTYPE_SINE_NODE, simulation, 0, 1) {
@@ -35,11 +35,20 @@ std::shared_ptr<LavNode> createSineNode(std::shared_ptr<LavSimulation> simulatio
 }
 
 void LavSineNode::process() {
-	float freq = getProperty(Lav_SINE_FREQUENCY).getFloatValue();
-	float phaseDelta=freq/simulation->getSr();
-	for(unsigned int i = 0; i< block_size; i++) {
-		output_buffers[0][i] = sinf(2*phase*PI);
-		phase+=phaseDelta;
+	auto &freqProp = getProperty(Lav_SINE_FREQUENCY);
+	if(freqProp.needsARate()==false) {
+		double phaseDelta=freqProp.getFloatValue()/simulation->getSr();
+		for(unsigned int i = 0; i< block_size; i++) {
+			output_buffers[0][i] = (float)sin(2*phase*PI);
+			phase+=phaseDelta;
+		}
+	}
+	else {
+		for(unsigned int i = 0; i< block_size; i++) {
+			float phaseDelta=freqProp.getFloatValue(i)/simulation->getSr();
+			output_buffers[0][i] = sin(2*phase*PI);
+			phase+=phaseDelta;
+		}
 	}
 	phase -=floorf(phase);
 }
