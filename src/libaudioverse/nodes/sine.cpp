@@ -46,7 +46,7 @@ void LavSineNode::process() {
 	else {
 		for(unsigned int i = 0; i< block_size; i++) {
 			float phaseDelta=freqProp.getFloatValue(i)/simulation->getSr();
-			output_buffers[0][i] = sin(2*phase*PI);
+			output_buffers[0][i] = (float)sin(2*phase*PI);
 			phase+=phaseDelta;
 		}
 	}
