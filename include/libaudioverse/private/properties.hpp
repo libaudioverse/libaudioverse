@@ -52,6 +52,7 @@ class LavProperty {
 	double getTime();
 
 	void advanceAutomatorToTime(double t);
+	void scheduleAutomator(LavAutomator* automator, double time);
 
 	//yes, really. This is as uggly as it looks.
 	int getIntValue();

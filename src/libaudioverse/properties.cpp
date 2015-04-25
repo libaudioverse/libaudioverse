@@ -88,6 +88,11 @@ void LavProperty::advanceAutomatorToTime(double t) {
 	if(next != automators.end()) automators.erase(next, next); //we kill this record,It'll die with current_automator_value.
 }
 
+void LavProperty::scheduleAutomator(LavAutomator* automator, double time) {
+	if(type!=Lav_PROPERTYTYPE_FLOAT || type != Lav_PROPERTYTYPE_DOUBLE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
+	automators[time] = automator;
+}
+
 bool LavProperty::isReadOnly() {
 	return read_only;
 }

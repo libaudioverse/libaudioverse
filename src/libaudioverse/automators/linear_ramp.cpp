@@ -3,8 +3,11 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/private/automators.hpp>
+#include <libaudioverse/private/macros.hpp>
+#include <libaudioverse/private/memory.hpp>
+#include <libaudioverse/private/node.hpp>
 
-class LavLinearRampAutomator: LavAutomator {
+class LavLinearRampAutomator: public LavAutomator {
 	public:
 	LavLinearRampAutomator(LavProperty* p, double endTime, double finalValue);
 	virtual void start(double initialTime, double initialValue) override;
@@ -27,4 +30,17 @@ double LavLinearRampAutomator::getValueAtTime(double time) {
 
 double LavLinearRampAutomator::getFinalValue() {
 	return final_value;
+}
+
+//begin public api.
+
+Lav_PUBLIC_FUNCTION LavError Lav_node_LinearRampToValue(LavHandle nodeHandle, int slot, double time, double value) {
+	PUB_BEGIN
+	auto node = incomingObject<LavNode>(nodeHandle);
+	LOCK(*node);
+	auto &prop= node->getProperty(slot);
+	LavLinearRampAutomator* automator = new LavLinearRampAutomator(&prop, time, value);
+	//the property will throw for us if any part of the next part goes wrong.
+	prop.scheduleAutomator(automator, time);
+	PUB_END
 }

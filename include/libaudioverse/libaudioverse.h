@@ -288,6 +288,13 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeGetArrayPropertyLengthRange(LavHandle nodeH
 Lav_PUBLIC_FUNCTION LavError Lav_nodeSetBufferProperty(LavHandle nodeHandle, int slot, LavHandle bufferHandle);
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetBufferProperty(LavHandle nodeHandle, int slot, LavHandle* destination);
 
+/**Automators.
+These apply only to float and double properties. Times are relative to "now" in node time, not simulation time.
+If setting up complex timelines, do it inside an atomic block.
+*/
+//Linear ramp to value starting after the last event and ending at time t.
+Lav_PUBLIC_FUNCTION LavError Lav_node_LinearRampToValue(LavHandle nodeHandle, int slot, double time, double value);
+
 /**events.
 Unlike callbacks, which are dedicated on a per-node basis, events fire in a background thread. It is safe to call the Libaudioverse API from a firing event.
 It is documented which of these will fire more than once.  Most events will wait for you to return from the handler before firing a duplicate event.  It is wise to be as quick as possible.*/
