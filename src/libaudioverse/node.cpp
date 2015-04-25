@@ -95,32 +95,27 @@ void LavNode::tick() {
 	block_size = simulation->getBlockSize();
 	process();
 	auto &mulProp = getProperty(Lav_NODE_MUL), &addProp = getProperty(Lav_NODE_ADD);
-	if(mulProp.getFloatValue() != 1.0 || mulProp.needsARate()) {
-		for(int i = 0; i < getOutputBufferCount(); i++) {
-			float* output = getOutputBufferArray()[i];
-			if(mulProp.needsARate() ==false) {
-				scalarMultiplicationKernel(block_size, mulProp.getFloatValue(), output, output);
-			}
-			else {
-				for(int j = 0; j < block_size; j++) {
-					float mul = mulProp.getFloatValue();
-					output[j]*=mul;
-				}
-			}
+	float** outputs =getOutputBufferArray();
+	if(mulProp.needsARate()) {
+		for(int i = 0; i < block_size; i++) {
+			float mul = mulProp.getFloatValue(i);
+			for(int j = 0; j < num_output_buffers; j++) outputs[j][i]*=mul;
 		}
 	}
-	if(addProp.getFloatValue() !=0.0 || addProp.needsARate()) {
-		for(int i = 0; i < getOutputBufferCount(); i++) {
-			float* output = getOutputBufferArray()[i];
-			if(addProp.needsARate() == false) {
-				scalarAdditionKernel(block_size, mulProp.getFloatValue(), output, output);
-			}
-			else {
-				for(int j = 0; j < block_size; j++) {
-					float add=addProp.getFloatValue(j);
-					output[j] += add;
-				}
-			}
+	else if(mulProp.getFloatValue() !=1.0) {
+		for(int i = 0; i < num_output_buffers; i++) {
+			scalarMultiplicationKernel(block_size, mulProp.getFloatValue(), outputs[i], outputs[i]);
+		}
+	}
+	if(addProp.needsARate()) {
+		for(int i = 0; i < block_size; i++) {
+		float add=addProp.getFloatValue(i);
+			for(int j = 0; j < num_output_buffers; j++) outputs[j][i]+=add;
+		}
+	}
+	else if(addProp.getFloatValue() !=0.0) {
+		for(int i = 0; i < num_output_buffers; i++) {
+			scalarAdditionKernel(block_size, addProp.getFloatValue(), outputs[i], outputs[i]);
 		}
 	}
 	//tick properties, bringing them in line for this block.
@@ -320,17 +315,28 @@ void LavSubgraphNode::tick() {
 	subgraph_output->tick();
 	//Handle our add and mul, on top of the output object of the subgraph.
 	//We prefer this over forwarding because this allows the subgraph to change all internal volumes without them being overridden by the user.
-	float mul = getProperty(Lav_NODE_MUL).getFloatValue();
-	if(mul != 1.0f) {
-		for(int i = 0; i < subgraph_output->getOutputBufferCount(); i++) {
-			float* output = subgraph_output->getOutputBufferArray()[i];
-			scalarMultiplicationKernel(simulation->getBlockSize(), mul, output, output);
+	auto &mulProp = getProperty(Lav_NODE_MUL), &addProp = getProperty(Lav_NODE_ADD);
+	float** outputs =getOutputBufferArray();
+	if(mulProp.needsARate()) {
+		for(int i = 0; i < block_size; i++) {
+			float mul = mulProp.getFloatValue(i);
+			for(int j = 0; j < num_output_buffers; j++) outputs[j][i]*=mul;
 		}
 	}
-	float add=getProperty(Lav_NODE_ADD).getFloatValue();
-	if(add != 0.0f) {
-		for(int i = 0; i < subgraph_output->getOutputBufferCount(); i++) {
-			scalarAdditionKernel(simulation->getBlockSize(), add, subgraph_output->getOutputBufferArray()[i], getOutputBufferArray()[i]);
+	else if(mulProp.getFloatValue() !=1.0) {
+		for(int i = 0; i < num_output_buffers; i++) {
+			scalarMultiplicationKernel(block_size, mulProp.getFloatValue(), outputs[i], outputs[i]);
+		}
+	}
+	if(addProp.needsARate()) {
+		for(int i = 0; i < block_size; i++) {
+		float add=addProp.getFloatValue(i);
+			for(int j = 0; j < num_output_buffers; j++) outputs[j][i]+=add;
+		}
+	}
+	else if(addProp.getFloatValue() !=0.0) {
+		for(int i = 0; i < num_output_buffers; i++) {
+			scalarAdditionKernel(block_size, addProp.getFloatValue(), outputs[i], outputs[i]);
 		}
 	}
 	tickProperties();
