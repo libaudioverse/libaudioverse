@@ -50,7 +50,7 @@ void LavSineNode::process() {
 			phase+=phaseDelta;
 		}
 	}
-	phase -=floorf(phase);
+	phase -=floor(phase);
 }
 
 void LavSineNode::reset() {
