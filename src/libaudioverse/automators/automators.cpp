@@ -5,7 +5,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/automators.hpp>
 #include <libaudioverse/private/properties.hpp>
 
-LavAutomator::LavAutomator(LavProperty* p, double endTime): property(p), end_time(endTime) {
+LavAutomator::LavAutomator(LavProperty* p, double scheduledTime): property(p), scheduled_time(scheduledTime) {
 }
 
 LavAutomator::~LavAutomator() {
@@ -18,4 +18,12 @@ void LavAutomator::start(double initialValue, double initialTime) {
 
 double LavAutomator::getDuration() {
 return 0.0;
+}
+
+double LavAutomator::getScheduledTime() {
+	return scheduled_time;
+}
+
+bool compareAutomators(LavAutomator *a, LavAutomator *b) {
+	return a->getScheduledTime() < b->getScheduledTime();
 }

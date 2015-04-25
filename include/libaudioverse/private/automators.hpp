@@ -21,16 +21,19 @@ Subclasses should set duration in their constructors, should they need to contin
 
 class LavAutomator {
 	public:
-	LavAutomator(LavProperty* p, double endTime);
+	LavAutomator(LavProperty* p, double scheduledTime);
 	virtual ~LavAutomator();
 
 	//default implementation: initial_value and initial_time are set.
 	virtual void start(double initialValue, double initialTime) ;
-	virtual double getValueAtTime(double time) = 0;
+	virtual double getValue(double time) = 0;
 	virtual double getFinalValue() = 0;
-	virtual double getDuration();
+	double getDuration();
+	double getScheduledTime();
 
 	protected:
-	double initial_value = 0.0, initial_time = 0.0, end_time = 0.0, duration = 0.0;
+	double initial_value = 0.0, initial_time = 0.0, scheduled_time = 0.0, duration = 0.0;
 	LavProperty* property = nullptr;
 };
+
+bool compareAutomators(LavAutomator *a, LavAutomator *b);

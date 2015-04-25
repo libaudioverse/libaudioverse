@@ -9,22 +9,22 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 class LavLinearRampAutomator: public LavAutomator {
 	public:
-	LavLinearRampAutomator(LavProperty* p, double endTime, double finalValue);
+	LavLinearRampAutomator(LavProperty* p, double scheduledTime, double finalValue);
 	virtual void start(double initialTime, double initialValue) override;
-	virtual double  getValueAtTime(double time) override;
+	virtual double  getValue(double time) override;
 	virtual double getFinalValue();
 	double delta, final_value;
 };
 
-LavLinearRampAutomator::LavLinearRampAutomator(LavProperty* p, double endTime, double finalValue): LavAutomator(p, endTime), final_value(finalValue) {
+LavLinearRampAutomator::LavLinearRampAutomator(LavProperty* p, double scheduledTime, double finalValue): LavAutomator(p, scheduledTime), final_value(finalValue) {
 }
 
 void LavLinearRampAutomator::start(double initialValue, double initialTime) {
 	LavAutomator::start(initialValue, initialTime);
-	delta = (final_value-initial_value)/(end_time-initial_time);
+	delta = (final_value-initial_value)/(scheduled_time-initial_time);
 }
 
-double LavLinearRampAutomator::getValueAtTime(double time) {
+double LavLinearRampAutomator::getValue(double time) {
 	return initial_value+(time-initial_time)*delta;
 }
 
@@ -39,8 +39,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeLinearRampToValue(LavHandle nodeHandle, int
 	auto node = incomingObject<LavNode>(nodeHandle);
 	LOCK(*node);
 	auto &prop= node->getProperty(slot);
-	LavLinearRampAutomator* automator = new LavLinearRampAutomator(&prop, time, value);
+	LavLinearRampAutomator* automator = new LavLinearRampAutomator(&prop, prop.getTime()+time, value);
 	//the property will throw for us if any part of the next part goes wrong.
-	prop.scheduleAutomator(automator, time);
+	prop.scheduleAutomator(automator);
 	PUB_END
 }

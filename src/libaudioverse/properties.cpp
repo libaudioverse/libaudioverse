@@ -8,6 +8,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/simulation.hpp>
 #include <stdlib.h>
 #include <string.h>
+#include <algorithm>
 
 LavProperty::LavProperty(int property_type): type(property_type) {}
 
@@ -31,9 +32,6 @@ void LavProperty::reset() {
 	iarray_value = default_iarray_value;
 	buffer_value=nullptr;
 	automators.clear();
-	if(current_automator_value) delete current_automator_value;
-	current_automator_value = nullptr;
-	current_automator_key = 0.0;
 	if(post_changed_callback) post_changed_callback();
 }
 
@@ -73,13 +71,49 @@ double LavProperty::getTime() {
 	return time;
 }
 
-void LavProperty::advanceAutomatorToTime(double t) {
-//empty for now. The old one was buggy.
+void LavProperty::updateAutomatorIndex(double t) {
+	//This should be a small number of compares.
+	//This is O(n), lower_bound is O(log n), but c probably makes a huge difference here.
+	for(unsigned int i = automator_index; i < automators.size(); i++) {
+		if(automators[i]->getScheduledTime()+automators[i]->getDuration() > t) break;
+		automator_index ++;
+	}
 }
 
-void LavProperty::scheduleAutomator(LavAutomator* automator, double time) {
-	if(type!=Lav_PROPERTYTYPE_FLOAT && type != Lav_PROPERTYTYPE_DOUBLE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
-	automators[time] = automator;
+void LavProperty::scheduleAutomator(LavAutomator* automator) {
+	//find iterators bracketting where we want to insert.
+	auto lower = std::lower_bound(automators.begin(), automators.end(), automator, compareAutomators);
+	auto upper = std::upper_bound(automators.begin(), automators.end(), automator, compareAutomators);
+	//All automators in this range have a scheduled time less than ours.
+	//But we might be trying to add one "inside" another event, and this can't be allowed.
+	//We know that no event is scheduled inside another, so we can make an inductive argument:
+	//It is not possible for an event to overlap us if the one immediately before us does not.
+	for(auto i = lower; i != upper; i++) {
+		auto &a = *i;
+		if(a->getScheduledTime()+a->getDuration() > automator->getScheduledTime()) throw LavErrorException(Lav_ERROR_OVERLAPPING_AUTOMATORS);
+	}
+	//If our time + our delay time overlaps upper, we have the same problem.
+	if(upper != automators.end() && automator->getScheduledTime()+automator->getDuration() > (*upper)->getScheduledTime()) throw LavErrorException(Lav_ERROR_OVERLAPPING_AUTOMATORS);
+	//Okay, we're good, insert the automator.
+	auto inserted=automators.insert(upper, automator);
+	//Re-establish the peacewise function.
+	double prevValue, prevTime;
+	if(inserted == automators.begin()) {
+		prevValue = type == Lav_PROPERTYTYPE_FLOAT ? value.fval : value.dval;
+		prevTime = time;
+	} else {
+		inserted--;
+		prevValue = (*inserted)->getFinalValue();
+		prevTime = (*inserted)->getScheduledTime()+(*inserted)->getDuration();
+		inserted++;
+	}
+	//Next, call the starts.
+	for(auto i = inserted; i != automators.end(); i++) {
+		auto &a = *i;
+		a->start(prevValue, prevTime);
+		prevValue = a->getFinalValue();
+		prevTime = a->getScheduledTime()+a->getDuration();
+	}
 }
 
 bool LavProperty::isReadOnly() {
@@ -123,17 +157,14 @@ void LavProperty::setIntRange(int a, int b) {
 
 
 float LavProperty::getFloatValue(int i) {
-	if(current_automator_value == nullptr && automators.size() == 0) return value.fval;
-	//is this automator out?
-	advanceAutomatorToTime(time+i*sr);
-	//If we still don't have an automator, fval.
-	if(current_automator_value == nullptr) return value.fval;
-	//otherwise, we use the automator.
-	return current_automator_value->getValueAtTime(time+block_size*sr);
+	updateAutomatorIndex(time+i/sr);
+	if(automator_index < automators.size()) return automators[automator_index]->getValue(time+i/sr);
+	else return value.fval;
 }
 
 void LavProperty::setFloatValue(float v) {
 	RC(v, fval);
+	automators.clear();
 	value.fval = v;
 	if(post_changed_callback) post_changed_callback();
 }
@@ -160,16 +191,14 @@ void LavProperty::setFloatRange(float a, float b) {
 
 //doubles...
 double LavProperty::getDoubleValue(int i) {
-	if(current_automator_value == nullptr && automators.size() == 0) return value.dval;
-	advanceAutomatorToTime(time+i*sr);
-	//If we still don't have an automator, fval.
-	if(current_automator_value == nullptr) return value.dval;
-	//otherwise, we use the automator.
-	return current_automator_value->getValueAtTime(time+block_size*sr);
+	updateAutomatorIndex(time+i/sr);
+	if(automator_index < automators.size()) return automators[automator_index]->getValue(time+i/sr);
+	else return value.fval;
 }
 
 void LavProperty::setDoubleValue(double v) {
 	RC(v, dval);
+	automators.clear();
 	value.dval = v;
 	if(post_changed_callback) post_changed_callback();
 }
@@ -362,19 +391,25 @@ void LavProperty::setPostChangedCallback(std::function<void(void)> cb) {
 }
 
 bool LavProperty::needsARate() {
-	return automators.empty()== false || current_automator_value != nullptr;
+	return automators.empty()== false;
 }
 
 void LavProperty::tick() {
-	//We know this is safe because nothing can read past the block.
-	if(type == Lav_PROPERTYTYPE_FLOAT) {
-		value.fval = getFloatValue(block_size-1);
-	}
-	else if(type == Lav_PROPERTYTYPE_DOUBLE) {
-		value.dval = getDoubleValue(block_size-1);
-	}
 	//Time advances 
-	time += block_size*sr;
+	time += block_size/sr;
+	//If we have automators and the last automator is done, free all of them and clear the list.
+	//This both saves ram and reverts us to a k-rate parameter.
+	//Note: having automators means float and double, scheduleAutomator won't allow them on anything else.
+	if(automators.empty()==false) {
+		auto &a = *automators[automators.size()-1];
+		if(a.getScheduledTime()+a.getDuration() < time) {
+			if(type == Lav_PROPERTYTYPE_FLOAT) value.fval = a.getFinalValue();
+			else value.dval = a.getFinalValue();
+			for(auto i = automators.begin(); i != automators.end(); i++) delete *i;
+			automators.clear();
+			automator_index = 0;
+		}
+	}
 }
 
 bool LavProperty::getHasDynamicRange() {

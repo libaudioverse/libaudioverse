@@ -7,7 +7,7 @@ set_property( TARGET ${name} PROPERTY RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} "
 endforeach( OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES )
 set_property(TARGET ${name} PROPERTY RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/examples")
 endmacro()
-example(sine)
+example(automation)
 example(file)
 example(hrtf)
 example(3d)

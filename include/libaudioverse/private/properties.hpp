@@ -51,8 +51,8 @@ class LavProperty {
 	double getSr();
 	double getTime();
 
-	void advanceAutomatorToTime(double t);
-	void scheduleAutomator(LavAutomator* automator, double time);
+	void updateAutomatorIndex(double t);
+	void scheduleAutomator(LavAutomator* automator);
 
 	//yes, really. This is as uggly as it looks.
 	int getIntValue();
@@ -164,11 +164,9 @@ class LavProperty {
 
 	//These are for automation and node connections:
 	int block_size= 0;
+	unsigned int automator_index = 0;
 	double time = 0.0, sr = 0.0;
-	std::map<double, LavAutomator*> automators;
-	//We extract these from the map for efficiency.
-	LavAutomator* current_automator_value = nullptr;
-	double current_automator_key = 0.0;
+	std::vector<LavAutomator*> automators;
 };
 
 //helper methods to quickly make properties.

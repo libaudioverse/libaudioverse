@@ -25,7 +25,11 @@ void main() {
 	ERRCHECK(Lav_createSineNode(simulation, &node));
 	ERRCHECK(Lav_nodeSetFloatProperty(node, Lav_SINE_FREQUENCY, 0));
 	ERRCHECK(Lav_nodeConnectSimulation(node, 0));
-	ERRCHECK(Lav_nodeLinearRampToValue(node, Lav_SINE_FREQUENCY, 8.0, 1000.0));
+	ERRCHECK(Lav_nodeLinearRampToValue(node, Lav_NODE_MUL, 8.0, 0.05));
+	ERRCHECK(Lav_nodeLinearRampToValue(node, Lav_SINE_FREQUENCY, 2.0, 500.0));
+	ERRCHECK(Lav_nodeLinearRampToValue(node, Lav_SINE_FREQUENCY, 4.0, 300.0));
+	ERRCHECK(Lav_nodeLinearRampToValue(node, Lav_SINE_FREQUENCY, 6.0, 500.0));
+	ERRCHECK(Lav_nodeLinearRampToValue(node, Lav_SINE_FREQUENCY, 8.0, 100.0));
 	std::this_thread::sleep_for(std::chrono::milliseconds(10000));
 	Lav_shutdown();
 }
