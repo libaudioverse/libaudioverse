@@ -395,15 +395,24 @@ bool LavProperty::needsARate() {
 }
 
 void LavProperty::tick() {
-	//If we have automators, we use the value buffer:
-	should_use_value_buffer=automators.size()!=0;
-	if(should_use_value_buffer) {
+	if(type !=Lav_PROPERTYTYPE_FLOAT && type != Lav_PROPERTYTYPE_DOUBLE) return; //nothing to do for other types.
+	//Automator index can't ever go backward, so we can do this.
+	if(automator_index < automators.size()) {
+		should_use_value_buffer = true;
+		double last;
+		last=automators[automator_index]->getFinalValue(); //start this.
 		//We need to compute it.
 		for(int i = 0; i < block_size; i++) {
 			updateAutomatorIndex(time+i/sr);
-			if(automator_index != automators.size()) value_buffer[i]=automators[automator_index]->getValue(time+i/sr);
-			else value_buffer[i] = type==Lav_PROPERTYTYPE_FLOAT ? value.fval : value.dval;
+			if(automator_index != automators.size()) {
+				value_buffer[i]=automators[automator_index]->getValue(time+i/sr);
+				last = automators[automator_index]->getFinalValue();
+			}
+			else value_buffer[i] = last;
 		}
+	}
+	else {
+		std::fill(value_buffer, value_buffer+block_size, type == Lav_PROPERTYTYPE_FLOAT ? value.fval : value.dval);
 	}
 	//Time advances 
 	time += block_size/sr;
