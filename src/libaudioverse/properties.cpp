@@ -13,12 +13,14 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 LavProperty::LavProperty(int property_type): type(property_type) {}
 
 LavProperty::~LavProperty() {
+	if(value_buffer) LavFreeArray(value_buffer);
 }
 
 void LavProperty::associateNode(LavNode* node) {
 	this->node = node;
 	block_size=node->getSimulation()->getBlockSize();
 	sr = node->getSimulation()->getSr();
+	if(type==Lav_PROPERTYTYPE_FLOAT || type == Lav_PROPERTYTYPE_DOUBLE) value_buffer= LavAllocArray<double>(block_size);
 }
 
 void LavProperty::associateSimulation(std::shared_ptr<LavSimulation> simulation) {

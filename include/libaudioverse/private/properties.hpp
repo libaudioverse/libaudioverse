@@ -167,6 +167,7 @@ class LavProperty {
 	unsigned int automator_index = 0;
 	double time = 0.0, sr = 0.0;
 	std::vector<LavAutomator*> automators;
+	double* value_buffer = nullptr;
 };
 
 //helper methods to quickly make properties.
