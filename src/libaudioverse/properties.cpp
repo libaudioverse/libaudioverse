@@ -159,10 +159,7 @@ void LavProperty::setIntRange(int a, int b) {
 
 
 float LavProperty::getFloatValue(int i) {
-	updateAutomatorIndex(time+i/sr);
-	if(automator_index < automators.size()) return automators[automator_index]->getValue(time+i/sr);
-	//Note that fval doesn't "fix" itself until the next tick.
-	else if(automators.size() != 0) return automators[automators.size()-1]->getFinalValue();
+	if(should_use_value_buffer) return value_buffer[i];
 	else return value.fval;
 }
 
@@ -195,10 +192,8 @@ void LavProperty::setFloatRange(float a, float b) {
 
 //doubles...
 double LavProperty::getDoubleValue(int i) {
-	updateAutomatorIndex(time+i/sr);
-	if(automator_index < automators.size()) return automators[automator_index]->getValue(time+i/sr);
-	else if(automators.size()!=0) return automators[automators.size()-1]->getFinalValue();
-	else return value.fval;
+	if(should_use_value_buffer) return value_buffer[i];
+	else return value.dval;
 }
 
 void LavProperty::setDoubleValue(double v) {
@@ -400,6 +395,16 @@ bool LavProperty::needsARate() {
 }
 
 void LavProperty::tick() {
+	//If we have automators, we use the value buffer:
+	should_use_value_buffer=automators.size()!=0;
+	if(should_use_value_buffer) {
+		//We need to compute it.
+		for(int i = 0; i < block_size; i++) {
+			updateAutomatorIndex(time+i/sr);
+			if(automator_index != automators.size()) value_buffer[i]=automators[automator_index]->getValue(time+i/sr);
+			else value_buffer[i] = type==Lav_PROPERTYTYPE_FLOAT ? value.fval : value.dval;
+		}
+	}
 	//Time advances 
 	time += block_size/sr;
 	//If we have automators and the last automator is done, free all of them and clear the list.

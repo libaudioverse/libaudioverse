@@ -81,6 +81,7 @@ void LavNode::tick() {
 	last_processed = simulation->getTickCount();
 	zeroOutputBuffers(); //we always do this because sometimes we're not going to actually do anything else.
 	if(getState() == Lav_NODESTATE_PAUSED) return; //nothing to do, for we are paused.
+	tickProperties();
 	willProcessParents();
 	zeroInputBuffers();
 	//tick all alive parents, collecting their outputs onto ours.
@@ -118,10 +119,6 @@ void LavNode::tick() {
 			scalarAdditionKernel(block_size, addProp.getFloatValue(), outputs[i], outputs[i]);
 		}
 	}
-	//tick properties, bringing them in line for this block.
-	//This advances their time. If we do it first, properties get ahead by a block.
-	//Note that changing how automators works may necessitate having properties tick first in future.
-	tickProperties();
 	is_processing = false;
 }
 
@@ -310,6 +307,7 @@ void LavSubgraphNode::tick() {
 	if(last_processed== simulation->getTickCount()) return;
 	last_processed=simulation->getTickCount();
 	if(getState() == Lav_NODESTATE_PAUSED) return;
+	tickProperties();
 	willProcessParents();
 	if(subgraph_output == nullptr) return;
 	subgraph_output->tick();
@@ -339,7 +337,6 @@ void LavSubgraphNode::tick() {
 			scalarAdditionKernel(block_size, addProp.getFloatValue(), outputs[i], outputs[i]);
 		}
 	}
-	tickProperties();
 }
 
 //begin public api
