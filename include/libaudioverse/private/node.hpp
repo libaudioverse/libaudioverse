@@ -44,6 +44,8 @@ class LavNode: public LavExternalObject { //enable_shared_from_this is for event
 	virtual void connect(int output, std::shared_ptr<LavNode> toNode, int input);
 	//make a connection from an output of this node to the simulation.
 	virtual void connectSimulation(int which);
+	//Connects an output to a property.
+	virtual void connectProperty(int output, std::shared_ptr<LavNode> node, int slot);
 	//called on an output, this function terminates all connections for which it is involved.
 	virtual void disconnect(int which);
 

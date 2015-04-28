@@ -207,6 +207,14 @@ void LavNode::connectSimulation(int which) {
 	makeConnection(outputConnection, inputConnection);
 }
 
+void LavNode::connectProperty(int output, std::shared_ptr<LavNode> node, int slot) {
+	auto prop = node->getProperty(slot);
+	auto conn = prop.getInputConnection();
+	if(conn ==nullptr) throw LavErrorException(Lav_ERROR_CANNOT_CONNECT_TO_PROPERTY);
+	auto outputConn =getOutputConnection(output);
+	makeConnection(outputConn, conn);
+}
+
 void LavNode::disconnect(int which) {
 	auto o =getOutputConnection(which);
 	o->clear();

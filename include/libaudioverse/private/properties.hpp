@@ -52,6 +52,7 @@ class LavProperty {
 	void setReadOnly(bool what);
 	double getSr();
 	double getTime();
+	std::shared_ptr<LavInputConnection> getInputConnection();
 
 	void updateAutomatorIndex(double t);
 	void scheduleAutomator(LavAutomator* automator);
@@ -172,7 +173,7 @@ class LavProperty {
 	double* value_buffer = nullptr;
 	bool should_use_value_buffer = false;
 	float* node_buffer=nullptr; //temporary place for putting node outputs.
-	LavInputConnection* incoming_nodes = nullptr; //The nodes connected to this property. Pointer to break an include cycle.
+	std::shared_ptr<LavInputConnection> incoming_nodes = nullptr; //The nodes connected to this property. Pointer to break an include cycle.
 };
 
 //helper methods to quickly make properties.

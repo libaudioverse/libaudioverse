@@ -14,7 +14,6 @@ LavProperty::LavProperty(int property_type): type(property_type) {}
 
 LavProperty::~LavProperty() {
 	if(value_buffer) LavFreeArray(value_buffer);
-	if(incoming_nodes) delete incoming_nodes;
 }
 
 void LavProperty::associateNode(LavNode* node) {
@@ -24,7 +23,7 @@ void LavProperty::associateNode(LavNode* node) {
 	if(type==Lav_PROPERTYTYPE_FLOAT || type == Lav_PROPERTYTYPE_DOUBLE) {
 		value_buffer= LavAllocArray<double>(block_size);
 		node_buffer = LavAllocArray<float>(block_size);
-		incoming_nodes=new LavInputConnection(node->getSimulation(), nullptr, 0, 1);
+		incoming_nodes=std::make_shared<LavInputConnection>(node->getSimulation(), nullptr, 0, 1);
 	}
 }
 
@@ -76,6 +75,10 @@ double LavProperty::getSr() {
 
 double LavProperty::getTime() {
 	return time;
+}
+
+std::shared_ptr<LavInputConnection> LavProperty::getInputConnection() {
+	return incoming_nodes;
 }
 
 void LavProperty::updateAutomatorIndex(double t) {
