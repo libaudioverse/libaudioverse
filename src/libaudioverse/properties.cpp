@@ -421,6 +421,11 @@ void LavProperty::tick() {
 	}
 	//We might have nodes:
 	if(incoming_nodes->getCount()) {
+		//If should_use_value_buffer is false, we haven't set it to fval or dval yet.
+		if(should_use_value_buffer== false) {
+			double needed = type == Lav_PROPERTYTYPE_FLOAT ? value.fval : value.dval;
+			std::fill(value_buffer, value_buffer+block_size, needed);
+		}
 		memset(node_buffer, 0, block_size*sizeof(float));
 		incoming_nodes->addNodeless(&node_buffer, true); //downmix to mono.
 		for(int i = 0; i < block_size; i++) value_buffer[i]+=node_buffer[i];
