@@ -17,7 +17,7 @@ def audio_callback(obj):
 def out_callback(obj):
 	p.feed(len(stereo), stereo)
 
-p.threshold = 0.1
+p.threshold.value = 0.1
 p.audio_event = audio_callback
 p.out_event = out_callback
 

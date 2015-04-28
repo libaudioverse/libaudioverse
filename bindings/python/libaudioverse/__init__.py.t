@@ -323,8 +323,16 @@ class LibaudioverseProperty(object):
 		return self._getter(self._node, self._slot)
 
 	@value.setter
-	def set_value(self, val):
+	def value(self, val):
 		return self._setter(self._node, self._slot, val)
+
+class BooleanProperty(LibaudioverseProperty):
+	def __init__(self, node, slot):
+		super(BooleanProperty, self).__init__(node = node, slot = slot, getter =_lav.node_get_int_property, setter = _lav.node_set_int_property)
+
+	@LibaudioverseProperty.value.getter
+	def value(self):
+		return bool(self._getter(self._node, self._slot))
 
 class IntProperty(LibaudioverseProperty):
 	"""Proxy to an integer or enumeration property."""
@@ -341,9 +349,9 @@ class IntProperty(LibaudioverseProperty):
 		return v
 
 	@value.setter
-	def set_value(self, v):
+	def value(self, val):
 		if isinstance(val, enum.IntEnum):
-			if not isintstance(v, self.enum):
+			if not isinstance(val, self.enum):
 				raise valueError('Attemptn to use wrong enum to set property. Expected instance of {}'.format(self.enum.__class__))
 			val = val.value
 		_lav.node_set_int_property(self._node, self._slot, val)
@@ -382,27 +390,27 @@ class BufferProperty(LibaudioverseProperty):
 		return _resurrect(_lav.node_get_buffer_property(self._node, self._slot))
 
 	@value.setter
-	def setValue(self, val):
+	def value(self, val):
 		if val is None or isinstance(val, Buffer):
 			_lav.node_set_buffer_property(self._node, self._slot, val)
 		else:
 			raise ValueError("Expected a Buffer or None.")
 
 class VectorProperty(LibaudioverseProperty):
-	def __init__(self, node, slot, getter, setter, length_limit):
+	def __init__(self, node, slot, getter, setter, length):
 		super(VectorProperty, self).__init__(node = node, slot = slot, getter = getter, setter =setter)
 		self._length = length
 
 	#Override setter:
 	@LibaudioverseProperty.value.setter
-	def set_value(self, val):
-		if not isinstance(val, collections.sized):
+	def value(self, val):
+		if not isinstance(val, collections.Sized):
 			raise ValueError("Expected a collections.sized subclass")
 		if len(val) != self._length:
 			raise ValueError("Expected a {}-element list".format(self._length))
-		self.setter(self._node, self._slot, *val)
+		self._setter(self._node, self._slot, *val)
 
-class Float3Properety(VectorProperty):
+class Float3Property(VectorProperty):
 	def __init__(self, node, slot):
 		super(Float3Property, self).__init__(node, slot, getter =_lav.node_get_float3_property, setter = _lav.node_set_float3_property, length = 3)
 
@@ -431,7 +439,7 @@ class ArrayProperty(LibaudioverseProperty):
 		return tuple(accum)
 
 	@value.setter
-	def set_value(self, val):
+	def value(self, val):
 		self._replacer(self._node, self._slot, len(val), *val)
 
 class IntArrayProperty(ArrayProperty):

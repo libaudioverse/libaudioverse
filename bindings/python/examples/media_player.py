@@ -34,15 +34,15 @@ while True:
 		if command[0] == 'quit':
 			break
 		elif command[0] == 'play':
-			filenode.state= libaudioverse.NodeStates.playing
+			filenode.state.value = libaudioverse.NodeStates.playing
 		elif command[0] == 'pause':
-			filenode.state = libaudioverse.NodeStates.paused
+			filenode.state.value = libaudioverse.NodeStates.paused
 		elif command[0] == 'seek':
 			to = float(command[1])
-			filenode.position = to
+			filenode.position.value = to
 		elif command[0] == 'pitch_bend':
 			to = float(command[1])
-			filenode.pitch_bend = to
+			filenode.pitch_bend.value = to
 	except Exception as e:
 		print "Libaudioverse error.  Unrecognized command, or invalid syntax."
 		print commands

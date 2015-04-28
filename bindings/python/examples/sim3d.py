@@ -11,10 +11,10 @@ filepath = raw_input()
 n = libaudioverse.BufferNode(sim)
 b = libaudioverse.Buffer(sim)
 b.load_from_file(filepath)
-n.buffer = b
+n.buffer.value = b
 n.connect(0, source, 0)
 
-n.looping = True
+n.looping.value = True
 
 world.connect_simulation(0)
 
@@ -29,6 +29,6 @@ while True:
 	if not isinstance(vect, collections.Sized) or len(vect) != 3:
 		print "Must evaluate to a 3-tuple.  Try again"
 		continue
-	source.position = vect
+	source.position.value = vect
 
 libaudioverse.shutdown()

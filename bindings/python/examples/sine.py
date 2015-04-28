@@ -9,7 +9,7 @@ sim = libaudioverse.Simulation(device_index = -1)
 #make a sine node.
 sine_node = libaudioverse.SineNode(sim)
 
-sine_node.frequency = 440
+sine_node.frequency.value = 440
 
 sine_node.connect_simulation(0)
 

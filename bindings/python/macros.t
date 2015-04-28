@@ -4,12 +4,12 @@
 	def {{prop['name']}}(self):
 {%if prop['type'] == 'int'%}
 {%if 'value_enum' in prop%}
-			return IntProperty(node = self, slot = _libaudioverse.{{enumerant}}, enum = {{prop['value_enum']|without_lav|underscores_to_camelcase(True)}})
+		return IntProperty(node = self, slot = _libaudioverse.{{enumerant}}, enum = {{prop['value_enum']|without_lav|underscores_to_camelcase(True)}})
 {%else%}
-			return IntProperty(node = self, slot = _libaudioverse.{{enumerant}})
+		return IntProperty(node = self, slot = _libaudioverse.{{enumerant}})
 {%endif%}
 {%else%}
-			return {{prop['type']|underscores_to_camelcase(True)}}Property(node=self, slot = _libaudioverse.{{enumerant}})
+		return {{prop['type']|underscores_to_camelcase(True)}}Property(node=self, slot = _libaudioverse.{{enumerant}})
 {%endif%}
 {%endmacro%}
 

@@ -13,8 +13,8 @@ ringmod_node.set_processing_callback(ringmod)
 
 w1=libaudioverse.SineNode(sim)
 w2=libaudioverse.SineNode(sim)
-w1.frequency = 30
-w2.frequency = 300
+w1.frequency.value = 30
+w2.frequency.value = 300
 w1.connect(0, ringmod_node, 0)
 w2.connect(0, ringmod_node, 1)
 

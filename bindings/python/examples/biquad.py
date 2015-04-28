@@ -17,28 +17,28 @@ bq.connect_simulation(0)
 print "Sweeping lowpass from 0.0 hz to 10000 hz over", time_per_demo, "seconds:"
 resolution = 10
 for i in xrange(10000/resolution):
-	bq.frequency = i*resolution
+	bq.frequency.value = i*resolution
 	time.sleep(time_per_demo/(10000/resolution))
 
 print "Sweeping Highpass from 0 to 10000 over", time_per_demo, "seconds:"
-bq.filter_type = libaudioverse.BiquadTypes.highpass
+bq.filter_type.value = libaudioverse.BiquadTypes.highpass
 for i in xrange(10000/resolution):
-	bq.frequency = i
+	bq.frequency.value = i
 	time.sleep(time_per_demo/(10000/resolution))
 
 print "Sweeping bandpass from 2000 to 12000 with q=1 over", time_per_demo, "seconds:"
-bq.filter_type = libaudioverse.BiquadTypes.bandpass
-bq.q = 1
+bq.filter_type.value = libaudioverse.BiquadTypes.bandpass
+bq.q.value = 1
 for i in xrange(10000/resolution):
-	bq.frequency = 2000+i*resolution
+	bq.frequency.value = 2000+i*resolution
 	time.sleep(time_per_demo/(10000/resolution))
 
 print "Sweeping peaking filter from 2000 to 22000 with q=3 and dbgain=-36 over", time_per_demo, "seconds"
-bq.filter_type = libaudioverse.BiquadTypes.peaking
-bq.q = 3
-bq.dbgain = -36
+bq.filter_type.value = libaudioverse.BiquadTypes.peaking
+bq.q.value = 3
+bq.dbgain.value = -36
 for i in xrange(10000/resolution):
-	bq.frequency = 2000+i*resolution*2
+	bq.frequency.value = 2000+i*resolution*2
 	time.sleep(time_per_demo/(10000/resolution))
 
 

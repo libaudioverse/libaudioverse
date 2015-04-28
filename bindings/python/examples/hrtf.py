@@ -9,7 +9,7 @@ print "Enter a file path."
 path = raw_input()
 path = os.path.abspath(path)
 fnode = libaudioverse.FileNode(sim, path)
-fnode.looping = True
+fnode.looping.value = True
 panner = libaudioverse.HrtfNode(sim, "default")
 fnode.connect(0, panner, 0)
 panner.connect_simulation(0)
@@ -23,7 +23,7 @@ while True:
 	if command == 'quit':
 		break
 	az, elev = eval(command)
-	panner.azimuth = az
-	panner.elevation = elev
+	panner.azimuth.value = az
+	panner.elevation.value = elev
 
 libaudioverse.shutdown()

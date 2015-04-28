@@ -19,8 +19,8 @@ w2.connect(0, merger, 1)
 merger.connect(0, listener, 0)
 
 #settings for binaural beats: 300 and 305.
-w1.frequency = 300
-w2.frequency = 305
+w1.frequency.value = 300
+w2.frequency.value = 305
 
 #the queue and callback for recording.
 audio_queue = Queue.Queue()
@@ -33,7 +33,6 @@ listener.set_listening_callback(callback)
 print "beginning synthesis and playing for 5 seconds..."
 listener.connect_simulation(0)
 time.sleep(5.0)
-sim.output_node= None
 libaudioverse.shutdown()
 
 print "Writing audio data to out.wav in the current directory:"
