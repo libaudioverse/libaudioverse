@@ -373,6 +373,15 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeConnectSimulation(LavHandle nodeHandle, int
 	PUB_END
 }
 
+Lav_PUBLIC_FUNCTION LavError Lav_nodeConnectProperty(LavHandle nodeHandle, int output, LavHandle otherHandle, int slot) {
+	PUB_BEGIN
+	auto n = incomingObject<LavNode>(nodeHandle);
+	auto o = incomingObject<LavNode>(otherHandle);
+	LOCK(*n);
+	n->connectProperty(output, o, slot);
+	PUB_END
+}
+
 Lav_PUBLIC_FUNCTION LavError Lav_nodeDisconnect(LavHandle nodeHandle, int output) {
 	PUB_BEGIN
 	auto node = incomingObject<LavNode>(nodeHandle);

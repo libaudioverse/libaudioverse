@@ -230,6 +230,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeGetSimulation(LavHandle handle, LavHandle* 
 Lav_PUBLIC_FUNCTION LavError Lav_nodeConnect(LavHandle nodeHandle, int output, LavHandle destHandle, int input);
 /**Connect the specified output to the simulation.*/
 Lav_PUBLIC_FUNCTION LavError Lav_nodeConnectSimulation(LavHandle nodeHandle, int output);
+/**Connect a node's output to a properety of another node.*/
+Lav_PUBLIC_FUNCTION LavError Lav_nodeConnectProperty(LavHandle nodeHandle, int output, LavHandle otherHandle, int slot);
 /**Kill all connections involving the output specified.*/
 Lav_PUBLIC_FUNCTION LavError Lav_nodeDisconnect(LavHandle nodeHandle, int output);
 
