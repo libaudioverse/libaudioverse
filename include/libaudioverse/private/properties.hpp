@@ -12,6 +12,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "../libaudioverse.h"
 #include "errors.hpp"
 
+
 union LavPropertyValue {
 	float fval; //Actual value is in automation_buffer, kept for range checking.
 	int ival;
@@ -28,6 +29,7 @@ class LavBuffer;
 class LavSimulation;
 class LavNode;
 class LavAutomator;
+class LavInputConnection;
 
 class LavProperty {
 	public:
@@ -169,6 +171,8 @@ class LavProperty {
 	std::vector<LavAutomator*> automators;
 	double* value_buffer = nullptr;
 	bool should_use_value_buffer = false;
+	float* node_buffer=nullptr; //temporary place for putting node outputs.
+	LavInputConnection* incoming_nodes = nullptr; //The nodes connected to this property. Pointer to break an include cycle.
 };
 
 //helper methods to quickly make properties.

@@ -15,8 +15,6 @@ These two classes implement the connection logic for Libaudioverse: the ability 
 
 Nodes have any number of input connections and any number of output connections; these are exposed publicly as simply inputs and outputs.  When nodes die, connections automatically break.
 
-Most importantly, in order to facilitate behavior from Webaudio, namely automatic handling of multichannel signals, these also function as an event channel from parents to children.
-
 Shared pointers geta bit funny here: the shared pointer that has to be used must come from and share ownership with a LavNode shared pointer.
 To that end, connection logic is contained in a function that favours neither class, and some functions (specifically those intended to be called on the other class and mostly/completely private to this module) use raw pointers to indicate which object they're talking about.*/
 

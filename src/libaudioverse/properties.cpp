@@ -14,13 +14,18 @@ LavProperty::LavProperty(int property_type): type(property_type) {}
 
 LavProperty::~LavProperty() {
 	if(value_buffer) LavFreeArray(value_buffer);
+	if(incoming_nodes) delete incoming_nodes;
 }
 
 void LavProperty::associateNode(LavNode* node) {
 	this->node = node;
 	block_size=node->getSimulation()->getBlockSize();
 	sr = node->getSimulation()->getSr();
-	if(type==Lav_PROPERTYTYPE_FLOAT || type == Lav_PROPERTYTYPE_DOUBLE) value_buffer= LavAllocArray<double>(block_size);
+	if(type==Lav_PROPERTYTYPE_FLOAT || type == Lav_PROPERTYTYPE_DOUBLE) {
+		value_buffer= LavAllocArray<double>(block_size);
+		node_buffer = LavAllocArray<float>(block_size);
+		incoming_nodes=new LavInputConnection(node->getSimulation(), nullptr, 0, 1);
+	}
 }
 
 void LavProperty::associateSimulation(std::shared_ptr<LavSimulation> simulation) {
@@ -414,10 +419,17 @@ void LavProperty::tick() {
 	else {
 		std::fill(value_buffer, value_buffer+block_size, type == Lav_PROPERTYTYPE_FLOAT ? value.fval : value.dval);
 	}
+	//We might have nodes:
+	if(incoming_nodes->getCount()) {
+		memset(node_buffer, 0, block_size*sizeof(float));
+		incoming_nodes->addNodeless(&node_buffer, true); //downmix to mono.
+		for(int i = 0; i < block_size; i++) value_buffer[i]+=node_buffer[i];
+		should_use_value_buffer =true;
+	}
 	//Time advances 
 	time += block_size/sr;
 	//If we have automators and the last automator is done, free all of them and clear the list.
-	//This both saves ram and reverts us to a k-rate parameter.
+	//This both saves ram and reverts us to a k-rate parameter if no nodes are connected.
 	//Note: having automators means float and double, scheduleAutomator won't allow them on anything else.
 	if(automators.empty()==false) {
 		auto &a = *automators[automators.size()-1];
