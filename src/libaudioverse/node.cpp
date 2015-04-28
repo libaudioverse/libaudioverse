@@ -276,6 +276,15 @@ std::set<std::shared_ptr<LavNode>> LavNode::getDependencies() {
 			retval.insert(std::static_pointer_cast<LavNode>(p->shared_from_this()));
 		}
 	}
+	for(auto p: properties) {
+		auto &prop = p.second;
+		auto conn = prop.getInputConnection();
+		if(conn) {
+			for(auto n: conn->getConnectedNodes()) {
+				retval.insert(std::static_pointer_cast<LavNode>(n->shared_from_this()));
+			}
+		}
+	}
 	return retval;
 }
 
