@@ -53,8 +53,8 @@ void LavBiquadNode::reconfigure() {
 	float q = getProperty(Lav_BIQUAD_Q).getFloatValue();
 	float dbgain= getProperty(Lav_BIQUAD_DBGAIN).getFloatValue();
 	for(auto &i: biquads) {
-		if(type != prev_type) i.clearHistories();
 		i.configureBiquad(type, sr, frequency, dbgain, q);
+		if(type != prev_type) i.clearHistories();
 	}
 	prev_type = type;
 }

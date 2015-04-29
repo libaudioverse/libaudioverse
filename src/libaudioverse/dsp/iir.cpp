@@ -18,14 +18,16 @@ void LavIIRFilter::configure(int newNumeratorLength, double* newNumerator, int n
 	if(newNumeratorLength == 0 || newDenominatorLength == 0) throw LavErrorException(Lav_ERROR_RANGE);
 	//we normalize by the first coefficient but throw it out; consequently, it must be nonzero.
 	if(newDenominator[0] == 0.0) throw LavErrorException(Lav_ERROR_RANGE);
-	if(history) delete[] history;
-	if(numerator) delete[] numerator;
-	if(denominator) delete[] denominator;
-	if(recursion_history) delete[] recursion_history;
-	history = new double[newNumeratorLength]();
-	recursion_history = new double[newDenominatorLength]();
-	numerator = new double[newNumeratorLength]();
-	denominator = new double[newDenominatorLength]();
+	if(numerator_length != newNumeratorLength || denominator_length != newDenominatorLength) { //only clear these if absolutely necessary.
+		if(history) delete[] history;
+		if(numerator) delete[] numerator;
+		if(denominator) delete[] denominator;
+		if(recursion_history) delete[] recursion_history;
+		history = new double[newNumeratorLength]();
+		recursion_history = new double[newDenominatorLength]();
+		numerator = new double[newNumeratorLength]();
+		denominator = new double[newDenominatorLength]();
+	}
 	std::copy(newNumerator, newNumerator+newNumeratorLength, numerator);
 	std::copy(newDenominator, newDenominator+newDenominatorLength, denominator);
 	numerator_length= newNumeratorLength;
@@ -144,6 +146,7 @@ void LavIIRFilter::configureBiquad(int type, double sr, double frequency, double
 		a0 = 1;
 		a1 = 0;
 		a2 = 0;
+		break;
 	};
 	double numerator[] = {1, b1/b0, b2/b0};
 	double denominator[] = {1, a1/a0, a2/a0};
