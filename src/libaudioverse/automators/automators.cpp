@@ -31,7 +31,7 @@ bool compareAutomators(LavAutomator *a, LavAutomator *b) {
 	return a->getScheduledTime() < b->getScheduledTime();
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_automationCancelChanges(LavHandle nodeHandle, int slot, double time) {
+Lav_PUBLIC_FUNCTION LavError Lav_automationCancelAutomators(LavHandle nodeHandle, int slot, double time) {
 	PUB_BEGIN
 	if(time < 0.0) throw LavErrorException(Lav_ERROR_RANGE);
 	auto n = incomingObject<LavNode>(nodeHandle);
