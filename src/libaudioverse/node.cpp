@@ -209,7 +209,7 @@ void LavNode::connectSimulation(int which) {
 
 void LavNode::connectProperty(int output, std::shared_ptr<LavNode> node, int slot) {
 	if(doesEdgePreserveAcyclicity(std::static_pointer_cast<LavNode>(this->shared_from_this()), node) == false) throw LavErrorException(Lav_ERROR_CAUSES_CYCLE);
-	auto prop = node->getProperty(slot);
+	auto &prop = node->getProperty(slot);
 	auto conn = prop.getInputConnection();
 	if(conn ==nullptr) throw LavErrorException(Lav_ERROR_CANNOT_CONNECT_TO_PROPERTY);
 	auto outputConn =getOutputConnection(output);
@@ -272,11 +272,11 @@ std::set<std::shared_ptr<LavNode>> LavNode::getDependencies() {
 	std::set<std::shared_ptr<LavNode>> retval;
 	for(int i = 0; i < getInputConnectionCount(); i++) {
 		auto j = getInputConnection(i)->getConnectedNodes();
-		for(auto p: j) {
+		for(auto &p: j) {
 			retval.insert(std::static_pointer_cast<LavNode>(p->shared_from_this()));
 		}
 	}
-	for(auto p: properties) {
+	for(auto &p: properties) {
 		auto &prop = p.second;
 		auto conn = prop.getInputConnection();
 		if(conn) {

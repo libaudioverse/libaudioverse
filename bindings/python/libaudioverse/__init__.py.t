@@ -477,6 +477,10 @@ class GenericNode(_HandleComparer):
 				self._state['output_connection_count'] = _lav.node_get_output_connection_count(self)
 				self._state['inputs'] =set()
 				self._state['outputs'] = collections.defaultdict(set)
+				#Holds (slot, other) tuples for disconnection logic with properties.
+				self._state['outputs_properties'] = collections.defaultdict(set)
+				#Holds (output, other) for property connections. Keys are property slot values.
+				self._state['inputs_properties'] = collections.defaultdict(set)
 				self._state['lock'] = threading.Lock()
 				self._state['properties'] = dict()
 {%for enumerant, prop in metadata['nodes']['Lav_OBJTYPE_GENERIC_NODE']['properties'].iteritems()%}
@@ -509,13 +513,24 @@ class GenericNode(_HandleComparer):
 	def connect(self, output, node, input):
 		with self._lock:
 			_lav.node_connect(self, output, node, input)
-			self._state['outputs'][output].add((output, weakref.ref))
+			self._state['outputs'][output].add((output, weakref.ref(self)))
 			node._state['inputs'].add((output, self))
 
 	def connect_simulation(self, output):
 		with self._lock:
 			_lav.node_connect_simulation(self, output)
 			self._state['simulation']._state['inputs'].add(self)
+
+	def connect_property(self, output, property):
+		"""Property is a subclass of LibaudioverseProperty.
+Example: n.connect_property(0, mySineNode.frequency).
+"""
+		other = property._node
+		slot = property._slot
+		with self._lock:
+			_lav.node_connect_property(self, output, other, slot)
+			self._state['outputs_properties'][output].add((slot, weakref.ref(other)))
+			other._state['inputs_properties'][slot].add((output, self))
 
 	def disconnect(self, output):
 		with self._lock:
@@ -525,6 +540,11 @@ class GenericNode(_HandleComparer):
 				obj=weak.get()
 				if obj is not None and (output, self) in obj._state['inputs']:
 					obj._state['inputs'].remove((output, self))
+			for i in self._state['outputs_properties'][output]:
+				slot, weak = i
+				obj = weak.get()
+				if obj is not None and (output, self) in obj._state['inputs_properties']:
+					obj._state['inputs_properties'].remove((output, self))
 			if self in self._state['simulation']._state['inputs']:
 				self._state['simulation']._state['inputs'].remove(self)
 

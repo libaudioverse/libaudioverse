@@ -14,6 +14,7 @@ LavProperty::LavProperty(int property_type): type(property_type) {}
 
 LavProperty::~LavProperty() {
 	if(value_buffer) LavFreeArray(value_buffer);
+	if(node_buffer) LavFreeArray(node_buffer);
 }
 
 void LavProperty::associateNode(LavNode* node) {
@@ -399,12 +400,14 @@ void LavProperty::setPostChangedCallback(std::function<void(void)> cb) {
 }
 
 bool LavProperty::needsARate() {
-	return automators.empty()== false;
+	//This is not reliable until the property is ticked, which shouldn't be a problem.
+	return should_use_value_buffer;
 }
 
 void LavProperty::tick() {
 	if(type !=Lav_PROPERTYTYPE_FLOAT && type != Lav_PROPERTYTYPE_DOUBLE) return; //nothing to do for other types.
-	//Automator index can't ever go backward, so we can do this.
+	//we don't know for sure if we want this yet, so reset it.
+	should_use_value_buffer = false;
 	if(automator_index < automators.size()) {
 		should_use_value_buffer = true;
 		double last;
@@ -418,9 +421,6 @@ void LavProperty::tick() {
 			}
 			else value_buffer[i] = last;
 		}
-	}
-	else {
-		std::fill(value_buffer, value_buffer+block_size, type == Lav_PROPERTYTYPE_FLOAT ? value.fval : value.dval);
 	}
 	//We might have nodes:
 	if(incoming_nodes->getCount()) {
