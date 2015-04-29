@@ -325,6 +325,8 @@ class LibaudioverseProperty(object):
 	@value.setter
 	def value(self, val):
 		return self._setter(self._node, self._slot, val)
+	def reset(self):
+		_lav.node_reset_property(self._node, self._slot)
 
 class BooleanProperty(LibaudioverseProperty):
 	def __init__(self, node, slot):
@@ -358,7 +360,8 @@ class IntProperty(LibaudioverseProperty):
 
 class AutomatedProperty(LibaudioverseProperty):
 	"""A property that supports automation and node connection."""
-	pass
+	def linear_ramp_to_value(self, time, value):
+		_lav.automation_linear_ramp_to_value(self._node, self._slot, time, value)
 
 class FloatProperty(AutomatedProperty):
 	"""Proxy to a float property."""
