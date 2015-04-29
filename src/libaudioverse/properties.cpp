@@ -128,13 +128,18 @@ void LavProperty::scheduleAutomator(LavAutomator* automator) {
 }
 
 void LavProperty::cancelAutomators(double time) {
+	if(type != Lav_PROPERTYTYPE_FLOAT && type != Lav_PROPERTYTYPE_DOUBLE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
+	double currentValue = type == Lav_PROPERTYTYPE_FLOAT ? getFloatValue(0) : getDoubleValue(0); //shold onto this.
 	time+=this->time;
 	auto b = automators.begin();
 	while(b != automators.end()) {
 		auto a = *b;
 		if(a->getScheduledTime() > time) break;
+		b++;
 	}
-	automators.erase(automators.begin(), b);
+	if(b != automators.end()) automators.erase(b, automators.end());
+	//If the automators vector is empty, we need to use the cached value.
+	if(automators.empty()) type==Lav_PROPERTYTYPE_FLOAT ? value.fval = currentValue : value.dval = currentValue;
 }
 
 bool LavProperty::isReadOnly() {

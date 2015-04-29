@@ -363,6 +363,10 @@ class AutomatedProperty(LibaudioverseProperty):
 	def linear_ramp_to_value(self, time, value):
 		_lav.automation_linear_ramp_to_value(self._node, self._slot, time, value)
 
+	def cancel_automators(self, time):
+		"""Cancel all automators scheduled to start after time."""
+		_lav.automation_cancel_automators(self._node, self._slot, time)
+
 class FloatProperty(AutomatedProperty):
 	"""Proxy to a float property."""
 
