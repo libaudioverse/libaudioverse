@@ -127,6 +127,16 @@ void LavProperty::scheduleAutomator(LavAutomator* automator) {
 	}
 }
 
+void LavProperty::cancelAutomators(double time) {
+	time+=this->time;
+	auto b = automators.begin();
+	while(b != automators.end()) {
+		auto a = *b;
+		if(a->getScheduledTime() > time) break;
+	}
+	automators.erase(automators.begin(), b);
+}
+
 bool LavProperty::isReadOnly() {
 	return read_only;
 }

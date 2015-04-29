@@ -298,6 +298,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeGetBufferProperty(LavHandle nodeHandle, int
 These apply only to float and double properties. Times are relative to "now" in node time, not simulation time.
 If setting up complex timelines, do it inside an atomic block.
 */
+//Clears all automation after time t.
+Lav_PUBLIC_FUNCTION LavError Lav_automationCancelChanges(LavHandle node, int slot, double time);
 //Linear ramp to value starting after the last event and ending at time t.
 Lav_PUBLIC_FUNCTION LavError Lav_automationLinearRampToValue(LavHandle nodeHandle, int slot, double time, double value);
 

@@ -56,7 +56,8 @@ class LavProperty {
 
 	void updateAutomatorIndex(double t);
 	void scheduleAutomator(LavAutomator* automator);
-
+	//Cancels all automation after time t. T is relative to the property's current time.
+	void cancelAutomators(double time);
 	//yes, really. This is as uggly as it looks.
 	int getIntValue();
 	void setIntValue(int v);

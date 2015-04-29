@@ -4,6 +4,9 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/private/automators.hpp>
 #include <libaudioverse/private/properties.hpp>
+#include <libaudioverse/private/node.hpp>
+#include <libaudioverse/private/memory.hpp>
+#include <libaudioverse/private/macros.hpp>
 
 LavAutomator::LavAutomator(LavProperty* p, double scheduledTime): property(p), scheduled_time(scheduledTime) {
 }
@@ -26,4 +29,14 @@ double LavAutomator::getScheduledTime() {
 
 bool compareAutomators(LavAutomator *a, LavAutomator *b) {
 	return a->getScheduledTime() < b->getScheduledTime();
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_automationCancelChanges(LavHandle nodeHandle, int slot, double time) {
+	PUB_BEGIN
+	if(time < 0.0) throw LavErrorException(Lav_ERROR_RANGE);
+	auto n = incomingObject<LavNode>(nodeHandle);
+	LOCK(*n);
+	auto &prop = n->getProperty(slot);
+	prop.cancelAutomators(time);
+	PUB_END
 }
