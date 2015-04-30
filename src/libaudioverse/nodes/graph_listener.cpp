@@ -29,7 +29,7 @@ class GraphListenerNode: public Node {
 };
 
 GraphListenerNode::GraphListenerNode(std::shared_ptr<Simulation> sim, unsigned int channels): Node(Lav_OBJTYPE_GRAPH_LISTENER_NODE, sim, channels, channels) {
-	outgoing_buffer = AllocArray<float>(channels*sim->getBlockSize());
+	outgoing_buffer = allocArray<float>(channels*sim->getBlockSize());
 	this->channels = channels;
 	appendInputConnection(0, channels);
 	appendOutputConnection(0, channels);
@@ -42,7 +42,7 @@ std::shared_ptr<Node> createGraphListenerNode(std::shared_ptr<Simulation> simula
 }
 
 GraphListenerNode::~GraphListenerNode() {
-	FreeArray(outgoing_buffer);
+	freeArray(outgoing_buffer);
 }
 
 void GraphListenerNode::process() {

@@ -34,13 +34,13 @@ class HrtfNode: public Node {
 HrtfNode::HrtfNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf): Node(Lav_OBJTYPE_HRTF_NODE, simulation, 1, 2) {
 	type = Lav_OBJTYPE_HRTF_NODE;
 	this->hrtf = hrtf;
-	left_response = AllocArray<float>(hrtf->getLength()*sizeof(float));
-	right_response = AllocArray<float>(hrtf->getLength()*sizeof(float));
+	left_response = allocArray<float>(hrtf->getLength()*sizeof(float));
+	right_response = allocArray<float>(hrtf->getLength()*sizeof(float));
 	//used for moving objects.
-	old_left_response = AllocArray<float>(hrtf->getLength());
-	old_right_response = AllocArray<float>(hrtf->getLength());
+	old_left_response = allocArray<float>(hrtf->getLength());
+	old_right_response = allocArray<float>(hrtf->getLength());
 	history_length = hrtf->getLength() + simulation->getBlockSize();
-	history = AllocArray<float>(history_length);
+	history = allocArray<float>(history_length);
 	hrtf->computeCoefficientsStereo(0.0f, 0.0f, left_response, right_response);
 	prev_azimuth = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
 	prev_elevation = getProperty(Lav_PANNER_ELEVATION).getFloatValue();
@@ -49,11 +49,11 @@ HrtfNode::HrtfNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfD
 }
 
 HrtfNode::~HrtfNode() {
-	FreeArray(history);
-	FreeArray(left_response);
-	FreeArray(right_response);
-	FreeArray(old_left_response);
-	FreeArray(old_right_response);
+	freeArray(history);
+	freeArray(left_response);
+	freeArray(right_response);
+	freeArray(old_left_response);
+	freeArray(old_right_response);
 }
 
 std::shared_ptr<Node>createHrtfNode(std::shared_ptr<Simulation>simulation, std::shared_ptr<HrtfData> hrtf) {

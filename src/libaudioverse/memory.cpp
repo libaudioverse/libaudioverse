@@ -53,7 +53,7 @@ int ExternalObject::getType() {
 	return type;
 }
 
-void FreeArray(void* ptr) {
+void freeArray(void* ptr) {
 	#if LIBAUDIOVERSE_MALLOC_ALIGNMENT == 1
 	free(ptr);
 	#else

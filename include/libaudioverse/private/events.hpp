@@ -52,4 +52,5 @@ class Event {
 	std::atomic<int> is_firing;
 	bool no_multifire = false;
 };
+
 }

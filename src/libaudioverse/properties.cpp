@@ -15,8 +15,8 @@ namespace libaudioverse_implementation {
 Property::Property(int property_type): type(property_type) {}
 
 Property::~Property() {
-	if(value_buffer) FreeArray(value_buffer);
-	if(node_buffer) FreeArray(node_buffer);
+	if(value_buffer) freeArray(value_buffer);
+	if(node_buffer) freeArray(node_buffer);
 }
 
 void Property::associateNode(Node* node) {
@@ -24,8 +24,8 @@ void Property::associateNode(Node* node) {
 	block_size=node->getSimulation()->getBlockSize();
 	sr = node->getSimulation()->getSr();
 	if(type==Lav_PROPERTYTYPE_FLOAT || type == Lav_PROPERTYTYPE_DOUBLE) {
-		value_buffer= AllocArray<double>(block_size);
-		node_buffer = AllocArray<float>(block_size);
+		value_buffer= allocArray<double>(block_size);
+		node_buffer = allocArray<float>(block_size);
 		incoming_nodes=std::make_shared<InputConnection>(node->getSimulation(), nullptr, 0, 1);
 	}
 }

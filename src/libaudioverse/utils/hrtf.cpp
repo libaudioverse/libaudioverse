@@ -38,11 +38,11 @@ void reverse_endianness(char* buffer, unsigned int count, unsigned int window) {
 static_assert(sizeof(float) == 4, "Sizeof float is not 4; cannot safely work with hrtfs");
 
 HrtfData::~HrtfData() {
-	if(temporary_buffer1) FreeArray(temporary_buffer1);
-	if(temporary_buffer2) FreeArray(temporary_buffer2);
+	if(temporary_buffer1) freeArray(temporary_buffer1);
+	if(temporary_buffer2) freeArray(temporary_buffer2);
 	if(hrirs == nullptr) return; //we never loaded one.
 	for(int i = 0; i < elev_count; i++) {
-		for(int j = 0; j < azimuth_counts[i]; j++) FreeArray(hrirs[i][j]);
+		for(int j = 0; j < azimuth_counts[i]; j++) freeArray(hrirs[i][j]);
 		delete[] hrirs[i];
 	}
 	delete[] hrirs;
@@ -134,7 +134,7 @@ void HrtfData::loadFromBuffer(unsigned int length, char* buffer, unsigned int fo
 
 	//the above gives us what amounts to a 2d array.  The first dimension represents elevation.  The second dimension represents azimuth going clockwise.
 	//fill it.
-	float* tempBuffer = AllocArray<float>(before_hrir_length);
+	float* tempBuffer = allocArray<float>(before_hrir_length);
 	int final_hrir_length = 0;
 	for(int elev = 0; elev < elev_count; elev++) {
 		for(int azimuth = 0; azimuth < azimuth_counts[elev]; azimuth++) {
@@ -145,12 +145,12 @@ void HrtfData::loadFromBuffer(unsigned int length, char* buffer, unsigned int fo
 	}
 	hrir_length = final_hrir_length;
 	samplerate = forSr;
-	FreeArray(tempBuffer);
+	freeArray(tempBuffer);
 
-	if(temporary_buffer1) FreeArray(temporary_buffer1);
-	if(temporary_buffer2) FreeArray(temporary_buffer2);
-	temporary_buffer1 = AllocArray<float>(hrir_length);
-	temporary_buffer2 = AllocArray<float>(hrir_length);
+	if(temporary_buffer1) freeArray(temporary_buffer1);
+	if(temporary_buffer2) freeArray(temporary_buffer2);
+	temporary_buffer1 = allocArray<float>(hrir_length);
+	temporary_buffer2 = allocArray<float>(hrir_length);
 }
 
 //a complete HRTF for stereo is two calls to this function.

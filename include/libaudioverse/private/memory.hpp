@@ -102,7 +102,7 @@ These return and free pointers to zero-initialized memory aligned on the appropr
 */
 
 template<class t>
-t* AllocArray(unsigned int size) {
+t* allocArray(unsigned int size) {
 	#if LIBAUDIOVERSE_MALLOC_ALIGNMENT == 1
 	return (t*)calloc(size*sizeof(t), 1);
 	#else
@@ -118,7 +118,7 @@ t* AllocArray(unsigned int size) {
 	#endif
 }
 
-void FreeArray(void* ptr);
+void freeArray(void* ptr);
 
 //custom deleter for smart pointer that guarantees thread safety.
 std::function<void(ExternalObject*)> ObjectDeleter(std::shared_ptr<Simulation> simulation);

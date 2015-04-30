@@ -25,9 +25,9 @@ Node(Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK_NODE, simulation, lines, lines) {
 	max_delay = maxDelay;
 	line_count = lines;
 	network = new FeedbackDelayNetwork(lines, maxDelay, simulation->getSr());
-	lastOutput = AllocArray<float>(lines);
-	nextInput = AllocArray<float>(lines);
-	gains = AllocArray<float>(lines);
+	lastOutput = allocArray<float>(lines);
+	nextInput = allocArray<float>(lines);
+	gains = allocArray<float>(lines);
 	for(int i = 0; i < lines; i++) gains[i] = 1.0f;
 	getProperty(Lav_FDN_MAX_DELAY).setFloatValue(maxDelay);
 	appendInputConnection(0, lines);
@@ -36,9 +36,9 @@ Node(Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK_NODE, simulation, lines, lines) {
 
 FeedbackDelayNetworkNode::~FeedbackDelayNetworkNode() {
 	delete network;
-	FreeArray(lastOutput);
-	FreeArray(nextInput);
-	FreeArray(gains);
+	freeArray(lastOutput);
+	freeArray(nextInput);
+	freeArray(gains);
 }
 
 std::shared_ptr<Node> createFeedbackDelayNetworkNode(std::shared_ptr<Simulation> simulation, float maxDelay, int lines) {

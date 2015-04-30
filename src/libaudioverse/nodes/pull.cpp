@@ -35,8 +35,8 @@ PullNode::PullNode(std::shared_ptr<Simulation> sim, unsigned int inputSr, unsign
 	input_sr = inputSr;
 	resampler = std::make_shared<Resampler>(sim->getBlockSize(), channels, inputSr, (int)sim->getSr());
 	this->channels = channels;
-	incoming_buffer = AllocArray<float>(channels*simulation->getBlockSize());
-	resampled_buffer = AllocArray<float>(channels*sim->getBlockSize());
+	incoming_buffer = allocArray<float>(channels*simulation->getBlockSize());
+	resampled_buffer = allocArray<float>(channels*sim->getBlockSize());
 	appendOutputConnection(0, channels);
 }
 
@@ -47,8 +47,8 @@ std::shared_ptr<Node> createPullNode(std::shared_ptr<Simulation> simulation, uns
 }
 
 PullNode::~PullNode() {
-	FreeArray(incoming_buffer);
-	FreeArray(resampled_buffer);
+	freeArray(incoming_buffer);
+	freeArray(resampled_buffer);
 }
 
 void PullNode::process() {

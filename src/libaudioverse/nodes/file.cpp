@@ -38,7 +38,7 @@ class FileNode: public Node {
 //todo: when objects support resizing their inputs and outputs, as they will inevitably support this, rewrite to use that functionality.
 FileNode::FileNode(std::shared_ptr<Simulation> simulation, const char* path, unsigned int channels): Node(Lav_OBJTYPE_FILE_NODE, simulation, 0, channels) {
 	file.open(path);
-	buffer = AllocArray<float>(file.getSampleCount());
+	buffer = allocArray<float>(file.getSampleCount());
 	file.readAll(buffer);
 	delta = file.getSr()/simulation->getSr();
 	getProperty(Lav_FILE_POSITION).setPostChangedCallback([this] () {seek();});
@@ -49,7 +49,7 @@ FileNode::FileNode(std::shared_ptr<Simulation> simulation, const char* path, uns
 }
 
 FileNode::~FileNode() {
-	FreeArray(buffer);
+	freeArray(buffer);
 }
 
 std::shared_ptr<Node> createFileNode(std::shared_ptr<Simulation> simulation, const char* path) {

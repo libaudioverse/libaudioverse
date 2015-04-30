@@ -39,8 +39,8 @@ PushNode::PushNode(std::shared_ptr<Simulation> sim, unsigned int inputSr, unsign
 	input_sr = inputSr;
 	resampler = std::make_shared<Resampler>(push_frames, channels, inputSr, (int)sim->getSr());
 	this->push_channels = channels;
-	workspace = AllocArray<float>(push_channels*simulation->getBlockSize());
-	push_buffer = AllocArray<float>(push_frames*channels);
+	workspace = allocArray<float>(push_channels*simulation->getBlockSize());
+	push_buffer = allocArray<float>(push_frames*channels);
 	appendOutputConnection(0, channels);
 }
 
@@ -51,8 +51,8 @@ std::shared_ptr<Node> createPushNode(std::shared_ptr<Simulation> simulation, uns
 }
 
 PushNode::~PushNode() {
-	FreeArray(workspace);
-	FreeArray(push_buffer);
+	freeArray(workspace);
+	freeArray(push_buffer);
 }
 
 void PushNode::process() {

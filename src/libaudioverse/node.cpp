@@ -64,10 +64,10 @@ Node::Node(int type, std::shared_ptr<Simulation> simulation, unsigned int numInp
 
 Node::~Node() {
 	for(auto i: output_buffers) {
-		FreeArray(i);
+		freeArray(i);
 	}
 	for(auto i: input_buffers) {
-		FreeArray(i);
+		freeArray(i);
 	}
 }
 
@@ -251,21 +251,21 @@ void Node::reset() {
 //protected resize function.
 void Node::resize(int newInputCount, int newOutputCount) {
 	int oldInputCount = input_buffers.size();
-	for(int i = oldInputCount-1; i >= newInputCount; i--) FreeArray(input_buffers[i]);
+	for(int i = oldInputCount-1; i >= newInputCount; i--) freeArray(input_buffers[i]);
 	input_buffers.resize(newInputCount, nullptr);
-	for(int i = oldInputCount; i < newInputCount; i++) input_buffers[i] = AllocArray<float>(simulation->getBlockSize());
+	for(int i = oldInputCount; i < newInputCount; i++) input_buffers[i] = allocArray<float>(simulation->getBlockSize());
 
 	int oldOutputCount = output_buffers.size();
 	if(newOutputCount < oldOutputCount) { //we need to free some arrays.
 		for(auto i = newOutputCount; i < oldOutputCount; i++) {
-			FreeArray(output_buffers[i]);
+			freeArray(output_buffers[i]);
 		}
 	}
 	//do the resize.
 	output_buffers.resize(newOutputCount, nullptr);
 	if(newOutputCount > oldOutputCount) { //we need to allocate some more arrays.
 		for(auto i = oldOutputCount; i < newOutputCount; i++) {
-			output_buffers[i] = AllocArray<float>(simulation->getBlockSize());
+			output_buffers[i] = allocArray<float>(simulation->getBlockSize());
 		}
 	}
 }

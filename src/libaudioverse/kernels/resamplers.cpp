@@ -16,7 +16,7 @@ namespace libaudioverse_implementation {
 
 void staticResamplerKernel(int inputSr, int outputSr, int channels, int frames, float* data, int *outLength, float** outData) {
 	if(inputSr== outputSr) { //copy
-		float* o = AllocArray<float>(channels*frames);
+		float* o = allocArray<float>(channels*frames);
 		std::copy(data, data+channels*frames, o);
 		*outLength = frames;
 		*outData = o;
@@ -33,7 +33,7 @@ void staticResamplerKernel(int inputSr, int outputSr, int channels, int frames, 
 	//Instead of reallocating, we waste a small amount of ram here.
 	//this is input rate/output rate, so multiply by denom.
 	int size=frames*channels*denom/numer+channels*200;
-	float* o = AllocArray<float>(size);
+	float* o = allocArray<float>(size);
 	//uframes is because speex needs an address to an unsigned int.
 	unsigned int written = 0, uframes= frames;
 	speex_resampler_process_interleaved_float(resampler, data, &uframes, o, &written);
