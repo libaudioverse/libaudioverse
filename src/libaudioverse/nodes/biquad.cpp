@@ -30,12 +30,6 @@ LavBiquadNode::LavBiquadNode(std::shared_ptr<LavSimulation> sim, unsigned int ch
 	biquads.resize(channels);
 	//configure all of them.
 	prev_type = getProperty(Lav_BIQUAD_FILTER_TYPE).getIntValue();
-	reconfigure();
-	//we can grab the properties dictionary ourselves, if we want.
-	for(auto i = properties.begin(); i != properties.end(); i++) {
-		if(i->first < STANDARD_PROPERTIES_BEGIN) continue; //this is a standard property.
-		properties[i->first].setPostChangedCallback([this]() {reconfigure();});
-	}
 	appendInputConnection(0, channels);
 	appendOutputConnection(0, channels);
 }
@@ -60,6 +54,7 @@ void LavBiquadNode::reconfigure() {
 }
 
 void LavBiquadNode::process() {
+	reconfigure(); //always reconfigure the biquad, so that properties are k-rate.
 	//doing this this way may make the algorithm morecache- friendly on some compilers/systems.
 	//It also avoids a large number of extraneous lookups in the vctor.
 	for(int j = 0; j < biquads.size(); j++) {
