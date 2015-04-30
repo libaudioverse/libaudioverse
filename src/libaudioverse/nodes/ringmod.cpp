@@ -16,25 +16,25 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <utility>
 #include <vector>
 
-class LavRingmodNode: public LavNode {
+class RingmodNode: public Node {
 	public:
-	LavRingmodNode(std::shared_ptr<LavSimulation> sim);
+	RingmodNode(std::shared_ptr<Simulation> sim);
 	void process();
 };
 
-LavRingmodNode::LavRingmodNode(std::shared_ptr<LavSimulation> sim): LavNode(Lav_OBJTYPE_RINGMOD_NODE, sim, 2, 1) {
+RingmodNode::RingmodNode(std::shared_ptr<Simulation> sim): Node(Lav_OBJTYPE_RINGMOD_NODE, sim, 2, 1) {
 	appendInputConnection(0, 1);
 	appendInputConnection(1, 1);
 	appendOutputConnection(0, 1);
 }
 
-std::shared_ptr<LavNode> createRingmodNode(std::shared_ptr<LavSimulation> simulation) {
-	auto retval = std::shared_ptr<LavRingmodNode>(new LavRingmodNode(simulation), LavObjectDeleter(simulation));
+std::shared_ptr<Node> createRingmodNode(std::shared_ptr<Simulation> simulation) {
+	auto retval = std::shared_ptr<RingmodNode>(new RingmodNode(simulation), ObjectDeleter(simulation));
 	simulation->associateNode(retval);
 	return retval;
 }
 
-void LavRingmodNode::process() {
+void RingmodNode::process() {
 	multiplicationKernel(block_size, input_buffers[0], input_buffers[1], output_buffers[0]);
 }
 
@@ -42,8 +42,8 @@ void LavRingmodNode::process() {
 
 Lav_PUBLIC_FUNCTION LavError Lav_createRingmodNode(LavHandle simulationHandle, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<LavSimulation>(simulationHandle);
+	auto simulation = incomingObject<Simulation>(simulationHandle);
 	LOCK(*simulation);
-	*destination = outgoingObject<LavNode>(createRingmodNode(simulation));
+	*destination = outgoingObject<Node>(createRingmodNode(simulation));
 	PUB_END
 }

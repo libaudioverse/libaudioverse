@@ -16,35 +16,35 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <limits>
 
 /**Note.  We can't use floats. There's some instability with the accumulator model that was here before that shows up as audible artifacts.*/
-class LavSquareNode: public LavNode {
+class SquareNode: public Node {
 	public:
-	LavSquareNode(std::shared_ptr<LavSimulation> simulation);
+	SquareNode(std::shared_ptr<Simulation> simulation);
 	void recomputeCounters();
 	virtual void process();
 	int wave_length, on_for, counter = 0;
 };
 
-LavSquareNode::LavSquareNode(std::shared_ptr<LavSimulation> simulation): LavNode(Lav_OBJTYPE_SQUARE_NODE, simulation, 0, 1) {
+SquareNode::SquareNode(std::shared_ptr<Simulation> simulation): Node(Lav_OBJTYPE_SQUARE_NODE, simulation, 0, 1) {
 	getProperty(Lav_SQUARE_FREQUENCY).setPostChangedCallback([=] (){recomputeCounters();});
 	getProperty(Lav_SQUARE_DUTY_CYCLE).setPostChangedCallback([=] (){recomputeCounters();});
 	recomputeCounters();
 	appendOutputConnection(0, 1);
 }
 
-std::shared_ptr<LavNode> createSquareNode(std::shared_ptr<LavSimulation> simulation) {
-	std::shared_ptr<LavSquareNode> retval = std::shared_ptr<LavSquareNode>(new LavSquareNode(simulation), LavObjectDeleter(simulation));
+std::shared_ptr<Node> createSquareNode(std::shared_ptr<Simulation> simulation) {
+	std::shared_ptr<SquareNode> retval = std::shared_ptr<SquareNode>(new SquareNode(simulation), ObjectDeleter(simulation));
 	simulation->associateNode(retval);
 	return retval;
 }
 
-void LavSquareNode::recomputeCounters() {
+void SquareNode::recomputeCounters() {
 	float freq= getProperty(Lav_SQUARE_FREQUENCY).getFloatValue();
 	float dutyCycle = getProperty(Lav_SQUARE_DUTY_CYCLE).getFloatValue();
 	wave_length = (int)(simulation->getSr()/freq);
 	on_for=(int)(wave_length*dutyCycle);
 }
 
-void LavSquareNode::process() {
+void SquareNode::process() {
 	for(int i= 0; i < block_size; i++) {
 		output_buffers[0][i] = counter < on_for ? 1.0f : 0.0f;
 		counter++;
@@ -56,9 +56,9 @@ void LavSquareNode::process() {
 
 Lav_PUBLIC_FUNCTION LavError Lav_createSquareNode(LavHandle simulationHandle, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<LavSimulation>(simulationHandle);
+	auto simulation = incomingObject<Simulation>(simulationHandle);
 	LOCK(*simulation);
 	auto retval = createSquareNode(simulation);
-	*destination = outgoingObject<LavNode>(retval);
+	*destination = outgoingObject<Node>(retval);
 	PUB_END
 }

@@ -8,21 +8,21 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <atomic>
 #include <functional>
 
-class LavSimulation;
-class LavNode;
+class Simulation;
+class Node;
 
-class LavEvent {
+class Event {
 	public:
-	LavEvent();
-	LavEvent(const LavEvent& other);
-	LavEvent& operator=(const LavEvent other);
-	void setHandler(std::function<void(LavNode*, void*)> cb);
+	Event();
+	Event(const Event& other);
+	Event& operator=(const Event other);
+	void setHandler(std::function<void(Node*, void*)> cb);
 	//these two are for when using externally. Allows us to make a query of what the handler is for c api.
 	void setExternalHandler(LavEventCallback cb);
 	LavEventCallback getExternalHandler();
 	void fire();
-	void associateSimulation(std::shared_ptr<LavSimulation> sim);
-	void associateNode(LavNode* node);
+	void associateSimulation(std::shared_ptr<Simulation> sim);
+	void associateNode(Node* node);
 	const char* getName();
 	void setName(const char* n);
 	void* getUserData();
@@ -30,7 +30,7 @@ class LavEvent {
 	bool getNoMultifire();
 	void setNoMultifire(bool what);
 	//this has to be here.
-	friend void swap(LavEvent &a, LavEvent &b) {
+	friend void swap(Event &a, Event &b) {
 		using std::swap;
 		swap(a.associated_simulation, b.associated_simulation);
 		swap(a.handler, b.handler);
@@ -41,11 +41,11 @@ class LavEvent {
 		//ignore isFiring.
 	};
 	private:
-	std::shared_ptr<LavSimulation> associated_simulation = nullptr;
+	std::shared_ptr<Simulation> associated_simulation = nullptr;
 	LavEventCallback external_handler = nullptr;
-	std::function<void(LavNode*, void*)> handler;
+	std::function<void(Node*, void*)> handler;
 	std::string name;
-	LavNode* associated_node = nullptr;
+	Node* associated_node = nullptr;
 	void* user_data = nullptr;
 	std::atomic<int> is_firing;
 	bool no_multifire = false;

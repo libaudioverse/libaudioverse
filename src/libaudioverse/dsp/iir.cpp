@@ -14,7 +14,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdio.h>
 #include <libaudioverse/private/errors.hpp>
 
-void LavIIRFilter::configure(int newNumeratorLength, double* newNumerator, int newDenominatorLength, double* newDenominator) {
+void IIRFilter::configure(int newNumeratorLength, double* newNumerator, int newDenominatorLength, double* newDenominator) {
 	if(newNumeratorLength == 0 || newDenominatorLength == 0) throw LavErrorException(Lav_ERROR_RANGE);
 	//we normalize by the first coefficient but throw it out; consequently, it must be nonzero.
 	if(newDenominator[0] == 0.0) throw LavErrorException(Lav_ERROR_RANGE);
@@ -35,16 +35,16 @@ void LavIIRFilter::configure(int newNumeratorLength, double* newNumerator, int n
 	for(int i = 0; i <denominator_length; i++) denominator[i]/=denominator[0];
 }
 
-void LavIIRFilter::clearHistories() {
+void IIRFilter::clearHistories() {
 	if(numerator_length) memset(history, 0, sizeof(double)*numerator_length);
 	if(denominator_length) memset(recursion_history, 0, sizeof(double)*denominator_length);
 }
 
-void LavIIRFilter::setGain(double gain) {
+void IIRFilter::setGain(double gain) {
 	this->gain = gain;
 }
 
-float LavIIRFilter::tick(float sample) {
+float IIRFilter::tick(float sample) {
 	int i;
 	history[0] = sample*gain;
 	recursion_history[0] = 0.0;
@@ -60,7 +60,7 @@ float LavIIRFilter::tick(float sample) {
 	return (float)recursion_history[0];
 }
 
-void LavIIRFilter::configureBiquad(int type, double sr, double frequency, double dbGain, double q) {
+void IIRFilter::configureBiquad(int type, double sr, double frequency, double dbGain, double q) {
 	//this entire function is a straightforward implementation of the Audio EQ cookbook, included with this repository.
 	//we move these onto the class at the end of the function explicitly.
 	double a0, a1, a2, b0, b1, b2, gain;

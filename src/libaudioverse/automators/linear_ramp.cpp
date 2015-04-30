@@ -7,28 +7,28 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/node.hpp>
 
-class LavLinearRampAutomator: public LavAutomator {
+class LinearRampAutomator: public Automator {
 	public:
-	LavLinearRampAutomator(LavProperty* p, double scheduledTime, double finalValue);
+	LinearRampAutomator(Property* p, double scheduledTime, double finalValue);
 	virtual void start(double initialTime, double initialValue) override;
 	virtual double  getValue(double time) override;
 	virtual double getFinalValue();
 	double delta, final_value;
 };
 
-LavLinearRampAutomator::LavLinearRampAutomator(LavProperty* p, double scheduledTime, double finalValue): LavAutomator(p, scheduledTime), final_value(finalValue) {
+LinearRampAutomator::LinearRampAutomator(Property* p, double scheduledTime, double finalValue): Automator(p, scheduledTime), final_value(finalValue) {
 }
 
-void LavLinearRampAutomator::start(double initialValue, double initialTime) {
-	LavAutomator::start(initialValue, initialTime);
+void LinearRampAutomator::start(double initialValue, double initialTime) {
+	Automator::start(initialValue, initialTime);
 	delta = (final_value-initial_value)/(scheduled_time-initial_time);
 }
 
-double LavLinearRampAutomator::getValue(double time) {
+double LinearRampAutomator::getValue(double time) {
 	return initial_value+(time-initial_time)*delta;
 }
 
-double LavLinearRampAutomator::getFinalValue() {
+double LinearRampAutomator::getFinalValue() {
 	return final_value;
 }
 
@@ -36,10 +36,10 @@ double LavLinearRampAutomator::getFinalValue() {
 
 Lav_PUBLIC_FUNCTION LavError Lav_automationLinearRampToValue(LavHandle nodeHandle, int slot, double time, double value) {
 	PUB_BEGIN
-	auto node = incomingObject<LavNode>(nodeHandle);
+	auto node = incomingObject<Node>(nodeHandle);
 	LOCK(*node);
 	auto &prop= node->getProperty(slot);
-	LavLinearRampAutomator* automator = new LavLinearRampAutomator(&prop, prop.getTime()+time, value);
+	LinearRampAutomator* automator = new LinearRampAutomator(&prop, prop.getTime()+time, value);
 	//the property will throw for us if any part of the next part goes wrong.
 	prop.scheduleAutomator(automator);
 	PUB_END

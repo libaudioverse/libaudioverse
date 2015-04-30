@@ -5,10 +5,10 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 //used by all delay lines.
 //This is a fixed-sized ringbuffer that can be advanced and written to as a single operation or read at a single offset.
-class LavDelayRingbuffer {
+class DelayRingbuffer {
 	public:
-	LavDelayRingbuffer(int length);
-	~LavDelayRingbuffer();
+	DelayRingbuffer(int length);
+	~DelayRingbuffer();
 	float read(int offset);
 	int getLength();
 	void advance(float sample);
@@ -23,9 +23,9 @@ class LavDelayRingbuffer {
 //A single-channel delay line, but with built-in crossfading.
 //note: this is for the delay object. It does not always do the intuitive thing from a DSP perspective.
 //The point is that it does the intuitive thing for external-facing components and users, and it is robust against even frequent delay changes.
-class LavCrossfadingDelayLine {
+class CrossfadingDelayLine {
 	public:
-	LavCrossfadingDelayLine(float maxDelay, float sr);
+	CrossfadingDelayLine(float maxDelay, float sr);
 	void setDelay(float delay);
 	float computeSample();
 	void advance(float sample);
@@ -34,7 +34,7 @@ class LavCrossfadingDelayLine {
 	void reset();
 	void setInterpolationTime(float t);
 	private:
-	LavDelayRingbuffer line;
+	DelayRingbuffer line;
 	unsigned int line_length = 0, delay = 0, new_delay = 0;
 	bool is_interpolating = false;
 	float interpolation_delta = 1.0f;

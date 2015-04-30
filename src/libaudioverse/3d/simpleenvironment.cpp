@@ -19,7 +19,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <algorithm>
 #include <vector>
 
-LavSimpleEnvironmentNode::LavSimpleEnvironmentNode(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf): LavEnvironmentBase(Lav_OBJTYPE_SIMPLE_ENVIRONMENT_NODE, simulation)  {
+SimpleEnvironmentNode::SimpleEnvironmentNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf): EnvironmentBase(Lav_OBJTYPE_SIMPLE_ENVIRONMENT_NODE, simulation)  {
 	this->hrtf = hrtf;
 	int channels = getProperty(Lav_ENVIRONMENT_OUTPUT_CHANNELS).getIntValue();
 	getProperty(Lav_ENVIRONMENT_OUTPUT_CHANNELS).setPostChangedCallback([&] () {outputChannelsChanged();});
@@ -35,13 +35,13 @@ LavSimpleEnvironmentNode::LavSimpleEnvironmentNode(std::shared_ptr<LavSimulation
 		glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
-std::shared_ptr<LavSimpleEnvironmentNode> createSimpleEnvironmentNode(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf) {
-	auto retval = std::shared_ptr<LavSimpleEnvironmentNode>(new LavSimpleEnvironmentNode(simulation, hrtf), LavObjectDeleter(simulation));
+std::shared_ptr<SimpleEnvironmentNode> createSimpleEnvironmentNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf) {
+	auto retval = std::shared_ptr<SimpleEnvironmentNode>(new SimpleEnvironmentNode(simulation, hrtf), ObjectDeleter(simulation));
 	simulation->associateNode(retval);
 	return retval;
 }
 
-void LavSimpleEnvironmentNode::willProcessParents() {
+void SimpleEnvironmentNode::willProcessParents() {
 	//update the matrix.
 	const float* pos = getProperty(Lav_3D_POSITION).getFloat3Value();
 	const float* atup = getProperty(Lav_3D_ORIENTATION).getFloat6Value();
@@ -66,17 +66,17 @@ void LavSimpleEnvironmentNode::willProcessParents() {
 	for(auto i: needsRemoval) sources.erase(i);
 }
 
-std::shared_ptr<LavNode> LavSimpleEnvironmentNode::createPannerNode() {
+std::shared_ptr<Node> SimpleEnvironmentNode::createPannerNode() {
 	auto pan = createMultipannerNode(simulation, hrtf);
 	pan->connect(0, output, 0);
 	return pan;
 }
 
-void LavSimpleEnvironmentNode::registerSourceForUpdates(std::shared_ptr<LavSourceNode> source) {
+void SimpleEnvironmentNode::registerSourceForUpdates(std::shared_ptr<SourceNode> source) {
 	sources.insert(source);
 }
 
-void LavSimpleEnvironmentNode::outputChannelsChanged() {
+void SimpleEnvironmentNode::outputChannelsChanged() {
 	int channels = getProperty(Lav_ENVIRONMENT_OUTPUT_CHANNELS).getIntValue();
 	output->resize(channels, channels);
 	getOutputConnection(0)->reconfigure(0, channels);
@@ -88,15 +88,15 @@ void LavSimpleEnvironmentNode::outputChannelsChanged() {
 
 Lav_PUBLIC_FUNCTION LavError Lav_createSimpleEnvironmentNode(LavHandle simulationHandle, const char*hrtfPath, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<LavSimulation>(simulationHandle);
+	auto simulation = incomingObject<Simulation>(simulationHandle);
 	LOCK(*simulation);
-	auto hrtf = std::make_shared<LavHrtfData>();
+	auto hrtf = std::make_shared<HrtfData>();
 	if(std::string(hrtfPath) != "default") {
 		hrtf->loadFromFile(hrtfPath, simulation->getSr());
 	} else {
 		hrtf->loadFromDefault(simulation->getSr());
 	}
 	auto retval = createSimpleEnvironmentNode(simulation, hrtf);
-	*destination = outgoingObject<LavNode>(retval);
+	*destination = outgoingObject<Node>(retval);
 	PUB_END
 }

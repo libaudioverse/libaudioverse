@@ -13,10 +13,10 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <functional>
 
 /**A physical output.*/
-class LavDevice {
+class Device {
 	protected:
-	LavDevice() = default;
-	virtual ~LavDevice();
+	Device() = default;
+	virtual ~Device();
 	//function parameters: output buffer, number of channels to write.
 	virtual void init(std::function<void(float*, int)> getBuffer, unsigned int inputBufferFrames, unsigned int inputBufferSr, unsigned int channels, unsigned int outputSr, unsigned int mixAhead); //second step fn initialization. We can't just fall through to the constructor.
 	virtual void start(); //final step in initialization via subclasses: starts the background thread.
@@ -42,29 +42,29 @@ class LavDevice {
 	std::thread mixing_thread;
 	std::function<void(float*, int)> get_buffer;
 	bool started = false;
-	friend class LavDeviceFactory;
+	friend class DeviceFactory;
 };
 
-class LavDeviceFactory {
+class DeviceFactory {
 	public:
-	LavDeviceFactory() = default;
-	virtual ~LavDeviceFactory();
+	DeviceFactory() = default;
+	virtual ~DeviceFactory();
 	virtual std::vector<std::string> getOutputNames() = 0;
 	//returns -1.0f for unknown.
 	virtual std::vector<float> getOutputLatencies() = 0;
 	virtual std::vector<int> getOutputMaxChannels() = 0;
 
-	virtual std::shared_ptr<LavDevice> createDevice(std::function<void(float*, int)> getBuffer, int index, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead) = 0;
+	virtual std::shared_ptr<Device> createDevice(std::function<void(float*, int)> getBuffer, int index, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead) = 0;
 	virtual unsigned int getOutputCount();
 	virtual std::string getName();
 	protected:
-	std::vector<std::weak_ptr<LavDevice>> created_devices;
+	std::vector<std::weak_ptr<Device>> created_devices;
 	int output_count = 0;
 };
 
-typedef LavDeviceFactory* (*LavDeviceFactoryCreationFunction)();
-LavDeviceFactory* createWinmmDeviceFactory();
-LavDeviceFactory* createOpenALDeviceFactory();
+typedef DeviceFactory* (*DeviceFactoryCreationFunction)();
+DeviceFactory* createWinmmDeviceFactory();
+DeviceFactory* createOpenALDeviceFactory();
 
 //finally, the function that initializes all of this.
 void initializeDeviceFactory();

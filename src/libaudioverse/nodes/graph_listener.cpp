@@ -16,10 +16,10 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <utility>
 #include <vector>
 
-class LavGraphListenerNode: public LavNode {
+class GraphListenerNode: public Node {
 	public:
-	LavGraphListenerNode(std::shared_ptr<LavSimulation> sim, unsigned int channels);
-	~LavGraphListenerNode();
+	GraphListenerNode(std::shared_ptr<Simulation> sim, unsigned int channels);
+	~GraphListenerNode();
 	void process();
 	LavGraphListenerNodeListeningCallback callback = nullptr;
 	float* outgoing_buffer = nullptr;
@@ -27,24 +27,24 @@ class LavGraphListenerNode: public LavNode {
 	unsigned int channels = 0;
 };
 
-LavGraphListenerNode::LavGraphListenerNode(std::shared_ptr<LavSimulation> sim, unsigned int channels): LavNode(Lav_OBJTYPE_GRAPH_LISTENER_NODE, sim, channels, channels) {
-	outgoing_buffer = LavAllocArray<float>(channels*sim->getBlockSize());
+GraphListenerNode::GraphListenerNode(std::shared_ptr<Simulation> sim, unsigned int channels): Node(Lav_OBJTYPE_GRAPH_LISTENER_NODE, sim, channels, channels) {
+	outgoing_buffer = AllocArray<float>(channels*sim->getBlockSize());
 	this->channels = channels;
 	appendInputConnection(0, channels);
 	appendOutputConnection(0, channels);
 }
 
-std::shared_ptr<LavNode> createGraphListenerNode(std::shared_ptr<LavSimulation> simulation, unsigned int channels) {
-	auto retval = std::shared_ptr<LavGraphListenerNode>(new LavGraphListenerNode(simulation, channels), LavObjectDeleter(simulation));
+std::shared_ptr<Node> createGraphListenerNode(std::shared_ptr<Simulation> simulation, unsigned int channels) {
+	auto retval = std::shared_ptr<GraphListenerNode>(new GraphListenerNode(simulation, channels), ObjectDeleter(simulation));
 	simulation->associateNode(retval);
 	return retval;
 }
 
-LavGraphListenerNode::~LavGraphListenerNode() {
-	LavFreeArray(outgoing_buffer);
+GraphListenerNode::~GraphListenerNode() {
+	FreeArray(outgoing_buffer);
 }
 
-void LavGraphListenerNode::process() {
+void GraphListenerNode::process() {
 	if(callback) {
 		for(int i = 0; i < block_size; i++) {
 			for(unsigned int j = 0; j < channels; j++) {
@@ -60,18 +60,18 @@ void LavGraphListenerNode::process() {
 
 Lav_PUBLIC_FUNCTION LavError Lav_createGraphListenerNode(LavHandle simulationHandle, unsigned int channels, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<LavSimulation>(simulationHandle);
+	auto simulation = incomingObject<Simulation>(simulationHandle);
 	LOCK(*simulation);
-	*destination = outgoingObject<LavNode>(createGraphListenerNode(simulation, channels));
+	*destination = outgoingObject<Node>(createGraphListenerNode(simulation, channels));
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_graphListenerNodeSetListeningCallback(LavHandle nodeHandle, LavGraphListenerNodeListeningCallback callback, void* userdata) {
 	PUB_BEGIN
-	auto node = incomingObject<LavNode>(nodeHandle);
+	auto node = incomingObject<Node>(nodeHandle);
 	LOCK(*node);
 	if(node->getType() != Lav_OBJTYPE_GRAPH_LISTENER_NODE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
-	auto node2= std::static_pointer_cast<LavGraphListenerNode>(node);
+	auto node2= std::static_pointer_cast<GraphListenerNode>(node);
 	node2->callback = callback;
 	node2->callback_userdata = userdata;
 	PUB_END

@@ -8,33 +8,33 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/macros.hpp>
 
-LavAutomator::LavAutomator(LavProperty* p, double scheduledTime): property(p), scheduled_time(scheduledTime) {
+Automator::Automator(Property* p, double scheduledTime): property(p), scheduled_time(scheduledTime) {
 }
 
-LavAutomator::~LavAutomator() {
+Automator::~Automator() {
 }
 
-void LavAutomator::start(double initialValue, double initialTime) {
+void Automator::start(double initialValue, double initialTime) {
 	initial_value = initialValue;
 	initial_time = initialTime;
 }
 
-double LavAutomator::getDuration() {
+double Automator::getDuration() {
 return 0.0;
 }
 
-double LavAutomator::getScheduledTime() {
+double Automator::getScheduledTime() {
 	return scheduled_time;
 }
 
-bool compareAutomators(LavAutomator *a, LavAutomator *b) {
+bool compareAutomators(Automator *a, Automator *b) {
 	return a->getScheduledTime() < b->getScheduledTime();
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_automationCancelAutomators(LavHandle nodeHandle, int slot, double time) {
 	PUB_BEGIN
 	if(time < 0.0) throw LavErrorException(Lav_ERROR_RANGE);
-	auto n = incomingObject<LavNode>(nodeHandle);
+	auto n = incomingObject<Node>(nodeHandle);
 	LOCK(*n);
 	auto &prop = n->getProperty(slot);
 	prop.cancelAutomators(time);

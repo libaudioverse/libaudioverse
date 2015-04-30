@@ -2,7 +2,7 @@
 This file is part of Libaudioverse, a library for 3D and environmental audio simulation, and is released under the terms of the Gnu General Public License Version 3 or (at your option) any later version.
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 
-/**Read an hrtf file into a LavHrtfData and compute left and right channel HRIR coefficients from an angle.*/
+/**Read an hrtf file into a HrtfData and compute left and right channel HRIR coefficients from an angle.*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -35,23 +35,23 @@ void reverse_endianness(char* buffer, unsigned int count, unsigned int window) {
 //this makes sure that we aren't about to do something silently dangerous and tels us at compile time.
 static_assert(sizeof(float) == 4, "Sizeof float is not 4; cannot safely work with hrtfs");
 
-LavHrtfData::~LavHrtfData() {
-	if(temporary_buffer1) LavFreeArray(temporary_buffer1);
-	if(temporary_buffer2) LavFreeArray(temporary_buffer2);
+HrtfData::~HrtfData() {
+	if(temporary_buffer1) FreeArray(temporary_buffer1);
+	if(temporary_buffer2) FreeArray(temporary_buffer2);
 	if(hrirs == nullptr) return; //we never loaded one.
 	for(int i = 0; i < elev_count; i++) {
-		for(int j = 0; j < azimuth_counts[i]; j++) LavFreeArray(hrirs[i][j]);
+		for(int j = 0; j < azimuth_counts[i]; j++) FreeArray(hrirs[i][j]);
 		delete[] hrirs[i];
 	}
 	delete[] hrirs;
 	delete[] azimuth_counts;
 }
 
-int LavHrtfData::getLength() {
+int HrtfData::getLength() {
 	return hrir_length;
 }
 
-void LavHrtfData::loadFromFile(std::string path, unsigned int forSr) {
+void HrtfData::loadFromFile(std::string path, unsigned int forSr) {
 	//first, load the file if we can.
 	FILE *fp = fopen(path.c_str(), "rb");
 	if(fp == nullptr) throw LavErrorException(Lav_ERROR_FILE);
@@ -70,14 +70,14 @@ void LavHrtfData::loadFromFile(std::string path, unsigned int forSr) {
 	delete[] data;
 }
 
-void LavHrtfData::loadFromDefault(unsigned int forSr) {
+void HrtfData::loadFromDefault(unsigned int forSr) {
 	loadFromBuffer(default_hrtf_size, default_hrtf, forSr);
 }
 
 #define convi(b) safeConvertMemory<int32_t>(b)
 #define convf(b) safeConvertMemory<float>*(b)
 
-void LavHrtfData::loadFromBuffer(unsigned int length, char* buffer, unsigned int forSr) {
+void HrtfData::loadFromBuffer(unsigned int length, char* buffer, unsigned int forSr) {
 	//we now handle endianness.
 	int32_t endianness_marker =convi(buffer);
 	if(endianness_marker != 1) reverse_endianness(buffer, length, 4);
@@ -132,7 +132,7 @@ void LavHrtfData::loadFromBuffer(unsigned int length, char* buffer, unsigned int
 
 	//the above gives us what amounts to a 2d array.  The first dimension represents elevation.  The second dimension represents azimuth going clockwise.
 	//fill it.
-	float* tempBuffer = LavAllocArray<float>(before_hrir_length);
+	float* tempBuffer = AllocArray<float>(before_hrir_length);
 	int final_hrir_length = 0;
 	for(int elev = 0; elev < elev_count; elev++) {
 		for(int azimuth = 0; azimuth < azimuth_counts[elev]; azimuth++) {
@@ -143,19 +143,19 @@ void LavHrtfData::loadFromBuffer(unsigned int length, char* buffer, unsigned int
 	}
 	hrir_length = final_hrir_length;
 	samplerate = forSr;
-	LavFreeArray(tempBuffer);
+	FreeArray(tempBuffer);
 
-	if(temporary_buffer1) LavFreeArray(temporary_buffer1);
-	if(temporary_buffer2) LavFreeArray(temporary_buffer2);
-	temporary_buffer1 = LavAllocArray<float>(hrir_length);
-	temporary_buffer2 = LavAllocArray<float>(hrir_length);
+	if(temporary_buffer1) FreeArray(temporary_buffer1);
+	if(temporary_buffer2) FreeArray(temporary_buffer2);
+	temporary_buffer1 = AllocArray<float>(hrir_length);
+	temporary_buffer2 = AllocArray<float>(hrir_length);
 }
 
 //a complete HRTF for stereo is two calls to this function.
 //some final preparation is done afterwords.
 //This is very complicated, thus the heavy commenting.
 //todo: can this be made simpler?
-void LavHrtfData::computeCoefficientsMono(float elevation, float azimuth, float* out) {
+void HrtfData::computeCoefficientsMono(float elevation, float azimuth, float* out) {
 	//clamp the elevation.
 	if(elevation < min_elevation) {elevation = (float)min_elevation;}
 	else if(elevation > max_elevation) {elevation = (float)max_elevation;}
@@ -215,7 +215,7 @@ void LavHrtfData::computeCoefficientsMono(float elevation, float azimuth, float*
 	}
 }
 
-void LavHrtfData::computeCoefficientsStereo(float elevation, float azimuth, float *left, float* right) {
+void HrtfData::computeCoefficientsStereo(float elevation, float azimuth, float *left, float* right) {
 	//wrap azimuth to be > 0 and < 360.
 	azimuth = ringmodf(azimuth, 360.0f);
 	//the hrtf datasets are right ear coefficients.  Consequently, the right ear requires no changes.

@@ -18,7 +18,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <tuple>
 #include <map>
 
-LavSimulation::LavSimulation(unsigned int sr, unsigned int blockSize, unsigned int mixahead): LavExternalObject(Lav_OBJTYPE_SIMULATION) {
+Simulation::Simulation(unsigned int sr, unsigned int blockSize, unsigned int mixahead): ExternalObject(Lav_OBJTYPE_SIMULATION) {
 	if(blockSize%4 || blockSize== 0) throw LavErrorException(Lav_ERROR_RANGE); //only afe to have this be a multiple of four.
 	this->sr = (float)sr;
 	this->block_size = blockSize;
@@ -28,25 +28,25 @@ LavSimulation::LavSimulation(unsigned int sr, unsigned int blockSize, unsigned i
 	backgroundTaskThread = std::thread([this]() {backgroundTaskThreadFunction();});
 	start();
 }
-void LavSimulation::completeInitialization() {
-	final_output_connection =std::make_shared<LavInputConnection>(std::static_pointer_cast<LavSimulation>(this->shared_from_this()), nullptr, 0, 0);
+void Simulation::completeInitialization() {
+	final_output_connection =std::make_shared<InputConnection>(std::static_pointer_cast<Simulation>(this->shared_from_this()), nullptr, 0, 0);
 }
 
-LavSimulation::~LavSimulation() {
+Simulation::~Simulation() {
 	//enqueue a task which will stop the background thread.
-	enqueueTask([]() {throw LavThreadTerminationException();});
+	enqueueTask([]() {throw ThreadTerminationException();});
 	backgroundTaskThread.join();
 }
 
 //Yes, this uses goto. Yes, goto is evil. We need a single point of exit.
-void LavSimulation::getBlock(float* out, unsigned int channels, bool mayApplyMixingMatrix) {
+void Simulation::getBlock(float* out, unsigned int channels, bool mayApplyMixingMatrix) {
 	if(out == nullptr || channels == 0) goto end; //nothing to do.
 	if(block_callback) block_callback(outgoingObject(this->shared_from_this()), block_callback_time, block_callback_userdata);
 	//configure our connection to the number of channels requested.
 	final_output_connection->reconfigure(0, channels);
 	//append buffers to the final_outputs vector until it's big enough.
 	//in a sane application, we'll never go above 8 channels so keeping them around is no big deal.
-	while(final_outputs.size() < channels) final_outputs.push_back(LavAllocArray<float>(block_size));
+	while(final_outputs.size() < channels) final_outputs.push_back(AllocArray<float>(block_size));
 	//zero the outputs we need.
 	for(unsigned int i= 0; i < channels; i++) memset(final_outputs[i], 0, sizeof(float)*block_size);
 	//write, applying mixing matrices as needed.
@@ -76,7 +76,7 @@ void LavSimulation::getBlock(float* out, unsigned int channels, bool mayApplyMix
 	tick_count ++;
 }
 
-void LavSimulation::doMaintenance() {
+void Simulation::doMaintenance() {
 	decltype(nodes) to_remove;
 	for(auto &n: nodes) {
 		if(n.lock() == nullptr) to_remove.insert(n);
@@ -86,34 +86,34 @@ void LavSimulation::doMaintenance() {
 	}
 }
 
-std::shared_ptr<LavInputConnection> LavSimulation::getFinalOutputConnection() {
+std::shared_ptr<InputConnection> Simulation::getFinalOutputConnection() {
 	return final_output_connection;
 }
 
-LavError LavSimulation::start() {
+LavError Simulation::start() {
 	is_started = 1;
 	return Lav_ERROR_NONE;
 }
 
-LavError LavSimulation::stop() {
+LavError Simulation::stop() {
 	is_started = 0;
 	return Lav_ERROR_NONE;
 }
 
-LavError LavSimulation::associateNode(std::shared_ptr<LavNode> node) {
-	nodes.insert(std::weak_ptr<LavNode>(node));
+LavError Simulation::associateNode(std::shared_ptr<Node> node) {
+	nodes.insert(std::weak_ptr<Node>(node));
 	return Lav_ERROR_NONE;
 }
 
-void LavSimulation::enqueueTask(std::function<void(void)> cb) {
+void Simulation::enqueueTask(std::function<void(void)> cb) {
 	tasks.enqueue(cb);
 }
 
-void LavSimulation::associateDevice(std::shared_ptr<LavDevice> what) {
+void Simulation::associateDevice(std::shared_ptr<Device> what) {
 	device = what;
 }
 
-void LavSimulation::registerMixingMatrix(unsigned int inChannels, unsigned int outChannels, float* matrix) {
+void Simulation::registerMixingMatrix(unsigned int inChannels, unsigned int outChannels, float* matrix) {
 	mixing_matrices[std::tuple<unsigned int, unsigned int>(inChannels, outChannels)] = matrix;
 	if(inChannels > largest_seen_mixing_matrix_input) {
 		if(mixing_matrix_workspace) delete[] mixing_matrix_workspace;
@@ -122,8 +122,8 @@ void LavSimulation::registerMixingMatrix(unsigned int inChannels, unsigned int o
 	}
 }
 
-void LavSimulation::resetMixingMatrix(unsigned int  inChannels, unsigned int outChannels) {
-	for(LavMixingMatrixInfo* i = mixing_matrix_list; i->pointer; i++) {
+void Simulation::resetMixingMatrix(unsigned int  inChannels, unsigned int outChannels) {
+	for(MixingMatrixInfo* i = mixing_matrix_list; i->pointer; i++) {
 		if(i->in_channels == inChannels && i->out_channels == outChannels) {
 			mixing_matrices[std::tuple<unsigned int, unsigned int>(inChannels, outChannels)] = i->pointer;
 			return;
@@ -132,30 +132,30 @@ void LavSimulation::resetMixingMatrix(unsigned int  inChannels, unsigned int out
 	if(mixing_matrices.count(std::tuple<unsigned int, unsigned int>(inChannels, outChannels)) != 0) mixing_matrices.erase(std::tuple<unsigned int, unsigned int>(inChannels, outChannels));
 }
 
-void LavSimulation::registerDefaultMixingMatrices() {
-	for(LavMixingMatrixInfo* i = mixing_matrix_list; i->pointer; i++) registerMixingMatrix(i->in_channels, i->out_channels, i->pointer);
+void Simulation::registerDefaultMixingMatrices() {
+	for(MixingMatrixInfo* i = mixing_matrix_list; i->pointer; i++) registerMixingMatrix(i->in_channels, i->out_channels, i->pointer);
 }
 
-const float* LavSimulation::getMixingMatrix(unsigned int inChannels, unsigned int outChannels) {
+const float* Simulation::getMixingMatrix(unsigned int inChannels, unsigned int outChannels) {
 	std::tuple<unsigned int, unsigned int> key(inChannels, outChannels);
 	if(mixing_matrices.count(key) != 0) return mixing_matrices[key];
 	else return nullptr;
 }
 
 //Default callback implementation.
-void LavSimulation::backgroundTaskThreadFunction() {
+void Simulation::backgroundTaskThreadFunction() {
 	try {
 		for(;;) {
 			auto task = tasks.dequeue();
 			task();
 		}
 	}
-	catch(LavThreadTerminationException) {
+	catch(ThreadTerminationException) {
 		return;
 	}
 }
 
-void LavSimulation::setBlockCallback(LavBlockCallback callback, void* userdata) {
+void Simulation::setBlockCallback(LavBlockCallback callback, void* userdata) {
 	block_callback = callback;
 	block_callback_time = 0.0;
 	block_callback_userdata=userdata;
@@ -165,7 +165,7 @@ void LavSimulation::setBlockCallback(LavBlockCallback callback, void* userdata) 
 
 Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlock(LavHandle simulationHandle, unsigned int channels, int mayApplyMixingMatrix, float* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<LavSimulation>(simulationHandle);
+	auto simulation = incomingObject<Simulation>(simulationHandle);
 	LOCK(*simulation);
 	simulation->getBlock(destination, channels, mayApplyMixingMatrix != 0);
 	PUB_END
@@ -173,7 +173,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlock(LavHandle simulationHandle, 
 
 Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlockSize(LavHandle simulationHandle, int* destination) {
 	PUB_BEGIN
-	auto simulation =incomingObject<LavSimulation>(simulationHandle);
+	auto simulation =incomingObject<Simulation>(simulationHandle);
 	LOCK(*simulation);
 	*destination = simulation->getBlockSize();
 	PUB_END
@@ -181,7 +181,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlockSize(LavHandle simulationHand
 
 Lav_PUBLIC_FUNCTION LavError Lav_simulationGetSr(LavHandle simulationHandle, int* destination) {
 	PUB_BEGIN
-	auto simulation =incomingObject<LavSimulation>(simulationHandle);
+	auto simulation =incomingObject<Simulation>(simulationHandle);
 	LOCK(*simulation);
 	*destination = (int)simulation->getSr();
 	PUB_END
@@ -191,20 +191,20 @@ Lav_PUBLIC_FUNCTION LavError Lav_simulationGetSr(LavHandle simulationHandle, int
 
 Lav_PUBLIC_FUNCTION LavError Lav_simulationBeginAtomicBlock(LavHandle simulationHandle) {
 	PUB_BEGIN
-	auto simulation = incomingObject<LavSimulation>(simulationHandle);
+	auto simulation = incomingObject<Simulation>(simulationHandle);
 	simulation->lock();
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_simulationEndAtomicBlock(LavHandle simulationHandle) {
 	PUB_BEGIN
-	auto simulation = incomingObject<LavSimulation>(simulationHandle);
+	auto simulation = incomingObject<Simulation>(simulationHandle);
 	simulation->unlock();
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_simulationSetBlockCallback(LavHandle handle, LavBlockCallback callback, void* userdata) {
 	PUB_BEGIN
-incomingObject<LavSimulation>(handle)->setBlockCallback(callback, userdata);
+incomingObject<Simulation>(handle)->setBlockCallback(callback, userdata);
 	PUB_END
 }

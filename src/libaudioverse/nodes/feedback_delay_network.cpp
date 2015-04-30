@@ -18,34 +18,34 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <algorithm>
 #include <math.h>
 
-LavFeedbackDelayNetworkNode::LavFeedbackDelayNetworkNode(std::shared_ptr<LavSimulation> simulation, float maxDelay, int lines):
-LavNode(Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK_NODE, simulation, lines, lines) {
+FeedbackDelayNetworkNode::FeedbackDelayNetworkNode(std::shared_ptr<Simulation> simulation, float maxDelay, int lines):
+Node(Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK_NODE, simulation, lines, lines) {
 	max_delay = maxDelay;
 	line_count = lines;
-	network = new LavFeedbackDelayNetwork(lines, maxDelay, simulation->getSr());
-	lastOutput = LavAllocArray<float>(lines);
-	nextInput = LavAllocArray<float>(lines);
-	gains = LavAllocArray<float>(lines);
+	network = new FeedbackDelayNetwork(lines, maxDelay, simulation->getSr());
+	lastOutput = AllocArray<float>(lines);
+	nextInput = AllocArray<float>(lines);
+	gains = AllocArray<float>(lines);
 	for(int i = 0; i < lines; i++) gains[i] = 1.0f;
 	getProperty(Lav_FDN_MAX_DELAY).setFloatValue(maxDelay);
 	appendInputConnection(0, lines);
 	appendOutputConnection(0, lines);
 }
 
-LavFeedbackDelayNetworkNode::~LavFeedbackDelayNetworkNode() {
+FeedbackDelayNetworkNode::~FeedbackDelayNetworkNode() {
 	delete network;
-	LavFreeArray(lastOutput);
-	LavFreeArray(nextInput);
-	LavFreeArray(gains);
+	FreeArray(lastOutput);
+	FreeArray(nextInput);
+	FreeArray(gains);
 }
 
-std::shared_ptr<LavNode> createFeedbackDelayNetworkNode(std::shared_ptr<LavSimulation> simulation, float maxDelay, int lines) {
-	auto retval = std::shared_ptr<LavFeedbackDelayNetworkNode>(new LavFeedbackDelayNetworkNode(simulation, maxDelay, lines), LavObjectDeleter(simulation));
+std::shared_ptr<Node> createFeedbackDelayNetworkNode(std::shared_ptr<Simulation> simulation, float maxDelay, int lines) {
+	auto retval = std::shared_ptr<FeedbackDelayNetworkNode>(new FeedbackDelayNetworkNode(simulation, maxDelay, lines), ObjectDeleter(simulation));
 	simulation->associateNode(retval);
 	return retval;
 }
 
-void LavFeedbackDelayNetworkNode::process() {
+void FeedbackDelayNetworkNode::process() {
 	for(int i = 0; i < block_size; i++) {
 		network->computeFrame(lastOutput);
 		for(int j = 0; j < num_output_buffers; j++) {
@@ -56,22 +56,22 @@ void LavFeedbackDelayNetworkNode::process() {
 	}
 }
 
-void LavFeedbackDelayNetworkNode::setFeedbackMatrix(int length, float* values) {
+void FeedbackDelayNetworkNode::setFeedbackMatrix(int length, float* values) {
 	if(length != line_count*line_count) throw LavErrorException(Lav_ERROR_RANGE);
 	network->setFeedbackMatrix(values);
 }
 
-void LavFeedbackDelayNetworkNode::setOutputGains(int count, float* values) {
+void FeedbackDelayNetworkNode::setOutputGains(int count, float* values) {
 	if(count != line_count) throw LavErrorException(Lav_ERROR_RANGE);
 	std::copy(values, values+count, gains);
 }
 
-void LavFeedbackDelayNetworkNode::setDelays(int length, float* values) {
+void FeedbackDelayNetworkNode::setDelays(int length, float* values) {
 	if(length != line_count) throw LavErrorException(Lav_ERROR_RANGE);
 	network->setDelays(values);
 }
 
-void LavFeedbackDelayNetworkNode::setFeedbackDelayMatrix(int length, float* values) {
+void FeedbackDelayNetworkNode::setFeedbackDelayMatrix(int length, float* values) {
 	if(length != line_count*line_count) throw LavErrorException(Lav_ERROR_RANGE);
 	network->setFeedbackDelayMatrix(values);
 }
@@ -80,9 +80,9 @@ void LavFeedbackDelayNetworkNode::setFeedbackDelayMatrix(int length, float* valu
 
 Lav_PUBLIC_FUNCTION LavError Lav_createFeedbackDelayNetworkNode(LavHandle simulationHandle, float maxDelay, int lines, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation =incomingObject<LavSimulation>(simulationHandle);
+	auto simulation =incomingObject<Simulation>(simulationHandle);
 	LOCK(*simulation);
-	*destination = outgoingObject<LavNode>(createFeedbackDelayNetworkNode(
+	*destination = outgoingObject<Node>(createFeedbackDelayNetworkNode(
 	simulation, maxDelay, lines));
 	PUB_END
 }
@@ -91,40 +91,40 @@ Lav_PUBLIC_FUNCTION LavError Lav_createFeedbackDelayNetworkNode(LavHandle simula
 
 Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetFeedbackMatrix(LavHandle nodeHandle, int count, float* values) {
 	PUB_BEGIN
-	auto node=incomingObject<LavNode>(nodeHandle);
+	auto node=incomingObject<Node>(nodeHandle);
 	LOCK(*node);
 	FDN_OR_ERROR
-	auto fdn=std::static_pointer_cast<LavFeedbackDelayNetworkNode>(node);
+	auto fdn=std::static_pointer_cast<FeedbackDelayNetworkNode>(node);
 	fdn->setFeedbackMatrix(count, values);
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetOutputGains(LavHandle nodeHandle, int count, float* values) {
 	PUB_BEGIN
-	auto node=incomingObject<LavNode>(nodeHandle);
+	auto node=incomingObject<Node>(nodeHandle);
 	LOCK(*node);
 	FDN_OR_ERROR
-	auto fdn = std::static_pointer_cast<LavFeedbackDelayNetworkNode>(node);
+	auto fdn = std::static_pointer_cast<FeedbackDelayNetworkNode>(node);
 	fdn->setOutputGains(count, values);
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetDelays(LavHandle nodeHandle, int count, float* values) {
 	PUB_BEGIN
-	auto node= incomingObject<LavNode>(nodeHandle);
+	auto node= incomingObject<Node>(nodeHandle);
 	LOCK(*node);
 	FDN_OR_ERROR
-	auto fdn=std::static_pointer_cast<LavFeedbackDelayNetworkNode>(node);
+	auto fdn=std::static_pointer_cast<FeedbackDelayNetworkNode>(node);
 	fdn->setDelays(count, values);
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetFeedbackDelayMatrix(LavHandle nodeHandle, int count, float* values) {
 	PUB_BEGIN
-	auto node = incomingObject<LavNode>(nodeHandle);
+	auto node = incomingObject<Node>(nodeHandle);
 	LOCK(*node);
 	FDN_OR_ERROR
-	auto fdn=std::static_pointer_cast<LavFeedbackDelayNetworkNode>(node);
+	auto fdn=std::static_pointer_cast<FeedbackDelayNetworkNode>(node);
 	fdn->setFeedbackDelayMatrix(count, values);
 	PUB_END
 }

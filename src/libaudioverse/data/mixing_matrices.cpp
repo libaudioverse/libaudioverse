@@ -18,7 +18,7 @@ Note 2: This file will need revision as practical examples of these configuratio
 #include <libaudioverse/private/data.hpp> //extern declarations.
 
 //this is the registry. The matrices are below.
-LavMixingMatrixInfo mixing_matrix_list[] = {
+MixingMatrixInfo mixing_matrix_list[] = {
 {1, 2, mixing_matrix_1_2},
 {1, 6, mixing_matrix_1_6},
 {1, 8, mixing_matrix_1_8},

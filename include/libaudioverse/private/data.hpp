@@ -6,13 +6,13 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 //contains the extern declarations for various static data.
 
 //the mixing matrices.
-struct LavMixingMatrixInfo {
+struct MixingMatrixInfo {
 unsigned int in_channels, out_channels;
 float* pointer;
 };
 
 //ends with a sentinal, {0, 0, nulptr}
-extern LavMixingMatrixInfo mixing_matrix_list[];
+extern MixingMatrixInfo mixing_matrix_list[];
 
 extern float mixing_matrix_1_2[];
 extern float mixing_matrix_1_6[];

@@ -16,14 +16,14 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <memory>
 #include <math.h>
 
-class LavFileNode: public LavNode {
+class FileNode: public Node {
 	public:
-	LavFileNode(std::shared_ptr<LavSimulation> simulation, const char* path, unsigned int channels);
-	~LavFileNode();
+	FileNode(std::shared_ptr<Simulation> simulation, const char* path, unsigned int channels);
+	~FileNode();
 	virtual void process();
 	void seek(); //property callback.
 	protected:
-	LavFileReader file;
+	FileReader file;
 	float* buffer = nullptr;
 	unsigned int position = 0, frame_count = 0;
 	float offset = 0;
@@ -34,9 +34,9 @@ class LavFileNode: public LavNode {
 
 //the third parameter is a hint: we need to know how many channels, we only expose objects through the create functions, so the create function can find this out.
 //todo: when objects support resizing their inputs and outputs, as they will inevitably support this, rewrite to use that functionality.
-LavFileNode::LavFileNode(std::shared_ptr<LavSimulation> simulation, const char* path, unsigned int channels): LavNode(Lav_OBJTYPE_FILE_NODE, simulation, 0, channels) {
+FileNode::FileNode(std::shared_ptr<Simulation> simulation, const char* path, unsigned int channels): Node(Lav_OBJTYPE_FILE_NODE, simulation, 0, channels) {
 	file.open(path);
-	buffer = LavAllocArray<float>(file.getSampleCount());
+	buffer = AllocArray<float>(file.getSampleCount());
 	file.readAll(buffer);
 	delta = file.getSr()/simulation->getSr();
 	getProperty(Lav_FILE_POSITION).setPostChangedCallback([this] () {seek();});
@@ -46,19 +46,19 @@ LavFileNode::LavFileNode(std::shared_ptr<LavSimulation> simulation, const char* 
 	appendOutputConnection(0, channels);
 }
 
-LavFileNode::~LavFileNode() {
-	LavFreeArray(buffer);
+FileNode::~FileNode() {
+	FreeArray(buffer);
 }
 
-std::shared_ptr<LavNode> createFileNode(std::shared_ptr<LavSimulation> simulation, const char* path) {
-	auto f = LavFileReader();
+std::shared_ptr<Node> createFileNode(std::shared_ptr<Simulation> simulation, const char* path) {
+	auto f = FileReader();
 	f.open(path);
-	auto retval = std::shared_ptr<LavFileNode>(new LavFileNode(simulation, path, f.getChannelCount()), LavObjectDeleter(simulation));
+	auto retval = std::shared_ptr<FileNode>(new FileNode(simulation, path, f.getChannelCount()), ObjectDeleter(simulation));
 	simulation->associateNode(retval);
 	return retval;
 }
 
-void LavFileNode::seek() {
+void FileNode::seek() {
 	if(is_processing) return;
 	double pos = getProperty(Lav_FILE_POSITION).getDoubleValue();
 	offset = 0.0f;
@@ -66,7 +66,7 @@ void LavFileNode::seek() {
 	has_ended = false;
 }
 
-void LavFileNode::process() {
+void FileNode::process() {
 	bool isLooping = (bool)getProperty(Lav_FILE_LOOPING).getIntValue();
 	if(has_ended) {
 		if(isLooping) {
@@ -121,9 +121,9 @@ void LavFileNode::process() {
 
 Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavHandle simulationHandle, const char* path, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation =incomingObject<LavSimulation>(simulationHandle);
+	auto simulation =incomingObject<Simulation>(simulationHandle);
 	LOCK(*simulation);
 	auto retval = createFileNode(simulation, path);
-	*destination = outgoingObject<LavNode>(retval);
+	*destination = outgoingObject<Node>(retval);
 	PUB_END
 }

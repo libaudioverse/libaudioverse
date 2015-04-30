@@ -8,10 +8,10 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 /**A completely stand-alone wrapper around Libsndfile for file reading: implements both a  streaming and non-streaming interface.
 
 This can theoreticaly handle any type of file, including codec decoding, but uses Libsndfile for the moment.*/
-class LavFileReader: std::enable_shared_from_this<LavFileReader>  {
+class FileReader: std::enable_shared_from_this<FileReader>  {
 	public:
-	LavFileReader(): info() {} //vc++ crashes if we try to do this the c++11 way.
-	~LavFileReader();
+	FileReader(): info() {} //vc++ crashes if we try to do this the c++11 way.
+	~FileReader();
 	void open(const char* path);
 	void close();
 	float getSr();

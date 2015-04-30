@@ -18,9 +18,9 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <limits>
 #include <vector>
 
-class LavBufferNode: public LavNode {
+class BufferNode: public Node {
 	public:
-	LavBufferNode(std::shared_ptr<LavSimulation> simulation);
+	BufferNode(std::shared_ptr<Simulation> simulation);
 	virtual void bufferChanged();
 	virtual void positionChanged();
 	virtual void process();
@@ -29,19 +29,19 @@ class LavBufferNode: public LavNode {
 	double offset=0.0;
 };
 
-LavBufferNode::LavBufferNode(std::shared_ptr<LavSimulation> simulation): LavNode(Lav_OBJTYPE_BUFFER_NODE, simulation, 0, 1) {
+BufferNode::BufferNode(std::shared_ptr<Simulation> simulation): Node(Lav_OBJTYPE_BUFFER_NODE, simulation, 0, 1) {
 	appendOutputConnection(0, 1);
 	getProperty(Lav_BUFFER_BUFFER).setPostChangedCallback([&] () {bufferChanged();});
 	getProperty(Lav_BUFFER_POSITION).setPostChangedCallback([&] () {positionChanged();});
 }
 
-std::shared_ptr<LavNode> createBufferNode(std::shared_ptr<LavSimulation> simulation) {
-	std::shared_ptr<LavBufferNode> retval = std::shared_ptr<LavBufferNode>(new LavBufferNode(simulation), LavObjectDeleter(simulation));
+std::shared_ptr<Node> createBufferNode(std::shared_ptr<Simulation> simulation) {
+	std::shared_ptr<BufferNode> retval = std::shared_ptr<BufferNode>(new BufferNode(simulation), ObjectDeleter(simulation));
 	simulation->associateNode(retval);
 	return retval;
 }
 
-void LavBufferNode::bufferChanged() {
+void BufferNode::bufferChanged() {
 	auto buff= getProperty(Lav_BUFFER_BUFFER).getBufferValue();
 	double maxPosition= 0.0;
 	int newChannels= 0;
@@ -62,13 +62,13 @@ void LavBufferNode::bufferChanged() {
 	buffer_length = newBufferLength;
 }
 
-void LavBufferNode::positionChanged() {
+void BufferNode::positionChanged() {
 	if(is_processing) return;
 	frame = (int)(getProperty(Lav_BUFFER_POSITION).getDoubleValue()*simulation->getSr());
 	offset = 0.0;
 }
 
-void LavBufferNode::process() {
+void BufferNode::process() {
 	auto buff = getProperty(Lav_BUFFER_BUFFER).getBufferValue();
 	if(buff== nullptr) return; //no buffer.
 	if(buffer_length== 0) return;
@@ -103,9 +103,9 @@ void LavBufferNode::process() {
 
 Lav_PUBLIC_FUNCTION LavError Lav_createBufferNode(LavHandle simulationHandle, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<LavSimulation>(simulationHandle);
+	auto simulation = incomingObject<Simulation>(simulationHandle);
 	LOCK(*simulation);
 	auto retval = createBufferNode(simulation);
-	*destination = outgoingObject<LavNode>(retval);
+	*destination = outgoingObject<Node>(retval);
 	PUB_END
 }

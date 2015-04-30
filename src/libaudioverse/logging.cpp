@@ -15,55 +15,55 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdarg.h>
 #include <libaudioverse/private/logging.hpp>
 
-LavLogger *logger = nullptr;
+Logger *logger = nullptr;
 
-LavLogger::LavLogger() {
+Logger::Logger() {
 	logging_thread = std::thread([this]() {loggingThreadFunction();});
 	workspace = new char[workspace_length];
 }
 
-LavLogger::~LavLogger() {
-	log_queue.enqueue(LavLogMessage(Lav_LOG_LEVEL_CRITICAL, "Logger shutting down", true));
+Logger::~Logger() {
+	log_queue.enqueue(LogMessage(Lav_LOG_LEVEL_CRITICAL, "Logger shutting down", true));
 	logging_thread.join();
 }
 
-void LavLogger::log(int level, std::string fmt, va_list& argptr) {
+void Logger::log(int level, std::string fmt, va_list& argptr) {
 	int got = vsnprintf(workspace, workspace_length, fmt.c_str(), argptr);
 	if(got == 0) return;
-	LavLogMessage msg(level, std::string(workspace), false);
+	LogMessage msg(level, std::string(workspace), false);
 	log_queue.enqueue(msg);
 }
 
-void LavLogger::setLoggingLevel(int level) {
+void Logger::setLoggingLevel(int level) {
 	config_mutex.lock();
 	this->level = level;
 	config_mutex.unlock();
 }
 
-int LavLogger::getLoggingLevel() {
+int Logger::getLoggingLevel() {
 	config_mutex.lock();
 	int retval = level;
 	config_mutex.unlock();
 	return retval;
 }
 
-void LavLogger::setLoggingCallback(LavLoggingCallback cb) {
+void Logger::setLoggingCallback(LavLoggingCallback cb) {
 	config_mutex.lock();
 	callback = cb;
 	config_mutex.unlock();
 }
 
-LavLoggingCallback LavLogger::getLoggingCallback() {
+LavLoggingCallback Logger::getLoggingCallback() {
 	config_mutex.lock();
 	LavLoggingCallback retval = callback;
 	config_mutex.unlock();
 	return retval;
 }
 
-void LavLogger::loggingThreadFunction() {
+void Logger::loggingThreadFunction() {
 	bool shouldContinue = true;
 	while(shouldContinue) {
-		LavLogMessage msg= log_queue.dequeue();
+		LogMessage msg= log_queue.dequeue();
 		config_mutex.lock();
 		if(callback && msg.level <= level) callback(msg.level, msg.message.c_str(), msg.is_final);
 		config_mutex.unlock();
@@ -73,7 +73,7 @@ void LavLogger::loggingThreadFunction() {
 
 std::once_flag logging_init_flag;
 void initLogging() {
-	logger = new LavLogger();
+	logger = new Logger();
 }
 
 void log(int level, std::string fmt, ...) {

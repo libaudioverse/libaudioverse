@@ -6,17 +6,17 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "../implementations/feedback_delay_network.hpp"
 #include <memory>
 
-class LavFeedbackDelayNetworkNode: public LavNode {
+class FeedbackDelayNetworkNode: public Node {
 	public:
-	LavFeedbackDelayNetworkNode(std::shared_ptr<LavSimulation> simulation, float maxDelay, int lines);
-	~LavFeedbackDelayNetworkNode();
+	FeedbackDelayNetworkNode(std::shared_ptr<Simulation> simulation, float maxDelay, int lines);
+	~FeedbackDelayNetworkNode();
 	void process();
 	void setFeedbackMatrix(int length, float* values);
 	void setOutputGains(int count, float* values);
 	void setDelays(int length, float* values);
 	void setFeedbackDelayMatrix(int length, float* values);
 	private:
-	LavFeedbackDelayNetwork*network = nullptr;
+	FeedbackDelayNetwork*network = nullptr;
 	float max_delay = 0.0f;
 	int line_count = 0;
 	float*lastOutput = nullptr, *nextInput = nullptr;

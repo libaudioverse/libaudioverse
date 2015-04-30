@@ -16,17 +16,17 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <vector>
 #include <libaudioverse/private/iir.hpp>
 
-class LavBiquadNode: public LavNode {
+class BiquadNode: public Node {
 	public:
-	LavBiquadNode(std::shared_ptr<LavSimulation> sim, unsigned int channels);
+	BiquadNode(std::shared_ptr<Simulation> sim, unsigned int channels);
 	void process();
 	void reconfigure();
 	private:
-	std::vector<LavIIRFilter> biquads;
+	std::vector<IIRFilter> biquads;
 	int prev_type;
 };
 
-LavBiquadNode::LavBiquadNode(std::shared_ptr<LavSimulation> sim, unsigned int channels): LavNode(Lav_OBJTYPE_BIQUAD_NODE, sim, channels, channels) {
+BiquadNode::BiquadNode(std::shared_ptr<Simulation> sim, unsigned int channels): Node(Lav_OBJTYPE_BIQUAD_NODE, sim, channels, channels) {
 	biquads.resize(channels);
 	//configure all of them.
 	prev_type = getProperty(Lav_BIQUAD_FILTER_TYPE).getIntValue();
@@ -34,13 +34,13 @@ LavBiquadNode::LavBiquadNode(std::shared_ptr<LavSimulation> sim, unsigned int ch
 	appendOutputConnection(0, channels);
 }
 
-std::shared_ptr<LavNode> createBiquadNode(std::shared_ptr<LavSimulation> simulation, unsigned int channels) {
-	auto retval = std::shared_ptr<LavBiquadNode>(new LavBiquadNode(simulation, channels), LavObjectDeleter(simulation));
+std::shared_ptr<Node> createBiquadNode(std::shared_ptr<Simulation> simulation, unsigned int channels) {
+	auto retval = std::shared_ptr<BiquadNode>(new BiquadNode(simulation, channels), ObjectDeleter(simulation));
 	simulation->associateNode(retval);
 	return retval;
 }
 
-void LavBiquadNode::reconfigure() {
+void BiquadNode::reconfigure() {
 	int type = getProperty(Lav_BIQUAD_FILTER_TYPE).getIntValue();
 	float sr = simulation->getSr();
 	float frequency = getProperty(Lav_BIQUAD_FREQUENCY).getFloatValue();
@@ -53,12 +53,12 @@ void LavBiquadNode::reconfigure() {
 	prev_type = type;
 }
 
-void LavBiquadNode::process() {
+void BiquadNode::process() {
 	reconfigure(); //always reconfigure the biquad, so that properties are k-rate.
 	//doing this this way may make the algorithm morecache- friendly on some compilers/systems.
 	//It also avoids a large number of extraneous lookups in the vctor.
 	for(int j = 0; j < biquads.size(); j++) {
-		LavIIRFilter &bq = biquads[j];
+		IIRFilter &bq = biquads[j];
 		for(unsigned int i = 0; i < block_size; i++) {
 			output_buffers[j][i] = bq.tick(input_buffers[j][i]);
 		}
@@ -67,9 +67,9 @@ void LavBiquadNode::process() {
 
 Lav_PUBLIC_FUNCTION LavError Lav_createBiquadNode(LavHandle simulationHandle, unsigned int channels, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation =incomingObject<LavSimulation>(simulationHandle);
+	auto simulation =incomingObject<Simulation>(simulationHandle);
 	LOCK(*simulation);
-	*destination = outgoingObject<LavNode>(createBiquadNode(simulation, channels));
+	*destination = outgoingObject<Node>(createBiquadNode(simulation, channels));
 	PUB_END
 }
 

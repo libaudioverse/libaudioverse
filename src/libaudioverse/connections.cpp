@@ -19,14 +19,14 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <string.h>
 #include <vector>
 
-LavOutputConnection::LavOutputConnection(std::shared_ptr<LavSimulation> simulation, LavNode* node, int start, int count) {
+OutputConnection::OutputConnection(std::shared_ptr<Simulation> simulation, Node* node, int start, int count) {
 	this->simulation = simulation;
 	this->node= node;
 	this->start =start;
 	this->count = count;
 }
 
-void LavOutputConnection::add(int inputBufferCount, float** inputBuffers, bool shouldApplyMixingMatrix) {
+void OutputConnection::add(int inputBufferCount, float** inputBuffers, bool shouldApplyMixingMatrix) {
 	//make sure our node has been ticked (nodes short-circuit if the simulation has not advanced).
 	node->tick();
 	//get the array of outputs from our node.
@@ -42,12 +42,12 @@ void LavOutputConnection::add(int inputBufferCount, float** inputBuffers, bool s
 	}
 }
 
-void LavOutputConnection::reconfigure(int newStart, int newCount) {
+void OutputConnection::reconfigure(int newStart, int newCount) {
 	start=newStart;
 	count= newCount;
 }
 
-void LavOutputConnection::clear() {
+void OutputConnection::clear() {
 	for(auto &c: connected_to) {
 		auto c_s= c.lock();
 		if(c_s) c_s->forgetConnection(this);
@@ -56,16 +56,16 @@ void LavOutputConnection::clear() {
 	connected_to.clear();
 }
 
-void LavOutputConnection::connectHalf(std::shared_ptr<LavInputConnection> inputConnection) {
+void OutputConnection::connectHalf(std::shared_ptr<InputConnection> inputConnection) {
 	connected_to.insert(inputConnection);
 }
 
-LavNode* LavOutputConnection::getNode() {
+Node* OutputConnection::getNode() {
 	return node;
 }
 
-std::vector<LavNode*> LavOutputConnection::getConnectedNodes() {
-	std::vector<LavNode*> retval;
+std::vector<Node*> OutputConnection::getConnectedNodes() {
+	std::vector<Node*> retval;
 	for(auto &i: connected_to) {
 		auto i_s= i.lock();
 		if(i_s==nullptr) continue;
@@ -77,18 +77,18 @@ std::vector<LavNode*> LavOutputConnection::getConnectedNodes() {
 }
 
 
-LavInputConnection::LavInputConnection(std::shared_ptr<LavSimulation> simulation, LavNode* node, int start, int count) {
+InputConnection::InputConnection(std::shared_ptr<Simulation> simulation, Node* node, int start, int count) {
 	this->simulation = simulation;
 	this->node= node;
 	this->start=start;
 	this->count = count;
 }
 
-void LavInputConnection::add(bool shouldApplyMixingMatrix) {
+void InputConnection::add(bool shouldApplyMixingMatrix) {
 	addNodeless(node->getInputBufferArray(), shouldApplyMixingMatrix);
 }
 
-void LavInputConnection::addNodeless(float** inputs, bool shouldApplyMixingMatrix) {
+void InputConnection::addNodeless(float** inputs, bool shouldApplyMixingMatrix) {
 	for(auto &i: connected_to) {
 		auto i_s = i.lock();
 		if(i_s == nullptr) continue;
@@ -96,16 +96,16 @@ void LavInputConnection::addNodeless(float** inputs, bool shouldApplyMixingMatri
 	}
 }
 
-void LavInputConnection::reconfigure(int newStart, int newCount) {
+void InputConnection::reconfigure(int newStart, int newCount) {
 	start= newStart;
 	count= newCount;
 }
 
-void LavInputConnection::connectHalf(std::shared_ptr<LavOutputConnection> outputConnection) {
+void InputConnection::connectHalf(std::shared_ptr<OutputConnection> outputConnection) {
 	connected_to.insert(outputConnection);
 }
 
-void LavInputConnection::forgetConnection(LavOutputConnection* which) {
+void InputConnection::forgetConnection(OutputConnection* which) {
 	decltype(connected_to) removing;
 	for(auto &i: connected_to) {
 		auto i_s=i.lock();
@@ -117,12 +117,12 @@ void LavInputConnection::forgetConnection(LavOutputConnection* which) {
 	}
 }
 
-LavNode* LavInputConnection::getNode() {
+Node* InputConnection::getNode() {
 	return node;
 }
 
-std::vector<LavNode*> LavInputConnection::getConnectedNodes() {
-	std::vector<LavNode*> retval;
+std::vector<Node*> InputConnection::getConnectedNodes() {
+	std::vector<Node*> retval;
 	for(auto &i: connected_to) {
 		auto i_s= i.lock();
 		if(i_s == nullptr) continue;
@@ -132,7 +132,7 @@ std::vector<LavNode*> LavInputConnection::getConnectedNodes() {
 	return retval;
 }
 
-void makeConnection(std::shared_ptr<LavOutputConnection> output, std::shared_ptr<LavInputConnection> input) {
+void makeConnection(std::shared_ptr<OutputConnection> output, std::shared_ptr<InputConnection> input) {
 	output->connectHalf(input);
 	input->connectHalf(output);
 }

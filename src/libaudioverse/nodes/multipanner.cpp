@@ -18,17 +18,17 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <utility>
 #include <vector>
 
-class LavMultipannerObject: public LavSubgraphNode {
+class MultipannerObject: public SubgraphNode {
 	public:
-	LavMultipannerObject(std::shared_ptr<LavSimulation> sim, std::shared_ptr<LavHrtfData> hrtf);
-	std::shared_ptr<LavNode> hrtf_panner = nullptr, amplitude_panner = nullptr, input= nullptr;
+	MultipannerObject(std::shared_ptr<Simulation> sim, std::shared_ptr<HrtfData> hrtf);
+	std::shared_ptr<Node> hrtf_panner = nullptr, amplitude_panner = nullptr, input= nullptr;
 	void forwardAzimuth();
 	void forwardElevation();
 	void forwardShouldCrossfade();
 	void strategyChanged();
 };
 
-LavMultipannerObject::LavMultipannerObject(std::shared_ptr<LavSimulation> sim, std::shared_ptr<LavHrtfData> hrtf): LavSubgraphNode(Lav_OBJTYPE_MULTIPANNER_NODE, sim)  {
+MultipannerObject::MultipannerObject(std::shared_ptr<Simulation> sim, std::shared_ptr<HrtfData> hrtf): SubgraphNode(Lav_OBJTYPE_MULTIPANNER_NODE, sim)  {
 	hrtf_panner = createHrtfNode(sim, hrtf);
 	amplitude_panner = createAmplitudePannerNode(sim);
 	input=createGainNode(simulation);
@@ -46,33 +46,33 @@ LavMultipannerObject::LavMultipannerObject(std::shared_ptr<LavSimulation> sim, s
 	getProperty(Lav_PANNER_STRATEGY).setPostChangedCallback([this](){strategyChanged();});
 }
 
-std::shared_ptr<LavNode> createMultipannerNode(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf) {
-	auto retval = std::shared_ptr<LavMultipannerObject>(new LavMultipannerObject(simulation, hrtf), LavObjectDeleter(simulation));
+std::shared_ptr<Node> createMultipannerNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf) {
+	auto retval = std::shared_ptr<MultipannerObject>(new MultipannerObject(simulation, hrtf), ObjectDeleter(simulation));
 	simulation->associateNode(retval);
 	//this call must be here because it involves shared_from_this.
 	retval->strategyChanged();
 	return retval;
 }
 
-void LavMultipannerObject::forwardAzimuth() {
+void MultipannerObject::forwardAzimuth() {
 	float az = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
 	hrtf_panner->getProperty(Lav_PANNER_AZIMUTH).setFloatValue(az);
 	amplitude_panner->getProperty(Lav_PANNER_AZIMUTH).setFloatValue(az);
 }
 
-void LavMultipannerObject::forwardElevation() {
+void MultipannerObject::forwardElevation() {
 	float elev = getProperty(Lav_PANNER_ELEVATION).getFloatValue();
 	hrtf_panner->getProperty(Lav_PANNER_ELEVATION).setFloatValue(elev);
 	amplitude_panner->getProperty(Lav_PANNER_ELEVATION).setFloatValue(elev);
 }
 
-void LavMultipannerObject::forwardShouldCrossfade() {
+void MultipannerObject::forwardShouldCrossfade() {
 	int cf = getProperty(Lav_PANNER_SHOULD_CROSSFADE).getIntValue();
 	hrtf_panner->getProperty(Lav_PANNER_SHOULD_CROSSFADE).setIntValue(cf);
 	amplitude_panner->getProperty(Lav_PANNER_SHOULD_CROSSFADE).setIntValue(cf);
 }
 
-void LavMultipannerObject::strategyChanged() {
+void MultipannerObject::strategyChanged() {
 	int newStrategy = getProperty(Lav_PANNER_STRATEGY).getIntValue();
 	bool hookHrtf = false, hookAmplitude = false;
 	switch(newStrategy) {
@@ -80,15 +80,15 @@ void LavMultipannerObject::strategyChanged() {
 		hookHrtf = true;
 		break;
 		case Lav_PANNING_STRATEGY_STEREO:
-		std::dynamic_pointer_cast<LavAmplitudePannerNode>(amplitude_panner)->configureStandardChannelMap(2);
+		std::dynamic_pointer_cast<AmplitudePannerNode>(amplitude_panner)->configureStandardChannelMap(2);
 		hookAmplitude = true;
 		break;
 		case Lav_PANNING_STRATEGY_SURROUND51:
-		std::dynamic_pointer_cast<LavAmplitudePannerNode>(amplitude_panner)->configureStandardChannelMap(6);
+		std::dynamic_pointer_cast<AmplitudePannerNode>(amplitude_panner)->configureStandardChannelMap(6);
 		hookAmplitude = true;
 		break;
 		case Lav_PANNING_STRATEGY_SURROUND71:
-		std::dynamic_pointer_cast<LavAmplitudePannerNode>(amplitude_panner)->configureStandardChannelMap(8);
+		std::dynamic_pointer_cast<AmplitudePannerNode>(amplitude_panner)->configureStandardChannelMap(8);
 		hookAmplitude=true;
 		break;
 	}
@@ -107,14 +107,14 @@ void LavMultipannerObject::strategyChanged() {
 
 Lav_PUBLIC_FUNCTION LavError Lav_createMultipannerNode(LavHandle simulationHandle, char* hrtfPath, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<LavSimulation>(simulationHandle);
+	auto simulation = incomingObject<Simulation>(simulationHandle);
 	LOCK(*simulation);
-	std::shared_ptr<LavHrtfData> hrtf = std::make_shared<LavHrtfData>();
+	std::shared_ptr<HrtfData> hrtf = std::make_shared<HrtfData>();
 	if(std::string(hrtfPath) == "default") {
 		hrtf->loadFromDefault(simulation->getSr());
 	} else {
 		hrtf->loadFromFile(hrtfPath, simulation->getSr());
 	}
-	*destination = outgoingObject<LavNode>(createMultipannerNode(simulation, hrtf));
+	*destination = outgoingObject<Node>(createMultipannerNode(simulation, hrtf));
 	PUB_END
 }

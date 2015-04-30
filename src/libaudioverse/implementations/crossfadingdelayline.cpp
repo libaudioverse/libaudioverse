@@ -7,11 +7,11 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <functional>
 #include <math.h>
 
-LavCrossfadingDelayLine::LavCrossfadingDelayLine(float maxDelay, float sr): line((int)(sr*maxDelay)+1) {
+CrossfadingDelayLine::CrossfadingDelayLine(float maxDelay, float sr): line((int)(sr*maxDelay)+1) {
 	this->sr = sr;
 }
 
-void LavCrossfadingDelayLine::setDelay(float delay) {
+void CrossfadingDelayLine::setDelay(float delay) {
 	int newDelay = (unsigned int)(delay*sr);
 	if(newDelay >= line.getLength()) newDelay = line.getLength()-1;
 	new_delay = newDelay;
@@ -20,16 +20,16 @@ void LavCrossfadingDelayLine::setDelay(float delay) {
 	//if we are already interpolating, there is no good option, but suddenly moving back is worse.
 }
 
-void LavCrossfadingDelayLine::setInterpolationTime(float t) {
+void CrossfadingDelayLine::setInterpolationTime(float t) {
 	interpolation_delta = 1.0/(t*sr);
 }
 
-float LavCrossfadingDelayLine::computeSample() {
+float CrossfadingDelayLine::computeSample() {
 	if(is_interpolating) return weight1*line.read(delay)+weight2*line.read(new_delay);
 	return line.read(delay);
 }
 
-void LavCrossfadingDelayLine::advance(float sample) {
+void CrossfadingDelayLine::advance(float sample) {
 	line.advance(sample);
 	if(is_interpolating) {
 		weight1 -= interpolation_delta;
@@ -43,17 +43,17 @@ void LavCrossfadingDelayLine::advance(float sample) {
 		}
 	}
 }
-void LavCrossfadingDelayLine::write(float delay, float value) {
+void CrossfadingDelayLine::write(float delay, float value) {
 	int index = (int)(delay*sr);
 	line.write(index, value);
 }
 
-void LavCrossfadingDelayLine::add(float delay, float value) {
+void CrossfadingDelayLine::add(float delay, float value) {
 	int index = (int)(delay*sr);
 	line.write(index, value);
 }
 
-void LavCrossfadingDelayLine::reset() {
+void CrossfadingDelayLine::reset() {
 	weight1 = 1.0f;
 	weight2 = 0.0f;
 	is_interpolating = false;

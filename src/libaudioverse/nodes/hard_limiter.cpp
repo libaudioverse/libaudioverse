@@ -12,24 +12,24 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/memory.hpp>
 #include <memory>
 
-class LavHardLimiterNode: public LavNode {
+class HardLimiterNode: public Node {
 	public:
-	LavHardLimiterNode(std::shared_ptr<LavSimulation> simulation, unsigned int numInputs);
+	HardLimiterNode(std::shared_ptr<Simulation> simulation, unsigned int numInputs);
 	virtual void process();
 };
 
-LavHardLimiterNode::LavHardLimiterNode(std::shared_ptr<LavSimulation> simulation, unsigned int numInputs): LavNode(Lav_OBJTYPE_HARD_LIMITER_NODE, simulation, numInputs, numInputs) {
+HardLimiterNode::HardLimiterNode(std::shared_ptr<Simulation> simulation, unsigned int numInputs): Node(Lav_OBJTYPE_HARD_LIMITER_NODE, simulation, numInputs, numInputs) {
 	appendInputConnection(0, numInputs);
 	appendOutputConnection(0, numInputs);
 }
 
-std::shared_ptr<LavNode>createHardLimiterNode(std::shared_ptr<LavSimulation> simulation, unsigned int numChannels) {
-	auto retval = std::shared_ptr<LavHardLimiterNode>(new LavHardLimiterNode(simulation, numChannels), LavObjectDeleter(simulation));
+std::shared_ptr<Node>createHardLimiterNode(std::shared_ptr<Simulation> simulation, unsigned int numChannels) {
+	auto retval = std::shared_ptr<HardLimiterNode>(new HardLimiterNode(simulation, numChannels), ObjectDeleter(simulation));
 	simulation->associateNode(retval);
 	return retval;
 }
 
-void LavHardLimiterNode::process() {
+void HardLimiterNode::process() {
 	for(unsigned int i = 0; i < block_size; i++) {
 		for(unsigned int o = 0; o < num_output_buffers; o++) {
 			if(input_buffers[o][i] > 1.0f) {
@@ -49,9 +49,9 @@ void LavHardLimiterNode::process() {
 
 Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterNode(LavHandle simulationHandle, unsigned int numChannels, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation =incomingObject<LavSimulation>(simulationHandle);
+	auto simulation =incomingObject<Simulation>(simulationHandle);
 	LOCK(*simulation);
 	auto retval = createHardLimiterNode(simulation, numChannels);
-	*destination = outgoingObject<LavNode>(retval);
+	*destination = outgoingObject<Node>(retval);
 	PUB_END
 }

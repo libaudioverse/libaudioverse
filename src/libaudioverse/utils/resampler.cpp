@@ -14,13 +14,13 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdio.h>
 #include <libaudioverse/speex_resampler.h>
 
-LavResampler::LavResampler(int inputFrameCount, int inputChannels, int inputSr, int outputSr): input_frame_count(inputFrameCount), input_channels(inputChannels), input_sr(inputSr), output_sr(outputSr) {
+Resampler::Resampler(int inputFrameCount, int inputChannels, int inputSr, int outputSr): input_frame_count(inputFrameCount), input_channels(inputChannels), input_sr(inputSr), output_sr(outputSr) {
 	delta = (float)inputSr/(float)outputSr;
 	spx_resampler = speex_resampler_init(inputChannels, inputSr, outputSr, 1, &spx_error);
 	if(spx_resampler==nullptr) throw LavErrorException(Lav_ERROR_MEMORY);
 }
 
-void LavResampler::read(float* source) {
+void Resampler::read(float* source) {
 	float* buff;
 	if(done_queue.empty()) {
 		buff = new float[input_frame_count*input_channels];
@@ -33,7 +33,7 @@ void LavResampler::read(float* source) {
 	queue.push_back(buff);
 }
 
-int LavResampler::write(float* dest, int maxFrameCount) {
+int Resampler::write(float* dest, int maxFrameCount) {
 	int count = 0;
 	float* buff;
 	while(count < maxFrameCount && queue.empty() == false) {
@@ -57,7 +57,7 @@ int LavResampler::write(float* dest, int maxFrameCount) {
 	return count;
 }
 
-int LavResampler::estimateAvailableFrames() {
+int Resampler::estimateAvailableFrames() {
 	float delta_rec = 1.0/delta;
 	return queue.size()*delta_rec*input_frame_count;
 }

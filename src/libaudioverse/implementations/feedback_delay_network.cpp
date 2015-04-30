@@ -8,19 +8,19 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <functional>
 #include <math.h>
 
-LavFeedbackDelayNetwork::LavFeedbackDelayNetwork(int n, float maxDelay, float sr) {
+FeedbackDelayNetwork::FeedbackDelayNetwork(int n, float maxDelay, float sr) {
 	this->n = n;
 	this->sr = sr;
 	this->using_feedback_delay_matrix = false;
-	bank = new LavCrossfadingDelayLine*[n];
-	for(int i = 0; i < n; i++) bank[i] = new LavCrossfadingDelayLine(maxDelay, sr);
+	bank = new CrossfadingDelayLine*[n];
+	for(int i = 0; i < n; i++) bank[i] = new CrossfadingDelayLine(maxDelay, sr);
 	feedback_matrix = new float[n*n]();
 	feedback_delay_matrix = new float[n*n]();
 	delays = new float[n]();
 	workspace = new float[n*n]();
 }
 
-LavFeedbackDelayNetwork::~LavFeedbackDelayNetwork() {
+FeedbackDelayNetwork::~FeedbackDelayNetwork() {
 	for(int i = 0; i < n; i++) delete bank[i];
 	delete[] bank;
 	delete[] feedback_matrix;
@@ -29,12 +29,12 @@ LavFeedbackDelayNetwork::~LavFeedbackDelayNetwork() {
 	delete[] workspace;
 }
 
-void LavFeedbackDelayNetwork::computeFrame(float* outputs) {
+void FeedbackDelayNetwork::computeFrame(float* outputs) {
 	//the output step is not special.
 	for(int i = 0; i < n; i++) outputs[i] = bank[i]->computeSample();
 }
 
-void LavFeedbackDelayNetwork::advance(float* nextInput, float* lastOutput) {
+void FeedbackDelayNetwork::advance(float* nextInput, float* lastOutput) {
 	//two cases. The first is that we're not using the feedback delay matrix.
 	if(using_feedback_delay_matrix == false) {
 		advanceNoFeedbackDelayMatrix(nextInput, lastOutput);
@@ -43,7 +43,7 @@ void LavFeedbackDelayNetwork::advance(float* nextInput, float* lastOutput) {
 	}
 }
 
-void LavFeedbackDelayNetwork::computeFeedbacks(float* lastOutput) {
+void FeedbackDelayNetwork::computeFeedbacks(float* lastOutput) {
 	for(int row = 0; row < n; row++) {
 		for(int column = 0; column < n; column++) {
 			workspace[row*n+column] = lastOutput[row]*feedback_matrix[row*n+column];
@@ -58,7 +58,7 @@ void LavFeedbackDelayNetwork::computeFeedbacks(float* lastOutput) {
 	//and now the first row of workspace is a frame of feedback.
 }
 
-void LavFeedbackDelayNetwork::advanceNoFeedbackDelayMatrix(float* nextInput, float* lastOutput) {
+void FeedbackDelayNetwork::advanceNoFeedbackDelayMatrix(float* nextInput, float* lastOutput) {
 	//in this case, we advance the delay lines with their computed feedback samples.
 	//fill workspace with a computed feedback frame:
 	computeFeedbacks(lastOutput);
@@ -68,7 +68,7 @@ void LavFeedbackDelayNetwork::advanceNoFeedbackDelayMatrix(float* nextInput, flo
 	for(int column = 0; column < n; column++) bank[column]->advance(workspace[column]);
 }
 
-void LavFeedbackDelayNetwork::advanceFeedbackDelayMatrix(float* nextInput, float* lastOutput) {
+void FeedbackDelayNetwork::advanceFeedbackDelayMatrix(float* nextInput, float* lastOutput) {
 	//in this case, we do the same as above.
 	//but instead of advancing with feedback+input, we advance with input and then manually write the feedbacks.
 	for(int column = 0; column < n; column++) bank[column]->advance(nextInput[column]);
@@ -84,23 +84,23 @@ void LavFeedbackDelayNetwork::advanceFeedbackDelayMatrix(float* nextInput, float
 
 //below here is not very algorithmic, just setters.
 
-void LavFeedbackDelayNetwork::setFeedbackMatrix(float* feedbacks) {
+void FeedbackDelayNetwork::setFeedbackMatrix(float* feedbacks) {
 	std::copy(feedbacks, feedbacks+n*n, feedback_matrix);
 }
 
-void LavFeedbackDelayNetwork::setFeedbackDelayMatrix(float* feedbackDelays) {
+void FeedbackDelayNetwork::setFeedbackDelayMatrix(float* feedbackDelays) {
 	std::copy(feedbackDelays, feedbackDelays+n*n, feedback_delay_matrix);
 }
 
-void LavFeedbackDelayNetwork::setDelays(float* delays) {
+void FeedbackDelayNetwork::setDelays(float* delays) {
 	std::copy(delays, delays+n, this->delays);
 	for(int i = 0; i < n; i++) bank[i]->setDelay(delays[i]);
 }
 
-void LavFeedbackDelayNetwork::setCrossfadingTime(float time) {
+void FeedbackDelayNetwork::setCrossfadingTime(float time) {
 	for(int i = 0; i < n; i++) bank[i]->setInterpolationTime(time);
 }
 
-void LavFeedbackDelayNetwork::reset() {
+void FeedbackDelayNetwork::reset() {
 	for(int i = 0; i < n; i++) bank[i]->reset();
 }

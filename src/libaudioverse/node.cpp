@@ -22,7 +22,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <vector>
 
 /**Given two nodes, determine if connecting an output of start to an input of end causes a cycle.*/
-bool doesEdgePreserveAcyclicity(std::shared_ptr<LavNode> start, std::shared_ptr<LavNode> end) {
+bool doesEdgePreserveAcyclicity(std::shared_ptr<Node> start, std::shared_ptr<Node> end) {
 	//A cycle exists if end is directly or indirectly conneccted to an input of start.
 	//To that end, we use recursion as follows.
 	//if we are called with start==end, it's a cycle.
@@ -35,7 +35,7 @@ bool doesEdgePreserveAcyclicity(std::shared_ptr<LavNode> start, std::shared_ptr<
 	return true;
 }
 
-LavNode::LavNode(int type, std::shared_ptr<LavSimulation> simulation, unsigned int numInputBuffers, unsigned int numOutputBuffers): LavExternalObject(type) {
+Node::Node(int type, std::shared_ptr<Simulation> simulation, unsigned int numInputBuffers, unsigned int numOutputBuffers): ExternalObject(type) {
 	this->simulation= simulation;
 	//request properties from the metadata module.
 	properties = makePropertyTable(type);
@@ -60,22 +60,22 @@ LavNode::LavNode(int type, std::shared_ptr<LavSimulation> simulation, unsigned i
 	resize(numInputBuffers, numOutputBuffers);
 }
 
-LavNode::~LavNode() {
+Node::~Node() {
 	for(auto i: output_buffers) {
-		LavFreeArray(i);
+		FreeArray(i);
 	}
 	for(auto i: input_buffers) {
-		LavFreeArray(i);
+		FreeArray(i);
 	}
 }
 
-void LavNode::tickProperties() {
+void Node::tickProperties() {
 	for(auto &i: properties) {
 		i.second.tick();
 	}
 }
 
-void LavNode::tick() {
+void Node::tick() {
 	if(last_processed== simulation->getTickCount()) return; //we processed this tick already.
 	//Incrementing this counter here prevents duplication of zeroing outputs if we're in the paused state.
 	last_processed = simulation->getTickCount();
@@ -123,92 +123,92 @@ void LavNode::tick() {
 }
 
 //cleans up stuff.
-void LavNode::doMaintenance() {
+void Node::doMaintenance() {
 	//nothing, for now. This is needed for the upcoming refactor.
 }
 
 /*Default Processing function.*/
-void LavNode::process() {
+void Node::process() {
 	zeroOutputBuffers();
 }
 
-void LavNode::zeroOutputBuffers() {
+void Node::zeroOutputBuffers() {
 	for(unsigned int i = 0; i < output_buffers.size(); i++) {
 		memset(output_buffers[i], 0, block_size*sizeof(float));
 	}
 }
 
-void LavNode::zeroInputBuffers() {
+void Node::zeroInputBuffers() {
 	for(unsigned int i = 0; i < input_buffers.size(); i++) {
 		memset(input_buffers[i], 0, sizeof(float)*simulation->getBlockSize());
 	}
 }
 
-void LavNode::willProcessParents() {
+void Node::willProcessParents() {
 }
 
-int LavNode::getState() {
+int Node::getState() {
 	return getProperty(Lav_NODE_STATE).getIntValue();
 }
 
-int LavNode::getOutputBufferCount() {
+int Node::getOutputBufferCount() {
 	return output_buffers.size();
 }
 
-float** LavNode::getOutputBufferArray() {
+float** Node::getOutputBufferArray() {
 	//vectors are guaranteed to be contiguous in most if not all implementations as well as (possibly, no source handy) the C++11 standard.
 	return &output_buffers[0];
 }
 
-int LavNode::getInputBufferCount() {
+int Node::getInputBufferCount() {
 	return input_buffers.size();
 }
 
-float** LavNode::getInputBufferArray() {
+float** Node::getInputBufferArray() {
 	return &input_buffers[0];
 }
 
-int LavNode::getInputConnectionCount() {
+int Node::getInputConnectionCount() {
 	return input_connections.size();
 }
 
-int LavNode::getOutputConnectionCount() {
+int Node::getOutputConnectionCount() {
 	return output_connections.size();
 }
 
-std::shared_ptr<LavInputConnection> LavNode::getInputConnection(int which) {
+std::shared_ptr<InputConnection> Node::getInputConnection(int which) {
 	if(which >= getInputConnectionCount() || which < 0) throw LavErrorException(Lav_ERROR_RANGE);
-	return std::shared_ptr<LavInputConnection>(this->shared_from_this(), &input_connections[which]);
+	return std::shared_ptr<InputConnection>(this->shared_from_this(), &input_connections[which]);
 }
 
-std::shared_ptr<LavOutputConnection> LavNode::getOutputConnection(int which) {
+std::shared_ptr<OutputConnection> Node::getOutputConnection(int which) {
 	if(which < 0 || which >= getOutputConnectionCount()) throw LavErrorException(Lav_ERROR_RANGE);
-	return std::shared_ptr<LavOutputConnection>(this->shared_from_this(), &output_connections[which]);
+	return std::shared_ptr<OutputConnection>(this->shared_from_this(), &output_connections[which]);
 }
 
-void LavNode::appendInputConnection(int start, int count) {
+void Node::appendInputConnection(int start, int count) {
 	input_connections.emplace_back(simulation, this, start, count);
 }
 
-void LavNode::appendOutputConnection(int start, int count) {
+void Node::appendOutputConnection(int start, int count) {
 	output_connections.emplace_back(simulation, this, start, count);
 }
 
-void LavNode::connect(int output, std::shared_ptr<LavNode> toNode, int input) {
-	if(doesEdgePreserveAcyclicity(std::static_pointer_cast<LavNode>(this->shared_from_this()), toNode) == false) throw LavErrorException(Lav_ERROR_CAUSES_CYCLE);
+void Node::connect(int output, std::shared_ptr<Node> toNode, int input) {
+	if(doesEdgePreserveAcyclicity(std::static_pointer_cast<Node>(this->shared_from_this()), toNode) == false) throw LavErrorException(Lav_ERROR_CAUSES_CYCLE);
 	auto outputConnection =getOutputConnection(output);
 	auto inputConnection = toNode->getInputConnection(input);
 	makeConnection(outputConnection, inputConnection);
 }
 
-void LavNode::connectSimulation(int which) {
+void Node::connectSimulation(int which) {
 	auto outputConnection=getOutputConnection(which);
 	auto inputConnection = simulation->getFinalOutputConnection();
 	makeConnection(outputConnection, inputConnection);
 }
 
-void LavNode::connectProperty(int output, std::shared_ptr<LavNode> node, int slot) {
-	if(doesEdgePreserveAcyclicity(std::static_pointer_cast<LavNode>(this->shared_from_this()), node) == false) throw LavErrorException(Lav_ERROR_CAUSES_CYCLE);
+void Node::connectProperty(int output, std::shared_ptr<Node> node, int slot) {
+	if(doesEdgePreserveAcyclicity(std::static_pointer_cast<Node>(this->shared_from_this()), node) == false) throw LavErrorException(Lav_ERROR_CAUSES_CYCLE);
 	auto &prop = node->getProperty(slot);
 	auto conn = prop.getInputConnection();
 	if(conn ==nullptr) throw LavErrorException(Lav_ERROR_CANNOT_CONNECT_TO_PROPERTY);
@@ -216,64 +216,64 @@ void LavNode::connectProperty(int output, std::shared_ptr<LavNode> node, int slo
 	makeConnection(outputConn, conn);
 }
 
-void LavNode::disconnect(int which) {
+void Node::disconnect(int which) {
 	auto o =getOutputConnection(which);
 	o->clear();
 }
 
-std::shared_ptr<LavSimulation> LavNode::getSimulation() {
+std::shared_ptr<Simulation> Node::getSimulation() {
 	return simulation;
 }
 
-LavProperty& LavNode::getProperty(int slot) {
+Property& Node::getProperty(int slot) {
 	if(properties.count(slot) == 0) throw LavErrorException(Lav_ERROR_RANGE);
 	else return properties[slot];
 }
 
-LavEvent& LavNode::getEvent(int which) {
+Event& Node::getEvent(int which) {
 	if(events.count(which) == 0) throw LavErrorException(Lav_ERROR_RANGE);
 	return events[which];
 }
 
-void LavNode::lock() {
+void Node::lock() {
 	simulation->lock();
 }
 
-void LavNode::unlock() {
+void Node::unlock() {
 	simulation->unlock();
 }
 
-void LavNode::reset() {
+void Node::reset() {
 }
 
 //protected resize function.
-void LavNode::resize(int newInputCount, int newOutputCount) {
+void Node::resize(int newInputCount, int newOutputCount) {
 	int oldInputCount = input_buffers.size();
-	for(int i = oldInputCount-1; i >= newInputCount; i--) LavFreeArray(input_buffers[i]);
+	for(int i = oldInputCount-1; i >= newInputCount; i--) FreeArray(input_buffers[i]);
 	input_buffers.resize(newInputCount, nullptr);
-	for(int i = oldInputCount; i < newInputCount; i++) input_buffers[i]=LavAllocArray<float>(simulation->getBlockSize());
+	for(int i = oldInputCount; i < newInputCount; i++) input_buffers[i] = AllocArray<float>(simulation->getBlockSize());
 
 	int oldOutputCount = output_buffers.size();
 	if(newOutputCount < oldOutputCount) { //we need to free some arrays.
 		for(auto i = newOutputCount; i < oldOutputCount; i++) {
-			LavFreeArray(output_buffers[i]);
+			FreeArray(output_buffers[i]);
 		}
 	}
 	//do the resize.
 	output_buffers.resize(newOutputCount, nullptr);
 	if(newOutputCount > oldOutputCount) { //we need to allocate some more arrays.
 		for(auto i = oldOutputCount; i < newOutputCount; i++) {
-			output_buffers[i] = LavAllocArray<float>(simulation->getBlockSize());
+			output_buffers[i] = AllocArray<float>(simulation->getBlockSize());
 		}
 	}
 }
 
-std::set<std::shared_ptr<LavNode>> LavNode::getDependencies() {
-	std::set<std::shared_ptr<LavNode>> retval;
+std::set<std::shared_ptr<Node>> Node::getDependencies() {
+	std::set<std::shared_ptr<Node>> retval;
 	for(int i = 0; i < getInputConnectionCount(); i++) {
 		auto j = getInputConnection(i)->getConnectedNodes();
 		for(auto &p: j) {
-			retval.insert(std::static_pointer_cast<LavNode>(p->shared_from_this()));
+			retval.insert(std::static_pointer_cast<Node>(p->shared_from_this()));
 		}
 	}
 	for(auto &p: properties) {
@@ -281,7 +281,7 @@ std::set<std::shared_ptr<LavNode>> LavNode::getDependencies() {
 		auto conn = prop.getInputConnection();
 		if(conn) {
 			for(auto n: conn->getConnectedNodes()) {
-				retval.insert(std::static_pointer_cast<LavNode>(n->shared_from_this()));
+				retval.insert(std::static_pointer_cast<Node>(n->shared_from_this()));
 			}
 		}
 	}
@@ -290,38 +290,38 @@ std::set<std::shared_ptr<LavNode>> LavNode::getDependencies() {
 
 //LavSubgraphNode
 
-LavSubgraphNode::LavSubgraphNode(int type, std::shared_ptr<LavSimulation> simulation): LavNode(type, simulation, 0, 0) {
+SubgraphNode::SubgraphNode(int type, std::shared_ptr<Simulation> simulation): Node(type, simulation, 0, 0) {
 }
 
-void LavSubgraphNode::setInputNode(std::shared_ptr<LavNode> node) {
+void SubgraphNode::setInputNode(std::shared_ptr<Node> node) {
 	subgraph_input= node;
 }
 
-void LavSubgraphNode::setOutputNode(std::shared_ptr<LavNode> node) {
+void SubgraphNode::setOutputNode(std::shared_ptr<Node> node) {
 	subgraph_output=node;
 }
 
-int LavSubgraphNode::getInputConnectionCount() {
+int SubgraphNode::getInputConnectionCount() {
 	if(subgraph_input) return subgraph_input->getInputConnectionCount();
 	else return 0;
 }
 
-std::shared_ptr<LavInputConnection> LavSubgraphNode::getInputConnection(int which) {
+std::shared_ptr<InputConnection> SubgraphNode::getInputConnection(int which) {
 	if(which < 0|| which >= getInputConnectionCount()) throw LavErrorException(Lav_ERROR_RANGE);
 	else return subgraph_input->getInputConnection(which);
 }
 
-int LavSubgraphNode::getOutputBufferCount() {
+int SubgraphNode::getOutputBufferCount() {
 	if(subgraph_output) return subgraph_output->getOutputBufferCount();
 	else return 0;
 }
 
-float** LavSubgraphNode::getOutputBufferArray() {
+float** SubgraphNode::getOutputBufferArray() {
 	if(subgraph_output) return subgraph_output->getOutputBufferArray();
 	return nullptr;
 }
 
-void LavSubgraphNode::tick() {
+void SubgraphNode::tick() {
 	if(last_processed== simulation->getTickCount()) return;
 	last_processed=simulation->getTickCount();
 	if(getState() == Lav_NODESTATE_PAUSED) return;
@@ -361,15 +361,15 @@ void LavSubgraphNode::tick() {
 
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetSimulation(LavHandle handle, LavHandle* destination) {
 	PUB_BEGIN
-auto n = incomingObject<LavNode>(handle);
+auto n = incomingObject<Node>(handle);
 	*destination = outgoingObject(n->getSimulation());
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_nodeConnect(LavHandle nodeHandle, int output, LavHandle destHandle, int input) {
 	PUB_BEGIN
-	auto node= incomingObject<LavNode>(nodeHandle);
-	auto dest = incomingObject<LavNode>(destHandle);
+	auto node= incomingObject<Node>(nodeHandle);
+	auto dest = incomingObject<Node>(destHandle);
 	LOCK(*node);
 	node->connect(output, dest, input);
 	PUB_END
@@ -377,7 +377,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeConnect(LavHandle nodeHandle, int output, L
 
 Lav_PUBLIC_FUNCTION LavError Lav_nodeConnectSimulation(LavHandle nodeHandle, int output) {
 	PUB_BEGIN
-	auto node = incomingObject<LavNode>(nodeHandle);
+	auto node = incomingObject<Node>(nodeHandle);
 	LOCK(*node);
 	node->connectSimulation(output);
 	PUB_END
@@ -385,8 +385,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeConnectSimulation(LavHandle nodeHandle, int
 
 Lav_PUBLIC_FUNCTION LavError Lav_nodeConnectProperty(LavHandle nodeHandle, int output, LavHandle otherHandle, int slot) {
 	PUB_BEGIN
-	auto n = incomingObject<LavNode>(nodeHandle);
-	auto o = incomingObject<LavNode>(otherHandle);
+	auto n = incomingObject<Node>(nodeHandle);
+	auto o = incomingObject<Node>(otherHandle);
 	LOCK(*n);
 	n->connectProperty(output, o, slot);
 	PUB_END
@@ -394,7 +394,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeConnectProperty(LavHandle nodeHandle, int o
 
 Lav_PUBLIC_FUNCTION LavError Lav_nodeDisconnect(LavHandle nodeHandle, int output) {
 	PUB_BEGIN
-	auto node = incomingObject<LavNode>(nodeHandle);
+	auto node = incomingObject<Node>(nodeHandle);
 	LOCK(*node);
 	node->disconnect(output);
 	PUB_END
@@ -402,7 +402,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeDisconnect(LavHandle nodeHandle, int output
 
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetInputConnectionCount(LavHandle nodeHandle, unsigned int* destination) {
 	PUB_BEGIN
-	auto node = incomingObject<LavNode>(nodeHandle);
+	auto node = incomingObject<Node>(nodeHandle);
 	LOCK(*node);
 	*destination =node->getInputConnectionCount();
 	PUB_END
@@ -410,7 +410,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeGetInputConnectionCount(LavHandle nodeHandl
 
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetOutputConnectionCount(LavHandle nodeHandle, unsigned int* destination) {
 	PUB_BEGIN
-	auto node = incomingObject<LavNode>(nodeHandle);
+	auto node = incomingObject<Node>(nodeHandle);
 	LOCK(*node);
 	*destination = node->getOutputConnectionCount();
 	PUB_END
@@ -418,7 +418,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeGetOutputConnectionCount(LavHandle nodeHand
 
 Lav_PUBLIC_FUNCTION LavError Lav_nodeReset(LavHandle nodeHandle) {
 	PUB_BEGIN
-	auto node = incomingObject<LavNode>(nodeHandle);
+	auto node = incomingObject<Node>(nodeHandle);
 	LOCK(*node);
 	node->reset();
 	PUB_END
@@ -428,7 +428,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeReset(LavHandle nodeHandle) {
 //this is here because properties do not "know" about objects and only objects have properties; also, it made properties.cpp have to "know" about simulations and objects.
 
 //this works for getters and setters to lock the object and set a variable prop to be a pointer-like thing to a property.
-#define PROP_PREAMBLE(n, s, t) auto node_ptr = incomingObject<LavNode>(n);\
+#define PROP_PREAMBLE(n, s, t) auto node_ptr = incomingObject<Node>(n);\
 LOCK(*node_ptr);\
 auto &prop = node_ptr->getProperty((s));\
 if(prop.getType() != (t)) {\
@@ -439,7 +439,7 @@ throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);\
 
 Lav_PUBLIC_FUNCTION LavError Lav_nodeResetProperty(LavHandle nodeHandle, int slot) {
 	PUB_BEGIN
-	auto node_ptr = incomingObject<LavNode>(nodeHandle);
+	auto node_ptr = incomingObject<Node>(nodeHandle);
 	LOCK(*node_ptr);
 	auto prop = node_ptr->getProperty(slot);
 	READONLY_CHECK
@@ -573,7 +573,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeGetDoublePropertyRange(LavHandle nodeHandle
 
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetPropertyType(LavHandle nodeHandle, int slot, int* destination) {
 	PUB_BEGIN
-	auto node= incomingObject<LavNode>(nodeHandle);
+	auto node= incomingObject<Node>(nodeHandle);
 	LOCK(*node);
 	auto &prop = node->getProperty(slot);
 	*destination = prop.getType();
@@ -582,7 +582,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeGetPropertyType(LavHandle nodeHandle, int s
 
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetPropertyName(LavHandle nodeHandle, int slot, char** destination) {
 	PUB_BEGIN
-	auto node_ptr = incomingObject<LavNode>(nodeHandle);
+	auto node_ptr = incomingObject<Node>(nodeHandle);
 	LOCK(*node_ptr);
 	auto prop = node_ptr->getProperty(slot);
 	const char* n = prop.getName();
@@ -595,7 +595,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeGetPropertyName(LavHandle nodeHandle, int s
 
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetPropertyHasDynamicRange(LavHandle nodeHandle, int slot, int* destination) {
 	PUB_BEGIN
-	auto node = incomingObject<LavNode>(nodeHandle);
+	auto node = incomingObject<Node>(nodeHandle);
 	LOCK(*node);
 	auto &prop = node->getProperty(slot);
 	*destination = prop.getHasDynamicRange();
@@ -702,7 +702,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeGetIntArrayPropertyLength(LavHandle nodeHan
 
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetArrayPropertyLengthRange(LavHandle nodeHandle, int slot, unsigned int* destinationMin, unsigned int* destinationMax) {
 	PUB_BEGIN
-	auto ptr = incomingObject<LavNode>(nodeHandle);
+	auto ptr = incomingObject<Node>(nodeHandle);
 	LOCK(*ptr);
 	auto &prop = ptr->getProperty(slot);
 	int type = prop.getType();
@@ -713,7 +713,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeGetArrayPropertyLengthRange(LavHandle nodeH
 Lav_PUBLIC_FUNCTION LavError Lav_nodeSetBufferProperty(LavHandle nodeHandle, int slot, LavHandle bufferHandle) {
 	PUB_BEGIN
 	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_BUFFER);
-	auto buff=incomingObject<LavBuffer>(bufferHandle, true);
+	auto buff=incomingObject<Buffer>(bufferHandle, true);
 	prop.setBufferValue(buff);
 	PUB_END
 }
@@ -728,7 +728,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeGetBufferProperty(LavHandle nodeHandle, int
 //callback setup/configure/retrieval.
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetEventHandler(LavHandle nodeHandle, int event, LavEventCallback *destination) {
 	PUB_BEGIN
-	auto ptr = incomingObject<LavNode>(nodeHandle);
+	auto ptr = incomingObject<Node>(nodeHandle);
 	LOCK(*ptr);
 	*destination = ptr->getEvent(event).getExternalHandler();
 	PUB_END
@@ -736,7 +736,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeGetEventHandler(LavHandle nodeHandle, int e
 
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetEventUserDataPointer(LavHandle nodeHandle, int event, void** destination) {
 	PUB_BEGIN
-	auto ptr = incomingObject<LavNode>(nodeHandle);
+	auto ptr = incomingObject<Node>(nodeHandle);
 	LOCK(*ptr);
 	*destination = ptr->getEvent(event).getUserData();
 	PUB_END
@@ -744,15 +744,15 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeGetEventUserDataPointer(LavHandle nodeHandl
 
 Lav_PUBLIC_FUNCTION LavError Lav_nodeSetEvent(LavHandle nodeHandle, int event, LavEventCallback handler, void* userData) {
 	PUB_BEGIN
-	auto ptr = incomingObject<LavNode>(nodeHandle);
+	auto ptr = incomingObject<Node>(nodeHandle);
 	LOCK(*ptr);
 	auto &ev = ptr->getEvent(event);
 	if(handler) {
-		ev.setHandler([=](LavNode* o, void* d) { handler(o->externalObjectHandle, d);});
+		ev.setHandler([=](Node* o, void* d) { handler(o->externalObjectHandle, d);});
 		ev.setExternalHandler(handler);
 		ev.setUserData(userData);
 	} else {
-		ev.setHandler(std::function<void(LavNode*, void*)>());
+		ev.setHandler(std::function<void(Node*, void*)>());
 		ev.setExternalHandler(nullptr);
 	}
 	PUB_END

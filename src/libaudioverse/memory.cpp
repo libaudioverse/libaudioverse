@@ -18,7 +18,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 std::map<void*, std::shared_ptr<void>> *external_ptrs = nullptr;
 std::mutex *memory_lock = nullptr;
-std::map<int, std::shared_ptr<LavExternalObject>> *external_handles = nullptr;
+std::map<int, std::shared_ptr<ExternalObject>> *external_handles = nullptr;
 std::atomic<int> *max_handle = nullptr;
 LavHandleDestroyedCallback handle_destroyed_callback = nullptr;
 
@@ -27,7 +27,7 @@ void initializeMemoryModule() {
 	max_handle = new std::atomic<int>();
 	max_handle->store(1);
 	external_ptrs= new std::map<void*, std::shared_ptr<void>>();
-	external_handles=new std::map<int, std::shared_ptr<LavExternalObject>>();
+	external_handles=new std::map<int, std::shared_ptr<ExternalObject>>();
 }
 
 void shutdownMemoryModule() {
@@ -37,21 +37,21 @@ void shutdownMemoryModule() {
 	delete memory_lock;
 }
 
-LavExternalObject::LavExternalObject(int type) {
+ExternalObject::ExternalObject(int type) {
 	externalObjectHandle = max_handle->fetch_add(1);
 	this->type=type;
 	refcount.store(0);
 }
 
-LavExternalObject::~LavExternalObject() {
+ExternalObject::~ExternalObject() {
 	if(isExternalObject && handle_destroyed_callback) handle_destroyed_callback(externalObjectHandle);
 }
 
-int LavExternalObject::getType() {
+int ExternalObject::getType() {
 	return type;
 }
 
-void LavFreeArray(void* ptr) {
+void FreeArray(void* ptr) {
 	#if LIBAUDIOVERSE_MALLOC_ALIGNMENT == 1
 	free(ptr);
 	#else
@@ -60,8 +60,8 @@ void LavFreeArray(void* ptr) {
 	#endif
 }
 
-std::function<void(LavExternalObject*)> LavObjectDeleter(std::shared_ptr<LavSimulation> simulation) {
-	return [=](LavExternalObject* obj) {
+std::function<void(ExternalObject*)> ObjectDeleter(std::shared_ptr<Simulation> simulation) {
+	return [=](ExternalObject* obj) {
 		LOCK(*simulation);
 		delete obj;
 	};
@@ -79,14 +79,14 @@ Lav_PUBLIC_FUNCTION LavError Lav_free(void* ptr) {
 
 Lav_PUBLIC_FUNCTION LavError Lav_handleIncRef(LavHandle handle) {
 	PUB_BEGIN
-	auto e = incomingObject<LavExternalObject>(handle);
+	auto e = incomingObject<ExternalObject>(handle);
 	e->refcount.fetch_add(1);
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_handleDecRef(LavHandle handle) {
 	PUB_BEGIN
-	auto e = incomingObject<LavExternalObject>(handle);
+	auto e = incomingObject<ExternalObject>(handle);
 	e->refcount.fetch_add(-1);
 	int rc = e->refcount.load();
 	if(rc == 0) {
@@ -98,7 +98,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_handleDecRef(LavHandle handle) {
 
 Lav_PUBLIC_FUNCTION LavError Lav_handleGetAndClearFirstAccess(LavHandle handle, int* destination) {
 	PUB_BEGIN
-	auto e = incomingObject<LavExternalObject>(handle);
+	auto e = incomingObject<ExternalObject>(handle);
 	*destination = e->isFirstExternalAccess;
 	e->isFirstExternalAccess = false;
 	PUB_END
@@ -106,14 +106,14 @@ Lav_PUBLIC_FUNCTION LavError Lav_handleGetAndClearFirstAccess(LavHandle handle, 
 
 Lav_PUBLIC_FUNCTION LavError Lav_handleGetRefCount(LavHandle handle, int* destination) {
 	PUB_BEGIN
-	auto e =incomingObject<LavExternalObject>(handle);
+	auto e =incomingObject<ExternalObject>(handle);
 	*destination =e->refcount.load();
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_handleGetType(LavHandle handle, int* destination) {
 	PUB_BEGIN
-	auto e = incomingObject<LavExternalObject>(handle);
+	auto e = incomingObject<ExternalObject>(handle);
 	*destination = e->getType();
 	PUB_END
 }

@@ -16,29 +16,29 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <memory>
 #include <math.h>
 
-class LavHrtfNode: public LavNode {
+class HrtfNode: public Node {
 	public:
-	LavHrtfNode(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf);
-	~LavHrtfNode();
+	HrtfNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf);
+	~HrtfNode();
 	virtual void process();
 	void reset();
 	private:
 	int history_length = 0;
 	float *history = nullptr, *left_response = nullptr, *right_response = nullptr, *old_left_response = nullptr, *old_right_response = nullptr;
-	std::shared_ptr<LavHrtfData> hrtf = nullptr;
+	std::shared_ptr<HrtfData> hrtf = nullptr;
 	float prev_azimuth = 0.0f, prev_elevation = 0.0f;
 };
 
-LavHrtfNode::LavHrtfNode(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf): LavNode(Lav_OBJTYPE_HRTF_NODE, simulation, 1, 2) {
+HrtfNode::HrtfNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf): Node(Lav_OBJTYPE_HRTF_NODE, simulation, 1, 2) {
 	type = Lav_OBJTYPE_HRTF_NODE;
 	this->hrtf = hrtf;
-	left_response = LavAllocArray<float>(hrtf->getLength()*sizeof(float));
-	right_response = LavAllocArray<float>(hrtf->getLength()*sizeof(float));
+	left_response = AllocArray<float>(hrtf->getLength()*sizeof(float));
+	right_response = AllocArray<float>(hrtf->getLength()*sizeof(float));
 	//used for moving objects.
-	old_left_response = LavAllocArray<float>(hrtf->getLength());
-	old_right_response = LavAllocArray<float>(hrtf->getLength());
+	old_left_response = AllocArray<float>(hrtf->getLength());
+	old_right_response = AllocArray<float>(hrtf->getLength());
 	history_length = hrtf->getLength() + simulation->getBlockSize();
-	history = LavAllocArray<float>(history_length);
+	history = AllocArray<float>(history_length);
 	hrtf->computeCoefficientsStereo(0.0f, 0.0f, left_response, right_response);
 	prev_azimuth = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
 	prev_elevation = getProperty(Lav_PANNER_ELEVATION).getFloatValue();
@@ -46,21 +46,21 @@ LavHrtfNode::LavHrtfNode(std::shared_ptr<LavSimulation> simulation, std::shared_
 	appendOutputConnection(0, 2);
 }
 
-LavHrtfNode::~LavHrtfNode() {
-	LavFreeArray(history);
-	LavFreeArray(left_response);
-	LavFreeArray(right_response);
-	LavFreeArray(old_left_response);
-	LavFreeArray(old_right_response);
+HrtfNode::~HrtfNode() {
+	FreeArray(history);
+	FreeArray(left_response);
+	FreeArray(right_response);
+	FreeArray(old_left_response);
+	FreeArray(old_right_response);
 }
 
-std::shared_ptr<LavNode>createHrtfNode(std::shared_ptr<LavSimulation>simulation, std::shared_ptr<LavHrtfData> hrtf) {
-	auto retval = std::shared_ptr<LavHrtfNode>(new LavHrtfNode(simulation, hrtf), LavObjectDeleter(simulation));
+std::shared_ptr<Node>createHrtfNode(std::shared_ptr<Simulation>simulation, std::shared_ptr<HrtfData> hrtf) {
+	auto retval = std::shared_ptr<HrtfNode>(new HrtfNode(simulation, hrtf), ObjectDeleter(simulation));
 	simulation->associateNode(retval);
 	return retval;
 }
 
-void LavHrtfNode::process() {
+void HrtfNode::process() {
 	//calculating the hrir is expensive, do it only if needed.
 	bool didRecompute = false;
 	bool allowCrossfade = getProperty(Lav_PANNER_SHOULD_CROSSFADE).getIntValue();
@@ -101,7 +101,7 @@ void LavHrtfNode::process() {
 	}
 }
 
-void LavHrtfNode::reset() {
+void HrtfNode::reset() {
 	memset(history, 0, sizeof(float)*history_length);
 }
 
@@ -109,15 +109,15 @@ void LavHrtfNode::reset() {
 
 Lav_PUBLIC_FUNCTION LavError Lav_createHrtfNode(LavHandle simulationHandle, const char* hrtfPath, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<LavSimulation>(simulationHandle);
+	auto simulation = incomingObject<Simulation>(simulationHandle);
 	LOCK(*simulation);
-	auto hrtf = std::make_shared<LavHrtfData>();
+	auto hrtf = std::make_shared<HrtfData>();
 	if(std::string(hrtfPath) != "default") {
 		hrtf->loadFromFile(hrtfPath, simulation->getSr());
 	} else {
 		hrtf->loadFromDefault(simulation->getSr());
 	}
 	auto retval = createHrtfNode(simulation, hrtf);
-	*destination = outgoingObject<LavNode>(retval);
+	*destination = outgoingObject<Node>(retval);
 	PUB_END
 }

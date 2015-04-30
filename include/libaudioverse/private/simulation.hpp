@@ -15,28 +15,28 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "../libaudioverse.h"
 #include "memory.hpp"
 
-class LavNode;
-class LavDevice;
-class LavInputConnection;
+class Node;
+class Device;
+class InputConnection;
 
 /*When thrown on the background thread, terminates it.*/
-class LavThreadTerminationException {
+class ThreadTerminationException {
 };
 
-class LavSimulation: public LavExternalObject {
+class Simulation: public ExternalObject {
 	public:
-	LavSimulation(unsigned int sr, unsigned int blockSize, unsigned int mixahead);
-	//needed because the LavInputConnection needs us to use shared_from_this.
+	Simulation(unsigned int sr, unsigned int blockSize, unsigned int mixahead);
+	//needed because the InputConnection needs us to use shared_from_this.
 	void completeInitialization();
-	virtual ~LavSimulation();
+	virtual ~Simulation();
 	virtual void getBlock(float* out, unsigned int channels, bool mayApplyMixingMatrix = true);
-	std::shared_ptr<LavInputConnection> getFinalOutputConnection();
+	std::shared_ptr<InputConnection> getFinalOutputConnection();
 
 	//this is in frames of audio data.
 	virtual unsigned int getBlockSize() { return block_size;}
 	virtual LavError start();
 	virtual LavError stop();
-	virtual LavError associateNode(std::shared_ptr<LavNode> node);
+	virtual LavError associateNode(std::shared_ptr<Node> node);
 
 	virtual float getSr() { return sr;}
 	virtual int getTickCount() {return tick_count;}
@@ -49,7 +49,7 @@ class LavSimulation: public LavExternalObject {
 	void enqueueTask(std::function<void(void)>);
 
 	//makes this device hold a shared pointer to its output.
-	void associateDevice(std::shared_ptr<LavDevice> what);
+	void associateDevice(std::shared_ptr<Device> what);
 
 	//register a mixing matrix with this device.
 	void registerMixingMatrix(unsigned int inChannels, unsigned int outChannels, float* matrix);
@@ -62,14 +62,14 @@ class LavSimulation: public LavExternalObject {
 
 	protected:
 	//the connection to which nodes connect themselves if their output should be audible.
-	std::shared_ptr<LavInputConnection> final_output_connection;
+	std::shared_ptr<InputConnection> final_output_connection;
 	//pointers to output buffers that the above connection can write to.
 	std::vector<float*> final_outputs;
 
 	unsigned int block_size = 0, mixahead = 0, is_started = 0;
 	float sr = 0.0f;
 	//if nodes die, they automatically need to be removed.  We can do said removal on next process.
-	std::set<std::weak_ptr<LavNode>, std::owner_less<std::weak_ptr<LavNode>>> nodes;
+	std::set<std::weak_ptr<Node>, std::owner_less<std::weak_ptr<Node>>> nodes;
 	std::recursive_mutex mutex;
 
 	powercores::ThreadsafeQueue<std::function<void(void)>>  tasks;
@@ -77,7 +77,7 @@ class LavSimulation: public LavExternalObject {
 	void backgroundTaskThreadFunction();
 
 	//our output, if any.
-	std::shared_ptr<LavDevice> device = nullptr;
+	std::shared_ptr<Device> device = nullptr;
 
 	//the registered mixing matrices for this simulation.
 	std::map<std::tuple<unsigned int, unsigned int>, float*> mixing_matrices;

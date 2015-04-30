@@ -10,38 +10,38 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 /**events.*/
 
-LavEvent::LavEvent() {
+Event::Event() {
 	is_firing.store(0);
 }
 
-LavEvent::LavEvent(const LavEvent &other):
+Event::Event(const Event &other):
 name(other.name), associated_simulation(other.associated_simulation), handler(other.handler), associated_node(other.associated_node), user_data(other.user_data), no_multifire(other.no_multifire) {
 	is_firing.store(0);
 }
 
-LavEvent& LavEvent::operator=(LavEvent other) {
+Event& Event::operator=(Event other) {
 	swap(*this, other);
 	return *this;
 }
 
-void LavEvent::setExternalHandler(LavEventCallback cb) {
+void Event::setExternalHandler(LavEventCallback cb) {
 	external_handler = cb;
 }
 
-LavEventCallback LavEvent::getExternalHandler() {
+LavEventCallback Event::getExternalHandler() {
 	return external_handler;
 }
 
-void LavEvent::setHandler(std::function<void(LavNode*, void*)> handler) {
+void Event::setHandler(std::function<void(Node*, void*)> handler) {
 	this->handler = handler;
 }
 
-void LavEvent::fire() {
+void Event::fire() {
 	if(handler == false) return; //nothing to do.
 	if(no_multifire && is_firing.load() == 1) return;
 	is_firing.store(1);
 	//we need to hold local copies of both the node and data in case they are changed between firing and processing by the simulation.
-	auto node= std::weak_ptr<LavNode>(std::static_pointer_cast<LavNode>(associated_node->shared_from_this()));
+	auto node= std::weak_ptr<Node>(std::static_pointer_cast<Node>(associated_node->shared_from_this()));
 	void* userdata = user_data;
 	//fire a lambda that uses these by copy.
 	associated_simulation->enqueueTask([=]() {
@@ -53,34 +53,34 @@ void LavEvent::fire() {
 	});
 }
 
-void LavEvent::associateSimulation(std::shared_ptr<LavSimulation> simulation) {
+void Event::associateSimulation(std::shared_ptr<Simulation> simulation) {
 	associated_simulation = simulation;
 }
 
-void LavEvent::associateNode(LavNode* node) {
+void Event::associateNode(Node* node) {
 	associated_node= node;
 }
 
-const char* LavEvent::getName() {
+const char* Event::getName() {
 	return name.c_str();
 }
 
-void LavEvent::setName(const char* n) {
+void Event::setName(const char* n) {
 	name = std::string(n);
 }
 
-void* LavEvent::getUserData() {
+void* Event::getUserData() {
 	return user_data;
 }
 
-void LavEvent::setUserData(void* data) {
+void Event::setUserData(void* data) {
 	user_data = data;
 }
 
-bool LavEvent::getNoMultifire() {
+bool Event::getNoMultifire() {
 	return no_multifire;
 }
 
-void LavEvent::setNoMultifire(bool what) {
+void Event::setNoMultifire(bool what) {
 	no_multifire = what;
 }

@@ -16,18 +16,18 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <algorithm>
 #include <math.h>
 
-class LavDelayNode: public LavNode {
+class DelayNode: public Node {
 	public:
-	LavDelayNode(std::shared_ptr<LavSimulation> simulation, float maxDelay, unsigned int lineCount);
+	DelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, unsigned int lineCount);
 	void process();
 	protected:
 	void delayChanged();
 	void recomputeDelta();
 	unsigned int delay_line_length = 0;
-	std::vector<LavCrossfadingDelayLine> lines;
+	std::vector<CrossfadingDelayLine> lines;
 };
 
-LavDelayNode::LavDelayNode(std::shared_ptr<LavSimulation> simulation, float maxDelay, unsigned int lineCount): LavNode(Lav_OBJTYPE_DELAY_NODE, simulation, lineCount, lineCount) {
+DelayNode::DelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, unsigned int lineCount): Node(Lav_OBJTYPE_DELAY_NODE, simulation, lineCount, lineCount) {
 	if(lineCount == 0) throw LavErrorException(Lav_ERROR_RANGE);
 	for(unsigned int i = 0; i < lineCount; i++) lines.emplace_back(maxDelay, simulation->getSr());
 	getProperty(Lav_DELAY_DELAY).setFloatRange(0.0f, maxDelay);
@@ -41,23 +41,23 @@ LavDelayNode::LavDelayNode(std::shared_ptr<LavSimulation> simulation, float maxD
 	appendOutputConnection(0, lineCount);
 }
 
-std::shared_ptr<LavNode> createDelayNode(std::shared_ptr<LavSimulation> simulation, float maxDelay, unsigned int lineCount) {
-	auto tmp = std::shared_ptr<LavDelayNode>(new LavDelayNode(simulation, maxDelay, lineCount), LavObjectDeleter(simulation));
+std::shared_ptr<Node> createDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, unsigned int lineCount) {
+	auto tmp = std::shared_ptr<DelayNode>(new DelayNode(simulation, maxDelay, lineCount), ObjectDeleter(simulation));
 	simulation->associateNode(tmp);
 	return tmp;
 }
 
-void LavDelayNode::recomputeDelta() {
+void DelayNode::recomputeDelta() {
 	float time = getProperty(Lav_DELAY_INTERPOLATION_TIME).getFloatValue();
 	for(auto &line: lines) line.setInterpolationTime(time);
 }
 
-void LavDelayNode::delayChanged() {
+void DelayNode::delayChanged() {
 	float newDelay = getProperty(Lav_DELAY_DELAY).getFloatValue();
 	for(auto &line: lines) line.setDelay(newDelay);
 }
 
-void LavDelayNode::process() {
+void DelayNode::process() {
 	float feedback = getProperty(Lav_DELAY_FEEDBACK).getFloatValue();
 	//optimize the common case of not having feedback.
 	//the only difference between these blocks is in the advance line.
@@ -84,7 +84,7 @@ void LavDelayNode::process() {
 //begin public api
 Lav_PUBLIC_FUNCTION LavError Lav_createDelayNode(LavHandle simulationHandle, float maxDelay, unsigned int lineCount, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation =incomingObject<LavSimulation>(simulationHandle);
+	auto simulation =incomingObject<Simulation>(simulationHandle);
 	LOCK(*simulation);
 	auto d = createDelayNode(simulation, maxDelay, lineCount);
 	*destination = outgoingObject(d);

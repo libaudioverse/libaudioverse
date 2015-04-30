@@ -16,14 +16,14 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <utility>
 #include <vector>
 
-class LavPushNode: public LavNode {
+class PushNode: public Node {
 	public:
-	LavPushNode(std::shared_ptr<LavSimulation> sim, unsigned int inputSr, unsigned int channels);
-	~LavPushNode();
+	PushNode(std::shared_ptr<Simulation> sim, unsigned int inputSr, unsigned int channels);
+	~PushNode();
 	void process();
 	void feed(unsigned int length, float* buffer);
 	unsigned int input_sr = 0;
-	std::shared_ptr<LavResampler> resampler = nullptr;
+	std::shared_ptr<Resampler> resampler = nullptr;
 	float* workspace = nullptr;
 	//the push_* variables are for the public api to feed us.
 	float* push_buffer = nullptr;
@@ -33,27 +33,27 @@ class LavPushNode: public LavNode {
 	bool fired_out_callback = false;
 };
 
-LavPushNode::LavPushNode(std::shared_ptr<LavSimulation> sim, unsigned int inputSr, unsigned int channels): LavNode(Lav_OBJTYPE_PUSH_NODE, sim, 0, channels) {
+PushNode::PushNode(std::shared_ptr<Simulation> sim, unsigned int inputSr, unsigned int channels): Node(Lav_OBJTYPE_PUSH_NODE, sim, 0, channels) {
 	input_sr = inputSr;
-	resampler = std::make_shared<LavResampler>(push_frames, channels, inputSr, (int)sim->getSr());
+	resampler = std::make_shared<Resampler>(push_frames, channels, inputSr, (int)sim->getSr());
 	this->push_channels = channels;
-	workspace = LavAllocArray<float>(push_channels*simulation->getBlockSize());
-	push_buffer = LavAllocArray<float>(push_frames*channels);
+	workspace = AllocArray<float>(push_channels*simulation->getBlockSize());
+	push_buffer = AllocArray<float>(push_frames*channels);
 	appendOutputConnection(0, channels);
 }
 
-std::shared_ptr<LavNode> createPushNode(std::shared_ptr<LavSimulation> simulation, unsigned int inputSr, unsigned int channels) {
-	auto retval = std::shared_ptr<LavPushNode>(new LavPushNode(simulation, inputSr, channels), LavObjectDeleter(simulation));
+std::shared_ptr<Node> createPushNode(std::shared_ptr<Simulation> simulation, unsigned int inputSr, unsigned int channels) {
+	auto retval = std::shared_ptr<PushNode>(new PushNode(simulation, inputSr, channels), ObjectDeleter(simulation));
 	simulation->associateNode(retval);
 	return retval;
 }
 
-LavPushNode::~LavPushNode() {
-	LavFreeArray(workspace);
-	LavFreeArray(push_buffer);
+PushNode::~PushNode() {
+	FreeArray(workspace);
+	FreeArray(push_buffer);
 }
 
-void LavPushNode::process() {
+void PushNode::process() {
 	memset(workspace, 0, sizeof(float)*push_channels*block_size);
 	unsigned int got = resampler->write(workspace, simulation->getBlockSize());
 	if(got < simulation->getBlockSize()) {
@@ -78,7 +78,7 @@ void LavPushNode::process() {
 	}
 }
 
-void LavPushNode::feed(unsigned int length, float* buffer) {
+void PushNode::feed(unsigned int length, float* buffer) {
 	fired_out_callback = false;
 	if(length%push_channels != 0) throw LavErrorException(Lav_ERROR_RANGE);
 	unsigned int frames = length/push_channels;
@@ -99,17 +99,17 @@ void LavPushNode::feed(unsigned int length, float* buffer) {
 
 Lav_PUBLIC_FUNCTION LavError Lav_createPushNode(LavHandle simulationHandle, unsigned int sr, unsigned int channels, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation =incomingObject<LavSimulation>(simulationHandle);
+	auto simulation =incomingObject<Simulation>(simulationHandle);
 	LOCK(*simulation);
-	*destination = outgoingObject<LavNode>(createPushNode(simulation, sr, channels));
+	*destination = outgoingObject<Node>(createPushNode(simulation, sr, channels));
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_pushNodeFeed(LavHandle nodeHandle, unsigned int length, float* buffer) {
 	PUB_BEGIN
-	auto node=incomingObject<LavNode>(nodeHandle);
+	auto node=incomingObject<Node>(nodeHandle);
 	LOCK(*node);
 	if(node->getType() != Lav_OBJTYPE_PUSH_NODE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
-	std::static_pointer_cast<LavPushNode>(node)->feed(length, buffer);
+	std::static_pointer_cast<PushNode>(node)->feed(length, buffer);
 	PUB_END
 }

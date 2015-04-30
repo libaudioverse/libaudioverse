@@ -7,36 +7,36 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <functional>
 #include <math.h>
 
-LavDelayRingbuffer::LavDelayRingbuffer(int length) {
+DelayRingbuffer::DelayRingbuffer(int length) {
 	buffer_length = length;
 	buffer = new float[length]();
 }
 
-LavDelayRingbuffer::~LavDelayRingbuffer() {
+DelayRingbuffer::~DelayRingbuffer() {
 	delete[] buffer;
 }
 
-float LavDelayRingbuffer::read(int offset) {
+float DelayRingbuffer::read(int offset) {
 	return buffer[ringmodi(write_head-offset, buffer_length)];
 }
 
-int LavDelayRingbuffer::getLength() {
+int DelayRingbuffer::getLength() {
 	return buffer_length;
 }
 
-void LavDelayRingbuffer::advance(float sample) {
+void DelayRingbuffer::advance(float sample) {
 	write_head++;
 	buffer[ringmodi(write_head, buffer_length)] = sample;
 }
 
-void LavDelayRingbuffer::write(int index, float value) {
+void DelayRingbuffer::write(int index, float value) {
 	buffer[ringmodi(write_head-index, buffer_length)] = value;
 }
 
-void LavDelayRingbuffer::add(int index, float value) {
+void DelayRingbuffer::add(int index, float value) {
 	buffer[ringmodi(write_head-index, buffer_length)] += value;
 }
 
-void LavDelayRingbuffer::reset() {
+void DelayRingbuffer::reset() {
 	memset(buffer, 0, sizeof(float)*buffer_length);
 }

@@ -20,10 +20,10 @@ This allows the last output frame to be modified before feeding it back in.
 */
 
 
-class LavFeedbackDelayNetwork {
+class FeedbackDelayNetwork {
 	public:
-	LavFeedbackDelayNetwork(int n, float maxDelay, float sr);
-	~LavFeedbackDelayNetwork();
+	FeedbackDelayNetwork(int n, float maxDelay, float sr);
+	~FeedbackDelayNetwork();
 	void computeFrame(float* outputs);
 	void advance(float* nextInput, float* lastOutput);
 	void setFeedbackMatrix(float* feedbacks);
@@ -38,7 +38,7 @@ class LavFeedbackDelayNetwork {
 	void advanceFeedbackDelayMatrix(float* nextInput, float* lastOutput);
 	int n;
 	float sr;
-	LavCrossfadingDelayLine **bank = nullptr;
+	CrossfadingDelayLine **bank = nullptr;
 	float *feedback_matrix = nullptr, *feedback_delay_matrix = nullptr;
 	//avoids very continuous reallocation, an n*n matrix.
 	float* workspace = nullptr;

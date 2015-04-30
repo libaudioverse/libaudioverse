@@ -20,7 +20,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 /**Code common to all backends, i.e. enumeration.*/
 
 //these are the two steps in initialization, and are consequently put before the destructor.
-void LavDevice::init(std::function<void(float*, int)> getBuffer, unsigned int inputBufferFrames, unsigned int inputBufferSr, unsigned int channels, unsigned int outputSr, unsigned int mixAhead) {
+void Device::init(std::function<void(float*, int)> getBuffer, unsigned int inputBufferFrames, unsigned int inputBufferSr, unsigned int channels, unsigned int outputSr, unsigned int mixAhead) {
 	input_buffer_frames = inputBufferFrames;
 	mix_ahead = mixAhead;
 	input_buffer_size = inputBufferFrames*channels;
@@ -42,13 +42,13 @@ void LavDevice::init(std::function<void(float*, int)> getBuffer, unsigned int in
 	}
 }
 
-void LavDevice::start() {
+void Device::start() {
 	mixing_thread_continue.test_and_set();
 	mixing_thread = std::thread([this] () {mixingThreadFunction();});
 	started = true;
 }
 
-LavDevice::~LavDevice() {
+Device::~Device() {
 	stop();
 	if(buffers != nullptr)
 	for(unsigned int i = 0; i < mix_ahead+1; i++) {
@@ -58,13 +58,13 @@ LavDevice::~LavDevice() {
 	if(buffer_statuses) delete[] buffer_statuses;
 }
 
-void LavDevice::stop() {
+void Device::stop() {
 	if(started == false) return;
 	mixing_thread_continue.clear();
 	mixing_thread.join();
 }
 
-void LavDevice::zeroOrNextBuffer(float* where) {
+void Device::zeroOrNextBuffer(float* where) {
 	if(buffer_statuses[next_output_buffer].load() == 1) {
 		std::copy(buffers[next_output_buffer], buffers[next_output_buffer]+output_buffer_size, where);
 		buffer_statuses[next_output_buffer].store(0);
@@ -76,15 +76,15 @@ void LavDevice::zeroOrNextBuffer(float* where) {
 	next_output_buffer %= mix_ahead+1;
 }
 
-void LavDevice::startup_hook() {
+void Device::startup_hook() {
 }
 
-void LavDevice::shutdown_hook() {
+void Device::shutdown_hook() {
 }
 
-void LavDevice::mixingThreadFunction() {
+void Device::mixingThreadFunction() {
 	bool hasFilledQueueFirstTime = false;
-	LavResampler resampler(input_buffer_frames, channels, input_sr, output_sr);
+	Resampler resampler(input_buffer_frames, channels, input_sr, output_sr);
 	unsigned int currentBuffer = 0;
 	unsigned int sleepFor = (unsigned int)(((double)input_buffer_frames/input_sr)*1000);
 	float* currentBlock = new float[input_buffer_size]();
@@ -122,17 +122,17 @@ void LavDevice::mixingThreadFunction() {
 	shutdown_hook();
 }
 
-LavDeviceFactory::~LavDeviceFactory() {
+DeviceFactory::~DeviceFactory() {
 	for(auto p: created_devices) {
 		auto strong = p.lock();
 		if(strong) strong->stop();
 	}
 }
 
-unsigned int LavDeviceFactory::getOutputCount() {
+unsigned int DeviceFactory::getOutputCount() {
 	return (unsigned int)output_count;
 }
 
-std::string LavDeviceFactory::getName() {
+std::string DeviceFactory::getName() {
 	return "Invalid backend: subclass failed to implement";
 }

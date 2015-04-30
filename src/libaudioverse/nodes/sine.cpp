@@ -16,25 +16,25 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/constants.hpp>
 #include <limits>
 
-class LavSineNode: public LavNode {
+class SineNode: public Node {
 	public:
-	LavSineNode(std::shared_ptr<LavSimulation> simulation);
+	SineNode(std::shared_ptr<Simulation> simulation);
 	virtual void process();
 	virtual void reset() override;
 	double phase = 0;
 };
 
-LavSineNode::LavSineNode(std::shared_ptr<LavSimulation> simulation): LavNode(Lav_OBJTYPE_SINE_NODE, simulation, 0, 1) {
+SineNode::SineNode(std::shared_ptr<Simulation> simulation): Node(Lav_OBJTYPE_SINE_NODE, simulation, 0, 1) {
 	appendOutputConnection(0, 1);
 }
 
-std::shared_ptr<LavNode> createSineNode(std::shared_ptr<LavSimulation> simulation) {
-	std::shared_ptr<LavSineNode> retval = std::shared_ptr<LavSineNode>(new LavSineNode(simulation), LavObjectDeleter(simulation));
+std::shared_ptr<Node> createSineNode(std::shared_ptr<Simulation> simulation) {
+	std::shared_ptr<SineNode> retval = std::shared_ptr<SineNode>(new SineNode(simulation), ObjectDeleter(simulation));
 	simulation->associateNode(retval);
 	return retval;
 }
 
-void LavSineNode::process() {
+void SineNode::process() {
 	auto &freqProp = getProperty(Lav_SINE_FREQUENCY);
 	if(freqProp.needsARate()==false) {
 		double phaseDelta=freqProp.getFloatValue()/simulation->getSr();
@@ -53,7 +53,7 @@ void LavSineNode::process() {
 	phase -=floor(phase);
 }
 
-void LavSineNode::reset() {
+void SineNode::reset() {
 	phase=0.0;
 }
 
@@ -61,9 +61,9 @@ void LavSineNode::reset() {
 
 Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavHandle simulationHandle, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<LavSimulation>(simulationHandle);
+	auto simulation = incomingObject<Simulation>(simulationHandle);
 	LOCK(*simulation);
 	auto retval = createSineNode(simulation);
-	*destination = outgoingObject<LavNode>(retval);
+	*destination = outgoingObject<Node>(retval);
 	PUB_END
 }

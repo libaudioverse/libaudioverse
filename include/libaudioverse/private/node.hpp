@@ -12,13 +12,13 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <vector>
 #include <set>
 
-class LavProperty;
+class Property;
 
 /**Things all Libaudioverse nodes have.*/
-class LavNode: public LavExternalObject { //enable_shared_from_this is for event infrastructure.
+class Node: public ExternalObject { //enable_shared_from_this is for event infrastructure.
 	public:
-	LavNode(int type, std::shared_ptr<LavSimulation> simulation, unsigned int numInputBuffers, unsigned int numOutputBuffers);
-	virtual ~LavNode();
+	Node(int type, std::shared_ptr<Simulation> simulation, unsigned int numInputBuffers, unsigned int numOutputBuffers);
+	virtual ~Node();
 
 	virtual int getOutputBufferCount();
 	//Note that this isn't shared ptr.  The output pointers for a node are managed by the node itself and we need to be able to allocate/deallocate them for SSE, as well as work with arrays.  Don't hold on to output pointers.
@@ -34,18 +34,18 @@ class LavNode: public LavExternalObject { //enable_shared_from_this is for event
 	virtual int getInputConnectionCount();
 	virtual int getOutputConnectionCount();
 	//these next two return shared pointers which "alias" this object.
-	virtual std::shared_ptr<LavInputConnection> getInputConnection(int which);
-	virtual std::shared_ptr<LavOutputConnection> getOutputConnection(int which);
+	virtual std::shared_ptr<InputConnection> getInputConnection(int which);
+	virtual std::shared_ptr<OutputConnection> getOutputConnection(int which);
 	//intended to be used by subclasses to add input and output connections.
 	virtual void appendInputConnection(int start, int count);
 	virtual void appendOutputConnection(int start, int count);
 
 	//make a connection from an output of this node to an input of another.
-	virtual void connect(int output, std::shared_ptr<LavNode> toNode, int input);
+	virtual void connect(int output, std::shared_ptr<Node> toNode, int input);
 	//make a connection from an output of this node to the simulation.
 	virtual void connectSimulation(int which);
 	//Connects an output to a property.
-	virtual void connectProperty(int output, std::shared_ptr<LavNode> node, int slot);
+	virtual void connectProperty(int output, std::shared_ptr<Node> node, int slot);
 	//called on an output, this function terminates all connections for which it is involved.
 	virtual void disconnect(int which);
 
@@ -67,11 +67,11 @@ class LavNode: public LavExternalObject { //enable_shared_from_this is for event
 	//the default does nothing.
 	virtual void willProcessParents();
 
-	virtual std::shared_ptr<LavSimulation> getSimulation();
-	virtual LavProperty& getProperty(int slot);
+	virtual std::shared_ptr<Simulation> getSimulation();
+	virtual Property& getProperty(int slot);
 
 	//event helper methods.
-	LavEvent& getEvent(int which);
+	Event& getEvent(int which);
 
 	//meet the lockable concept.
 	//Warning: these aren't virtual because they're just so that our macro works; all locking still forwards to devices.
@@ -85,15 +85,15 @@ class LavNode: public LavExternalObject { //enable_shared_from_this is for event
 	virtual void resize(int newInputCount, int newOutputCount);
 
 	//Return a set containing all nodes upon which we depend.
-	std::set<std::shared_ptr<LavNode>> getDependencies();
+	std::set<std::shared_ptr<Node>> getDependencies();
 	protected:
-	std::shared_ptr<LavSimulation> simulation = nullptr;
-	std::map<int, LavProperty> properties;
-	std::map<int, LavEvent> events;
+	std::shared_ptr<Simulation> simulation = nullptr;
+	std::map<int, Property> properties;
+	std::map<int, Event> events;
 	std::vector<float*> input_buffers;
 	std::vector<float*> output_buffers;
-	std::vector<LavInputConnection> input_connections;
-	std::vector<LavOutputConnection> output_connections;
+	std::vector<InputConnection> input_connections;
+	std::vector<OutputConnection> output_connections;
 	bool is_processing = false, is_suspended = false;
 	int num_input_buffers = 0, num_output_buffers = 0, block_size = 0;
 	//used to make no-op state changes free.
@@ -101,8 +101,8 @@ class LavNode: public LavExternalObject { //enable_shared_from_this is for event
 	int last_processed = -1; //-1 so that it's not equal to the simulation's tick counter, which starts at 0.
 
 	//we are never allowed to copy.
-	LavNode(const LavNode&) = delete;
-	LavNode& operator=(const LavNode&) = delete;
+	Node(const Node&) = delete;
+	Node& operator=(const Node&) = delete;
 };
 
 /*needed for things that wish to encapsulate and manage nodes that the public API isn't supposed to see.
@@ -111,14 +111,14 @@ The subgraph node forwards most calls onto the current output object, including 
 The properties mul and (todo) add are forwarded onto the output node before every block.
 Changing the input node is defined behavior: it will break horribly and unpredictably.
 Changing the output node is safe so long as the connections on the subgraph are reconfigured, same as for any other resize.*/
-class LavSubgraphNode: public LavNode {
+class SubgraphNode: public Node {
 	public:
-	LavSubgraphNode(int type, std::shared_ptr<LavSimulation> simulation);
-	virtual void setInputNode(std::shared_ptr<LavNode> node);
-	virtual void setOutputNode(std::shared_ptr<LavNode> node);
+	SubgraphNode(int type, std::shared_ptr<Simulation> simulation);
+	virtual void setInputNode(std::shared_ptr<Node> node);
+	virtual void setOutputNode(std::shared_ptr<Node> node);
 	//these all forward onto the input node.
 	int getInputConnectionCount() override;
-	std::shared_ptr<LavInputConnection> getInputConnection(int which) override;
+	std::shared_ptr<InputConnection> getInputConnection(int which) override;
 	//these forward onto the output node, making connections to the subgraph magically work.
 	int getOutputBufferCount() override;
 	float** getOutputBufferArray() override;
@@ -127,5 +127,5 @@ class LavSubgraphNode: public LavNode {
 	void tick() override;
 
 	protected:
-	std::shared_ptr<LavNode> subgraph_input, subgraph_output;
+	std::shared_ptr<Node> subgraph_input, subgraph_output;
 };

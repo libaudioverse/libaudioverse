@@ -20,7 +20,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <limits>
 #include <memory>
 
-LavSourceNode::LavSourceNode(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavEnvironmentBase> manager): LavSubgraphNode(Lav_OBJTYPE_SOURCE_NODE, simulation) {
+SourceNode::SourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentBase> manager): SubgraphNode(Lav_OBJTYPE_SOURCE_NODE, simulation) {
 	input = createGainNode(simulation);
 	input->resize(1, 1);
 	input->appendInputConnection(0, 1);
@@ -39,8 +39,8 @@ LavSourceNode::LavSourceNode(std::shared_ptr<LavSimulation> simulation, std::sha
 	setInputNode(input);
 }
 
-std::shared_ptr<LavNode> createSourceNode(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavEnvironmentBase> manager) {
-	auto temp = std::shared_ptr<LavSourceNode>(new LavSourceNode(simulation, manager), LavObjectDeleter(simulation));
+std::shared_ptr<Node> createSourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentBase> manager) {
+	auto temp = std::shared_ptr<SourceNode>(new SourceNode(simulation, manager), ObjectDeleter(simulation));
 	manager->registerSourceForUpdates(temp);
 	simulation->associateNode(temp);
 	return temp;
@@ -61,7 +61,7 @@ float calculateGainForDistanceModel(int model, float distance, float maxDistance
 	return retval;
 }
 
-void LavSourceNode::update(LavEnvironment environment) {
+void SourceNode::update(Environment environment) {
 	//first, extract the vector of our position.
 	const float* pos = getProperty(Lav_3D_POSITION).getFloat3Value();
 	glm::vec4 npos = environment.world_to_listener_transform*glm::vec4(pos[0], pos[1], pos[2], 1.0f);
@@ -88,9 +88,9 @@ void LavSourceNode::update(LavEnvironment environment) {
 
 Lav_PUBLIC_FUNCTION LavError Lav_createSourceNode(LavHandle simulationHandle, LavHandle environmentHandle, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<LavSimulation>(simulationHandle);
+	auto simulation = incomingObject<Simulation>(simulationHandle);
 	LOCK(*simulation);
-	auto retval = createSourceNode(simulation, incomingObject<LavEnvironmentBase>(environmentHandle));
-	*destination = outgoingObject<LavNode>(retval);
+	auto retval = createSourceNode(simulation, incomingObject<EnvironmentBase>(environmentHandle));
+	*destination = outgoingObject<Node>(retval);
 	PUB_END
 }

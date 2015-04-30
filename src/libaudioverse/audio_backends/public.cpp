@@ -22,16 +22,16 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 /**Public facing code.  This includes the rest of the library itself and the public API.*/
 
 //list from greatest to least priority.
-LavDeviceFactoryCreationFunction possible_backends[] = {
+DeviceFactoryCreationFunction possible_backends[] = {
 	createWinmmDeviceFactory,
 //	createOpenALDeviceFactory,
 };
-LavDeviceFactory* chosen_factory = nullptr;
+DeviceFactory* chosen_factory = nullptr;
 
 void initializeDeviceFactory() {
 	log(Lav_LOG_LEVEL_INFO, "Initializing audio backend.");
-	for(unsigned int i = 0; i < sizeof(possible_backends)/sizeof(LavDeviceFactoryCreationFunction); i++) {
-		LavDeviceFactory* possible = possible_backends[i]();
+	for(unsigned int i = 0; i < sizeof(possible_backends)/sizeof(DeviceFactoryCreationFunction); i++) {
+		DeviceFactory* possible = possible_backends[i]();
 		if(possible != nullptr) {
 			chosen_factory = possible;
 			log(Lav_LOG_LEVEL_INFO, "Chosen backend is %s", chosen_factory->getName().c_str());
@@ -87,10 +87,10 @@ Lav_PUBLIC_FUNCTION LavError Lav_deviceGetChannels(unsigned int index, unsigned 
 Lav_PUBLIC_FUNCTION LavError Lav_createSimulationForDevice(int index, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead, LavHandle* destination) {
 	PUB_BEGIN
 	//don't use defaults, use user options.
-	auto sim = std::make_shared<LavSimulation>(sr, blockSize, mixAhead);
+	auto sim = std::make_shared<Simulation>(sr, blockSize, mixAhead);
 	sim->completeInitialization();
 	//this can in theory invalidate while the callback is still needed:
-	auto weak_sim = std::weak_ptr<LavSimulation>(sim);
+	auto weak_sim = std::weak_ptr<Simulation>(sim);
 	auto audioFunction = [=](float* out, int channels) {
 		auto strong_sim = weak_sim.lock();
 		if(strong_sim == nullptr) {
@@ -103,14 +103,14 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSimulationForDevice(int index, unsigned i
 	};
 	auto dev = chosen_factory->createDevice(audioFunction, index, channels, sr, blockSize, mixAhead);
 	sim->associateDevice(dev);
-	*destination = outgoingObject<LavSimulation>(sim);
+	*destination = outgoingObject<Simulation>(sim);
 	PUB_END
 }
 
 //the special case of a device without an output.
 Lav_PUBLIC_FUNCTION LavError Lav_createReadSimulation(unsigned int sr, unsigned int blockSize, LavHandle* destination) {
 	PUB_BEGIN
-	auto shared = std::make_shared<LavSimulation>(sr, blockSize, 0);
+	auto shared = std::make_shared<Simulation>(sr, blockSize, 0);
 	shared->completeInitialization();
 	*destination = outgoingObject(shared);
 	PUB_END

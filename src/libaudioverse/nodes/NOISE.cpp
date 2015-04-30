@@ -17,22 +17,22 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <limits>
 #include <random>
 
-class LavNoiseNode: public LavNode {
+class NoiseNode: public Node {
 	public:
-	LavNoiseNode(std::shared_ptr<LavSimulation> simulation);
+	NoiseNode(std::shared_ptr<Simulation> simulation);
 	virtual void process();
 	void white();
 	void pink();
 	void brown();
 	std::mt19937_64 random_number_generator;
 	std::uniform_real_distribution<float> uniform_distribution;
-	LavIIRFilter pinkifier; //filter to turn white noise into pink noise.
-	LavIIRFilter brownifier; //and likewise for brown.
+	IIRFilter pinkifier; //filter to turn white noise into pink noise.
+	IIRFilter brownifier; //and likewise for brown.
 	float pink_max = 0.0f, brown_max = 0.0f; //used for normalizing noise.
 };
 
 //we give the random number generator a fixed seed for debugging purposes.
-LavNoiseNode::LavNoiseNode(std::shared_ptr<LavSimulation> simulation): LavNode(Lav_OBJTYPE_NOISE_NODE, simulation, 0, 1),
+NoiseNode::NoiseNode(std::shared_ptr<Simulation> simulation): Node(Lav_OBJTYPE_NOISE_NODE, simulation, 0, 1),
 random_number_generator(1234), uniform_distribution(-1.0f, 1.0f)  {
 	/**We have to configure the pinkifier.
 This was originally taken from Spectral Audio processing by JOS.*/
@@ -55,13 +55,13 @@ This was originally taken from Spectral Audio processing by JOS.*/
 	appendOutputConnection(0, 1);
 }
 
-std::shared_ptr<LavNode> createNoiseNode(std::shared_ptr<LavSimulation> simulation) {
-	std::shared_ptr<LavNoiseNode> retval = std::shared_ptr<LavNoiseNode>(new LavNoiseNode(simulation), LavObjectDeleter(simulation));
+std::shared_ptr<Node> createNoiseNode(std::shared_ptr<Simulation> simulation) {
+	std::shared_ptr<NoiseNode> retval = std::shared_ptr<NoiseNode>(new NoiseNode(simulation), ObjectDeleter(simulation));
 	simulation->associateNode(retval);
 	return retval;
 }
 
-void LavNoiseNode::white() {
+void NoiseNode::white() {
 	for(int i = 0; i < block_size; i++) {
 		float noiseSample = 0.0f;
 		//use the central limit theorem to generate white noise.
@@ -73,7 +73,7 @@ void LavNoiseNode::white() {
 	}
 }
 
-void LavNoiseNode::pink() {
+void NoiseNode::pink() {
 	white();
 	for(int i = 0; i < block_size; i++) output_buffers[0][i] =pinkifier.tick(output_buffers[0][i]);
 	//pass over the output buffer and find the max sample.
@@ -84,7 +84,7 @@ void LavNoiseNode::pink() {
 	for(int i = 0; i < block_size; i++) output_buffers[0][i]/=pink_max;
 }
 
-void LavNoiseNode::brown() {
+void NoiseNode::brown() {
 	white();
 	for(int i= 0; i < block_size; i++) output_buffers[0][i]=brownifier.tick(output_buffers[0][i]);
 	//do something to make brown noise here...
@@ -96,7 +96,7 @@ void LavNoiseNode::brown() {
 	for(int i = 0; i < block_size; i++) output_buffers[0][i]/=brown_max;
 }
 
-void LavNoiseNode::process() {
+void NoiseNode::process() {
 	int type = getProperty(Lav_NOISE_NOISE_TYPE).getIntValue();
 	switch(type) {
 		case Lav_NOISE_TYPE_WHITE: white(); break;
@@ -109,9 +109,9 @@ void LavNoiseNode::process() {
 
 Lav_PUBLIC_FUNCTION LavError Lav_createNoiseNode(LavHandle simulationHandle, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation =incomingObject<LavSimulation>(simulationHandle);
+	auto simulation =incomingObject<Simulation>(simulationHandle);
 	LOCK(*simulation);
 	auto retval = createNoiseNode(simulation);
-	*destination = outgoingObject<LavNode>(retval);
+	*destination = outgoingObject<Node>(retval);
 	PUB_END
 }

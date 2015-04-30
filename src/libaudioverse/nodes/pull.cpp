@@ -16,40 +16,40 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <utility>
 #include <vector>
 
-class LavPullNode: public LavNode {
+class PullNode: public Node {
 	public:
-	LavPullNode(std::shared_ptr<LavSimulation> sim, unsigned int inputSr, unsigned int channels);
-	~LavPullNode();
+	PullNode(std::shared_ptr<Simulation> sim, unsigned int inputSr, unsigned int channels);
+	~PullNode();
 	void process();
 	unsigned int input_sr = 0, channels = 0;
-	std::shared_ptr<LavResampler> resampler = nullptr;
+	std::shared_ptr<Resampler> resampler = nullptr;
 	float* incoming_buffer = nullptr, *resampled_buffer = nullptr;
 	LavPullNodeAudioCallback callback = nullptr;
 	void* callback_userdata = nullptr;
 };
 
-LavPullNode::LavPullNode(std::shared_ptr<LavSimulation> sim, unsigned int inputSr, unsigned int channels): LavNode(Lav_OBJTYPE_PULL_NODE, sim, 0, channels) {
+PullNode::PullNode(std::shared_ptr<Simulation> sim, unsigned int inputSr, unsigned int channels): Node(Lav_OBJTYPE_PULL_NODE, sim, 0, channels) {
 	this->channels = channels;
 	input_sr = inputSr;
-	resampler = std::make_shared<LavResampler>(sim->getBlockSize(), channels, inputSr, (int)sim->getSr());
+	resampler = std::make_shared<Resampler>(sim->getBlockSize(), channels, inputSr, (int)sim->getSr());
 	this->channels = channels;
-	incoming_buffer = LavAllocArray<float>(channels*simulation->getBlockSize());
-	resampled_buffer = LavAllocArray<float>(channels*sim->getBlockSize());
+	incoming_buffer = AllocArray<float>(channels*simulation->getBlockSize());
+	resampled_buffer = AllocArray<float>(channels*sim->getBlockSize());
 	appendOutputConnection(0, channels);
 }
 
-std::shared_ptr<LavNode> createPullNode(std::shared_ptr<LavSimulation> simulation, unsigned int inputSr, unsigned int channels) {
-	auto retval = std::shared_ptr<LavPullNode>(new LavPullNode(simulation, inputSr, channels), LavObjectDeleter(simulation));
+std::shared_ptr<Node> createPullNode(std::shared_ptr<Simulation> simulation, unsigned int inputSr, unsigned int channels) {
+	auto retval = std::shared_ptr<PullNode>(new PullNode(simulation, inputSr, channels), ObjectDeleter(simulation));
 	simulation->associateNode(retval);
 	return retval;
 }
 
-LavPullNode::~LavPullNode() {
-	LavFreeArray(incoming_buffer);
-	LavFreeArray(resampled_buffer);
+PullNode::~PullNode() {
+	FreeArray(incoming_buffer);
+	FreeArray(resampled_buffer);
 }
 
-void LavPullNode::process() {
+void PullNode::process() {
 	//first get audio into the resampler if needed.
 	int got = 0;
 	while(got < block_size) {
@@ -74,18 +74,18 @@ void LavPullNode::process() {
 
 Lav_PUBLIC_FUNCTION LavError Lav_createPullNode(LavHandle simulationHandle, unsigned int sr, unsigned int channels, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<LavSimulation>(simulationHandle);
+	auto simulation = incomingObject<Simulation>(simulationHandle);
 	LOCK(*simulation);
-	*destination = outgoingObject<LavNode>(createPullNode(simulation, sr, channels));
+	*destination = outgoingObject<Node>(createPullNode(simulation, sr, channels));
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_pullNodeSetAudioCallback(LavHandle nodeHandle, LavPullNodeAudioCallback callback, void* userdata) {
 	PUB_BEGIN
-	auto node = incomingObject<LavNode>(nodeHandle);
+	auto node = incomingObject<Node>(nodeHandle);
 	LOCK(*node);
 	if(node->getType() != Lav_OBJTYPE_PULL_NODE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
-	auto p = std::static_pointer_cast<LavPullNode>(node);
+	auto p = std::static_pointer_cast<PullNode>(node);
 	p->callback = callback;
 	p->callback_userdata = userdata;
 	PUB_END

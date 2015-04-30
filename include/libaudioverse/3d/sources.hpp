@@ -7,11 +7,11 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "environmentbase.hpp"
 #include <memory>
 
-class LavSourceNode: public LavSubgraphNode {
+class SourceNode: public SubgraphNode {
 	public:
-	LavSourceNode(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavEnvironmentBase> world);
-	void update(LavEnvironment env);
+	SourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentBase> world);
+	void update(Environment env);
 	private:
-	std::shared_ptr<LavNode> panner_node, input;
-	std::shared_ptr<LavEnvironmentBase> manager;
+	std::shared_ptr<Node> panner_node, input;
+	std::shared_ptr<EnvironmentBase> manager;
 };

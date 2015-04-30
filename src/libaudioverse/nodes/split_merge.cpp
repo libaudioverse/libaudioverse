@@ -15,23 +15,23 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/memory.hpp>
 #include <limits>
 
-class LavSplitMergeNode: public LavNode {
+class SplitMergeNode: public Node {
 	public:
-	LavSplitMergeNode(std::shared_ptr<LavSimulation> simulation, int type);
+	SplitMergeNode(std::shared_ptr<Simulation> simulation, int type);
 	//these overrides let the input buffers be the output buffers, cutting the memory usage for these in half.
 	int getOutputBufferCount() override;
 	float** getOutputBufferArray() override;
 };
 
-LavSplitMergeNode::LavSplitMergeNode(std::shared_ptr<LavSimulation> simulation, int type): LavNode(type, simulation, 0, 1) {
+SplitMergeNode::SplitMergeNode(std::shared_ptr<Simulation> simulation, int type): Node(type, simulation, 0, 1) {
 }
 
-std::shared_ptr<LavNode> createSplitMergeNode(std::shared_ptr<LavSimulation> simulation, int type) {
-	auto retval = std::shared_ptr<LavSplitMergeNode>(new LavSplitMergeNode(simulation, type), LavObjectDeleter(simulation));
+std::shared_ptr<Node> createSplitMergeNode(std::shared_ptr<Simulation> simulation, int type) {
+	auto retval = std::shared_ptr<SplitMergeNode>(new SplitMergeNode(simulation, type), ObjectDeleter(simulation));
 	return retval;
 }
 
-std::shared_ptr<LavNode> createChannelSplitterNode(std::shared_ptr<LavSimulation> simulation, int channels) {
+std::shared_ptr<Node> createChannelSplitterNode(std::shared_ptr<Simulation> simulation, int channels) {
 	auto retval= createSplitMergeNode(simulation, Lav_OBJTYPE_CHANNEL_SPLITTER_NODE);
 	retval->resize(channels, 0);
 	for(int i =0; i < channels; i++) retval->appendOutputConnection(i, 1);
@@ -40,7 +40,7 @@ std::shared_ptr<LavNode> createChannelSplitterNode(std::shared_ptr<LavSimulation
 	return retval;
 }
 
-std::shared_ptr<LavNode> createChannelMergerNode(std::shared_ptr<LavSimulation> simulation, int channels) {
+std::shared_ptr<Node> createChannelMergerNode(std::shared_ptr<Simulation> simulation, int channels) {
 	auto retval = createSplitMergeNode(simulation, Lav_OBJTYPE_CHANNEL_MERGER_NODE);
 	retval->resize(channels, 0);
 	retval->appendOutputConnection(0, channels);
@@ -49,11 +49,11 @@ std::shared_ptr<LavNode> createChannelMergerNode(std::shared_ptr<LavSimulation> 
 	return retval;
 }
 
-int LavSplitMergeNode::getOutputBufferCount() {
+int SplitMergeNode::getOutputBufferCount() {
 	return getInputBufferCount();
 }
 
-float** LavSplitMergeNode::getOutputBufferArray() {
+float** SplitMergeNode::getOutputBufferArray() {
 	return getInputBufferArray();
 }
 
@@ -61,7 +61,7 @@ float** LavSplitMergeNode::getOutputBufferArray() {
 
 Lav_PUBLIC_FUNCTION LavError Lav_createChannelSplitterNode(LavHandle simulationHandle, int channels, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<LavSimulation>(simulationHandle);
+	auto simulation = incomingObject<Simulation>(simulationHandle);
 	LOCK(*simulation);
 	auto retval = createChannelSplitterNode(simulation, channels);
 	*destination = outgoingObject(retval);
@@ -70,7 +70,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createChannelSplitterNode(LavHandle simulationH
 
 Lav_PUBLIC_FUNCTION LavError Lav_createChannelMergerNode(LavHandle simulationHandle, int channels, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<LavSimulation>(simulationHandle);
+	auto simulation = incomingObject<Simulation>(simulationHandle);
 	LOCK(*simulation);
 	auto retval = createChannelMergerNode(simulation, channels);
 	*destination = outgoingObject(retval);

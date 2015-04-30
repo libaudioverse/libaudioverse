@@ -16,22 +16,22 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <utility>
 #include <vector>
 
-class LavGainNode: public LavNode {
+class GainNode: public Node {
 	public:
-	LavGainNode(std::shared_ptr<LavSimulation> sim);
+	GainNode(std::shared_ptr<Simulation> sim);
 	void process();
 };
 
-LavGainNode::LavGainNode(std::shared_ptr<LavSimulation> sim): LavNode(Lav_OBJTYPE_GAIN_NODE, sim, 0, 0) {
+GainNode::GainNode(std::shared_ptr<Simulation> sim): Node(Lav_OBJTYPE_GAIN_NODE, sim, 0, 0) {
 }
 
-std::shared_ptr<LavNode> createGainNode(std::shared_ptr<LavSimulation> simulation) {
-	auto retval = std::shared_ptr<LavGainNode>(new LavGainNode(simulation), LavObjectDeleter(simulation));
+std::shared_ptr<Node> createGainNode(std::shared_ptr<Simulation> simulation) {
+	auto retval = std::shared_ptr<GainNode>(new GainNode(simulation), ObjectDeleter(simulation));
 	simulation->associateNode(retval);
 	return retval;
 }
 
-void LavGainNode::process() {
+void GainNode::process() {
 	for(unsigned int i = 0; i < input_buffers.size(); i++) {
 		std::copy(input_buffers[i], input_buffers[i]+block_size, output_buffers[i]);
 	}
@@ -41,12 +41,12 @@ void LavGainNode::process() {
 
 Lav_PUBLIC_FUNCTION LavError Lav_createGainNode(LavHandle simulationHandle, int channels, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<LavSimulation>(simulationHandle);
+	auto simulation = incomingObject<Simulation>(simulationHandle);
 	LOCK(*simulation);
 	auto retval= createGainNode(simulation);
 	retval->resize(channels, channels);
 	retval->appendInputConnection(0, channels);
 	retval->appendOutputConnection(0, channels);
-	*destination =outgoingObject<LavNode>(retval);
+	*destination =outgoingObject<Node>(retval);
 	PUB_END
 }

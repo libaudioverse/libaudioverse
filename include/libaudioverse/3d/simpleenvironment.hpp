@@ -8,22 +8,22 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <set>
 #include <memory>
 
-class LavSourceNode;
-class LavHrtfData;
+class SourceNode;
+class HrtfData;
 
-class LavSimpleEnvironmentNode: public LavEnvironmentBase {
+class SimpleEnvironmentNode: public EnvironmentBase {
 	public:
-	LavSimpleEnvironmentNode(std::shared_ptr<LavSimulation> simulation, std::shared_ptr<LavHrtfData> hrtf);
-	void registerSourceForUpdates(std::shared_ptr<LavSourceNode> source);
+	SimpleEnvironmentNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf);
+	void registerSourceForUpdates(std::shared_ptr<SourceNode> source);
 	//call update on all sources.
 	virtual void willProcessParents();
-	std::shared_ptr<LavNode> createPannerNode();
+	std::shared_ptr<Node> createPannerNode();
 	virtual void outputChannelsChanged();
 	private:
 	//while these may be parents (through virtue of the panners we give out), they also have to hold a reference to us-and that reference must be strong.
 	//the world is more capable of handling a source that dies than a source a world that dies.
-	std::set<std::weak_ptr<LavSourceNode>, std::owner_less<std::weak_ptr<LavSourceNode>>> sources;
-	std::shared_ptr<LavHrtfData > hrtf;
-	std::shared_ptr<LavNode> output=nullptr;
-	LavEnvironment environment;
+	std::set<std::weak_ptr<SourceNode>, std::owner_less<std::weak_ptr<SourceNode>>> sources;
+	std::shared_ptr<HrtfData > hrtf;
+	std::shared_ptr<Node> output=nullptr;
+	Environment environment;
 };

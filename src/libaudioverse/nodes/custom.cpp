@@ -16,26 +16,26 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <utility>
 #include <vector>
 
-class LavCustomNode: public LavNode {
+class CustomNode: public Node {
 	public:
-	LavCustomNode(std::shared_ptr<LavSimulation> sim, unsigned int inputs, unsigned int channelsPerInput, unsigned int outputs, unsigned int channelsPerOutput);
+	CustomNode(std::shared_ptr<Simulation> sim, unsigned int inputs, unsigned int channelsPerInput, unsigned int outputs, unsigned int channelsPerOutput);
 	void process();
 	LavCustomNodeProcessingCallback callback = nullptr;
 	void* callback_userdata = nullptr;
 };
 
-LavCustomNode::LavCustomNode(std::shared_ptr<LavSimulation> sim, unsigned int inputs, unsigned int channelsPerInput, unsigned int outputs, unsigned int channelsPerOutput): LavNode(Lav_OBJTYPE_CUSTOM_NODE, sim, inputs*channelsPerInput, outputs*channelsPerOutput) {
+CustomNode::CustomNode(std::shared_ptr<Simulation> sim, unsigned int inputs, unsigned int channelsPerInput, unsigned int outputs, unsigned int channelsPerOutput): Node(Lav_OBJTYPE_CUSTOM_NODE, sim, inputs*channelsPerInput, outputs*channelsPerOutput) {
 	for(unsigned int i= 0; i < inputs; i++) appendInputConnection(i*channelsPerInput, channelsPerInput);
 	for(int i= 0; i < outputs; i++) appendOutputConnection(i*channelsPerOutput, channelsPerOutput);
 }
 
-std::shared_ptr<LavNode> createCustomNode(std::shared_ptr<LavSimulation> simulation, unsigned int inputs, unsigned int channelsPerInput, unsigned int outputs,  unsigned int channelsPerOutput) {
-	auto retval = std::shared_ptr<LavCustomNode>(new LavCustomNode(simulation, inputs, channelsPerInput, outputs, channelsPerOutput), LavObjectDeleter(simulation));
+std::shared_ptr<Node> createCustomNode(std::shared_ptr<Simulation> simulation, unsigned int inputs, unsigned int channelsPerInput, unsigned int outputs,  unsigned int channelsPerOutput) {
+	auto retval = std::shared_ptr<CustomNode>(new CustomNode(simulation, inputs, channelsPerInput, outputs, channelsPerOutput), ObjectDeleter(simulation));
 	simulation->associateNode(retval);
 	return retval;
 }
 
-void LavCustomNode::process() {
+void CustomNode::process() {
 	if(callback != nullptr) {
 		callback(externalObjectHandle, block_size, num_input_buffers, getInputBufferArray(), num_output_buffers, getOutputBufferArray(), callback_userdata);
 	}
@@ -48,18 +48,18 @@ void LavCustomNode::process() {
 
 Lav_PUBLIC_FUNCTION LavError Lav_createCustomNode(LavHandle simulationHandle, unsigned int inputs, unsigned int channelsPerInput, unsigned int outputs, unsigned int channelsPerOutput, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation=incomingObject<LavSimulation>(simulationHandle);
+	auto simulation=incomingObject<Simulation>(simulationHandle);
 	LOCK(*simulation);
-	*destination = outgoingObject<LavNode>(createCustomNode(simulation, inputs, channelsPerInput, outputs, channelsPerOutput));
+	*destination = outgoingObject<Node>(createCustomNode(simulation, inputs, channelsPerInput, outputs, channelsPerOutput));
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_customNodeSetProcessingCallback(LavHandle nodeHandle, LavCustomNodeProcessingCallback callback, void* userdata) {
 	PUB_BEGIN
-	auto node= incomingObject<LavNode>(nodeHandle);
+	auto node= incomingObject<Node>(nodeHandle);
 	LOCK(*node);
 	if(node->getType() != Lav_OBJTYPE_CUSTOM_NODE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
-	auto node2 = std::static_pointer_cast<LavCustomNode>(node);
+	auto node2 = std::static_pointer_cast<CustomNode>(node);
 	node2->callback = callback;
 	node2->callback_userdata = userdata;
 	PUB_END

@@ -17,18 +17,18 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <memory>
 #include <math.h>
 
-class LavMultifileNode: public LavSubgraphNode {
+class MultifileNode: public SubgraphNode {
 	public:
-	LavMultifileNode(std::shared_ptr<LavSimulation> simulation, int channels, int maxSimultaneousFiles);
-	~LavMultifileNode();
+	MultifileNode(std::shared_ptr<Simulation> simulation, int channels, int maxSimultaneousFiles);
+	~MultifileNode();
 	void play(std::string file);
 	void stopAll();
-	std::shared_ptr<LavNode> gain = nullptr;
+	std::shared_ptr<Node> gain = nullptr;
 	int channels, max_simultaneous_files;
-	std::vector<std::shared_ptr<LavNode>> file_nodes;
+	std::vector<std::shared_ptr<Node>> file_nodes;
 };
 
-LavMultifileNode::LavMultifileNode(std::shared_ptr<LavSimulation> simulation, int channels, int maxSimultaneousFiles): LavSubgraphNode(Lav_OBJTYPE_MULTIFILE_NODE, simulation) {
+MultifileNode::MultifileNode(std::shared_ptr<Simulation> simulation, int channels, int maxSimultaneousFiles): SubgraphNode(Lav_OBJTYPE_MULTIFILE_NODE, simulation) {
 	this->channels = channels;
 	this->max_simultaneous_files = maxSimultaneousFiles;
 	this->gain=createGainNode(simulation);
@@ -40,16 +40,16 @@ LavMultifileNode::LavMultifileNode(std::shared_ptr<LavSimulation> simulation, in
 	for(unsigned int i = 0; i < file_nodes.size(); i++) file_nodes[i] = nullptr;
 }
 
-LavMultifileNode::~LavMultifileNode() {
+MultifileNode::~MultifileNode() {
 }
 
-std::shared_ptr<LavNode> createMultifileNode(std::shared_ptr<LavSimulation> simulation, int channels, int maxSimultaneousFiles) {
-	auto retval =std::shared_ptr<LavMultifileNode>(new LavMultifileNode(simulation, channels, maxSimultaneousFiles), LavObjectDeleter(simulation));
+std::shared_ptr<Node> createMultifileNode(std::shared_ptr<Simulation> simulation, int channels, int maxSimultaneousFiles) {
+	auto retval =std::shared_ptr<MultifileNode>(new MultifileNode(simulation, channels, maxSimultaneousFiles), ObjectDeleter(simulation));
 	simulation->associateNode(retval);
 	return retval;
 }
 
-void LavMultifileNode::play(std::string file) {
+void MultifileNode::play(std::string file) {
 	//first, find out if we have an empty slot.  If not, then stop.
 	int empty_slot= 0;
 	bool found_empty_slot = false;
@@ -65,9 +65,9 @@ void LavMultifileNode::play(std::string file) {
 	auto node = createFileNode(simulation, file.c_str());
 	node->connect(0, gain, 0);
 	//we need to hook up a clearing event.  We do this here.
-	std::weak_ptr<LavMultifileNode> weakref = std::static_pointer_cast<LavMultifileNode>(this->shared_from_this());
+	std::weak_ptr<MultifileNode> weakref = std::static_pointer_cast<MultifileNode>(this->shared_from_this());
 	auto &ev = node->getEvent(Lav_FILE_END_EVENT);
-	ev.setHandler([=](LavNode* node, void* userdata) {
+	ev.setHandler([=](Node* node, void* userdata) {
 		auto strongref = weakref.lock();
 		if(strongref == nullptr) return; //no more strong reference for us to work with.
 		LOCK(*strongref);
@@ -77,7 +77,7 @@ void LavMultifileNode::play(std::string file) {
 	file_nodes[empty_slot] = node;
 }
 
-void LavMultifileNode::stopAll() {
+void MultifileNode::stopAll() {
 	for(unsigned int i = 0; i < file_nodes.size(); i++) {
 		file_nodes[i]->disconnect(0);
 		file_nodes[i]=nullptr;
@@ -88,7 +88,7 @@ void LavMultifileNode::stopAll() {
 
 Lav_PUBLIC_FUNCTION LavError Lav_createMultifileNode(LavHandle simulationHandle, int channels, int maxSimultaneousFiles, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<LavSimulation>(simulationHandle);
+	auto simulation = incomingObject<Simulation>(simulationHandle);
 	LOCK(*simulation);
 	*destination = outgoingObject(createMultifileNode(simulation, channels, maxSimultaneousFiles));
 	PUB_END
@@ -96,18 +96,18 @@ Lav_PUBLIC_FUNCTION LavError Lav_createMultifileNode(LavHandle simulationHandle,
 
 Lav_PUBLIC_FUNCTION LavError Lav_multifileNodePlay(LavHandle nodeHandle, char* path) {
 	PUB_BEGIN
-	auto node= incomingObject<LavNode>(nodeHandle);
+	auto node= incomingObject<Node>(nodeHandle);
 	LOCK(*node);
 	if(node->getType() != Lav_OBJTYPE_MULTIFILE_NODE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
-	std::static_pointer_cast<LavMultifileNode>(node)->play(path);
+	std::static_pointer_cast<MultifileNode>(node)->play(path);
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_multifileNodeStopAll(LavHandle nodeHandle) {
 	PUB_BEGIN
-	auto node=incomingObject<LavNode>(nodeHandle);
+	auto node=incomingObject<Node>(nodeHandle);
 	LOCK(*node);
 	if(node->getType() != Lav_OBJTYPE_MULTIFILE_NODE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
-	std::static_pointer_cast<LavMultifileNode>(node)->stopAll();
+	std::static_pointer_cast<MultifileNode>(node)->stopAll();
 	PUB_END
 }

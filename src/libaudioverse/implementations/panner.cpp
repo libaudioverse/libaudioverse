@@ -9,17 +9,17 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <functional>
 #include <math.h>
 
-void LavPannerImplementation::reset() {
+void PannerImplementation::reset() {
 	channels.clear();
 }
 
-void LavPannerImplementation::addEntry(float angle, unsigned int channel) {
+void PannerImplementation::addEntry(float angle, unsigned int channel) {
 	channels.emplace_back(ringmodf(angle, 360.0f), channel);
 	std::sort(channels.begin(), channels.end(),
-	[](LavPannerEntry &a, LavPannerEntry& b) {return a.angle < b.angle;});
+	[](PannerEntry &a, PannerEntry& b) {return a.angle < b.angle;});
 }
 
-void LavPannerImplementation::pan(float angle, unsigned int block_size, float* input, unsigned int outputCount, float** outputs) {
+void PannerImplementation::pan(float angle, unsigned int block_size, float* input, unsigned int outputCount, float** outputs) {
 	//the two degenerates: 0 and 1 channels.
 	if(input == nullptr || outputs == nullptr) return;
 	if(channels.size() == 0 || channels.size() == 1) {

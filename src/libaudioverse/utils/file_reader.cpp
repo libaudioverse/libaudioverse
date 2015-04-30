@@ -6,11 +6,11 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <sndfile.h>
 #include <libaudioverse/private/errors.hpp>
 
-LavFileReader::~LavFileReader() {
+FileReader::~FileReader() {
 	if(handle) close(); //make sure the file gets closed behind us.
 }
 
-void LavFileReader::open(const char* path) {
+void FileReader::open(const char* path) {
 	if(handle) throw LavErrorException(Lav_ERROR_FILE);
 	handle = sf_open(path, SFM_READ, &info);
 	if(handle == nullptr) {
@@ -18,7 +18,7 @@ void LavFileReader::open(const char* path) {
 	}
 }
 
-void LavFileReader::close() {
+void FileReader::close() {
 	if(handle != NULL)  {
 		sf_close(handle);
 		handle = NULL;
@@ -28,27 +28,27 @@ void LavFileReader::close() {
 	}
 }
 
-float LavFileReader::getSr() {
+float FileReader::getSr() {
 	return (float)info.samplerate;
 }
 
-unsigned int LavFileReader::getChannelCount() {
+unsigned int FileReader::getChannelCount() {
 	return info.channels;
 }
 
-unsigned int LavFileReader::getFrameCount() {
+unsigned int FileReader::getFrameCount() {
 	return (unsigned int)info.frames;
 }
 
-unsigned int LavFileReader::getSampleCount() {
+unsigned int FileReader::getSampleCount() {
 	return getChannelCount()*getFrameCount();
 }
 
-unsigned int LavFileReader::read(unsigned int frames, float* buffer) {
+unsigned int FileReader::read(unsigned int frames, float* buffer) {
 	if(handle == NULL) return 0;
 	return (unsigned int)sf_readf_float(handle, buffer, frames);
 }
 
-unsigned int LavFileReader::readAll(float* buffer) {
+unsigned int FileReader::readAll(float* buffer) {
 	return read(getFrameCount(), buffer);
 }

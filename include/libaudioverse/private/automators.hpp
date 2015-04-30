@@ -3,7 +3,7 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #pragma once
 
-class LavProperty;
+class Property;
 
 /**The automators.
 
@@ -19,10 +19,10 @@ Furthermore, all automators must have a well-defined final value.
 
 Subclasses should set duration in their constructors, should they need to continue past their scheduled time.*/
 
-class LavAutomator {
+class Automator {
 	public:
-	LavAutomator(LavProperty* p, double scheduledTime);
-	virtual ~LavAutomator();
+	Automator(Property* p, double scheduledTime);
+	virtual ~Automator();
 
 	//default implementation: initial_value and initial_time are set.
 	virtual void start(double initialValue, double initialTime) ;
@@ -33,7 +33,7 @@ class LavAutomator {
 
 	protected:
 	double initial_value = 0.0, initial_time = 0.0, scheduled_time = 0.0, duration = 0.0;
-	LavProperty* property = nullptr;
+	Property* property = nullptr;
 };
 
-bool compareAutomators(LavAutomator *a, LavAutomator *b);
+bool compareAutomators(Automator *a, Automator *b);

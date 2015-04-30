@@ -7,17 +7,17 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 //An n-channel panner.
 //very very private. This does almost no error checking.
 
-struct LavPannerEntry {
-	LavPannerEntry(float _angle, unsigned int _c): angle(_angle), channel(_c) {}
+struct PannerEntry {
+	PannerEntry(float _angle, unsigned int _c): angle(_angle), channel(_c) {}
 	float angle;
 	unsigned int channel;
 };
 
-class LavPannerImplementation {
+class PannerImplementation {
 	public:
 	void reset();
 	void addEntry(float angle, unsigned int channel);
 	void pan(float angle, unsigned int block_size, float* input, unsigned int outputCount, float** outputs);
 	private:
-	std::vector<LavPannerEntry> channels;
+	std::vector<PannerEntry> channels;
 };

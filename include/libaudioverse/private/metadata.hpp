@@ -7,5 +7,5 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "events.hpp"
 
 void initializeMetadata();
-std::map<int, LavProperty> makePropertyTable(int objtype);
-std::map<int, LavEvent> makeEventTable(int objtyp);
+std::map<int, Property> makePropertyTable(int objtype);
+std::map<int, Event> makeEventTable(int objtyp);

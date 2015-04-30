@@ -7,11 +7,11 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <memory>
 
 
-class LavBuffer: public LavExternalObject {
+class Buffer: public ExternalObject {
 	public:
-	LavBuffer(std::shared_ptr<LavSimulation> simulation);
-	~LavBuffer();
-	std::shared_ptr<LavSimulation> getSimulation();
+	Buffer(std::shared_ptr<Simulation> simulation);
+	~Buffer();
+	std::shared_ptr<Simulation> getSimulation();
 	int getLength();
 	double getDuration();
 	int getChannels();
@@ -25,7 +25,7 @@ class LavBuffer: public LavExternalObject {
 	//maxChannels is the maximum channels of the node using this function. Buffers know how to upmix and downmix using the Libaudioverse rules.
 	int writeChannel(int startFrame, int channel, int maxChannels, int frames, float* dest);
 	//The following two functions do not check if the requested frame is past the end for efficiency.
-	//It is possible the compiler would optimize this, but running Lav in debug mode is already really painful and the trade-off here is worth it.
+	//It is possible the compiler would optimize this, but running  in debug mode is already really painful and the trade-off here is worth it.
 	//a single sample without mixing:
 	float getSample(int frame, int channel);
 	//And with mixing:
@@ -40,5 +40,5 @@ class LavBuffer: public LavExternalObject {
 	int frames = 0;
 	int sr = 0;
 	float* data = nullptr, *data_end = nullptr;
-	std::shared_ptr<LavSimulation> simulation;
+	std::shared_ptr<Simulation> simulation;
 };

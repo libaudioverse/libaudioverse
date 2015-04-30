@@ -13,7 +13,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "errors.hpp"
 
 
-union LavPropertyValue {
+union PropertyValue {
 	float fval; //Actual value is in automation_buffer, kept for range checking.
 	int ival;
 	double dval; //Also in automation_buffer, kept for range checking.
@@ -25,20 +25,20 @@ union LavPropertyValue {
 //this disables on readonly because it is expected that the library can handle that itself, and bumping ranges for writes on readonly properties would be annoying.
 #define RC(val, fld) if((val > maximum_value.fld || val < minimum_value.fld) && read_only == false) throw LavErrorException(Lav_ERROR_RANGE)
 
-class LavBuffer;
-class LavSimulation;
-class LavNode;
-class LavAutomator;
-class LavInputConnection;
+class Buffer;
+class Simulation;
+class Node;
+class Automator;
+class InputConnection;
 
-class LavProperty {
+class Property {
 	public:
-	LavProperty() = default;
-	LavProperty(const LavProperty&) = default;
-	explicit LavProperty(int property_type);
-	~LavProperty();
-	void associateNode(LavNode* node);
-	void associateSimulation(std::shared_ptr<LavSimulation> simulation);
+	Property() = default;
+	Property(const Property&) = default;
+	explicit Property(int property_type);
+	~Property();
+	void associateNode(Node* node);
+	void associateSimulation(std::shared_ptr<Simulation> simulation);
 
 	void reset();
 	int getType();
@@ -52,10 +52,10 @@ class LavProperty {
 	void setReadOnly(bool what);
 	double getSr();
 	double getTime();
-	std::shared_ptr<LavInputConnection> getInputConnection();
+	std::shared_ptr<InputConnection> getInputConnection();
 
 	void updateAutomatorIndex(double t);
-	void scheduleAutomator(LavAutomator* automator);
+	void scheduleAutomator(Automator* automator);
 	//Cancels all automation after time t. T is relative to the property's current time.
 	void cancelAutomators(double time);
 	//yes, really. This is as uggly as it looks.
@@ -134,8 +134,8 @@ class LavProperty {
 	void setStringDefault(const char* s);
 
 	//Buffer properties.
-	std::shared_ptr<LavBuffer> getBufferValue();
-	void setBufferValue(std::shared_ptr<LavBuffer> b);
+	std::shared_ptr<Buffer> getBufferValue();
+	void setBufferValue(std::shared_ptr<Buffer> b);
 
 	//set the callback...
 	void setPostChangedCallback(std::function<void(void)> cb);
@@ -154,36 +154,36 @@ class LavProperty {
 
 	private:
 	int type, tag;
-	LavPropertyValue value, default_value, minimum_value, maximum_value;
+	PropertyValue value, default_value, minimum_value, maximum_value;
 	std::string name, string_value, default_string_value;
 	std::vector<float> farray_value, default_farray_value;
 	std::vector<int> iarray_value, default_iarray_value;
-	std::shared_ptr<LavBuffer> buffer_value = nullptr;
+	std::shared_ptr<Buffer> buffer_value = nullptr;
 	unsigned int min_array_length = 0, max_array_length = std::numeric_limits<unsigned int>::max();
 	std::function<void(void)> post_changed_callback;
 	bool read_only = false;
 	bool has_dynamic_range = false;
-	LavNode* node;
-	std::shared_ptr<LavSimulation> simulation;
+	Node* node;
+	std::shared_ptr<Simulation> simulation;
 
 	//These are for automation and node connections:
 	int block_size= 0;
 	unsigned int automator_index = 0;
 	double time = 0.0, sr = 0.0;
-	std::vector<LavAutomator*> automators;
+	std::vector<Automator*> automators;
 	double* value_buffer = nullptr;
 	bool should_use_value_buffer = false;
 	float* node_buffer=nullptr; //temporary place for putting node outputs.
-	std::shared_ptr<LavInputConnection> incoming_nodes = nullptr; //The nodes connected to this property. Pointer to break an include cycle.
+	std::shared_ptr<InputConnection> incoming_nodes = nullptr; //The nodes connected to this property. Pointer to break an include cycle.
 };
 
 //helper methods to quickly make properties.
-LavProperty* createIntProperty(const char* name, int default, int min, int max);
-LavProperty* createFloatProperty(const char* name, float default, float min, float max);
-LavProperty* createDoubleProperty(const char* name, double default, double min, double max);
-LavProperty* createFloat3Property(const char* name, float default[3]);
-LavProperty* createFloat6Property(const char* name, float default[6]);
-LavProperty* createStringProperty(const char* name, const char* default);
-LavProperty* createIntArrayProperty(const char* name, unsigned int minLength, unsigned int maxLength, unsigned int defaultLength, int* defaultData);
-LavProperty* createFloatArrayProperty(const char* name, unsigned int minLength, unsigned int maxLength, unsigned int defaultLength, float* defaultData);
-LavProperty* createBufferProperty(const char* name);
+Property* createIntProperty(const char* name, int default, int min, int max);
+Property* createFloatProperty(const char* name, float default, float min, float max);
+Property* createDoubleProperty(const char* name, double default, double min, double max);
+Property* createFloat3Property(const char* name, float default[3]);
+Property* createFloat6Property(const char* name, float default[6]);
+Property* createStringProperty(const char* name, const char* default);
+Property* createIntArrayProperty(const char* name, unsigned int minLength, unsigned int maxLength, unsigned int defaultLength, int* defaultData);
+Property* createFloatArrayProperty(const char* name, unsigned int minLength, unsigned int maxLength, unsigned int defaultLength, float* defaultData);
+Property* createBufferProperty(const char* name);

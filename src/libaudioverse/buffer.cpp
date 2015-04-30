@@ -12,35 +12,35 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/macros.hpp>
 #include <algorithm>
 
-LavBuffer::LavBuffer(std::shared_ptr<LavSimulation> simulation): LavExternalObject(Lav_OBJTYPE_BUFFER) {
+Buffer::Buffer(std::shared_ptr<Simulation> simulation): ExternalObject(Lav_OBJTYPE_BUFFER) {
 	this->simulation = simulation;
 }
 
-std::shared_ptr<LavBuffer> createBuffer(std::shared_ptr<LavSimulation>simulation) {
-	return std::shared_ptr<LavBuffer>(new LavBuffer(simulation), LavObjectDeleter(simulation));
+std::shared_ptr<Buffer> createBuffer(std::shared_ptr<Simulation>simulation) {
+	return std::shared_ptr<Buffer>(new Buffer(simulation), ObjectDeleter(simulation));
 }
 
-LavBuffer::~LavBuffer() {
-	if(data) LavFreeArray(data);
+Buffer::~Buffer() {
+	if(data) FreeArray(data);
 }
 
-std::shared_ptr<LavSimulation> LavBuffer::getSimulation() {
+std::shared_ptr<Simulation> Buffer::getSimulation() {
 	return simulation;
 }
 
-int LavBuffer::getLength() {
+int Buffer::getLength() {
 	return frames;
 }
 
-double LavBuffer::getDuration() {
+double Buffer::getDuration() {
 	return frames / simulation->getSr();
 }
 
-int LavBuffer::getChannels() {
+int Buffer::getChannels() {
 	return channels;
 }
 
-void LavBuffer::loadFromArray(int sr, int channels, int frames, float* inputData) {
+void Buffer::loadFromArray(int sr, int channels, int frames, float* inputData) {
 	int simulationSr= (int)simulation->getSr();
 	staticResamplerKernel(sr, simulationSr, channels, frames, inputData, &(this->frames), &data);
 	if(data==nullptr) throw LavErrorException(Lav_ERROR_MEMORY);
@@ -48,7 +48,7 @@ void LavBuffer::loadFromArray(int sr, int channels, int frames, float* inputData
 	this->channels = channels;
 }
 
-int LavBuffer::writeData(int startFrame, int channels, int frames, float** outputs) {
+int Buffer::writeData(int startFrame, int channels, int frames, float** outputs) {
 	//we know that writeChannel always returns the same value for all channels and the same startFrame and frames.
 	int count = 0;
 	for(int i=0; i < channels; i++) {
@@ -58,7 +58,7 @@ int LavBuffer::writeData(int startFrame, int channels, int frames, float** outpu
 	return count;
 }
 
-int LavBuffer::writeChannel(int startFrame, int channel, int maxChannels, int frames, float* dest) {
+int Buffer::writeChannel(int startFrame, int channel, int maxChannels, int frames, float* dest) {
 	if(channel >=maxChannels) return 0; //bad, very bad.
 	const float* matrix= simulation->getMixingMatrix(this->channels, maxChannels);
 	float* readFrom =data+startFrame*this->channels;
@@ -80,11 +80,11 @@ int LavBuffer::writeChannel(int startFrame, int channel, int maxChannels, int fr
 	}
 }
 
-float LavBuffer::getSample(int frame, int channel) {
+float Buffer::getSample(int frame, int channel) {
 	return data[frame*channels+channel];
 }
 
-float LavBuffer::getSampleWithMixingMatrix(int frame, int channel, int maxChannels) {
+float Buffer::getSampleWithMixingMatrix(int frame, int channel, int maxChannels) {
 	auto mat =simulation->getMixingMatrix(channels, maxChannels);
 	if(mat) {
 		float res= 0.0;
@@ -99,36 +99,36 @@ float LavBuffer::getSampleWithMixingMatrix(int frame, int channel, int maxChanne
 
 Lav_PUBLIC_FUNCTION LavError Lav_createBuffer(LavHandle simulationHandle, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<LavSimulation>(simulationHandle);
+	auto simulation = incomingObject<Simulation>(simulationHandle);
 	LOCK(*simulation);
 	*destination = outgoingObject(createBuffer(simulation));
 	PUB_END
 }
 Lav_PUBLIC_FUNCTION LavError Lav_bufferGetSimulation(LavHandle handle, LavHandle* destination) {
 	PUB_BEGIN
-	auto b= incomingObject<LavBuffer>(handle);
+	auto b= incomingObject<Buffer>(handle);
 	*destination = outgoingObject(b->getSimulation());
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_bufferLoadFromFile(LavHandle bufferHandle, const char* path) {
 	PUB_BEGIN
-	auto buff =incomingObject<LavBuffer>(bufferHandle);
-	LavFileReader f{};
+	auto buff =incomingObject<Buffer>(bufferHandle);
+	FileReader f{};
 	f.open(path);
-	float* data = LavAllocArray<float>(f.getSampleCount());
+	float* data = AllocArray<float>(f.getSampleCount());
 	f.readAll(data);
 	{
 		LOCK(*buff);
 		buff->loadFromArray(f.getSr(), f.getChannelCount(), f.getSampleCount()/f.getChannelCount(), data);
 	}
-	LavFreeArray(data);
+	FreeArray(data);
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_bufferLoadFromArray(LavHandle bufferHandle, int sr, int channels, int frames, float* data) {
 	PUB_BEGIN
-	auto buff=incomingObject<LavBuffer>(bufferHandle);
+	auto buff=incomingObject<Buffer>(bufferHandle);
 	LOCK(*buff);
 	buff->loadFromArray(sr, channels, frames, data);
 	PUB_END

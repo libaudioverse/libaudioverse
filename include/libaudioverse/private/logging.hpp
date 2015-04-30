@@ -11,19 +11,19 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdarg.h>
 #include <stdio.h>
 
-class LavLogMessage {
+class LogMessage {
 	public:
-	LavLogMessage() = default; //makes powercores happy, but in regards to functionality we don't use.
-	LavLogMessage(int l, std::string msg, bool isFinal = false): level(l), message(msg), is_final(isFinal) {}
+	LogMessage() = default; //makes powercores happy, but in regards to functionality we don't use.
+	LogMessage(int l, std::string msg, bool isFinal = false): level(l), message(msg), is_final(isFinal) {}
 	int level = 0;
 	std::string message;
 	bool is_final = false;
 };
 
-class LavLogger {
+class Logger {
 	public:
-	LavLogger();
-	~LavLogger();
+	Logger();
+	~Logger();
 	void log(int level, std::string fmt, va_list &argptr);
 	void setLoggingLevel(int level);
 	int getLoggingLevel();
@@ -31,7 +31,7 @@ class LavLogger {
 	LavLoggingCallback getLoggingCallback();
 	private:
 	void loggingThreadFunction();
-	powercores::ThreadsafeQueue<LavLogMessage> log_queue;
+	powercores::ThreadsafeQueue<LogMessage> log_queue;
 	std::thread logging_thread;
 	std::mutex config_mutex;
 	LavLoggingCallback callback = nullptr;

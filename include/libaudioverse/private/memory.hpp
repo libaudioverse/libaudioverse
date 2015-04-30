@@ -19,19 +19,19 @@ the reason that this is not a class is because there can only ever be one.  This
 This also implements Lav_free, which works the same for all pointers, and the object handle interfaces, most notably Lav_freeHandle.
 */
 
-class LavExternalObject;//declared in this header below the globals.
-class LavSimulation;
+class ExternalObject;//declared in this header below the globals.
+class Simulation;
 
 extern std::map<void*, std::shared_ptr<void>> *external_ptrs;
-extern std::map<int, std::shared_ptr<LavExternalObject>> *external_handles;
+extern std::map<int, std::shared_ptr<ExternalObject>> *external_handles;
 extern std::mutex *memory_lock;
 //max handle we've used for an outgoing object. Ensures no duplication.
 extern std::atomic<int> *max_handle;
 
-class LavExternalObject: public std::enable_shared_from_this<LavExternalObject>  {
+class ExternalObject: public std::enable_shared_from_this<ExternalObject>  {
 	public:
-	LavExternalObject(int type);
-	virtual ~LavExternalObject();
+	ExternalObject(int type);
+	virtual ~ExternalObject();
 	int getType();
 	bool isExternalObject = false, isFirstExternalAccess = false;
 	int externalObjectHandle, type;
@@ -100,7 +100,7 @@ These return and free pointers to zero-initialized memory aligned on the appropr
 */
 
 template<class t>
-t* LavAllocArray(unsigned int size) {
+t* AllocArray(unsigned int size) {
 	#if LIBAUDIOVERSE_MALLOC_ALIGNMENT == 1
 	return (t*)calloc(size*sizeof(t), 1);
 	#else
@@ -116,8 +116,8 @@ t* LavAllocArray(unsigned int size) {
 	#endif
 }
 
-void LavFreeArray(void* ptr);
+void FreeArray(void* ptr);
 
 //custom deleter for smart pointer that guarantees thread safety.
-std::function<void(LavExternalObject*)> LavObjectDeleter(std::shared_ptr<LavSimulation> simulation);
+std::function<void(ExternalObject*)> ObjectDeleter(std::shared_ptr<Simulation> simulation);
 
