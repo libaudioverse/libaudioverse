@@ -16,6 +16,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <utility>
 #include <vector>
 
+namespace libaudioverse_implementation {
+
 class PullNode: public Node {
 	public:
 	PullNode(std::shared_ptr<Simulation> sim, unsigned int inputSr, unsigned int channels);
@@ -89,4 +91,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_pullNodeSetAudioCallback(LavHandle nodeHandle, 
 	p->callback = callback;
 	p->callback_userdata = userdata;
 	PUB_END
+}
+
 }

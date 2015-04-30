@@ -16,6 +16,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <utility>
 #include <vector>
 
+namespace libaudioverse_implementation {
+
 class RingmodNode: public Node {
 	public:
 	RingmodNode(std::shared_ptr<Simulation> sim);
@@ -46,4 +48,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createRingmodNode(LavHandle simulationHandle, L
 	LOCK(*simulation);
 	*destination = outgoingObject<Node>(createRingmodNode(simulation));
 	PUB_END
+}
+
 }

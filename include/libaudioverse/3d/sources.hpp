@@ -7,6 +7,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "environmentbase.hpp"
 #include <memory>
 
+namespace libaudioverse_implementation {
+
 class SourceNode: public SubgraphNode {
 	public:
 	SourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentBase> world);
@@ -15,3 +17,5 @@ class SourceNode: public SubgraphNode {
 	std::shared_ptr<Node> panner_node, input;
 	std::shared_ptr<EnvironmentBase> manager;
 };
+
+}

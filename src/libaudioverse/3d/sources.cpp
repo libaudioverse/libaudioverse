@@ -20,6 +20,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <limits>
 #include <memory>
 
+namespace libaudioverse_implementation {
+
 SourceNode::SourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentBase> manager): SubgraphNode(Lav_OBJTYPE_SOURCE_NODE, simulation) {
 	input = createGainNode(simulation);
 	input->resize(1, 1);
@@ -93,4 +95,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSourceNode(LavHandle simulationHandle, La
 	auto retval = createSourceNode(simulation, incomingObject<EnvironmentBase>(environmentHandle));
 	*destination = outgoingObject<Node>(retval);
 	PUB_END
+}
+
 }

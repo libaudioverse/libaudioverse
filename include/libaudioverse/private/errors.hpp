@@ -4,9 +4,13 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include "../libaudioverse.h"
 
+namespace libaudioverse_implementation {
+
 /*This class serves one purpose: preventing us from catching and throwing integers.*/
 class LavErrorException {
 	public:
 	LavErrorException(LavError e): err(e) {}
 	LavError err;
 };
+
+}

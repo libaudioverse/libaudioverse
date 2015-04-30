@@ -15,6 +15,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/memory.hpp>
 #include <limits>
 
+namespace libaudioverse_implementation {
+
 /**Note.  We can't use floats. There's some instability with the accumulator model that was here before that shows up as audible artifacts.*/
 class SquareNode: public Node {
 	public:
@@ -61,4 +63,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSquareNode(LavHandle simulationHandle, La
 	auto retval = createSquareNode(simulation);
 	*destination = outgoingObject<Node>(retval);
 	PUB_END
+}
+
 }

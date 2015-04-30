@@ -9,6 +9,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <functional>
 #include <math.h>
 
+namespace libaudioverse_implementation {
+
 void PannerImplementation::reset() {
 	channels.clear();
 }
@@ -69,4 +71,6 @@ void PannerImplementation::pan(float angle, unsigned int block_size, float* inpu
 		else if(i == channel2) for(unsigned int j = 0; j < block_size; j++) outputs[i][j] = weight2*input[j];
 		else memset(outputs[i], 0, sizeof(float)*block_size);
 	}
+}
+
 }

@@ -8,6 +8,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <atomic>
 #include <functional>
 
+namespace libaudioverse_implementation {
+
 class Simulation;
 class Node;
 
@@ -50,3 +52,4 @@ class Event {
 	std::atomic<int> is_firing;
 	bool no_multifire = false;
 };
+}

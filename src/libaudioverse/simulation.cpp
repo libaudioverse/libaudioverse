@@ -18,6 +18,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <tuple>
 #include <map>
 
+namespace libaudioverse_implementation {
+
 Simulation::Simulation(unsigned int sr, unsigned int blockSize, unsigned int mixahead): ExternalObject(Lav_OBJTYPE_SIMULATION) {
 	if(blockSize%4 || blockSize== 0) throw LavErrorException(Lav_ERROR_RANGE); //only afe to have this be a multiple of four.
 	this->sr = (float)sr;
@@ -207,4 +209,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_simulationSetBlockCallback(LavHandle handle, La
 	PUB_BEGIN
 incomingObject<Simulation>(handle)->setBlockCallback(callback, userdata);
 	PUB_END
+}
+
 }

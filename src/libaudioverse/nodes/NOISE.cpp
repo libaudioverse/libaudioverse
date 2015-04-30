@@ -17,6 +17,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <limits>
 #include <random>
 
+namespace libaudioverse_implementation {
+
 class NoiseNode: public Node {
 	public:
 	NoiseNode(std::shared_ptr<Simulation> simulation);
@@ -114,4 +116,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createNoiseNode(LavHandle simulationHandle, Lav
 	auto retval = createNoiseNode(simulation);
 	*destination = outgoingObject<Node>(retval);
 	PUB_END
+}
+
 }

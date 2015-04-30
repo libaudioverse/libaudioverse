@@ -16,6 +16,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <atomic>
 #include <functional>
 
+namespace libaudioverse_implementation {
+
 std::map<void*, std::shared_ptr<void>> *external_ptrs = nullptr;
 std::mutex *memory_lock = nullptr;
 std::map<int, std::shared_ptr<ExternalObject>> *external_handles = nullptr;
@@ -124,4 +126,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_setHandleDestroyedCallback(LavHandleDestroyedCa
 	handle_destroyed_callback=cb;
 	if(memory_lock) memory_lock->unlock();
 	PUB_END
+}
+
 }

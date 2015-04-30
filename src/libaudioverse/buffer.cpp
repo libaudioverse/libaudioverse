@@ -12,6 +12,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/macros.hpp>
 #include <algorithm>
 
+namespace libaudioverse_implementation {
+
 Buffer::Buffer(std::shared_ptr<Simulation> simulation): ExternalObject(Lav_OBJTYPE_BUFFER) {
 	this->simulation = simulation;
 }
@@ -132,4 +134,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_bufferLoadFromArray(LavHandle bufferHandle, int
 	LOCK(*buff);
 	buff->loadFromArray(sr, channels, frames, data);
 	PUB_END
+}
+
 }

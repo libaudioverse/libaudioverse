@@ -16,6 +16,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <utility>
 #include <vector>
 
+namespace libaudioverse_implementation {
+
 class PushNode: public Node {
 	public:
 	PushNode(std::shared_ptr<Simulation> sim, unsigned int inputSr, unsigned int channels);
@@ -112,4 +114,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_pushNodeFeed(LavHandle nodeHandle, unsigned int
 	if(node->getType() != Lav_OBJTYPE_PUSH_NODE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
 	std::static_pointer_cast<PushNode>(node)->feed(length, buffer);
 	PUB_END
+}
+
 }

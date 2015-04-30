@@ -16,6 +16,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <string>
 #include <set>
 
+namespace libaudioverse_implementation {
 //these three macros make ranges work.
 #ifdef INFINITY
 #undef INFINITY
@@ -107,4 +108,6 @@ std::map<int, Event> makeEventTable(int nodetype) {
 		retval[index] = (*default_event_instances)[std::tuple<int, int>(nodetype, index)];
 	}
 	return retval;
+}
+
 }

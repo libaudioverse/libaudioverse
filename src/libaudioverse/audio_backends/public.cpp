@@ -19,6 +19,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <chrono>
 #include <libaudioverse/private/logging.hpp>
 
+namespace libaudioverse_implementation {
+
 /**Public facing code.  This includes the rest of the library itself and the public API.*/
 
 //list from greatest to least priority.
@@ -114,4 +116,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createReadSimulation(unsigned int sr, unsigned 
 	shared->completeInitialization();
 	*destination = outgoingObject(shared);
 	PUB_END
+}
+
 }

@@ -8,6 +8,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <string.h>
 #include <algorithm>
 
+namespace libaudioverse_implementation {
+
 void uninterleaveSamples(unsigned int channels, unsigned int frames, float* samples, unsigned int outputCount, float** outputs) {
 	for(unsigned int i = 0; i < channels; i++) {
 		if(i >= outputCount) break;
@@ -23,4 +25,6 @@ void interleaveSamples(unsigned int channels, unsigned int frames, unsigned int 
 			output[j*channels+i] = i >= inputCount ? 0.0f : inputs[i][j];
 		}
 	}
+}
+
 }

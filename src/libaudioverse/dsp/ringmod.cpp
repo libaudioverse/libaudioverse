@@ -4,6 +4,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/dspmath.hpp>
 #include <math.h>
 
+namespace libaudioverse_implementation {
+
 //Apparently, C's mod is in fact not the discrete math operation: modulus of negative numbers does not follow the description needed for a ringbuffer.
 //These function handles that.
 int ringmodi(int dividend, int divisor) {
@@ -19,4 +21,6 @@ float ringmodf(float dividend, float divisor) {
 double ringmod(double dividend, double divisor) {
 	const double result  = fmod(dividend, divisor);
 	return result < 0 ? result+divisor : result;
+}
+
 }

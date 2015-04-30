@@ -6,6 +6,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "simulation.hpp"
 #include <memory>
 
+namespace libaudioverse_implementation {
 
 class Buffer: public ExternalObject {
 	public:
@@ -42,3 +43,5 @@ class Buffer: public ExternalObject {
 	float* data = nullptr, *data_end = nullptr;
 	std::shared_ptr<Simulation> simulation;
 };
+
+}

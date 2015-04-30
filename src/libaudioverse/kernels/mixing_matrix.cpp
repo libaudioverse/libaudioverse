@@ -7,6 +7,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <string.h>
 #include <algorithm>
 
+namespace libaudioverse_implementation {
+
 void applyMixingMatrix(int sampleCount, int inputChannels, float** inputs, int outputChannels, float** outputs, const float* mixingMatrix) {
 	//loop over the matrix rows. Apply multiplicationAdditionKernel.
 	for(int i= 0; i < outputChannels; i++) {
@@ -14,4 +16,6 @@ void applyMixingMatrix(int sampleCount, int inputChannels, float** inputs, int o
 			multiplicationAdditionKernel(sampleCount, *(mixingMatrix+i*inputChannels+j), inputs[j], outputs[i], outputs[i]);
 		}
 	}
+}
+
 }

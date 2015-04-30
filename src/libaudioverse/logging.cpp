@@ -15,6 +15,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdarg.h>
 #include <libaudioverse/private/logging.hpp>
 
+namespace libaudioverse_implementation {
+
 Logger *logger = nullptr;
 
 Logger::Logger() {
@@ -115,4 +117,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_getLoggingLevel(int* destination) {
 	std::call_once(logging_init_flag, initLogging);
 	*destination = logger->getLoggingLevel();
 	PUB_END
+}
+
 }

@@ -7,6 +7,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <functional>
 #include <math.h>
 
+namespace libaudioverse_implementation {
+
 DelayRingbuffer::DelayRingbuffer(int length) {
 	buffer_length = length;
 	buffer = new float[length]();
@@ -39,4 +41,6 @@ void DelayRingbuffer::add(int index, float value) {
 
 void DelayRingbuffer::reset() {
 	memset(buffer, 0, sizeof(float)*buffer_length);
+}
+
 }

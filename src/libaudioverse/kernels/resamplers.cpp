@@ -12,6 +12,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <algorithm>
 #include <math.h>
 
+namespace libaudioverse_implementation {
+
 void staticResamplerKernel(int inputSr, int outputSr, int channels, int frames, float* data, int *outLength, float** outData) {
 	if(inputSr== outputSr) { //copy
 		float* o = AllocArray<float>(channels*frames);
@@ -37,4 +39,6 @@ void staticResamplerKernel(int inputSr, int outputSr, int channels, int frames, 
 	speex_resampler_process_interleaved_float(resampler, data, &uframes, o, &written);
 	*outLength=written;
 	*outData = o;
+}
+
 }

@@ -3,6 +3,8 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #pragma once
 
+namespace libaudioverse_implementation {
+
 /**A feedback delay network consists of the following:
 N delay lines of some quality or type.
 A vector of length n representing relative output gains.
@@ -45,3 +47,4 @@ class FeedbackDelayNetwork {
 	float* delays = nullptr;
 	bool using_feedback_delay_matrix = false;
 };
+}

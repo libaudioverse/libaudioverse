@@ -16,6 +16,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <limits>
 #include <libaudioverse/private/iir.hpp>
 
+namespace libaudioverse_implementation {
+
 class IirNode: public Node {
 	public:
 	IirNode(std::shared_ptr<Simulation> simulation, int channels);
@@ -72,4 +74,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_iirNodeSetCoefficients(LavHandle nodeHandle, in
 	if(node->getType() != Lav_OBJTYPE_IIR_NODE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
 	std::static_pointer_cast<IirNode>(node)->setCoefficients(numeratorLength, numerator, denominatorLength, denominator, shouldClearHistory);
 	PUB_END
+}
+
 }

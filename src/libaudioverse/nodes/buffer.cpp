@@ -18,6 +18,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <limits>
 #include <vector>
 
+namespace libaudioverse_implementation {
+
 class BufferNode: public Node {
 	public:
 	BufferNode(std::shared_ptr<Simulation> simulation);
@@ -108,4 +110,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createBufferNode(LavHandle simulationHandle, La
 	auto retval = createBufferNode(simulation);
 	*destination = outgoingObject<Node>(retval);
 	PUB_END
+}
+
 }

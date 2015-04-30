@@ -20,6 +20,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <memory>
 #include <algorithm>
 
+namespace libaudioverse_implementation {
+
 /**Swaps bytes to reverse endianness.*/
 void reverse_endianness(char* buffer, unsigned int count, unsigned int window) {
 	char* end = buffer+count*window;
@@ -223,4 +225,6 @@ void HrtfData::computeCoefficientsStereo(float elevation, float azimuth, float *
 	//the left ear is found at an azimuth which is reflectred about 0 degrees.
 	azimuth = ringmodf(360-azimuth, 360.0f);
 	computeCoefficientsMono(elevation, azimuth, left);
+}
+
 }

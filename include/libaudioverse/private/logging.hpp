@@ -11,6 +11,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdarg.h>
 #include <stdio.h>
 
+namespace libaudioverse_implementation {
+
 class LogMessage {
 	public:
 	LogMessage() = default; //makes powercores happy, but in regards to functionality we don't use.
@@ -45,3 +47,5 @@ void log(int level, std::string fmt, ...);
 
 //deinitialization function.
 void shutdownLogging();
+
+}

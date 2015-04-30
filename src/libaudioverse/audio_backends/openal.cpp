@@ -20,6 +20,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <al/alc.h>
 #include <atomic>
 
+namespace libaudioverse_implementation {
+
 //Justification for ugliness and supurfluous comments: this is OpenAL.
 //the mutex to make sure that nothing touches OpenAL while something else is.
 std::mutex *openal_linearizer = nullptr;
@@ -230,4 +232,6 @@ std::shared_ptr<Device> OpenALDeviceFactory::createDevice(std::function<void(flo
 DeviceFactory* createOpenALDeviceFactory() {
 	openal_linearizer = new std::mutex();
 	return new OpenALDeviceFactory();
+}
+
 }

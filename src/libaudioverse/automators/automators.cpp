@@ -8,6 +8,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/macros.hpp>
 
+namespace libaudioverse_implementation {
+
 Automator::Automator(Property* p, double scheduledTime): property(p), scheduled_time(scheduledTime) {
 }
 
@@ -39,4 +41,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_automationCancelAutomators(LavHandle nodeHandle
 	auto &prop = n->getProperty(slot);
 	prop.cancelAutomators(time);
 	PUB_END
+}
+
 }

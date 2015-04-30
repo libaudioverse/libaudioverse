@@ -12,6 +12,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "../libaudioverse.h"
 #include "errors.hpp"
 
+namespace libaudioverse_implementation {
 
 union PropertyValue {
 	float fval; //Actual value is in automation_buffer, kept for range checking.
@@ -187,3 +188,5 @@ Property* createStringProperty(const char* name, const char* default);
 Property* createIntArrayProperty(const char* name, unsigned int minLength, unsigned int maxLength, unsigned int defaultLength, int* defaultData);
 Property* createFloatArrayProperty(const char* name, unsigned int minLength, unsigned int maxLength, unsigned int defaultLength, float* defaultData);
 Property* createBufferProperty(const char* name);
+
+}

@@ -5,6 +5,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <sndfile.h>
 #include <memory>
 
+namespace libaudioverse_implementation {
+
 /**A completely stand-alone wrapper around Libsndfile for file reading: implements both a  streaming and non-streaming interface.
 
 This can theoreticaly handle any type of file, including codec decoding, but uses Libsndfile for the moment.*/
@@ -24,3 +26,5 @@ class FileReader: std::enable_shared_from_this<FileReader>  {
 	SNDFILE* handle = nullptr;
 	SF_INFO info;
 };
+
+}

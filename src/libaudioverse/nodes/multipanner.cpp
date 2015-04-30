@@ -18,6 +18,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <utility>
 #include <vector>
 
+namespace libaudioverse_implementation {
+
 class MultipannerObject: public SubgraphNode {
 	public:
 	MultipannerObject(std::shared_ptr<Simulation> sim, std::shared_ptr<HrtfData> hrtf);
@@ -117,4 +119,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createMultipannerNode(LavHandle simulationHandl
 	}
 	*destination = outgoingObject<Node>(createMultipannerNode(simulation, hrtf));
 	PUB_END
+}
+
 }

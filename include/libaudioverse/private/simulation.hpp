@@ -15,6 +15,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "../libaudioverse.h"
 #include "memory.hpp"
 
+namespace libaudioverse_implementation {
+
 class Node;
 class Device;
 class InputConnection;
@@ -93,3 +95,5 @@ class Simulation: public ExternalObject {
 	LavBlockCallback block_callback = nullptr;
 	void* block_callback_userdata =nullptr;
 };
+
+}

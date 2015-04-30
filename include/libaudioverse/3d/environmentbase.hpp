@@ -7,9 +7,12 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <glm/glm.hpp>
 #include <memory>
 
+namespace libaudioverse_implementation {
+
 /**This is an abstract class and helper struct that is the minimum a source needs to associate to an object.*/
 
 class SourceNode;
+class Simulation;
 
 /**This holds info on listener positions, defaults, etc.
 Anything a source needs for updating, basically.*/
@@ -25,3 +28,5 @@ class EnvironmentBase: public SubgraphNode {
 	//must return an appropriate panner object for this environment.
 	virtual std::shared_ptr<Node> createPannerNode() = 0;
 };
+
+}

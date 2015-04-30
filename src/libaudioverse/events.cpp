@@ -8,6 +8,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <string>
 #include <memory>
 
+namespace libaudioverse_implementation {
+
 /**events.*/
 
 Event::Event() {
@@ -83,4 +85,6 @@ bool Event::getNoMultifire() {
 
 void Event::setNoMultifire(bool what) {
 	no_multifire = what;
+}
+
 }

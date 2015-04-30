@@ -3,6 +3,8 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #pragma once
 
+namespace libaudioverse_implementation {
+
 /**InInterleaving and uninterleaving of samples.
 
 
@@ -49,3 +51,5 @@ void staticResamplerKernel(int inputSr, int outputSr, int channels, int frames, 
 The matrix rows represent output channels and the columns input channels.
 The result is that each output buffer is the sum of the input buffers multiplied by the scalars in the matrix row representing it.*/
 void applyMixingMatrix(int sampleCount, int inputChannels, float** inputs, int outputChannels, float** outputs, const float* mixingMatrix);
+
+}

@@ -12,6 +12,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/audio_devices.hpp>
 #include <libaudioverse/private/logging.hpp>
 
+namespace libaudioverse_implementation {
+
 typedef void (*initfunc_t)();
 
 //These run in the order specified in this array with no parallelism.
@@ -42,6 +44,7 @@ unsigned int isInitialized = 0;
 
 
 Lav_PUBLIC_FUNCTION LavError Lav_initialize() {
+	using namespace libaudioverse_implementation;
 	PUB_BEGIN
 	if(isInitialized == 1) {
 		return Lav_ERROR_NONE;
@@ -54,6 +57,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_initialize() {
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_shutdown() {
+	using namespace libaudioverse_implementation;
 	PUB_BEGIN
 	for(int i = 0; i < sizeof(shutdown_funcs)/sizeof(shutdown_funcs[0]); i++) {
 		shutdown_funcs[i]();
@@ -66,4 +70,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_isInitialized(int* destination) {
 	PUB_BEGIN
 	*destination = isInitialized;
 	PUB_END
+}
+
 }

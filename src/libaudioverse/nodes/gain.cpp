@@ -16,6 +16,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <utility>
 #include <vector>
 
+namespace libaudioverse_implementation {
+
 class GainNode: public Node {
 	public:
 	GainNode(std::shared_ptr<Simulation> sim);
@@ -49,4 +51,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createGainNode(LavHandle simulationHandle, int 
 	retval->appendOutputConnection(0, channels);
 	*destination =outgoingObject<Node>(retval);
 	PUB_END
+}
+
 }

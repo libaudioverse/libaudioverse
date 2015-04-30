@@ -19,6 +19,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <windows.h>
 #include <mmreg.h> //WAVEFORMATEXTENSIBLE
 
+namespace libaudioverse_implementation {
+
 WAVEFORMATEXTENSIBLE makeFormat(unsigned int channels, unsigned int sr, bool isExtended) {
 	//lookup table so we can easily pull out masks.
 	unsigned int chanmasks[] = {
@@ -268,4 +270,6 @@ DeviceFactory* createWinmmDeviceFactory() {
 		return nullptr;
 	}
 	return fact;
+}
+
 }

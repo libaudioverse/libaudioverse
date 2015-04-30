@@ -16,6 +16,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <algorithm>
 #include <math.h>
 
+namespace libaudioverse_implementation {
+
 class DelayNode: public Node {
 	public:
 	DelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, unsigned int lineCount);
@@ -89,4 +91,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createDelayNode(LavHandle simulationHandle, flo
 	auto d = createDelayNode(simulation, maxDelay, lineCount);
 	*destination = outgoingObject(d);
 	PUB_END
+}
+
 }

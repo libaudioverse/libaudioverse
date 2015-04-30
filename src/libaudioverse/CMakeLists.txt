@@ -5,6 +5,7 @@ COMMAND python "${CMAKE_SOURCE_DIR}/metadata/metadata.py" "${CMAKE_CURRENT_BINAR
 add_custom_command(
 OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/data/default_hrtf.cpp"
 COMMAND python "${CMAKE_SOURCE_DIR}/scripts/convert_to_cpp_file.py" 
+"libaudioverse_implementation"
 "default_hrtf"
 "${CMAKE_SOURCE_DIR}/default_hrtf.hrtf"
 "${CMAKE_CURRENT_BINARY_DIR}/data/default_hrtf.cpp"

@@ -4,6 +4,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include <vector>
 
+namespace libaudioverse_implementation {
+
 //An n-channel panner.
 //very very private. This does almost no error checking.
 
@@ -21,3 +23,5 @@ class PannerImplementation {
 	private:
 	std::vector<PannerEntry> channels;
 };
+
+}

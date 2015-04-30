@@ -17,6 +17,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <thread>
 #include <chrono>
 
+namespace libaudioverse_implementation {
+
 /**Code common to all backends, i.e. enumeration.*/
 
 //these are the two steps in initialization, and are consequently put before the destructor.
@@ -135,4 +137,6 @@ unsigned int DeviceFactory::getOutputCount() {
 
 std::string DeviceFactory::getName() {
 	return "Invalid backend: subclass failed to implement";
+}
+
 }

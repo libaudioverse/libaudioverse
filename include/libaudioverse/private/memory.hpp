@@ -10,6 +10,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <functional>
 //contains some various memory-related bits and pieces, as well as the smart pointer marshalling.
 
+namespace libaudioverse_implementation {
+
 /**This is a standalone component that knows how to hold onto smart pointers, avoid accidentally duplicating entries, and cast the entries before giving them to us.
 
 Asking for an entry that is not present gives a null pointer.
@@ -121,3 +123,5 @@ void FreeArray(void* ptr);
 //custom deleter for smart pointer that guarantees thread safety.
 std::function<void(ExternalObject*)> ObjectDeleter(std::shared_ptr<Simulation> simulation);
 
+
+}

@@ -18,6 +18,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <algorithm>
 #include <math.h>
 
+namespace libaudioverse_implementation {
+
 FeedbackDelayNetworkNode::FeedbackDelayNetworkNode(std::shared_ptr<Simulation> simulation, float maxDelay, int lines):
 Node(Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK_NODE, simulation, lines, lines) {
 	max_delay = maxDelay;
@@ -127,4 +129,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetFeedbackDelayMatrix(
 	auto fdn=std::static_pointer_cast<FeedbackDelayNetworkNode>(node);
 	fdn->setFeedbackDelayMatrix(count, values);
 	PUB_END
+}
+
 }

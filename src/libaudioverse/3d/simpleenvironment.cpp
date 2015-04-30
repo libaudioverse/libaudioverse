@@ -19,6 +19,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <algorithm>
 #include <vector>
 
+namespace libaudioverse_implementation {
+
 SimpleEnvironmentNode::SimpleEnvironmentNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf): EnvironmentBase(Lav_OBJTYPE_SIMPLE_ENVIRONMENT_NODE, simulation)  {
 	this->hrtf = hrtf;
 	int channels = getProperty(Lav_ENVIRONMENT_OUTPUT_CHANNELS).getIntValue();
@@ -99,4 +101,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSimpleEnvironmentNode(LavHandle simulatio
 	auto retval = createSimpleEnvironmentNode(simulation, hrtf);
 	*destination = outgoingObject<Node>(retval);
 	PUB_END
+}
+
 }

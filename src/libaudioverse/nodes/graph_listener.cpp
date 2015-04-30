@@ -15,6 +15,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <algorithm>
 #include <utility>
 #include <vector>
+namespace libaudioverse_implementation {
 
 class GraphListenerNode: public Node {
 	public:
@@ -75,4 +76,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_graphListenerNodeSetListeningCallback(LavHandle
 	node2->callback = callback;
 	node2->callback_userdata = userdata;
 	PUB_END
+}
+
 }

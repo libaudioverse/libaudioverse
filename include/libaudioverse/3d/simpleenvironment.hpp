@@ -8,8 +8,11 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <set>
 #include <memory>
 
+namespace libaudioverse_implementation {
+
 class SourceNode;
 class HrtfData;
+class Simulation;
 
 class SimpleEnvironmentNode: public EnvironmentBase {
 	public:
@@ -27,3 +30,5 @@ class SimpleEnvironmentNode: public EnvironmentBase {
 	std::shared_ptr<Node> output=nullptr;
 	Environment environment;
 };
+
+}

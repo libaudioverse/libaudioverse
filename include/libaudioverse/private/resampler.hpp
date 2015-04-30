@@ -10,6 +10,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <utility>
 #include "../speex_resampler.h"
 
+namespace libaudioverse_implementation {
+
 /**A resampler.
 
 This is a class because it, unlike the kernels, needs specific initialization.
@@ -30,3 +32,5 @@ class Resampler {
 	SpeexResamplerState* spx_resampler= nullptr;
 	int spx_error= 0;
 };
+
+}

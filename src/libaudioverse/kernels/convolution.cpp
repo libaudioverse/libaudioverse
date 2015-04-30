@@ -6,6 +6,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/kernels.hpp>
 #include <string.h>
 
+namespace libaudioverse_implementation {
+
 void convolutionKernel(float* input, unsigned int outputSampleCount, float* output, unsigned int responseLength, float* response) {
 	scalarMultiplicationKernel(outputSampleCount, response[responseLength-1], input, output);
 	input++;
@@ -33,4 +35,6 @@ void crossfadeConvolutionKernel(float* input, unsigned int outputSampleCount, fl
 		}
 	output[i] = samp;
 	}
+}
+
 }

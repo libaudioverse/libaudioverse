@@ -14,6 +14,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdio.h>
 #include <libaudioverse/speex_resampler.h>
 
+namespace libaudioverse_implementation {
+
 Resampler::Resampler(int inputFrameCount, int inputChannels, int inputSr, int outputSr): input_frame_count(inputFrameCount), input_channels(inputChannels), input_sr(inputSr), output_sr(outputSr) {
 	delta = (float)inputSr/(float)outputSr;
 	spx_resampler = speex_resampler_init(inputChannels, inputSr, outputSr, 1, &spx_error);
@@ -60,4 +62,6 @@ int Resampler::write(float* dest, int maxFrameCount) {
 int Resampler::estimateAvailableFrames() {
 	float delta_rec = 1.0/delta;
 	return queue.size()*delta_rec*input_frame_count;
+}
+
 }

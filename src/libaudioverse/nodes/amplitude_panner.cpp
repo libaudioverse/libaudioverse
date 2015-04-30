@@ -17,6 +17,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <utility>
 #include <vector>
 
+namespace libaudioverse_implementation {
+
 float standard_map_stereo[] = {-90.0f, 90.0f};
 float standard_map_51[] = {-22.5f, 22.5f, -110.0f, 110.0f};
 float standard_map_71[] = {-22.5f, 22.5f, -150.0f, 150.0f, -110.0f, 110.0f};
@@ -100,4 +102,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_amplitudePannerNodeConfigureStandardMap(LavHand
 	if(node->getType() != Lav_OBJTYPE_AMPLITUDE_PANNER_NODE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
 	std::static_pointer_cast<AmplitudePannerNode>(node)->configureStandardChannelMap(channels);
 	PUB_END
+}
+
 }

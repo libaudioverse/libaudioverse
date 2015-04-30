@@ -3,6 +3,8 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #pragma once
 
+namespace libaudioverse_implementation {
+
 //used by all delay lines.
 //This is a fixed-sized ringbuffer that can be advanced and written to as a single operation or read at a single offset.
 class DelayRingbuffer {
@@ -40,3 +42,5 @@ class CrossfadingDelayLine {
 	float interpolation_delta = 1.0f;
 	float sr = 0.0f, weight1=1.0f, weight2=0.0f;
 };
+
+}

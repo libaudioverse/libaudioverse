@@ -7,6 +7,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <functional>
 #include <math.h>
 
+namespace libaudioverse_implementation {
+
 CrossfadingDelayLine::CrossfadingDelayLine(float maxDelay, float sr): line((int)(sr*maxDelay)+1) {
 	this->sr = sr;
 }
@@ -58,4 +60,6 @@ void CrossfadingDelayLine::reset() {
 	weight2 = 0.0f;
 	is_interpolating = false;
 	line.reset();
+}
+
 }

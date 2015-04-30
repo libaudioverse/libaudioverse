@@ -6,6 +6,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <sndfile.h>
 #include <libaudioverse/private/errors.hpp>
 
+namespace libaudioverse_implementation {
+
 FileReader::~FileReader() {
 	if(handle) close(); //make sure the file gets closed behind us.
 }
@@ -51,4 +53,6 @@ unsigned int FileReader::read(unsigned int frames, float* buffer) {
 
 unsigned int FileReader::readAll(float* buffer) {
 	return read(getFrameCount(), buffer);
+}
+
 }

@@ -7,6 +7,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/node.hpp>
 
+namespace libaudioverse_implementation {
+
 class LinearRampAutomator: public Automator {
 	public:
 	LinearRampAutomator(Property* p, double scheduledTime, double finalValue);
@@ -43,4 +45,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_automationLinearRampToValue(LavHandle nodeHandl
 	//the property will throw for us if any part of the next part goes wrong.
 	prop.scheduleAutomator(automator);
 	PUB_END
+}
+
 }

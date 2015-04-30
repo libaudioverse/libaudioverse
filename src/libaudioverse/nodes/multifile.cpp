@@ -17,6 +17,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <memory>
 #include <math.h>
 
+namespace libaudioverse_implementation {
+
 class MultifileNode: public SubgraphNode {
 	public:
 	MultifileNode(std::shared_ptr<Simulation> simulation, int channels, int maxSimultaneousFiles);
@@ -110,4 +112,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_multifileNodeStopAll(LavHandle nodeHandle) {
 	if(node->getType() != Lav_OBJTYPE_MULTIFILE_NODE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
 	std::static_pointer_cast<MultifileNode>(node)->stopAll();
 	PUB_END
+}
+
 }

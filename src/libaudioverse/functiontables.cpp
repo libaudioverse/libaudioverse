@@ -9,9 +9,13 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/functiontables.hpp>
 #include <math.h>
 
+namespace libaudioverse_implementation {
+
 /**As a property of these tables, the last sample of the array must be the same as the first, and length must not include the last sample.
 
 Justification: this greatly simplifies interpolating between samples when the end of the array is coming up, completely removing some operations and simplifying weight calculations.*/
 
 void initializeFunctionTables() {
+}
+
 }

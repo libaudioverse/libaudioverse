@@ -12,6 +12,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/memory.hpp>
 #include <memory>
 
+namespace libaudioverse_implementation {
+
 class HardLimiterNode: public Node {
 	public:
 	HardLimiterNode(std::shared_ptr<Simulation> simulation, unsigned int numInputs);
@@ -54,4 +56,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterNode(LavHandle simulationHandl
 	auto retval = createHardLimiterNode(simulation, numChannels);
 	*destination = outgoingObject<Node>(retval);
 	PUB_END
+}
+
 }

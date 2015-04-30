@@ -8,6 +8,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <functional>
 #include <math.h>
 
+namespace libaudioverse_implementation {
+
 FeedbackDelayNetwork::FeedbackDelayNetwork(int n, float maxDelay, float sr) {
 	this->n = n;
 	this->sr = sr;
@@ -103,4 +105,6 @@ void FeedbackDelayNetwork::setCrossfadingTime(float time) {
 
 void FeedbackDelayNetwork::reset() {
 	for(int i = 0; i < n; i++) bank[i]->reset();
+}
+
 }

@@ -6,6 +6,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "../implementations/feedback_delay_network.hpp"
 #include <memory>
 
+namespace libaudioverse_implementation {
+
 class FeedbackDelayNetworkNode: public Node {
 	public:
 	FeedbackDelayNetworkNode(std::shared_ptr<Simulation> simulation, float maxDelay, int lines);
@@ -22,3 +24,5 @@ class FeedbackDelayNetworkNode: public Node {
 	float*lastOutput = nullptr, *nextInput = nullptr;
 	float* gains = nullptr;
 };
+
+}

@@ -16,6 +16,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/constants.hpp>
 #include <limits>
 
+namespace libaudioverse_implementation {
+
 class SineNode: public Node {
 	public:
 	SineNode(std::shared_ptr<Simulation> simulation);
@@ -66,4 +68,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavHandle simulationHandle, LavH
 	auto retval = createSineNode(simulation);
 	*destination = outgoingObject<Node>(retval);
 	PUB_END
+}
+
 }

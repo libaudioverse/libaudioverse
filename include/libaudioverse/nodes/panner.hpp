@@ -5,6 +5,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "../private/node.hpp"
 #include "../implementations/panner.hpp"
 #include <memory>
+namespace libaudioverse_implementation {
 
 class AmplitudePannerNode: public Node {
 	public:
@@ -15,3 +16,5 @@ class AmplitudePannerNode: public Node {
 	bool map_changed = true;
 	PannerImplementation panner;
 };
+
+}

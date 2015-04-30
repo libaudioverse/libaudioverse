@@ -1,6 +1,9 @@
 /**Copyright (C) Austin Hicks, 2014
 This file is part of Libaudioverse, a library for 3D and environmental audio simulation, and is released under the terms of the Gnu General Public License Version 3 or (at your option) any later version.
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
+#include <libaudioverse/private/data.hpp> //extern declarations.
+
+namespace libaudioverse_implementation {
 
 /*These are the default mixing matrices.
 
@@ -15,7 +18,7 @@ Note: this file exists so that we can do something reasonable when the output ob
 It is not inconceivable that this will be useful for testing, and those apps which make the request will still need reasonable audio until they have input from the user.
 
 Note 2: This file will need revision as practical examples of these configurations are found in the wild.*/
-#include <libaudioverse/private/data.hpp> //extern declarations.
+
 
 //this is the registry. The matrices are below.
 MixingMatrixInfo mixing_matrix_list[] = {
@@ -132,3 +135,5 @@ float mixing_matrix_8_6[] = {
 0.0f, 0.0f, 0.0f, 0.0f, 0.5f, 0.5f, 0.0f, 0.0f, //bl.
 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f, 0.5f, //br.
 };
+
+}

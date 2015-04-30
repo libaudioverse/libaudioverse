@@ -5,6 +5,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <string>
 #include <memory>
 
+namespace libaudioverse_implementation {
+
 class HrtfData {
 	public:
 	~HrtfData();
@@ -30,3 +32,5 @@ class HrtfData {
 	//used for crossfading so we don't clobber the heap.
 	float *temporary_buffer1 = nullptr, *temporary_buffer2 = nullptr;
 };
+
+}

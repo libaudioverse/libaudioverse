@@ -21,6 +21,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <set>
 #include <vector>
 
+namespace libaudioverse_implementation {
+
 /**Given two nodes, determine if connecting an output of start to an input of end causes a cycle.*/
 bool doesEdgePreserveAcyclicity(std::shared_ptr<Node> start, std::shared_ptr<Node> end) {
 	//A cycle exists if end is directly or indirectly conneccted to an input of start.
@@ -756,4 +758,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeSetEvent(LavHandle nodeHandle, int event, L
 		ev.setExternalHandler(nullptr);
 	}
 	PUB_END
+}
+
 }

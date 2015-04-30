@@ -16,6 +16,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <vector>
 #include <libaudioverse/private/iir.hpp>
 
+namespace libaudioverse_implementation {
+
 class BiquadNode: public Node {
 	public:
 	BiquadNode(std::shared_ptr<Simulation> sim, unsigned int channels);
@@ -73,3 +75,4 @@ Lav_PUBLIC_FUNCTION LavError Lav_createBiquadNode(LavHandle simulationHandle, un
 	PUB_END
 }
 
+}

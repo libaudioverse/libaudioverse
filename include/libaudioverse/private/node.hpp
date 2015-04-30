@@ -12,6 +12,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <vector>
 #include <set>
 
+namespace libaudioverse_implementation {
+
 class Property;
 
 /**Things all Libaudioverse nodes have.*/
@@ -129,3 +131,5 @@ class SubgraphNode: public Node {
 	protected:
 	std::shared_ptr<Node> subgraph_input, subgraph_output;
 };
+
+}

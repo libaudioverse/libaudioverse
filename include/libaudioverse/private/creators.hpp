@@ -4,6 +4,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include <memory>
 
+namespace libaudioverse_implementation {
+
 class Node;
 class Simulation;
 class HrtfData;
@@ -38,3 +40,5 @@ std::shared_ptr<Node> createSquareNode(std::shared_ptr<Simulation> simulation);
 //3d nodes.
 std::shared_ptr<SimpleEnvironmentNode> createSimpleEnvironmentNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf);
 std::shared_ptr<Node> createSourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentBase> manager);
+
+}

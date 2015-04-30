@@ -12,6 +12,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <thread>
 #include <functional>
 
+namespace libaudioverse_implementation {
+
 /**A physical output.*/
 class Device {
 	protected:
@@ -69,3 +71,5 @@ DeviceFactory* createOpenALDeviceFactory();
 //finally, the function that initializes all of this.
 void initializeDeviceFactory();
 void shutdownDeviceFactory();
+
+}

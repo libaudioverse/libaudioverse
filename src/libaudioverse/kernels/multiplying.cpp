@@ -8,6 +8,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <emmintrin.h>
 #include <xmmintrin.h>
 
+namespace libaudioverse_implementation {
+
 void multiplicationKernelSimple(int length, float* a1, float* a2, float* dest) {
 	for(int i = 0; i < length; i++) dest[i]=a1[i]*a2[i];
 }
@@ -73,3 +75,4 @@ void multiplicationAdditionKernel(int length, float c, float* a1, float* a2, flo
 
 #endif
 
+}

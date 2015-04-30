@@ -10,6 +10,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <string.h>
 #include <algorithm>
 
+namespace libaudioverse_implementation {
+
 Property::Property(int property_type): type(property_type) {}
 
 Property::~Property() {
@@ -556,4 +558,6 @@ Property* createBufferProperty(const char* name) {
 	Property* prop=new Property(Lav_PROPERTYTYPE_BUFFER);
 	prop->reset();
 	return prop;
+}
+
 }

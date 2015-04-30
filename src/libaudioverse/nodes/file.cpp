@@ -16,6 +16,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <memory>
 #include <math.h>
 
+namespace libaudioverse_implementation {
+
 class FileNode: public Node {
 	public:
 	FileNode(std::shared_ptr<Simulation> simulation, const char* path, unsigned int channels);
@@ -126,4 +128,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavHandle simulationHandle, cons
 	auto retval = createFileNode(simulation, path);
 	*destination = outgoingObject<Node>(retval);
 	PUB_END
+}
+
 }

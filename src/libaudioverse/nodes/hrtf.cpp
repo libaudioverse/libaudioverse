@@ -16,6 +16,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <memory>
 #include <math.h>
 
+namespace libaudioverse_implementation {
+
 class HrtfNode: public Node {
 	public:
 	HrtfNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf);
@@ -120,4 +122,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createHrtfNode(LavHandle simulationHandle, cons
 	auto retval = createHrtfNode(simulation, hrtf);
 	*destination = outgoingObject<Node>(retval);
 	PUB_END
+}
+
 }

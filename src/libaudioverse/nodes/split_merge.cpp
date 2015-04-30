@@ -15,6 +15,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/memory.hpp>
 #include <limits>
 
+namespace libaudioverse_implementation {
+
 class SplitMergeNode: public Node {
 	public:
 	SplitMergeNode(std::shared_ptr<Simulation> simulation, int type);
@@ -75,4 +77,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createChannelMergerNode(LavHandle simulationHan
 	auto retval = createChannelMergerNode(simulation, channels);
 	*destination = outgoingObject(retval);
 	PUB_END
+}
+
 }

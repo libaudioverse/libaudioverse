@@ -6,6 +6,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <set>
 #include <vector>
 
+namespace libaudioverse_implementation {
+
 class Node;
 class Simulation;
 
@@ -63,3 +65,5 @@ class InputConnection {
 };
 
 void makeConnection(std::shared_ptr<OutputConnection> output, std::shared_ptr<InputConnection> input);
+
+}

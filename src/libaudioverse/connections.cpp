@@ -19,6 +19,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <string.h>
 #include <vector>
 
+namespace libaudioverse_implementation {
+
 OutputConnection::OutputConnection(std::shared_ptr<Simulation> simulation, Node* node, int start, int count) {
 	this->simulation = simulation;
 	this->node= node;
@@ -135,4 +137,6 @@ std::vector<Node*> InputConnection::getConnectedNodes() {
 void makeConnection(std::shared_ptr<OutputConnection> output, std::shared_ptr<InputConnection> input) {
 	output->connectHalf(input);
 	input->connectHalf(output);
+}
+
 }

@@ -16,6 +16,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <utility>
 #include <vector>
 
+namespace libaudioverse_implementation {
+
 class CustomNode: public Node {
 	public:
 	CustomNode(std::shared_ptr<Simulation> sim, unsigned int inputs, unsigned int channelsPerInput, unsigned int outputs, unsigned int channelsPerOutput);
@@ -63,4 +65,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_customNodeSetProcessingCallback(LavHandle nodeH
 	node2->callback = callback;
 	node2->callback_userdata = userdata;
 	PUB_END
+}
+
 }

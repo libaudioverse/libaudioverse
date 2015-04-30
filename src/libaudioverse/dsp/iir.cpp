@@ -14,6 +14,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdio.h>
 #include <libaudioverse/private/errors.hpp>
 
+namespace libaudioverse_implementation {
+
 void IIRFilter::configure(int newNumeratorLength, double* newNumerator, int newDenominatorLength, double* newDenominator) {
 	if(newNumeratorLength == 0 || newDenominatorLength == 0) throw LavErrorException(Lav_ERROR_RANGE);
 	//we normalize by the first coefficient but throw it out; consequently, it must be nonzero.
@@ -152,4 +154,6 @@ void IIRFilter::configureBiquad(int type, double sr, double frequency, double db
 	double denominator[] = {1, a1/a0, a2/a0};
 	configure(3, numerator, 3, denominator);
 	setGain(b0/a0);
+}
+
 }
