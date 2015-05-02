@@ -1,36 +1,18 @@
 == Introduction
 
-Libaudioverse is a library for building audio simulations and the audio component of multimedia applications and a system for simple 3D and environmental audio simulations built on top of the lower-level components.
-capabilities of Libaudioverse include the ability to run the simulation at a different sampling rate than the host audio device, to receive callbacks on various events, and to rapidly (7 lines in Pythhon) build 3d simulations for games.
-Libaudioverse provides all necessary primitives for basic audio applications and many synthesis algorithms.
-it then uses these to build higher-level synthesis primitives.
-A good example is the 3d simulation, which uses an attenuator, a panner, and a mixer.
-
-From a technical perspective, Libaudioverse presents a collection of various objects with inputs and outputs.
-In much the same way one might wire speakers to a computer, one can wire Libaudioverse objects together.
-The only limitation on the configuration of objects is that no cycles may be formed.
-To put this simply, no object may ever directly or indirectly depend on its output.
-
-Libaudioverse has applications across many fields.  Here's a brief list of just some of the things that can be done with libaudioverse:
-
-- A first person shooter with high quality audio.  High quality enough that blind people can play it.
-- A media player capable of applying any of a host of effects to tracks, implemented without requiring users to write plugins in C/C++.
-- Add-ons for screen readers and other assistive technologies that augment user interfaces with auditory feedback, including use of the so-called head-related transfer function.
-- Virtual surround sound systems.
+Libaudioverse is a system for the development of realtime audio effects and synthesis.  Its capabilities include filters, 3D simulation, oscillators, and a variety of other useful tools needed to construct engaging audio experiences.  The readme provides a detailed overview from the perspective of why you might wish to use Libaudioverse, whereas this manual is focused on how it works.  If you found this manual first, the readme is a much better place to start.
 
 The rest of this manual discusses Libaudioverse from a technical point of view.
 For those looking for tutorials, see <<tutorials,Tutorials>>.
 The <<basics,setion discussing basic concepts>> is required reading for anyone wanting to get far.
-When demonstrating concepts, the programming language of choice for this manual is Python, but a discussion of the C API can be dfound <<c-api,here>>.
+When demonstrating concepts, the programming language of choice for this manual is Python, but a discussion of the C API can be found <<c-api,here>>.
 
 === Some Important Notes On This Manual
 
-Libaudioverse is programming language agnostic and contains a system for generating bindings automatically, provided only Jinja2 templates.
-To that end, this manual is incredibly programming language agnostic and does not uyse specific terms for concepts.
+Libaudioverse is programming language agnostic.
+If your language supports a thread-safe C FFI including at least 2 levels of pointer indirection, function pointers, and being called from threads that are not the main thread, it is more than possible to get Libaudioverse working for you.
+Where possible, language bindings will contain specific documentation in the format most common to your language of choice, but it is impractical for this manual to cover all languages.
+To that end, this manual uses Python for examples and attempts to avoid discussing specific language features as much as possible.
 
-The <<tutorials,tutorials>> are written in Python, and a <<c-api,section>> exists discussin the C API.
-Apart from this, yo will need to read the <<bindings,Bindings>> section to determine how Libaudioverse maps these concepts on to your programming language.
-This is incredibly self-explanatory in most cases: Python uses properties, for example.
-Languages also contain limited documentation in their native format, and all bindings come with basic examples.
-Reading the tutorials and jumping right in with your language of choice is by all means reasonable, but this manual does not have the freedom to favour one specific language over all others.
-
+If you need to bind Libaudioverse to your language, see <<c-api,the description of the C API>>.
+<<bindings,Notes on the existing bindings also exist>>.
