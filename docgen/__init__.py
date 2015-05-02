@@ -15,8 +15,8 @@ def make_property_table():
 	sorted_nodes= context['metadata']['nodes'].items()
 	sorted_nodes.sort(key = lambda x: x[1]['doc_name'].lower())
 	sorted_nodes= [i[0] for i in sorted_nodes]
-	sorted_nodes.remove('Lav_NODETYPE_GENERIC')
-	sorted_nodes = ['Lav_NODETYPE_GENERIC'] + sorted_nodes
+	sorted_nodes.remove('Lav_OBJTYPE_GENERIC_NODE')
+	sorted_nodes = ['Lav_OBJTYPE_GENERIC_NODE'] + sorted_nodes
 	context['sorted_nodes'] = sorted_nodes
 	context['nodes'] = context['metadata']['nodes']
 	return template.render(context)
