@@ -10,7 +10,6 @@ All of the following dependencies are required to build Libaudioverse.
 
 - Libsndfile
 - CMake
-- Portaudio (Linux and Mac only; Libaudioverse bundles on windows)
 - Python 2.7.x.
 
 And the following Python packages (all available on PyPI):
@@ -19,21 +18,11 @@ And the following Python packages (all available on PyPI):
 - Enum34 (for running the Python bindings only)
 - Pycparser
 
-For the documentation, you will also need a working implementation of Asciidoc.
-See below for specifics on how to make your own copy of this manual, or just use this one.
-The build process will complete without Asciidoc, but a final, manual step is needed to turn the text files the build process gives into HTML.
-
-=== Setup
-
-At the moment, Libaudioverse's build system assumes windows in a few places.
-Specifically, the directories to Libsndfile are hard-coded in exactly two places, and the paths therein may not be correct.
-You may need to update both CMakeLists.txt and the top of bindings/build_bindings.py to point at your Libsndfile.
-If this is the case and you used the pre-built binaries that come as an installer, then please report this as an issue so I can fix it.
-This only applies to windows.
+For the documentation, you will also need a working implementation of Asciidoc and it must be callable as asciidoc at the command line.
 
 === Building
 
-IMPORTANT: you must do an out-of-source build with CMake and it must be in `repository_root/build`.
+IMPORTANT: you must do an out-of-source build with CMake and it must be in `repository_root/build` where `repository_root` is the directory you cloned the Libaudioverse repository.
 Otherwise, binding and documentation generation will crash.
 
 The rest of the process is the standard CMake process.
@@ -48,4 +37,5 @@ my_generator_specific_build_command
 
 A custom target, `libaudioverse_docs`, generates a set of Asciidoc documentation in `build/documentation`.
 To build the docs, run Asciidoc on main.txt.  Main.txt includes the other files that make up this manual, generates tables of contents, and the like.
+The resulting manual is titled `main.html` and may be found, along with the manual's source files,  in the `documentation` subdirectory of the build directory.
 

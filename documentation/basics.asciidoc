@@ -2,234 +2,81 @@
 == Basic Concepts of Libaudioverse
 
 In order to begin using Libaudioverse's 3d components, it is not necessary to fully understand this section.
-For a gentler introduction, see the tutorials.
+For a gentler and much more hands-on introduction, see the tutorials.
 
-[[view-of-audio]]
-=== Libaudioverse's View of Audio
+[[basics-general-overview]]
+=== General Overview of Libaudioverse Concepts
 
-In order to provide flexibility to the programmer, Libaudioverse presents audio as a set of interconnected objects arranged in an acyclic dependency graph.
-Each object has some number of inputs, some number of properties, and some number of outputs.
-The relationship of inputs to outputs is one-to-many.
-Properties are not the domain of this discussion; see <<basics-properties,properties>> for an overview.
-This section focuses on inputs, outputs, and connections between them.
+Libaudioverse has three main types of object:
 
-To provide a helpful analogy for those not familiar with graph terminology, Libaudioverse objects are like boxes with wires and ports.
-The wires represent inputs and the ports represent outputs.
-Because analogies aren't perfect, multiple wires may be plugged into one port.
-The bit about acyclicity is simply this: if you can follow wires to ports in such a way that you reach a port on the object with which you started, you have a cycle.
-This invarriant is inforced by the library and will result in an error if violated.
+- The simulation represents a collection of nodes and mixes audio.
+- Nodes process or produce audio.
+- Buffers hold chunks of audio data.
 
-Objects are part of a simulation.  The simulation holds information about sampling rates, block sizes, and other miscellania.
-It is an error to connect an input of one object in one simulation to an object in another simulation.
+Each of these is discussed below.
 
-One object per simulation is designated the output object.
-The outputs of the output object are mapped directly to sound card channels: output 0 is channel 0, output 1 is channel 1, and so on.
+[[basics-simulation]]
+==== The Simulation and Audio Mixing
 
-In order to process audio quickly, Libaudioverse locks the simulation while preparing blocks of audio.
-Consequently, any changes made to the object graph will happen either before or after a block.
-For a full discussion of the block size, see <<quantifying-latency,quantifying latency>>.
+The simulation is the main entry point to Libaudioverse.
+When created, the simulation fixes the sampling rate of all nodes that use it.
+There are two types of simulation: a regular simulation and a read simulation.
+Regular simulations automatically advance audio and associate themselves with audio devices at initialization.
+Read simulations do not advance audio unless you ask them for a block.
+Where this distinction is important, this manual will make a point of distinguishing; hereafter you can take "the simulation" to mean both unless otherwise specified.
 
-Libaudioverse's internal sampling rates are not those of your sound card, so it is possible to run at any sampling rate.
-It is not possible for Libaudioverse objects to produce anything but one full block of audio, so all resampling either happens at inputs to the library (file nodes, etc) or between the output object and the sound card.
-Lowering the sampling rate is one way to drastically lower the CPU usage of the library, though some objects will lose quality if you do so.
-A prime example of this is the HRTF object, which works best at the sampling rate of the HRTF file fed to it.
+Every simulation has two key parameters: the sampling rate and the block size.
 
-[[basics-devices-and-simulations]]
-=== Devices and the Simulation
+The sampling rate is exactly what it sounds like.  When in doubt, use 44100, as this is sufficient for most purposes.
 
-As discussed above, a simulation is needed by every every Libaudioverse program.
-It encapsulates a chosen sampling rate and number of channels as well as providing functions for requesting blocks of audio.
+Libaudioverse processes audio in blocks.
+When audio is being processed, the simulation locks an internal lock, blocking all incoming Libaudioverse calls that refer to that simulation or nodes which are a part of it.
+It then produces the next block of audio before releasing this lock, allowing your code to continue making calls.
+The block size is the size of this block.
+In effect, the block size is the number of samples for which any property values are fixed; properties are described below.
 
-There are two ways in which a simulation may be used.
-The first is to specify the sampling rate, channels, and block size.
-In this configuration, the simulation's `get_block` method must be used directly and no audio will be heard.
+Regular simulations add two more parameters.
 
-The second method is to specify a sampling rate, mixahead, buffer size, and device index.
-If initialized in this manner, Libaudioverse decides the number of channels.
-Mixahead and buffer size are discussed further in <<quantifying-latency,Quantifying Latency>>.
+The first of these is called mixahead and deserves some discussion.
+When audio is produced, it has to be produced slightly in advance of realtime.
+This is due to the fact that Libaudioverse may be pre-empted by the OS.
+If Libaudioverse produced a block and then waited for it to be completely finished before beginning the next one, audio would click continuously.
+Furthermore, smaller block sizes take more CPU because of the overhead of starting a block, yet smaller block sizes increase audio quality.
+To deal with this, Libaudioverse maintains a queue of blocks.
+If the queue is not full, then more blocks will be produced without waiting.
+Mixahead is the limit on this queue.
 
-Device indexes are integers which Libaudioverse assigns to devices.
-it is possible to enumerate all devices on the system.
-For specifics, see the tutorials for how this is done in Python, the binding-specific notes for your language, or the <<c-api,section on the C API>>.
+The simplest way to look at mixahead is as a latency in blocks.
+If you want to know approximately how much latency Libaudioverse is introducing, use the following expression: `block_size*sample_rate/mixa_ahead`.
 
-Device indexes 0 to n represent all output devices on the system.
-Device index -1 is special and refers to the default audio output device with following functionality.
-Device index -1 will always have 2 channels.
-This is due to the fact that, should it be supported on the platform Libaudioverse is running on, device index -1 is an explicit request to follow the default audio device if it changes.
-Changing the number of channels as the device changes leads to too many ambiguities; should your application wish to support surround sound or even odder channel setups, this functionality must be foregone or manually implemented by the application.
+A mixahead of 0 will click for almost everyone.
+As a general guideline, a latency of 100 MS will work for most people.
+Furthermore, block size should usually be no more than 1024, as this is about the point where rapid property changes become audible as discrete events.
+This implies that your mixahead should usually be greater than 4.
+Lowering the block size usually means raising the mixahead, so larger values are certainly possible.
 
-most language bindings choose the second approach when constructing a simulation with the default constructor, though it is obviously possible to change this.
+Unfortunately, the situation is yet more complicated.
+These settings will work for almost everyone, but you should allow your user to change them.
+In this case, almost  everyone includes setups with very high latencies, for example bluetooth headphones.
+It is suggested that you put a latency slider in your advanced options, and allow the user to move it in units of `block_size/sr`.
+Note: this will become easier, but mixahead is currently fixed at simulation start-up.
 
-[[basics-object-states]]
-=== Object States: When Are Objects processed?
+Simulations provide the ability to perform an atomic operation, so called because I have not yet found a better name.
+When making multiple calls to change aspects of audio, it is possible for the user to hear intermediate changes.
+This occurs because Libaudioverse might decide to process a lock between them.
+An atomic operation acquires the internal Libaudioverse lock, preventing all threads save the current one from accessing this simulation and its nodes.
+This includes Libaudioverse's internal threads for mixing.
 
-WARNING:
-This section is complex the first time you read it.
-Libaudioverse's goal is to be fast, so the functionality described in this section is unfortunately necessary.
-If this is your first time playing with Libaudioverse, start with the <<tutorials,tutorials>>, which spend time showing how this works in a much gentler fashion.
+This is exposed via your language binding in the usual manner for locks, and you should treat this feature with the same level of caution.
+For example, Python only allows use of this feature via with blocks.
+Think of this as acquiring a lock that protects the simulation: if you wait on a lock that is held by another thread that is also calling Libaudioverse in such a way that this simulation is required, you can deadlock.
 
-As stated above, Libaudioverse objects are in a dependency graph.  This means that it is possible to perform pruning.  This is best illustrated with an example.
-
-Say you have a mixer called `m` and a file object called `f`.  For simplicity, let's say they both have one output.  Furthermore, let `m` be the output object of some simulation.
-
-`m` will always process, so long as it is the designated output object.
-At this point, however, `f` does not process.
-If the input of `m` is connected to `f`'s output, `f` will begin processing.
-If `f` is made the output object of the simulation, `m` will stop processing (because no input of `f` connects to `m`) and `f` will begin processing.
-
-The rule can formally be stated as follows.
-If a simulation has no output object and all objects are in their default states (see below), then no objects which are part of that simulation process.
-Otherwise, start at the output object of the simulation and build a set of objects by following all inputs of the output object.
-Recursively.  process each object seen exactly once in an order such that no object is processed before all objects to which its inputs point are processed.
-In the below discussion, any objects reachable by following inputs from some other object A are termed A's  parents.
-
-This seems overly complicated, but three things should be noted:
-
-- Some objects are prohibitively expensive, for example the HRTF panners.
-HRTF panners take millions of mathematical operations per second.
-Processing them when they are not required penalizes the rest of the simulation heavily.
-This algorithm is especially important when working in garbage collected languages: we don't know when objects will die, but we do know when they have been disconnected from everything else.
-
-- This will usually do what one expects.
-For a majority of applications, all objects are connected at start-up and this algorithm can be disregarded.
-For those in which this is not the case, this behavior can be directly useful to the programmer.
-
-- Finally, if you wish to change this default, keep reading.
-it is not advised to abuse object states in this manner, but it is possible to essentially circumvent this algorithm by placing all objects in the `always_playing` state.
-
-Every object has a state.
-By default, the above algorithm holds.
-This is because all objects start in the `playing` state.
-The possible values for the `state` property are as follows:
-
-- paused: A paused object does not process.
-if its parents are not needed by any other object, then those objects do not process either.
-In terms of what gets processed, pausing an object is functionally identical to disconnecting any inputs pointed at it.
-
-- Playing: the default.
-The algorithm works as described above.
-
-- always_playing: The object can be treated like an additional output object, save that it is not connected to the audio device.
-Always_playing objects will process their parents recursively as described above.
-Every block.
-Guaranteed.
-
-==== Some Practical notes
-
-When building applications under this system, most will connect all objects at start-up.  Furthermore, many objects are not stateful.  There are some best practices, however, which this section will discuss.
-
-HRTf objects, delay lines, file objects, and the like have internal state that advances with time.
-if no input points at these objects, they will not be processed; time will not advance for them.
-This can lead to some odd behavior when reconnected, for which there are two approaches.
-While it is true that many objects do not have state, much benefit can be reached from simply assuming that they do.
-
-First, when possible, use object states to pause and play.
-It is more than possible to pause something by disconneccting inputs from it, but this is hard to get right.
-This is especially true of objects which are shared between multiple game components or the like.
-For example, if pausing a file, pause the file directly.
-Do not work around the library and try to unhook the file object from the graph.
-When paused, objects will take up almost no CPU, so there is no advantage in disconnecting them.
-
-Second, when you make the decision to unplug objects, consider why you are doing so.
-If this is because the object will not be needed for a long time and you don't specifically care if time advances for it, then call the `reset` metod on it before beginning to use it again.
-Otherwise, set the object's state to always_playing and leave it there unless you intend to explicitly pause it.
-
-Third, a very convenient way to pause large groups of objects is to place them behind a mixer.
-Connect to the mixer instead of the objects.
-Any object behind the mixer should have its state set to playing and an effort should be made to have no connection ignore the intermediate mixer object.
-When the mixer is paused, all objects behind it will also be paused.
-In this way, it is easily possible to make complex components that can be treated as one.
-While mixers do combine objects by adding their channels, they can also be treated as something akin to classes.
-The creation of factory functions can then be used to make so-called subgraphs.
-
-Finally, setting all objects in your simulation to always_playing is a useful debugging tool.
-If things work right with all objects in the always_playing state, then there is something wrong with your input connection logic.
-This will only be useful for those apps which spend large amounts of time changing where inputs go, but is worth mentioning nonetheless.
-
-[[basics-properties]]
-=== Properties
-
-In order to function in a language-agnostic manner, communicating with Libaudioverse is performed primarily through setting properties.
-Examples include file names, delay line lengths, and positions of objects in 3D space.
-In the view of Libaudioverse, your code is not requesting a service; it is asserting that specific conditions are true.
-The philosophical difference is simple: in Libaudioverse, you state that a 3D source is at (3, 0, 3).  You do not request that libaudioverse move it there.
-
-properties have a type, default value, name, and range.
-There are many different types of properties, which are enumerated below.
-The <<object-reference,Object Reference>> contains a reference of the properties on various objects,
-the <<bindings,Bindings>> secction tells you how properties are bound to your language, and the <<c-api,C API>> section discusses the functions and constants used with properties for those working at that level.
-
-The types of Libaudioverse properties are as follows:
-
-- Boolean.
-Boolean properties are a special case of integer properties with the range [0, 1].
-They are used in the same manner as integer properties from the C API.
-They exist so that languages which provide a boolean type may take advantage of it; bindings will bind boolean properties to true/false whenever possible.
-
-- Integer.
-Integer properties are signed 32-bit integers, typically used to accept enumeration values or to represent other quantities that are discrete.
-A good example of an integer property is the state property, available on all objects; the state property may be set to one of the `Lav_OBJSTATE` constants.
-Whenever possible, integer properties have an associated enumeration.
-This information is used by the bindings to allow one to use symbolic constants rather than memorized integral values.
-Again, the <<bindings,Bindings>> section discusses how this works for your language.
-
-- Float.
-Float properties represent volumes, pitches, and other low-precision decimal qualities as a 32-bit floating point value.
-
-- Double.
-Double properties are rarely used and exist primarily for high-precision timing information and deltas.
-Double properties are the 64-bit double from C.
-
-- Float3.
-Float3 properties are a fast path for vectors, which also have the side effect of forcing atomic updates.
-Float3 properties are used primarily in the 3D audio API for position information.
-
-- Float6.
-Float6 properties are rarely used and are a set of 6 packed floats.
-usually, float6 properties are used for pairs of vectors which must be atompically updated;
-an example of this is the orientation of the listener in the 3d audio objects.
-
-- Strings.
-Exactly what they sound like.
-There isn't much to say about them, save that if you don't know what they are, you've got problems.
-
-There are two further property types which should be discussed together: array of ints and array of floats.
-Both of these are used only for the most advanced objects and both are intensionally designed to be inefficient.
-While it is possible to perform partial updates of these properties in C, bindings will usually bind them to force whole, atomic updates of the entire array.
-Arrays are not meant for large lists of ints or floats; in this case, Libaudioverse will either expect a file or provide dedicated functions on a per-object basis.
-The only way to read arrays is to copy to buffers owned by the application.
-This is due to Libaudioverse's policy of never exposing internnal memory. Ever.
-
-[[quantifying-latency]]
-=== Quantifying Latency, Memory, and CPU: the Block Size and the Mixahead
-
-Libaudioverse has two parameters which are specified at simulation creation: the block size and the mixahead.
-
-Block size is always specified, and represents the size of one "block" of audio.
-This is normally called the buffer size, but buffer implies that it can be changed or partially filled by data.
-When reading audio, no matter if this is done internally for output or by the application for some other purpose, one always gets exactly one block.
-No more, no less.
-
-The second parameter is only used in the case of audio output and is the primary discussion topic of this section.
-
-The mixahead is how many buffers to prepare in advance of playing.  The minimum value is 0 and the maximum value is unbounded.
-
-before discussing memory and CPU, a discussion of latency is in order.
-The approximate length of time before any change in the simulation's objects is processed is computed as `(mixahead+1)*block_size`.
-This is subject to variation.  The mixahead exists to give the internal audio backends extra audio in the event that a simulation suddenly becomes expensive.
-high mixaheads will cause stuttering audio to stop stuttering, but at the cost of higher latency.
-While not a solution for a simulation that is always too expensive to process in real-time, it allows things such as crossfading to avoid audible breaks in the output.
-
-When processing, Libaudioverse holds a per-simulation lock.
-Larger block sizes can cause this lock to be held longer, while larger mixaheads will cause the lock to be released and reaquired more rapidly.
-While this lock is held, your code cannot make changes to the objects in the simulation being processed.
-Should the simulation become too expensive or both the block size and mixahead be too high, the application using Libaudioverse may experience unresponsiveness.
-The main contributing factor is simulation expense,but tuning these parameters can help.
-
-Small block sizes cause a growing amount of overhead in terms of releasing locks, copying buffers, and other such mundanities.
-Below a certain point (the specific point depends on the configuration of the simulation's objects), Libaudioverse will spend more time performing overhead than mixing.
-Extremely low block sizes also decrease cache friendliness and cause internal optimizations to no longer provide benefit.
-
-In terms of memory, the majority goes to outputs.  Inputs take up almost nothing, and properties should be considered free.  Every output takes up exactly `4*block_size` bytes.
-Counting outputs is merely a lower bound, because some objects in libaudioverse are  actually made up of more than one object internally; Libaudioverse is programmed, in some cases, by using Libaudioverse as the application programmer does.
-
+Finally, simulations provide the ability to execute code in the audio thread.
+This allows you to write code that can update the nodes you are using without ever missing a block.
+The callback receives the simulation and the simulation's current time as parameters.
+because it is running in the audio thread, this callback should try its best not to block.
+Unlike some other audio libraries, blocking here is perfectly fine, but it will slow down audio mixing.
+In addition, you are executing inside the critical section of the audio thread, so other threads of your application that may need to access this simulation will not be able to make progress.
+It is not only safe to call Libaudioverse functions, but expected.
+The only rule you must not break here is this: do not access another simulation or an object belonging to another simulation.
+This is the most complicated way to write code that drives libaudioverse, and is primarily intended for synthesizers and the development of instruments, where the greatest concern is on precise, sample-accurate  timing.
