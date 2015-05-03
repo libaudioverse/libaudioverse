@@ -1,9 +1,9 @@
 [submodule "glm"]
 	path = glm
 	url = https://github.com/g-truc/glm.git
-[submodule "OpenAL-Soft"]
-	path = OpenAL-Soft
-	url = git@github.com:camlorn/OpenAL-Soft.git
 [submodule "powercores"]
 	path = powercores
 	url = http://github.com/camlorn/powercores.git
+[submodule "openAL-Soft"]
+	path = openAL-Soft
+	url = http://github.com/camlorn/openAL-Soft.git
