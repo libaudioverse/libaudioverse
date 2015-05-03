@@ -7,3 +7,6 @@
 [submodule "openAL-Soft"]
 	path = openAL-Soft
 	url = http://github.com/camlorn/openAL-Soft.git
+[submodule "OpenAL-Soft"]
+	path = OpenAL-Soft
+	url = http://github.com/camlorn/OpenAL-Soft.git
