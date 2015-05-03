@@ -6,4 +6,4 @@
 	url = git@github.com:camlorn/OpenAL-Soft.git
 [submodule "powercores"]
 	path = powercores
-	url = git@github.com:camlorn/powercores
+	url = http://github.com/camlorn/powercores.git
