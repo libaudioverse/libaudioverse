@@ -21,4 +21,4 @@ shutil.copytree(os.path.join(repository_root, 'documentation'), dest_dir)
 with file(os.path.join(dest_dir, 'object_reference.asciidoc'), 'wb') as f:
 	f.write(property_table)
 
-print subprocess.check_output(["asciidoc", os.path.join(dest_dir, 'main.asciidoc')], stderr= subprocess.STDOUT, shell = True)
+print subprocess.check_output(["asciidoc", os.path.join(dest_dir, 'libaudioverse_manual.asciidoc')], stderr= subprocess.STDOUT, shell = True)
