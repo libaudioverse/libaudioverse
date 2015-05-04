@@ -4,19 +4,47 @@ properties:
   type: int
   default: Lav_BIQUAD_TYPE_LOWPASS
   value_enum: Lav_BIQUAD_TYPES
+  doc_description: |
+   The type of the filter.
+   This determines the interpretations of the other properties on this node.
  Lav_BIQUAD_Q:
   name: q
   type: float
   range: [0.001, INFINITY]
-  default: 0.7
+  default: 0.5
+  doc_description: |
+   Q is a mathematically complex parameter, a full description of which is beyond the scope of this manual.
+   Naively, Q can be interpreted as a measure of resonation.
+   For Q<=0.5, the filter is said to be damped:
+   it will cut frequencies.
+   For Q>0.5, however, some frequencies are likely to be boosted.
+   
+   Q controls the bandwidth for the bandpass and peaking filter types
+   as well as the S parameter for the shelving EQ.
+   Changing any of these three properties will change the other two, so be warned.
+   
+   The relationship to bw is: 1/Q = 2*sinh(ln(2)/2*BW*w0/sin(w0))
+   
+   The relationship to s is: 1/Q = sqrt((A + 1/A)*(1/S - 1) + 2)
+   
+   For everything except the peaking filter, this property follows the normal definition of Q in the electrical engineering literature.
+   For more specifics, see the Audio EQ Cookbook.
+   It is found here:
+   http://www.musicdsp.org/files/Audio-EQ-Cookbook.txt
  Lav_BIQUAD_FREQUENCY:
   name: frequency
   type: float
   range: [0, INFINITY]
   default: 2000.0
+  doc_description: |
+   This is the frequency of interest.
+   What specifically this means depends on the selected filter type; for example, it is the cutoff frequency for lowpass and highpass.
  Lav_BIQUAD_DBGAIN:
   name: dbgain
   type: float
   range: [-INFINITY, INFINITY]
   default: 0.0
+  doc_description: |
+   This property is a the gain in decibals to be used with the peaking and shelving filters.
+   It measures the gain that these filters apply to the part of the signal they boost.
 doc_name: Biquad Filter
