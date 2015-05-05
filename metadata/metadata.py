@@ -14,7 +14,8 @@ if len(sys.argv) != 2:
 print "Generating", sys.argv[1]
 
 directory = os.path.split(os.path.abspath(__file__))[0]
-metadata =bindings.get_info.all_info['metadata']
+all_info = bindings.get_info.get_all_info()
+metadata =all_info['metadata']
 #we change {{ and }} to <% and %> to avoid ambiguity when building arrays.
 environment = jinja2.Environment(
 variable_start_string = '<%', variable_end_string = '%>',
@@ -26,7 +27,7 @@ extensions = ['jinja2.ext.loopcontrols'])
 #the map we have here is actually very verbose, and can be flattened into something easily iterable.
 #we can then take advantage of either std::pair or std::tuple as the keys.
 joined_properties = []
-for nodekey, nodeinfo in [(i, metadata['nodes'].get(i, dict())) for i in bindings.get_info.constants.iterkeys() if re.match("Lav_OBJTYPE_(\w+_*)+_NODE", i)]:
+for nodekey, nodeinfo in [(i, metadata['nodes'].get(i, dict())) for i in all_info['constants'].iterkeys() if re.match("Lav_OBJTYPE_(\w+_*)+_NODE", i)]:
 	#add everything from the object itself.
 	for propkey, propinfo in nodeinfo.get('properties', dict()).iteritems():
 		joined_properties.append((nodekey, propkey, propinfo))
@@ -37,7 +38,7 @@ for nodekey, nodeinfo in [(i, metadata['nodes'].get(i, dict())) for i in binding
 
 #this is the same logic, but for callbacks.
 joined_events = []
-for nodekey, nodeinfo in [(i, metadata['nodes'].get(i, dict())) for i in bindings.get_info.constants.iterkeys() if re.match("Lav_OBJTYPE_(\w+_*)+_NODE", i)]:
+for nodekey, nodeinfo in [(i, metadata['nodes'].get(i, dict())) for i in all_info['constants'].iterkeys() if re.match("Lav_OBJTYPE_(\w+_*)+_NODE", i)]:
 	#add everything from the object itself.
 	for eventkey, eventinfo in nodeinfo.get('events', dict()).iteritems():
 		joined_events.append((nodekey, eventkey, eventinfo))
@@ -77,12 +78,12 @@ for propkey, propid, propinfo in joined_properties:
 	if propinfo['type'] == 'double' and propinfo.get('read_only', False):
 		propinfo['range'] = [0.0, 0.0]
 	if propinfo['type'] == 'int' and not propinfo.get('read_only', False) and 'value_enum' in propinfo:
-		e = bindings.get_info.all_info['constants_by_enum'][propinfo['value_enum']]
+		e = all_info['constants_by_enum'][propinfo['value_enum']]
 		r1 = min(e.values())
 		r2 = max(e.values())
 		propinfo['range'] = [r1, r2]
-	if propinfo['type'] == 'int' and propinfo.get('default', None) in bindings.get_info.all_info['constants']:
-		propinfo['default'] = bindings.get_info.all_info['constants'][propinfo['default']]
+	if propinfo['type'] == 'int' and propinfo.get('default', None) in all_info['constants']:
+		propinfo['default'] = all_info['constants'][propinfo['default']]
 	if propinfo.get('range', None) =='dynamic':
 		propinfo['range'] = [0, 0]
 		propinfo['is_dynamic'] = True

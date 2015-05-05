@@ -44,29 +44,33 @@ class ParameterInfo(object):
 		self.type = type
 		self.name = name
 
-#compute the input file.
-#this gives us the root directory of the repository.
-root_directory = os.path.split(os.path.split(os.path.abspath(__file__))[0])[0]
-input_file = os.path.join(root_directory, 'include', 'libaudioverse', 'binding.h')
+def get_root_directory():
+	return os.path.split(os.path.split(os.path.abspath(__file__))[0])[0]
 
-if sys.platform == 'win32':
-	command = 'cl'
-	args = '/nologo /EP ' + input_file
-else:
-	command  = 'cpp'
-	args = input_file
+def make_ast():
+	#compute the input file.
+	#this gives us the root directory of the repository.
+	root_directory = get_root_directory()
+	input_file = os.path.join(root_directory, 'include', 'libaudioverse', 'binding.h')
 
-text = subprocess.check_output(command + ' ' + args, shell = True)
-#convert from windows to linux newlines, if needed.
-text = text.replace('\r\n', '\n')
+	if sys.platform == 'win32':
+		command = 'cl'
+		args = '/nologo /EP ' + input_file
+	else:
+		command  = 'cpp'
+		args = input_file
 
-#build a cffi parser.
-parser = c_parser.CParser()
-ast = parser.parse(text)
+	text = subprocess.check_output(command + ' ' + args, shell = True)
+	#convert from windows to linux newlines, if needed.
+	text = text.replace('\r\n', '\n')
 
-def extract_enums():
+	#build a cffi parser.
+	parser = c_parser.CParser()
+	ast = parser.parse(text)
+	return ast
+
+def extract_enums(ast):
 	"""Returns a dict of enum constant names to their values as integers."""
-	global ast
 	#we don't allow declaring nested types, so we know that all enums are at the top level-that is, they are to be found in ast.ext.
 	enum_list = [i.type for i in ast.ext if isinstance(i, Decl) and isinstance(i.type, Enum)]
 	#now, we note that we can find--for a specific enum e--:
@@ -89,20 +93,18 @@ def extract_enums():
 			implicit_value+=1
 	return constants_by_enum
 
-def extract_typedefs():
+def extract_typedefs(ast):
 	"""Returns a dict of typedefs.  Keys are names, values are TypeInfos describing the type."""
-	global ast
 	#again, we expect them at the top levle--if they're not, we'll miss them.
 	#the primary use of this is a bit later, when we build function objects-we aggregate typedefs when possible.
 	typedef_list = [i for i in ast.ext if isinstance(i, Typedef)]
 	typedefs = OrderedDict()
 	for typedef in typedef_list:
 		name = typedef.name
-		typedefs[name] = compute_type_info(typedef)
+		typedefs[name] = compute_type_info(node = typedef, typedefs =typedefs)
 	return typedefs
 
-def compute_type_info(node):
-	global typedefs
+def compute_type_info(node, typedefs):
 	indirection = 0
 	currently_examining = node.type
 	while isinstance(currently_examining, PtrDecl):
@@ -115,13 +117,13 @@ def compute_type_info(node):
 		info = TypeInfo(base = name, indirection = indirection)
 		return info
 	elif isinstance(currently_examining, FuncDecl):
-		base = compute_function_info(currently_examining)
+		base = compute_function_info(func = currently_examining, typedefs =typedefs)
 		return TypeInfo(base = base, indirection = indirection)
 
-def compute_function_info(func, name = ""):
-	return_type = compute_type_info(func) #not func.type-the function expects one node above.
+def compute_function_info(func, typedefs, name = ""):
+	return_type = compute_type_info(node = func, typedefs = typedefs) #not func.type-the function expects one node above.
 	if func.args is not None:
-		types = [compute_type_info(i) for i in func.args.params]
+		types = [compute_type_info(node = i, typedefs = typedefs) for i in func.args.params]
 		names = [i.name for i in func.args.params]
 		args = zip(types, names)
 		args = tuple([ParameterInfo(i[0], i[1]) for i in args])
@@ -129,46 +131,48 @@ def compute_function_info(func, name = ""):
 		args = ()
 	return FunctionInfo(return_type, name, args)
 
-def extract_functions():
-	global ast
+def extract_functions(ast, typedefs):
 	function_list = [i for i in ast.ext if isinstance(i, Decl) and isinstance(i.type, FuncDecl)]
 	functions = OrderedDict()
 	for function in function_list:
 		name = function.name
-		functions[name] = compute_function_info(function.type, name)
+		functions[name] = compute_function_info(func = function.type, typedefs =typedefs, name= name)
 	return functions
 
-constants_by_enum = extract_enums()
-constants = dict()
-for i in constants_by_enum.values():
-	constants.update(i)
+def get_all_info():
+	ast=make_ast()
+	constants_by_enum = extract_enums(ast=ast)
+	constants = dict()
+	for i in constants_by_enum.values():
+		constants.update(i)
 
-#remove anything that ends in _MAX from constants_by_enum at this point.
-#rationale: the _MAX constants are needed in very specific places, but not by code that auto-binds enums.
-for i in constants_by_enum.itervalues():
-	for j in dict(i).iterkeys():
+	#remove anything that ends in _MAX from constants_by_enum at this point.
+	#rationale: the _MAX constants are needed in very specific places, but not by code that auto-binds enums.
+	for i in constants_by_enum.itervalues():
+		for j in dict(i).iterkeys():
 			if j.endswith('_MAX'):
 				del i[j]
 
-#export this in one dict so that we have a way to add it to parent scripts.
-all_info = {
-'functions' : extract_functions(),
-'typedefs': extract_typedefs(),
-'constants' : constants,
-'constants_by_enum': constants_by_enum
-}
+	typedefs = extract_typedefs(ast)
+	#export this in one dict so that we have a way to add it to parent scripts.
+	all_info = {
+	'functions' : extract_functions(ast = ast, typedefs = typedefs),
+	'typedefs': typedefs,
+	'constants' : constants,
+	'constants_by_enum': constants_by_enum
+	}
 
+	metadata = metadata_handler.make_metadata()
+	all_info['metadata'] = metadata
 
-metadata = metadata_handler.metadata
-all_info['metadata'] = metadata
-
-#We can extract the "important" enums by looking for all properties with a value_enum key and grabbing its value.
-important_enums = []
-for i in metadata['nodes'].values():
-	for j in i.get('properties', dict()).values():
+	#We can extract the "important" enums by looking for all properties with a value_enum key and grabbing its value.
+	important_enums = []
+	for i in metadata['nodes'].values():
+		for j in i.get('properties', dict()).values():
 			if 'value_enum' in j:
 				important_enums.append(j['value_enum'])
-for i in metadata['additional_important_enums']:
-	important_enums.append(i)
+	for i in metadata['additional_important_enums']:
+		important_enums.append(i)
 
-all_info['important_enums'] = important_enums
+	all_info['important_enums'] = important_enums
+	return all_info

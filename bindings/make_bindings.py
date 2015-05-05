@@ -3,6 +3,8 @@ from .python import make_python
 import os.path
 import os
 import shutil
+import copy
+
 if os.name == 'nt':
 	libsndfile_path = r"C:\Program Files (x86)\Mega-Nerd\libsndfile\bin"
 else:
@@ -30,7 +32,7 @@ def write_files(files, source_dir, dest_dir):
 	path = os.path.join(dest_dir, dll_target)
 	if not os.path.exists(path):
 		os.makedirs(path)
-	shutil.copy(os.path.join(get_info.root_directory, 'build', 'libaudioverse.dll'), os.path.join(path, 'libaudioverse.dll'))
+	shutil.copy(os.path.join(get_info.get_root_directory(), 'build', 'libaudioverse.dll'), os.path.join(path, 'libaudioverse.dll'))
 	#copy libsndfile
 	if libsndfile_path is not None:
 		path = os.path.join(dest_dir, files.get('libsndfile_location', ''))
@@ -42,6 +44,8 @@ def write_files(files, source_dir, dest_dir):
 		shutil.copytree(os.path.join(source_dir, i), os.path.join(dest_dir, i))
 
 def make_bindings():
+	all_info = get_info.get_all_info()
 	for name, func in generators.iteritems():
-		files = func(get_info.all_info)
-		write_files(files, os.path.join(get_info.root_directory, 'bindings', name), os.path.join(get_info.root_directory, 'build', 'bindings', name))
+		#we copy so that the generators can modify data as they need.
+		files = func(copy.deepcopy(all_info))
+		write_files(files, os.path.join(get_info.get_root_directory(), 'bindings', name), os.path.join(get_info.get_root_directory(), 'build', 'bindings', name))
