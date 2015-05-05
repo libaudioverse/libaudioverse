@@ -18,7 +18,7 @@ And the following Python packages (all available on PyPI):
 - Enum34 (for running the Python bindings only)
 - Pycparser
 
-For the documentation, you will also need a working implementation of Asciidoc and it must be callable as asciidoc at the command line.
+For the documentation, you will also need a working implementation of Asciidoc and it must be callable as `asciidoc` at the command line.
 
 === Building
 
@@ -29,13 +29,11 @@ The rest of the process is the standard CMake process.
 Something like the following:
 
 ....
-mkddir build
+mkdir build
 cd build
 cmake -G "MY_GENERATOR" ..
 my_generator_specific_build_command
 ....
 
 A custom target, `libaudioverse_docs`, generates a set of Asciidoc documentation in `build/documentation`.
-To build the docs, run Asciidoc on main.txt.  Main.txt includes the other files that make up this manual, generates tables of contents, and the like.
-The resulting manual is titled `main.html` and may be found, along with the manual's source files,  in the `documentation` subdirectory of the build directory.
-
+The resulting manual is titled `libaudioverse_manual.html` and may be found, along with the manual's source files,  in the `documentation` subdirectory of the build directory.

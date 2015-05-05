@@ -4,7 +4,7 @@ Libaudioverse is a system for the development of realtime audio effects and synt
 
 The rest of this manual discusses Libaudioverse from a technical point of view.
 For those looking for tutorials, see <<tutorials,Tutorials>>.
-The <<basics,setion discussing basic concepts>> is required reading for anyone wanting to get far.
+The <<basics,section discussing basic concepts>> is required reading for anyone wanting to get far.
 When demonstrating concepts, the programming language of choice for this manual is Python, but a discussion of the C API can be found <<c-api,here>>.
 
 === Some Important Notes On This Manual

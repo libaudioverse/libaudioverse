@@ -19,6 +19,7 @@ import sys
 import os.path
 from collections import OrderedDict
 import yaml
+from . import metadata_handler
 
 #this is a helper class representing a type.
 #base is int, etc.
@@ -157,10 +158,9 @@ all_info = {
 'constants_by_enum': constants_by_enum
 }
 
-#update this dict with the keys from metadata.yml.
-with file(os.path.join(root_directory, 'metadata', 'metadata.y')) as f:
-	metadata = yaml.load(f)
-	all_info['metadata'] = metadata
+
+metadata = metadata_handler.metadata
+all_info['metadata'] = metadata
 
 #We can extract the "important" enums by looking for all properties with a value_enum key and grabbing its value.
 important_enums = []

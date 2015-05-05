@@ -14,8 +14,7 @@ if len(sys.argv) != 2:
 print "Generating", sys.argv[1]
 
 directory = os.path.split(os.path.abspath(__file__))[0]
-with file(os.path.join(directory, 'metadata.y')) as f:
-	metadata = yaml.load(f)
+metadata =bindings.get_info.all_info['metadata']
 #we change {{ and }} to <% and %> to avoid ambiguity when building arrays.
 environment = jinja2.Environment(
 variable_start_string = '<%', variable_end_string = '%>',
