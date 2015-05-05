@@ -4,7 +4,7 @@ properties:
   type: float
   default: 440.0
   range: [0, INFINITY]
-  doc-description: |
+  doc_description: |
    The frequency of the square wave, in hertz.
  Lav_SQUARE_DUTY_CYCLE:
   name: duty_cycle

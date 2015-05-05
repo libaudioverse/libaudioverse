@@ -24,5 +24,5 @@ doc_description: |
  The purpose of this node is the same as the pull node, but it is used in situations wherein we do not know when we are going to get audio.
  Audio is queued as it is pushed to this node and then played as fast as possible.
  This node can be used to avoid writing a queue of audio yourself, as it essentially implements said functionality.
- if you need low latency audio or the ability to run something like the Opus encoder's
+ If you need low latency audio or the ability to run something like the Opus encoder's
  ability to cover for missing frames, you need a pull node.

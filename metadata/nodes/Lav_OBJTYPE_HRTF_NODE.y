@@ -4,7 +4,7 @@ properties:
   type: float
   default: 0.0
   range: [-INFINITY, INFINITY]
-  doc-description: |
+  doc_description: |
    The horizontal angle of the panner in degrees.
    0 is straight ahead and positive values are clockwise.
  Lav_PANNER_ELEVATION:

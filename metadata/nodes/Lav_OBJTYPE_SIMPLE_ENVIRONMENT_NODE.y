@@ -73,5 +73,5 @@ doc_description: |
  The simple environment is the simplest environment possible, having no functionality beyond positioning.
  
  Note that the various properties for default values do not affect already created sources.
- it is best to configure these first.
+ It is best to configure these first.
  Any functionality to change a property on all sources needs to be implemented by the app, and is not offered by Libaudioverse.

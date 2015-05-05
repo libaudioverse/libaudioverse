@@ -35,3 +35,6 @@ events:
   doc_description: |
    Fires each time this node reaches the end of the associated buffer.
 doc_name: Buffer Node
+doc_description: |
+ This node plays a buffer.
+ The output of this node will have as many channels as the buffer does, so connecting it directly to the simulation will have the desired effect.
