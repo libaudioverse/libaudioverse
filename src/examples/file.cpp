@@ -16,7 +16,7 @@ if((x) != Lav_ERROR_NONE) {\
 }\
 } while(0)\
 
-void endOfFileCallback(LavHandle ignoredObject, void* ignored) {
+void endOfBufferCallback(LavHandle ignoredObject, void* ignored) {
 	printf("End of file reached.\n");
 }
 
@@ -31,11 +31,15 @@ void main(int argc, char** args) {
 	LavHandle simulation;
 	ERRCHECK(Lav_initialize());
 	ERRCHECK(Lav_createSimulationForDevice(-1, 2, 44100, 1024, 2, &simulation));
-	ERRCHECK(Lav_createFileNode(simulation, path, &node));
+	ERRCHECK(Lav_createBufferNode(simulation, &node));
+	LavHandle buffer;
+	ERRCHECK(Lav_createBuffer(simulation, &buffer));
+	ERRCHECK(Lav_bufferLoadFromFile(buffer, path));
+	ERRCHECK(Lav_nodeSetBufferProperty(node, Lav_BUFFER_BUFFER, buffer));
 	LavHandle limit;
 	ERRCHECK(Lav_createHardLimiterNode(simulation, 2, &limit));
 	ERRCHECK(Lav_nodeConnect(node, 0, limit, 0));
-	ERRCHECK(Lav_nodeSetEvent(node, Lav_FILE_END_EVENT, endOfFileCallback, nullptr));
+	ERRCHECK(Lav_nodeSetEvent(node, Lav_BUFFER_END_EVENT, endOfBufferCallback, nullptr));
 	ERRCHECK(Lav_nodeConnectSimulation(limit, 0));
 	//enter the transducer loop.
 	char command[1024];

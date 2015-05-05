@@ -9,7 +9,10 @@ print """Biquad demo.
 Please enter the path to a file in a format supported by Libsndfile: typically wave or ogg."""
 filepath = raw_input()
 filepath = os.path.abspath(filepath)
-filenode = libaudioverse.FileNode(sim, filepath)
+filenode = libaudioverse.BufferNode(sim)
+buffer = libaudioverse.Buffer(sim)
+buffer.load_from_file(filepath)
+filenode.buffer.value = buffer
 bq = libaudioverse.BiquadNode(sim, 2)
 filenode.connect(0, bq, 0)
 bq.connect_simulation(0)
