@@ -1,0 +1,2017 @@
+FileAST: 
+  Typedef: LavError, [], ['typedef']
+    TypeDecl: LavError, []
+      IdentifierType: ['int']
+  Typedef: LavHandle, [], ['typedef']
+    TypeDecl: LavHandle, []
+      IdentifierType: ['int']
+  Decl: None, [], [], []
+    Enum: Lav_ERRORS
+      EnumeratorList: 
+        Enumerator: Lav_ERROR_NONE
+        Enumerator: Lav_ERROR_UNKNOWN
+        Enumerator: Lav_ERROR_TYPE_MISMATCH
+        Enumerator: Lav_ERROR_INVALID_SLOT
+        Enumerator: Lav_ERROR_NULL_POINTER
+        Enumerator: Lav_ERROR_MEMORY
+        Enumerator: Lav_ERROR_INVALID_HANDLE
+        Enumerator: Lav_ERROR_RANGE
+        Enumerator: Lav_ERROR_CANNOT_INIT_AUDIO
+        Enumerator: Lav_ERROR_FILE
+        Enumerator: Lav_ERROR_FILE_NOT_FOUND
+        Enumerator: Lav_ERROR_HRTF_INVALID
+        Enumerator: Lav_ERROR_SHAPE
+        Enumerator: Lav_ERROR_CANNOT_CROSS_DEVICES
+        Enumerator: Lav_ERROR_NO_OUTPUTS
+        Enumerator: Lav_ERROR_LIMIT_EXCEEDED
+        Enumerator: Lav_ERROR_CAUSES_CYCLE
+        Enumerator: Lav_ERROR_PROPERTY_IS_READ_ONLY
+        Enumerator: Lav_ERROR_OVERLAPPING_AUTOMATORS
+        Enumerator: Lav_ERROR_CANNOT_CONNECT_TO_PROPERTY
+        Enumerator: Lav_ERROR_INTERNAL
+          Constant: int, 999
+  Decl: None, [], [], []
+    Enum: Lav_PROPERTY_TYPES
+      EnumeratorList: 
+        Enumerator: Lav_PROPERTYTYPE_INT
+        Enumerator: Lav_PROPERTYTYPE_FLOAT
+        Enumerator: Lav_PROPERTYTYPE_DOUBLE
+        Enumerator: Lav_PROPERTYTYPE_STRING
+        Enumerator: Lav_PROPERTYTYPE_FLOAT3
+        Enumerator: Lav_PROPERTYTYPE_FLOAT6
+        Enumerator: Lav_PROPERTYTYPE_FLOAT_ARRAY
+        Enumerator: Lav_PROPERTYTYPE_INT_ARRAY
+        Enumerator: Lav_PROPERTYTYPE_BUFFER
+  Decl: None, [], [], []
+    Enum: Lav_OBJECT_TYPES
+      EnumeratorList: 
+        Enumerator: Lav_OBJTYPE_SIMULATION
+        Enumerator: Lav_OBJTYPE_BUFFER
+        Enumerator: Lav_OBJTYPE_GENERIC_NODE
+        Enumerator: Lav_OBJTYPE_SIMPLE_ENVIRONMENT_NODE
+        Enumerator: Lav_OBJTYPE_SOURCE_NODE
+        Enumerator: Lav_OBJTYPE_HRTF_NODE
+        Enumerator: Lav_OBJTYPE_SINE_NODE
+        Enumerator: Lav_OBJTYPE_HARD_LIMITER_NODE
+        Enumerator: Lav_OBJTYPE_DELAY_NODE
+        Enumerator: Lav_OBJTYPE_AMPLITUDE_PANNER_NODE
+        Enumerator: Lav_OBJTYPE_PUSH_NODE
+        Enumerator: Lav_OBJTYPE_BIQUAD_NODE
+        Enumerator: Lav_OBJTYPE_PULL_NODE
+        Enumerator: Lav_OBJTYPE_GRAPH_LISTENER_NODE
+        Enumerator: Lav_OBJTYPE_CUSTOM_NODE
+        Enumerator: Lav_OBJTYPE_RINGMOD_NODE
+        Enumerator: Lav_OBJTYPE_MULTIPANNER_NODE
+        Enumerator: Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK_NODE
+        Enumerator: Lav_OBJTYPE_SQUARE_NODE
+        Enumerator: Lav_OBJTYPE_NOISE_NODE
+        Enumerator: Lav_OBJTYPE_IIR_NODE
+        Enumerator: Lav_OBJTYPE_GAIN_NODE
+        Enumerator: Lav_OBJTYPE_CHANNEL_SPLITTER_NODE
+        Enumerator: Lav_OBJTYPE_CHANNEL_MERGER_NODE
+        Enumerator: Lav_OBJTYPE_BUFFER_NODE
+  Decl: None, [], [], []
+    Enum: Lav_NODE_STATES
+      EnumeratorList: 
+        Enumerator: Lav_NODESTATE_PAUSED
+        Enumerator: Lav_NODESTATE_PLAYING
+        Enumerator: Lav_NODESTATE_ALWAYS_PLAYING
+  Decl: None, [], [], []
+    Enum: Lav_LOGGING_LEVELS
+      EnumeratorList: 
+        Enumerator: Lav_LOG_LEVEL_OFF
+          Constant: int, 0
+        Enumerator: Lav_LOG_LEVEL_CRITICAL
+          Constant: int, 1
+        Enumerator: Lav_LOG_LEVEL_INFO
+          Constant: int, 2
+        Enumerator: Lav_LOG_LEVEL_DEBUG
+          Constant: int, 3
+  Decl: Lav_initialize, [], [], []
+    FuncDecl: 
+      TypeDecl: Lav_initialize, []
+        IdentifierType: ['LavError']
+  Decl: Lav_shutdown, [], [], []
+    FuncDecl: 
+      TypeDecl: Lav_shutdown, []
+        IdentifierType: ['LavError']
+  Decl: Lav_isInitialized, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['int']
+      TypeDecl: Lav_isInitialized, []
+        IdentifierType: ['LavError']
+  Decl: Lav_free, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: ptr, [], [], []
+          PtrDecl: []
+            TypeDecl: ptr, []
+              IdentifierType: ['void']
+      TypeDecl: Lav_free, []
+        IdentifierType: ['LavError']
+  Decl: Lav_handleIncRef, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: handle, [], [], []
+          TypeDecl: handle, []
+            IdentifierType: ['LavHandle']
+      TypeDecl: Lav_handleIncRef, []
+        IdentifierType: ['LavError']
+  Decl: Lav_handleDecRef, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: handle, [], [], []
+          TypeDecl: handle, []
+            IdentifierType: ['LavHandle']
+      TypeDecl: Lav_handleDecRef, []
+        IdentifierType: ['LavError']
+  Decl: Lav_handleGetAndClearFirstAccess, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: handle, [], [], []
+          TypeDecl: handle, []
+            IdentifierType: ['LavHandle']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['int']
+      TypeDecl: Lav_handleGetAndClearFirstAccess, []
+        IdentifierType: ['LavError']
+  Decl: Lav_handleGetRefCount, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: handle, [], [], []
+          TypeDecl: handle, []
+            IdentifierType: ['LavHandle']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['int']
+      TypeDecl: Lav_handleGetRefCount, []
+        IdentifierType: ['LavError']
+  Decl: Lav_handleGetType, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: handle, [], [], []
+          TypeDecl: handle, []
+            IdentifierType: ['LavHandle']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['int']
+      TypeDecl: Lav_handleGetType, []
+        IdentifierType: ['LavError']
+  Typedef: LavLoggingCallback, [], ['typedef']
+    PtrDecl: []
+      FuncDecl: 
+        ParamList: 
+          Decl: level, [], [], []
+            TypeDecl: level, []
+              IdentifierType: ['int']
+          Decl: message, ['const'], [], []
+            PtrDecl: []
+              TypeDecl: message, ['const']
+                IdentifierType: ['char']
+          Decl: is_final, [], [], []
+            TypeDecl: is_final, []
+              IdentifierType: ['int']
+        TypeDecl: LavLoggingCallback, []
+          IdentifierType: ['void']
+  Decl: Lav_setLoggingCallback, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: cb, [], [], []
+          TypeDecl: cb, []
+            IdentifierType: ['LavLoggingCallback']
+      TypeDecl: Lav_setLoggingCallback, []
+        IdentifierType: ['LavError']
+  Decl: Lav_getLoggingCallback, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['LavLoggingCallback']
+      TypeDecl: Lav_getLoggingCallback, []
+        IdentifierType: ['LavError']
+  Decl: Lav_setLoggingLevel, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: level, [], [], []
+          TypeDecl: level, []
+            IdentifierType: ['int']
+      TypeDecl: Lav_setLoggingLevel, []
+        IdentifierType: ['LavError']
+  Decl: Lav_getLoggingLevel, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['int']
+      TypeDecl: Lav_getLoggingLevel, []
+        IdentifierType: ['LavError']
+  Typedef: LavHandleDestroyedCallback, [], ['typedef']
+    PtrDecl: []
+      FuncDecl: 
+        ParamList: 
+          Decl: which, [], [], []
+            TypeDecl: which, []
+              IdentifierType: ['LavHandle']
+        TypeDecl: LavHandleDestroyedCallback, []
+          IdentifierType: ['void']
+  Decl: Lav_setHandleDestroyedCallback, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: cb, [], [], []
+          TypeDecl: cb, []
+            IdentifierType: ['LavHandleDestroyedCallback']
+      TypeDecl: Lav_setHandleDestroyedCallback, []
+        IdentifierType: ['LavError']
+  Decl: Lav_deviceGetCount, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['unsigned', 'int']
+      TypeDecl: Lav_deviceGetCount, []
+        IdentifierType: ['LavError']
+  Decl: Lav_deviceGetLatency, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: index, [], [], []
+          TypeDecl: index, []
+            IdentifierType: ['unsigned', 'int']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['float']
+      TypeDecl: Lav_deviceGetLatency, []
+        IdentifierType: ['LavError']
+  Decl: Lav_deviceGetName, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: index, [], [], []
+          TypeDecl: index, []
+            IdentifierType: ['unsigned', 'int']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            PtrDecl: []
+              TypeDecl: destination, []
+                IdentifierType: ['char']
+      TypeDecl: Lav_deviceGetName, []
+        IdentifierType: ['LavError']
+  Decl: Lav_deviceGetChannels, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: index, [], [], []
+          TypeDecl: index, []
+            IdentifierType: ['unsigned', 'int']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['unsigned', 'int']
+      TypeDecl: Lav_deviceGetChannels, []
+        IdentifierType: ['LavError']
+  Decl: Lav_createSimulationForDevice, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: index, [], [], []
+          TypeDecl: index, []
+            IdentifierType: ['int']
+        Decl: channels, [], [], []
+          TypeDecl: channels, []
+            IdentifierType: ['unsigned', 'int']
+        Decl: sr, [], [], []
+          TypeDecl: sr, []
+            IdentifierType: ['unsigned', 'int']
+        Decl: blockSize, [], [], []
+          TypeDecl: blockSize, []
+            IdentifierType: ['unsigned', 'int']
+        Decl: mixAhead, [], [], []
+          TypeDecl: mixAhead, []
+            IdentifierType: ['unsigned', 'int']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['LavHandle']
+      TypeDecl: Lav_createSimulationForDevice, []
+        IdentifierType: ['LavError']
+  Decl: Lav_createReadSimulation, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: sr, [], [], []
+          TypeDecl: sr, []
+            IdentifierType: ['unsigned', 'int']
+        Decl: blockSize, [], [], []
+          TypeDecl: blockSize, []
+            IdentifierType: ['unsigned', 'int']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['LavHandle']
+      TypeDecl: Lav_createReadSimulation, []
+        IdentifierType: ['LavError']
+  Decl: Lav_simulationGetBlockSize, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: simulationHandle, [], [], []
+          TypeDecl: simulationHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['int']
+      TypeDecl: Lav_simulationGetBlockSize, []
+        IdentifierType: ['LavError']
+  Decl: Lav_simulationGetBlock, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: simulationHandle, [], [], []
+          TypeDecl: simulationHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: channels, [], [], []
+          TypeDecl: channels, []
+            IdentifierType: ['unsigned', 'int']
+        Decl: mayApplyMixingMatrix, [], [], []
+          TypeDecl: mayApplyMixingMatrix, []
+            IdentifierType: ['int']
+        Decl: buffer, [], [], []
+          PtrDecl: []
+            TypeDecl: buffer, []
+              IdentifierType: ['float']
+      TypeDecl: Lav_simulationGetBlock, []
+        IdentifierType: ['LavError']
+  Decl: Lav_simulationGetSr, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: simulationHandle, [], [], []
+          TypeDecl: simulationHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['int']
+      TypeDecl: Lav_simulationGetSr, []
+        IdentifierType: ['LavError']
+  Decl: Lav_simulationBeginAtomicBlock, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: simulationHandle, [], [], []
+          TypeDecl: simulationHandle, []
+            IdentifierType: ['LavHandle']
+      TypeDecl: Lav_simulationBeginAtomicBlock, []
+        IdentifierType: ['LavError']
+  Decl: Lav_simulationEndAtomicBlock, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: simulationHandle, [], [], []
+          TypeDecl: simulationHandle, []
+            IdentifierType: ['LavHandle']
+      TypeDecl: Lav_simulationEndAtomicBlock, []
+        IdentifierType: ['LavError']
+  Typedef: LavBlockCallback, [], ['typedef']
+    PtrDecl: []
+      FuncDecl: 
+        ParamList: 
+          Decl: handle, [], [], []
+            TypeDecl: handle, []
+              IdentifierType: ['LavHandle']
+          Decl: time, [], [], []
+            TypeDecl: time, []
+              IdentifierType: ['double']
+          Decl: userdata, [], [], []
+            PtrDecl: []
+              TypeDecl: userdata, []
+                IdentifierType: ['void']
+        TypeDecl: LavBlockCallback, []
+          IdentifierType: ['void']
+  Decl: Lav_simulationSetBlockCallback, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: simulationHandle, [], [], []
+          TypeDecl: simulationHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: callback, [], [], []
+          TypeDecl: callback, []
+            IdentifierType: ['LavBlockCallback']
+        Decl: userdata, [], [], []
+          PtrDecl: []
+            TypeDecl: userdata, []
+              IdentifierType: ['void']
+      TypeDecl: Lav_simulationSetBlockCallback, []
+        IdentifierType: ['LavError']
+  Decl: Lav_createBuffer, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: simulationHandle, [], [], []
+          TypeDecl: simulationHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['LavHandle']
+      TypeDecl: Lav_createBuffer, []
+        IdentifierType: ['LavError']
+  Decl: Lav_bufferGetSimulation, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: bufferHandle, [], [], []
+          TypeDecl: bufferHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['LavHandle']
+      TypeDecl: Lav_bufferGetSimulation, []
+        IdentifierType: ['LavError']
+  Decl: Lav_bufferLoadFromFile, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: bufferHandle, [], [], []
+          TypeDecl: bufferHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: path, ['const'], [], []
+          PtrDecl: []
+            TypeDecl: path, ['const']
+              IdentifierType: ['char']
+      TypeDecl: Lav_bufferLoadFromFile, []
+        IdentifierType: ['LavError']
+  Decl: Lav_bufferLoadFromArray, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: bufferHandle, [], [], []
+          TypeDecl: bufferHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: sr, [], [], []
+          TypeDecl: sr, []
+            IdentifierType: ['int']
+        Decl: channels, [], [], []
+          TypeDecl: channels, []
+            IdentifierType: ['int']
+        Decl: frames, [], [], []
+          TypeDecl: frames, []
+            IdentifierType: ['int']
+        Decl: data, [], [], []
+          PtrDecl: []
+            TypeDecl: data, []
+              IdentifierType: ['float']
+      TypeDecl: Lav_bufferLoadFromArray, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeGetSimulation, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: handle, [], [], []
+          TypeDecl: handle, []
+            IdentifierType: ['LavHandle']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['LavHandle']
+      TypeDecl: Lav_nodeGetSimulation, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeConnect, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: output, [], [], []
+          TypeDecl: output, []
+            IdentifierType: ['int']
+        Decl: destHandle, [], [], []
+          TypeDecl: destHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: input, [], [], []
+          TypeDecl: input, []
+            IdentifierType: ['int']
+      TypeDecl: Lav_nodeConnect, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeConnectSimulation, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: output, [], [], []
+          TypeDecl: output, []
+            IdentifierType: ['int']
+      TypeDecl: Lav_nodeConnectSimulation, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeConnectProperty, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: output, [], [], []
+          TypeDecl: output, []
+            IdentifierType: ['int']
+        Decl: otherHandle, [], [], []
+          TypeDecl: otherHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: slot, [], [], []
+          TypeDecl: slot, []
+            IdentifierType: ['int']
+      TypeDecl: Lav_nodeConnectProperty, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeDisconnect, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: output, [], [], []
+          TypeDecl: output, []
+            IdentifierType: ['int']
+      TypeDecl: Lav_nodeDisconnect, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeGetInputConnectionCount, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['unsigned', 'int']
+      TypeDecl: Lav_nodeGetInputConnectionCount, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeGetOutputConnectionCount, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['unsigned', 'int']
+      TypeDecl: Lav_nodeGetOutputConnectionCount, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeResetProperty, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: slot, [], [], []
+          TypeDecl: slot, []
+            IdentifierType: ['int']
+      TypeDecl: Lav_nodeResetProperty, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeSetIntProperty, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: slot, [], [], []
+          TypeDecl: slot, []
+            IdentifierType: ['int']
+        Decl: value, [], [], []
+          TypeDecl: value, []
+            IdentifierType: ['int']
+      TypeDecl: Lav_nodeSetIntProperty, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeSetFloatProperty, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: slot, [], [], []
+          TypeDecl: slot, []
+            IdentifierType: ['int']
+        Decl: value, [], [], []
+          TypeDecl: value, []
+            IdentifierType: ['float']
+      TypeDecl: Lav_nodeSetFloatProperty, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeSetDoubleProperty, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: slot, [], [], []
+          TypeDecl: slot, []
+            IdentifierType: ['int']
+        Decl: value, [], [], []
+          TypeDecl: value, []
+            IdentifierType: ['double']
+      TypeDecl: Lav_nodeSetDoubleProperty, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeSetStringProperty, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: slot, [], [], []
+          TypeDecl: slot, []
+            IdentifierType: ['int']
+        Decl: value, [], [], []
+          PtrDecl: []
+            TypeDecl: value, []
+              IdentifierType: ['char']
+      TypeDecl: Lav_nodeSetStringProperty, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeSetFloat3Property, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: slot, [], [], []
+          TypeDecl: slot, []
+            IdentifierType: ['int']
+        Decl: v1, [], [], []
+          TypeDecl: v1, []
+            IdentifierType: ['float']
+        Decl: v2, [], [], []
+          TypeDecl: v2, []
+            IdentifierType: ['float']
+        Decl: v3, [], [], []
+          TypeDecl: v3, []
+            IdentifierType: ['float']
+      TypeDecl: Lav_nodeSetFloat3Property, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeSetFloat6Property, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: slot, [], [], []
+          TypeDecl: slot, []
+            IdentifierType: ['int']
+        Decl: v1, [], [], []
+          TypeDecl: v1, []
+            IdentifierType: ['float']
+        Decl: v2, [], [], []
+          TypeDecl: v2, []
+            IdentifierType: ['float']
+        Decl: v3, [], [], []
+          TypeDecl: v3, []
+            IdentifierType: ['float']
+        Decl: v4, [], [], []
+          TypeDecl: v4, []
+            IdentifierType: ['float']
+        Decl: v5, [], [], []
+          TypeDecl: v5, []
+            IdentifierType: ['float']
+        Decl: v6, [], [], []
+          TypeDecl: v6, []
+            IdentifierType: ['float']
+      TypeDecl: Lav_nodeSetFloat6Property, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeGetIntProperty, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: slot, [], [], []
+          TypeDecl: slot, []
+            IdentifierType: ['int']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['int']
+      TypeDecl: Lav_nodeGetIntProperty, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeGetFloatProperty, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: slot, [], [], []
+          TypeDecl: slot, []
+            IdentifierType: ['int']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['float']
+      TypeDecl: Lav_nodeGetFloatProperty, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeGetDoubleProperty, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: slot, [], [], []
+          TypeDecl: slot, []
+            IdentifierType: ['int']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['double']
+      TypeDecl: Lav_nodeGetDoubleProperty, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeGetStringProperty, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: slot, [], [], []
+          TypeDecl: slot, []
+            IdentifierType: ['int']
+        Decl: destination, ['const'], [], []
+          PtrDecl: []
+            PtrDecl: []
+              TypeDecl: destination, ['const']
+                IdentifierType: ['char']
+      TypeDecl: Lav_nodeGetStringProperty, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeGetFloat3Property, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: slot, [], [], []
+          TypeDecl: slot, []
+            IdentifierType: ['int']
+        Decl: destination1, [], [], []
+          PtrDecl: []
+            TypeDecl: destination1, []
+              IdentifierType: ['float']
+        Decl: destination2, [], [], []
+          PtrDecl: []
+            TypeDecl: destination2, []
+              IdentifierType: ['float']
+        Decl: destination3, [], [], []
+          PtrDecl: []
+            TypeDecl: destination3, []
+              IdentifierType: ['float']
+      TypeDecl: Lav_nodeGetFloat3Property, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeGetFloat6Property, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: slot, [], [], []
+          TypeDecl: slot, []
+            IdentifierType: ['int']
+        Decl: destinationV1, [], [], []
+          PtrDecl: []
+            TypeDecl: destinationV1, []
+              IdentifierType: ['float']
+        Decl: destinationV2, [], [], []
+          PtrDecl: []
+            TypeDecl: destinationV2, []
+              IdentifierType: ['float']
+        Decl: destinationV3, [], [], []
+          PtrDecl: []
+            TypeDecl: destinationV3, []
+              IdentifierType: ['float']
+        Decl: destinationV4, [], [], []
+          PtrDecl: []
+            TypeDecl: destinationV4, []
+              IdentifierType: ['float']
+        Decl: destinationV5, [], [], []
+          PtrDecl: []
+            TypeDecl: destinationV5, []
+              IdentifierType: ['float']
+        Decl: destinationV6, [], [], []
+          PtrDecl: []
+            TypeDecl: destinationV6, []
+              IdentifierType: ['float']
+      TypeDecl: Lav_nodeGetFloat6Property, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeGetIntPropertyRange, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: slot, [], [], []
+          TypeDecl: slot, []
+            IdentifierType: ['int']
+        Decl: destinationMin, [], [], []
+          PtrDecl: []
+            TypeDecl: destinationMin, []
+              IdentifierType: ['int']
+        Decl: destinationMax, [], [], []
+          PtrDecl: []
+            TypeDecl: destinationMax, []
+              IdentifierType: ['int']
+      TypeDecl: Lav_nodeGetIntPropertyRange, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeGetFloatPropertyRange, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: slot, [], [], []
+          TypeDecl: slot, []
+            IdentifierType: ['int']
+        Decl: destinationMin, [], [], []
+          PtrDecl: []
+            TypeDecl: destinationMin, []
+              IdentifierType: ['float']
+        Decl: destinationMax, [], [], []
+          PtrDecl: []
+            TypeDecl: destinationMax, []
+              IdentifierType: ['float']
+      TypeDecl: Lav_nodeGetFloatPropertyRange, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeGetDoublePropertyRange, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: slot, [], [], []
+          TypeDecl: slot, []
+            IdentifierType: ['int']
+        Decl: destinationMin, [], [], []
+          PtrDecl: []
+            TypeDecl: destinationMin, []
+              IdentifierType: ['double']
+        Decl: destinationMax, [], [], []
+          PtrDecl: []
+            TypeDecl: destinationMax, []
+              IdentifierType: ['double']
+      TypeDecl: Lav_nodeGetDoublePropertyRange, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeGetPropertyName, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: slot, [], [], []
+          TypeDecl: slot, []
+            IdentifierType: ['int']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            PtrDecl: []
+              TypeDecl: destination, []
+                IdentifierType: ['char']
+      TypeDecl: Lav_nodeGetPropertyName, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeGetPropertyType, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: slot, [], [], []
+          TypeDecl: slot, []
+            IdentifierType: ['int']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['int']
+      TypeDecl: Lav_nodeGetPropertyType, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeGetPropertyHasDynamicRange, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: slot, [], [], []
+          TypeDecl: slot, []
+            IdentifierType: ['int']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['int']
+      TypeDecl: Lav_nodeGetPropertyHasDynamicRange, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeReplaceFloatArrayProperty, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: slot, [], [], []
+          TypeDecl: slot, []
+            IdentifierType: ['int']
+        Decl: length, [], [], []
+          TypeDecl: length, []
+            IdentifierType: ['unsigned', 'int']
+        Decl: values, [], [], []
+          PtrDecl: []
+            TypeDecl: values, []
+              IdentifierType: ['float']
+      TypeDecl: Lav_nodeReplaceFloatArrayProperty, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeReadFloatArrayProperty, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: slot, [], [], []
+          TypeDecl: slot, []
+            IdentifierType: ['int']
+        Decl: index, [], [], []
+          TypeDecl: index, []
+            IdentifierType: ['unsigned', 'int']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['float']
+      TypeDecl: Lav_nodeReadFloatArrayProperty, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeWriteFloatArrayProperty, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: slot, [], [], []
+          TypeDecl: slot, []
+            IdentifierType: ['int']
+        Decl: start, [], [], []
+          TypeDecl: start, []
+            IdentifierType: ['unsigned', 'int']
+        Decl: stop, [], [], []
+          TypeDecl: stop, []
+            IdentifierType: ['unsigned', 'int']
+        Decl: values, [], [], []
+          PtrDecl: []
+            TypeDecl: values, []
+              IdentifierType: ['float']
+      TypeDecl: Lav_nodeWriteFloatArrayProperty, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeGetFloatArrayPropertyLength, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: slot, [], [], []
+          TypeDecl: slot, []
+            IdentifierType: ['int']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['unsigned', 'int']
+      TypeDecl: Lav_nodeGetFloatArrayPropertyLength, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeReplaceIntArrayProperty, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: slot, [], [], []
+          TypeDecl: slot, []
+            IdentifierType: ['int']
+        Decl: length, [], [], []
+          TypeDecl: length, []
+            IdentifierType: ['unsigned', 'int']
+        Decl: values, [], [], []
+          PtrDecl: []
+            TypeDecl: values, []
+              IdentifierType: ['int']
+      TypeDecl: Lav_nodeReplaceIntArrayProperty, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeReadIntArrayProperty, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: slot, [], [], []
+          TypeDecl: slot, []
+            IdentifierType: ['int']
+        Decl: index, [], [], []
+          TypeDecl: index, []
+            IdentifierType: ['unsigned', 'int']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['int']
+      TypeDecl: Lav_nodeReadIntArrayProperty, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeWriteIntArrayProperty, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: slot, [], [], []
+          TypeDecl: slot, []
+            IdentifierType: ['int']
+        Decl: start, [], [], []
+          TypeDecl: start, []
+            IdentifierType: ['unsigned', 'int']
+        Decl: stop, [], [], []
+          TypeDecl: stop, []
+            IdentifierType: ['unsigned', 'int']
+        Decl: values, [], [], []
+          PtrDecl: []
+            TypeDecl: values, []
+              IdentifierType: ['int']
+      TypeDecl: Lav_nodeWriteIntArrayProperty, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeGetIntArrayPropertyLength, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: slot, [], [], []
+          TypeDecl: slot, []
+            IdentifierType: ['int']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['int']
+      TypeDecl: Lav_nodeGetIntArrayPropertyLength, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeGetArrayPropertyLengthRange, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: slot, [], [], []
+          TypeDecl: slot, []
+            IdentifierType: ['int']
+        Decl: destinationMin, [], [], []
+          PtrDecl: []
+            TypeDecl: destinationMin, []
+              IdentifierType: ['unsigned', 'int']
+        Decl: destinationMax, [], [], []
+          PtrDecl: []
+            TypeDecl: destinationMax, []
+              IdentifierType: ['unsigned', 'int']
+      TypeDecl: Lav_nodeGetArrayPropertyLengthRange, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeSetBufferProperty, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: slot, [], [], []
+          TypeDecl: slot, []
+            IdentifierType: ['int']
+        Decl: bufferHandle, [], [], []
+          TypeDecl: bufferHandle, []
+            IdentifierType: ['LavHandle']
+      TypeDecl: Lav_nodeSetBufferProperty, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeGetBufferProperty, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: slot, [], [], []
+          TypeDecl: slot, []
+            IdentifierType: ['int']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['LavHandle']
+      TypeDecl: Lav_nodeGetBufferProperty, []
+        IdentifierType: ['LavError']
+  Decl: Lav_automationCancelAutomators, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: slot, [], [], []
+          TypeDecl: slot, []
+            IdentifierType: ['int']
+        Decl: time, [], [], []
+          TypeDecl: time, []
+            IdentifierType: ['double']
+      TypeDecl: Lav_automationCancelAutomators, []
+        IdentifierType: ['LavError']
+  Decl: Lav_automationLinearRampToValue, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: slot, [], [], []
+          TypeDecl: slot, []
+            IdentifierType: ['int']
+        Decl: time, [], [], []
+          TypeDecl: time, []
+            IdentifierType: ['double']
+        Decl: value, [], [], []
+          TypeDecl: value, []
+            IdentifierType: ['double']
+      TypeDecl: Lav_automationLinearRampToValue, []
+        IdentifierType: ['LavError']
+  Typedef: LavEventCallback, [], ['typedef']
+    PtrDecl: []
+      FuncDecl: 
+        ParamList: 
+          Decl: cause, [], [], []
+            TypeDecl: cause, []
+              IdentifierType: ['LavHandle']
+          Decl: userdata, [], [], []
+            PtrDecl: []
+              TypeDecl: userdata, []
+                IdentifierType: ['void']
+        TypeDecl: LavEventCallback, []
+          IdentifierType: ['void']
+  Decl: Lav_nodeGetEventHandler, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: event, [], [], []
+          TypeDecl: event, []
+            IdentifierType: ['int']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['LavEventCallback']
+      TypeDecl: Lav_nodeGetEventHandler, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeGetEventUserDataPointer, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: event, [], [], []
+          TypeDecl: event, []
+            IdentifierType: ['int']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            PtrDecl: []
+              TypeDecl: destination, []
+                IdentifierType: ['void']
+      TypeDecl: Lav_nodeGetEventUserDataPointer, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeSetEvent, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: node, [], [], []
+          TypeDecl: node, []
+            IdentifierType: ['LavHandle']
+        Decl: event, [], [], []
+          TypeDecl: event, []
+            IdentifierType: ['int']
+        Decl: handler, [], [], []
+          TypeDecl: handler, []
+            IdentifierType: ['LavEventCallback']
+        Decl: userData, [], [], []
+          PtrDecl: []
+            TypeDecl: userData, []
+              IdentifierType: ['void']
+      TypeDecl: Lav_nodeSetEvent, []
+        IdentifierType: ['LavError']
+  Decl: Lav_nodeReset, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+      TypeDecl: Lav_nodeReset, []
+        IdentifierType: ['LavError']
+  Decl: Lav_createSineNode, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: simulationHandle, [], [], []
+          TypeDecl: simulationHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['LavHandle']
+      TypeDecl: Lav_createSineNode, []
+        IdentifierType: ['LavError']
+  Decl: Lav_createSquareNode, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: simulationHandle, [], [], []
+          TypeDecl: simulationHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['LavHandle']
+      TypeDecl: Lav_createSquareNode, []
+        IdentifierType: ['LavError']
+  Decl: Lav_createNoiseNode, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: simulationHandle, [], [], []
+          TypeDecl: simulationHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['LavHandle']
+      TypeDecl: Lav_createNoiseNode, []
+        IdentifierType: ['LavError']
+  Decl: Lav_createHrtfNode, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: simulationHandle, [], [], []
+          TypeDecl: simulationHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: hrtfPath, ['const'], [], []
+          PtrDecl: []
+            TypeDecl: hrtfPath, ['const']
+              IdentifierType: ['char']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['LavHandle']
+      TypeDecl: Lav_createHrtfNode, []
+        IdentifierType: ['LavError']
+  Decl: Lav_createHardLimiterNode, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: simulationHandle, [], [], []
+          TypeDecl: simulationHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: numInputs, [], [], []
+          TypeDecl: numInputs, []
+            IdentifierType: ['unsigned', 'int']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['LavHandle']
+      TypeDecl: Lav_createHardLimiterNode, []
+        IdentifierType: ['LavError']
+  Decl: Lav_createDelayNode, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: simulationHandle, [], [], []
+          TypeDecl: simulationHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: maxDelay, [], [], []
+          TypeDecl: maxDelay, []
+            IdentifierType: ['float']
+        Decl: lineCount, [], [], []
+          TypeDecl: lineCount, []
+            IdentifierType: ['unsigned', 'int']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['LavHandle']
+      TypeDecl: Lav_createDelayNode, []
+        IdentifierType: ['LavError']
+  Decl: Lav_createAmplitudePannerNode, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: simulationHandle, [], [], []
+          TypeDecl: simulationHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['LavHandle']
+      TypeDecl: Lav_createAmplitudePannerNode, []
+        IdentifierType: ['LavError']
+  Decl: Lav_amplitudePannerNodeConfigureStandardMap, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: channels, [], [], []
+          TypeDecl: channels, []
+            IdentifierType: ['unsigned', 'int']
+      TypeDecl: Lav_amplitudePannerNodeConfigureStandardMap, []
+        IdentifierType: ['LavError']
+  Decl: Lav_createMultipannerNode, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: simulationHandle, [], [], []
+          TypeDecl: simulationHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: hrtfPath, [], [], []
+          PtrDecl: []
+            TypeDecl: hrtfPath, []
+              IdentifierType: ['char']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['LavHandle']
+      TypeDecl: Lav_createMultipannerNode, []
+        IdentifierType: ['LavError']
+  Decl: Lav_createPushNode, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: simulationHandle, [], [], []
+          TypeDecl: simulationHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: sr, [], [], []
+          TypeDecl: sr, []
+            IdentifierType: ['unsigned', 'int']
+        Decl: channels, [], [], []
+          TypeDecl: channels, []
+            IdentifierType: ['unsigned', 'int']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['LavHandle']
+      TypeDecl: Lav_createPushNode, []
+        IdentifierType: ['LavError']
+  Decl: Lav_pushNodeFeed, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: length, [], [], []
+          TypeDecl: length, []
+            IdentifierType: ['unsigned', 'int']
+        Decl: buffer, [], [], []
+          PtrDecl: []
+            TypeDecl: buffer, []
+              IdentifierType: ['float']
+      TypeDecl: Lav_pushNodeFeed, []
+        IdentifierType: ['LavError']
+  Decl: Lav_createBiquadNode, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: simulationHandle, [], [], []
+          TypeDecl: simulationHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: channels, [], [], []
+          TypeDecl: channels, []
+            IdentifierType: ['unsigned', 'int']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['LavHandle']
+      TypeDecl: Lav_createBiquadNode, []
+        IdentifierType: ['LavError']
+  Typedef: LavPullNodeAudioCallback, [], ['typedef']
+    PtrDecl: []
+      FuncDecl: 
+        ParamList: 
+          Decl: nodeHandle, [], [], []
+            TypeDecl: nodeHandle, []
+              IdentifierType: ['LavHandle']
+          Decl: frames, [], [], []
+            TypeDecl: frames, []
+              IdentifierType: ['int']
+          Decl: channels, [], [], []
+            TypeDecl: channels, []
+              IdentifierType: ['int']
+          Decl: buffer, [], [], []
+            PtrDecl: []
+              TypeDecl: buffer, []
+                IdentifierType: ['float']
+          Decl: userdata, [], [], []
+            PtrDecl: []
+              TypeDecl: userdata, []
+                IdentifierType: ['void']
+        TypeDecl: LavPullNodeAudioCallback, []
+          IdentifierType: ['void']
+  Decl: Lav_createPullNode, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: simulationHandle, [], [], []
+          TypeDecl: simulationHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: sr, [], [], []
+          TypeDecl: sr, []
+            IdentifierType: ['unsigned', 'int']
+        Decl: channels, [], [], []
+          TypeDecl: channels, []
+            IdentifierType: ['unsigned', 'int']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['LavHandle']
+      TypeDecl: Lav_createPullNode, []
+        IdentifierType: ['LavError']
+  Decl: Lav_pullNodeSetAudioCallback, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: callback, [], [], []
+          TypeDecl: callback, []
+            IdentifierType: ['LavPullNodeAudioCallback']
+        Decl: userdata, [], [], []
+          PtrDecl: []
+            TypeDecl: userdata, []
+              IdentifierType: ['void']
+      TypeDecl: Lav_pullNodeSetAudioCallback, []
+        IdentifierType: ['LavError']
+  Typedef: LavGraphListenerNodeListeningCallback, [], ['typedef']
+    PtrDecl: []
+      FuncDecl: 
+        ParamList: 
+          Decl: nodeHandle, [], [], []
+            TypeDecl: nodeHandle, []
+              IdentifierType: ['LavHandle']
+          Decl: frames, [], [], []
+            TypeDecl: frames, []
+              IdentifierType: ['unsigned', 'int']
+          Decl: channels, [], [], []
+            TypeDecl: channels, []
+              IdentifierType: ['unsigned', 'int']
+          Decl: buffer, [], [], []
+            PtrDecl: []
+              TypeDecl: buffer, []
+                IdentifierType: ['float']
+          Decl: userdata, [], [], []
+            PtrDecl: []
+              TypeDecl: userdata, []
+                IdentifierType: ['void']
+        TypeDecl: LavGraphListenerNodeListeningCallback, []
+          IdentifierType: ['void']
+  Decl: Lav_createGraphListenerNode, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: simulationHandle, [], [], []
+          TypeDecl: simulationHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: channels, [], [], []
+          TypeDecl: channels, []
+            IdentifierType: ['unsigned', 'int']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['LavHandle']
+      TypeDecl: Lav_createGraphListenerNode, []
+        IdentifierType: ['LavError']
+  Decl: Lav_graphListenerNodeSetListeningCallback, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: callback, [], [], []
+          TypeDecl: callback, []
+            IdentifierType: ['LavGraphListenerNodeListeningCallback']
+        Decl: userdata, [], [], []
+          PtrDecl: []
+            TypeDecl: userdata, []
+              IdentifierType: ['void']
+      TypeDecl: Lav_graphListenerNodeSetListeningCallback, []
+        IdentifierType: ['LavError']
+  Typedef: LavCustomNodeProcessingCallback, [], ['typedef']
+    PtrDecl: []
+      FuncDecl: 
+        ParamList: 
+          Decl: nodeHandle, [], [], []
+            TypeDecl: nodeHandle, []
+              IdentifierType: ['LavHandle']
+          Decl: frames, [], [], []
+            TypeDecl: frames, []
+              IdentifierType: ['unsigned', 'int']
+          Decl: numInputs, [], [], []
+            TypeDecl: numInputs, []
+              IdentifierType: ['unsigned', 'int']
+          Decl: inputs, [], [], []
+            PtrDecl: []
+              PtrDecl: []
+                TypeDecl: inputs, []
+                  IdentifierType: ['float']
+          Decl: numOutputs, [], [], []
+            TypeDecl: numOutputs, []
+              IdentifierType: ['unsigned', 'int']
+          Decl: outputs, [], [], []
+            PtrDecl: []
+              PtrDecl: []
+                TypeDecl: outputs, []
+                  IdentifierType: ['float']
+          Decl: userdata, [], [], []
+            PtrDecl: []
+              TypeDecl: userdata, []
+                IdentifierType: ['void']
+        TypeDecl: LavCustomNodeProcessingCallback, []
+          IdentifierType: ['void']
+  Decl: Lav_createCustomNode, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: simulationHandle, [], [], []
+          TypeDecl: simulationHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: inputs, [], [], []
+          TypeDecl: inputs, []
+            IdentifierType: ['unsigned', 'int']
+        Decl: channelsPerInput, [], [], []
+          TypeDecl: channelsPerInput, []
+            IdentifierType: ['unsigned', 'int']
+        Decl: outputs, [], [], []
+          TypeDecl: outputs, []
+            IdentifierType: ['unsigned', 'int']
+        Decl: channelsPerOutput, [], [], []
+          TypeDecl: channelsPerOutput, []
+            IdentifierType: ['unsigned', 'int']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['LavHandle']
+      TypeDecl: Lav_createCustomNode, []
+        IdentifierType: ['LavError']
+  Decl: Lav_customNodeSetProcessingCallback, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: callback, [], [], []
+          TypeDecl: callback, []
+            IdentifierType: ['LavCustomNodeProcessingCallback']
+        Decl: userdata, [], [], []
+          PtrDecl: []
+            TypeDecl: userdata, []
+              IdentifierType: ['void']
+      TypeDecl: Lav_customNodeSetProcessingCallback, []
+        IdentifierType: ['LavError']
+  Decl: Lav_createRingmodNode, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: simulationHandle, [], [], []
+          TypeDecl: simulationHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['LavHandle']
+      TypeDecl: Lav_createRingmodNode, []
+        IdentifierType: ['LavError']
+  Decl: Lav_createFeedbackDelayNetworkNode, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: simulationHandle, [], [], []
+          TypeDecl: simulationHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: maxDelay, [], [], []
+          TypeDecl: maxDelay, []
+            IdentifierType: ['float']
+        Decl: lines, [], [], []
+          TypeDecl: lines, []
+            IdentifierType: ['int']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['LavHandle']
+      TypeDecl: Lav_createFeedbackDelayNetworkNode, []
+        IdentifierType: ['LavError']
+  Decl: Lav_feedbackDelayNetworkNodeSetFeedbackMatrix, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: node, [], [], []
+          TypeDecl: node, []
+            IdentifierType: ['LavHandle']
+        Decl: count, [], [], []
+          TypeDecl: count, []
+            IdentifierType: ['int']
+        Decl: values, [], [], []
+          PtrDecl: []
+            TypeDecl: values, []
+              IdentifierType: ['float']
+      TypeDecl: Lav_feedbackDelayNetworkNodeSetFeedbackMatrix, []
+        IdentifierType: ['LavError']
+  Decl: Lav_feedbackDelayNetworkNodeSetOutputGains, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: count, [], [], []
+          TypeDecl: count, []
+            IdentifierType: ['int']
+        Decl: values, [], [], []
+          PtrDecl: []
+            TypeDecl: values, []
+              IdentifierType: ['float']
+      TypeDecl: Lav_feedbackDelayNetworkNodeSetOutputGains, []
+        IdentifierType: ['LavError']
+  Decl: Lav_feedbackDelayNetworkNodeSetDelays, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: count, [], [], []
+          TypeDecl: count, []
+            IdentifierType: ['int']
+        Decl: values, [], [], []
+          PtrDecl: []
+            TypeDecl: values, []
+              IdentifierType: ['float']
+      TypeDecl: Lav_feedbackDelayNetworkNodeSetDelays, []
+        IdentifierType: ['LavError']
+  Decl: Lav_feedbackDelayNetworkNodeSetFeedbackDelayMatrix, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: count, [], [], []
+          TypeDecl: count, []
+            IdentifierType: ['int']
+        Decl: values, [], [], []
+          PtrDecl: []
+            TypeDecl: values, []
+              IdentifierType: ['float']
+      TypeDecl: Lav_feedbackDelayNetworkNodeSetFeedbackDelayMatrix, []
+        IdentifierType: ['LavError']
+  Decl: Lav_createIirNode, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: simulationHandle, [], [], []
+          TypeDecl: simulationHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: channels, [], [], []
+          TypeDecl: channels, []
+            IdentifierType: ['int']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['LavHandle']
+      TypeDecl: Lav_createIirNode, []
+        IdentifierType: ['LavError']
+  Decl: Lav_iirNodeSetCoefficients, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: nodeHandle, [], [], []
+          TypeDecl: nodeHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: numeratorLength, [], [], []
+          TypeDecl: numeratorLength, []
+            IdentifierType: ['int']
+        Decl: numerator, [], [], []
+          PtrDecl: []
+            TypeDecl: numerator, []
+              IdentifierType: ['double']
+        Decl: denominatorLength, [], [], []
+          TypeDecl: denominatorLength, []
+            IdentifierType: ['int']
+        Decl: denominator, [], [], []
+          PtrDecl: []
+            TypeDecl: denominator, []
+              IdentifierType: ['double']
+        Decl: shouldClearHistory, [], [], []
+          TypeDecl: shouldClearHistory, []
+            IdentifierType: ['int']
+      TypeDecl: Lav_iirNodeSetCoefficients, []
+        IdentifierType: ['LavError']
+  Decl: Lav_createGainNode, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: simulationHandle, [], [], []
+          TypeDecl: simulationHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: channels, [], [], []
+          TypeDecl: channels, []
+            IdentifierType: ['int']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['LavHandle']
+      TypeDecl: Lav_createGainNode, []
+        IdentifierType: ['LavError']
+  Decl: Lav_createChannelSplitterNode, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: simulationHandle, [], [], []
+          TypeDecl: simulationHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: channels, [], [], []
+          TypeDecl: channels, []
+            IdentifierType: ['int']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['LavHandle']
+      TypeDecl: Lav_createChannelSplitterNode, []
+        IdentifierType: ['LavError']
+  Decl: Lav_createChannelMergerNode, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: simulationHandle, [], [], []
+          TypeDecl: simulationHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: channels, [], [], []
+          TypeDecl: channels, []
+            IdentifierType: ['int']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['LavHandle']
+      TypeDecl: Lav_createChannelMergerNode, []
+        IdentifierType: ['LavError']
+  Decl: Lav_createBufferNode, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: simulationHandle, [], [], []
+          TypeDecl: simulationHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['LavHandle']
+      TypeDecl: Lav_createBufferNode, []
+        IdentifierType: ['LavError']
+  Decl: None, [], [], []
+    Enum: lav_STANDARD_PROPERTIES
+      EnumeratorList: 
+        Enumerator: Lav_NODE_STATE
+          UnaryOp: -
+            Constant: int, 100
+        Enumerator: Lav_NODE_AUTORESET
+          UnaryOp: -
+            Constant: int, 101
+        Enumerator: Lav_NODE_MUL
+          UnaryOp: -
+            Constant: int, 102
+        Enumerator: Lav_NODE_ADD
+          UnaryOp: -
+            Constant: int, 103
+        Enumerator: Lav_NODE_CHANNEL_INTERPRETATION
+          UnaryOp: -
+            Constant: int, 104
+  Decl: None, [], [], []
+    Enum: Lav_CHANNEL_INTERPRETATIONS
+      EnumeratorList: 
+        Enumerator: Lav_CHANNEL_INTERPRETATION_DISCRETE
+          Constant: int, 0
+        Enumerator: Lav_CHANNEL_INTERPRETATION_SPEAKERS
+          Constant: int, 1
+  Decl: None, [], [], []
+    Enum: Lav_SINE_PROPERTIES
+      EnumeratorList: 
+        Enumerator: Lav_SINE_FREQUENCY
+          UnaryOp: -
+            Constant: int, 1
+  Decl: None, [], [], []
+    Enum: lav_SQUARE_PROPERTIES
+      EnumeratorList: 
+        Enumerator: Lav_SQUARE_FREQUENCY
+          UnaryOp: -
+            Constant: int, 1
+        Enumerator: Lav_SQUARE_DUTY_CYCLE
+          UnaryOp: -
+            Constant: int, 2
+  Decl: None, [], [], []
+    Enum: Lav_NOISE_PROPERTIES
+      EnumeratorList: 
+        Enumerator: Lav_NOISE_NOISE_TYPE
+          UnaryOp: -
+            Constant: int, 1
+        Enumerator: Lav_NOISE_SHOULD_NORMALIZE
+          UnaryOp: -
+            Constant: int, 2
+  Decl: None, [], [], []
+    Enum: Lav_NOISE_TYPES
+      EnumeratorList: 
+        Enumerator: Lav_NOISE_TYPE_WHITE
+          Constant: int, 0
+        Enumerator: Lav_NOISE_TYPE_PINK
+          Constant: int, 1
+        Enumerator: Lav_NOISE_TYPE_BROWN
+          Constant: int, 2
+  Decl: None, [], [], []
+    Enum: Lav_FILE_PROPERTIES
+      EnumeratorList: 
+        Enumerator: Lav_FILE_POSITION
+          UnaryOp: -
+            Constant: int, 1
+        Enumerator: Lav_FILE_PITCH_BEND
+          UnaryOp: -
+            Constant: int, 2
+        Enumerator: Lav_FILE_LOOPING
+          UnaryOp: -
+            Constant: int, 3
+        Enumerator: Lav_FILE_END_EVENT
+          UnaryOp: -
+            Constant: int, 1
+  Decl: None, [], [], []
+    Enum: Lav_PANNER_PROPERTIES
+      EnumeratorList: 
+        Enumerator: Lav_PANNER_AZIMUTH
+          UnaryOp: -
+            Constant: int, 1
+        Enumerator: Lav_PANNER_ELEVATION
+          UnaryOp: -
+            Constant: int, 2
+        Enumerator: Lav_PANNER_CHANNEL_MAP
+          UnaryOp: -
+            Constant: int, 3
+        Enumerator: Lav_PANNER_SHOULD_CROSSFADE
+          UnaryOp: -
+            Constant: int, 4
+        Enumerator: Lav_PANNER_SKIP_LFE
+          UnaryOp: -
+            Constant: int, 5
+        Enumerator: Lav_PANNER_SKIP_CENTER
+          UnaryOp: -
+            Constant: int, 6
+        Enumerator: Lav_PANNER_STRATEGY
+          UnaryOp: -
+            Constant: int, 7
+  Decl: None, [], [], []
+    Enum: Lav_PANNING_STRATEGIES
+      EnumeratorList: 
+        Enumerator: Lav_PANNING_STRATEGY_HRTF
+          Constant: int, 0
+        Enumerator: Lav_PANNING_STRATEGY_STEREO
+          Constant: int, 1
+        Enumerator: Lav_PANNING_STRATEGY_SURROUND51
+          Constant: int, 2
+        Enumerator: Lav_PANNING_STRATEGY_SURROUND71
+          Constant: int, 3
+  Decl: None, [], [], []
+    Enum: Lav_MIXER_PROPERTIES
+      EnumeratorList: 
+        Enumerator: Lav_MIXER_MAX_PARENTS
+          UnaryOp: -
+            Constant: int, 1
+        Enumerator: Lav_MIXER_INPUTS_PER_PARENT
+          UnaryOp: -
+            Constant: int, 2
+  Decl: None, [], [], []
+    Enum: Lav_DELAY_PROPERTIES
+      EnumeratorList: 
+        Enumerator: Lav_DELAY_DELAY
+          UnaryOp: -
+            Constant: int, 1
+        Enumerator: Lav_DELAY_DELAY_MAX
+          UnaryOp: -
+            Constant: int, 2
+        Enumerator: Lav_DELAY_FEEDBACK
+          UnaryOp: -
+            Constant: int, 3
+        Enumerator: Lav_DELAY_INTERPOLATION_TIME
+          UnaryOp: -
+            Constant: int, 4
+  Decl: None, [], [], []
+    Enum: Lav_PUSH_NODE_PROPERTIES
+      EnumeratorList: 
+        Enumerator: Lav_PUSH_THRESHOLD
+          UnaryOp: -
+            Constant: int, 1
+        Enumerator: Lav_PUSH_AUDIO_EVENT
+          UnaryOp: -
+            Constant: int, 2
+        Enumerator: Lav_PUSH_OUT_EVENT
+          UnaryOp: -
+            Constant: int, 3
+  Decl: None, [], [], []
+    Enum: Lav_BIQUAD_PROPERTIES
+      EnumeratorList: 
+        Enumerator: Lav_BIQUAD_FILTER_TYPE
+          UnaryOp: -
+            Constant: int, 1
+        Enumerator: Lav_BIQUAD_Q
+          UnaryOp: -
+            Constant: int, 2
+        Enumerator: Lav_BIQUAD_FREQUENCY
+          UnaryOp: -
+            Constant: int, 3
+        Enumerator: Lav_BIQUAD_DBGAIN
+          UnaryOp: -
+            Constant: int, 4
+  Decl: None, [], [], []
+    Enum: Lav_BIQUAD_TYPES
+      EnumeratorList: 
+        Enumerator: Lav_BIQUAD_TYPE_LOWPASS
+          Constant: int, 0
+        Enumerator: Lav_BIQUAD_TYPE_HIGHPASS
+          Constant: int, 1
+        Enumerator: Lav_BIQUAD_TYPE_BANDPASS
+          Constant: int, 2
+        Enumerator: Lav_BIQUAD_TYPE_NOTCH
+          Constant: int, 3
+        Enumerator: Lav_BIQUAD_TYPE_ALLPASS
+          Constant: int, 4
+        Enumerator: Lav_BIQUAD_TYPE_PEAKING
+          Constant: int, 5
+        Enumerator: Lav_BIQUAD_TYPE_LOWSHELF
+          Constant: int, 6
+        Enumerator: Lav_BIQUAD_TYPE_HIGHSHELF
+          Constant: int, 7
+        Enumerator: Lav_BIQUAD_TYPE_IDENTITY
+          Constant: int, 8
+  Decl: None, [], [], []
+    Enum: Lav_FEEDBACK_DELAY_NETWORK_PROPERTIES
+      EnumeratorList: 
+        Enumerator: Lav_FDN_MAX_DELAY
+          UnaryOp: -
+            Constant: int, 1
+        Enumerator: Lav_FDN_INTERPOLATION_TIME
+          UnaryOp: -
+            Constant: int, 2
+  Decl: None, [], [], []
+    Enum: Lav_BUFFER_PROPERTIES
+      EnumeratorList: 
+        Enumerator: Lav_BUFFER_BUFFER
+          UnaryOp: -
+            Constant: int, 1
+        Enumerator: Lav_BUFFER_POSITION
+          UnaryOp: -
+            Constant: int, 2
+        Enumerator: Lav_BUFFER_PITCH_BEND
+          UnaryOp: -
+            Constant: int, 3
+        Enumerator: Lav_BUFFER_LOOPING
+          UnaryOp: -
+            Constant: int, 4
+        Enumerator: Lav_BUFFER_END_EVENT
+          UnaryOp: -
+            Constant: int, 1
+  Decl: Lav_createSimpleEnvironmentNode, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: simulationHandle, [], [], []
+          TypeDecl: simulationHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: hrtfPath, ['const'], [], []
+          PtrDecl: []
+            TypeDecl: hrtfPath, ['const']
+              IdentifierType: ['char']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['LavHandle']
+      TypeDecl: Lav_createSimpleEnvironmentNode, []
+        IdentifierType: ['LavError']
+  Decl: Lav_createSourceNode, [], [], []
+    FuncDecl: 
+      ParamList: 
+        Decl: simulationHandle, [], [], []
+          TypeDecl: simulationHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: environmentHandle, [], [], []
+          TypeDecl: environmentHandle, []
+            IdentifierType: ['LavHandle']
+        Decl: destination, [], [], []
+          PtrDecl: []
+            TypeDecl: destination, []
+              IdentifierType: ['LavHandle']
+      TypeDecl: Lav_createSourceNode, []
+        IdentifierType: ['LavError']
+  Decl: None, [], [], []
+    Enum: Lav_3D_PROPERTIES
+      EnumeratorList: 
+        Enumerator: Lav_3D_ORIENTATION
+          UnaryOp: -
+            Constant: int, 1
+        Enumerator: Lav_3D_POSITION
+          UnaryOp: -
+            Constant: int, 2
+  Decl: None, [], [], []
+    Enum: lav_STANDARD_ENVIRONMENT_PROPERTIES
+      EnumeratorList: 
+        Enumerator: Lav_ENVIRONMENT_DEFAULT_PANNER_STRATEGY
+          UnaryOp: -
+            Constant: int, 8
+        Enumerator: Lav_ENVIRONMENT_DEFAULT_DISTANCE_MODEL
+          UnaryOp: -
+            Constant: int, 11
+        Enumerator: Lav_ENVIRONMENT_DEFAULT_MAX_DISTANCE
+          UnaryOp: -
+            Constant: int, 12
+        Enumerator: Lav_ENVIRONMENT_DEFAULT_SIZE
+          UnaryOp: -
+            Constant: int, 13
+        Enumerator: Lav_ENVIRONMENT_OUTPUT_CHANNELS
+          UnaryOp: -
+            Constant: int, 14
+  Decl: None, [], [], []
+    Enum: Lav_SOURCE_PROPERTIES
+      EnumeratorList: 
+        Enumerator: Lav_SOURCE_MAX_DISTANCE
+          UnaryOp: -
+            Constant: int, 3
+        Enumerator: Lav_SOURCE_DISTANCE_MODEL
+          UnaryOp: -
+            Constant: int, 4
+        Enumerator: Lav_SOURCE_SIZE
+          UnaryOp: -
+            Constant: int, 5
+        Enumerator: Lav_SOURCE_PANNER_STRATEGY
+          UnaryOp: -
+            Constant: int, 8
+  Decl: None, [], [], []
+    Enum: Lav_DISTANCE_MODELS
+      EnumeratorList: 
+        Enumerator: Lav_DISTANCE_MODEL_LINEAR
+          Constant: int, 0
+        Enumerator: Lav_DISTANCE_MODEL_EXPONENTIAL
+          Constant: int, 1
+        Enumerator: Lav_DISTANCE_MODEL_INVERSE_SQUARE
+          Constant: int, 2
