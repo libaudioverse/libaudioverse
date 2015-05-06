@@ -89,7 +89,7 @@ enum Lav_OBJECT_TYPES {
 	Lav_OBJTYPE_GENERIC_NODE, //this is not something you should ever see outside the library, and basically means none.
 	Lav_OBJTYPE_SIMPLE_ENVIRONMENT_NODE,
 	Lav_OBJTYPE_SOURCE_NODE,
-	Lav_OBJTYPE_FILE_NODE,
+
 	Lav_OBJTYPE_HRTF_NODE,
 	Lav_OBJTYPE_SINE_NODE,
 	Lav_OBJTYPE_HARD_LIMITER_NODE,
@@ -103,7 +103,7 @@ enum Lav_OBJECT_TYPES {
 	Lav_OBJTYPE_RINGMOD_NODE,
 	Lav_OBJTYPE_MULTIPANNER_NODE,
 	Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK_NODE,
-	Lav_OBJTYPE_MULTIFILE_NODE,
+
 	Lav_OBJTYPE_SQUARE_NODE,
 	Lav_OBJTYPE_NOISE_NODE,
 	Lav_OBJTYPE_IIR_NODE,
@@ -319,7 +319,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavHandle simulationHandle, LavH
 Lav_PUBLIC_FUNCTION LavError Lav_createSquareNode(LavHandle simulationHandle, LavHandle* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createNoiseNode(LavHandle simulationHandle, LavHandle* destination);
 
-Lav_PUBLIC_FUNCTION LavError Lav_createFileNode(LavHandle simulationHandle, const char* path, LavHandle* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createHrtfNode(LavHandle simulationHandle, const char* hrtfPath, LavHandle* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterNode(LavHandle simulationHandle, unsigned int numInputs, LavHandle *destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createDelayNode(LavHandle simulationHandle, float maxDelay, unsigned int lineCount, LavHandle* destination);
@@ -360,10 +359,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetFeedbackMatrix(LavHa
 Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetOutputGains(LavHandle nodeHandle, int count, float* values);
 Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetDelays(LavHandle nodeHandle , int count, float* values);
 Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetFeedbackDelayMatrix(LavHandle nodeHandle, int count, float* values);
-
-Lav_PUBLIC_FUNCTION LavError Lav_createMultifileNode(LavHandle simulationHandle, int channels, int maxSimultaneousFiles, LavHandle* destination);
-Lav_PUBLIC_FUNCTION LavError Lav_multifileNodePlay(LavHandle nodeHandle, char* path);
-Lav_PUBLIC_FUNCTION LavError Lav_multifileNodeStopAll(LavHandle nodeHandle);
 
 //implements iir filters.
 Lav_PUBLIC_FUNCTION LavError Lav_createIirNode(LavHandle simulationHandle, int channels, LavHandle* destination);

@@ -62,7 +62,6 @@ implementations/feedback_delay_network.cpp
 
 #specific node types.
 nodes/sine.cpp
-nodes/file.cpp
 nodes/hard_limiter.cpp
 nodes/hrtf.cpp
 nodes/delay.cpp
@@ -75,7 +74,6 @@ nodes/custom.cpp
 nodes/ringmod.cpp
 nodes/multipanner.cpp
 nodes/feedback_delay_network.cpp
-nodes/multifile.cpp
 nodes/square.cpp
 nodes/noise.cpp
 nodes/iir.cpp

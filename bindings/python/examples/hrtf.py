@@ -8,7 +8,10 @@ sim = libaudioverse.Simulation(device_index = -1)
 print "Enter a file path."
 path = raw_input()
 path = os.path.abspath(path)
-fnode = libaudioverse.FileNode(sim, path)
+fnode = libaudioverse.BufferNode(sim)
+buffer=libaudioverse.Buffer(sim)
+buffer.load_from_file(path)
+fnode.buffer.value = buffer
 fnode.looping.value = True
 panner = libaudioverse.HrtfNode(sim, "default")
 fnode.connect(0, panner, 0)

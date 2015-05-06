@@ -31,10 +31,14 @@ void main(int argc, char** args) {
 		return;
 	}
 	LavHandle simulation;
-	LavHandle fileNode, panNode, limit;
+	LavHandle bufferNode, panNode, limit;
 	ERRCHECK(Lav_initialize());
 	ERRCHECK(Lav_createSimulationForDevice(-1, channels, 44100, 1024, 2, &simulation));
-	ERRCHECK(Lav_createFileNode(simulation, args[1], &fileNode));
+	ERRCHECK(Lav_createBufferNode(simulation, &bufferNode));
+	LavHandle buffer;
+	ERRCHECK(Lav_createBuffer(simulation, &buffer));
+	ERRCHECK(Lav_bufferLoadFromFile(buffer, args[1]));
+	ERRCHECK(Lav_nodeSetBufferProperty(bufferNode, Lav_BUFFER_BUFFER, buffer));
 	ERRCHECK(Lav_createMultipannerNode(simulation, "default", &panNode));
 	int pantype =Lav_PANNING_STRATEGY_STEREO;
 	switch(channels) {
@@ -42,7 +46,7 @@ void main(int argc, char** args) {
 		case 8: pantype=Lav_PANNING_STRATEGY_SURROUND71; break;
 	}
 	ERRCHECK(Lav_nodeSetIntProperty(panNode, Lav_PANNER_STRATEGY, pantype));
-	ERRCHECK(Lav_nodeConnect(fileNode, 0, panNode, 0));
+	ERRCHECK(Lav_nodeConnect(bufferNode, 0, panNode, 0));
 	ERRCHECK(Lav_createHardLimiterNode(simulation, channels, &limit));
 	ERRCHECK(Lav_nodeConnect(panNode, 0, limit, 0));
 	ERRCHECK(Lav_nodeConnectSimulation(limit, 0));

@@ -23,12 +23,16 @@ void main(int argc, char** args) {
 		return;
 	}
 	LavHandle simulation;
-	LavHandle fileNode, hrtfNode, limit;
+	LavHandle bufferNode, hrtfNode, limit;
 	ERRCHECK(Lav_initialize());
 	ERRCHECK(Lav_createSimulationForDevice(-1, 2, 44100, 1024, 2, &simulation));
-	ERRCHECK(Lav_createFileNode(simulation, args[1], &fileNode));
+	ERRCHECK(Lav_createBufferNode(simulation, &bufferNode));
+	LavHandle buffer;
+	ERRCHECK(Lav_createBuffer(simulation, &buffer));
+	ERRCHECK(Lav_bufferLoadFromFile(buffer, args[1]));
+	ERRCHECK(Lav_nodeSetBufferProperty(bufferNode, Lav_BUFFER_BUFFER, buffer));
 	ERRCHECK(Lav_createHrtfNode(simulation, args[2], &hrtfNode));
-	ERRCHECK(Lav_nodeConnect(fileNode, 0, hrtfNode, 0));
+	ERRCHECK(Lav_nodeConnect(bufferNode, 0, hrtfNode, 0));
 	ERRCHECK(Lav_createHardLimiterNode(simulation, 2, &limit));
 	ERRCHECK(Lav_nodeConnect(hrtfNode, 0, limit, 0));
 	ERRCHECK(Lav_nodeConnectSimulation(limit, 0));
