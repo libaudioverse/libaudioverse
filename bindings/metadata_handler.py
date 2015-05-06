@@ -6,6 +6,8 @@ import os.path
 
 def cleanup_property(i):
 	i['doc_description'] = i.get('doc_description', 'No description available.')
+	i['is_dynamic'] = i.get('is_dynamic', False)
+	i['read_only'] = i.get('read_only', False)
 
 def cleanup_callback(i):
 	pass
