@@ -10,8 +10,6 @@ important_enums: The enums which metadata marks as important in some way.
 metadata: The parsed yaml document itself as a dict.
 """
 
-
-
 from pycparser import *
 #we need to be able to compare with isinstance, unfortunately. Grab all of these too.
 from pycparser.c_ast import *
@@ -28,10 +26,12 @@ all_info_cache=None
 #this is a helper class representing a type.
 #base is int, etc.
 #indirection is the number of *s. int* is 1, etc.
+#quals is a dict of indirection levels to qualifiers.
 class TypeInfo(object):
-	def __init__(self, base, indirection, typedef_from = None):
+	def __init__(self, base, indirection, quals = dict(), typedef_from = None):
 		self.base = base
 		self.indirection = indirection
+		self.quals = quals
 
 #helper class for functions: return_type, args, name. Return_type and args should be TypeInfos.
 class FunctionInfo(object):
@@ -110,19 +110,26 @@ def extract_typedefs(ast):
 
 def compute_type_info(node, typedefs):
 	indirection = 0
+	quals =dict()
 	currently_examining = node.type
 	while isinstance(currently_examining, PtrDecl):
 		indirection += 1
+		quals[indirection] = currently_examining.quals
 		currently_examining = currently_examining.type
+	newquals = dict()
+	for i, j in quals.iteritems():
+		newquals[indirection-i+1] = j
+	quals=newquals
 	if isinstance(currently_examining, TypeDecl):
+		quals[0] = currently_examining.quals
 		currently_examining  = currently_examining.type
 		name = " ".join(currently_examining.names)
 		#first, make a TypeInfo
-		info = TypeInfo(base = name, indirection = indirection)
+		info = TypeInfo(base = name, indirection = indirection, quals=quals)
 		return info
 	elif isinstance(currently_examining, FuncDecl):
 		base = compute_function_info(func = currently_examining, typedefs =typedefs)
-		return TypeInfo(base = base, indirection = indirection)
+		return TypeInfo(base = base, indirection = indirection, quals=quals)
 
 def compute_function_info(func, typedefs, name = ""):
 	return_type = compute_type_info(node = func, typedefs = typedefs) #not func.type-the function expects one node above.
