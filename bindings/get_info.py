@@ -20,6 +20,9 @@ import os.path
 from collections import OrderedDict
 import yaml
 from . import metadata_handler
+import copy
+
+all_info_cache=None
 
 #this is a helper class representing a type.
 #base is int, etc.
@@ -140,6 +143,10 @@ def extract_functions(ast, typedefs):
 	return functions
 
 def get_all_info():
+	global all_info_cache
+	if all_info_cache is not None:
+		return copy.deepcopy(all_info_cache)
+
 	ast=make_ast()
 	constants_by_enum = extract_enums(ast=ast)
 	constants = dict()
@@ -175,4 +182,5 @@ def get_all_info():
 		important_enums.append(i)
 
 	all_info['important_enums'] = important_enums
-	return all_info
+	all_info_cache =all_info
+	return copy.deepcopy(all_info)
