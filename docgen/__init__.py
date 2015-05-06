@@ -5,6 +5,8 @@ repository_root = os.path.split(os.path.split(os.path.abspath(__file__))[0])[0]
 sys.path = [repository_root] + sys.path
 from bindings import get_info, transformers
 import jinja2
+#Make make_function_reference available without further imports.
+from .function_docs import make_function_reference
 
 def make_property_table():
 	env = jinja2.Environment(loader = jinja2.PackageLoader(__package__, ""), undefined = jinja2.StrictUndefined, trim_blocks = True)
@@ -21,3 +23,4 @@ def make_property_table():
 	context['sorted_nodes'] = sorted_nodes
 	context['nodes'] = context['metadata']['nodes']
 	return template.render(context)
+
