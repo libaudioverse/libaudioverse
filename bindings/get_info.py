@@ -1,6 +1,7 @@
 """Extracts nodes of interest from a pycparser parse of bindings.h run through a platform-specific preprocessor and compares it with the metadata in metadata.y.
 
-The information extracted by this module is placed in all_info, a dict with the following keys.
+get_all_info is a function that returns a dict with the following keys:
+
 functions: A set of function instances. Keys are the names.
 typedefs: A set of type instances describing the final form of typedefs.
 constants: An extracted list of all constants.  This is a flat representation computed by reading all enumerations.
