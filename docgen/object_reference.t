@@ -11,13 +11,16 @@ These transformations are done for you in this document, listed as Camelcase Ide
 
 For a discussion of property types, see Property Types.  For a discussion of callbacksk see Callbacks.  This document is focused only on the  nodes themselves.
 
+Any function not described in the <<c-api,C API section>> is a "extra function", a function which breaks the usual property model.
+Extra functions do any number of things and are documented with the node that they manipulate.
+
 {%for node_name in sorted_nodes%}
 {%set doc_header = nodes[node_name]['doc_name']%}
 === {{doc_header}}
 
-{{nodes[node_name].get('doc_description', 'None defined.')}}
+{{nodes[node_name]['doc_description']}}
 
-{%if nodes[node_name].get('properties', [])|length > 0%}
+{%if nodes[node_name]['has_properties']%}
 ==== Properties
 
 
@@ -33,13 +36,13 @@ Range: {{propinfo[1].get('range', '')}}
 
 Default Value: {{propinfo[1].get('default', 'See Description')}}
 
-{{propinfo[1].get('doc_description', 'None Defined')}}
+{{propinfo[1]['doc_description']}}
 
 {%endfor%}
 
 
 {%endif%}
-{%if nodes[node_name].get('events', [])|length > 0%}
+{%if nodes[node_name]['has_events']%}
 ==== Events
 
 {%for callinfo in nodes[node_name]['events'].iteritems()%}
@@ -47,7 +50,7 @@ Default Value: {{propinfo[1].get('default', 'See Description')}}
 ===== {{callinfo[1]['name']}}
 C Enumeration Value: {{callinfo[0]}}
 
-{{callinfo[1].get('doc_description', 'None Defined')}}
+{{callinfo[1]['doc_description']}}
 
 {%endfor%}
 
