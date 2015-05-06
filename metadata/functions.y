@@ -190,3 +190,432 @@ functions:
       simulationHandle: The handle of the simulation to read a block from.
       channels: The number of channels we want. The simulations' output will be upmixed or downmixed as appropriate.
       mayApplyMixingMatrix: If 0, drop any additional channels in the simulation's output and set any  missing channels in the simulation's output to 0. Otherwise, if we can, apply a mixing matrix.
+  Lav_simulationGetSr:
+    category: simulations
+    doc_description: |
+      Query the simulation's sampling rate.
+    params:
+      simulationHandle: The handle of the simulation.
+      destination: Contains the sampling rate, in hertz.
+  Lav_simulationBeginAtomicBlock:
+    category: simulations
+    doc_description: |
+      All operations between a call to this function and a call to Lav_simulationEndAtomicBlock will happen together, with no blocks mixed between them.
+      This is equivalent to holding the internal lock of the simulation yourself, so failure to call lav_simulationEndAtomicBlock in a timely manner will cause audio to stop.
+      Furthermore, other  threads will block if they try to  manipulate the simulation directly or indirectly.
+      In summary, treat this with the same caution and in the same way as a regular lock.
+    params:
+      simulationHandle: The simulation to lock.
+  Lav_simulationEndAtomicBlock:
+    category: simulations
+    doc_description: |
+      Release the internal lock of a simulation, allowing normal operation to resume.
+      This is to be used after a call to Lav_simulationBeginAtomicBlock and on the same thread as that call; calling it in any other circumstance or on any other thread invokes very, very undefined behavior.
+    params:
+      simulationHandle: The simulation to release.
+  Lav_simulationSetBlockCallback:
+    category: simulations
+    doc_description: |
+      Set a callback to be called just before every block and in the audio thread.
+      This callback can and should access the Libaudioverse API:
+      the point of it is that you can use it to perform tasks where missing even one block would be problematic, i.e. very precise scheduling of events.
+      
+      This  callback can even block, though this will slow down audio mixing and may cause glitchy audio.
+      The one thing you should never do in this callback is access anything belonging to another simulation, as this can cause deadlock.
+      
+      The callback receives two parameters: the simulation to which it is associated and the time in simulation time that corresponds to the beginning of the block about to be mixed.
+    params:
+      simulationHandle: The simulation to set the callback for.
+      callback: The callback to use.
+      userdata: An extra parameter that will be passed to the callback.
+  Lav_createBuffer:
+    category: buffers
+    doc_description: |
+      Create an empty buffer.
+    params:
+      simulationHandle: The simulation to which this buffer belongs.
+      destination: After a call to this function, contains the handle of the newly created buffer.
+  Lav_bufferGetSimulation:
+    category: buffers
+    doc_description: |
+      Get the handle of the simulation used to create this buffer.
+    params:
+      bufferHandle: The handle of the buffer.
+      destination: After a call to this function, contains the simulation's handle.
+  Lav_bufferLoadFromFile:
+    category: buffers
+    doc_description:
+      Loads data into this buffer from a file.
+      The file will be resampled to the sampling rate of the simulation.
+      This will happen synchronously.
+    params:
+      bufferHandle: The buffer into which to load data.
+      path: The path to the file to load data from.
+  Lav_bufferLoadFromArray:
+    category: buffers
+    doc_description: |
+      Load data into the specified buffer from the specified array of floating point audio data.
+    params:
+      bufferHandle: The buffer to load data into.
+      sr: The sampling rate of the data in the array.
+      channels: The number of audio channels in the data; frames*channels is the total length of the array in samples.
+      frames: The number of frames of audio data; frames*channels is the length of the array in samples.
+      data: A pointer to the beginning of the array to load from.
+  Lav_nodeGetSimulation:
+    category: nodes
+    doc_description: |
+      Get the simulation that a node belongs to.
+    params:
+      nodehandle: The node to query.
+      destination: After a call to this function, contains the handle to the simulation this node was created with.
+  Lav_nodeConnect:
+    category: nodes
+    doc_description: |
+      Connect the specified output of the specified node to the specified input of the specified node.
+      
+      it is an error if this would cause a cycle in the graph of nodes.
+    params:
+      nodeHandle: The node whose output we are going to connect.
+      output: The index of the output to connect.
+      destHandle: The node to whose input we are connecting.
+      input: The input to which to connect.
+  Lav_nodeConnectSimulation:
+    category: nodes
+    doc_description: |
+      Connect the specified output of the specified node to the simulation's input.
+    params:
+      nodeHandle: The node to connect.
+      output: The index of the output to connect.
+  Lav_nodeConnectProperty:
+    category: nodes
+    doc_description: |
+      Connect a node's output to an automatable property.
+    params:
+      nodeHandle: the node to connect.
+      output: The output to connect.
+      otherhandle: The node to which we are connecting.
+      slot: The index of the property to which to connect.
+  Lav_nodeDisconnect:
+    category: nodes
+    doc_description: |
+      Disconnect the output of the specified node from all inputs to which it is connected.
+    params:
+      nodeHandle: The node to disconnect.
+      output: The output to disconnect.
+  Lav_nodeGetInputConnectionCount:
+    category: nodes
+    doc_description: |
+      Get the number of inputs this node has.
+    params:
+      nodeHandle: The handle of the node.
+      destination: After a call to this function, contains the number of inputs.
+  Lav_nodeGetOutputConnectionCount:
+    category: nodes
+    doc_description: |
+      Get the number of outputs this node has.
+    params:
+      nodeHandle: The node's handle.
+      destination: After a call to this function, contains the number of outputs.
+  Lav_nodeResetProperty:
+    category: nodes
+    doc-description: |
+      Reset a property to its default.
+    params:
+      nodeHandle: The handle of the node.
+      slot: The slot of the property to be reset.
+  Lav_nodeSetIntProperty:
+    category: nodes
+    doc_description: |
+      Set an int property.
+      Note that this function also applies to boolean properties, as these are actually int properties with the range [0, 1].
+    params:
+      nodeHandle: The handle of the node.
+      slot: The slot of the property on the specified node.
+      value: The new value of the property.
+  Lav_nodeSetFloatProperty:
+    category: nodes
+    doc_description: |
+      Set the specified float property.
+    params:
+      nodeHandle: The node to manipulate.
+      slot: The property to manipulate.
+      Value: the new value of the property.
+  lav_nodeSetDoubleProperty:
+    category: nodes
+    doc_description: |
+      Set the specified double property.
+    params:
+          nodeHandle: The node to manipulate.
+      slot: The property to manipulate.
+      Value: the new value of the property.
+  Lav_nodeSetStringProperty:
+    category: nodes
+    doc-description: |
+      Set the specified string property.
+    params:
+      nodeHandle: The node to manipulate.
+      slot: The property to manipulate.
+      Value: the new value of the property.  Note that the specified string is copied and the memory may be freed.
+  Lav_nodeSetFloat3Property:
+    category: nodes
+    doc_description: |
+      Set the specified float3 property.
+    params:
+      nodeHandle: The node to manipulate.
+      slot: The property to manipulate.
+      v1: The first component of the float3.
+      v2: The second component of the float3.
+      v3: The third component of the float3.
+  Lav_nodeSetFloat6Property:
+    category: nodes
+    doc_description: |
+      Set the specified float6 property.
+    params:
+      nodeHandle: The node to manipulate.
+      slot: The property to manipulate.
+      v1: The first component of the float6.
+      v2: The second component of the float6.
+      v3: The third component of the float6.
+      v4: The fourth component of the float6.
+      v5: The fifth component of the float6.
+      v6: The 6th component of the float6.
+  Lav_nodeGetIntProperty:
+    category: nodes
+    doc_description: |
+      Get the value of the specified int property.
+    params:
+      nodeHandle: The node that has the property.
+      slot: The index of the property.
+      destination: After a call to this function, contains the value of the property.
+  aLav_nodeGetFloatProperty:
+    category: nodes
+    doc-description: |
+      Get the specified float property's value.
+    params:
+      nodeHandle: The node that has the property.
+      slot: The index of the property.
+      destination: After a call to this function, contains the value of the property.
+  Lav_nodeGetDoubleProperty:
+    category: nodes
+    doc_description: |
+      Get the specified double property.
+    params:
+      nodeHandle: The node that has the property.
+      slot: The index of the property.
+      destination: After a call to this function, contains the value of the property.
+  Lav_nodeGetStringProperty:
+    category: nodes
+    doc_description: |
+      Get the specified string property.
+    params:
+      nodeHandle: The node that has the property.
+      slot: The index of the property.
+      destination: After a call to this function, contains a pointer to a newly allocated string that is a copy of the value of the property.  Free this string with Lav_free.
+  Lav_nodeGetIntPropertyRange:
+    category: nodes
+    doc_description: |
+      Get the range of an int property.
+      Note that ranges are meaningless for  read-only properties.
+    params:
+      nodeHandle: the node.
+      slot: The index of the property.
+      destinationMin: After a call to this function, holds the range's minimum.
+      destinationMax: After a call to this function, holds the range's maximum.
+  Lav_nodeGetFloatPropertyRange:
+    category: nodes
+    doc_description: |
+      Get the range of a float property.
+      Note that ranges are meaningless for read-only properties.
+    params:
+      nodeHandle: the node.
+      slot: The index of the property.
+      destinationMin: After a call to this function, holds the range's minimum.
+      destinationMax: After a call to this function, holds the range's maximum.
+  Lav_nodeGetDoublePropertyRange:
+    category: nodes
+    doc_description: |
+      Query the range of a double property.
+      Note that ranges are meaningless for read-only properties.
+    params:
+      nodeHandle: the node.
+      slot: The index of the property.
+      destinationMin: After a call to this function, holds the range's minimum.
+      destinationMax: After a call to this function, holds the range's maximum.
+  Lav_nodeGetpropertyName:
+    category: nodes
+    doc_description: |
+      Get the name of a property.
+    params:
+      nodeHandle: The node which ahs the property of interest.
+      slot: The index of the property of interest.
+      destination: After a call to this function, contains a newly allocated string that should be freed with Lav_free.  The string is the name of this property.
+  Lav_nodeGetPropertyType:
+    category: nodes
+    doc_description: |
+      Get the type of a property.
+    params:
+      nodeHandle: The node with the property of interest.
+      slot: The index of the property of interest.
+      destination: After a call to this function, contains the type of this property.
+  Lav_nodeGetPropertyHasDynamicRange:
+    category: nodes
+    doc_description: |
+      Find out whether or not a property has a dynamic range.
+      Properties with dynamic ranges change their ranges at specified times, as documented by the documentation for the property of interrest.
+    params:
+      nodeHandle: The handle of the node with the property of interest.
+      slot: The index of the property of interest.
+      destination: After a call to this function, contains 1 if the property has a dynamic range, otherwise 0.
+  Lav_nodeReplaceFloatArrayProperty:
+    category: nodes
+    doc_description: |
+      Replace the array contained by a float array property with a new array.
+      Note that, as usual, memory is copied, not shared.
+    params:
+      nodeHandle: The node  with the property of interest.
+      slot: The index of the property of interest.
+      length: The length of the new array.
+      values: The array itself.
+  Lav_nodeReadFloatArrayProperty:
+    category: nodes
+    doc_description: |
+      Read the float array property at a specified index.
+    params:
+      nodeHandle: The node with the property of interest.
+      slot: The index of the property of interest.
+      index: The index at which to read.
+      destination: After a call to this function, contains the value of the float array property at the specified index.
+  Lav_nodeWriteFloatArrayProperty:
+    category: nodes
+    doc_description: |
+      Write a range of values into the specified float array property, without changing its length.
+    params:
+      nodeHandle: The node with the property of interest.
+      slot: The index of the property of interest.
+      start: The starting index of the range to replace. Must be less than the length of the property.
+      stop: One past the end of the region to be replaced. Must be no more than the length of the property.
+      values: the data with which to replace the range. Must have length stop-start.
+  Lav_nodeGetFloatArrayPropertyLength:
+    category: nodes
+    doc_description: |
+      Get the length of the specified float array property.
+    params:
+      nodeHandle: The node with the property of interest.
+      slot: The index of the property of interest.
+      destination: After a call to this function, contains the current length of the property.
+  Lav_nodeReplaceIntArrayProperty:
+    category: nodes
+    doc_description: |
+      Replace the array contained by a int array property with a new array.
+      Note that, as usual, memory is copied, not shared.
+    params:
+      nodeHandle: The node  with the property of interest.
+      slot: The index of the property of interest.
+      length: The length of the new array.
+      values: The array itself.
+  Lav_nodeReadIntArrayProperty:
+    category: nodes
+    doc_description: |
+      Read the int array property at a specified index.
+    params:
+      nodeHandle: The node with the property of interest.
+      slot: The index of the property of interest.
+      index: The index at which to read.
+      destination: After a call to this function, contains the value of the int array property at the specified index.
+  Lav_nodeWriteIntArrayProperty:
+    category: nodes
+    doc_description: |
+      Write a range of values into the specified  int array property, without changing its length.
+    params:
+      nodeHandle: The node with the property of interest.
+      slot: The index of the property of interest.
+      start: The starting index of the range to replace. Must be less than the length of the property.
+      stop: One past the end of the region to be replaced. Must be no more than the length of the property.
+      values: the data with which to replace the range. Must have length stop-start.
+  Lav_nodeGetIntArrayPropertyLength:
+    category: nodes
+    doc_description: |
+      Get the length of the specified int array property.
+    params:
+      nodeHandle: The node with the property of interest.
+      slot: The index of the property of interest.
+      destination: After a call to this function, contains the current length of the property.
+  Lav_nodeGetArrayPropertyLengthRange:
+    category: nodes
+    doc_description: |
+      Get the allowed range for the length of an array in an array property.
+      This works on both int and float properties.
+    params:
+      nodeHandle: The node with the property of interest.
+      slot: The index of the property of interest.
+      destinationMin: After a call to this function, contains the minimum allowed length.
+      destinationMax: After a call to this function, contains the maximum allowed length.
+  Lav_nodeSetBufferProperty:
+    category: nodes
+    doc_description: |
+      Set a buffer property.
+    params:
+      nodeHandle: The handle of the node with the property of interest.
+      slot: The index of the property of interest.
+      bufferHandle: The buffer to set the property to.  0 means none.
+  Lav_nodeGetBufferProperty:
+    category: nodes
+    doc_description: |
+      Gets the value of a specified buffer property.
+    params:
+      nodeHandle: The handle of the node with the property of interest.
+      slot: The index of the property of interest.
+      destination: After a call to this function, contains the handle of the buffer. Note that 0 means none.
+  Lav_automationCancelAutomators:
+    category: nodes
+    doc_description: |
+      Cancel all automators that are scheduled to begin running after the specified time.
+    params:
+      nodeHandle: The handle of the node with the property on which to cancel automators.
+      slot: The index of the property to cancel automators on.
+      time: The time after which to cancel automation.  This is relative to the node.
+  Lav_automationLinearRampToValue:
+    category: nodes
+    doc_description: |
+      Sets up a linear ramp.
+      
+      The value of a linear ramp begins at the end of the last automation and linearly increases to the start time of this automator, after which the property holds steady unless more automators are scheduled.
+    params:
+      nodeHandle: The node with the property to automate.
+      slot: The index of the property to automate.
+      time: The time at which we must be at the specified value.
+      value: The value we must arrive at by the specified time.
+  Lav_nodeGetEventhandler:
+    category: nodes
+    doc_description: |
+      Gets an event handler for a specified event.
+    params:
+      nodeHandle: The handle of the node with the event to query.
+      event: The index of the event.
+      destination: After a call to this function, contains the address of the associated handler if any, otherwise NULL.
+  Lav_nodeGetEventUserDataPointer:
+    category: nodes
+    doc_description: |
+      Get the userdata of the specified event, if any.
+      When event handlers are registered, the userdata is an extra parameter which is passed to them when the event fires.
+    params:
+      nodeHandle: The node with the event of interest.
+      event: The index of the event of interest.
+      destination: After a call to this function, contains the value of the userdata pointer if any, otherwise NULL.
+  Lav_nodeSetEvent:
+    category: nodes
+    doc_description: |
+      Set an event handler.
+    params:
+      nodeHandle: The node on which to set the handler.
+      event: The event's index.
+      handler: The function to use as the event handler.
+      userData: An extra parameter which is passed to the handler.
+  Lav_nodeReset:
+    category: nodes
+    doc_description: |
+      Reset a node.
+      What this means depends on the node in question, so see its documentation.
+    params:
+      nodeHandler: The node to reset.
+  
