@@ -1,2 +1,0 @@
-[[c-api]]
-== The Libaudioverse C API
