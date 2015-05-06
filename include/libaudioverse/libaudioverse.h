@@ -138,7 +138,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_shutdown();
 Lav_PUBLIC_FUNCTION LavError Lav_isInitialized(int* destination);
 
 /**Free any pointer that libaudioverse gives you.  If something goes wrong, namely that the pointer isn't from Libaudioverse in the first place, this tries to fail gracefully and give you an error, but don't rely on this.*/
-Lav_PUBLIC_FUNCTION LavError Lav_free(void* obj);
+Lav_PUBLIC_FUNCTION LavError Lav_free(void* ptr);
 
 /**Handle refcounts.*/
 Lav_PUBLIC_FUNCTION LavError Lav_handleIncRef(LavHandle handle);
@@ -148,7 +148,6 @@ This is to avoid an issue with bindings that need to know if they should increme
 Lav_PUBLIC_FUNCTION LavError Lav_handleGetAndClearFirstAccess(LavHandle handle, int* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_handleGetRefCount(LavHandle handle, int* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_handleGetType(LavHandle handle, int* destination);
-
 
 
 /**Configure and query logging.
@@ -216,12 +215,12 @@ For audio output devices, this callback is called in the mixing thread.  If it b
 It is safe to call Libaudioverse from this callback.
 To clear, use null as the callback.*/
 typedef void (*LavBlockCallback)(LavHandle handle, double time, void* userdata);
-Lav_PUBLIC_FUNCTION LavError Lav_simulationSetBlockCallback(LavHandle simulation, LavBlockCallback callback, void* userdata);
+Lav_PUBLIC_FUNCTION LavError Lav_simulationSetBlockCallback(LavHandle simulationHandle, LavBlockCallback callback, void* userdata);
 
 /**Buffers.
 Buffers are chunks of audio data from any source.  A variety of nodes to work with buffers exist.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createBuffer(LavHandle simulationHandle, LavHandle* destination);
-Lav_PUBLIC_FUNCTION LavError Lav_bufferGetSimulation(LavHandle handle, LavHandle* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_bufferGetSimulation(LavHandle bufferHandle, LavHandle* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_bufferLoadFromFile(LavHandle bufferHandle, const char* path);
 Lav_PUBLIC_FUNCTION LavError Lav_bufferLoadFromArray(LavHandle bufferHandle, int sr, int channels, int frames, float* data);
 

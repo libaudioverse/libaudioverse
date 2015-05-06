@@ -36,7 +36,7 @@ for nodekey, nodeinfo in [(i, metadata['nodes'].get(i, dict())) for i in all_inf
 		for propkey, propinfo in metadata['nodes']['Lav_OBJTYPE_GENERIC_NODE']['properties'].iteritems():
 			joined_properties.append((nodekey, propkey, propinfo))
 
-#this is the same logic, but for callbacks.
+#this is the same logic, but for events.
 joined_events = []
 for nodekey, nodeinfo in [(i, metadata['nodes'].get(i, dict())) for i in all_info['constants'].iterkeys() if re.match("Lav_OBJTYPE_(\w+_*)+_NODE", i)]:
 	#add everything from the object itself.
