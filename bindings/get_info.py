@@ -1,6 +1,7 @@
 """Extracts nodes of interest from a pycparser parse of bindings.h run through a platform-specific preprocessor and compares it with the metadata in metadata.y.
 
-The information extracted by this module is placed in all_info, a dict with the following keys.
+get_all_info is a function that returns a dict with the following keys:
+
 functions: A set of function instances. Keys are the names.
 typedefs: A set of type instances describing the final form of typedefs.
 constants: An extracted list of all constants.  This is a flat representation computed by reading all enumerations.
@@ -8,8 +9,6 @@ constants_by_enum:Same as constants, but grouped by the enumeration and placed i
 important_enums: The enums which metadata marks as important in some way.
 metadata: The parsed yaml document itself as a dict.
 """
-
-
 
 from pycparser import *
 #we need to be able to compare with isinstance, unfortunately. Grab all of these too.
@@ -20,14 +19,19 @@ import os.path
 from collections import OrderedDict
 import yaml
 from . import metadata_handler
+import copy
+
+all_info_cache=None
 
 #this is a helper class representing a type.
 #base is int, etc.
 #indirection is the number of *s. int* is 1, etc.
+#quals is a dict of indirection levels to qualifiers.
 class TypeInfo(object):
-	def __init__(self, base, indirection, typedef_from = None):
+	def __init__(self, base, indirection, quals = dict(), typedef_from = None):
 		self.base = base
 		self.indirection = indirection
+		self.quals = quals
 
 #helper class for functions: return_type, args, name. Return_type and args should be TypeInfos.
 class FunctionInfo(object):
@@ -106,19 +110,26 @@ def extract_typedefs(ast):
 
 def compute_type_info(node, typedefs):
 	indirection = 0
+	quals =dict()
 	currently_examining = node.type
 	while isinstance(currently_examining, PtrDecl):
 		indirection += 1
+		quals[indirection] = currently_examining.quals
 		currently_examining = currently_examining.type
+	newquals = dict()
+	for i, j in quals.iteritems():
+		newquals[indirection-i+1] = j
+	quals=newquals
 	if isinstance(currently_examining, TypeDecl):
+		quals[0] = currently_examining.quals
 		currently_examining  = currently_examining.type
 		name = " ".join(currently_examining.names)
 		#first, make a TypeInfo
-		info = TypeInfo(base = name, indirection = indirection)
+		info = TypeInfo(base = name, indirection = indirection, quals=quals)
 		return info
 	elif isinstance(currently_examining, FuncDecl):
 		base = compute_function_info(func = currently_examining, typedefs =typedefs)
-		return TypeInfo(base = base, indirection = indirection)
+		return TypeInfo(base = base, indirection = indirection, quals=quals)
 
 def compute_function_info(func, typedefs, name = ""):
 	return_type = compute_type_info(node = func, typedefs = typedefs) #not func.type-the function expects one node above.
@@ -140,6 +151,10 @@ def extract_functions(ast, typedefs):
 	return functions
 
 def get_all_info():
+	global all_info_cache
+	if all_info_cache is not None:
+		return copy.deepcopy(all_info_cache)
+
 	ast=make_ast()
 	constants_by_enum = extract_enums(ast=ast)
 	constants = dict()
@@ -175,4 +190,5 @@ def get_all_info():
 		important_enums.append(i)
 
 	all_info['important_enums'] = important_enums
-	return all_info
+	all_info_cache =all_info
+	return copy.deepcopy(all_info)

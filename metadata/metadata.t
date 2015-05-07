@@ -72,9 +72,9 @@ void initializeMetadata() {
 	{%elif prop['type'] == 'buffer'%}
 	tempProp=createBufferProperty("<%prop['name']%>");
 	{%endif%}
-	tempProp->setReadOnly(<%"true" if prop.get('read_only', False) else "false"%>);
-	tempProp->setHasDynamicRange(<%"true" if prop.get('is_dynamic', False) else "false"%>);
-	{#Use the copy constructor to put this into the default instances##}
+	tempProp->setReadOnly(<%prop['read_only']|lower%>);
+	tempProp->setHasDynamicRange(<%prop['is_dynamic']|lower%>);
+	{#Use the copy constructor to put this into the default instances#}
 	(*default_property_instances)[std::tuple<int, int>(<%objid%>, <%propid%>)] = *tempProp;
 	delete tempProp;
 	(*properties_by_node_type)[<%objid%>].insert(<%propid%>);
@@ -84,7 +84,7 @@ void initializeMetadata() {
 	{%for objid, evtid, evtinfo in joined_events%}
 	tempevt = new Event();
 	tempevt->setName("<%evtinfo["name"]%>");
-	tempevt->setNoMultifire(<%evtinfo.get('multifiring_protection', False)|lower%>);
+	tempevt->setNoMultifire(<%evtinfo['multifiring_protection']|lower%>);
 	(*default_event_instances)[std::tuple<int, int>(<%objid%>, <%evtid%>)] = *tempevt;
 	delete tempevt;
 	(*events_by_node_type)[<%objid%>].insert(<%evtid%>);

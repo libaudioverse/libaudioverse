@@ -138,7 +138,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_shutdown();
 Lav_PUBLIC_FUNCTION LavError Lav_isInitialized(int* destination);
 
 /**Free any pointer that libaudioverse gives you.  If something goes wrong, namely that the pointer isn't from Libaudioverse in the first place, this tries to fail gracefully and give you an error, but don't rely on this.*/
-Lav_PUBLIC_FUNCTION LavError Lav_free(void* obj);
+Lav_PUBLIC_FUNCTION LavError Lav_free(void* ptr);
 
 /**Handle refcounts.*/
 Lav_PUBLIC_FUNCTION LavError Lav_handleIncRef(LavHandle handle);
@@ -148,7 +148,6 @@ This is to avoid an issue with bindings that need to know if they should increme
 Lav_PUBLIC_FUNCTION LavError Lav_handleGetAndClearFirstAccess(LavHandle handle, int* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_handleGetRefCount(LavHandle handle, int* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_handleGetType(LavHandle handle, int* destination);
-
 
 
 /**Configure and query logging.
@@ -216,16 +215,16 @@ For audio output devices, this callback is called in the mixing thread.  If it b
 It is safe to call Libaudioverse from this callback.
 To clear, use null as the callback.*/
 typedef void (*LavBlockCallback)(LavHandle handle, double time, void* userdata);
-Lav_PUBLIC_FUNCTION LavError Lav_simulationSetBlockCallback(LavHandle simulation, LavBlockCallback callback, void* userdata);
+Lav_PUBLIC_FUNCTION LavError Lav_simulationSetBlockCallback(LavHandle simulationHandle, LavBlockCallback callback, void* userdata);
 
 /**Buffers.
 Buffers are chunks of audio data from any source.  A variety of nodes to work with buffers exist.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createBuffer(LavHandle simulationHandle, LavHandle* destination);
-Lav_PUBLIC_FUNCTION LavError Lav_bufferGetSimulation(LavHandle handle, LavHandle* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_bufferGetSimulation(LavHandle bufferHandle, LavHandle* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_bufferLoadFromFile(LavHandle bufferHandle, const char* path);
 Lav_PUBLIC_FUNCTION LavError Lav_bufferLoadFromArray(LavHandle bufferHandle, int sr, int channels, int frames, float* data);
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetSimulation(LavHandle handle, LavHandle* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetSimulation(LavHandle nodeHandle, LavHandle* destination);
 /**Connect two nodes.*/
 Lav_PUBLIC_FUNCTION LavError Lav_nodeConnect(LavHandle nodeHandle, int output, LavHandle destHandle, int input);
 /**Connect the specified output to the simulation.*/
@@ -234,8 +233,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeConnectSimulation(LavHandle nodeHandle, int
 Lav_PUBLIC_FUNCTION LavError Lav_nodeConnectProperty(LavHandle nodeHandle, int output, LavHandle otherHandle, int slot);
 /**Kill all connections involving the output specified.*/
 Lav_PUBLIC_FUNCTION LavError Lav_nodeDisconnect(LavHandle nodeHandle, int output);
-
-/**Query node type.*/
 
 /**Query maximum number of inputs and outputs.*/
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetInputConnectionCount(LavHandle nodeHandle, unsigned int* destination);
@@ -260,9 +257,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeGetFloat3Property(LavHandle nodeHandle, int
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetFloat6Property(LavHandle nodeHandle, int slot, float* destinationV1, float* destinationV2, float* destinationV3, float* destinationV4, float* destinationV5, float* destinationV6);
 
 /**Query property ranges. These are set only by internal code.  Float3 and Float6 are effectively rangeless: specifically what a range is for those is very undefined and specific to the node in question.*/
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetIntPropertyRange(LavHandle nodeHandle, int slot, int* destination_lower, int* destination_upper);
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetFloatPropertyRange(LavHandle nodeHandle, int slot, float* destination_lower, float* destination_upper);
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetDoublePropertyRange(LavHandle nodeHandle, int slot, double* destination_lower, double* destination_upper);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetIntPropertyRange(LavHandle nodeHandle, int slot, int* destinationMin, int* destinationMax);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetFloatPropertyRange(LavHandle nodeHandle, int slot, float* destinationMin, float* destinationMax);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetDoublePropertyRange(LavHandle nodeHandle, int slot, double* destinationMin, double* destinationMax);
 
 
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetPropertyName(LavHandle nodeHandle, int slot, char** destination);
@@ -280,13 +277,12 @@ In order to make reading sane, you can only read one value at a time. Since Liba
 Lav_PUBLIC_FUNCTION LavError Lav_nodeReplaceFloatArrayProperty(LavHandle nodeHandle, int slot, unsigned int length, float* values);
 Lav_PUBLIC_FUNCTION LavError Lav_nodeReadFloatArrayProperty(LavHandle nodeHandle, int slot, unsigned int index, float* destination);
 Lav_PUBLIC_FUNCTION LavError  Lav_nodeWriteFloatArrayProperty(LavHandle nodeHandle, int slot, unsigned int start, unsigned int stop, float* values);
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetFloatArrayPropertyDefault(LavHandle nodeHandle, int slot, unsigned int* destinationLength, float** destinationArray);
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetFloatArrayPropertyLength(LavHandle nodeHandle, int slot, unsigned int* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_nodeReplaceIntArrayProperty(LavHandle nodeHandle, int slot, unsigned int length, int* values);
 Lav_PUBLIC_FUNCTION LavError Lav_nodeReadIntArrayProperty(LavHandle nodeHandle, int slot, unsigned int index, int* destination);
 Lav_PUBLIC_FUNCTION LavError  Lav_nodeWriteIntArrayProperty(LavHandle nodeHandle, int slot, unsigned int start, unsigned int stop, int* values);
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetIntArrayPropertyDefault(LavHandle nodeHandle, int slot, unsigned int* destinationLength, int** destinationArray);
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetIntArrayPropertyLength(LavHandle nodeHandle, int slot, int* destination);
+
 //applies to eather array type.
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetArrayPropertyLengthRange(LavHandle nodeHandle, int slot, unsigned int* destinationMin, unsigned int* destinationMax);
 
@@ -299,7 +295,7 @@ These apply only to float and double properties. Times are relative to "now" in 
 If setting up complex timelines, do it inside an atomic block.
 */
 //Clears all automation after time t.
-Lav_PUBLIC_FUNCTION LavError Lav_automationCancelAutomators(LavHandle node, int slot, double time);
+Lav_PUBLIC_FUNCTION LavError Lav_automationCancelAutomators(LavHandle nodeHandle, int slot, double time);
 //Linear ramp to value starting after the last event and ending at time t.
 Lav_PUBLIC_FUNCTION LavError Lav_automationLinearRampToValue(LavHandle nodeHandle, int slot, double time, double value);
 
@@ -307,9 +303,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_automationLinearRampToValue(LavHandle nodeHandl
 Unlike callbacks, which are dedicated on a per-node basis, events fire in a background thread. It is safe to call the Libaudioverse API from a firing event.
 It is documented which of these will fire more than once.  Most events will wait for you to return from the handler before firing a duplicate event.  It is wise to be as quick as possible.*/
 EXTERN_FUNCTION typedef void (*LavEventCallback)(LavHandle cause, void* userdata);
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetEventHandler(LavHandle node, int event, LavEventCallback *destination);
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetEventUserDataPointer(LavHandle node, int event, void** destination);
-Lav_PUBLIC_FUNCTION LavError Lav_nodeSetEvent(LavHandle node, int event, LavEventCallback handler, void* userData);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetEventHandler(LavHandle nodeHandle, int event, LavEventCallback *destination);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetEventUserDataPointer(LavHandle nodeHandle, int event, void** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeSetEvent(LavHandle nodeHandle, int event, LavEventCallback handler, void* userData);
 
 /**Performs the node-specific reset operation.
 
@@ -335,6 +331,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createMultipannerNode(LavHandle simulationHandl
 
 Lav_PUBLIC_FUNCTION LavError Lav_createPushNode(LavHandle simulationHandle, unsigned int sr, unsigned int channels, LavHandle* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_pushNodeFeed(LavHandle nodeHandle, unsigned int length, float* buffer);
+
 Lav_PUBLIC_FUNCTION LavError Lav_createBiquadNode(LavHandle simulationHandle, unsigned int channels, LavHandle* destination);
 
 //pull node:

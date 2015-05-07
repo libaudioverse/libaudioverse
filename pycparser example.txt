@@ -1,0 +1,2017 @@
+FileAST: 
+  Typedef <ext[0]>: name=LavError, quals=[], storage=['typedef']
+    TypeDecl <type>: declname=LavError, quals=[]
+      IdentifierType <type>: names=['int']
+  Typedef <ext[1]>: name=LavHandle, quals=[], storage=['typedef']
+    TypeDecl <type>: declname=LavHandle, quals=[]
+      IdentifierType <type>: names=['int']
+  Decl <ext[2]>: name=None, quals=[], storage=[], funcspec=[]
+    Enum <type>: name=Lav_ERRORS
+      EnumeratorList <values>: 
+        Enumerator <enumerators[0]>: name=Lav_ERROR_NONE
+        Enumerator <enumerators[1]>: name=Lav_ERROR_UNKNOWN
+        Enumerator <enumerators[2]>: name=Lav_ERROR_TYPE_MISMATCH
+        Enumerator <enumerators[3]>: name=Lav_ERROR_INVALID_SLOT
+        Enumerator <enumerators[4]>: name=Lav_ERROR_NULL_POINTER
+        Enumerator <enumerators[5]>: name=Lav_ERROR_MEMORY
+        Enumerator <enumerators[6]>: name=Lav_ERROR_INVALID_HANDLE
+        Enumerator <enumerators[7]>: name=Lav_ERROR_RANGE
+        Enumerator <enumerators[8]>: name=Lav_ERROR_CANNOT_INIT_AUDIO
+        Enumerator <enumerators[9]>: name=Lav_ERROR_FILE
+        Enumerator <enumerators[10]>: name=Lav_ERROR_FILE_NOT_FOUND
+        Enumerator <enumerators[11]>: name=Lav_ERROR_HRTF_INVALID
+        Enumerator <enumerators[12]>: name=Lav_ERROR_SHAPE
+        Enumerator <enumerators[13]>: name=Lav_ERROR_CANNOT_CROSS_DEVICES
+        Enumerator <enumerators[14]>: name=Lav_ERROR_NO_OUTPUTS
+        Enumerator <enumerators[15]>: name=Lav_ERROR_LIMIT_EXCEEDED
+        Enumerator <enumerators[16]>: name=Lav_ERROR_CAUSES_CYCLE
+        Enumerator <enumerators[17]>: name=Lav_ERROR_PROPERTY_IS_READ_ONLY
+        Enumerator <enumerators[18]>: name=Lav_ERROR_OVERLAPPING_AUTOMATORS
+        Enumerator <enumerators[19]>: name=Lav_ERROR_CANNOT_CONNECT_TO_PROPERTY
+        Enumerator <enumerators[20]>: name=Lav_ERROR_INTERNAL
+          Constant <value>: type=int, value=999
+  Decl <ext[3]>: name=None, quals=[], storage=[], funcspec=[]
+    Enum <type>: name=Lav_PROPERTY_TYPES
+      EnumeratorList <values>: 
+        Enumerator <enumerators[0]>: name=Lav_PROPERTYTYPE_INT
+        Enumerator <enumerators[1]>: name=Lav_PROPERTYTYPE_FLOAT
+        Enumerator <enumerators[2]>: name=Lav_PROPERTYTYPE_DOUBLE
+        Enumerator <enumerators[3]>: name=Lav_PROPERTYTYPE_STRING
+        Enumerator <enumerators[4]>: name=Lav_PROPERTYTYPE_FLOAT3
+        Enumerator <enumerators[5]>: name=Lav_PROPERTYTYPE_FLOAT6
+        Enumerator <enumerators[6]>: name=Lav_PROPERTYTYPE_FLOAT_ARRAY
+        Enumerator <enumerators[7]>: name=Lav_PROPERTYTYPE_INT_ARRAY
+        Enumerator <enumerators[8]>: name=Lav_PROPERTYTYPE_BUFFER
+  Decl <ext[4]>: name=None, quals=[], storage=[], funcspec=[]
+    Enum <type>: name=Lav_OBJECT_TYPES
+      EnumeratorList <values>: 
+        Enumerator <enumerators[0]>: name=Lav_OBJTYPE_SIMULATION
+        Enumerator <enumerators[1]>: name=Lav_OBJTYPE_BUFFER
+        Enumerator <enumerators[2]>: name=Lav_OBJTYPE_GENERIC_NODE
+        Enumerator <enumerators[3]>: name=Lav_OBJTYPE_SIMPLE_ENVIRONMENT_NODE
+        Enumerator <enumerators[4]>: name=Lav_OBJTYPE_SOURCE_NODE
+        Enumerator <enumerators[5]>: name=Lav_OBJTYPE_HRTF_NODE
+        Enumerator <enumerators[6]>: name=Lav_OBJTYPE_SINE_NODE
+        Enumerator <enumerators[7]>: name=Lav_OBJTYPE_HARD_LIMITER_NODE
+        Enumerator <enumerators[8]>: name=Lav_OBJTYPE_DELAY_NODE
+        Enumerator <enumerators[9]>: name=Lav_OBJTYPE_AMPLITUDE_PANNER_NODE
+        Enumerator <enumerators[10]>: name=Lav_OBJTYPE_PUSH_NODE
+        Enumerator <enumerators[11]>: name=Lav_OBJTYPE_BIQUAD_NODE
+        Enumerator <enumerators[12]>: name=Lav_OBJTYPE_PULL_NODE
+        Enumerator <enumerators[13]>: name=Lav_OBJTYPE_GRAPH_LISTENER_NODE
+        Enumerator <enumerators[14]>: name=Lav_OBJTYPE_CUSTOM_NODE
+        Enumerator <enumerators[15]>: name=Lav_OBJTYPE_RINGMOD_NODE
+        Enumerator <enumerators[16]>: name=Lav_OBJTYPE_MULTIPANNER_NODE
+        Enumerator <enumerators[17]>: name=Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK_NODE
+        Enumerator <enumerators[18]>: name=Lav_OBJTYPE_SQUARE_NODE
+        Enumerator <enumerators[19]>: name=Lav_OBJTYPE_NOISE_NODE
+        Enumerator <enumerators[20]>: name=Lav_OBJTYPE_IIR_NODE
+        Enumerator <enumerators[21]>: name=Lav_OBJTYPE_GAIN_NODE
+        Enumerator <enumerators[22]>: name=Lav_OBJTYPE_CHANNEL_SPLITTER_NODE
+        Enumerator <enumerators[23]>: name=Lav_OBJTYPE_CHANNEL_MERGER_NODE
+        Enumerator <enumerators[24]>: name=Lav_OBJTYPE_BUFFER_NODE
+  Decl <ext[5]>: name=None, quals=[], storage=[], funcspec=[]
+    Enum <type>: name=Lav_NODE_STATES
+      EnumeratorList <values>: 
+        Enumerator <enumerators[0]>: name=Lav_NODESTATE_PAUSED
+        Enumerator <enumerators[1]>: name=Lav_NODESTATE_PLAYING
+        Enumerator <enumerators[2]>: name=Lav_NODESTATE_ALWAYS_PLAYING
+  Decl <ext[6]>: name=None, quals=[], storage=[], funcspec=[]
+    Enum <type>: name=Lav_LOGGING_LEVELS
+      EnumeratorList <values>: 
+        Enumerator <enumerators[0]>: name=Lav_LOG_LEVEL_OFF
+          Constant <value>: type=int, value=0
+        Enumerator <enumerators[1]>: name=Lav_LOG_LEVEL_CRITICAL
+          Constant <value>: type=int, value=1
+        Enumerator <enumerators[2]>: name=Lav_LOG_LEVEL_INFO
+          Constant <value>: type=int, value=2
+        Enumerator <enumerators[3]>: name=Lav_LOG_LEVEL_DEBUG
+          Constant <value>: type=int, value=3
+  Decl <ext[7]>: name=Lav_initialize, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      TypeDecl <type>: declname=Lav_initialize, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[8]>: name=Lav_shutdown, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      TypeDecl <type>: declname=Lav_shutdown, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[9]>: name=Lav_isInitialized, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['int']
+      TypeDecl <type>: declname=Lav_isInitialized, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[10]>: name=Lav_free, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=ptr, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=ptr, quals=[]
+              IdentifierType <type>: names=['void']
+      TypeDecl <type>: declname=Lav_free, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[11]>: name=Lav_handleIncRef, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=handle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=handle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+      TypeDecl <type>: declname=Lav_handleIncRef, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[12]>: name=Lav_handleDecRef, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=handle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=handle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+      TypeDecl <type>: declname=Lav_handleDecRef, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[13]>: name=Lav_handleGetAndClearFirstAccess, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=handle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=handle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['int']
+      TypeDecl <type>: declname=Lav_handleGetAndClearFirstAccess, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[14]>: name=Lav_handleGetRefCount, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=handle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=handle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['int']
+      TypeDecl <type>: declname=Lav_handleGetRefCount, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[15]>: name=Lav_handleGetType, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=handle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=handle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['int']
+      TypeDecl <type>: declname=Lav_handleGetType, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Typedef <ext[16]>: name=LavLoggingCallback, quals=[], storage=['typedef']
+    PtrDecl <type>: quals=[]
+      FuncDecl <type>: 
+        ParamList <args>: 
+          Decl <params[0]>: name=level, quals=[], storage=[], funcspec=[]
+            TypeDecl <type>: declname=level, quals=[]
+              IdentifierType <type>: names=['int']
+          Decl <params[1]>: name=message, quals=['const'], storage=[], funcspec=[]
+            PtrDecl <type>: quals=[]
+              TypeDecl <type>: declname=message, quals=['const']
+                IdentifierType <type>: names=['char']
+          Decl <params[2]>: name=is_final, quals=[], storage=[], funcspec=[]
+            TypeDecl <type>: declname=is_final, quals=[]
+              IdentifierType <type>: names=['int']
+        TypeDecl <type>: declname=LavLoggingCallback, quals=[]
+          IdentifierType <type>: names=['void']
+  Decl <ext[17]>: name=Lav_setLoggingCallback, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=cb, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=cb, quals=[]
+            IdentifierType <type>: names=['LavLoggingCallback']
+      TypeDecl <type>: declname=Lav_setLoggingCallback, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[18]>: name=Lav_getLoggingCallback, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['LavLoggingCallback']
+      TypeDecl <type>: declname=Lav_getLoggingCallback, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[19]>: name=Lav_setLoggingLevel, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=level, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=level, quals=[]
+            IdentifierType <type>: names=['int']
+      TypeDecl <type>: declname=Lav_setLoggingLevel, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[20]>: name=Lav_getLoggingLevel, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['int']
+      TypeDecl <type>: declname=Lav_getLoggingLevel, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Typedef <ext[21]>: name=LavHandleDestroyedCallback, quals=[], storage=['typedef']
+    PtrDecl <type>: quals=[]
+      FuncDecl <type>: 
+        ParamList <args>: 
+          Decl <params[0]>: name=which, quals=[], storage=[], funcspec=[]
+            TypeDecl <type>: declname=which, quals=[]
+              IdentifierType <type>: names=['LavHandle']
+        TypeDecl <type>: declname=LavHandleDestroyedCallback, quals=[]
+          IdentifierType <type>: names=['void']
+  Decl <ext[22]>: name=Lav_setHandleDestroyedCallback, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=cb, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=cb, quals=[]
+            IdentifierType <type>: names=['LavHandleDestroyedCallback']
+      TypeDecl <type>: declname=Lav_setHandleDestroyedCallback, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[23]>: name=Lav_deviceGetCount, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['unsigned', 'int']
+      TypeDecl <type>: declname=Lav_deviceGetCount, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[24]>: name=Lav_deviceGetLatency, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=index, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=index, quals=[]
+            IdentifierType <type>: names=['unsigned', 'int']
+        Decl <params[1]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['float']
+      TypeDecl <type>: declname=Lav_deviceGetLatency, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[25]>: name=Lav_deviceGetName, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=index, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=index, quals=[]
+            IdentifierType <type>: names=['unsigned', 'int']
+        Decl <params[1]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            PtrDecl <type>: quals=[]
+              TypeDecl <type>: declname=destination, quals=[]
+                IdentifierType <type>: names=['char']
+      TypeDecl <type>: declname=Lav_deviceGetName, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[26]>: name=Lav_deviceGetChannels, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=index, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=index, quals=[]
+            IdentifierType <type>: names=['unsigned', 'int']
+        Decl <params[1]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['unsigned', 'int']
+      TypeDecl <type>: declname=Lav_deviceGetChannels, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[27]>: name=Lav_createSimulationForDevice, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=index, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=index, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[1]>: name=channels, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=channels, quals=[]
+            IdentifierType <type>: names=['unsigned', 'int']
+        Decl <params[2]>: name=sr, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=sr, quals=[]
+            IdentifierType <type>: names=['unsigned', 'int']
+        Decl <params[3]>: name=blockSize, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=blockSize, quals=[]
+            IdentifierType <type>: names=['unsigned', 'int']
+        Decl <params[4]>: name=mixAhead, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=mixAhead, quals=[]
+            IdentifierType <type>: names=['unsigned', 'int']
+        Decl <params[5]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['LavHandle']
+      TypeDecl <type>: declname=Lav_createSimulationForDevice, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[28]>: name=Lav_createReadSimulation, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=sr, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=sr, quals=[]
+            IdentifierType <type>: names=['unsigned', 'int']
+        Decl <params[1]>: name=blockSize, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=blockSize, quals=[]
+            IdentifierType <type>: names=['unsigned', 'int']
+        Decl <params[2]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['LavHandle']
+      TypeDecl <type>: declname=Lav_createReadSimulation, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[29]>: name=Lav_simulationGetBlockSize, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=simulationHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=simulationHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['int']
+      TypeDecl <type>: declname=Lav_simulationGetBlockSize, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[30]>: name=Lav_simulationGetBlock, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=simulationHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=simulationHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=channels, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=channels, quals=[]
+            IdentifierType <type>: names=['unsigned', 'int']
+        Decl <params[2]>: name=mayApplyMixingMatrix, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=mayApplyMixingMatrix, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[3]>: name=buffer, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=buffer, quals=[]
+              IdentifierType <type>: names=['float']
+      TypeDecl <type>: declname=Lav_simulationGetBlock, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[31]>: name=Lav_simulationGetSr, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=simulationHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=simulationHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['int']
+      TypeDecl <type>: declname=Lav_simulationGetSr, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[32]>: name=Lav_simulationBeginAtomicBlock, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=simulationHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=simulationHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+      TypeDecl <type>: declname=Lav_simulationBeginAtomicBlock, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[33]>: name=Lav_simulationEndAtomicBlock, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=simulationHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=simulationHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+      TypeDecl <type>: declname=Lav_simulationEndAtomicBlock, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Typedef <ext[34]>: name=LavBlockCallback, quals=[], storage=['typedef']
+    PtrDecl <type>: quals=[]
+      FuncDecl <type>: 
+        ParamList <args>: 
+          Decl <params[0]>: name=handle, quals=[], storage=[], funcspec=[]
+            TypeDecl <type>: declname=handle, quals=[]
+              IdentifierType <type>: names=['LavHandle']
+          Decl <params[1]>: name=time, quals=[], storage=[], funcspec=[]
+            TypeDecl <type>: declname=time, quals=[]
+              IdentifierType <type>: names=['double']
+          Decl <params[2]>: name=userdata, quals=[], storage=[], funcspec=[]
+            PtrDecl <type>: quals=[]
+              TypeDecl <type>: declname=userdata, quals=[]
+                IdentifierType <type>: names=['void']
+        TypeDecl <type>: declname=LavBlockCallback, quals=[]
+          IdentifierType <type>: names=['void']
+  Decl <ext[35]>: name=Lav_simulationSetBlockCallback, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=simulationHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=simulationHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=callback, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=callback, quals=[]
+            IdentifierType <type>: names=['LavBlockCallback']
+        Decl <params[2]>: name=userdata, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=userdata, quals=[]
+              IdentifierType <type>: names=['void']
+      TypeDecl <type>: declname=Lav_simulationSetBlockCallback, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[36]>: name=Lav_createBuffer, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=simulationHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=simulationHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['LavHandle']
+      TypeDecl <type>: declname=Lav_createBuffer, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[37]>: name=Lav_bufferGetSimulation, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=bufferHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=bufferHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['LavHandle']
+      TypeDecl <type>: declname=Lav_bufferGetSimulation, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[38]>: name=Lav_bufferLoadFromFile, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=bufferHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=bufferHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=path, quals=['const'], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=path, quals=['const']
+              IdentifierType <type>: names=['char']
+      TypeDecl <type>: declname=Lav_bufferLoadFromFile, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[39]>: name=Lav_bufferLoadFromArray, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=bufferHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=bufferHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=sr, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=sr, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=channels, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=channels, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[3]>: name=frames, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=frames, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[4]>: name=data, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=data, quals=[]
+              IdentifierType <type>: names=['float']
+      TypeDecl <type>: declname=Lav_bufferLoadFromArray, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[40]>: name=Lav_nodeGetSimulation, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=handle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=handle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['LavHandle']
+      TypeDecl <type>: declname=Lav_nodeGetSimulation, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[41]>: name=Lav_nodeConnect, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=output, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=output, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=destHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=destHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[3]>: name=input, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=input, quals=[]
+            IdentifierType <type>: names=['int']
+      TypeDecl <type>: declname=Lav_nodeConnect, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[42]>: name=Lav_nodeConnectSimulation, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=output, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=output, quals=[]
+            IdentifierType <type>: names=['int']
+      TypeDecl <type>: declname=Lav_nodeConnectSimulation, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[43]>: name=Lav_nodeConnectProperty, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=output, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=output, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=otherHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=otherHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[3]>: name=slot, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=slot, quals=[]
+            IdentifierType <type>: names=['int']
+      TypeDecl <type>: declname=Lav_nodeConnectProperty, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[44]>: name=Lav_nodeDisconnect, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=output, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=output, quals=[]
+            IdentifierType <type>: names=['int']
+      TypeDecl <type>: declname=Lav_nodeDisconnect, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[45]>: name=Lav_nodeGetInputConnectionCount, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['unsigned', 'int']
+      TypeDecl <type>: declname=Lav_nodeGetInputConnectionCount, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[46]>: name=Lav_nodeGetOutputConnectionCount, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['unsigned', 'int']
+      TypeDecl <type>: declname=Lav_nodeGetOutputConnectionCount, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[47]>: name=Lav_nodeResetProperty, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=slot, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=slot, quals=[]
+            IdentifierType <type>: names=['int']
+      TypeDecl <type>: declname=Lav_nodeResetProperty, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[48]>: name=Lav_nodeSetIntProperty, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=slot, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=slot, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=value, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=value, quals=[]
+            IdentifierType <type>: names=['int']
+      TypeDecl <type>: declname=Lav_nodeSetIntProperty, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[49]>: name=Lav_nodeSetFloatProperty, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=slot, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=slot, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=value, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=value, quals=[]
+            IdentifierType <type>: names=['float']
+      TypeDecl <type>: declname=Lav_nodeSetFloatProperty, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[50]>: name=Lav_nodeSetDoubleProperty, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=slot, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=slot, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=value, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=value, quals=[]
+            IdentifierType <type>: names=['double']
+      TypeDecl <type>: declname=Lav_nodeSetDoubleProperty, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[51]>: name=Lav_nodeSetStringProperty, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=slot, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=slot, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=value, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=value, quals=[]
+              IdentifierType <type>: names=['char']
+      TypeDecl <type>: declname=Lav_nodeSetStringProperty, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[52]>: name=Lav_nodeSetFloat3Property, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=slot, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=slot, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=v1, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=v1, quals=[]
+            IdentifierType <type>: names=['float']
+        Decl <params[3]>: name=v2, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=v2, quals=[]
+            IdentifierType <type>: names=['float']
+        Decl <params[4]>: name=v3, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=v3, quals=[]
+            IdentifierType <type>: names=['float']
+      TypeDecl <type>: declname=Lav_nodeSetFloat3Property, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[53]>: name=Lav_nodeSetFloat6Property, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=slot, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=slot, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=v1, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=v1, quals=[]
+            IdentifierType <type>: names=['float']
+        Decl <params[3]>: name=v2, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=v2, quals=[]
+            IdentifierType <type>: names=['float']
+        Decl <params[4]>: name=v3, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=v3, quals=[]
+            IdentifierType <type>: names=['float']
+        Decl <params[5]>: name=v4, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=v4, quals=[]
+            IdentifierType <type>: names=['float']
+        Decl <params[6]>: name=v5, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=v5, quals=[]
+            IdentifierType <type>: names=['float']
+        Decl <params[7]>: name=v6, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=v6, quals=[]
+            IdentifierType <type>: names=['float']
+      TypeDecl <type>: declname=Lav_nodeSetFloat6Property, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[54]>: name=Lav_nodeGetIntProperty, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=slot, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=slot, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['int']
+      TypeDecl <type>: declname=Lav_nodeGetIntProperty, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[55]>: name=Lav_nodeGetFloatProperty, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=slot, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=slot, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['float']
+      TypeDecl <type>: declname=Lav_nodeGetFloatProperty, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[56]>: name=Lav_nodeGetDoubleProperty, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=slot, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=slot, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['double']
+      TypeDecl <type>: declname=Lav_nodeGetDoubleProperty, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[57]>: name=Lav_nodeGetStringProperty, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=slot, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=slot, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=destination, quals=['const'], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            PtrDecl <type>: quals=[]
+              TypeDecl <type>: declname=destination, quals=['const']
+                IdentifierType <type>: names=['char']
+      TypeDecl <type>: declname=Lav_nodeGetStringProperty, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[58]>: name=Lav_nodeGetFloat3Property, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=slot, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=slot, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=destination1, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination1, quals=[]
+              IdentifierType <type>: names=['float']
+        Decl <params[3]>: name=destination2, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination2, quals=[]
+              IdentifierType <type>: names=['float']
+        Decl <params[4]>: name=destination3, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination3, quals=[]
+              IdentifierType <type>: names=['float']
+      TypeDecl <type>: declname=Lav_nodeGetFloat3Property, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[59]>: name=Lav_nodeGetFloat6Property, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=slot, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=slot, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=destinationV1, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destinationV1, quals=[]
+              IdentifierType <type>: names=['float']
+        Decl <params[3]>: name=destinationV2, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destinationV2, quals=[]
+              IdentifierType <type>: names=['float']
+        Decl <params[4]>: name=destinationV3, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destinationV3, quals=[]
+              IdentifierType <type>: names=['float']
+        Decl <params[5]>: name=destinationV4, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destinationV4, quals=[]
+              IdentifierType <type>: names=['float']
+        Decl <params[6]>: name=destinationV5, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destinationV5, quals=[]
+              IdentifierType <type>: names=['float']
+        Decl <params[7]>: name=destinationV6, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destinationV6, quals=[]
+              IdentifierType <type>: names=['float']
+      TypeDecl <type>: declname=Lav_nodeGetFloat6Property, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[60]>: name=Lav_nodeGetIntPropertyRange, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=slot, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=slot, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=destinationMin, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destinationMin, quals=[]
+              IdentifierType <type>: names=['int']
+        Decl <params[3]>: name=destinationMax, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destinationMax, quals=[]
+              IdentifierType <type>: names=['int']
+      TypeDecl <type>: declname=Lav_nodeGetIntPropertyRange, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[61]>: name=Lav_nodeGetFloatPropertyRange, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=slot, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=slot, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=destinationMin, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destinationMin, quals=[]
+              IdentifierType <type>: names=['float']
+        Decl <params[3]>: name=destinationMax, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destinationMax, quals=[]
+              IdentifierType <type>: names=['float']
+      TypeDecl <type>: declname=Lav_nodeGetFloatPropertyRange, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[62]>: name=Lav_nodeGetDoublePropertyRange, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=slot, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=slot, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=destinationMin, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destinationMin, quals=[]
+              IdentifierType <type>: names=['double']
+        Decl <params[3]>: name=destinationMax, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destinationMax, quals=[]
+              IdentifierType <type>: names=['double']
+      TypeDecl <type>: declname=Lav_nodeGetDoublePropertyRange, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[63]>: name=Lav_nodeGetPropertyName, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=slot, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=slot, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            PtrDecl <type>: quals=[]
+              TypeDecl <type>: declname=destination, quals=[]
+                IdentifierType <type>: names=['char']
+      TypeDecl <type>: declname=Lav_nodeGetPropertyName, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[64]>: name=Lav_nodeGetPropertyType, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=slot, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=slot, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['int']
+      TypeDecl <type>: declname=Lav_nodeGetPropertyType, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[65]>: name=Lav_nodeGetPropertyHasDynamicRange, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=slot, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=slot, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['int']
+      TypeDecl <type>: declname=Lav_nodeGetPropertyHasDynamicRange, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[66]>: name=Lav_nodeReplaceFloatArrayProperty, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=slot, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=slot, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=length, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=length, quals=[]
+            IdentifierType <type>: names=['unsigned', 'int']
+        Decl <params[3]>: name=values, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=values, quals=[]
+              IdentifierType <type>: names=['float']
+      TypeDecl <type>: declname=Lav_nodeReplaceFloatArrayProperty, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[67]>: name=Lav_nodeReadFloatArrayProperty, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=slot, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=slot, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=index, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=index, quals=[]
+            IdentifierType <type>: names=['unsigned', 'int']
+        Decl <params[3]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['float']
+      TypeDecl <type>: declname=Lav_nodeReadFloatArrayProperty, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[68]>: name=Lav_nodeWriteFloatArrayProperty, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=slot, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=slot, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=start, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=start, quals=[]
+            IdentifierType <type>: names=['unsigned', 'int']
+        Decl <params[3]>: name=stop, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=stop, quals=[]
+            IdentifierType <type>: names=['unsigned', 'int']
+        Decl <params[4]>: name=values, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=values, quals=[]
+              IdentifierType <type>: names=['float']
+      TypeDecl <type>: declname=Lav_nodeWriteFloatArrayProperty, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[69]>: name=Lav_nodeGetFloatArrayPropertyLength, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=slot, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=slot, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['unsigned', 'int']
+      TypeDecl <type>: declname=Lav_nodeGetFloatArrayPropertyLength, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[70]>: name=Lav_nodeReplaceIntArrayProperty, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=slot, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=slot, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=length, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=length, quals=[]
+            IdentifierType <type>: names=['unsigned', 'int']
+        Decl <params[3]>: name=values, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=values, quals=[]
+              IdentifierType <type>: names=['int']
+      TypeDecl <type>: declname=Lav_nodeReplaceIntArrayProperty, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[71]>: name=Lav_nodeReadIntArrayProperty, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=slot, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=slot, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=index, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=index, quals=[]
+            IdentifierType <type>: names=['unsigned', 'int']
+        Decl <params[3]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['int']
+      TypeDecl <type>: declname=Lav_nodeReadIntArrayProperty, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[72]>: name=Lav_nodeWriteIntArrayProperty, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=slot, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=slot, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=start, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=start, quals=[]
+            IdentifierType <type>: names=['unsigned', 'int']
+        Decl <params[3]>: name=stop, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=stop, quals=[]
+            IdentifierType <type>: names=['unsigned', 'int']
+        Decl <params[4]>: name=values, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=values, quals=[]
+              IdentifierType <type>: names=['int']
+      TypeDecl <type>: declname=Lav_nodeWriteIntArrayProperty, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[73]>: name=Lav_nodeGetIntArrayPropertyLength, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=slot, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=slot, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['int']
+      TypeDecl <type>: declname=Lav_nodeGetIntArrayPropertyLength, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[74]>: name=Lav_nodeGetArrayPropertyLengthRange, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=slot, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=slot, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=destinationMin, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destinationMin, quals=[]
+              IdentifierType <type>: names=['unsigned', 'int']
+        Decl <params[3]>: name=destinationMax, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destinationMax, quals=[]
+              IdentifierType <type>: names=['unsigned', 'int']
+      TypeDecl <type>: declname=Lav_nodeGetArrayPropertyLengthRange, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[75]>: name=Lav_nodeSetBufferProperty, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=slot, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=slot, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=bufferHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=bufferHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+      TypeDecl <type>: declname=Lav_nodeSetBufferProperty, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[76]>: name=Lav_nodeGetBufferProperty, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=slot, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=slot, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['LavHandle']
+      TypeDecl <type>: declname=Lav_nodeGetBufferProperty, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[77]>: name=Lav_automationCancelAutomators, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=slot, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=slot, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=time, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=time, quals=[]
+            IdentifierType <type>: names=['double']
+      TypeDecl <type>: declname=Lav_automationCancelAutomators, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[78]>: name=Lav_automationLinearRampToValue, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=slot, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=slot, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=time, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=time, quals=[]
+            IdentifierType <type>: names=['double']
+        Decl <params[3]>: name=value, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=value, quals=[]
+            IdentifierType <type>: names=['double']
+      TypeDecl <type>: declname=Lav_automationLinearRampToValue, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Typedef <ext[79]>: name=LavEventCallback, quals=[], storage=['typedef']
+    PtrDecl <type>: quals=[]
+      FuncDecl <type>: 
+        ParamList <args>: 
+          Decl <params[0]>: name=cause, quals=[], storage=[], funcspec=[]
+            TypeDecl <type>: declname=cause, quals=[]
+              IdentifierType <type>: names=['LavHandle']
+          Decl <params[1]>: name=userdata, quals=[], storage=[], funcspec=[]
+            PtrDecl <type>: quals=[]
+              TypeDecl <type>: declname=userdata, quals=[]
+                IdentifierType <type>: names=['void']
+        TypeDecl <type>: declname=LavEventCallback, quals=[]
+          IdentifierType <type>: names=['void']
+  Decl <ext[80]>: name=Lav_nodeGetEventHandler, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=event, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=event, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['LavEventCallback']
+      TypeDecl <type>: declname=Lav_nodeGetEventHandler, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[81]>: name=Lav_nodeGetEventUserDataPointer, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=event, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=event, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            PtrDecl <type>: quals=[]
+              TypeDecl <type>: declname=destination, quals=[]
+                IdentifierType <type>: names=['void']
+      TypeDecl <type>: declname=Lav_nodeGetEventUserDataPointer, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[82]>: name=Lav_nodeSetEvent, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=node, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=node, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=event, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=event, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=handler, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=handler, quals=[]
+            IdentifierType <type>: names=['LavEventCallback']
+        Decl <params[3]>: name=userData, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=userData, quals=[]
+              IdentifierType <type>: names=['void']
+      TypeDecl <type>: declname=Lav_nodeSetEvent, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[83]>: name=Lav_nodeReset, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+      TypeDecl <type>: declname=Lav_nodeReset, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[84]>: name=Lav_createSineNode, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=simulationHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=simulationHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['LavHandle']
+      TypeDecl <type>: declname=Lav_createSineNode, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[85]>: name=Lav_createSquareNode, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=simulationHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=simulationHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['LavHandle']
+      TypeDecl <type>: declname=Lav_createSquareNode, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[86]>: name=Lav_createNoiseNode, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=simulationHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=simulationHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['LavHandle']
+      TypeDecl <type>: declname=Lav_createNoiseNode, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[87]>: name=Lav_createHrtfNode, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=simulationHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=simulationHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=hrtfPath, quals=['const'], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=hrtfPath, quals=['const']
+              IdentifierType <type>: names=['char']
+        Decl <params[2]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['LavHandle']
+      TypeDecl <type>: declname=Lav_createHrtfNode, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[88]>: name=Lav_createHardLimiterNode, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=simulationHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=simulationHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=numInputs, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=numInputs, quals=[]
+            IdentifierType <type>: names=['unsigned', 'int']
+        Decl <params[2]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['LavHandle']
+      TypeDecl <type>: declname=Lav_createHardLimiterNode, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[89]>: name=Lav_createDelayNode, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=simulationHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=simulationHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=maxDelay, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=maxDelay, quals=[]
+            IdentifierType <type>: names=['float']
+        Decl <params[2]>: name=lineCount, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=lineCount, quals=[]
+            IdentifierType <type>: names=['unsigned', 'int']
+        Decl <params[3]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['LavHandle']
+      TypeDecl <type>: declname=Lav_createDelayNode, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[90]>: name=Lav_createAmplitudePannerNode, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=simulationHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=simulationHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['LavHandle']
+      TypeDecl <type>: declname=Lav_createAmplitudePannerNode, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[91]>: name=Lav_amplitudePannerNodeConfigureStandardMap, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=channels, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=channels, quals=[]
+            IdentifierType <type>: names=['unsigned', 'int']
+      TypeDecl <type>: declname=Lav_amplitudePannerNodeConfigureStandardMap, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[92]>: name=Lav_createMultipannerNode, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=simulationHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=simulationHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=hrtfPath, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=hrtfPath, quals=[]
+              IdentifierType <type>: names=['char']
+        Decl <params[2]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['LavHandle']
+      TypeDecl <type>: declname=Lav_createMultipannerNode, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[93]>: name=Lav_createPushNode, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=simulationHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=simulationHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=sr, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=sr, quals=[]
+            IdentifierType <type>: names=['unsigned', 'int']
+        Decl <params[2]>: name=channels, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=channels, quals=[]
+            IdentifierType <type>: names=['unsigned', 'int']
+        Decl <params[3]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['LavHandle']
+      TypeDecl <type>: declname=Lav_createPushNode, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[94]>: name=Lav_pushNodeFeed, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=length, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=length, quals=[]
+            IdentifierType <type>: names=['unsigned', 'int']
+        Decl <params[2]>: name=buffer, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=buffer, quals=[]
+              IdentifierType <type>: names=['float']
+      TypeDecl <type>: declname=Lav_pushNodeFeed, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[95]>: name=Lav_createBiquadNode, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=simulationHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=simulationHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=channels, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=channels, quals=[]
+            IdentifierType <type>: names=['unsigned', 'int']
+        Decl <params[2]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['LavHandle']
+      TypeDecl <type>: declname=Lav_createBiquadNode, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Typedef <ext[96]>: name=LavPullNodeAudioCallback, quals=[], storage=['typedef']
+    PtrDecl <type>: quals=[]
+      FuncDecl <type>: 
+        ParamList <args>: 
+          Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+            TypeDecl <type>: declname=nodeHandle, quals=[]
+              IdentifierType <type>: names=['LavHandle']
+          Decl <params[1]>: name=frames, quals=[], storage=[], funcspec=[]
+            TypeDecl <type>: declname=frames, quals=[]
+              IdentifierType <type>: names=['int']
+          Decl <params[2]>: name=channels, quals=[], storage=[], funcspec=[]
+            TypeDecl <type>: declname=channels, quals=[]
+              IdentifierType <type>: names=['int']
+          Decl <params[3]>: name=buffer, quals=[], storage=[], funcspec=[]
+            PtrDecl <type>: quals=[]
+              TypeDecl <type>: declname=buffer, quals=[]
+                IdentifierType <type>: names=['float']
+          Decl <params[4]>: name=userdata, quals=[], storage=[], funcspec=[]
+            PtrDecl <type>: quals=[]
+              TypeDecl <type>: declname=userdata, quals=[]
+                IdentifierType <type>: names=['void']
+        TypeDecl <type>: declname=LavPullNodeAudioCallback, quals=[]
+          IdentifierType <type>: names=['void']
+  Decl <ext[97]>: name=Lav_createPullNode, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=simulationHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=simulationHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=sr, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=sr, quals=[]
+            IdentifierType <type>: names=['unsigned', 'int']
+        Decl <params[2]>: name=channels, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=channels, quals=[]
+            IdentifierType <type>: names=['unsigned', 'int']
+        Decl <params[3]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['LavHandle']
+      TypeDecl <type>: declname=Lav_createPullNode, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[98]>: name=Lav_pullNodeSetAudioCallback, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=callback, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=callback, quals=[]
+            IdentifierType <type>: names=['LavPullNodeAudioCallback']
+        Decl <params[2]>: name=userdata, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=userdata, quals=[]
+              IdentifierType <type>: names=['void']
+      TypeDecl <type>: declname=Lav_pullNodeSetAudioCallback, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Typedef <ext[99]>: name=LavGraphListenerNodeListeningCallback, quals=[], storage=['typedef']
+    PtrDecl <type>: quals=[]
+      FuncDecl <type>: 
+        ParamList <args>: 
+          Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+            TypeDecl <type>: declname=nodeHandle, quals=[]
+              IdentifierType <type>: names=['LavHandle']
+          Decl <params[1]>: name=frames, quals=[], storage=[], funcspec=[]
+            TypeDecl <type>: declname=frames, quals=[]
+              IdentifierType <type>: names=['unsigned', 'int']
+          Decl <params[2]>: name=channels, quals=[], storage=[], funcspec=[]
+            TypeDecl <type>: declname=channels, quals=[]
+              IdentifierType <type>: names=['unsigned', 'int']
+          Decl <params[3]>: name=buffer, quals=[], storage=[], funcspec=[]
+            PtrDecl <type>: quals=[]
+              TypeDecl <type>: declname=buffer, quals=[]
+                IdentifierType <type>: names=['float']
+          Decl <params[4]>: name=userdata, quals=[], storage=[], funcspec=[]
+            PtrDecl <type>: quals=[]
+              TypeDecl <type>: declname=userdata, quals=[]
+                IdentifierType <type>: names=['void']
+        TypeDecl <type>: declname=LavGraphListenerNodeListeningCallback, quals=[]
+          IdentifierType <type>: names=['void']
+  Decl <ext[100]>: name=Lav_createGraphListenerNode, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=simulationHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=simulationHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=channels, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=channels, quals=[]
+            IdentifierType <type>: names=['unsigned', 'int']
+        Decl <params[2]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['LavHandle']
+      TypeDecl <type>: declname=Lav_createGraphListenerNode, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[101]>: name=Lav_graphListenerNodeSetListeningCallback, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=callback, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=callback, quals=[]
+            IdentifierType <type>: names=['LavGraphListenerNodeListeningCallback']
+        Decl <params[2]>: name=userdata, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=userdata, quals=[]
+              IdentifierType <type>: names=['void']
+      TypeDecl <type>: declname=Lav_graphListenerNodeSetListeningCallback, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Typedef <ext[102]>: name=LavCustomNodeProcessingCallback, quals=[], storage=['typedef']
+    PtrDecl <type>: quals=[]
+      FuncDecl <type>: 
+        ParamList <args>: 
+          Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+            TypeDecl <type>: declname=nodeHandle, quals=[]
+              IdentifierType <type>: names=['LavHandle']
+          Decl <params[1]>: name=frames, quals=[], storage=[], funcspec=[]
+            TypeDecl <type>: declname=frames, quals=[]
+              IdentifierType <type>: names=['unsigned', 'int']
+          Decl <params[2]>: name=numInputs, quals=[], storage=[], funcspec=[]
+            TypeDecl <type>: declname=numInputs, quals=[]
+              IdentifierType <type>: names=['unsigned', 'int']
+          Decl <params[3]>: name=inputs, quals=[], storage=[], funcspec=[]
+            PtrDecl <type>: quals=[]
+              PtrDecl <type>: quals=[]
+                TypeDecl <type>: declname=inputs, quals=[]
+                  IdentifierType <type>: names=['float']
+          Decl <params[4]>: name=numOutputs, quals=[], storage=[], funcspec=[]
+            TypeDecl <type>: declname=numOutputs, quals=[]
+              IdentifierType <type>: names=['unsigned', 'int']
+          Decl <params[5]>: name=outputs, quals=[], storage=[], funcspec=[]
+            PtrDecl <type>: quals=[]
+              PtrDecl <type>: quals=[]
+                TypeDecl <type>: declname=outputs, quals=[]
+                  IdentifierType <type>: names=['float']
+          Decl <params[6]>: name=userdata, quals=[], storage=[], funcspec=[]
+            PtrDecl <type>: quals=[]
+              TypeDecl <type>: declname=userdata, quals=[]
+                IdentifierType <type>: names=['void']
+        TypeDecl <type>: declname=LavCustomNodeProcessingCallback, quals=[]
+          IdentifierType <type>: names=['void']
+  Decl <ext[103]>: name=Lav_createCustomNode, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=simulationHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=simulationHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=inputs, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=inputs, quals=[]
+            IdentifierType <type>: names=['unsigned', 'int']
+        Decl <params[2]>: name=channelsPerInput, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=channelsPerInput, quals=[]
+            IdentifierType <type>: names=['unsigned', 'int']
+        Decl <params[3]>: name=outputs, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=outputs, quals=[]
+            IdentifierType <type>: names=['unsigned', 'int']
+        Decl <params[4]>: name=channelsPerOutput, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=channelsPerOutput, quals=[]
+            IdentifierType <type>: names=['unsigned', 'int']
+        Decl <params[5]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['LavHandle']
+      TypeDecl <type>: declname=Lav_createCustomNode, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[104]>: name=Lav_customNodeSetProcessingCallback, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=callback, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=callback, quals=[]
+            IdentifierType <type>: names=['LavCustomNodeProcessingCallback']
+        Decl <params[2]>: name=userdata, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=userdata, quals=[]
+              IdentifierType <type>: names=['void']
+      TypeDecl <type>: declname=Lav_customNodeSetProcessingCallback, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[105]>: name=Lav_createRingmodNode, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=simulationHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=simulationHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['LavHandle']
+      TypeDecl <type>: declname=Lav_createRingmodNode, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[106]>: name=Lav_createFeedbackDelayNetworkNode, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=simulationHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=simulationHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=maxDelay, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=maxDelay, quals=[]
+            IdentifierType <type>: names=['float']
+        Decl <params[2]>: name=lines, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=lines, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[3]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['LavHandle']
+      TypeDecl <type>: declname=Lav_createFeedbackDelayNetworkNode, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[107]>: name=Lav_feedbackDelayNetworkNodeSetFeedbackMatrix, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=node, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=node, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=count, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=count, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=values, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=values, quals=[]
+              IdentifierType <type>: names=['float']
+      TypeDecl <type>: declname=Lav_feedbackDelayNetworkNodeSetFeedbackMatrix, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[108]>: name=Lav_feedbackDelayNetworkNodeSetOutputGains, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=count, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=count, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=values, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=values, quals=[]
+              IdentifierType <type>: names=['float']
+      TypeDecl <type>: declname=Lav_feedbackDelayNetworkNodeSetOutputGains, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[109]>: name=Lav_feedbackDelayNetworkNodeSetDelays, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=count, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=count, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=values, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=values, quals=[]
+              IdentifierType <type>: names=['float']
+      TypeDecl <type>: declname=Lav_feedbackDelayNetworkNodeSetDelays, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[110]>: name=Lav_feedbackDelayNetworkNodeSetFeedbackDelayMatrix, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=count, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=count, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=values, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=values, quals=[]
+              IdentifierType <type>: names=['float']
+      TypeDecl <type>: declname=Lav_feedbackDelayNetworkNodeSetFeedbackDelayMatrix, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[111]>: name=Lav_createIirNode, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=simulationHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=simulationHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=channels, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=channels, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['LavHandle']
+      TypeDecl <type>: declname=Lav_createIirNode, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[112]>: name=Lav_iirNodeSetCoefficients, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=nodeHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=nodeHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=numeratorLength, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=numeratorLength, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=numerator, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=numerator, quals=[]
+              IdentifierType <type>: names=['double']
+        Decl <params[3]>: name=denominatorLength, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=denominatorLength, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[4]>: name=denominator, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=denominator, quals=[]
+              IdentifierType <type>: names=['double']
+        Decl <params[5]>: name=shouldClearHistory, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=shouldClearHistory, quals=[]
+            IdentifierType <type>: names=['int']
+      TypeDecl <type>: declname=Lav_iirNodeSetCoefficients, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[113]>: name=Lav_createGainNode, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=simulationHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=simulationHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=channels, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=channels, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['LavHandle']
+      TypeDecl <type>: declname=Lav_createGainNode, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[114]>: name=Lav_createChannelSplitterNode, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=simulationHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=simulationHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=channels, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=channels, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['LavHandle']
+      TypeDecl <type>: declname=Lav_createChannelSplitterNode, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[115]>: name=Lav_createChannelMergerNode, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=simulationHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=simulationHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=channels, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=channels, quals=[]
+            IdentifierType <type>: names=['int']
+        Decl <params[2]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['LavHandle']
+      TypeDecl <type>: declname=Lav_createChannelMergerNode, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[116]>: name=Lav_createBufferNode, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=simulationHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=simulationHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['LavHandle']
+      TypeDecl <type>: declname=Lav_createBufferNode, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[117]>: name=None, quals=[], storage=[], funcspec=[]
+    Enum <type>: name=lav_STANDARD_PROPERTIES
+      EnumeratorList <values>: 
+        Enumerator <enumerators[0]>: name=Lav_NODE_STATE
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=100
+        Enumerator <enumerators[1]>: name=Lav_NODE_AUTORESET
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=101
+        Enumerator <enumerators[2]>: name=Lav_NODE_MUL
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=102
+        Enumerator <enumerators[3]>: name=Lav_NODE_ADD
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=103
+        Enumerator <enumerators[4]>: name=Lav_NODE_CHANNEL_INTERPRETATION
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=104
+  Decl <ext[118]>: name=None, quals=[], storage=[], funcspec=[]
+    Enum <type>: name=Lav_CHANNEL_INTERPRETATIONS
+      EnumeratorList <values>: 
+        Enumerator <enumerators[0]>: name=Lav_CHANNEL_INTERPRETATION_DISCRETE
+          Constant <value>: type=int, value=0
+        Enumerator <enumerators[1]>: name=Lav_CHANNEL_INTERPRETATION_SPEAKERS
+          Constant <value>: type=int, value=1
+  Decl <ext[119]>: name=None, quals=[], storage=[], funcspec=[]
+    Enum <type>: name=Lav_SINE_PROPERTIES
+      EnumeratorList <values>: 
+        Enumerator <enumerators[0]>: name=Lav_SINE_FREQUENCY
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=1
+  Decl <ext[120]>: name=None, quals=[], storage=[], funcspec=[]
+    Enum <type>: name=lav_SQUARE_PROPERTIES
+      EnumeratorList <values>: 
+        Enumerator <enumerators[0]>: name=Lav_SQUARE_FREQUENCY
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=1
+        Enumerator <enumerators[1]>: name=Lav_SQUARE_DUTY_CYCLE
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=2
+  Decl <ext[121]>: name=None, quals=[], storage=[], funcspec=[]
+    Enum <type>: name=Lav_NOISE_PROPERTIES
+      EnumeratorList <values>: 
+        Enumerator <enumerators[0]>: name=Lav_NOISE_NOISE_TYPE
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=1
+        Enumerator <enumerators[1]>: name=Lav_NOISE_SHOULD_NORMALIZE
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=2
+  Decl <ext[122]>: name=None, quals=[], storage=[], funcspec=[]
+    Enum <type>: name=Lav_NOISE_TYPES
+      EnumeratorList <values>: 
+        Enumerator <enumerators[0]>: name=Lav_NOISE_TYPE_WHITE
+          Constant <value>: type=int, value=0
+        Enumerator <enumerators[1]>: name=Lav_NOISE_TYPE_PINK
+          Constant <value>: type=int, value=1
+        Enumerator <enumerators[2]>: name=Lav_NOISE_TYPE_BROWN
+          Constant <value>: type=int, value=2
+  Decl <ext[123]>: name=None, quals=[], storage=[], funcspec=[]
+    Enum <type>: name=Lav_FILE_PROPERTIES
+      EnumeratorList <values>: 
+        Enumerator <enumerators[0]>: name=Lav_FILE_POSITION
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=1
+        Enumerator <enumerators[1]>: name=Lav_FILE_PITCH_BEND
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=2
+        Enumerator <enumerators[2]>: name=Lav_FILE_LOOPING
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=3
+        Enumerator <enumerators[3]>: name=Lav_FILE_END_EVENT
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=1
+  Decl <ext[124]>: name=None, quals=[], storage=[], funcspec=[]
+    Enum <type>: name=Lav_PANNER_PROPERTIES
+      EnumeratorList <values>: 
+        Enumerator <enumerators[0]>: name=Lav_PANNER_AZIMUTH
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=1
+        Enumerator <enumerators[1]>: name=Lav_PANNER_ELEVATION
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=2
+        Enumerator <enumerators[2]>: name=Lav_PANNER_CHANNEL_MAP
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=3
+        Enumerator <enumerators[3]>: name=Lav_PANNER_SHOULD_CROSSFADE
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=4
+        Enumerator <enumerators[4]>: name=Lav_PANNER_SKIP_LFE
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=5
+        Enumerator <enumerators[5]>: name=Lav_PANNER_SKIP_CENTER
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=6
+        Enumerator <enumerators[6]>: name=Lav_PANNER_STRATEGY
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=7
+  Decl <ext[125]>: name=None, quals=[], storage=[], funcspec=[]
+    Enum <type>: name=Lav_PANNING_STRATEGIES
+      EnumeratorList <values>: 
+        Enumerator <enumerators[0]>: name=Lav_PANNING_STRATEGY_HRTF
+          Constant <value>: type=int, value=0
+        Enumerator <enumerators[1]>: name=Lav_PANNING_STRATEGY_STEREO
+          Constant <value>: type=int, value=1
+        Enumerator <enumerators[2]>: name=Lav_PANNING_STRATEGY_SURROUND51
+          Constant <value>: type=int, value=2
+        Enumerator <enumerators[3]>: name=Lav_PANNING_STRATEGY_SURROUND71
+          Constant <value>: type=int, value=3
+  Decl <ext[126]>: name=None, quals=[], storage=[], funcspec=[]
+    Enum <type>: name=Lav_MIXER_PROPERTIES
+      EnumeratorList <values>: 
+        Enumerator <enumerators[0]>: name=Lav_MIXER_MAX_PARENTS
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=1
+        Enumerator <enumerators[1]>: name=Lav_MIXER_INPUTS_PER_PARENT
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=2
+  Decl <ext[127]>: name=None, quals=[], storage=[], funcspec=[]
+    Enum <type>: name=Lav_DELAY_PROPERTIES
+      EnumeratorList <values>: 
+        Enumerator <enumerators[0]>: name=Lav_DELAY_DELAY
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=1
+        Enumerator <enumerators[1]>: name=Lav_DELAY_DELAY_MAX
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=2
+        Enumerator <enumerators[2]>: name=Lav_DELAY_FEEDBACK
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=3
+        Enumerator <enumerators[3]>: name=Lav_DELAY_INTERPOLATION_TIME
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=4
+  Decl <ext[128]>: name=None, quals=[], storage=[], funcspec=[]
+    Enum <type>: name=Lav_PUSH_NODE_PROPERTIES
+      EnumeratorList <values>: 
+        Enumerator <enumerators[0]>: name=Lav_PUSH_THRESHOLD
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=1
+        Enumerator <enumerators[1]>: name=Lav_PUSH_AUDIO_EVENT
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=2
+        Enumerator <enumerators[2]>: name=Lav_PUSH_OUT_EVENT
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=3
+  Decl <ext[129]>: name=None, quals=[], storage=[], funcspec=[]
+    Enum <type>: name=Lav_BIQUAD_PROPERTIES
+      EnumeratorList <values>: 
+        Enumerator <enumerators[0]>: name=Lav_BIQUAD_FILTER_TYPE
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=1
+        Enumerator <enumerators[1]>: name=Lav_BIQUAD_Q
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=2
+        Enumerator <enumerators[2]>: name=Lav_BIQUAD_FREQUENCY
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=3
+        Enumerator <enumerators[3]>: name=Lav_BIQUAD_DBGAIN
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=4
+  Decl <ext[130]>: name=None, quals=[], storage=[], funcspec=[]
+    Enum <type>: name=Lav_BIQUAD_TYPES
+      EnumeratorList <values>: 
+        Enumerator <enumerators[0]>: name=Lav_BIQUAD_TYPE_LOWPASS
+          Constant <value>: type=int, value=0
+        Enumerator <enumerators[1]>: name=Lav_BIQUAD_TYPE_HIGHPASS
+          Constant <value>: type=int, value=1
+        Enumerator <enumerators[2]>: name=Lav_BIQUAD_TYPE_BANDPASS
+          Constant <value>: type=int, value=2
+        Enumerator <enumerators[3]>: name=Lav_BIQUAD_TYPE_NOTCH
+          Constant <value>: type=int, value=3
+        Enumerator <enumerators[4]>: name=Lav_BIQUAD_TYPE_ALLPASS
+          Constant <value>: type=int, value=4
+        Enumerator <enumerators[5]>: name=Lav_BIQUAD_TYPE_PEAKING
+          Constant <value>: type=int, value=5
+        Enumerator <enumerators[6]>: name=Lav_BIQUAD_TYPE_LOWSHELF
+          Constant <value>: type=int, value=6
+        Enumerator <enumerators[7]>: name=Lav_BIQUAD_TYPE_HIGHSHELF
+          Constant <value>: type=int, value=7
+        Enumerator <enumerators[8]>: name=Lav_BIQUAD_TYPE_IDENTITY
+          Constant <value>: type=int, value=8
+  Decl <ext[131]>: name=None, quals=[], storage=[], funcspec=[]
+    Enum <type>: name=Lav_FEEDBACK_DELAY_NETWORK_PROPERTIES
+      EnumeratorList <values>: 
+        Enumerator <enumerators[0]>: name=Lav_FDN_MAX_DELAY
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=1
+        Enumerator <enumerators[1]>: name=Lav_FDN_INTERPOLATION_TIME
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=2
+  Decl <ext[132]>: name=None, quals=[], storage=[], funcspec=[]
+    Enum <type>: name=Lav_BUFFER_PROPERTIES
+      EnumeratorList <values>: 
+        Enumerator <enumerators[0]>: name=Lav_BUFFER_BUFFER
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=1
+        Enumerator <enumerators[1]>: name=Lav_BUFFER_POSITION
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=2
+        Enumerator <enumerators[2]>: name=Lav_BUFFER_PITCH_BEND
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=3
+        Enumerator <enumerators[3]>: name=Lav_BUFFER_LOOPING
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=4
+        Enumerator <enumerators[4]>: name=Lav_BUFFER_END_EVENT
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=1
+  Decl <ext[133]>: name=Lav_createSimpleEnvironmentNode, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=simulationHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=simulationHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=hrtfPath, quals=['const'], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=hrtfPath, quals=['const']
+              IdentifierType <type>: names=['char']
+        Decl <params[2]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['LavHandle']
+      TypeDecl <type>: declname=Lav_createSimpleEnvironmentNode, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[134]>: name=Lav_createSourceNode, quals=[], storage=[], funcspec=[]
+    FuncDecl <type>: 
+      ParamList <args>: 
+        Decl <params[0]>: name=simulationHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=simulationHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[1]>: name=environmentHandle, quals=[], storage=[], funcspec=[]
+          TypeDecl <type>: declname=environmentHandle, quals=[]
+            IdentifierType <type>: names=['LavHandle']
+        Decl <params[2]>: name=destination, quals=[], storage=[], funcspec=[]
+          PtrDecl <type>: quals=[]
+            TypeDecl <type>: declname=destination, quals=[]
+              IdentifierType <type>: names=['LavHandle']
+      TypeDecl <type>: declname=Lav_createSourceNode, quals=[]
+        IdentifierType <type>: names=['LavError']
+  Decl <ext[135]>: name=None, quals=[], storage=[], funcspec=[]
+    Enum <type>: name=Lav_3D_PROPERTIES
+      EnumeratorList <values>: 
+        Enumerator <enumerators[0]>: name=Lav_3D_ORIENTATION
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=1
+        Enumerator <enumerators[1]>: name=Lav_3D_POSITION
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=2
+  Decl <ext[136]>: name=None, quals=[], storage=[], funcspec=[]
+    Enum <type>: name=lav_STANDARD_ENVIRONMENT_PROPERTIES
+      EnumeratorList <values>: 
+        Enumerator <enumerators[0]>: name=Lav_ENVIRONMENT_DEFAULT_PANNER_STRATEGY
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=8
+        Enumerator <enumerators[1]>: name=Lav_ENVIRONMENT_DEFAULT_DISTANCE_MODEL
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=11
+        Enumerator <enumerators[2]>: name=Lav_ENVIRONMENT_DEFAULT_MAX_DISTANCE
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=12
+        Enumerator <enumerators[3]>: name=Lav_ENVIRONMENT_DEFAULT_SIZE
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=13
+        Enumerator <enumerators[4]>: name=Lav_ENVIRONMENT_OUTPUT_CHANNELS
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=14
+  Decl <ext[137]>: name=None, quals=[], storage=[], funcspec=[]
+    Enum <type>: name=Lav_SOURCE_PROPERTIES
+      EnumeratorList <values>: 
+        Enumerator <enumerators[0]>: name=Lav_SOURCE_MAX_DISTANCE
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=3
+        Enumerator <enumerators[1]>: name=Lav_SOURCE_DISTANCE_MODEL
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=4
+        Enumerator <enumerators[2]>: name=Lav_SOURCE_SIZE
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=5
+        Enumerator <enumerators[3]>: name=Lav_SOURCE_PANNER_STRATEGY
+          UnaryOp <value>: op=-
+            Constant <expr>: type=int, value=8
+  Decl <ext[138]>: name=None, quals=[], storage=[], funcspec=[]
+    Enum <type>: name=Lav_DISTANCE_MODELS
+      EnumeratorList <values>: 
+        Enumerator <enumerators[0]>: name=Lav_DISTANCE_MODEL_LINEAR
+          Constant <value>: type=int, value=0
+        Enumerator <enumerators[1]>: name=Lav_DISTANCE_MODEL_EXPONENTIAL
+          Constant <value>: type=int, value=1
+        Enumerator <enumerators[2]>: name=Lav_DISTANCE_MODEL_INVERSE_SQUARE
+          Constant <value>: type=int, value=2
