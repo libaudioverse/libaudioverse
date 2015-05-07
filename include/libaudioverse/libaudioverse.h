@@ -186,9 +186,9 @@ Channel orders for the output node are as follows:
 Internal mixing matrices will handle conversions to and from other formats to the output format. It is suggested that the user is queried for the preferred format, as not all supported APIs are capable of determining system defaults appropriately.  In the event that a backend cannot determine a default, it will suggest 2-channel stereo; this provides a good default for most applications and will be upconverted as needed.
 */
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetCount(unsigned int* destination);
-Lav_PUBLIC_FUNCTION LavError Lav_deviceGetLatency(unsigned int index, float* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetName(unsigned int index, char** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetChannels(unsigned int index, unsigned int* destination);
+
 Lav_PUBLIC_FUNCTION LavError Lav_createSimulationForDevice(int index, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead, LavHandle* destination);
 
 /**This type of simulation is intended for apps that wish to handle audio themselves: it will not output and time will not advance for it.

@@ -28,9 +28,6 @@ void main() {
 		ERRCHECK(Lav_deviceGetName(i, &name));
 		printf("%s:\n", name);
 		Lav_free(name);
-		float latency = 0.0f;
-		ERRCHECK(Lav_deviceGetLatency(i, &latency));
-		printf("Latency: %f\n", latency);
 		unsigned int channels = 0;
 		ERRCHECK(Lav_deviceGetChannels(i, &channels));
 		printf("channels: %u\n", channels);

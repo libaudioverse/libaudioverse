@@ -149,8 +149,7 @@ class _CallbackWrapper(object):
 class DeviceInfo(object):
 	"""Represents info on a audio device."""
 
-	def __init__(self, latency, channels, name, index):
-		self.latency = latency
+	def __init__(self, channels, name, index):
 		self.channels = channels
 		self.name = name
 		self.index = index
@@ -163,7 +162,6 @@ The position in the list is the needed device index for Simulation.__iniit__."""
 	infos = []
 	for i in xrange(max_index):
 		info = DeviceInfo(index = i,
-		latency = _lav.device_get_latency(i),
 		channels = _lav.device_get_channels(i),
 		name = _lav.device_get_name(i))
 		infos.append(info)

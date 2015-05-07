@@ -57,14 +57,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_deviceGetCount(unsigned int* destination) {
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_deviceGetLatency(unsigned int index, float* destination) {
-	PUB_BEGIN
-	auto l = chosen_factory->getOutputLatencies();
-	if(index >= l.size()) throw LavErrorException(Lav_ERROR_RANGE);
-	*destination = l[index];
-	PUB_END
-}
-
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetName(unsigned int index, char** destination) {
 	PUB_BEGIN
 	auto n = chosen_factory->getOutputNames();

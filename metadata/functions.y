@@ -129,16 +129,6 @@ functions:
       Get the number of audio devices on the system.
     params:
       destination: Contains the number of audio devices on the system after a call to this function.
-  Lav_deviceGetLatency:
-    category: core
-    doc_description: |
-      Gets the latency of the specified audio device.
-      Note that this is not likely to be accurate.
-      In some cases, it is a guess.
-      Querying latency cannot be performed on most platforms.
-    params:
-      index: The index of the audio device.
-      destination: Contains the latency in seconds.
   Lav_deviceGetName:
     category: core
     doc_description: |
