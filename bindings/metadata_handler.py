@@ -75,5 +75,9 @@ def make_metadata():
 	for i in nodes:
 		node_info = load_node(i)
 		metadata['nodes'][node_info[0]] = node_info[1]
-
+	#Grab function categories and function documentation:
+	with file(os.path.join(metadata_dir, 'function_categories.y')) as f:
+		metadata.update(yaml.load(f))
+	with file(os.path.join(metadata_dir, 'functions.y')) as f:
+		metadata.update(yaml.load(f))
 	return metadata

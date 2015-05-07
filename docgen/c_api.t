@@ -3,7 +3,6 @@
 
 This section of the Libaudioverse documentation documents the low-level C API.
 
-
 [[c-api-functions]]
 === Functions By Category
 
@@ -17,9 +16,45 @@ The `LavError` and `LavHandle` typedefs are intensionally omitted: both typedef 
 All functions return error codes which should be checked.
 Error  conditions are not documented; see the enum section of this documentation for specific information on possible error return values.
 
-{%for category_info in documentation['function_categories']%}
-==== {{category_info['doc_name']
+{%for category_info in metadata['function_categories']%}
+==== {{category_info['doc_name']}}
 
 {{category_info['doc_description']}}
+
+{%for name in functions_by_category[category_info['name']]%}
+{%set function_object = functions[name]%}
+{%set function_documentation = metadata['functions'][name]%}
+===== {{name}}
+
+Prototype: `{{function_object | prototype}}`
+
+{{function_documentation['doc_description']}}
+
+{%if function_object.args|length%}
+[caption=""]
+.PARAMETERS
+|====
+|Type |Name |Description
+{%for arg in function_object.args%}
+|`{{arg.type | type_to_string}}`
+|{{arg.name}}
+|{{function_documentation['params'][arg.name]}}
+{%endfor%}
+|====
+{%endif%}
+
+{%set involved_typedefs= function_object | compute_involved_typedefs%}
+{%if involved_typedefs | length%}
+[caption =""]
+.Typedefs of interest
+|====
+|Name |Actual Type
+{%for name, typedef in involved_typedefs%}
+|{{name}}
+|`{{typedef|type_to_string}}`
+{%endfor%}
+|====
+{%endif%}
+{%endfor%}
 
 {%endfor%}

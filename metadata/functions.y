@@ -36,8 +36,8 @@ functions:
     doc_description: |
       Newly allocated Libaudioverse handles have a reference count of 1.
       This function allows incrementing this reference count.
-      if you are working in C, this function is not very helpful.
-      it is used primarily by the various programming language bindings
+      If you are working in C, this function is not very helpful.
+      It is used primarily by the various programming language bindings
       in order to make the garbage collector play nice.
     params:
       handle: The handle whose reference count is to be incremented.
@@ -45,7 +45,7 @@ functions:
     category: core
     doc_description: |
       Decrement the reference count of a Libaudioverse handle.
-      This function is the equivalent to lav_free for objects.
+      This function is the equivalent to Lav_free for objects.
       Note that this is only a decrement.
       if you call it in the middle of a block or in a variety of other situations, you may see the same handle again via a callback.
       
@@ -54,6 +54,8 @@ functions:
       Furthermore, in the case of objects like buffers, various internal Libaudioverse properties could conceivably need to hold onto the object.
       Internally, Libaudioverse uses shared pointers to make sure this cannot happen,
       but at the cost of not being able to guarantee instant resource freeing.
+    params:
+      handle: The handle whose reference count we are decrementing.
   Lav_handleGetAndClearFirstAccess:
     category: core
     doc_description: |
@@ -155,7 +157,7 @@ functions:
     params:
       index: The index of the audio device.
       destination: Contains the number of channels the device claims to support.
-  lav_createSimulationForDevice:
+  Lav_createSimulationForDevice:
     category: simulations
     doc_description: |
       Creates a simulation that outputs on the specified audio device and with the specified parameters.
@@ -174,7 +176,7 @@ functions:
       sr: The sampling rate of the new simulation.
       blockSize: The block size of the new simulation.
       destination: After a call to this function, contains the handle of the newly created simulation.
-  lav_simulationGetBlockSize:
+  Lav_simulationGetBlockSize:
     category: simulations
     doc_description: |
       Query the block size of the specified simulation.
@@ -186,10 +188,13 @@ functions:
     doc_description: |
       Gets a block of audio from the simulation and advances its time.
       using this with a simulation that is outputting audio to an audio device will not work well.
+      
+      You must allocate enough space to hold exactly one block of audio: the simulation's block size times the number of channels requested floating point values.
     params:
       simulationHandle: The handle of the simulation to read a block from.
       channels: The number of channels we want. The simulations' output will be upmixed or downmixed as appropriate.
       mayApplyMixingMatrix: If 0, drop any additional channels in the simulation's output and set any  missing channels in the simulation's output to 0. Otherwise, if we can, apply a mixing matrix.
+      buffer: The memory to which to write the result.
   Lav_simulationGetSr:
     category: simulations
     doc_description: |
@@ -201,7 +206,7 @@ functions:
     category: simulations
     doc_description: |
       All operations between a call to this function and a call to Lav_simulationEndAtomicBlock will happen together, with no blocks mixed between them.
-      This is equivalent to holding the internal lock of the simulation yourself, so failure to call lav_simulationEndAtomicBlock in a timely manner will cause audio to stop.
+      This is equivalent to holding the internal lock of the simulation yourself, so failure to call Lav_simulationEndAtomicBlock in a timely manner will cause audio to stop.
       Furthermore, other  threads will block if they try to  manipulate the simulation directly or indirectly.
       In summary, treat this with the same caution and in the same way as a regular lock.
     params:
@@ -266,7 +271,7 @@ functions:
     doc_description: |
       Get the simulation that a node belongs to.
     params:
-      nodehandle: The node to query.
+      nodeHandle: The node to query.
       destination: After a call to this function, contains the handle to the simulation this node was created with.
   Lav_nodeConnect:
     category: nodes
@@ -293,7 +298,7 @@ functions:
     params:
       nodeHandle: the node to connect.
       output: The output to connect.
-      otherhandle: The node to which we are connecting.
+      otherHandle: The node to which we are connecting.
       slot: The index of the property to which to connect.
   Lav_nodeDisconnect:
     category: nodes
@@ -318,7 +323,7 @@ functions:
       destination: After a call to this function, contains the number of outputs.
   Lav_nodeResetProperty:
     category: nodes
-    doc-description: |
+    doc_description: |
       Reset a property to its default.
     params:
       nodeHandle: The handle of the node.
@@ -339,23 +344,23 @@ functions:
     params:
       nodeHandle: The node to manipulate.
       slot: The property to manipulate.
-      Value: the new value of the property.
-  lav_nodeSetDoubleProperty:
+      value: the new value of the property.
+  Lav_nodeSetDoubleProperty:
     category: nodes
     doc_description: |
       Set the specified double property.
     params:
-          nodeHandle: The node to manipulate.
+      nodeHandle: The node to manipulate.
       slot: The property to manipulate.
-      Value: the new value of the property.
+      value: the new value of the property.
   Lav_nodeSetStringProperty:
     category: nodes
-    doc-description: |
+    doc_description: |
       Set the specified string property.
     params:
       nodeHandle: The node to manipulate.
       slot: The property to manipulate.
-      Value: the new value of the property.  Note that the specified string is copied and the memory may be freed.
+      value: the new value of the property.  Note that the specified string is copied and the memory may be freed.
   Lav_nodeSetFloat3Property:
     category: nodes
     doc_description: |
@@ -387,9 +392,9 @@ functions:
       nodeHandle: The node that has the property.
       slot: The index of the property.
       destination: After a call to this function, contains the value of the property.
-  aLav_nodeGetFloatProperty:
+  Lav_nodeGetFloatProperty:
     category: nodes
-    doc-description: |
+    doc_description: |
       Get the specified float property's value.
     params:
       nodeHandle: The node that has the property.
@@ -441,7 +446,7 @@ functions:
       slot: The index of the property.
       destinationMin: After a call to this function, holds the range's minimum.
       destinationMax: After a call to this function, holds the range's maximum.
-  Lav_nodeGetpropertyName:
+  Lav_nodeGetPropertyName:
     category: nodes
     doc_description: |
       Get the name of a property.
@@ -585,7 +590,7 @@ functions:
       slot: The index of the property to automate.
       time: The time at which we must be at the specified value.
       value: The value we must arrive at by the specified time.
-  Lav_nodeGetEventhandler:
+  Lav_nodeGetEventHandler:
     category: nodes
     doc_description: |
       Gets an event handler for a specified event.
@@ -617,5 +622,5 @@ functions:
       Reset a node.
       What this means depends on the node in question, so see its documentation.
     params:
-      nodeHandler: The node to reset.
+      nodeHandle: The node to reset.
   

@@ -224,7 +224,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_bufferGetSimulation(LavHandle bufferHandle, Lav
 Lav_PUBLIC_FUNCTION LavError Lav_bufferLoadFromFile(LavHandle bufferHandle, const char* path);
 Lav_PUBLIC_FUNCTION LavError Lav_bufferLoadFromArray(LavHandle bufferHandle, int sr, int channels, int frames, float* data);
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetSimulation(LavHandle handle, LavHandle* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetSimulation(LavHandle nodeHandle, LavHandle* destination);
 /**Connect two nodes.*/
 Lav_PUBLIC_FUNCTION LavError Lav_nodeConnect(LavHandle nodeHandle, int output, LavHandle destHandle, int input);
 /**Connect the specified output to the simulation.*/
@@ -305,7 +305,7 @@ It is documented which of these will fire more than once.  Most events will wait
 EXTERN_FUNCTION typedef void (*LavEventCallback)(LavHandle cause, void* userdata);
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetEventHandler(LavHandle nodeHandle, int event, LavEventCallback *destination);
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetEventUserDataPointer(LavHandle nodeHandle, int event, void** destination);
-Lav_PUBLIC_FUNCTION LavError Lav_nodeSetEvent(LavHandle node, int event, LavEventCallback handler, void* userData);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeSetEvent(LavHandle nodeHandle, int event, LavEventCallback handler, void* userData);
 
 /**Performs the node-specific reset operation.
 
