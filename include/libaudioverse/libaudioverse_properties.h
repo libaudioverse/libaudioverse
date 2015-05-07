@@ -54,13 +54,6 @@ enum Lav_NOISE_TYPES {
 	Lav_NOISE_TYPE_BROWN = 2,
 };
 
-enum Lav_FILE_PROPERTIES {
-	Lav_FILE_POSITION = -1,
-	Lav_FILE_PITCH_BEND = -2,
-	Lav_FILE_LOOPING = -3,
-	Lav_FILE_END_EVENT = -1,
-};
-
 /**This enumeration is used for all panners because it is necessary to be able to treat them identically internally in some circumstances.
 For those using the C API, this matters; see the following comment. Higher-level languages need not be concerned as the higher-level language interfaces reflect this directly.
 HRTF: Azimuth, elevation, crossfading.

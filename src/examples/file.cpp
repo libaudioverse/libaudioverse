@@ -54,9 +54,9 @@ void main(int argc, char** args) {
 		while(*start == ' ') start+=1; //skip spaces.
 		sscanf(start, "%f", &value);
 		switch(command[0]) {
-			case 'p': Lav_nodeSetFloatProperty(node, Lav_FILE_PITCH_BEND, value); break;
+			case 'p': Lav_nodeSetFloatProperty(node, Lav_BUFFER_PITCH_BEND, value); break;
 			case 'v': Lav_nodeSetFloatProperty(node, Lav_NODE_MUL, value); break;
-			case 's': Lav_nodeSetDoubleProperty(node, Lav_FILE_POSITION, value); break;
+			case 's': Lav_nodeSetDoubleProperty(node, Lav_BUFFER_POSITION, value); break;
 			case 'a': isPlaying = ! isPlaying; Lav_nodeSetIntProperty(node, Lav_NODE_STATE, isPlaying == false ? Lav_NODESTATE_PAUSED: Lav_NODESTATE_PLAYING); break;
 			default: printf("Unrecognized command.\n"); break;
 		}
