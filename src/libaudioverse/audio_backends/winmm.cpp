@@ -154,14 +154,12 @@ class WinmmDeviceFactory: public DeviceFactory {
 	public:
 	WinmmDeviceFactory();
 	virtual std::vector<std::string> getOutputNames();
-	virtual std::vector<float> getOutputLatencies();
 	virtual std::vector<int> getOutputMaxChannels();
 	virtual std::shared_ptr<Device> createDevice(std::function<void(float*, int)> getBuffer, int index, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead);
 	virtual unsigned int getOutputCount();
 	virtual bool scan();
 	std::string getName();
 	private:
-	std::vector<float> latencies;
 	std::vector<std::string> names;
 	std::vector<int> max_channels;
 	std::vector<unsigned int> srs; //we need this, because these are not easy to query.
@@ -173,10 +171,6 @@ WinmmDeviceFactory::WinmmDeviceFactory() {
 
 std::vector<std::string> WinmmDeviceFactory::getOutputNames() {
 	return names;
-}
-
-std::vector<float> WinmmDeviceFactory::getOutputLatencies() {
-	return latencies;
 }
 
 std::vector<int> WinmmDeviceFactory::getOutputMaxChannels() {
@@ -233,7 +227,6 @@ WinmmCapabilities getWinmmCapabilities(UINT index) {
 }
 
 bool WinmmDeviceFactory::scan() {
-	std::vector<float> newLatencies;
 	std::vector<std::string> newNames;
 	std::vector<int> newMaxChannels;
 	std::vector<unsigned int> newSrs; //we need this, because these are not easy to query.
@@ -249,12 +242,8 @@ bool WinmmDeviceFactory::scan() {
 		newMaxChannels.push_back(channels);
 		newNames.push_back(name);
 		newSrs.push_back(sr);
-		//we have no latency information.
-		//This is too system specific. Consequently, we ahve to assume 0.
-		newLatencies.push_back(-1.0f);
 	}
 	this->max_channels = newMaxChannels;
-	this->latencies = newLatencies;
 	this->names = newNames;
 	this->srs = newSrs;
 	caps = getWinmmCapabilities(WAVE_MAPPER);

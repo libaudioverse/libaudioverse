@@ -156,13 +156,11 @@ class OpenALDeviceFactory: public DeviceFactory {
 	public:
 	OpenALDeviceFactory();
 	virtual std::vector<std::string> getOutputNames();
-	virtual std::vector<float> getOutputLatencies();
 	virtual std::vector<int> getOutputMaxChannels();
 	virtual std::shared_ptr<Device> createDevice(std::function<void(float*, int)> getBlock, int index, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead);
 	std::string getName();
 	private:
 	std::vector<std::string> names;
-	std::vector<float> latencies;
 	std::vector<int> max_channels;
 	void scan();
 };
@@ -173,7 +171,6 @@ OpenALDeviceFactory::OpenALDeviceFactory() {
 
 void OpenALDeviceFactory::scan() {
 	std::vector<std::string> newNames;
-	std::vector<float> newLatencies;
 	std::vector<int> newMaxChannels;
 	const char* devices;
 	ALCenum query = ALC_DEVICE_SPECIFIER;
@@ -186,23 +183,17 @@ void OpenALDeviceFactory::scan() {
 	while(devices[index]) {
 		std::string name(&devices[index]);
 		newNames.push_back(name);
-		newLatencies.push_back(-1.0f);
 		newMaxChannels.push_back(2);
 		//move to the first character of the next device.
 		index += name.size()+1;
 	}
 	names = newNames;
 	max_channels = newMaxChannels;
-	latencies = newLatencies;
 	output_count = names.size();
 }
 
 std::string OpenALDeviceFactory::getName() {
 	return "OpenAL";
-}
-
-std::vector<float> OpenALDeviceFactory::getOutputLatencies() {
-	return latencies;
 }
 
 std::vector<int>LavOpenALDeviceFactory::getOutputMaxChannels() {

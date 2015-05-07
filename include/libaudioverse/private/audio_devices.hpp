@@ -52,8 +52,6 @@ class DeviceFactory {
 	DeviceFactory() = default;
 	virtual ~DeviceFactory();
 	virtual std::vector<std::string> getOutputNames() = 0;
-	//returns -1.0f for unknown.
-	virtual std::vector<float> getOutputLatencies() = 0;
 	virtual std::vector<int> getOutputMaxChannels() = 0;
 
 	virtual std::shared_ptr<Device> createDevice(std::function<void(float*, int)> getBuffer, int index, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead) = 0;
