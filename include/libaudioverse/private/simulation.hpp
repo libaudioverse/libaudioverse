@@ -31,28 +31,29 @@ class Simulation: public ExternalObject {
 	Simulation(unsigned int sr, unsigned int blockSize, unsigned int mixahead);
 	//needed because the InputConnection needs us to use shared_from_this.
 	void completeInitialization();
-	virtual ~Simulation();
-	virtual void getBlock(float* out, unsigned int channels, bool mayApplyMixingMatrix = true);
+	~Simulation();
+	void getBlock(float* out, unsigned int channels, bool mayApplyMixingMatrix = true);
 	std::shared_ptr<InputConnection> getFinalOutputConnection();
 
 	//this is in frames of audio data.
-	virtual unsigned int getBlockSize() { return block_size;}
-	virtual LavError start();
-	virtual LavError stop();
-	virtual LavError associateNode(std::shared_ptr<Node> node);
+	unsigned int getBlockSize() { return block_size;}
+	LavError start();
+	LavError stop();
+	LavError associateNode(std::shared_ptr<Node> node);
 
-	virtual float getSr() { return sr;}
-	virtual int getTickCount() {return tick_count;}
-	virtual void doMaintenance(); //cleans up dead weak pointers, etc.
+	float getSr() { return sr;}
+	int getTickCount() {return tick_count;}
+	void doMaintenance(); //cleans up dead weak pointers, etc.
 	//these make us meet the basic lockable concept.
 	void lock() {mutex.lock();}
 	void unlock() {mutex.unlock();}
 
+	//associate with the specified device index.
+	void setOutputDevice(int index, int channels, int mixahead);
+	void clearOutputDevice();
+
 	//Tasks that need to run in the background.
 	void enqueueTask(std::function<void(void)>);
-
-	//makes this device hold a shared pointer to its output.
-	void associateDevice(std::shared_ptr<audio_io::OutputDevice> what);
 
 	//register a mixing matrix with this device.
 	void registerMixingMatrix(unsigned int inChannels, unsigned int outChannels, float* matrix);
@@ -61,7 +62,7 @@ class Simulation: public ExternalObject {
 	const float* getMixingMatrix(unsigned int inChannels, unsigned int outChannels);
 
 	//Set the block callback.
-	virtual void setBlockCallback(LavBlockCallback cb, void* userdata);
+	void setBlockCallback(LavBlockCallback cb, void* userdata);
 
 	protected:
 	//the connection to which nodes connect themselves if their output should be audible.
@@ -80,7 +81,7 @@ class Simulation: public ExternalObject {
 	void backgroundTaskThreadFunction();
 
 	//our output, if any.
-	std::shared_ptr<audio_io::OutputDevice> device = nullptr;
+	std::shared_ptr<audio_io::OutputDevice> output_device = nullptr;
 
 	//the registered mixing matrices for this simulation.
 	std::map<std::tuple<unsigned int, unsigned int>, float*> mixing_matrices;

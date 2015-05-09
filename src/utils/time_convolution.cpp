@@ -39,7 +39,7 @@ void main(int argc, char** args) {
 	unsigned int numSources = 0;
 
 	//some setup: create a world and a simulation.
-	ERRCHECK(Lav_createReadSimulation(44100, BLOCK_SIZE, &simulation));
+	ERRCHECK(Lav_createSimulation(44100, BLOCK_SIZE, &simulation));
 	ERRCHECK(Lav_createSimpleEnvironmentNode(simulation, args[1], &world));
 	ERRCHECK(Lav_nodeSetIntProperty(world, Lav_ENVIRONMENT_DEFAULT_PANNER_STRATEGY, Lav_PANNING_STRATEGY_HRTF));
 	ERRCHECK(Lav_createSineNode(simulation, &sineObj));

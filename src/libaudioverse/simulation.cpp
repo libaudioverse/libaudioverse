@@ -89,6 +89,27 @@ void Simulation::doMaintenance() {
 	}
 }
 
+void Simulation::setOutputDevice(int index, int channels, int mixahead) {
+	if(index < -1) throw LavErrorException(Lav_ERROR_RANGE);
+	auto factory = getOutputDeviceFactory();
+	if(factory == nullptr) throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
+	auto sptr = std::static_pointer_cast<Simulation>(shared_from_this());
+	std::weak_ptr<Simulation> wptr(sptr);
+	int blockSize=getBlockSize();
+	auto cb =[wptr, blockSize](float* buffer, int channels)->void {
+		auto strong =wptr.lock();
+		if(strong==nullptr) memset(buffer, 0, sizeof(float)*blockSize*channels);
+		else strong->getBlock(buffer, channels);
+	};
+	auto dev =factory->createDevice(cb, index, channels, getSr(), getBlockSize(), mixahead);
+	if(dev == nullptr) throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
+	output_device=dev;
+}
+
+void Simulation::clearOutputDevice() {
+	output_device=nullptr;
+}
+
 std::shared_ptr<InputConnection> Simulation::getFinalOutputConnection() {
 	return final_output_connection;
 }
@@ -110,10 +131,6 @@ LavError Simulation::associateNode(std::shared_ptr<Node> node) {
 
 void Simulation::enqueueTask(std::function<void(void)> cb) {
 	tasks.enqueue(cb);
-}
-
-void Simulation::associateDevice(std::shared_ptr<audio_io::OutputDevice> what) {
-	device = what;
 }
 
 void Simulation::registerMixingMatrix(unsigned int inChannels, unsigned int outChannels, float* matrix) {
@@ -166,6 +183,14 @@ void Simulation::setBlockCallback(LavBlockCallback callback, void* userdata) {
 
 //begin public API
 
+Lav_PUBLIC_FUNCTION LavError Lav_createSimulation(unsigned int sr, unsigned int blockSize, LavHandle* destination) {
+	PUB_BEGIN
+	auto shared = std::make_shared<Simulation>(sr, blockSize, 0);
+	shared->completeInitialization();
+	*destination = outgoingObject(shared);
+	PUB_END
+}
+
 Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlock(LavHandle simulationHandle, unsigned int channels, int mayApplyMixingMatrix, float* destination) {
 	PUB_BEGIN
 	auto simulation = incomingObject<Simulation>(simulationHandle);
@@ -187,6 +212,22 @@ Lav_PUBLIC_FUNCTION LavError Lav_simulationGetSr(LavHandle simulationHandle, int
 	auto simulation =incomingObject<Simulation>(simulationHandle);
 	LOCK(*simulation);
 	*destination = (int)simulation->getSr();
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_simulationSetOutputDevice(LavHandle simulationHandle, int index, int channels, int mixahead) {
+	PUB_BEGIN
+	auto sim = incomingObject<Simulation>(simulationHandle);
+	LOCK(*sim);
+	sim->setOutputDevice(index, channels, mixahead);
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_simulationClearOutputDevice(LavHandle simulationHandle) {
+	PUB_BEGIN
+	auto sim = incomingObject<Simulation>(simulationHandle);
+	LOCK(*sim);
+	sim->clearOutputDevice();
 	PUB_END
 }
 

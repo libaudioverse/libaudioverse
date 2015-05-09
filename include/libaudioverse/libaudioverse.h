@@ -189,15 +189,16 @@ Lav_PUBLIC_FUNCTION LavError Lav_deviceGetCount(unsigned int* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetName(unsigned int index, char** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetChannels(unsigned int index, unsigned int* destination);
 
-Lav_PUBLIC_FUNCTION LavError Lav_createSimulationForDevice(int index, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead, LavHandle* destination);
-
-/**This type of simulation is intended for apps that wish to handle audio themselves: it will not output and time will not advance for it.
-Combine it with Lav_simulationReadBlock to make use of it.*/
-Lav_PUBLIC_FUNCTION LavError Lav_createReadSimulation(unsigned int sr, unsigned int blockSize, LavHandle* destination);
+/**Create the simulation.*/
+Lav_PUBLIC_FUNCTION LavError Lav_createSimulation(unsigned int sr, unsigned int blockSize, LavHandle* destination);
 
 Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlockSize(LavHandle simulationHandle, int* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlock(LavHandle simulationHandle, unsigned int channels, int mayApplyMixingMatrix, float* buffer);
 Lav_PUBLIC_FUNCTION LavError Lav_simulationGetSr(LavHandle simulationHandle, int* destination);
+
+/**Set or clear the output device.*/
+Lav_PUBLIC_FUNCTION LavError Lav_simulationSetOutputDevice(LavHandle simulationHandle, int index, int channels, int mixahead);
+Lav_PUBLIC_FUNCTION LavError Lav_simulationClearOutputDevice(LavHandle simulationHandle);
 
 /**Atomic block support.
 Todo: find a better name.

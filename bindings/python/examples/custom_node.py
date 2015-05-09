@@ -4,6 +4,7 @@ import time
 
 libaudioverse.initialize()
 sim = libaudioverse.Simulation()
+sim.set_output_device(-1)
 def ringmod(obj, frames, input_count, inputs, output_count, outputs):
 	for i in xrange(frames):
 		outputs[0][i] = inputs[0][i]*inputs[1][i]

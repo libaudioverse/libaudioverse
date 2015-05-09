@@ -33,7 +33,8 @@ void main(int argc, char** args) {
 	LavHandle simulation;
 	LavHandle bufferNode, panNode, limit;
 	ERRCHECK(Lav_initialize());
-	ERRCHECK(Lav_createSimulationForDevice(-1, channels, 44100, 1024, 2, &simulation));
+	ERRCHECK(Lav_createSimulation(44100, 1024, &simulation));
+	ERRCHECK(Lav_simulationSetOutputDevice(simulation, -1, channels, 2));
 	ERRCHECK(Lav_createBufferNode(simulation, &bufferNode));
 	LavHandle buffer;
 	ERRCHECK(Lav_createBuffer(simulation, &buffer));

@@ -4,7 +4,8 @@ import time
 time_per_demo = 5.0
 
 libaudioverse.initialize()
-sim = libaudioverse.Simulation(device_index = -1)
+sim = libaudioverse.Simulation()
+sim.set_output_device(-1)
 print """Biquad demo.
 Please enter the path to a file in a format supported by Libsndfile: typically wave or ogg."""
 filepath = raw_input()
