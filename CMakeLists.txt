@@ -20,6 +20,8 @@ include("vendoring/libsndfile.txt")
 include("vendoring/glm.txt")
 include("vendoring/kissfft.txt")
 
+#mine:
+include("vendoring/audio_io.txt")
 #All the libraries we need to link with:
 SET(libaudioverse_required_libraries ${libsndfile_name} kissfft winmm)
 add_subdirectory(src)

@@ -7,3 +7,6 @@
 [submodule "OpenAL-Soft"]
 	path = OpenAL-Soft
 	url = http://github.com/camlorn/OpenAL-Soft.git
+[submodule "audio_io"]
+	path = audio_io
+	url = http://github.com/camlorn/audio_io.git
