@@ -3,7 +3,8 @@ import libaudioverse
 import collections
 libaudioverse.initialize()
 
-sim = libaudioverse.Simulation(device_index = -1)
+sim = libaudioverse.Simulation()
+sim.set_output_device(-1)
 world = libaudioverse.SimpleEnvironmentNode(sim, "default")
 source = libaudioverse.SourceNode(sim, world)
 print "Enter a path to a sound file."

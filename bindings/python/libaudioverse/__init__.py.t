@@ -188,24 +188,9 @@ class Simulation(_HandleComparer):
 Instances of this class are context managers.  Using the with statement on an instance of this class invoke's Libaudioverse's atomic block support."""
 
 
-	def __init__(self, sample_rate = 44100, block_size = 1024, mix_ahead = 2, channels = 2, device_index = -1):
-		"""Create a simulation.
-
-See enumerate_devices for the possible values of device_index and other output information.
-
-There are two ways to initialize a device.
-
-If device_index is None, sample_rate and buffer_size are used to give a simulation that doesn't actually output.  In this case, use the get_block method yourself to retrieve blocks of 32-bit floating point audio data.
-
-If device_index is an integer, a device is created which feeds the specified output.  In this case, sample_rate, block_size, channels, and mix_ahead are respected.
-
-One special value is not included in get_device_infos; this is -1.  -1 is the default system audio device plus the functionality required to follow the default if the user changes it, i.e. by unplugging headphones.  Backends will handle mixing to this device appropriately, though getting it's properties is not possible.
-
-See the manual for specifics on how output objects work.  A brief summary is given here: if the output object has 1, 2, 6, or 8 outputs, it is mixed to the output channel count using internal mixing matrices.  Otherwise, the first n outputs are taken as the channels to be outputted and mapped to the channels of the output device."""
-		if device_index is not None:
-			handle = _lav.create_simulation_for_device(device_index, channels, sample_rate, block_size, mix_ahead)
-		else:
-			handle = _lav.create_read_simulation(sample_rate, block_size)
+	def __init__(self, sample_rate = 44100, block_size = 1024):
+		"""Create a simulation."""
+		handle = _lav.create_simulation(sample_rate, block_size)
 		self.init_with_handle(handle)
 		_weak_handle_lookup[self.handle] = self
 
@@ -219,6 +204,16 @@ See the manual for specifics on how output objects work.  A brief summary is giv
 			self._state = _object_states[handle.handle]
 			self.handle = handle
 			self._lock = self._state['lock']
+
+	def set_output_device(self, index, channels=2, mixahead=2):
+		"""Sets the output device.
+		Use -1 for default system audio. 0 and greater are specific audio devices.
+		To enumerate output devices, use enumerate_output_devices."""
+		_lav.simulation_set_output_device(self, index, channels, mixahead)
+
+	def clear_output_device(self):
+		"""Clears the output device, stopping audio and allowing use of get_block again."""
+		_lav.simulation_clear_output_device(self)
 
 	def get_block(self, channels, may_apply_mixing_matrix = True):
 		"""Returns a block of data.

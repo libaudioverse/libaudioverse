@@ -10,6 +10,7 @@ import struct
 
 libaudioverse.initialize()
 sim = libaudioverse.Simulation()
+sim.set_output_device(-1)
 w1 = libaudioverse.SineNode(sim)
 w2 = libaudioverse.SineNode(sim)
 listener = libaudioverse.GraphListenerNode(sim, 2)
