@@ -75,27 +75,4 @@ Lav_PUBLIC_FUNCTION LavError Lav_deviceGetChannels(unsigned int index, unsigned 
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_createSimulationForDevice(int index, unsigned int channels, unsigned int sr, unsigned int blockSize, unsigned int mixAhead, LavHandle* destination) {
-	PUB_BEGIN
-	//don't use defaults, use user options.
-	auto sim = std::make_shared<Simulation>(sr, blockSize, mixAhead);
-	sim->completeInitialization();
-	//this can in theory invalidate while the callback is still needed:
-	auto weak_sim = std::weak_ptr<Simulation>(sim);
-	auto audioFunction = [=](float* out, int channels) {
-		auto strong_sim = weak_sim.lock();
-		if(strong_sim == nullptr) {
-			memset(out, 0, sizeof(float)*channels*blockSize);
-			return;
-		}
-		strong_sim->lock();
-		strong_sim->getBlock(out, channels, false);
-		strong_sim->unlock();
-	};
-	auto dev = (*audio_output_factory)->createDevice(audioFunction, index, channels, sr, blockSize, mixAhead);
-	sim->associateDevice(dev);
-	*destination = outgoingObject<Simulation>(sim);
-	PUB_END
-}
-
 }

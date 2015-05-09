@@ -112,10 +112,6 @@ void Simulation::enqueueTask(std::function<void(void)> cb) {
 	tasks.enqueue(cb);
 }
 
-void Simulation::associateDevice(std::shared_ptr<audio_io::OutputDevice> what) {
-	device = what;
-}
-
 void Simulation::registerMixingMatrix(unsigned int inChannels, unsigned int outChannels, float* matrix) {
 	mixing_matrices[std::tuple<unsigned int, unsigned int>(inChannels, outChannels)] = matrix;
 	if(inChannels > largest_seen_mixing_matrix_input) {

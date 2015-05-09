@@ -51,9 +51,6 @@ class Simulation: public ExternalObject {
 	//Tasks that need to run in the background.
 	void enqueueTask(std::function<void(void)>);
 
-	//makes this device hold a shared pointer to its output.
-	void associateDevice(std::shared_ptr<audio_io::OutputDevice> what);
-
 	//register a mixing matrix with this device.
 	void registerMixingMatrix(unsigned int inChannels, unsigned int outChannels, float* matrix);
 	void resetMixingMatrix(unsigned int inChannels, unsigned int outChannels);
