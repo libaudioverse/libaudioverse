@@ -33,7 +33,7 @@ void main(int argc, char** args) {
 	LavHandle sineObj;
 	unsigned int numLines = 0;
 
-	ERRCHECK(Lav_createReadSimulation(44100, BLOCK_SIZE, &simulation));
+	ERRCHECK(Lav_createSimulation(44100, BLOCK_SIZE, &simulation));
 	ERRCHECK(Lav_createSineNode(simulation, &sineObj));
 
 	lines.resize(NUM_LINES, 0);

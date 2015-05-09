@@ -21,7 +21,8 @@ void main() {
 	LavHandle simulation;
 	LavHandle node;
 	ERRCHECK(Lav_initialize());
-	ERRCHECK(Lav_createSimulationForDevice(-1, 2, 44100, 8192, 2, &simulation));
+	ERRCHECK(Lav_createSimulation(44100, 8192, &simulation));
+	ERRCHECK(Lav_simulationSetOutputDevice(simulation, -1, 2, 2));
 	ERRCHECK(Lav_createSineNode(simulation, &node));
 	ERRCHECK(Lav_nodeSetFloatProperty(node, Lav_SINE_FREQUENCY, 0));
 	ERRCHECK(Lav_nodeConnectSimulation(node, 0));
