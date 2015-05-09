@@ -196,6 +196,10 @@ Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlockSize(LavHandle simulationHand
 Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlock(LavHandle simulationHandle, unsigned int channels, int mayApplyMixingMatrix, float* buffer);
 Lav_PUBLIC_FUNCTION LavError Lav_simulationGetSr(LavHandle simulationHandle, int* destination);
 
+/**Set or clear the output device.*/
+Lav_PUBLIC_FUNCTION LavError Lav_simulationSetOutputDevice(LavHandle simulationHandle, int index, int channels, int mixahead);
+Lav_PUBLIC_FUNCTION LavError Lav_simulationClearOutputDevice(LavHandle simulationHandle);
+
 /**Atomic block support.
 Todo: find a better name.
 This isn't truly atomic: operations you perform will not roll back on error.

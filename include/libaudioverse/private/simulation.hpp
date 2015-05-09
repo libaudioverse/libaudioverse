@@ -48,6 +48,10 @@ class Simulation: public ExternalObject {
 	void lock() {mutex.lock();}
 	void unlock() {mutex.unlock();}
 
+	//associate with the specified device index.
+	void setOutputDevice(int index, int channels, int mixahead);
+	void clearOutputDevice();
+
 	//Tasks that need to run in the background.
 	void enqueueTask(std::function<void(void)>);
 
@@ -77,7 +81,7 @@ class Simulation: public ExternalObject {
 	void backgroundTaskThreadFunction();
 
 	//our output, if any.
-	std::shared_ptr<audio_io::OutputDevice> device = nullptr;
+	std::shared_ptr<audio_io::OutputDevice> output_device = nullptr;
 
 	//the registered mixing matrices for this simulation.
 	std::map<std::tuple<unsigned int, unsigned int>, float*> mixing_matrices;
