@@ -22,8 +22,9 @@ include("vendoring/kissfft.txt")
 
 #mine:
 include("vendoring/audio_io.txt")
+
 #All the libraries we need to link with:
-SET(libaudioverse_required_libraries ${libsndfile_name} kissfft winmm)
+SET(libaudioverse_required_libraries ${libsndfile_name} kissfft audio_io)
 add_subdirectory(src)
 
 #this makes the bindings generation step always run after a Libaudioverse build.

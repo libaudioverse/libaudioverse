@@ -85,11 +85,8 @@ nodes/buffer.cpp
 automators/automators.cpp
 automators/linear_ramp.cpp
 
-#physical outputs, etc.
-audio_backends/common.cpp
-audio_backends/public.cpp
-audio_backends/winmm.cpp
-#audio_backends/openal.cpp
+#audio output using audio_io:
+audio_output.cpp
 
 #the 3D abstraction on top of libaudioverse.
 3d/simpleenvironment.cpp

@@ -10,6 +10,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/kernels.hpp>
 #include <libaudioverse/private/audio_devices.hpp>
 #include <libaudioverse/private/data.hpp>
+#include <audio_io/audio_io.hpp>
 #include <stdlib.h>
 #include <functional>
 #include <algorithm>
@@ -111,7 +112,7 @@ void Simulation::enqueueTask(std::function<void(void)> cb) {
 	tasks.enqueue(cb);
 }
 
-void Simulation::associateDevice(std::shared_ptr<Device> what) {
+void Simulation::associateDevice(std::shared_ptr<audio_io::OutputDevice> what) {
 	device = what;
 }
 
