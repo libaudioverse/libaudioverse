@@ -42,6 +42,10 @@ void shutdownDeviceFactory() {
 	if(audio_output_factory) delete audio_output_factory;
 }
 
+std::shared_ptr<audio_io::OutputDeviceFactory> getOutputDeviceFactory() {
+	return *audio_output_factory;
+}
+
 //begin public api.
 
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetCount(unsigned int* destination) {
