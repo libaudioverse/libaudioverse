@@ -166,6 +166,14 @@ void Simulation::setBlockCallback(LavBlockCallback callback, void* userdata) {
 
 //begin public API
 
+Lav_PUBLIC_FUNCTION LavError Lav_createSimulation(unsigned int sr, unsigned int blockSize, LavHandle* destination) {
+	PUB_BEGIN
+	auto shared = std::make_shared<Simulation>(sr, blockSize, 0);
+	shared->completeInitialization();
+	*destination = outgoingObject(shared);
+	PUB_END
+}
+
 Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlock(LavHandle simulationHandle, unsigned int channels, int mayApplyMixingMatrix, float* destination) {
 	PUB_BEGIN
 	auto simulation = incomingObject<Simulation>(simulationHandle);
