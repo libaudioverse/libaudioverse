@@ -4,8 +4,8 @@
 In order to begin using Libaudioverse's 3d components, it is not necessary to fully understand this section.
 For a gentler and much more hands-on introduction, see the tutorials.
 
-[[basics-general-overview]]
-=== General Overview of Libaudioverse Concepts
+[[basics-object-types]]
+=== Nodes, Simulations, and Buffers
 
 Libaudioverse has three main types of object:
 
@@ -16,76 +16,45 @@ Libaudioverse has three main types of object:
 Each of these is discussed below.
 
 [[basics-simulation]]
-==== The Simulation and Audio Mixing
+==== The Simulation
 
 The simulation is the object which deserves most discussion, hence the length of this section.
-Understanding the simulation is essential to effective use of Libaudioverse.
-If you already understand the parameters that go into initializing a simulation, namely block size, mixahead, sampling rate and a device index, you can probably refer to your language's documentation and skip this section until later.
-You are encouraged to read it anyway, however, as there are a few unique Libaudioverse features described herein.
 
 The simulation is the main entry point to Libaudioverse.
 When created, the simulation fixes the sampling rate of all nodes that use it.
-There are two types of simulation: a regular simulation and a read simulation.
-Regular simulations automatically advance audio and associate themselves with audio devices at initialization.
-Read simulations do not advance audio unless you ask them for a block.
-Where this distinction is important, this manual will make a point of distinguishing; hereafter you can take "the simulation" to mean both unless otherwise specified.
 
 Every simulation has two key parameters: the sampling rate and the block size.
 
 The sampling rate is exactly what it sounds like.  When in doubt, use 44100, as this is sufficient for most purposes.
 
 Libaudioverse processes audio in blocks.
-When audio is being processed, the simulation locks an internal lock, blocking all incoming Libaudioverse calls that refer to that simulation or nodes which are a part of it.
-It then produces the next block of audio before releasing this lock, allowing your code to continue making calls.
 The block size is the size of this block.
 In effect, the block size is the number of samples for which any property values are fixed; properties are described below.
+When the simulation has an associated output device, the block size is the number of frames of audio that will be submitted to the sound card at once.
+Otherwise, it is the number of frames of audio returned by a call to `Lav_getBlock`.
 
-Regular simulations add two more parameters.
+See <<basics-audio-output,the section on outputting audio>> for information about associating the simulation to an audio output device.
 
-The first of these is called mixahead and deserves some discussion.
-When audio is produced, it has to be produced slightly in advance of realtime.
-This is due to the fact that Libaudioverse may be pre-empted by the OS.
-If Libaudioverse produced a block and then waited for it to be completely finished before beginning the next one, audio would click continuously.
-Furthermore, smaller block sizes take more CPU because of the overhead of starting a block, yet smaller block sizes increase audio quality.
-To deal with this, Libaudioverse maintains a queue of blocks.
-If the queue is not full, then more blocks will be produced without waiting.
-Mixahead is the limit on this queue.
-
-The simplest way to look at mixahead is as a latency in blocks.
-If you want to know approximately how much latency Libaudioverse is introducing, use the following expression: `block_size*sample_rate/mix_ahead`.
-
-A mixahead of 0 will click for almost everyone.
-As a general guideline, a latency of 100 MS will work for most people.
-Furthermore, block size should usually be no more than 1024, as this is about the point where rapid property changes become audible as discrete events.
-This implies that your mixahead should usually be greater than 4.
-Lowering the block size usually means raising the mixahead, so larger values are certainly possible.
-
-Unfortunately, the situation is yet more complicated.
-These settings will work for almost everyone, but you should allow your user to change them.
-In this case, almost  everyone includes setups with very high latencies, for example Bluetooth headphones.
-It is suggested that you put a latency slider in your advanced options, and allow the user to move it in units of `block_size/sr`.
-If you leave it this high, the latency will be noticeable; if you lower it then your app will not work for some people.
-Note: this will become easier, but mixahead is currently fixed at simulation start-up.
-
-Simulations provide the ability to perform an atomic operation, so called because I have not yet found a better name.
 When making multiple calls to change aspects of audio, it is possible for the user to hear intermediate changes.
-This occurs because Libaudioverse might decide to process a lock between them.
-An atomic operation acquires the internal Libaudioverse lock, preventing all threads save the current one from accessing this simulation and its nodes.
+This occurs because Libaudioverse might decide to process a block between them.
+It is therefore possible to treat the simulation like a lock, preventing all threads save the current one from accessing this simulation and its nodes.
 This includes Libaudioverse's internal threads for mixing.
-
-This is exposed via your language binding in the usual manner for locks, and you should treat this feature with the same level of caution.
+In the C API, this is available through `Lav_simulationLock` and `Lav_simulationUnlock`.
+For other languages, this is bound in the safest way possible.
 For example, Python only allows use of this feature via with blocks.
-Think of this as acquiring a lock that protects the simulation: if you wait on a lock that is held by another thread that is also calling Libaudioverse in such a way that this simulation is required, you can deadlock.
+This *is* a lock, and should be treated as such.
 
 Finally, simulations provide the ability to execute code in the audio thread.
 This allows you to write code that can update the nodes you are using without ever missing a block.
-The callback receives the simulation and the simulation's current time as parameters.
+This is called the block callback.
+It receives the simulation and the simulation's current time as parameters.
 because it is running in the audio thread, this callback should try its best not to block.
 Unlike some other audio libraries, blocking here is perfectly fine, but it will slow down audio mixing.
 In addition, you are executing inside the critical section of the audio thread, so other threads of your application that may need to access this simulation will not be able to make progress.
 It is not only safe to call Libaudioverse functions, but expected.
-The only rule you must not break here is this: do not access another simulation or an object belonging to another simulation.
-This is the most complicated way to write code that drives Libaudioverse, and is primarily intended for synthesizers and the development of instruments, where the greatest concern is on precise, sample-accurate  timing.
+This function should act exactly as though it is being executed between calls to `Lav_simulationLock` and `Lav_simulationUnlock`.
+This is the most complicated way to write code that drives Libaudioverse.
+This callback exists for those applications where the greatest concern is on precise, sample-accurate  timing.
 
 [[basics-nodes]]
 ==== Nodes
@@ -96,13 +65,14 @@ Every node will run at most once per block, as described <<basics-audio-processi
 The specifics of properties are also discussed in a dedicated section, <<basics-properties,namely this one>>.
 
 The relationship between inputs and outputs is many-to-many, acting as though every input is a small mixer.
-This means that it is possible to have one node feed the input of many others, or to add nodes together by connecting them to the same input.
+It is therefore possible to have one node feed the input of many others, or to add nodes together by connecting them to the same input.
 An example of the former is feeding a file through 4 filters in parallel;
 an example of the latter is additive synthesis, a technique whereby sounds are made by adding other sounds together (typically sine waves).
 
 While properties are discussed later, one deserves special mention here. Every node has a state, either playing, always playing, or paused.  The specific meanings of these are discussed below alongside the audio algorithm, but references to a node's state refer to this property.
 
 Finally, inputs and outputs have channel counts associated with them.  So long as you are working with standard channel counts, Libaudioverse will "do the right thing" and upmix/downmix your audio appropriately.
+This upmixing/downmixing is described in <<basics-audio-output,the section on audio output>>.
 
 [[basics-buffers]]
 ==== Buffers
@@ -130,7 +100,6 @@ A k-rate property is evaluated at the beginning of a block and not read again un
 an a-rate property is read every sample.
 Only float and double properties can be a-rate.
 
-
 In addition, the following types of properties are present in Libaudioverse:
 
 - Boolean: Holds 0 or 1.  In the C API, this is manipulated using the functions for int properties.
@@ -138,8 +107,8 @@ In addition, the following types of properties are present in Libaudioverse:
 - Float: Holds a 32-bit floating point value.
 - Double: Holds a64-bit double.
 - Buffer: Holds a reference to a buffer.
-- Float3: Holds a vector of 3 floats, primarily for position in the 3D audio components of this library.
-- Float6: Holds a vector of 6 floats, also for use primarily by the 3D components.
+- Float3: Holds a vector of 3 floats, primarily for position in the 3D audio components of this library.  All 3 components must be updated at once.
+- Float6: Holds a vector of 6 floats, also for use primarily by the 3D components.  All 6 components must be updated at once.
 - Int array: Holds an array of integers with limits on its length.
 - Float array: Holds an array of floats with limits on its length.
 - String: A string.
@@ -168,22 +137,23 @@ To be more formal, the value of an automatable property for time `t` where `t` i
 - let the node value be the value of all connected nodes at `t`, summed.
 - The value of the property is the sum of the intrinsic and node values.
 
-[[basics-audio-processing]]
-=== Audio Processing and Connections
+[[basics-node-processing]]
+=== Node Processing and Connections
 
-So far, no discussion has been made of how simulations know what audio to output, or how audio is routed.
-This section remedies this deficiency.
+Simulations are like nodes with 1 input that cannot be accessed through the usual functions.
+Nodes have a function, namely `Lav_nodeConnectSimulation`, which connects a specific output to the internal input connection of the simulation passed to the node when it was created.
 
-Simulations are like nodes with 1 input and 1 output, save that you cannot access them through the usual function.
-Nodes have a function, namely `Lav_nodeConnectSimulation`, which connects a specific output to the simulation passed to the node when it was created.
-The output of a simulation is exposed either via `Lav_simulationGetBlock` for read simulations or as the audio played for the user for regular simulations.
+Both nodes and simulations have their own time, measured relative to how many blocks of audio have been processed.
+This is used with the automation API in order to determine the values of properties.
+When a time is not relative to realtime, this manual will make a point of indicating that this is the case.
+It is not possible to query this time.
 
 Nodes also have a state.
 Two of these, stopped and always playing, are simple.
 If a node is stopped, time does not advance for it.
-If a node is always playing, time always advances for it.
+If a node is always playing, time always advances for it at the same rate that time is advancing for the simulation.
 The final state is playing, which is slightly more complex.
-While this can be explained in English, this is a case where pseudocode is worth a thousand words:
+While these concepts can be explained in English, this is a case where pseudocode is worth a thousand words:
 
 ....
 function process(node):
@@ -199,34 +169,62 @@ function audio_algorithm(simulation):
         process(i)
 ....
 
-When a node ticks, time advances for the node.
-This is important because automators are computed relative to the node's current time, not that of the simulation.
-This allows one to pull off a couple  important tricks.
-If you leave the state of a node as the default (playing), it will only advance time if there is a direct path from one of its outputs, through 0 or more nodes,  to the simulation.
-This lets you:
+Libaudioverse will prevent you from causing cyclic dependencies.
 
-- Create factory functions that set up very complex node and automation configurations without using an atomic block.
-- Reuse complex node structures by disconnecting one output, making the entire thing stop processing.
+If you wish to escape this algorithm, set every node to the always playing state after creating it.
+That said, this algorithm usually does what you want.
+Consider the following sequence:
 
-If we started the node as always playing, the first of the above two items is impossible without an atomic operation.
-But the real reason for this algorithm is as follows.
-If you are in a language using garbage collection, rather than having to finalize an entire collection of nodes, you can often simply disconnect one or change its state to stopped.
-The alternative is to use explicit finalizers, a technique which can often become cumbersome, especially for games.
-The above algorithm usually does the right thing and, if it does not, you can change the state to always playing and escape it.
+- You want to build a structure of nodes representing an instrument.
+- You create each node, set its state to always playing, and connect it to other nodes.
+- In the middle of this process, a block advances.
+- Some of these nodes advance, but the rest do not.
+- The instrument gets returned, and stored temporarily.
+- Time advances some more.
+- You connect it to the simulation.
 
-[[basics-devices]]
-=== Devices and Device Indices
+At which point you are playing a half-played instrument.
+If the default state is always playing, the same problem arises: time might advance between the node's creation and you changing it to the playing state.
+It can also happen for file nodes: time can advance by a block before you get the file node connected to the simulation, or whereever else it is going.
+In garbage collected languages, there is one additional implication of always playing: if a node is no longer needed but has yet to be garbage collected, it will still take up CPU resources.
+While this is not a big deal for, say, the amplitude panner, some nodes like the HRTF panner and the feedback delay network take up large amounts of CPU resources.
 
-Libaudioverse represents the audio device as a regular simulation with a device index.
-This is an integer ranging from -1 to one less than the maximum number of devices on the system.
-0 through the maximum value are specific audio devices and -1 is default with follow.
-That is, a request for device -1 will use the default sound device and attempt to follow it if the user changes it.
-The following functionality of -1 is not possible on all platforms.
+[[basics-audio-output]]
+=== Audio Output and Mixing
 
-Note that we cannot query speaker layouts or latency requirements.
-This information is not reliable on any platform I am currently aware of: devices that lie to the system are common, as is backward compatibility hacks.
+Libaudioverse represents the audio device as a regular simulation with an associated output device.
+When an output device is associated, it becomes impossible for a program to read the simulation directly.
+Instead, an internal thread mixes audio from the simulation and passes it to the sound card.
+
+Output devices are represented by a device index, an integer ranging from -1 to one less than the maximum number of devices on the system.
+-1 is the default audio device.
+Additionally, if possible on the platform in question, -1 will attempt to follow the default audio device if it changes.
+
+Libaudioverse does provide some query functions to get information on devices, but this information is not reliable on any platform I am currently aware of: devices that lie to the system are common, as is backward compatibility hacks.
 Good examples include WinMM on Windows (more than happy to claim 7.1 surround sound on stereo headphones)
 and the Logitech G930 headphones, which always show up as surround sound even when switched to stereo by a physical switch on the device.
 
-This essentially means that there is no other option: ask your user what their audio configuration is and use a multipanner or the 3D simulation components for easy switching.
-The only good default for panners is stereo with no HRTF, as this will be upmixed to surround sound systems by the OS in most cases and we don't know if the user is using headphones.
+This essentially means that there is no other option but asking your user what their audio configuration is.
+To deal with the uncertainty, use a multipanner or the 3D simulation components for easy switching.
+The only good default for panners is stereo with no HRTF, as this will be upmixed to surround sound systems by the OS in most cases.
+
+==== Automatic Mixing
+
+Libaudioverse supports the ability to automatically upmix and downmix audio.
+It understands the following formats:
+
+- Mono.  Specified with channel value 1.
+- Stereo.  2 channels.  Channel 0 is left, channel 1 is right.
+- 5.1 surround sound.  6 channels.  Front left, front right, center, LFE, rear left, rear right.
+- 7.1.  8 channels.  Front left, front right, center, lfe, rear left, rear right, side left, side right.
+
+Any connection made between an input and an output with these channel values will cause audio to be remixed accordingly.
+In other configurations, one of the following two cases happens:
+
+- If the output has more channels than the input, additional channels are dropped.
+- If the input has more channels than the output, additional channels are considered to be zero.
+
+Simulations do not have an intrinsic channel count.
+Instead, this is a parameter to either `Lav_getBlock` or `Lav_simulationSetOutputDevice`.
+All nodes which are connected to the simulation will be remixed in the same manner as any other input-output connection,
+but the channel count used is the one specified to either of these functions.
