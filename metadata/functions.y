@@ -209,20 +209,22 @@ functions:
       After a call to this function, it is again safe to use `Lav_simulationGetBlock`.
     params:
       simulationHandle: The simulation whose output device should be cleared.
-  Lav_simulationBeginAtomicBlock:
+  Lav_simulationLock:
     category: simulations
     doc_description: |
-      All operations between a call to this function and a call to Lav_simulationEndAtomicBlock will happen together, with no blocks mixed between them.
-      This is equivalent to holding the internal lock of the simulation yourself, so failure to call Lav_simulationEndAtomicBlock in a timely manner will cause audio to stop.
-      Furthermore, other  threads will block if they try to  manipulate the simulation directly or indirectly.
-      In summary, treat this with the same caution and in the same way as a regular lock.
+      All operations between a call to this function and a call to `Lav_simulationUnlock` will happen together, with no blocks mixed between them.
+      This is equivalent to assuming that the simulation is a lock, with  all of the required caution that implies.
+      If you do not call `Lav_simulationUnlock` in a timely manner, then audio will stop until you do.
+      accessing another simulation for which your app uses `Lav_simulationLock` or
+      locking or unlocking another lock are both  dangerous operations.
+      Blocking will cause glitches in audio, but is otherwise safe.
     params:
       simulationHandle: The simulation to lock.
-  Lav_simulationEndAtomicBlock:
+  Lav_simulationUnlock:
     category: simulations
     doc_description: |
       Release the internal lock of a simulation, allowing normal operation to resume.
-      This is to be used after a call to Lav_simulationBeginAtomicBlock and on the same thread as that call; calling it in any other circumstance or on any other thread invokes very, very undefined behavior.
+      This is to be used after a call to `Lav_simulationLock` and on the same thread as that call; calling it in any other circumstance or on any other thread invokes undefined behavior.
     params:
       simulationHandle: The simulation to release.
   Lav_simulationSetBlockCallback:
