@@ -231,16 +231,14 @@ Lav_PUBLIC_FUNCTION LavError Lav_simulationClearOutputDevice(LavHandle simulatio
 	PUB_END
 }
 
-//atomic blocks
-
-Lav_PUBLIC_FUNCTION LavError Lav_simulationBeginAtomicBlock(LavHandle simulationHandle) {
+Lav_PUBLIC_FUNCTION LavError Lav_simulationLock(LavHandle simulationHandle) {
 	PUB_BEGIN
 	auto simulation = incomingObject<Simulation>(simulationHandle);
 	simulation->lock();
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_simulationEndAtomicBlock(LavHandle simulationHandle) {
+Lav_PUBLIC_FUNCTION LavError Lav_simulationUnlock(LavHandle simulationHandle) {
 	PUB_BEGIN
 	auto simulation = incomingObject<Simulation>(simulationHandle);
 	simulation->unlock();

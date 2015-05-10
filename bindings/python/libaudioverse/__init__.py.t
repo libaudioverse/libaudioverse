@@ -229,10 +229,10 @@ Calling this on an audio output device will cause the audio thread to skip ahead
 
 	#context manager support.
 	def __enter__(self):
-		_lav.simulation_begin_atomic_block(self.handle)
+		_lav.simulation_lock(self.handle)
 
 	def __exit__(self, type, value, traceback):
-		_lav.simulation_end_atomic_block(self.handle)
+		_lav.simulation_unlock(self.handle)
 
 	def set_block_callback(self, callback, additional_args=None, additional_kwargs=None):
 		with self._lock:

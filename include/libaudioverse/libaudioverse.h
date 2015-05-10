@@ -200,14 +200,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_simulationGetSr(LavHandle simulationHandle, int
 Lav_PUBLIC_FUNCTION LavError Lav_simulationSetOutputDevice(LavHandle simulationHandle, int index, int channels, int mixahead);
 Lav_PUBLIC_FUNCTION LavError Lav_simulationClearOutputDevice(LavHandle simulationHandle);
 
-/**Atomic block support.
-Todo: find a better name.
-This isn't truly atomic: operations you perform will not roll back on error.
-When an atomic block is begun, the net effect is that the current thread holds a lock to the libaudioverse simulation. If your code blocks, Libaudioverse cannot mix.
-Every call to Lav_simulationBeginAtomicBlock must be matched with a call to Lav_simulationEndAtomicBlock or audio will stop. Atomic blocks do nest.
-*/
-Lav_PUBLIC_FUNCTION LavError Lav_simulationBeginAtomicBlock(LavHandle simulationHandle);
-Lav_PUBLIC_FUNCTION LavError Lav_simulationEndAtomicBlock(LavHandle simulationHandle);
+/**Lock/unlock the simulation.*/
+Lav_PUBLIC_FUNCTION LavError Lav_simulationLock(LavHandle simulationHandle);
+Lav_PUBLIC_FUNCTION LavError Lav_simulationUnlock(LavHandle simulationHandle);
 
 /**The block callback.
 This can be used in some situations for precise timing.
