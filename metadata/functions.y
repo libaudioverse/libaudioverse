@@ -147,21 +147,12 @@ functions:
     params:
       index: The index of the audio device.
       destination: Contains the number of channels the device claims to support.
-  Lav_createSimulationForDevice:
+  Lav_createSimulation:
     category: simulations
     doc_description: |
-      Creates a simulation that outputs on the specified audio device and with the specified parameters.
-    params:
-      index: The audio device to use.
-      channels: The number of channels to request from the audio device.
-      sr: The sampling rate for all nodes created using this simulation.
-      blockSize: The size of each block, in samples.
-      mixAhead: The mixahead.  See the explanation in the basics section.
-      destination: After a call to this function, contains the handle of the newly created simulation.
-  Lav_createReadSimulation:
-    category: simulations
-    doc_description: |
-      Creates a read simulation, a simulation with no associated audio device.
+      Creates a  simulation.
+      The new simulation has no associated audio device.
+      To make it output, use `Lav_simulationSetOutputDevice`.
     params:
       sr: The sampling rate of the new simulation.
       blockSize: The block size of the new simulation.
@@ -192,6 +183,32 @@ functions:
     params:
       simulationHandle: The handle of the simulation.
       destination: Contains the sampling rate, in hertz.
+  Lav_simulationSetOutputDevice:
+    category: simulations
+    doc_description: |
+      Set the output device of the simulation.
+      -1 is the system default.  0 and above are specific audio devices, matching the indices returned by the enumeration functions.
+      
+      Note that it is possible to change the output device of a simulation even after it has been set.
+      This latter case is an expensive operation: Libaudioverse will block until all queued blocks have finished playing.
+      
+      After the output device has been set, calls to `Lav_simulationGetBlock` will error.
+    params:
+      simulationHandle: The simulation whose output device is to be set.
+      index: The output device  the simulation is to play on.
+      channels: The number of channels we wish to output.
+      mixahead: The mixahead.  See the basics section for information.
+  Lav_simulationClearOutputDevice:
+    category: simulations
+    doc_description: |
+      Clear a simulation's output device.
+      
+      This is no-op if no output device has been set.
+      If it has, this function will block until queued audio finishes.
+      
+      After a call to this function, it is again safe to use `Lav_simulationGetBlock`.
+    params:
+      simulationHandle: The simulation whose output device should be cleared.
   Lav_simulationBeginAtomicBlock:
     category: simulations
     doc_description: |
