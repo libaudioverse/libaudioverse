@@ -34,34 +34,40 @@ If set, it will be called every block, receiving the simulation and the simulati
 Code in this function can be thought of as executing between a `Lav_simulationLock` and `Lav_simulationUnlock` pair, and all the same considerations apply.
 This is by far the most complicated way to drive Libaudioverse, but is helpful when implementing event timelines or virtual instruments.
 
-[[basics-nodes]]
-=== Nodes
-
-Nodes process audio and are composed of three main components: inputs, outputs, and properties.
-Most of the explanation of nodes is in other subsections.
-Every node will run at most once per block, as described <<basics-audio-processing,here>>.
-The specifics of properties are also discussed in a dedicated section, <<basics-properties,namely this one>>.
-
-The relationship between inputs and outputs is many-to-many, acting as though every input is a small mixer.
-It is therefore possible to have one node feed the input of many others, or to add nodes together by connecting them to the same input.
-An example of the former is feeding a file through 4 filters in parallel;
-an example of the latter is additive synthesis, a technique whereby sounds are made by adding other sounds together (typically sine waves).
-
-While properties are discussed later, one deserves special mention here. Every node has a state, either playing, always playing, or paused.  The specific meanings of these are discussed below alongside the audio algorithm, but references to a node's state refer to this property.
-
-Finally, inputs and outputs have channel counts associated with them.  So long as you are working with standard channel counts, Libaudioverse will "do the right thing" and upmix/downmix your audio appropriately.
-This upmixing/downmixing is described in <<basics-audio-output,the section on audio output>>.
-
 [[basics-buffers]]
 === Buffers
 
 Buffers are the simplest Libaudioverse object: they hold audio data.
 This data can come from anywhere and be at any sampling rate.
-When the buffer's data is set, the data in it is resampled.
+When the buffer's data is set, the data in it is resampled to match the sampling rate of the simulation used to create it.
 
 Buffers are intended to allow many copies of the same data to be in use simultaneously.
-The use of the same buffer in multiple places takes only the resources of the node, not also the buffer.
+Instead of loading multiple copies of a file or other data,
+it is possible to use the same buffer handle in multiple places.
+In addition, the expensive resampling operation need only occur once.
+
 Due to the resampling, buffers are not ideal for streaming; if you need streaming, use a streaming file node, pull node or push node.
+
+[[basics-nodes]]
+=== Nodes
+
+Nodes can be thought of as black boxes that manipulate audio.
+The following lists some things that nodes can do, roughly in the order that you will need them.
+
+- Produce audio, for example the buffer node and the sine node.
+- Modify audio, for example the biquad and IIR filter sections.
+- perform analysis or otherwise allow observation of audio as it passes through Libaudioverse.
+- Execute side effects like recording to files.
+
+If there is not a node that does what you want, it is even possible to make your own.
+
+If the simulation is the entry point of Libaudioverse, the node is the actual functionality.
+Since it is difficult to separate nodes from other concepts, most of the explanation of their features is in other subsections.
+Every node will run at most once per block, as described <<basics-audio-processing,here>>.
+Inputs and outputs are discussed <<basics-inputs-outputs,here>>.
+The specifics of properties are also discussed in a dedicated section, <<basics-properties,namely this one>>.
+
+While properties are discussed later, one deserves special mention here. Every node has a state, either playing, always playing, or paused.  The specific meanings of these are discussed below alongside the audio algorithm, but references to a node's state refer to this property.
 
 [[basics-properties]]
 === Properties
