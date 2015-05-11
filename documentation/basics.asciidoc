@@ -4,19 +4,8 @@
 In order to begin using Libaudioverse's 3d components, it is not necessary to fully understand this section.
 For a gentler and much more hands-on introduction, see the tutorials.
 
-[[basics-object-types]]
-=== Nodes, Simulations, and Buffers
-
-Libaudioverse has three main types of object:
-
-- The simulation represents a collection of nodes and mixes audio.
-- Nodes process or produce audio.
-- Buffers hold chunks of audio data.
-
-Each of these is discussed below.
-
 [[basics-simulation]]
-==== The Simulation
+=== The Simulation
 
 The simulation is the main entry point to Libaudioverse.
 When created, the simulation fixes the sampling rate and block size of all nodes that use it.
@@ -46,10 +35,10 @@ Code in this function can be thought of as executing between a `Lav_simulationLo
 This is by far the most complicated way to drive Libaudioverse, but is helpful when implementing event timelines or virtual instruments.
 
 [[basics-nodes]]
-==== Nodes
+=== Nodes
 
 Nodes process audio and are composed of three main components: inputs, outputs, and properties.
-most of the explanation of nodes is in other subsections.
+Most of the explanation of nodes is in other subsections.
 Every node will run at most once per block, as described <<basics-audio-processing,here>>.
 The specifics of properties are also discussed in a dedicated section, <<basics-properties,namely this one>>.
 
@@ -64,7 +53,7 @@ Finally, inputs and outputs have channel counts associated with them.  So long a
 This upmixing/downmixing is described in <<basics-audio-output,the section on audio output>>.
 
 [[basics-buffers]]
-==== Buffers
+=== Buffers
 
 Buffers are the simplest Libaudioverse object: they hold audio data.
 This data can come from anywhere and be at any sampling rate.
