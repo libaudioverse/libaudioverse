@@ -18,43 +18,32 @@ Each of these is discussed below.
 [[basics-simulation]]
 ==== The Simulation
 
-The simulation is the object which deserves most discussion, hence the length of this section.
-
 The simulation is the main entry point to Libaudioverse.
-When created, the simulation fixes the sampling rate of all nodes that use it.
+When created, the simulation fixes the sampling rate and block size of all nodes that use it.
 
-Every simulation has two key parameters: the sampling rate and the block size.
+For efficiency, Libaudioverse audio is processed in blocks.
+At the beginning of each block, properties are read and updated, node connections examined,  and audio synthesized.
+The most useful way to think of the block size is the number of samples for which any node connections and property settings are fixed.
 
-The sampling rate is exactly what it sounds like.  When in doubt, use 44100, as this is sufficient for most purposes.
-
-Libaudioverse processes audio in blocks.
-The block size is the size of this block.
-In effect, the block size is the number of samples for which any property values are fixed; properties are described below.
-When the simulation has an associated output device, the block size is the number of frames of audio that will be submitted to the sound card at once.
+More concretely, when the simulation has an associated output device, the block size is the number of frames of audio that will be submitted to the sound card at once.
 Otherwise, it is the number of frames of audio returned by a call to `Lav_getBlock`.
 
 See <<basics-audio-output,the section on outputting audio>> for information about associating the simulation to an audio output device.
 
-When making multiple calls to change aspects of audio, it is possible for the user to hear intermediate changes.
-This occurs because Libaudioverse might decide to process a block between them.
-It is therefore possible to treat the simulation like a lock, preventing all threads save the current one from accessing this simulation and its nodes.
-This includes Libaudioverse's internal threads for mixing.
+If an app is changing multiple properties, it is possible for Libaudioverse to decide to mix a block before they are all at their new values.
+To prevent this, the simulation may be treated like a lock.
+While locked, all other threads (including the internal mixer thread) will be unable to access this simulation or its objects.
 In the C API, this is available through `Lav_simulationLock` and `Lav_simulationUnlock`.
-For other languages, this is bound in the safest way possible.
-For example, Python only allows use of this feature via with blocks.
-This *is* a lock, and should be treated as such.
 
-Finally, simulations provide the ability to execute code in the audio thread.
-This allows you to write code that can update the nodes you are using without ever missing a block.
-This is called the block callback.
-It receives the simulation and the simulation's current time as parameters.
-because it is running in the audio thread, this callback should try its best not to block.
-Unlike some other audio libraries, blocking here is perfectly fine, but it will slow down audio mixing.
-In addition, you are executing inside the critical section of the audio thread, so other threads of your application that may need to access this simulation will not be able to make progress.
-It is not only safe to call Libaudioverse functions, but expected.
-This function should act exactly as though it is being executed between calls to `Lav_simulationLock` and `Lav_simulationUnlock`.
-This is the most complicated way to write code that drives Libaudioverse.
-This callback exists for those applications where the greatest concern is on precise, sample-accurate  timing.
+IMPORTANT: Locking the simulation is not called something else for a reason.
+If you fail to apply all the considerations you would apply to regular locks, deadlock will result.
+Note that all objects lock their simulations when accessed.
+If your app uses multiple simulations and also locks more than one of them at any point, then be careful not to access objects from the other simulation.
+
+If the requirement for syncing with audio perfectly exists, the block callback may be used.
+If set, it will be called every block, receiving the simulation and the simulation's current time as parameters.
+Code in this function can be thought of as executing between a `Lav_simulationLock` and `Lav_simulationUnlock` pair, and all the same considerations apply.
+This is by far the most complicated way to drive Libaudioverse, but is helpful when implementing event timelines or virtual instruments.
 
 [[basics-nodes]]
 ==== Nodes
