@@ -64,7 +64,7 @@ If there is not a node that does what you want, it is even possible to make your
 If the simulation is the entry point of Libaudioverse, the node is the actual functionality.
 Since it is difficult to separate nodes from other concepts, most of the explanation of their features is in other subsections.
 Every node will run at most once per block, as described <<basics-audio-processing,here>>.
-Inputs and outputs are discussed <<basics-inputs-outputs,here>>.
+Inputs and outputs are discussed <<basics-connections,here>>.
 The specifics of properties are also discussed in a dedicated section, <<basics-properties,namely this one>>.
 
 While properties are discussed later, one deserves special mention here. Every node has a state, either playing, always playing, or paused.  The specific meanings of these are discussed below alongside the audio algorithm, but references to a node's state refer to this property.
@@ -122,3 +122,159 @@ To be more formal, the value of an automatable property for time `t` where `t` i
 - let the node value be the value of all connected nodes at `t`, summed.
 - The value of the property is the sum of the intrinsic and node values.
 
+[[basics-connections]]
+=== Connections
+
+Every node has some number of inputs and outputs.
+In order to feed the output of nodes to other nodes, it must be possible to form connections between them.
+
+Libaudioverse takes the approach of specifying connections  as destinations for outputs.
+That is, given some node `n`, output `o`, destination node `n2`, and input index `i`:
+
+
+....
+Lav_nodeConnect(n, o, n2, i);
+....
+
+Forms a connection from output `o` of node `n` to input `i` of node `n2`.
+
+Any output may be connected to any number of inputs.  Any input may have any number of outputs connected to it.
+Libaudioverse has no simple mixer node.  To build one, just connect all the outputs to be mixed to the same input of a gain node or other construct appropriate to your application.
+
+Outputs are chosen over inputs because this unifies the API.
+It is also possible to connect nodes to properties and the simulationn, both of which are not strictly inputs in the convensional sense.
+
+An example is the function `Lav_nodeConnectProperty` which enables connecting outputs to automatable properties.
+As explained in the <<basics-properties,properties section>>, outputs act as offsets to the values of properties when connected to them.
+
+It is not possible to introspect the graph of connected nodes.
+it is also not possible to disconnect specific output-input pairs.
+The only way to break connections is with `Lav_nodeDisconnect`, which breaks all connections involving a specified output.
+
+In most language bindings, nodes are kept alive as long as they have an output which is connected to something that is also alive.
+Note that this is not a feature of the C API but the bindings themselves.
+
+[[basics-channels]]
+=== Channels and Automatic Conversion
+
+Every input and output has a channel count associated with it.
+If both the input and the output in questionh have one of the values in the following table, Libaudioverse will convert the audio as appropriate.
+
+|====
+| Number | Name | Order
+| 1 | Mono | mono
+| 2 | Stereo | Front Left, Front Right
+| 6 | 5.1 SurroundSound | Front Left, Front Right, Center, LFE, Back Left, Back Right
+| 8 | 7.1 Surround Sound | Front left, Front Right, Center, LFE, Back Left, Back Right, Side Left, Side Right
+|====
+
+It is not currently possible to query the channel count of an output or an input.
+All automatable properties are treated as mono.
+The simulation's input can change from block to block, as its channel count depends on a parameter to `Lav_simulationGetBlock`.
+All other inputs and outputs depend only on parameters provided by your app or, in some cases, the values of specific properties.
+
+In the case where one end of the connection is not using one of the standard channel counts, one of two things happens.
+If the input has less channels than the output, additional channels are filled with zeros.
+If the output has less channels than the  input, additional channels are dropped.
+
+If you need to manipulate channels individually, the channel splitter and channel merger nodes allow doing so.
+This is one of the three cases wherein the channel order matters:
+a channel splitter splits an output into n outputs, where n is a number you specify to its constructor.
+The first output is the first channel, the second the second, etc.
+
+The other two cases in which the channel orders can be observed directly are callback functions that manipulate audio and `Lav_simulationGetBlock`.
+These cases are discussed in other sections.
+
+[[basics-audio-processing]]
+=== Audio Processing and Extracting Audio
+
+Every node has three states: stopped, playing, and always playing.
+The following is pseudocode for the processing algorithm.
+
+....
+function process(node):
+  if node.has_processed is True then return
+  if node.state=="stopped" then return
+  for i in get_dependents(node):
+    process(i)
+
+function get_block(simulation):
+  for i in simulation.input_connection.nodes:
+    process(i)
+  for i in simulation.nodes:
+    if i.state=="always playing" and not i.has_processed:
+      process(i)
+  block = sum(simulation.input_connection.connected_outputs)
+....
+
+This looks complicated.
+The tutorials make a point of showing how to use it to your advantage.
+Note that, if we always process all nodes, it is not possible to meaningfully use the factory pattern, as Libaudioverse might advance by a block while we are building and configuring objects.
+
+There are two ways in which this algorithm may be triggered.
+The simplest is with `Lav_simulationGetBlock`, taking as parameters a channel count, a buffer, and a flag to either allow automatic mixing to be applied or to force extra channels to be dropped.
+If your application wishes to write audio to a file or implement a VST plugin, this is the function it is using.
+The other is when the simulation is associated with an output device, in which case `Lav_simulationGetBlock` will error if called from your code because it is conceptually being called by a background thread that is performing audio mixing.
+
+[[basics-devices]]
+=== Audio Devices
+
+Libaudioverse represents audio devices with an index from -1 to `n-1`, where `n-1` is the maximum number of devices on  the system.
+0 through `n-1` are specific output devices.
+To get specific information, use the device enumeration API.
+
+-1 is special.
+-1 is always available and represents the default audio device.
+In addition, if the default audio device changes, -1 will attempt to change the simulations' device with it.
+
+The only "safe" default for channels on desktop platforms is stereo, which should be played reliably by virtually any setup anywhere.
+Other channel counts may or may not work as expected.
+It is an unfortunate consequence of the complexity of the modern audio stack that the desired default cannot be determined automatically.
+Libaudioverse attempts to query this information for you, but modern OSes will happily lie.
+Windows WaveOut, for example, is more than happy to claim support for 7.1 surround sound on stereo headphones.
+Some hardware such as the Logitech G930 attempts to provide surround sound imulation.
+Such hardware  may claim to be a 5.1 or 7.1 surround sound device, even when it is configured to be stereo headphones.
+
+As distasteful as it is, the best approach to take is simply this: default to stereo speakers and provide an option in the options of your applcation to change it to something else.
+Libaudioverse provides the multipanner and properties on the 3D simulation components for this purpose.
+
+Simulations are associated with output devices by `Lav_simulationSetOutputDevice` and can be made to stop playing with `Lav_simulationClearOutputDevice`.
+It is safe to call `Lav_simulationSetOutputDevice` more than once, but this function will block until all queued blocks have played.
+
+`Lav_simulationSetOutputDevice` takes a parameter called mixahead.
+It is possible for the OS to preempt Libaudioverse or for Libaudioverse to be under a heavy workload.
+Mixahead specifies a number of blocks of audio  that should be prepared ahead of time and used to provide some leeway for this case.
+To calculate the total latency this introduces in seconds, use `block_size*mixahead/sr`.
+
+Note that introducing a latency of 100 MS using a block size of 1024 works for most people.
+This is about a  mixahead of 5.
+Many systems can safely go much lower, however, so providing an option to do so may be advisable.
+This is especially true of real-time apps such as games and synths, where 100 MS is a significant latency.
+It is suggestred to fix the block size at a size where the audio updates are not noticeable, a value which highly depends on the application in question.
+In most cases,  allowing configuration of the mixahead is more than enough.
+
+[[basics-events-callbacks]]
+=== Events and Callbacks
+
+Events and callbacks are two very similar concepts.
+
+An event is a function with a specific signature that is called in order to inform your application of something.
+Libaudioverse does not expect anything from the application when an event is fired, and it is safe to call Libaudioverse APis from events.
+Events make no guarantee on their latency, and are far from sample accurate.
+Examples of events include indication that a file has ended.
+Events are manipulated from a node-neutral API and always have the same signature.
+It is not possible for Libaudioverse to send info with an event, save for the node that caused it and the fact that it has happened.
+
+Callbacks are requests from Libaudioverse.
+Callbacks mandate that you not touch any of the Libaudioverse API for any purpose, and run inside the mixing threads of Libaudioverse.
+They are most commonly used for requests from Libaudioverse for specific data
+or to pass out data to the application using them.
+Examples of callbacks include passing audio data out to your application (the graph listener) or requesting audio data from the application to be fed to further nodes in the pipeline (the pull node).
+One notable use for callbacks is the implementation of a custom node.
+Callbacks each have a different signature and are manipulated through dedicated getters and setters on a node-specific basis.
+
+It is not safe to assume that a callback or event will be called from a specific thread.
+It is possible for them to change threads at runtime at any time and for any reason.
+Exactly one guarantee is made: if you are not using `Lav_simulationGetBlock`, they will never happen on the main thread of your application.
+
+the specifics of each event and callback are documented in the node reference.
