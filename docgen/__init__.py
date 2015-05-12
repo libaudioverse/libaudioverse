@@ -9,10 +9,10 @@ import jinja2
 from .c_api import make_c_api
 
 def make_property_table():
-	env = jinja2.Environment(loader = jinja2.PackageLoader(__package__, ""), undefined = jinja2.StrictUndefined, trim_blocks = True)
-	env.filters.update(transformers.get_jinja2_filters())
-	context = dict()
 	all_info =get_info.get_all_info()
+	env = jinja2.Environment(loader = jinja2.PackageLoader(__package__, ""), undefined = jinja2.StrictUndefined, trim_blocks = True)
+	env.filters.update(transformers.get_jinja2_filters(all_info))
+	context = dict()
 	context.update(all_info)
 	template = env.get_template("node_reference.t")
 	sorted_nodes= context['metadata']['nodes'].items()

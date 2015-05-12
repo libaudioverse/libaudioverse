@@ -26,7 +26,7 @@ Error  conditions are not documented; see the enum section of this documentation
 {%set function_documentation = metadata['functions'][name]%}
 ===== {{name}}
 
-Prototype: `{{function_object | prototype}}`
+Prototype: `{{function_object | function_to_string}}`
 
 {{function_documentation['doc_description']}}
 

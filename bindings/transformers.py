@@ -3,6 +3,7 @@
 These are then made available to templates."""
 import re
 import os.path
+from . import get_info
 
 def without_lav(s):
 	"""Remove the lav_ prefix from a Libaudioverse identifier."""
@@ -113,7 +114,7 @@ def get_jinja2_filters(all_info):
 		'regexp_filter': regexp_filter,
 		'strip_prefix': strip_prefix,
 		'strip_suffix': strip_suffix,
-		'compute_all_typedefs': lambda x: compute_all_typedefs(x, all_info),
+		'compute_involved_typedefs': lambda x: compute_involved_typedefs(x, all_info),
 		'function_to_string': function_to_string,
 		'function_pointer_to_string': function_pointer_to_string,
 		'type_to_string': type_to_string,

@@ -16,7 +16,7 @@ def verify_all_parameters_documented(info, docs):
 def make_c_api():
 	all_info =get_info.get_all_info()
 	env = jinja2.Environment(loader=jinja2.PackageLoader(__package__, ""), undefined=jinja2.StrictUndefined, trim_blocks=True)
-	env.filters.update(transformers.get_jinja2_filters())
+	env.filters.update(transformers.get_jinja2_filters(all_info))
 	context=dict()
 	context.update(all_info)
 	functions_by_category=dict()
