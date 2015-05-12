@@ -632,4 +632,3 @@ functions:
       What this means depends on the node in question, so see its documentation.
     params:
       nodeHandle: The node to reset.
-  
