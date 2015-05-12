@@ -14,7 +14,7 @@ def make_property_table():
 	context = dict()
 	all_info =get_info.get_all_info()
 	context.update(all_info)
-	template = env.get_template("object_reference.t")
+	template = env.get_template("node_reference.t")
 	sorted_nodes= context['metadata']['nodes'].items()
 	sorted_nodes.sort(key = lambda x: x[1]['doc_name'].lower())
 	sorted_nodes= [i[0] for i in sorted_nodes]
