@@ -14,6 +14,11 @@ For a discussion of property types, see Property Types.  For a discussion of cal
 Any function not described in the <<c-api,C API section>> is a "extra function", a function which breaks the usual property model.
 Extra functions do any number of things and are documented with the node that they manipulate.
 
+To determine the number of inputs and outputs a node has, as well as their channel counts, check the general description of the node and the description of its constructor in that order.
+No node's output or input count can change after the node is created.
+A few nodes make the input and output channel counts change depending on properties.
+The most notable node of this type is the amplitude panner.
+
 {%for node_name in sorted_nodes%}
 {%set doc_header = nodes[node_name]['doc_name']%}
 === {{doc_header}}
