@@ -75,44 +75,45 @@ While properties are discussed later, one deserves special mention here. Every n
 Every node can have any number of properties.
 To find out specifically which properties a specific node of interest has, see the node reference.
 
-The purpose of a property is to hold a value.
-By abstracting the logic of getting and setting values behind them, properties allow Libaudioverse to pull off a number of tricks: introspection and high-quality language binding among them.
-
 There are two broad categories of properties: k-rate and a-rate.
 These terms are borrowed from other systems similar to Libaudioverse.
 A k-rate property is evaluated at the beginning of a block and not read again until the next block;
 an a-rate property is read every sample.
 Only float and double properties can be a-rate.
 
-In addition, the following types of properties are present in Libaudioverse:
+The following types of properties are present in Libaudioverse:
 
-- Boolean: Holds 0 or 1.  In the C API, this is manipulated using the functions for int properties.
+- Boolean: Holds 0 or 1.
+In the C API, this is manipulated using the functions for int properties.
+The distinction is only important in language bindings, which map boolean to the language's native boolean type.
 - Int: holds a 32-bit integer.
 - Float: Holds a 32-bit floating point value.
 - Double: Holds a64-bit double.
 - Buffer: Holds a reference to a buffer.
-- Float3: Holds a vector of 3 floats, primarily for position in the 3D audio components of this library.  All 3 components must be updated at once.
-- Float6: Holds a vector of 6 floats, also for use primarily by the 3D components.  All 6 components must be updated at once.
+- Float3: Holds a vector of 3 floats, primarily for position in the 3D audio components of this library.
+All 3 components must be updated at once.
+- Float6: Holds a vector of 6 floats, also for use primarily by the 3D components.
+All 6 components must be updated at once.
 - Int array: Holds an array of integers with limits on its length.
 - Float array: Holds an array of floats with limits on its length.
 - String: A string.
 
-Of these, float and double properties need further discussion.
+Float and double properties need further discussion.
 A float or double property, hereafter an automatable property, has a couple extra features.
 
 The first of these is that it is possible to connect nodes to automatable properties, in much the same way that one connects nodes to other nodes.
-When this happens, the audio of all connected nodes is downmixed to mono, added, and used to help contribute to the value of the property.
+When this happens, the audio of all connected nodes is downmixed to mono, added, and used as an offset on the property's set value.
 
-The second feature that automatable properties support is automators.
-These are borrowed directly from Web Audio.
+Automatable properties also support automators, a concept borrowed directly from Web Audio.
 An automator moves the value of a property according to a specific instruction.  The current automators are as follows:
 
 - Linear ramp to value: moves the property to a specific value by a specific time.
 
-In the various programming language bindings, these are found on the classes which represent the properties themselves.
+In the various programming language bindings, automation methods are found on the classes which represent the properties themselves.
 For example, in Python, `mysine.frequency.linear_ramp_to_value(1.0, 500.0)` will move the frequency of the sine node from where it is now to 500.0 HZ over 5 seconds.
 
-Unlike node connections, changing the value of or resetting an automatable property will cancel all automators.
+Changing the value of an automatable property will cancel all automators while leaving nodes connected.
+If you wish to disconnect nodes, you must do so manually.
 
 To be more formal, the value of an automatable property for time `t` where `t` is relative to the node's current time is computed as follows:
 
@@ -121,94 +122,3 @@ To be more formal, the value of an automatable property for time `t` where `t` i
 - let the node value be the value of all connected nodes at `t`, summed.
 - The value of the property is the sum of the intrinsic and node values.
 
-[[basics-node-processing]]
-=== Node Processing and Connections
-
-Simulations are like nodes with 1 input that cannot be accessed through the usual functions.
-Nodes have a function, namely `Lav_nodeConnectSimulation`, which connects a specific output to the internal input connection of the simulation passed to the node when it was created.
-
-Both nodes and simulations have their own time, measured relative to how many blocks of audio have been processed.
-This is used with the automation API in order to determine the values of properties.
-When a time is not relative to realtime, this manual will make a point of indicating that this is the case.
-It is not possible to query this time.
-
-Nodes also have a state.
-Two of these, stopped and always playing, are simple.
-If a node is stopped, time does not advance for it.
-If a node is always playing, time always advances for it at the same rate that time is advancing for the simulation.
-The final state is playing, which is slightly more complex.
-While these concepts can be explained in English, this is a case where pseudocode is worth a thousand words:
-
-....
-function process(node):
-    if node.state == "stopped" then return
-    for i in get_dependencies(node):
-        process(i)
-    node.tick()
-
-function audio_algorithm(simulation):
-    for i in simulation.connected_nodes:
-        process(i)
-    for i in simulation.all_nodes if i.state=="always playing":
-        process(i)
-....
-
-Libaudioverse will prevent you from causing cyclic dependencies.
-
-If you wish to escape this algorithm, set every node to the always playing state after creating it.
-That said, this algorithm usually does what you want.
-Consider the following sequence:
-
-- You want to build a structure of nodes representing an instrument.
-- You create each node, set its state to always playing, and connect it to other nodes.
-- In the middle of this process, a block advances.
-- Some of these nodes advance, but the rest do not.
-- The instrument gets returned, and stored temporarily.
-- Time advances some more.
-- You connect it to the simulation.
-
-At which point you are playing a half-played instrument.
-If the default state is always playing, the same problem arises: time might advance between the node's creation and you changing it to the playing state.
-It can also happen for file nodes: time can advance by a block before you get the file node connected to the simulation, or whereever else it is going.
-In garbage collected languages, there is one additional implication of always playing: if a node is no longer needed but has yet to be garbage collected, it will still take up CPU resources.
-While this is not a big deal for, say, the amplitude panner, some nodes like the HRTF panner and the feedback delay network take up large amounts of CPU resources.
-
-[[basics-audio-output]]
-=== Audio Output and Mixing
-
-Libaudioverse represents the audio device as a regular simulation with an associated output device.
-When an output device is associated, it becomes impossible for a program to read the simulation directly.
-Instead, an internal thread mixes audio from the simulation and passes it to the sound card.
-
-Output devices are represented by a device index, an integer ranging from -1 to one less than the maximum number of devices on the system.
--1 is the default audio device.
-Additionally, if possible on the platform in question, -1 will attempt to follow the default audio device if it changes.
-
-Libaudioverse does provide some query functions to get information on devices, but this information is not reliable on any platform I am currently aware of: devices that lie to the system are common, as is backward compatibility hacks.
-Good examples include WinMM on Windows (more than happy to claim 7.1 surround sound on stereo headphones)
-and the Logitech G930 headphones, which always show up as surround sound even when switched to stereo by a physical switch on the device.
-
-This essentially means that there is no other option but asking your user what their audio configuration is.
-To deal with the uncertainty, use a multipanner or the 3D simulation components for easy switching.
-The only good default for panners is stereo with no HRTF, as this will be upmixed to surround sound systems by the OS in most cases.
-
-==== Automatic Mixing
-
-Libaudioverse supports the ability to automatically upmix and downmix audio.
-It understands the following formats:
-
-- Mono.  Specified with channel value 1.
-- Stereo.  2 channels.  Channel 0 is left, channel 1 is right.
-- 5.1 surround sound.  6 channels.  Front left, front right, center, LFE, rear left, rear right.
-- 7.1.  8 channels.  Front left, front right, center, lfe, rear left, rear right, side left, side right.
-
-Any connection made between an input and an output with these channel values will cause audio to be remixed accordingly.
-In other configurations, one of the following two cases happens:
-
-- If the output has more channels than the input, additional channels are dropped.
-- If the input has more channels than the output, additional channels are considered to be zero.
-
-Simulations do not have an intrinsic channel count.
-Instead, this is a parameter to either `Lav_getBlock` or `Lav_simulationSetOutputDevice`.
-All nodes which are connected to the simulation will be remixed in the same manner as any other input-output connection,
-but the channel count used is the one specified to either of these functions.
