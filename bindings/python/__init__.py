@@ -52,7 +52,7 @@ def make_python(info):
 	context.update(transformers.get_jinja2_functions())
 	context['ctypes_string_func'] = ctypes_string #ugly workaround for what appears to be a bug in jinja2.
 	env = jinja2.Environment(loader = jinja2.PackageLoader(__package__, ""), undefined = jinja2.StrictUndefined, trim_blocks = True)
-	env.filters.update(transformers.get_jinja2_filters())
+	env.filters.update(transformers.get_jinja2_filters(info))
 	env.filters['ctypes_string'] = ctypes_string
 	return {
 		'libaudioverse/_lav.py' : env.get_template('libaudioverse/_lav.py.t').render(context),
