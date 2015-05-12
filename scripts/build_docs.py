@@ -12,7 +12,7 @@ if __name__ == '__main__':
 	print "Building documentation..."
 	dest_dir = os.path.join(repository_root, 'build', 'documentation')
 
-	property_table = docgen.make_property_table()
+	node_reference = docgen.make_node_reference()
 	c_api_docs=docgen.make_c_api()
 	if os.path.exists(dest_dir):
 		shutil.rmtree(dest_dir)
@@ -20,7 +20,7 @@ if __name__ == '__main__':
 	shutil.copytree(os.path.join(repository_root, 'documentation'), dest_dir)
 
 	with file(os.path.join(dest_dir, 'object_reference.asciidoc'), 'wb') as f:
-		f.write(property_table)
+		f.write(node_reference)
 	with file(os.path.join(dest_dir, 'c_api.asciidoc'), 'wb') as f:
 		f.write(c_api_docs)
 	print subprocess.check_output(["asciidoc", os.path.join(dest_dir, 'libaudioverse_manual.asciidoc')], stderr= subprocess.STDOUT, shell = True)
