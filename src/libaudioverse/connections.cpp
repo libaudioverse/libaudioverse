@@ -139,4 +139,8 @@ void makeConnection(std::shared_ptr<OutputConnection> output, std::shared_ptr<In
 	input->connectHalf(output);
 }
 
+int InputConnection::getConnectedNodeCount() {
+	return (int)getConnectedNodes().size();
+}
+
 }

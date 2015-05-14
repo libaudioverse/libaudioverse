@@ -57,6 +57,7 @@ class InputConnection {
 	int getCount() {return count;}
 	Node* getNode();
 	std::vector<Node*> getConnectedNodes();
+	int getConnectedNodeCount();
 	private:
 	Node* node;
 	int start, count;
