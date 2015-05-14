@@ -440,7 +440,7 @@ void Property::tick() {
 		}
 	}
 	//We might have nodes:
-	if(incoming_nodes->getCount()) {
+	if(incoming_nodes->getConnectedNodeCount()) {
 		//If should_use_value_buffer is false, we haven't set it to fval or dval yet.
 		if(should_use_value_buffer== false) {
 			double needed = type == Lav_PROPERTYTYPE_FLOAT ? value.fval : value.dval;
