@@ -41,6 +41,13 @@ class SinOsc {
 		sd=0;
 		cd=0;
 	}
+	
+	//phase is from 0 to 1 and measured in  periods.
+	void setPhase(float phase) {
+		cx = cosf(2*PI*phase);
+		sx=sinf(2*PI*phase);
+	}
+	
 	private:
 	//s=sin, c=cos
 	//internal vector is right, frequency is zero.
