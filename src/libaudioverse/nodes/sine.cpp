@@ -23,7 +23,7 @@ class SineNode: public Node {
 	SineNode(std::shared_ptr<Simulation> simulation);
 	virtual void process();
 	virtual void reset() override;
-	double phase = 0;
+	float phase = 0;
 };
 
 SineNode::SineNode(std::shared_ptr<Simulation> simulation): Node(Lav_OBJTYPE_SINE_NODE, simulation, 0, 1) {
@@ -41,9 +41,10 @@ void SineNode::process() {
 	if(freqProp.needsARate()==false) {
 		double phaseDelta=freqProp.getFloatValue()/simulation->getSr();
 		for(unsigned int i = 0; i< block_size; i++) {
-			output_buffers[0][i] = (float)sin(2*phase*PI);
-			phase+=phaseDelta;
+			///the (float) in the next line is important to keep us from promoting to double.
+			output_buffers[0][i] = sinf(2*phase*(float)PI);
 		}
+		phase+= block_size*phaseDelta;
 	}
 	else {
 		for(unsigned int i = 0; i< block_size; i++) {
