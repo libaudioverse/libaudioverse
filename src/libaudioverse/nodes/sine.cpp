@@ -39,6 +39,7 @@ std::shared_ptr<Node> createSineNode(std::shared_ptr<Simulation> simulation) {
 
 void SineNode::process() {
 	oscillator.normalize();
+	oscillator.setPhase(getProperty(Lav_SINE_PHASE).getFloatValue());
 	auto &freqProp = getProperty(Lav_SINE_FREQUENCY);
 	if(freqProp.needsARate()==false) {
 		oscillator.setFrequency(freqProp.getFloatValue());

@@ -11,41 +11,50 @@ namespace libaudioverse_implementation {
 //This is in the header because we want inlining.
 //The following algorithm is based off the angle sum and difference identities.
 //This is also equivalent to rotating a unit vector by f/sr radians every tick.
+/*Trig identities:
+sin(x+d)=sin(x)cos(d)+cos(x)sin(d)
+cos(x+d)=cos(x)cos(d)-sin(x)sin(d)	
+*/
+
 class SinOsc {
 	public:
 	SinOsc(float _sr): sr(_sr) {}
+	
 	float tick() {
-		/*Trig identities:
-		sin(x+d)=sin(x)cos(d)+cos(x)sin(d)
-		cos(x+d)=cos(x)cos(d)-sin(x)sin(d)
-		*/
 		float ocx=cx, osx=sx;
 		sx = osx*cd+ocx*sd;
 		cx = ocx*cd-osx*sd;
-		return osx;
+		//we account for phase here.
+		return osx*cp+ocx*sp;
 	}
+
 	void setFrequency(float f) {
 		//We don't lose phase, so don't touch cx and sx.
 		sd= sinf(2*PI*f/sr);
 		cd=cosf(2*PI*f/sr);
 	}
+	
 	void normalize() {
 		float magnitude=sqrtf(cx*cx+sx*sx);
 		sx/= magnitude;
 		cx /= magnitude;
 	}
+	
 	void reset() {
 		//point the internal vector at the positive x axis, also known as phase 0.
 		sx=0;
 		cx =1;
 		sd=0;
 		cd=0;
+		//phase:
+		cp =1;
+		sp = 0;
 	}
 	
 	//phase is from 0 to 1 and measured in  periods.
 	void setPhase(float phase) {
-		cx = cosf(2*PI*phase);
-		sx=sinf(2*PI*phase);
+		cp = cosf(2*PI*phase);
+		sp =sinf(2*PI*phase);
 	}
 	
 	private:
@@ -53,6 +62,8 @@ class SinOsc {
 	//internal vector is right, frequency is zero.
 	float sx = 0, cx = 1, sd = 0, cd = 0;
 	float sr; //sampling rate.
+	//sine and cosine of phase offset.
+	float cp=1, sp = 0;
 };
 
 }
