@@ -14,6 +14,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/constants.hpp>
+#include <libaudioverse/implementations/sin_osc.hpp>
 #include <limits>
 
 namespace libaudioverse_implementation {
@@ -23,10 +24,10 @@ class SineNode: public Node {
 	SineNode(std::shared_ptr<Simulation> simulation);
 	virtual void process();
 	virtual void reset() override;
-	float phase = 0;
+	SinOsc oscillator;
 };
 
-SineNode::SineNode(std::shared_ptr<Simulation> simulation): Node(Lav_OBJTYPE_SINE_NODE, simulation, 0, 1) {
+SineNode::SineNode(std::shared_ptr<Simulation> simulation): Node(Lav_OBJTYPE_SINE_NODE, simulation, 0, 1), oscillator(simulation->getSr()) {
 	appendOutputConnection(0, 1);
 }
 
@@ -37,27 +38,24 @@ std::shared_ptr<Node> createSineNode(std::shared_ptr<Simulation> simulation) {
 }
 
 void SineNode::process() {
+	oscillator.normalize();
 	auto &freqProp = getProperty(Lav_SINE_FREQUENCY);
 	if(freqProp.needsARate()==false) {
-		float phaseDelta=freqProp.getFloatValue()/simulation->getSr();
+		oscillator.setFrequency(freqProp.getFloatValue());
 		for(unsigned int i = 0; i< block_size; i++) {
-			//The (float) here keeps us from converting to double because of PI.
-			output_buffers[0][i] = (float)sinf(2*phase*(float)PI);
-			phase+=phaseDelta;
+			output_buffers[0][i] = oscillator.tick();
 		}
 	}
 	else {
-		for(unsigned int i = 0; i< block_size; i++) {
-			float phaseDelta=freqProp.getFloatValue(i)/simulation->getSr();
-			output_buffers[0][i] = (float)sin(2*phase*PI);
-			phase+=phaseDelta;
+		for(int i=0; i < block_size; i++) {
+			oscillator.setFrequency(freqProp.getFloatValue(i));
+			output_buffers[0][i] = oscillator.tick();
 		}
 	}
-	phase -=floor(phase);
 }
 
 void SineNode::reset() {
-	phase=0.0;
+	oscillator.reset();
 }
 
 //begin public api
