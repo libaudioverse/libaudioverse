@@ -1,9 +1,11 @@
 from bindings import get_info, transformers, doc_helper
 import jinja2
+from . import asciidoc_filters
 
 def make_node_reference():
 	all_info =get_info.get_all_info()
-	doc_helper.prepare_docs(all_info)
+	doc_helper.prepare_docs(all_info,
+	param = asciidoc_filters.param, node = asciidoc_filters.node, enum = asciidoc_filters.enum)
 	env = jinja2.Environment(loader = jinja2.PackageLoader(__package__, ""), undefined = jinja2.StrictUndefined, trim_blocks = True)
 	env.filters.update(transformers.get_jinja2_filters(all_info))
 	context = dict()
