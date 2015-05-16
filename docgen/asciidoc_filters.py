@@ -4,7 +4,7 @@ def enum(all_info, x):
 
 def node(all_info, x):
 	#reference a node.
-	if x not in all_uinfo['nodes']:
+	if x not in all_info['nodes']:
 		raise ValueError("{} is not a valid node".format(x))
 	link_text = all_info['nodes'][x]['doc_name'] + " node"
 	link_id = "nodes-{}".format(x)
