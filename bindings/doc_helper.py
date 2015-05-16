@@ -16,20 +16,21 @@ The second is the string to transform."""
 	env=jinja2.Environment(undefined=jinja2.StrictUndefined)
 	env.filters['param'] = lambda x: param(all_info, x)
 	env.filters['node'] = lambda x: node(all_info, x)
-	env.filters['enum'] = enum(all_info, x)
+	env.filters['enum'] = lambda x: enum(all_info, x)
 	#yes, this is a local function.
 	def render(s):
 		template=env.from_string(s)
 		return template.render()
 	for i in all_info['metadata']['functions'].itervalues():
 		i['doc_description'] = render(i.get('doc_description', no_doc_description))
-		for n, p in i['params'].iteritems():
-			i['params'][n] = render(p)
+		if 'params' in i: #some functions don't have params
+			for n, p in i['params'].iteritems():
+				i['params'][n] = render(p)
 	for i in all_info['metadata']['nodes'].itervalues():
-		i['doc_description'] = render(i.get('doc_description', no_doc_description)
+		i['doc_description'] = render(i.get('doc_description', no_doc_description))
 		constructor=i.get('constructor', dict())
 		constructor['doc_description'] = render(constructor.get('doc_description', no_doc_description))
-		constructor['params'] = constructor.get('params', dict()
+		constructor['params'] = constructor.get('params', dict())
 		for n, p in constructor['params'].iteritems():
 			constructor['params'][n] = render(p)
 	#no return, we modify in place.
