@@ -21,6 +21,7 @@ The most notable node of this type is the amplitude panner.
 
 {%for node_name in sorted_nodes%}
 {%set doc_header = (nodes[node_name]['doc_name']+" node") | title%}
+[[node-{{node_name}}]]
 === {{doc_header}}
 
 {{nodes[node_name]['doc_description']}}
