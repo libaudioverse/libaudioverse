@@ -1,4 +1,4 @@
-doc_name: Channel Splitter
+doc_name: channel splitter
 doc_description: |
   Libaudioverse inputs and outputs transport multiple channels of audio, which is usually the desired behavior.
   The channel splitter, coupled with the channel merger, allows advanced applications to manipulate the individual audio channels directly.

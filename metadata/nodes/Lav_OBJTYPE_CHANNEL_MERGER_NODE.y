@@ -1,4 +1,4 @@
-doc_name: Channel Merger
+doc_name: channel merger
 doc_description: |
   Libaudioverse inputs and outputs transport multiple channels of audio, which is usually the desired behavior.
   The channel merger, coupled with the channel splitter, allows advanced applications to manipulate the individual audio channels directly.

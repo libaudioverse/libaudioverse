@@ -31,7 +31,7 @@ properties:
       What type of panning to use.
       Possibilities include HRTF, stereo, 5.1, and 7.1 speaker configurations.
       For something more nontraditional, use an amplitude panner.
-doc_name: Multipanner
+doc_name: multipanner
 doc_description: |
   A panner which can have the algorithm it uses changed at runtime.
   The use for multipanners is for applications in which we may wish to change the speaker configuration at runtime.

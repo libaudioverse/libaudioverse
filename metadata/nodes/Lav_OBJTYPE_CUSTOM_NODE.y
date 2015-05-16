@@ -1,5 +1,5 @@
 callbacks: [processing]
-doc_name: Custom Node
+doc_name: custom
 doc_description: |
   This node's processing depends solely on a user-defined callback.
   It has a specific number of inputs and outputs which are aggregated into individual channels.

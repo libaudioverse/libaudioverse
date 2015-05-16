@@ -31,7 +31,7 @@ properties:
     read_only: true
     doc_description: |
       The max delay as set at the node's creation time.
-doc_name: Delay Line
+doc_name: delay line
 doc_description: |
   Implements a crossfading delay line.
   Delay lines have uses in echo and reverb, as well as many more esoteric effects.

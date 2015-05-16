@@ -14,6 +14,6 @@ properties:
       Whether or not to normalize the output.
       Some types of noise are quieter without this enabled.
       Turning it on is sometimes helpful and sometimes not.
-doc_name: Noise Generator
+doc_name: noise generator
 doc_description: |
   Generates any of a variety of types of noise.

@@ -19,7 +19,7 @@ events:
 extra_functions:
   Lav_pushNodeFeed:
     name: feed
-doc_name: Push Node
+doc_name: push
 doc_description: |
   The purpose of this node is the same as the pull node, but it is used in situations wherein we do not know when we are going to get audio.
   Audio is queued as it is pushed to this node and then played as fast as possible.

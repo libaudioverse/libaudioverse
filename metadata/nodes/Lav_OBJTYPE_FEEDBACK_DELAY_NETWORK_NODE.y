@@ -21,7 +21,7 @@ extra_functions:
     name: set_delays
   Lav_feedbackDelayNetworkNodeSetFeedbackDelayMatrix:
     name: set_feedback_delay_matrix
-doc_name: Feedback Delay Network
+doc_name: feedback delay network
 doc_description: |
   Implements a feedback delay network.
   This is possibly the single-most complicated node in Libaudioverse, and full documentation of it goes well beyond the manual.

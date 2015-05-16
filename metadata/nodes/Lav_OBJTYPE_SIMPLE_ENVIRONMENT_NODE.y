@@ -66,7 +66,7 @@ properties:
       If you are using something greater than stereo, i.e. 5.1, you need to change this property.
       The specific issue solved by this property is the case in which one source is set to something different than all others,
       or where the app changes the panning strategies of sources after creation.
-doc_name: Simple Environment
+doc_name: simple environment
 doc_description: |
   This is the entry point to the 3D simulation capabilities.
   Environment nodes hold the information needed to pan sources, as well as acting as an aggregate output for all sources that use this environment.

@@ -40,6 +40,6 @@ properties:
     value_enum: Lav_CHANNEL_INTERPRETATIONS
     doc_description: |
       This property is not currently used, and is reserved for future use.
-doc_name: Generic Properties Common to All Nodes
+doc_name: generic
 doc_description: |
   The properties and functionality described here are available on every Libaudioverse node without exception.

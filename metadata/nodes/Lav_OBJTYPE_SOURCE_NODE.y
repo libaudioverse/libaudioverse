@@ -47,7 +47,7 @@ properties:
     type: int
     doc_description: |
       The strategy for the internal multipanner.
-doc_name: Simple Source
+doc_name: simple source
 doc_description: |
   The source node allows the spatialization of sound that passes through it.
   Sources have one input which is mono, to which a node should be connected.

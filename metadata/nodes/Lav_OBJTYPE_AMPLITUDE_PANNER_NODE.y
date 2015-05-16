@@ -61,7 +61,7 @@ properties:
       You  almost always want this on.
 extra_functions:
   Lav_amplitudePannerNodeConfigureStandardMap: {name: configure_standard_map}
-doc_name: Amplitude Panner
+doc_name: amplitude panner
 doc_description: |
   This panner pans for a set of regular speakers without any additional effects applied.
   Additionally, it understands surround sound speaker layouts and allows for the assignment of custom speaker mappings.
