@@ -19,7 +19,7 @@ if __name__ == '__main__':
 
 	shutil.copytree(os.path.join(repository_root, 'documentation'), dest_dir)
 
-	with file(os.path.join(dest_dir, 'object_reference.asciidoc'), 'wb') as f:
+	with file(os.path.join(dest_dir, 'node_reference.asciidoc'), 'wb') as f:
 		f.write(node_reference)
 	with file(os.path.join(dest_dir, 'c_api.asciidoc'), 'wb') as f:
 		f.write(c_api_docs)

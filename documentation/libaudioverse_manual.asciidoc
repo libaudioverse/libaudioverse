@@ -10,10 +10,8 @@ include::tutorials.asciidoc[tabsize=4]
 
 include::basics.asciidoc[tabsize=4]
 
-include::c_api.asciidoc[tabsize=4]
-
 include::binding_notes.asciidoc[tabsize=4]
 
-//everything after this point is generated.
+include::c_api.asciidoc[tabsize=4]
 
-include::object_reference.asciidoc[tabsize=4]
+include::node_reference.asciidoc[tabsize=4]
