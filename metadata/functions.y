@@ -124,20 +124,20 @@ functions:
     params:
       cb: The callback to be called when handles are destroyed.
   Lav_deviceGetCount:
-    category: core
+    category: devices
     doc_description: |
       Get the number of audio devices on the system.
     params:
       destination: Contains the number of audio devices on the system after a call to this function.
   Lav_deviceGetName:
-    category: core
+    category: devices
     doc_description: |
       Returns a human-readable name for the specified audio device.
     params:
       index: The index of the audio device.
       destination: Contains a pointer to  a string allocated by Libaudioverse containing the name. Use Lav_free on this string when done with it.
   Lav_deviceGetChannels:
-    category: core
+    category: devices
     doc_description: |
       Query the maximum number of channels for this device before downmixing occurs.
       You should query the user as to the type of audio they want rather than relying on this function.
@@ -581,7 +581,7 @@ functions:
       slot: The index of the property of interest.
       destination: After a call to this function, contains the handle of the buffer. Note that 0 means none.
   Lav_automationCancelAutomators:
-    category: nodes
+    category: automators
     doc_description: |
       Cancel all automators that are scheduled to begin running after the specified time.
     params:
@@ -589,7 +589,7 @@ functions:
       slot: The index of the property to cancel automators on.
       time: The time after which to cancel automation.  This is relative to the node.
   Lav_automationLinearRampToValue:
-    category: nodes
+    category: automators
     doc_description: |
       Sets up a linear ramp.
       
