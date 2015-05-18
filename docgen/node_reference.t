@@ -20,14 +20,58 @@ A few nodes make the input and output channel counts change depending on propert
 The most notable node of this type is the amplitude panner.
 
 {%for node_name in sorted_nodes%}
-{%set doc_header = (nodes[node_name]['doc_name']+" node") | title%}
+{%set node = nodes[node_name]%}
+{%set doc_header = (node['doc_name']+" node") | title%}
 [[node-{{node_name}}]]
 === {{doc_header}}
 
 C Type Identifier: `{{node_name}}`
 
 {%if node_name != "Lav_OBJTYPE_GENERIC_NODE"%}
-Constructor: `{{functions[nodes[node_name]['constructor']]|function_to_string}}`
+Constructor: `{{functions[node['constructor']]|function_to_string}}`
+
+{%if not node['inputs']%}
+This node has no inputs.
+{%elif node['inputs'] == "constructor"%}
+The number of inputs to this node depends on parameters to its constructor.
+{%else%}
+[caption=""]
+.Inputs
+|====
+|Index | Channels | Description
+{%for info in node['inputs']%}
+{%if info[0] == "dynamic"%}
+|{{loop.index0}} |{{info[1]}} |{{info[2]}}
+{%elif info[0] == "constructor"%}
+|{{loop.index0}} |The number of channels for this input depends on parameters to this node's constructor. |{{info[1]}}
+{%else%}
+|{{loop.index0}} |{{info[0]}} |{{info[1]}}
+{%endif%}
+{%endfor%}
+|====
+{%endif%}
+
+{%if not node['outputs']%}
+This node has no outputs.
+{%elif node['outputs'] == "constructor"%}
+The number of outputs from this node depends on parameters to its constructor.
+{%else%}
+[caption=""]
+.Outputs
+|====
+|Index | Channels | Description
+{%for info in node['outputs']%}
+{%if info[0] == "dynamic"%}
+|{{loop.index0}} |{{info[1]}} |{{info[2]}}
+{%elif info[0] == "constructor"%}
+|{{loop.index0}} |The number of channels for this input depends on parameters to this node's constructor. |{{info[1]}}
+{%else%}
+|{{loop.index0}} |{{info[0]}} |{{info[1]}}
+{%endif%}
+{%endfor%}
+|====
+{%endif%}
+
 {%endif%}
 
 {{nodes[node_name]['doc_description']}}
