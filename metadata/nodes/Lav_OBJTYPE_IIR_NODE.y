@@ -1,6 +1,10 @@
 extra_functions:
   Lav_iirNodeSetCoefficients:
     name: set_coefficients
+inputs:
+  - [constructor, "The signal to filter."]
+outputs:
+  - [constructor, "The signal with the IIR filter applied."]
 doc_name: IIR filter
 doc_description: |
   Implements arbetrary IIR filters.

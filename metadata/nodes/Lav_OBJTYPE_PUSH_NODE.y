@@ -19,6 +19,9 @@ events:
 extra_functions:
   Lav_pushNodeFeed:
     name: feed
+inputs: null
+outputs:
+  - [constructor, "Either audio from the internal queue or zero."]
 doc_name: push
 doc_description: |
   The purpose of this node is the same as the pull node, but it is used in situations wherein we do not know when we are going to get audio.

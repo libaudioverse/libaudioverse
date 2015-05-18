@@ -25,6 +25,10 @@ properties:
       Note that for HRTF nodes, crossfading is more important than for other panner types.
       Unlike other panner types, the audio artifacts produced by disabling crossfading are noticeable, even for updates of only a few degrees.
       But, on the flip side, crossfading is also much, much more expensive.
+inputs:
+  - [1, "The signal to pan."]
+outputs:
+  - [2, "The signal with the HRTF applied."]
 doc_name: HRTF
 doc_description: |
   This node implements an HRTF panner.

@@ -14,6 +14,9 @@ properties:
     doc_description: |
       The duty cycle of the square wave.
       0 is always off and 1 is always on.
+inputs: null
+outputs:
+  - [1, "A square wave."]
 doc_name: square
 doc_description: |
   A simple square wave oscillator.

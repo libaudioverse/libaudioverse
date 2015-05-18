@@ -21,6 +21,10 @@ extra_functions:
     name: set_delays
   Lav_feedbackDelayNetworkNodeSetFeedbackDelayMatrix:
     name: set_feedback_delay_matrix
+inputs:
+  - [constructor, "The input to the FDN."]
+outputs:
+  - [constructor, "The output of the FDN."]
 doc_name: feedback delay network
 doc_description: |
   Implements a feedback delay network.

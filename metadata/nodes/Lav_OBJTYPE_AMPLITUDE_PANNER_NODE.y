@@ -61,6 +61,10 @@ properties:
       You  almost always want this on.
 extra_functions:
   Lav_amplitudePannerNodeConfigureStandardMap: {name: configure_standard_map}
+inputs:
+  - [1, "The signal to pan"]
+outputs:
+  - [dynamic, "Depends on a number of properties on this node.", "The result of panning the signal."]
 doc_name: amplitude panner
 doc_description: |
   This panner pans for a set of regular speakers without any additional effects applied.

@@ -47,6 +47,10 @@ properties:
     doc_description: |
       This property is a the gain in decibals to be used with the peaking and shelving filters.
       It measures the gain that these filters apply to the part of the signal they boost.
+inputs:
+  - [constructor, "The signal to process."]
+outputs:
+  - [constructor, "The result of processing the audio via the filter."]
 doc_name: biquad filter
 doc_description: |
   Implementation of a biquad filter section, as defined by the Audio EQ Cookbook by Robert Bristo-Johnson.

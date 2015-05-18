@@ -31,6 +31,10 @@ properties:
       What type of panning to use.
       Possibilities include HRTF, stereo, 5.1, and 7.1 speaker configurations.
       For something more nontraditional, use an amplitude panner.
+inputs:
+  - [1, "The signal to pan."]
+outputs:
+  - [dynamic, "Depends on the currently set panning strategy.", "The signal, panned according to the configured panning strategy."]
 doc_name: multipanner
 doc_description: |
   A panner which can have the algorithm it uses changed at runtime.

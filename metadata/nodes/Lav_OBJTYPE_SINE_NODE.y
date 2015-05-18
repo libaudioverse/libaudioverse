@@ -14,6 +14,9 @@ properties:
     doc_description: |
       The phase of the sine node.
       This is measured in periods, not in radians.
+inputs: null
+outputs:
+  - [1, "A sine wave."]
 doc_name: sine
 doc_description: |
   A simple sine oscillator.

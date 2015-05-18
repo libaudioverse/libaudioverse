@@ -1,3 +1,7 @@
+inputs:
+  - [constructor, "The signal to limit"]
+outputs:
+  - [constructor, "The limited signal: no sample shall have an absolute value greater than 1.0."]
 doc_name: hard limiter
 doc_description: |
     The input to this node is hard limited: values less than -1.0 are set to -1.0 and values above 1.0 are set to 1.0.

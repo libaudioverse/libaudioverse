@@ -1,4 +1,6 @@
 callbacks: [processing]
+inputs: constructor
+outputs: constructor
 doc_name: custom
 doc_description: |
   This node's processing depends solely on a user-defined callback.

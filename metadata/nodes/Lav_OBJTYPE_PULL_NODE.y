@@ -1,4 +1,7 @@
 callbacks: [audio]
+inputs: null
+outputs:
+  - [constructor, "The result of the configured callback."]
 doc_name: pull
 doc_description: |
   This node calls the audio callback whenever it needs more audio.

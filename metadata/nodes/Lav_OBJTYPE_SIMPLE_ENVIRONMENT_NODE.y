@@ -66,6 +66,9 @@ properties:
       If you are using something greater than stereo, i.e. 5.1, you need to change this property.
       The specific issue solved by this property is the case in which one source is set to something different than all others,
       or where the app changes the panning strategies of sources after creation.
+inputs: null
+outputs:
+  - [dynamic, "Depends on the output_channels property.", "The output of the 3D environment."]
 doc_name: simple environment
 doc_description: |
   This is the entry point to the 3D simulation capabilities.

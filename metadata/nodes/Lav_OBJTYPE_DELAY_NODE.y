@@ -31,6 +31,10 @@ properties:
     read_only: true
     doc_description: |
       The max delay as set at the node's creation time.
+inputs:
+  - [constructor, "The signal to delay."]
+outputs:
+  - [constructor, "The delayed signal."]
 doc_name: delay line
 doc_description: |
   Implements a crossfading delay line.

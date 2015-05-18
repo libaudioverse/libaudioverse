@@ -47,6 +47,9 @@ properties:
     type: int
     doc_description: |
       The strategy for the internal multipanner.
+inputs:
+  - [1, "The audio to enter the 3D environment."]
+outputs: null
 doc_name: simple source
 doc_description: |
   The source node allows the spatialization of sound that passes through it.

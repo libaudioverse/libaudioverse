@@ -34,6 +34,9 @@ events:
     name: end
     doc_description: |
       Fires each time this node reaches the end of the associated buffer.
+inputs: null
+outputs:
+  - [ dynamic, "Depends on the currently playing buffer.", "The output from the buffer being played."]
 doc_name: buffer
 doc_description: |
   This node plays a buffer.
