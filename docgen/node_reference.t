@@ -1,6 +1,6 @@
 == Libaudioverse  Node Reference
 
-This page is an overview of all Libaudioverse nodes.
+This section is an overview of all Libaudioverse nodes.
 
 For binding-specific references, see the bindings themselves.
 Python uses docstrings, for example.
@@ -23,6 +23,12 @@ The most notable node of this type is the amplitude panner.
 {%set doc_header = (nodes[node_name]['doc_name']+" node") | title%}
 [[node-{{node_name}}]]
 === {{doc_header}}
+
+C Type Identifier: `{{node_name}}`
+
+{%if node_name != "Lav_OBJTYPE_GENERIC_NODE"%}
+Constructor: `{{functions[nodes[node_name]['constructor']]|function_to_string}}`
+{%endif%}
 
 {{nodes[node_name]['doc_description']}}
 

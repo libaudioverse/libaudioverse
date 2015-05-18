@@ -29,9 +29,4 @@ The second is the string to transform."""
 				i['params'][n] = render(p)
 	for i in all_info['metadata']['nodes'].itervalues():
 		i['doc_description'] = render(i.get('doc_description', no_doc_description))
-		constructor=i.get('constructor', dict())
-		constructor['doc_description'] = render(constructor.get('doc_description', no_doc_description))
-		constructor['params'] = constructor.get('params', dict())
-		for n, p in constructor['params'].iteritems():
-			constructor['params'][n] = render(p)
 	#no return, we modify in place.

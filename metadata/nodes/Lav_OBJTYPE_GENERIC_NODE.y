@@ -43,3 +43,5 @@ properties:
 doc_name: generic
 doc_description: |
   The properties and functionality described here are available on every Libaudioverse node without exception.
+  
+  While an enumeration value is reserved for the generic node, it should not be possible to receive one publicly.  This identifier is only used internally.

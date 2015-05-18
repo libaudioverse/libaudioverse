@@ -1,4 +1,3 @@
-"""This module exports one variable, metadata, a dict containing the combined metadata from all metadata files."""
 import yaml
 import glob
 import os
@@ -19,7 +18,7 @@ def cleanup_event(i):
 def cleanup_extra_function(i):
 	i['doc_description'] = i.get('doc_description', 'No description available')
 
-def cleanup_node(node):
+def cleanup_node(name, node):
 	"""Ensures that a node has all of the properties which nodes must have."""
 	node['has_properties'] = True
 	node['has_events'] = True
@@ -47,12 +46,18 @@ def cleanup_node(node):
 		cleanup_extra_function(i)
 	node['doc_description'] = node.get('doc_description', 'No description available.')
 	node['doc_name'] = node.get('doc_name', 'No document name available')
+	#Build the name of the function that acts as this node's constructor.
+	constructor_tokens = name[len("Lav_OBJTYPE_"):-len("_NODE")].split("_")
+	constructor_tokens = [i.lower() for i in constructor_tokens]
+	constructor_tokens=[i[0].upper()+i[1:] for i in constructor_tokens]
+	constructor= "Lav_create"+"".join(constructor_tokens)+"Node"
+	node['constructor'] = constructor
 
 def load_node(path):
 	with file(path) as f:
 		node_info = yaml.load(f)
-	cleanup_node(node_info)
 	name =os.path.split(path)[1][:-len(".y")]
+	cleanup_node(name, node_info)
 	return (name, node_info)
 
 def make_metadata():
