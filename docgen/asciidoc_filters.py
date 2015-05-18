@@ -7,7 +7,7 @@ def node(all_info, x):
 	if x not in all_info['metadata']['nodes']:
 		raise ValueError("{} is not a valid node".format(x))
 	link_text = all_info['metadata']['nodes'][x]['doc_name'] + " node"
-	link_id = "nodes-{}".format(x)
+	link_id = "node-{}".format(x)
 	return "<<{},{}>>".format(link_id, link_text)
 
 def param(all_info, x):
