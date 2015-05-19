@@ -177,7 +177,7 @@ def get_all_info():
 	'constants_by_enum': constants_by_enum
 	}
 
-	metadata = metadata_handler.make_metadata()
+	metadata = metadata_handler.make_metadata(all_info)
 	all_info['metadata'] = metadata
 
 	#We can extract the "important" enums by looking for all properties with a value_enum key and grabbing its value.

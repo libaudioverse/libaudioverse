@@ -11,16 +11,7 @@ def verify_all_parameters_documented(info, docs):
 		docs[func.name]['params'] = docs[func.name].get('params', dict())
 		for p in func.args:
 			if p.name not in docs[func.name]['params']:
-				if p.name == "destination":
-					docs[func.name]['params'][p.name] = "Holds the result of a call to this function."
-				elif p.name == "simulationHandle":
-					docs[func.name]['params'][p.name] = "The simulation to manipulate."
-				elif p.name == "propertyIndex":
-					docs[func.name]['params'][p.name] = "The property to manipulate."
-				elif p.name == "nodeHandle":
-					docs[func.name]['params'][p.name] = "The node to manipulate."
-				else:
-					raise ValueError("{}: undocumented param {}".format(func.name, p.name))
+				raise ValueError("{}: undocumented param {}".format(func.name, p.name))
 
 def make_c_api():
 	all_info =get_info.get_all_info()
