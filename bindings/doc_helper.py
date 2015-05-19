@@ -22,11 +22,18 @@ The second is the string to transform."""
 	def render(s):
 		template=env.from_string(s)
 		return template.render()
-	for i in all_info['metadata']['functions'].itervalues():
-		i['doc_description'] = render(i.get('doc_description', no_doc_description))
-		if 'params' in i: #some functions don't have params
-			for n, p in i['params'].iteritems():
-				i['params'][n] = render(p)
-	for i in all_info['metadata']['nodes'].itervalues():
-		i['doc_description'] = render(i.get('doc_description', no_doc_description))
+	#This one is, as well. It lets us capture the Jinja2 environment:
+	def prepare_function(func):
+		func['doc_description'] = render(func.get('doc_description', no_doc_description))
+		if 'params' in func: #some functions don't have params
+			for n, p in func['params'].iteritems():
+				func['params'][n] = render(p)
+
+	for name, func in all_info['metadata']['functions'].iteritems():
+		prepare_function(func)
+
+	for name, d in all_info['metadata']['nodes'].iteritems():
+		d['doc_description'] = render(d.get('doc_description', no_doc_description))
+		for func in d.get('extra_functions', dict()).itervalues():
+			prepare_function(d)
 	#no return, we modify in place.
