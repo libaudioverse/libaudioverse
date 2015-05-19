@@ -89,7 +89,13 @@ C Enumeration Value: {{propinfo[0]}}
 
 Type: {{propinfo[1]['type']}}
 
-Range: {{propinfo[1].get('range', '')}}
+{%if propinfo[1]['type'] in ["int", "float", "double"]%}
+Range: {%if 'value_enum' in propinfo[1]-%}
+A value from the `{{propinfo[1]['value_enum']}}` enumeration.
+{%else-%}
+{{propinfo[1].get('range', '')}}
+{%endif%}
+{%endif%}
 
 Default Value: {{propinfo[1].get('default', 'See Description')}}
 
