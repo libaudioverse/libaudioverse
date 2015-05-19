@@ -21,7 +21,8 @@ The second is the string to transform."""
 	#yes, this is a local function.
 	def render(s):
 		template=env.from_string(s)
-		return template.render()
+		res = template.render()
+		return res
 	#This one is, as well. It lets us capture the Jinja2 environment:
 	def prepare_function(func):
 		func['doc_description'] = render(func.get('doc_description', no_doc_description))
@@ -34,6 +35,6 @@ The second is the string to transform."""
 
 	for name, d in all_info['metadata']['nodes'].iteritems():
 		d['doc_description'] = render(d.get('doc_description', no_doc_description))
-		for func in d.get('extra_functions', dict()).itervalues():
-			prepare_function(d)
+		for name, func in d.get('extra_functions', dict()).iteritems():
+			prepare_function(func)
 	#no return, we modify in place.

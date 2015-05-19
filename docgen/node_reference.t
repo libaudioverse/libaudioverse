@@ -1,3 +1,4 @@
+{%import 'macros.t' as macros with context%}
 == Libaudioverse  Node Reference
 
 This section is an overview of all Libaudioverse nodes.
@@ -112,4 +113,12 @@ C Enumeration Value: {{callinfo[0]}}
 
 {%endif%}
 
+{%if node['has_extra_functions']%}
+==== Extra Functions
+
+{%for c_name, info in node['extra_functions'].iteritems()%}
+{{macros.render_function(c_name, info)}}
+
+{%endfor%}
+{%endif%}
 {%endfor%}
