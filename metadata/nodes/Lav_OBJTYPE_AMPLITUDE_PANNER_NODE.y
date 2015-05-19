@@ -60,7 +60,12 @@ properties:
       This property controls whether or not the center channel is reserved, i.e. skipped.
       You  almost always want this on.
 extra_functions:
-  Lav_amplitudePannerNodeConfigureStandardMap: {name: configure_standard_map}
+  Lav_amplitudePannerNodeConfigureStandardMap:
+    doc_description: |
+      Sets the channel map and other properties on this node to match a standard configuration.
+      The possible standard configurations are found in the {{"Lav_PANNING_STRATEGIES"|enum}} enumeration.
+    params:
+      channels: A value from the {{"Lav_PANNING_STRATEGIES"|enum}} enumeration.
 inputs:
   - [1, "The signal to pan"]
 outputs:

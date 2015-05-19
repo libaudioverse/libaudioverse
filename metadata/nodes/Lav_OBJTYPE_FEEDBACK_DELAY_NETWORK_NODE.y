@@ -13,14 +13,24 @@ properties:
     doc_description: |
       The maximum delay any of the internal delay lines may be set to.
 extra_functions:
-  Lav_feedbackDelayNetworkNodeSetFeedbackMatrix:
-    name: set_feedback_matrix
   Lav_feedbackDelayNetworkNodeSetOutputGains:
-    name: set_output_gains
+    doc_description: |
+      Set the gains of the individual output channels.
+    params:
+      count: The number of values.  Must match the number of internal delay lines.
+      values: The new gains.
   Lav_feedbackDelayNetworkNodeSetDelays:
-    name: set_delays
+    doc_description: |
+      Set the internal delays of the FDN.
+    params:
+      count: The number of delays.  This must match the FDN's internal delay count as set by the constructor.
+      values: The new values for the delays.
   Lav_feedbackDelayNetworkNodeSetFeedbackDelayMatrix:
-    name: set_feedback_delay_matrix
+    doc_description: |
+      Set the FDN's feedback matrix.
+    params:
+      count: The number of values.  Must be exactly the product of the feedback matrix, that is the number of delay lines squared.
+      values: The new feedback matrix, stored in row-major order.
 inputs:
   - [constructor, "The input to the FDN."]
 outputs:

@@ -18,7 +18,11 @@ events:
       Fired when the node has no more audio at all.
 extra_functions:
   Lav_pushNodeFeed:
-    name: feed
+    doc_description: |
+      Feed more audio data into the internal queue.
+    params:
+      length: The length of the buffer, in samples.
+      frames: The buffer to feed into the node.  This memory is copied.
 inputs: null
 outputs:
   - [constructor, "Either audio from the internal queue or zero."]
