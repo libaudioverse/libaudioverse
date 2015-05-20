@@ -39,4 +39,7 @@ The second is the string to transform."""
 		d['doc_description'] = render(d.get('doc_description', no_doc_description))
 		for name, func in d.get('extra_functions', dict()).iteritems():
 			prepare_function(func)
+		#callbacks are function-like enough:
+		for name, cb in d.get('callbacks', dict()).iteritems():
+			prepare_function(cb)
 	#no return, we modify in place.
