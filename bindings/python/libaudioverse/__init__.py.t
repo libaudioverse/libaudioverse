@@ -599,7 +599,7 @@ class {{friendly_name}}Node(GenericNode):
 
 {%endfor%}
 
-{%for callback_name in metadata['nodes'].get(node_name, dict()).get('callbacks', [])%}
+{%for callback_name, callback_info in metadata['nodes'].get(node_name, dict()).get('callbacks', dict()).iteritems()%}
 {%set libaudioverse_function_name = "_lav."+friendly_name|camelcase_to_underscores+"_node_set_"+callback_name+"_callback"%}
 {%set ctypes_name = "_libaudioverse.Lav"+friendly_name+"Node"+callback_name|underscores_to_camelcase(True)+"Callback"%}
 	def get_{{callback_name}}(self):

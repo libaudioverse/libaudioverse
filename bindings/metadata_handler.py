@@ -66,7 +66,7 @@ def cleanup_node(all_info, name, node):
 		node['extra_functions'] = dict()
 	if 'callbacks' not in node:
 		node['has_callbacks'] = False
-		node['callbacks'] = list()
+		node['callbacks'] = dict()
 	for i in node['properties'].itervalues():
 		cleanup_property(i)
 	for i in node['events'].itervalues():
