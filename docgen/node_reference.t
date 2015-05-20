@@ -119,6 +119,21 @@ C Enumeration Value: {{callinfo[0]}}
 
 {%endif%}
 
+{%if node['has_callbacks']%}
+==== Callbacks
+
+{%for name, info in node['callbacks'].iteritems()%}
+===== {{name}}
+Setter: {{functions[info['setter_name']]|function_to_string}}
+
+Callback Prototype: {{info['callback_func']|function_to_string}}
+
+{{macros.render_args_table("Callback Parameters", info['callback_func'], info['params'])}}
+
+{{info['doc_description']}}
+{%endfor%}
+{%endif%}
+
 {%if node['has_extra_functions']%}
 ==== Extra Functions
 
