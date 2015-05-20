@@ -5,6 +5,7 @@ def identity(all_info, x):
 
 def prepare_docs(all_info,
 param = identity, node = identity, enum = identity, function = identity,
+codelit=identity,
 no_doc_description = "No description defined."):
 	"""Runs over the all_info specified.
 Renders all documentation therein through Jinja2, using the filters passed to this function.
@@ -18,6 +19,7 @@ The second is the string to transform."""
 	env.filters['node'] = lambda x: node(all_info, x)
 	env.filters['enum'] = lambda x: enum(all_info, x)
 	env.filters['function'] = lambda x: function(all_info, x)
+	env.filters['codelit'] = lambda x: codelit(all_info, x)
 	#yes, this is a local function.
 	def render(s):
 		template=env.from_string(s)

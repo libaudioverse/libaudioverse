@@ -27,7 +27,7 @@ def make_c_api():
 		j.sort() #alphabetize all of them
 		verify_all_parameters_documented(all_info, all_info['metadata']['functions'])
 		doc_helper.prepare_docs(all_info,
-		param = asciidoc_filters.param, node = asciidoc_filters.node, enum = asciidoc_filters.enum)
+		param = asciidoc_filters.param, node = asciidoc_filters.node, enum = asciidoc_filters.enum, codelit=asciidoc_filters.codelit)
 	env = jinja2.Environment(loader=jinja2.PackageLoader(__package__, ""), undefined=jinja2.StrictUndefined, trim_blocks=True)
 	env.filters.update(transformers.get_jinja2_filters(all_info))
 	context=dict()

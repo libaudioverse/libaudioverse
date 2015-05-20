@@ -13,3 +13,6 @@ def node(all_info, x):
 def param(all_info, x):
 	#This is identity.
 	return x
+
+def codelit(all_info, x):
+	return "`{}`".format(x)
