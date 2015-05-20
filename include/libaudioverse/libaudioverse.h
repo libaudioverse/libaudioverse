@@ -41,7 +41,7 @@ enum Lav_ERRORS {
 	Lav_ERROR_NONE, //everything is OK.
 	Lav_ERROR_UNKNOWN, //We know something has gone wrong, but can't figure out what.
 	Lav_ERROR_TYPE_MISMATCH, //Tried to get/set something with the wrong type, i.e. properties.
-	Lav_ERROR_INVALID_SLOT, //one of the functions taking a slot got passed an invalid number.
+	Lav_ERROR_INVALID_PROPERTY, //one of the functions taking a slot got passed an invalid number.
 	Lav_ERROR_NULL_POINTER, //you passed a NULL pointer into something that shouldn't have it.
 	Lav_ERROR_MEMORY, //a memory problem which probably isn't the fault of the application.
 	Lav_ERROR_INVALID_HANDLE,
@@ -52,12 +52,8 @@ enum Lav_ERRORS {
 
 	Lav_ERROR_HRTF_INVALID,
 
-	/**This one is odd.  It is what is thrown if you pass a node with the wrong "shape" to a function, most notably source creation.*/
-	Lav_ERROR_SHAPE,
+	Lav_ERROR_CANNOT_CROSS_SIMULATIONS, 
 
-	Lav_ERROR_CANNOT_CROSS_DEVICES, //an attempto either create a parent-child connect with nodes from different devices or to set an output with an node from a different device.
-	Lav_ERROR_NO_OUTPUTS, //we expected the node to have outputs here, but it didn't.
-	Lav_ERROR_LIMIT_EXCEEDED,
 	Lav_ERROR_CAUSES_CYCLE,
 	Lav_ERROR_PROPERTY_IS_READ_ONLY,
 
