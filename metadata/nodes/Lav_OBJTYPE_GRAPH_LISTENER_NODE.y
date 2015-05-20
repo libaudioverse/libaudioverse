@@ -1,4 +1,11 @@
-callbacks: [listening]
+callbacks:
+  listening:
+    doc_description: |
+      When set, audio is passed to this callback.
+    params:
+      frames: The number of frames of audio being made available to client code.  This should always be the same as the simulation's block size.
+      channels: The number of channels of audio being made available to client code.
+      buffer: The data, stored in interleaved format.  The length of this buffer is {{"frames*channels"|codelit}}.
 inputs:
   - [constructor, "The audio which will be bassed to the associated callback."]
 outputs:

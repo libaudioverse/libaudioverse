@@ -1,4 +1,14 @@
-callbacks: [processing]
+callbacks: 
+  processing:
+    doc_description: |
+      Called to process audio.
+      If implementing a custom node, the custom node behaves as identity until this callback is set.
+    params:
+      frames: The number of frames to process.  This should always be the block size of the associated simulation.
+      numInputs: The number of inputs of the node.
+      inputs: An array of buffers representing the input audio.
+      numOutputs: The number of outputs of the node.
+      outputs: An array of buffers representing the audio output.
 inputs: constructor
 outputs: constructor
 doc_name: custom
