@@ -27,8 +27,22 @@ def cleanup_property(i):
 	i['is_dynamic'] = i.get('is_dynamic', False)
 	i['read_only'] = i.get('read_only', False)
 
-def cleanup_callback(i):
-	pass
+def cleanup_callback(all_info, name, callback, for_node):
+	#We need two things: the name of the setter and the function object for the underlying typedef.
+	camelcase_node_name="".join([i[0]+i[1:].lower() for i in for_node.split("_")][2:])
+	camelcase_callback_name="".join([i[0].upper()+i[1:] for i in name.split("_")])
+	setter_name = "Lav_{}Set{}Callback".format(camelcase_node_name[0].lower()+camelcase_node_name[1:], camelcase_callback_name)
+	#We next need the typedef for the callback. This is the type of the second parameter to the setter.
+	#We use this below to compute which function object describes the callback itself.
+	setter_func = all_info['functions'][setter_name]
+	callback_typedef=setter_func.args[1].type
+	#compute the function object describing the callback itself:
+	callback_func_typedef = callback_typedef.base
+	callback_ptr_type = all_info['typedefs'][callback_func_typedef]
+	callback_func = callback_ptr_type.base
+	callback['callback_func'] = callback_func
+	callback['callback_typedef'] = callback_typedef
+	callback['setter_name'] = setter_name
 
 def cleanup_event(i):
 	i['doc_description'] = i.get('doc_description', 'No description available.')
@@ -71,8 +85,8 @@ def cleanup_node(all_info, name, node):
 		cleanup_property(i)
 	for i in node['events'].itervalues():
 		cleanup_event(i)
-	for i in node['callbacks']:
-		cleanup_callback(i)
+	for n, i in node['callbacks'].iteritems():
+		cleanup_callback(all_info, n, i, name)
 	for n, d in node['extra_functions'].iteritems():
 		cleanup_extra_function(all_info, n, d, name)
 	node['doc_description'] = node.get('doc_description', 'No description available.')
