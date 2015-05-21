@@ -133,6 +133,8 @@ def make_metadata(all_info):
 		metadata.update(yaml.load(f))
 	with file(os.path.join(metadata_dir, 'functions.y')) as f:
 		metadata.update(yaml.load(f))
+	with file(os.path.join(metadata_dir, 'enumerations.y')) as f:
+		metadata.update(yaml.load(f))
 
 	#run over all the functions, cleaning them up:
 	for name, func in metadata['functions'].iteritems():

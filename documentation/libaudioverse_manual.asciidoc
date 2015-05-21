@@ -15,3 +15,5 @@ include::binding_notes.asciidoc[tabsize=4]
 include::c_api.asciidoc[tabsize=4]
 
 include::node_reference.asciidoc[tabsize=4]
+
+include::enumerations.asciidoc[tabsize=4]

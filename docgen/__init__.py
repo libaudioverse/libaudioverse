@@ -6,3 +6,4 @@ sys.path = [repository_root] + sys.path
 
 from .c_api import make_c_api
 from .node_reference import make_node_reference
+from .enumerations import make_enumerations

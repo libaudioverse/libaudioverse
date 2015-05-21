@@ -16,7 +16,7 @@ from pycparser.c_ast import *
 import subprocess
 import sys
 import os.path
-from collections import OrderedDict
+import collections
 import yaml
 from . import metadata_handler
 import copy
@@ -80,10 +80,10 @@ def extract_enums(ast):
 	#now, we note that we can find--for a specific enum e--:
 	#name = e.name, values are in e.values as e.values[index].value and names in e.values[index]name
 	#note that minimal interpretation is needed so that we can have negated constants-pycparser is for interpreters, not this, and so represents them as a unary minus in the ast.
-	constants_by_enum = OrderedDict()
+	constants_by_enum = collections.OrderedDict()
 	for enum in enum_list:
 		implicit_value = 0
-		constants_by_enum[enum.name] = dict()
+		constants_by_enum[enum.name] = collections.OrderedDict()
 		for enum_value in enum.values.enumerators:
 			val = enum_value.value
 			if val is None:
@@ -102,7 +102,7 @@ def extract_typedefs(ast):
 	#again, we expect them at the top levle--if they're not, we'll miss them.
 	#the primary use of this is a bit later, when we build function objects-we aggregate typedefs when possible.
 	typedef_list = [i for i in ast.ext if isinstance(i, Typedef)]
-	typedefs = OrderedDict()
+	typedefs = collections.OrderedDict()
 	for typedef in typedef_list:
 		name = typedef.name
 		typedefs[name] = compute_type_info(node = typedef, typedefs =typedefs)
@@ -144,7 +144,7 @@ def compute_function_info(func, typedefs, name = ""):
 
 def extract_functions(ast, typedefs):
 	function_list = [i for i in ast.ext if isinstance(i, Decl) and isinstance(i.type, FuncDecl)]
-	functions = OrderedDict()
+	functions = collections.OrderedDict()
 	for function in function_list:
 		name = function.name
 		functions[name] = compute_function_info(func = function.type, typedefs =typedefs, name= name)
@@ -157,7 +157,7 @@ def get_all_info():
 
 	ast=make_ast()
 	constants_by_enum = extract_enums(ast=ast)
-	constants = dict()
+	constants = collections.OrderedDict()
 	for i in constants_by_enum.values():
 		constants.update(i)
 

@@ -14,6 +14,7 @@ if __name__ == '__main__':
 
 	node_reference = docgen.make_node_reference()
 	c_api_docs=docgen.make_c_api()
+	enum_docs=docgen.make_enumerations()
 	if os.path.exists(dest_dir):
 		shutil.rmtree(dest_dir)
 
@@ -23,4 +24,7 @@ if __name__ == '__main__':
 		f.write(node_reference)
 	with file(os.path.join(dest_dir, 'c_api.asciidoc'), 'wb') as f:
 		f.write(c_api_docs)
+	with file(os.path.join(dest_dir, 'enumerations.asciidoc'), 'w') as f:
+		f.write(enum_docs)
+
 	print subprocess.check_output(["asciidoc", os.path.join(dest_dir, 'libaudioverse_manual.asciidoc')], stderr= subprocess.STDOUT, shell = True)
