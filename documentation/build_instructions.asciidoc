@@ -22,8 +22,8 @@ For the documentation, you will also need a working implementation of Asciidoc a
 
 === Building
 
-IMPORTANT: you must do an out-of-source build with CMake and it must be in `repository_root/build` where `repository_root` is the directory you cloned the Libaudioverse repository.
-Otherwise, binding and documentation generation will crash.
+IMPORTANT: you must do an out-of-source build with CMake and it must be in `repository_root/build` where `repository_root` is the directory of the Libaudioverse repository.
+Otherwise, binding and documentation generation will crash or do other unexpected things.
 
 The rest of the process is the standard CMake process.
 Something like the following:
@@ -37,3 +37,4 @@ my_generator_specific_build_command
 
 A custom target, `libaudioverse_docs`, generates a set of Asciidoc documentation in `build/documentation`.
 The resulting manual is titled `libaudioverse_manual.html` and may be found, along with the manual's source files,  in the `documentation` subdirectory of the build directory.
+Alternatively, you can continue reading this one.

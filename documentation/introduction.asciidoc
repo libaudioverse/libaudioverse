@@ -15,4 +15,3 @@ Where possible, language bindings will contain specific documentation in the for
 To that end, this manual uses Python for examples and attempts to avoid discussing specific language features as much as possible.
 
 If you need to bind Libaudioverse to your language, see <<c-api,the description of the C API>>.
-<<bindings,Notes on the existing bindings also exist>>.
