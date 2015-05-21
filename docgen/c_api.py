@@ -13,8 +13,7 @@ def verify_all_parameters_documented(info, docs):
 			if p.name not in docs[func.name]['params']:
 				raise ValueError("{}: undocumented param {}".format(func.name, p.name))
 
-def make_c_api():
-	all_info =get_info.get_all_info()
+def make_c_api(all_info):
 	functions_by_category=dict()
 	for i in all_info['metadata']['function_categories']:
 		functions_by_category[i['name']] =[]
@@ -26,8 +25,6 @@ def make_c_api():
 	for i, j in functions_by_category.iteritems():
 		j.sort() #alphabetize all of them
 		verify_all_parameters_documented(all_info, all_info['metadata']['functions'])
-		doc_helper.prepare_docs(all_info,
-		param = asciidoc_filters.param, node = asciidoc_filters.node, enum = asciidoc_filters.enum, codelit=asciidoc_filters.codelit)
 	env = jinja2.Environment(loader=jinja2.PackageLoader(__package__, ""), undefined=jinja2.StrictUndefined, trim_blocks=True)
 	env.filters.update(transformers.get_jinja2_filters(all_info))
 	context=dict()

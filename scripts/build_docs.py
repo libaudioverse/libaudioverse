@@ -7,14 +7,17 @@ import subprocess
 repository_root = os.path.split(os.path.split(os.path.abspath(__file__))[0])[0]
 sys.path = [repository_root] + sys.path
 import docgen
+import bindings.get_info
 
 if __name__ == '__main__':
 	print "Building documentation..."
+	info=bindings.get_info.get_all_info()
+	docgen.prepare_docs(info)
 	dest_dir = os.path.join(repository_root, 'build', 'documentation')
 
-	node_reference = docgen.make_node_reference()
-	c_api_docs=docgen.make_c_api()
-	enum_docs=docgen.make_enumerations()
+	node_reference = docgen.make_node_reference(info)
+	c_api_docs=docgen.make_c_api(info)
+	enum_docs=docgen.make_enumerations(info)
 	if os.path.exists(dest_dir):
 		shutil.rmtree(dest_dir)
 
