@@ -1,4 +1,4 @@
-= Libaudioverse 1.0 Reference Manual
+= Libaudioverse 0.8 Reference Manual
 :toc:
 :toclevels: 1
 
