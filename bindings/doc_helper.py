@@ -42,4 +42,9 @@ The second is the string to transform."""
 		#callbacks are function-like enough:
 		for name, cb in d.get('callbacks', dict()).iteritems():
 			prepare_function(cb)
+	#Run over the enums and render them:
+	for enum in all_info['metadata']['enumerations'].itervalues():
+		enum['doc_description']=render(enum['doc_description'])
+		for k, v in enum['members'].iteritems():
+			enum['members'][k] = render(v)
 	#no return, we modify in place.

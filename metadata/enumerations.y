@@ -50,3 +50,33 @@ enumerations:
       Lav_LOG_LEVEL_CRITICAL: Logs critical messages such as failures to initialize and error conditions.
       Lav_LOG_LEVEL_INFO: Logs informative messages.
       Lav_LOG_LEVEL_DEBUG: Logs everything possible.
+  Lav_PANNING_STRATEGIES:
+    doc_description: |
+      Indicates a strategy to use for panning.
+      This is mostly for the {{"Lav_OBJTYPE_MULTIPANNER_NODE"|node}} and the 3D components of this library.
+    members:
+      Lav_PANNING_STRATEGY_HRTF: Indicates HRTF panning.
+      Lav_PANNING_STRATEGY_STEREO: Indicates stereo panning.
+      lav_PANNING_STRATEGY_SURROUND51: Indicates 5.1 surround sound panning.
+      Lav_PANNING_STRATEGY_SURROUND71: Indicates 7.1 surround sound panning.
+  Lav_BIQUAD_TYPES:
+    doc_description: |
+      Indicates a biquad filter type, used with the {{"Lav_OBJTYPE_BIQUAD_NODE"|node}} and in a few other places.
+    members:
+      Lav_BIQUAD_TYPE_LOWPASS: Indicates a lowpass filter.
+      Lav_BIQUAD_TYPE_HIGHPASS: Indicates a highpass filter.
+      Lav_BIQUAD_TYPE_BANDPASS: Indicates a bandpass filter.
+      Lav_BIQUAD_TYPE_NOTCH: Indicates a notch filter.
+      Lav_BIQUAD_TYPE_ALLPASS: Indicates an allpass filter.
+      Lav_BIQUAD_TYPE_PEAKING: Indicates a peaking filter.
+      Lav_BIQUAD_TYPE_LOWSHELF: Indicates a lowshelf filter.
+      Lav_BIQUAD_TYPE_HIGHSHELF: Indicates a highshelf filter.
+      Lav_BIQUAD_TYPE_IDENTITY: This filter does nothing.
+  Lav_DISTANCE_MODELS:
+    doc_description: |
+      used in the 3D components of this library.
+      Indicates how sound should become quieter as objects move away from the listener.
+    members:
+      Lav_DISTANCE_MODEL_LINEAR: Sound falls off as {{"1-(distance/maxDistance)"|codelit}}.
+      Lav_DISTANCE_MODEL_EXPONENTIAL: Sounds fall off as {{"1/distance"|codelit}}.
+      Lav_DISTANCE_MODEL_INVERSE_SQUARE: Sounds fall off as {{"1/min(distance, maxDistance)^2"|codelit}}.
