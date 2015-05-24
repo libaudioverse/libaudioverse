@@ -71,6 +71,7 @@ class GenericError(Exception):
 {%for error_name in constants.iterkeys()|prefix_filter("Lav_ERROR_")|remove_filter("Lav_ERROR_NONE")%}
 {%set friendly_name = error_name|strip_prefix("Lav_ERROR_")|lower|underscores_to_camelcase(True)%}
 class {{friendly_name}}Error(GenericError):
+	"""{{metadata['enumerations']["Lav_ERRORS"]['members'][error_name]}}"""
 	pass
 _lav.bindings_register_exception(_libaudioverse.{{error_name}}, {{friendly_name}}Error)
 
@@ -96,22 +97,29 @@ def get_logging_callback():
 	return _logging_callback
 
 def set_logging_level(level):
-	"""Set the logging level."""
+	"""Set the logging level.  This should be a value from the LoggingLevels enum."""
 	_lav.set_logging_level(level)
 
 def get_logging_level():
 	"""Get the logging level."""
-	return _lav.get_logging_level()
+	return LoggingLevels(_lav.get_logging_level())
 
 #library initialization and termination.
 
 _initialized = False
 def initialize():
+	"""Corresponds to Lav_initialize, plus binding specific setup.
+	
+	Call this before using anything from Libaudioverse."""
 	global _initialized
 	_lav.initialize()
 	_initialized = True
 
 def shutdown():
+	"""Corresponds to Lav_shutdown.
+	
+	Call this at the end of your application.
+	You must call it before the interpreter shuts down. Failure to do so will allow Libaudioverse to call your code during Python's shutdown procedures."""
 	global _initialized
 	_initialized = False
 	_lav.shutdown()
@@ -147,7 +155,12 @@ class _CallbackWrapper(object):
 		return self.cb(*needed_args, **self.additional_kwargs)
 
 class DeviceInfo(object):
-	"""Represents info on a audio device."""
+	"""Represents info on a audio device.
+	
+	Channels is the number of channels for the device.  Name is a human-readable name.  Index should be passed to Simulation.__init__ as the device index.
+	
+	The caveat from the Libaudioverse manual should be  summarized here:
+	channels is not reliable, and your application should default to stereo while providing the user the option to change it."""
 
 	def __init__(self, channels, name, index):
 		self.channels = channels
@@ -155,9 +168,7 @@ class DeviceInfo(object):
 		self.index = index
 
 def enumerate_devices():
-	"""Returns a list of DeviceInfo representing the devices on the system.
-
-The position in the list is the needed device index for Simulation.__iniit__."""
+	"""Returns a list of DeviceInfo representing the devices on the system."""
 	max_index = _lav.device_get_count()
 	infos = []
 	for i in xrange(max_index):
@@ -185,11 +196,12 @@ class _HandleComparer(object):
 class Simulation(_HandleComparer):
 	"""Represents a running simulation.  All libaudioverse nodes must be passed a simulation at creation time and cannot migrate between them.  Furthermore, it is an error to try to connect objects from different simulations.
 
-Instances of this class are context managers.  Using the with statement on an instance of this class invoke's Libaudioverse's atomic block support."""
+Instances of this class are context managers.  Using the with statement on an instance of this class invoke's Libaudioverse's atomic block support.
 
+For full details of this class, see the Libaudioverse manual."""
 
 	def __init__(self, sample_rate = 44100, block_size = 1024):
-		"""Create a simulation."""
+		"""Creates a simulation."""
 		handle = _lav.create_simulation(sample_rate, block_size)
 		self.init_with_handle(handle)
 		_weak_handle_lookup[self.handle] = self
@@ -217,7 +229,10 @@ Instances of this class are context managers.  Using the with statement on an in
 
 	def get_block(self, channels, may_apply_mixing_matrix = True):
 		"""Returns a block of data.
-Calling this on an audio output device will cause the audio thread to skip ahead a block, so don't do that."""
+		
+		This function wraps Lav_getBlock.  Note that calling this on a simulation configured to output audio is an error.
+		
+		If may_apply_mixing_matrix is True, audio will be automatically converted to the output channel type.  If it is false, channels are either dropped or padded with zeros."""
 		with self._lock:
 			length = _lav.simulation_get_block_size(self.handle)*channels
 			buff = (ctypes.c_float*length)()
@@ -229,12 +244,19 @@ Calling this on an audio output device will cause the audio thread to skip ahead
 
 	#context manager support.
 	def __enter__(self):
+		"""Lock the simulation."""
 		_lav.simulation_lock(self.handle)
 
 	def __exit__(self, type, value, traceback):
+		"""Unlock the simulation."""
 		_lav.simulation_unlock(self.handle)
 
 	def set_block_callback(self, callback, additional_args=None, additional_kwargs=None):
+		"""Set a callback to be called every block.
+		
+		This callback is called as though inside a with block, and takes two positional argguments: the simulation and the simulations' time.
+		
+		Wraps lav_simulationSetBlockCallback."""
 		with self._lock:
 			if callback is not None:
 				wrapper = _CallbackWrapper(self, callback, additional_args if additional_args is not None else (), additional_kwargs if additional_kwargs is not None else dict())
@@ -246,6 +268,7 @@ Calling this on an audio output device will cause the audio thread to skip ahead
 				self._state['block_callback'] = None
 
 	def get_block_callback(self):
+		"""The Python bindings provide the ability to retrieve callback objects.  This function retrieves the set block callback, if any."""
 		with self._lock:
 			return self._state['block_callback'][0]
 
@@ -273,37 +296,25 @@ Use load_from_file to read a file or load_from_array to load an iterable."""
 			self.handle = handle
 
 	def load_from_file(self, path):
+		"""Load an audio file.
+		
+		Wraps Lav_bufferLoadFromFile."""
 		_lav.buffer_load_from_file(self, path)
 
 	def load_from_array(sr, channels, frames, data):
+		"""Load from an array of interleaved floats.
+		
+		Wraps Lav_bufferLoadFromArray."""
 		_lav.buffer_load_from_array(sr, channels, frames, data)
 
 _types_to_classes[ObjectTypes.buffer] = Buffer
 
-class PropertyInfo(object):
-	"""Gives info about a property.
-
-type: Type of the property as libaudioverse.PropertyTypes.
-
-name: Name of the property.
-
-range:Range of the property, if applicable.  Otherwise none.
-
-has_dynamic_range: True if the property has a dynamic range (i.e. file node's position property), otherwise False.
-
-Note that this only communicates info.  If changes happen after you requested this instance, they will not be reflected here.
-"""
-
-	def __init__(self, name, type, range, has_dynamic_range):
-		self.name = name
-		self.type = type
-		self.range = range
-		self.has_dynamic_range = has_dynamic_range
-
 #the following classes implement properties:
 
 class LibaudioverseProperty(object):
-	"""Proxy to Libaudioverse properties."""
+	"""Proxy to Libaudioverse properties.
+	
+	All properties support resetting and type query."""
 
 	def __init__(self, node, slot, getter, setter):
 		self._node = node
@@ -321,7 +332,17 @@ class LibaudioverseProperty(object):
 	def reset(self):
 		_lav.node_reset_property(self._node, self._slot)
 
+	@property
+	def type(self):
+		"""The property's type."""
+		return PropertyTypes(_lav.node_get_property_type(self._node, self._slot))
+
 class BooleanProperty(LibaudioverseProperty):
+	"""Represents a boolean property.
+	
+	Note that boolean properties show up as int properties when their type is queried.
+	This class adds extra marshalling to make sure that boolean properties show up as booleans on the Python side, as the C API does not distinguish between boolean properties and int properties with range [0, 1]."""
+	
 	def __init__(self, node, slot):
 		super(BooleanProperty, self).__init__(node = node, slot = slot, getter =_lav.node_get_int_property, setter = _lav.node_set_int_property)
 
@@ -353,11 +374,19 @@ class IntProperty(LibaudioverseProperty):
 
 class AutomatedProperty(LibaudioverseProperty):
 	"""A property that supports automation and node connection."""
+
 	def linear_ramp_to_value(self, time, value):
+		"""Schedule a linear automator.
+		
+		The property's value will change to the specified value by the specified time, starting at the end of the previous automator
+		
+		This function wraps Lav_automationLinearRampToValue."""
 		_lav.automation_linear_ramp_to_value(self._node, self._slot, time, value)
 
 	def cancel_automators(self, time):
-		"""Cancel all automators scheduled to start after time."""
+		"""Cancel all automators scheduled to start after time.
+		
+		Wraps Lav_automationCancelAutomators."""
 		_lav.automation_cancel_automators(self._node, self._slot, time)
 
 class FloatProperty(AutomatedProperty):
@@ -379,7 +408,10 @@ class StringProperty(LibaudioverseProperty):
 		super(StringProperty, self).__init__(node = node, slot = slot, getter = _lav.node_get_string_property, setter = _lav.node_set_string_property)
 
 class BufferProperty(LibaudioverseProperty):
-	"""Proxy to a buffer property."""
+	"""Proxy to a buffer property.
+	
+	It is safe to set this property to None."""
+	
 	def __init__(self, node, slot):
 		#no getter and setter. This is custom.
 		self._node = node
@@ -397,6 +429,10 @@ class BufferProperty(LibaudioverseProperty):
 			raise ValueError("Expected a Buffer or None.")
 
 class VectorProperty(LibaudioverseProperty):
+	"""class to act as a base for  float3 and float6 properties.
+	
+	This class knows how to marshal anything that is a collections.sized and will error if length constraints are not met."""
+
 	def __init__(self, node, slot, getter, setter, length):
 		super(VectorProperty, self).__init__(node = node, slot = slot, getter = getter, setter =setter)
 		self._length = length
@@ -411,16 +447,21 @@ class VectorProperty(LibaudioverseProperty):
 		self._setter(self._node, self._slot, *val)
 
 class Float3Property(VectorProperty):
+	"""Represents a float3 property."""
+	
 	def __init__(self, node, slot):
 		super(Float3Property, self).__init__(node, slot, getter =_lav.node_get_float3_property, setter = _lav.node_set_float3_property, length = 3)
 
 class Float6Property(VectorProperty):
+	"""Represents a float6 property."""
+	
 	def __init__(self, node, slot):
 		super(Float6Property, self).__init__(node = node, slot = slot, gettter =_lav.node_get_float6_property, setter =_lav.node_set_float6_property, length = 6)
 
 #Array properties.
 #This is a base class because we have 2, but they have to lock their parent node.
 class ArrayProperty(LibaudioverseProperty):
+	"""Base class for all array properties."""
 
 	def __init__(self, node, slot, reader, replacer, length):
 		self._node = node
@@ -431,6 +472,7 @@ class ArrayProperty(LibaudioverseProperty):
 
 	@property
 	def value(self):
+		"""The array, as a tuple."""
 		with self._node._lock:
 			length = self._length(self._node, self._slot)
 			accum = [None]*length
@@ -443,11 +485,14 @@ class ArrayProperty(LibaudioverseProperty):
 		self._replacer(self._node, self._slot, len(val), *val)
 
 class IntArrayProperty(ArrayProperty):
+	"""Represents an int array property."""
 	def __init__(self, node, slot):
 		super(IntArrayProperty, self).__init__(node = node, slot = slot, reader = _lav.node_read_int_array_property,
 			writer =_lav.node_write_int_array_property, length = _lav.node_get_int_array_property_length)
 
 class FloatArrayProperty(ArrayProperty):
+	"""Represents a float array property."""
+
 	def __init__(self, node, slot):
 		super(FloatArrayProperty, self).__init__(node = node, slot = slot,
 			reader =_lav.node_read_float_array_property,
@@ -458,7 +503,9 @@ class FloatArrayProperty(ArrayProperty):
 #This is the class hierarchy.
 #GenericNode is at the bottom, and we should never see one; and GenericObject should hold most implementation.
 class GenericNode(_HandleComparer):
-	"""A Libaudioverse object."""
+	"""Base class for all Libaudioverse nodes.
+	
+	All properties and functionality on this class is available to all Libaudioverse nodes without exception."""
 
 	def __init__(self, handle):
 		self.init_with_handle(handle)
@@ -491,6 +538,7 @@ class GenericNode(_HandleComparer):
 			self._lock = self._state['lock']
 
 	def get_property_names(self):
+		"""Get the names of all properties on this node."""
 		return self._state['properties'].keys()
 
 	def get_property_info(self, name):
@@ -511,20 +559,29 @@ class GenericNode(_HandleComparer):
 			return PropertyInfo(name = name, type = type, range = range, has_dynamic_range = has_dynamic_range)
 
 	def connect(self, output, node, input):
+		"""Connect the specified output of this node to the specified input of another node.
+		
+		As a feature of the Python bindings, nodes are kept alive if another node's input is connected to one of their outputs.
+		So long as some node which this node is connected to is alive, this node will also be alive."""
 		with self._lock:
 			_lav.node_connect(self, output, node, input)
 			self._state['outputs'][output].add((output, weakref.ref(self)))
 			node._state['inputs'].add((output, self))
 
 	def connect_simulation(self, output):
+		"""Connect the specified output of this node to  this node's simulation.
+		
+		Nodes which are connected to the simulation are kept alive as long as they are connected to the simulation."""
 		with self._lock:
 			_lav.node_connect_simulation(self, output)
 			self._state['simulation']._state['inputs'].add(self)
 
 	def connect_property(self, output, property):
-		"""Property is a subclass of LibaudioverseProperty.
-Example: n.connect_property(0, mySineNode.frequency).
-"""
+		"""Connect an output of this node to an automatable property.
+		
+		Example: n.connect_property(0, mySineNode.frequency).
+		
+		As usual, this connection keeps this node alive as long as the destination is also alive."""
 		other = property._node
 		slot = property._slot
 		with self._lock:
@@ -533,6 +590,7 @@ Example: n.connect_property(0, mySineNode.frequency).
 			other._state['inputs_properties'][slot].add((output, self))
 
 	def disconnect(self, output):
+		"""Clears all connections made with a specific output."""
 		with self._lock:
 			_lav.node_disconnect(self, output)
 			for i in self._state['outputs'][output]:
@@ -556,6 +614,9 @@ Example: n.connect_property(0, mySineNode.frequency).
 {%endfor%}
 
 	def reset(self):
+		"""Perform the node-specific reset operation.
+		
+		This directly wraps Lav_nodeReset."""
 		_lav.node_reset(self)
 
 _types_to_classes[ObjectTypes.generic_node] = GenericNode
@@ -566,6 +627,8 @@ _types_to_classes[ObjectTypes.generic_node] = GenericNode
 {%set constructor_arg_names = functions[constructor_name].input_args|map(attribute='name')|map('camelcase_to_underscores')|list-%}
 {%set property_dict = metadata['nodes'].get(node_name, dict()).get('properties', dict())%}
 class {{friendly_name}}Node(GenericNode):
+	"""{{metadata['nodes'][node_name].get('doc_description', "No descriptiona vailable.")}}"""
+	
 	def __init__(self{%if constructor_arg_names|length > 0%}, {%endif%}{{constructor_arg_names|join(', ')}}):
 		super({{friendly_name}}Node, self).__init__(_lav.{{constructor_name|without_lav|camelcase_to_underscores}}({{constructor_arg_names|join(', ')}}))
 
@@ -595,6 +658,7 @@ class {{friendly_name}}Node(GenericNode):
 {%set func = functions[func_name]%}
 {%set lav_func = func.name|without_lav|camelcase_to_underscores%}
 	def {{friendly_func_name}}({{func.input_args|map(attribute='name')|list|join(', ')}}):
+		"""{{func_info.get('doc_description', "No description available.")}}"""
 		return _lav.{{lav_func}}({{func.input_args|map(attribute='name')|list|join(', ')}})
 
 {%endfor%}
@@ -603,6 +667,9 @@ class {{friendly_name}}Node(GenericNode):
 {%set libaudioverse_function_name = "_lav."+friendly_name|camelcase_to_underscores+"_node_set_"+callback_name+"_callback"%}
 {%set ctypes_name = "_libaudioverse.Lav"+friendly_name+"Node"+callback_name|underscores_to_camelcase(True)+"Callback"%}
 	def get_{{callback_name}}(self):
+		"""Get the {{callback_name}} callback.
+		
+		This is a feature of the Python bindings and is not available in the C API.  See the setter for specific documentation on this callback."""
 		with self._lock:
 			cb = self._state['callbacks'].get("{{callback_name}}", None)
 			if cb is None:
@@ -611,6 +678,9 @@ class {{friendly_name}}Node(GenericNode):
 				return cb[0]
 
 	def set_{{callback_name}}_callback(self, callback, additional_args = None, additional_kwargs = None):
+		"""Set the {{callback_name}} callback.
+		
+		{{callback_info.get("doc_description", "No description available.")}}"""
 		with self._lock:
 			if callback is None:
 				#delete the key, clear the callback with Libaudioverse.
