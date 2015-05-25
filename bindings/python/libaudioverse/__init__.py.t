@@ -661,7 +661,7 @@ class {{friendly_name}}Node(GenericNode):
 {%set friendly_func_name = func_info['name']%}
 {%set func = functions[func_name]%}
 {%set lav_func = func.name|without_lav|camelcase_to_underscores%}
-	def {{friendly_func_name}}({{func.input_args|map(attribute='name')|list|join(', ')}}):
+	def {{friendly_func_name}}({{func.input_args|map(attribute='name')|map('camelcase_to_underscores')|map('strip_suffix', '_handle')|list|join(', ')}}):
 		"""{{func_info.get('doc_description', "No description available.")}}"""
 		return _lav.{{lav_func}}({{func.input_args|map(attribute='name')|list|join(', ')}})
 
