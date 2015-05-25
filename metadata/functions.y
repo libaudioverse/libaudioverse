@@ -484,6 +484,19 @@ functions:
     params:
       time: The time at which we must be at the specified value.
       value: The value we must arrive at by the specified time.
+  Lav_automationEnvelope:
+    category: automators
+    doc_description: |
+      An automator that performs an envelope.
+      
+      The specified points are stretched to fit the specified duration.
+      At the scheduled time of this automator, the envelope will begin being performed, finishing at {{"time+duration"|codelit}}.
+    params:
+      slot: The index of the property to automate.
+      time: The time at which the envelope should begin.
+      duration: The duration of the envelope.
+      valuesLength: The length of the values array.
+      values: The points of the envelope, sampled every {{"duration/valuesLength"|codelit}} seconds.
   Lav_nodeGetEventHandler:
     category: nodes
     doc_description: |

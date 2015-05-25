@@ -387,6 +387,10 @@ class AutomatedProperty(LibaudioverseProperty):
 		This function wraps Lav_automationLinearRampToValue."""
 		_lav.automation_linear_ramp_to_value(self._node, self._slot, time, value)
 
+	def envelope(self, time, duration, values):
+		values_length = len(values)
+		_lav.automation_envelope(self._node, self._slot, time, duration, values_length, values)
+
 	def cancel_automators(self, time):
 		"""Cancel all automators scheduled to start after time.
 		

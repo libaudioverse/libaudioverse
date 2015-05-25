@@ -22,7 +22,7 @@ void Automator::start(double initialValue, double initialTime) {
 }
 
 double Automator::getDuration() {
-return 0.0;
+	return duration;
 }
 
 double Automator::getScheduledTime() {
