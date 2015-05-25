@@ -39,12 +39,17 @@ def remove_filter(l, item):
 	return filter(lambda x: x != item, l)
 
 def strip_prefix(s, prefix):
-	assert s.startswith(prefix)
-	return s[len(prefix):]
+	if s.startswith(prefix):
+		return s[len(prefix):]
+	else:
+		return s
 
 def strip_suffix(s, suffix):
-	assert s.endswith(suffix)
-	return s[0:-len(suffix)]
+	"""Strips a suffix, if that suffix exists."""
+	if s.endswith(suffix):
+		return s[0:-len(suffix)]
+	else:
+		return s
 
 def common_prefix(l):
 	return os.path.commonprefix(l)

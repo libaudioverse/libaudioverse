@@ -628,7 +628,7 @@ _types_to_classes[ObjectTypes.generic_node] = GenericNode
 {%for node_name in constants.iterkeys()|regexp_filter("Lav_OBJTYPE_\w+_NODE")|remove_filter("Lav_OBJTYPE_GENERIC_NODE")%}
 {%set friendly_name = node_name|strip_prefix("Lav_OBJTYPE_")|strip_suffix("_NODE")|lower|underscores_to_camelcase(True)%}
 {%set constructor_name = "Lav_create" + friendly_name + "Node"%}
-{%set constructor_arg_names = functions[constructor_name].input_args|map(attribute='name')|map('camelcase_to_underscores')|list-%}
+{%set constructor_arg_names = functions[constructor_name].input_args|map(attribute='name')|map('camelcase_to_underscores')| map('strip_suffix', "_handle")| list-%}
 {%set property_dict = metadata['nodes'].get(node_name, dict()).get('properties', dict())%}
 class {{friendly_name}}Node(GenericNode):
 	"""{{metadata['nodes'][node_name].get('doc_description', "No descriptiona vailable.")}}"""
