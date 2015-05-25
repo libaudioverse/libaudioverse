@@ -1,4 +1,8 @@
 {%-import 'macros.t' as macros with context-%}
+"""Implements all of the Libaudioverse API.
+
+This is the only module that should be used.  All other modules are private."""
+
 import _lav
 import _libaudioverse
 import weakref
