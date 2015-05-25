@@ -62,6 +62,7 @@ def make_python(info):
 		'dll_location': 'libaudioverse',
 		'libsndfile_location': 'libaudioverse',
 		'additional_directories': [
-			'examples'
+			'examples',
+			'docs',
 		]
 	}
