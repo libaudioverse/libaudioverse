@@ -1,7 +1,8 @@
 {%macro implement_property(enumerant, prop)%}
 
 	@property
-	def {{prop['name']}}(self):
+	def {{prop['name']}}(self):   
+		"""{{prop.get('doc_description', "")}}"""
 {%if prop['type'] == 'int'%}
 {%if 'value_enum' in prop%}
 		return IntProperty(node = self, slot = _libaudioverse.{{enumerant}}, enum = {{prop['value_enum']|without_lav|underscores_to_camelcase(True)}})
@@ -13,9 +14,10 @@
 {%endif%}
 {%endmacro%}
 
-{%macro implement_event(name, index)%}
+{%macro implement_event(name, index, info)%}
 	@property
 	def {{name}}_event(self):
+		"""{{info.get('doc_description', "")}}"""
 		evt = self._state['events'].get({{index}}, None)
 		if evt is None:
 			return

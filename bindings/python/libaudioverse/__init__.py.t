@@ -614,7 +614,7 @@ class GenericNode(_HandleComparer):
 {{macros.implement_property(enumerant, prop)}}
 {%endfor%}
 {%for enumerant, info in metadata['nodes']['Lav_OBJTYPE_GENERIC_NODE'].get('events', dict()).iteritems()%}
-{{macros.implement_event(info['name'], "_libaudioverse." + enumerant)}}
+{{macros.implement_event(info['name'], "_libaudioverse." + enumerant, info)}}
 {%endfor%}
 
 	def reset(self):
@@ -653,7 +653,7 @@ class {{friendly_name}}Node(GenericNode):
 
 {%endfor%}
 {%for enumerant, info in metadata['nodes'].get(node_name, dict()).get('events', dict()).iteritems()%}
-{{macros.implement_event(info['name'], "_libaudioverse." + enumerant)}}
+{{macros.implement_event(info['name'], "_libaudioverse." + enumerant, info)}}
 
 {%endfor%}
 
