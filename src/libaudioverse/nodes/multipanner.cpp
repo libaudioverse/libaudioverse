@@ -20,17 +20,15 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 namespace libaudioverse_implementation {
 
-class MultipannerObject: public SubgraphNode {
+class MultipannerNode: public SubgraphNode {
 	public:
-	MultipannerObject(std::shared_ptr<Simulation> sim, std::shared_ptr<HrtfData> hrtf);
-	std::shared_ptr<Node> hrtf_panner = nullptr, amplitude_panner = nullptr, input= nullptr;
-	void forwardAzimuth();
-	void forwardElevation();
-	void forwardShouldCrossfade();
+	MultipannerNode(std::shared_ptr<Simulation> sim, std::shared_ptr<HrtfData> hrtf);
+	std::shared_ptr<Node> hrtf_panner = nullptr, amplitude_panner = nullptr, input= nullptr, current_panner = nullptr;
 	void strategyChanged();
+	void willProcessParents() override;
 };
 
-MultipannerObject::MultipannerObject(std::shared_ptr<Simulation> sim, std::shared_ptr<HrtfData> hrtf): SubgraphNode(Lav_OBJTYPE_MULTIPANNER_NODE, sim)  {
+MultipannerNode::MultipannerNode(std::shared_ptr<Simulation> sim, std::shared_ptr<HrtfData> hrtf): SubgraphNode(Lav_OBJTYPE_MULTIPANNER_NODE, sim)  {
 	hrtf_panner = createHrtfNode(sim, hrtf);
 	amplitude_panner = createAmplitudePannerNode(sim);
 	input=createGainNode(simulation);
@@ -42,39 +40,18 @@ MultipannerObject::MultipannerObject(std::shared_ptr<Simulation> sim, std::share
 
 	appendOutputConnection(0, 0);
 	setInputNode(input);
-	getProperty(Lav_PANNER_AZIMUTH).setPostChangedCallback([this](){forwardAzimuth();});
-	getProperty(Lav_PANNER_ELEVATION).setPostChangedCallback([this](){forwardElevation();});
-	getProperty(Lav_PANNER_SHOULD_CROSSFADE).setPostChangedCallback([this](){forwardShouldCrossfade();});
 	getProperty(Lav_PANNER_STRATEGY).setPostChangedCallback([this](){strategyChanged();});
 }
 
 std::shared_ptr<Node> createMultipannerNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf) {
-	auto retval = std::shared_ptr<MultipannerObject>(new MultipannerObject(simulation, hrtf), ObjectDeleter(simulation));
+	auto retval = std::shared_ptr<MultipannerNode>(new MultipannerNode(simulation, hrtf), ObjectDeleter(simulation));
 	simulation->associateNode(retval);
 	//this call must be here because it involves shared_from_this.
 	retval->strategyChanged();
 	return retval;
 }
 
-void MultipannerObject::forwardAzimuth() {
-	float az = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
-	hrtf_panner->getProperty(Lav_PANNER_AZIMUTH).setFloatValue(az);
-	amplitude_panner->getProperty(Lav_PANNER_AZIMUTH).setFloatValue(az);
-}
-
-void MultipannerObject::forwardElevation() {
-	float elev = getProperty(Lav_PANNER_ELEVATION).getFloatValue();
-	hrtf_panner->getProperty(Lav_PANNER_ELEVATION).setFloatValue(elev);
-	amplitude_panner->getProperty(Lav_PANNER_ELEVATION).setFloatValue(elev);
-}
-
-void MultipannerObject::forwardShouldCrossfade() {
-	int cf = getProperty(Lav_PANNER_SHOULD_CROSSFADE).getIntValue();
-	hrtf_panner->getProperty(Lav_PANNER_SHOULD_CROSSFADE).setIntValue(cf);
-	amplitude_panner->getProperty(Lav_PANNER_SHOULD_CROSSFADE).setIntValue(cf);
-}
-
-void MultipannerObject::strategyChanged() {
+void MultipannerNode::strategyChanged() {
 	int newStrategy = getProperty(Lav_PANNER_STRATEGY).getIntValue();
 	bool hookHrtf = false, hookAmplitude = false;
 	switch(newStrategy) {
@@ -98,11 +75,22 @@ void MultipannerObject::strategyChanged() {
 		int newOutputSize = amplitude_panner->getOutputConnection(0)->getCount();
 		getOutputConnection(0)->reconfigure(0, newOutputSize);
 		setOutputNode(amplitude_panner);
+		current_panner = amplitude_panner;
 	}
 	if(hookHrtf) {
 		getOutputConnection(0)->reconfigure(0, 2);
 		setOutputNode(hrtf_panner);
+		current_panner = hrtf_panner;
 	}
+}
+
+void MultipannerNode::willProcessParents() {
+	float az = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
+	float elev = getProperty(Lav_PANNER_ELEVATION).getFloatValue();
+	int cf=getProperty(Lav_PANNER_SHOULD_CROSSFADE).getIntValue();
+	current_panner->getProperty(Lav_PANNER_AZIMUTH).setFloatValue(az);
+	current_panner->getProperty(Lav_PANNER_ELEVATION).setFloatValue(elev);
+	current_panner->getProperty(Lav_PANNER_SHOULD_CROSSFADE).setIntValue(cf);
 }
 
 //begin public api
