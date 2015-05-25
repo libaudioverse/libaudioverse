@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 from glob import glob
 
-__version__ = '0.1'
+__version__ = '0.8'
 
 setup(
 	name = 'libaudioverse',
