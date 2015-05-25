@@ -108,6 +108,7 @@ Automatable properties also support automators, a concept borrowed directly from
 An automator moves the value of a property according to a specific instruction.  The current automators are as follows:
 
 - Linear ramp to value: moves the property to a specific value by a specific time.
+- Envelope: Execute linearly interpolated envelopes from arrays of samples.
 
 Automators are scheduled relative to the local time of a node and have two important properties.
 The start time of an automator, sometimes just called the time, is the time at which it is scheduled.

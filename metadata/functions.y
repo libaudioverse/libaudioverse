@@ -482,6 +482,7 @@ functions:
       
       The value of a linear ramp begins at the end of the last automation and linearly increases to the start time of this automator, after which the property holds steady unless more automators are scheduled.
     params:
+      slot: The slot of the property to automate.
       time: The time at which we must be at the specified value.
       value: The value we must arrive at by the specified time.
   Lav_automationEnvelope:
@@ -491,6 +492,8 @@ functions:
       
       The specified points are stretched to fit the specified duration.
       At the scheduled time of this automator, the envelope will begin being performed, finishing at {{"time+duration"|codelit}}.
+      
+      As described in the basics section, it is an error to schedule an automator during the range {{"(time, time+duration)"|codelit}}.
     params:
       slot: The index of the property to automate.
       time: The time at which the envelope should begin.

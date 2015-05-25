@@ -388,6 +388,11 @@ class AutomatedProperty(LibaudioverseProperty):
 		_lav.automation_linear_ramp_to_value(self._node, self._slot, time, value)
 
 	def envelope(self, time, duration, values):
+		"""Run an envelope.
+		
+		The property's value will stay where it was after the last automator until the specified time is reached, whereupon it will follow the envelope until time+duration.
+		
+		This function wraps Lav_automationEnvelope."""
 		values_length = len(values)
 		_lav.automation_envelope(self._node, self._slot, time, duration, values_length, values)
 
