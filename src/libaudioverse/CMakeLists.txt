@@ -85,6 +85,7 @@ nodes/buffer.cpp
 automators/automators.cpp
 automators/envelope.cpp
 automators/linear_ramp.cpp
+automators/set.cpp
 
 #audio output using audio_io:
 audio_output.cpp

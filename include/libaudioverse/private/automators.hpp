@@ -13,8 +13,6 @@ The name for this component is borrowed from Webaudio.  This file only contains 
 
 Adding new automators is similar to nodes: create a file, define the class, create a creation function.
 
-We put the creeation functions for automators in this file.
-
 An automator itself must be equivalent a pure function with some parameters. bound.
 Put another way, multiple calls to start *must* be supported.
 Furthermore, all automators must have a well-defined final value.

@@ -485,6 +485,14 @@ functions:
       slot: The slot of the property to automate.
       time: The time at which we must be at the specified value.
       value: The value we must arrive at by the specified time.
+  Lav_automationSet:
+    category: automators
+    doc_description: |
+      An automator that sets the property's value to a specific value at a specific time.
+    params:
+      slot: The slot of the property to automate.
+      time: The time at which to set the value.
+      value: The value to set the property to at the specified time.
   Lav_automationEnvelope:
     category: automators
     doc_description: |

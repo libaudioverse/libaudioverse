@@ -396,6 +396,13 @@ class AutomatedProperty(LibaudioverseProperty):
 		values_length = len(values)
 		_lav.automation_envelope(self._node, self._slot, time, duration, values_length, values)
 
+	def set(self, time, value):
+		"""Sets the property's value to a specific value at a specific time.
+		
+		Wraps Lav_automationSet."""
+		_lav.automation_set(self._node, self._slot, time, value)
+
+
 	def cancel_automators(self, time):
 		"""Cancel all automators scheduled to start after time.
 		
