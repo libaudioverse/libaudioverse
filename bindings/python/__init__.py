@@ -1,8 +1,8 @@
 import jinja2
 from collections import OrderedDict
 import re
-from .. import transformers
-from .. import get_info
+from .. import transformers, get_info, doc_helper
+from . import doc_filters
 import os.path
 
 ctypes_map = {
@@ -44,6 +44,10 @@ def ctypes_function_helper(func, typedef_prefix):
 def make_python(info):
 	#get our directory.
 	source_dir = os.path.split(__file__)[0]
+	#prepare our docs:
+	doc_helper.prepare_docs(info,
+	node=doc_filters.node, param=doc_filters.param, enum = doc_filters.enum,
+	codelit=doc_filters.codelit)
 	#we have to inject into the global namespace: the templates should not have to move typedef info around for us.
 	global typedefs
 	typedefs = info['typedefs']
