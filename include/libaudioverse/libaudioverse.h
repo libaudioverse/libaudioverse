@@ -107,6 +107,7 @@ enum Lav_OBJECT_TYPES {
 	Lav_OBJTYPE_CHANNEL_SPLITTER_NODE,
 	Lav_OBJTYPE_CHANNEL_MERGER_NODE,
 	Lav_OBJTYPE_BUFFER_NODE,
+	Lav_OBJTYPE_BUFFER_TIMELINE_NODE,
 };
 
 /**Node states.*/
@@ -367,6 +368,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_createGainNode(LavHandle simulationHandle, int 
 Lav_PUBLIC_FUNCTION LavError Lav_createChannelSplitterNode(LavHandle simulationHandle, int channels, LavHandle* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createChannelMergerNode(LavHandle simulationHandle, int channels, LavHandle* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createBufferNode(LavHandle simulationHandle, LavHandle* destination);
+
+Lav_PUBLIC_FUNCTION LavError Lav_createBufferTimelineNode(LavHandle simulationHandle, int channels, LavHandle* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_bufferTimelineNodeScheduleBuffer(LavHandle nodeHandle, LavHandle bufferHandle, double time, float pitchBend);
 
 #ifdef __cplusplus
 }

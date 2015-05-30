@@ -30,7 +30,7 @@ class Buffer: public ExternalObject {
 	//a single sample without mixing:
 	float getSample(int frame, int channel);
 	//And with mixing:
-	float getSampleWithMixingMatrix(int frame, int channels, int maxChannels);
+	float getSampleWithMixingMatrix(int frame, int channel, int maxChannels);
 
 	//meet lockable concept:
 	void lock() {simulation->lock();}
