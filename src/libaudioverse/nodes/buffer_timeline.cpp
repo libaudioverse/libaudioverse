@@ -75,6 +75,7 @@ class BufferTimelineNode: public Node {
 	BufferTimelineNode(std::shared_ptr<Simulation> simulation, int channels);
 	void process() override;
 	void scheduleBuffer(double time, float delta, std::shared_ptr<Buffer> buffer);
+	void reset() override;
 	private:
 	std::vector<ScheduledBuffer> scheduled_buffers;
 	std::vector<ScheduledBuffer> active_buffers;
@@ -124,6 +125,11 @@ void BufferTimelineNode::scheduleBuffer(double time, float delta, std::shared_pt
 	auto sb=ScheduledBuffer(buffer, time, delta, output_channels);
 	auto insertBefore=std::upper_bound(scheduled_buffers.begin(), scheduled_buffers.end(), sb);
 	scheduled_buffers.insert(insertBefore, sb);
+}
+
+void BufferTimelineNode::reset() {
+	scheduled_buffers.clear();
+	active_buffers.clear();
 }
 
 //begin public API.
