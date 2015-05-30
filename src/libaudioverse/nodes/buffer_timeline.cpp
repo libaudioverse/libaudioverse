@@ -99,7 +99,6 @@ void BufferTimelineNode::process() {
 		if(i->time > time+(1.0f/simulation->getSr())*block_size) break; //the queue is sorted, we do want break.
 		active_buffers.push_back(*i);
 		i = scheduled_buffers.erase(i);
-		printf("Activation\n");
 		//We can invalidate the loop and need to check heree.
 		if(i== scheduled_buffers.end()) break; //may be because of the delete.
 	}
@@ -113,7 +112,6 @@ void BufferTimelineNode::process() {
 			done = i->add(output_buffers[j]+offset, writing, j);
 		}
 		if(done) {
-			printf("Deactivation\n");
 			i= active_buffers.erase(i);
 			if(i ==active_buffers.end()) break;
 		}
