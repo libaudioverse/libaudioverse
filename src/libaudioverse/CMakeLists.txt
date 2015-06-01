@@ -32,9 +32,8 @@ logging.cpp
 
 #Speex resampler.
 speex_resample.c
-
 hrtf.cpp
-utils/resampler.cpp
+resampler.cpp
 
 file_io/file_reader.cpp
 
