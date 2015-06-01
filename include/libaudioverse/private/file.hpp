@@ -29,13 +29,14 @@ class FileReader: std::enable_shared_from_this<FileReader>  {
 
 class FileWriter {
 	public:
-	FileWriter();
+	FileWriter(): info() {}
 	~FileWriter();
 	void open(const char* path, int sr, int channels);
-	int getSr();
-	int getChannelCount();
+	void close();
+	float getSr();
+	unsigned int getChannelCount();
 	//write frames of interleaved float data.
-	int write(int frames, float* data);
+	unsigned int write(int frames, float* data);
 	private:
 	SNDFILE *handle = nullptr;
 	SF_INFO info;

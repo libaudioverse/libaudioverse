@@ -36,6 +36,7 @@ hrtf.cpp
 resampler.cpp
 
 file_io/file_reader.cpp
+file_io/file_writer.cpp
 
 #classes and functionality for DSp that are stateful, and miscellaneous DSP-related math functions.
 dsp/ringmod.cpp
