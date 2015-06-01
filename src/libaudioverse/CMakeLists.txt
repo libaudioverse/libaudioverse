@@ -33,10 +33,10 @@ logging.cpp
 #Speex resampler.
 speex_resample.c
 
-#utilities: file reading, platform-specific code, stateful filters that can't be represented as kernels, etc:
-utils/file_reader.cpp
-utils/hrtf.cpp
+hrtf.cpp
 utils/resampler.cpp
+
+file_io/file_reader.cpp
 
 #classes and functionality for DSp that are stateful, and miscellaneous DSP-related math functions.
 dsp/ringmod.cpp
