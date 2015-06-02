@@ -81,6 +81,7 @@ nodes/gain.cpp
 nodes/split_merge.cpp #contains two nodes under the same class.
 nodes/buffer.cpp
 nodes/buffer_timeline.cpp
+nodes/recorder.cpp
 
 #automators
 automators/automators.cpp

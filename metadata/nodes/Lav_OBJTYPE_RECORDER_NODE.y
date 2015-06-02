@@ -1,3 +1,18 @@
+extra_functions:
+  Lav_recorderNodeStartRecording:
+    doc_description: |
+      Begin recording to the specified files.
+      The sample rate is the same as that of the simulation.
+      The channel count is the same as this node was initialized with.
+      The format of the file is determined from the extension: this function recognizes ".wav" and ".ogg" on all platforms.
+    params:
+      path: The path of the file to record to.
+  Lav_recorderNodeStopRecording:
+    doc_description: |
+      Stops recording.
+      
+      Be sure to call this function.
+      Failure to do so may lead to any of a number of undesirable problems.
 inputs:
   - [constructor, "The signal to record."]
 outputs:

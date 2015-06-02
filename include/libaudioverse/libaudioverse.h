@@ -375,6 +375,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_createBufferTimelineNode(LavHandle simulationHa
 Lav_PUBLIC_FUNCTION LavError Lav_bufferTimelineNodeScheduleBuffer(LavHandle nodeHandle, LavHandle bufferHandle, double time, float pitchBend);
 
 Lav_PUBLIC_FUNCTION LavError Lav_createRecorderNode(LavHandle simulationHandle, int channels, LavHandle* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_recorderNodeStartRecording(LavHandle nodeHandle, const char* path);
+Lav_PUBLIC_FUNCTION LavError Lav_recorderNodeStopRecording(LavHandle nodeHandle);
 
 #ifdef __cplusplus
 }
