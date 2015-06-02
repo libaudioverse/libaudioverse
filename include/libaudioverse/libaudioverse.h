@@ -108,6 +108,7 @@ enum Lav_OBJECT_TYPES {
 	Lav_OBJTYPE_CHANNEL_MERGER_NODE,
 	Lav_OBJTYPE_BUFFER_NODE,
 	Lav_OBJTYPE_BUFFER_TIMELINE_NODE,
+	Lav_OBJTYPE_RECORDER_NODE,
 };
 
 /**Node states.*/
@@ -372,6 +373,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_createBufferNode(LavHandle simulationHandle, La
 
 Lav_PUBLIC_FUNCTION LavError Lav_createBufferTimelineNode(LavHandle simulationHandle, int channels, LavHandle* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_bufferTimelineNodeScheduleBuffer(LavHandle nodeHandle, LavHandle bufferHandle, double time, float pitchBend);
+
+Lav_PUBLIC_FUNCTION LavError Lav_createRecorderNode(LavHandle simulationHandle, int channels, LavHandle* destination);
 
 #ifdef __cplusplus
 }
