@@ -276,6 +276,12 @@ For full details of this class, see the Libaudioverse manual."""
 		with self._lock:
 			return self._state['block_callback'][0]
 
+	def write_file(self, path, channels, blocks, may_apply_mixing_matrix=True):
+		"""Write blocks of data to a file.
+		
+		This function wraps Lav_simulationWriteFile."""
+		_lav.simulation_write_file(self, path, channels, blocks, may_apply_mixing_matrix)
+
 _types_to_classes[ObjectTypes.simulation] = Simulation
 
 #Buffer objects.

@@ -220,6 +220,22 @@ functions:
     params:
       callback: The callback to use.
       userdata: An extra parameter that will be passed to the callback.
+  Lav_simulationWriteFile:
+    category: simulations
+    doc_description: |
+      Write some number of blocks of audio data to the specified file.
+      
+      This function advances the simulation as though {{"Lav_simulationGetBlock"|function}} were called {{"blocks"|param}} times.
+      As a consequence, it is not possible to use this function while the simulation is outputting.
+      
+      The file format is determined from the path.
+      Recognized extensions include ".wav" and ".ogg", which are guaranteed to work on all systems.
+      In all cases, reasonable defaults are used for those settings which are specific to the encoder.
+    params:
+      path: The path to the audio file to be written.
+      channels: The number of channels in the resulting file.
+      blocks: The number of blocks to write.
+      mayApplyMixingMatrix: 1 if applying a mixing matrix should be attempted, 0 if extra channels should be treated as 0 or dropped.  This is the same behavior as with {{"Lav_simulationGetBlock"|function}}.
   Lav_createBuffer:
     category: buffers
     doc_description: |

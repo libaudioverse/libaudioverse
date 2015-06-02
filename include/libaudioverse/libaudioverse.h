@@ -209,6 +209,7 @@ It is safe to call Libaudioverse from this callback.
 To clear, use null as the callback.*/
 typedef void (*LavBlockCallback)(LavHandle handle, double time, void* userdata);
 Lav_PUBLIC_FUNCTION LavError Lav_simulationSetBlockCallback(LavHandle simulationHandle, LavBlockCallback callback, void* userdata);
+Lav_PUBLIC_FUNCTION LavError Lav_simulationWriteFile(LavHandle simulationHandle, const char* path, int channels, int blocks, int mayApplyMixingMatrix);
 
 /**Buffers.
 Buffers are chunks of audio data from any source.  A variety of nodes to work with buffers exist.*/

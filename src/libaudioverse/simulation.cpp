@@ -10,6 +10,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/kernels.hpp>
 #include <libaudioverse/private/audio_devices.hpp>
 #include <libaudioverse/private/data.hpp>
+#include <libaudioverse/private/file.hpp>
 #include <audio_io/audio_io.hpp>
 #include <stdlib.h>
 #include <functional>
@@ -181,6 +182,20 @@ void Simulation::setBlockCallback(LavBlockCallback callback, void* userdata) {
 	block_callback_userdata=userdata;
 }
 
+void Simulation::writeFile(std::string path, int channels, int blocks, bool mayApplyMixingMatrix) {
+	auto file = FileWriter();
+	file.open(path.c_str(), sr, channels);
+	//vectors are guaranteed to be contiguous. Using a vector here guarantees proper cleanup.
+	std::vector<float> block;
+	block.resize(channels*getBlockSize());
+	for(int i = 0; i < blocks; i++) {
+		getBlock(&block[0], channels, mayApplyMixingMatrix);
+		unsigned int written= 0;
+		while(written < getBlockSize()) written += file.write(getBlockSize(), &block[0]);
+	}
+	file.close();
+}
+
 //begin public API
 
 Lav_PUBLIC_FUNCTION LavError Lav_createSimulation(unsigned int sr, unsigned int blockSize, LavHandle* destination) {
@@ -247,7 +262,15 @@ Lav_PUBLIC_FUNCTION LavError Lav_simulationUnlock(LavHandle simulationHandle) {
 
 Lav_PUBLIC_FUNCTION LavError Lav_simulationSetBlockCallback(LavHandle handle, LavBlockCallback callback, void* userdata) {
 	PUB_BEGIN
-incomingObject<Simulation>(handle)->setBlockCallback(callback, userdata);
+	incomingObject<Simulation>(handle)->setBlockCallback(callback, userdata);
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_simulationWriteFile(LavHandle simulationHandle, const char* path, int channels, int blocks, int mayApplyMixingMatrix) {
+	PUB_BEGIN
+	auto sim = incomingObject<Simulation>(simulationHandle);
+	LOCK(*sim);
+	sim->writeFile(path, channels, blocks, mayApplyMixingMatrix);
 	PUB_END
 }
 
