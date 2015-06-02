@@ -38,8 +38,12 @@ properties:
     name: channel_interpretation
     type: int
     value_enum: Lav_CHANNEL_INTERPRETATIONS
+    default: Lav_CHANNEL_INTERPRETATION_SPEAKERS
     doc_description: |
-      This property is not currently used, and is reserved for future use.
+      How to treat channel count mismatches.
+      The default is to apply mixing matrices when possible.
+      
+      This property is almost never needed.
 inputs: null
 outputs: null
 doc_name: generic
