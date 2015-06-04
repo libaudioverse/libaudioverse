@@ -325,7 +325,8 @@ environment.default_panning_strategy = PanningStrategies.hrtf
 environment.output_channels = 2
 ....
 
-And the following configure 5.1 surround sound:
+And the following configures 5.1 surround sound:
+
 ....
 environment.default_panning_strategy = PanningStrategies.surround51
 environment.output_channels = 6
