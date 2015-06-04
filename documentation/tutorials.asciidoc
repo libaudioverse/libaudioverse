@@ -331,3 +331,95 @@ And the following configures 5.1 surround sound:
 environment.default_panning_strategy = PanningStrategies.surround51
 environment.output_channels = 6
 ....
+
+=== Property Automation and Locking the Simulation
+
+Earlier in these tutorials, we made a sine wave whose frequency varies over time.
+I promised to revisit this topic, as the implementation has a number of problems:
+
+- It can happen that we change the property twice in one block, hearing only one change.
+
+- If the thread driving the changes suddenly gets preempted by the OS, changes stop.
+
+- If the block size is sufficiently large, the first problem causes every change to be audible.
+
+Fortunately, there is a simple fix: we can ask Libaudioverse to move the properties for us.
+
+Every property is either an a-rate property or a k-rate property.
+If a property is an a-rate property, its value is computed every sample.
+If a property is a k-rate property, its value is computed only at the beginning of the block.
+
+Sine wave frequencies are an example of an a-rate property.
+If we ask Libaudioverse to handle moving it for us, it will be updated every sample.
+
+The following assumes  a sine node called sine, and is completely equivalent to the program from earlier.
+
+....
+sine.frequency.value = 0
+sine.frequency.linear_ramp_to_value(time = 2.0, value = 1000)
+....
+
+`linear_ramp_to_value` schedules a change to a value at a specific time in the future.
+We call this an automation method, and it schedules an automator--an object which orchestrates a change in a property in a specific manner.
+The `time` parameter is relative to now and specifies a time by which the property's value must be at the specified value.
+Starting at the end of the previous automator, a linear ramp will begin moving the property's value toward the final value you specify, and it will be there by the time you specify.
+
+Here is an example of an adsr envelope on the aforementioned sine node.
+It also demonstrates the `set` automation method, which serves the purpose of setting a property to a specific value at a specific time.
+Since automators usually start from the previously scheduled automator, `set` is sometimes required in order to prevent changes.
+Keep in mind that the times are relative to "now", not durations from the last scheduled event.
+
+....
+sine.mul.value = 0.0
+sine.mul.linear_ramp_to_value(time = 0.2, value = 1.0)
+sine.mul.linear_ramp_to_value(time = 0.4, value = 0.6)
+sine.mul.set(time = 1.0, value =0.6)
+sine.mul.linear_ramp_to_value(time = 1.5, value = 0.0)
+....
+
+Setting a value directly cancels all automators immediately.
+In addition, while we don't see them here, some automators have durations.
+If you try to schedule an automator during another automator's duration, an error results.
+The only automator that currently has a duration is the `envelope` automator, which affects its value starting at the specified time and not before.
+
+This example is the first that has  a particular problem, and it is one shared by most complex programs.
+When you make two calls into Libaudioverse, Libaudioverse can decide to synthesize a block between them.
+There are two ways to deal with it.
+
+The first is to wait to connect the node to the simulation, either directly or indirectly.
+This prevents the node from being "needed", which means that it never processes and no change to it can be audible.
+Once all changes are made, the node can then be wired up in the appropriate position, whereupon it will begin playing.
+This enables building complex node hierarchies, but has the disadvantage that it does not work effectively on already playing nodes.
+
+The second method is to lock the simulation.
+In Python, this is achieved by making the simulation a context manager.
+When the simulation is locked, the audio thread is unable to synthesize a block of audio.
+This lets us  prevent the problem with the above example as follows.
+
+....
+with simulation:
+    sine    .mul.value = 0.0
+    sine.mul.linear_ramp_to_value(time = 0.2, value = 1.0)
+    sine.mul.linear_ramp_to_value(time = 0.4, value = 0.6)
+    sine.mul.set(time = 1.0, value =0.6)
+    sine.mul.linear_ramp_to_value(time = 1.5, value = 0.0)
+....
+
+In general, Libaudioverse makes up for lost blocks.
+It is not a good idea to sleep or do anything time-consuming while the simulation is locked, as this may lead to Libaudioverse being unable to synthesize audio in time.
+A good sign you are having this problem is clicking or periods of silence after introducing the above change to your programs.
+It is safe to throw this around even sizeable chunks of code that need to modify Libaudioverse, just avoid blocking if you can.
+The first method is better if creating new nodes, however, and thus both are mentioned here.
+
+All the caution that applies to locks applies to this construct.
+You are holding a lock into a thread of Libaudioverse.
+If anything else in your app needs to access this simulation from a different thread, it will not be able to do so until the simulation is once more unlocked.
+To that end, beware holding locks after the simulation is locked, as this can lead to a deadlock.
+Since every language has best practices for dealing with Locks, Libaudioverse binds this construct in the safest way it can.
+To figure out how to use it in your language of choice, see the documentation for your bindings.
+
+You may have been wondering why the algorithm for processing nodes is not "all nodes always process".
+This is part of the reason.
+By not processing unnecessary nodes, you can make multiple calls into Libaudioverse while the node does nothing.
+Imagine what your program would look like if you had to lock and unlock the simulation every couple of calls, as well as deal with all the safety concerns such calls introduce.
+Instead, it is often sufficient to configure the node before connecting it.
