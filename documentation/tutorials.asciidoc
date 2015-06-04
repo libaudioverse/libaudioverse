@@ -174,7 +174,6 @@ class SoundLoader(object):
 To use it, instantiate the class with a simulation and call `load_sound` to get buffer nodes.
 Libaudioverse does support other file formats, but you will almost always want to use `ogg` for size reasons.
 
-
 Doing a loader like this  also allows tricks like grabbing files from the internet, decrypting, raeding from databases, or any number of other things limited only by imagination and time constraints.
 
 === Panning
@@ -182,7 +181,7 @@ Doing a loader like this  also allows tricks like grabbing files from the intern
 The following are the required steps to wire a buffer node, here `buffer_player`, up for playback through an amplitude  panner.
 
 ....
-panner=libaudioverse.AmplitudePanner(simulation)
+panner=libaudioverse.AmplitudePannerNode(simulation)
 buffer_player.connect(output = 0, node = panner, input = 0)
 panner.connect_simulation(0)
 ....
@@ -213,3 +212,48 @@ You can find the specifics of such conversion <<basics-channels,here>>.
 Nodes advance if  something needs them or if you specifically tell them to do so anyway.
 If you are familiar with graph terminology or simply wish to see pseudocode of this algorithm, see the <<basics-audio-processing,section on audio processing>>.
 
+=== HRTf and the Multipanner
+
+For most applications, the flexibility of the amplitude panner is overkill.
+HRTF is also sometimes desirable.
+The multipanner is like an amplitude panner, but with easier reconfiguration options.
+Using it resembles the following:
+
+....
+panner=libaudioverse.MultipannerNode(simulation, hrtf_path ="default")
+buffer_player.connect(output = 0, node = panner, input = 0)
+panner.connect_simulation(0)
+....
+
+Multipanners have the same properties as all other panners.
+The addition is the `strategy` property, which must be set to one of the members of the `Lav_PANNING_STRATEGIES` enumeration.
+In languages with classes, like Python, enumerations are mapped to a class with attributes; `Lav_PANNING_STRATEGIES` becomes `PanningStrategies`.
+For example, the following line configures HRTF:
+
+....
+panner.strategy =panningStrategies.hrtf
+....
+
+And the following 5.1 surround sound:
+
+....
+panner.strategy=PanningStrategies.surround51
+....
+
+Libaudioverse also features HRTF support.
+At the lowest level, this is accessed through the HRTF node.
+In almost all cases, however, a multipanner should be used instead.
+
+The `hrtf_path` argument is the path of an HRTF file in a format specific to Libaudioverse.
+Making your own is both unnecessary and very advanced.
+
+As a special case, anywhere that Libaudioverse expects a path to an HRTF file, it will also allow the special string `default`.
+This is an indicator that Libaudioverse should load from an internal HRTF and is usually what you want.
+If you are using `default`, there are no additional files to distribute.
+This HRTF is built directly into the Libaudioverse DLL itself.
+
+
+HRTFs work at any sampling rate, but the experience is suboptimal if the sampling rate of the simulation does not match the sampling rate of the HRTF dataset in use.
+The default dataset has a sampling rate of 44100 HZ.
+As a quite intensional design decision, the default arguments when constructing simulations also specify this sampling rate.
+To that end, `simulation = libaudioverse.simulation()` or your language's analog is sufficient to use the default dataset.
