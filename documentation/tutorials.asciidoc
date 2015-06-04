@@ -257,3 +257,76 @@ HRTFs work at any sampling rate, but the experience is suboptimal if the samplin
 The default dataset has a sampling rate of 44100 HZ.
 As a quite intensional design decision, the default arguments when constructing simulations also specify this sampling rate.
 To that end, `simulation = libaudioverse.simulation()` or your language's analog is sufficient to use the default dataset.
+
+=== Higher-level 3D components
+
+Libaudioverse provides higher level 3D components modeled after OpenGL, OpenAL, and Web Audio.
+This section is primarily conceptual.
+For an example, see the `sim3d` example for your bindings.
+
+These components are divided across two nodes: a source and an environment.
+There is only one node representing sources, namely <<node-Lav_OBJTYPE_SOURCE_NODE,the source node>>, but multiple environments are allowed for.
+At this stage in development, the only  environment is the <<node-Lav_OBJTYPE_SIMPLE_ENVIRONMENT_NODE,simple environment>>, which provides basic 3D positioning facilities.
+
+Sources can be thought of as mixers.
+They have one input.
+Any audio that passes through the source is panned.
+
+Environments represent the listener and properties on the listener's environment.
+Sources require environments in order to be created.
+At creation, every source is associated with an environment, and this environment never changes.
+
+Before turning to how to use them, it should be noted that sources and environments break the input-output model.
+A source has 0 outputs and an environment 0 inputs.
+Sources and environments are too tightly coupled to be managed separately, so Libaudioverse handles the connections for you.
+When sources are created and audio connected to them, the combined audio of all sources magically appears at the environment's output.
+How this occurs should be considered an implementation detail.
+
+NOTE: While we have not discussed note states yet,  changing the environment to paused pauses all sources.
+Changing individual sources to paused pauses that individual source.
+
+Using environments and sources requires some trigonometry, as well as the introduction of two new property types.
+Float3 and float6 properties are special-case properties for holding vectors of floats.
+A float3 usually represents a position `(x, y, z)` and a float6 an orientation `(front_x, front_y, front_z, up_x, up_y, up_z)`.
+
+Both sources and environments have a `position` property.  In Python, float3 maps to tuples of 3 items, so `environment.position.value = (5, 3, 2)`.
+On the environment, the `position` property represents the listeners' position in 3D space.
+On sources, `position` is that source's position.
+
+The default coordinate system is as follows: positive x is right, positive y is up, and positive z is backward.
+This is the same as the OpenAL defaults.
+
+Changing this involves the `orientation` property on environments, a float6.
+
+Orientations are made up of two components.
+The at vector is the direction in which the listener is facing, and the up vector the direction of the top of the listener's head.
+Both of these must be unit vectors, and they must be orthoganal.
+To that end, we pack them in a float6 so that it is impossible to change one without also changing the other.
+
+The mathematical explanation is as follows.
+Common formulas are given below.
+The right vector is at cross up.
+A transformation matrix can then be constructed representing the listener's local coordinate system, and the position of every source transformed by it.
+
+If the above is greek, then the following   is probably what you want.
+Usually, x is east/west, y is north/south, and z is up/down.
+Given degrees clockwise from north, the following formula will set the orientation such that this is the case:
+`(math.sin(angle*math.pi/180.0), math.cos(angle*math.pi/180.0), 0, 0, 0, 1)`.
+
+Finally, by default, the environment and sources are configured for stereo panning.
+Every source can be configured individually for various types of panning, but by far the easiest is to set two properties on the environment.
+`default_panning_strategy` is the panning strategy that new sources should be configured with by default.
+`output_channels` is the number of channels that the environment's output should have.
+We need both because sources can be reconfigured later, and it is therefore not sufficient to assume that `default_panning_strategy` infers `output_channels`.
+
+The following lines turn on HRTF:
+....
+environment.default_panning_strategy = PanningStrategies.hrtf
+environment.output_channels = 2
+....
+
+And the following configure 5.1 surround sound:
+....
+environment.default_panning_strategy = PanningStrategies.surround51
+environment.output_channels = 6
+....
