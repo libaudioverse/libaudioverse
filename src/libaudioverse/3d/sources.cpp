@@ -52,10 +52,15 @@ std::shared_ptr<Node> createSourceNode(std::shared_ptr<Simulation> simulation, s
 float calculateGainForDistanceModel(int model, float distance, float maxDistance, float referenceDistance) {
 	float retval = 1.0f;
 	float adjustedDistance = std::max<float>(0.0f, distance-referenceDistance);
-	switch(model) {
-		case Lav_DISTANCE_MODEL_LINEAR: retval = 1.0f-(adjustedDistance/maxDistance); break;
-		case Lav_DISTANCE_MODEL_EXPONENTIAL: retval = 1.0f/adjustedDistance; break;
-		case Lav_DISTANCE_MODEL_INVERSE_SQUARE: retval = 1.0f/(adjustedDistance*adjustedDistance); break;
+		if(adjustedDistance > maxDistance) {
+		retval = 0.0f;
+	}
+	else {
+		switch(model) {
+			case Lav_DISTANCE_MODEL_LINEAR: retval = 1.0f-(adjustedDistance/maxDistance); break;
+			case Lav_DISTANCE_MODEL_EXPONENTIAL: retval = 1.0f/adjustedDistance; break;
+			case Lav_DISTANCE_MODEL_INVERSE_SQUARE: retval = 1.0f/(adjustedDistance*adjustedDistance); break;
+		}
 	}
 
 	//safety clamping.  Some of the equations above will go negative after max_distance.
@@ -81,6 +86,7 @@ void SourceNode::update(Environment environment) {
 	float gain = calculateGainForDistanceModel(distanceModel, distance, maxDistance, referenceDistance);
 	//Add in our mul.
 	gain *= getProperty(Lav_NODE_MUL).getFloatValue();
+	printf("%f\n", gain);
 
 	//set the panner.
 	panner_node->getProperty(Lav_PANNER_AZIMUTH).setFloatValue(azimuth);
