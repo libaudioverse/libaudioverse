@@ -223,9 +223,9 @@ functions:
   Lav_simulationWriteFile:
     category: simulations
     doc_description: |
-      Write some number of blocks of audio data to the specified file.
+      Write the simulation's output to the specified file.
       
-      This function advances the simulation as though {{"Lav_simulationGetBlock"|function}} were called {{"blocks"|param}} times.
+      This function advances the simulation as though {{"Lav_simulationGetBlock"|function}} were called multiple times, the number of times determined by {{"duration"|param}}.
       As a consequence, it is not possible to use this function while the simulation is outputting.
       
       The file format is determined from the path.
@@ -234,7 +234,7 @@ functions:
     params:
       path: The path to the audio file to be written.
       channels: The number of channels in the resulting file.
-      blocks: The number of blocks to write.
+      duration: Duration of the resulting file, in seconds.
       mayApplyMixingMatrix: 1 if applying a mixing matrix should be attempted, 0 if extra channels should be treated as 0 or dropped.  This is the same behavior as with {{"Lav_simulationGetBlock"|function}}.
   Lav_createBuffer:
     category: buffers

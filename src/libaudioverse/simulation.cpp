@@ -182,7 +182,8 @@ void Simulation::setBlockCallback(LavBlockCallback callback, void* userdata) {
 	block_callback_userdata=userdata;
 }
 
-void Simulation::writeFile(std::string path, int channels, int blocks, bool mayApplyMixingMatrix) {
+void Simulation::writeFile(std::string path, int channels, double duration, bool mayApplyMixingMatrix) {
+	int blocks = (duration*getSr()/block_size)+1;
 	auto file = FileWriter();
 	file.open(path.c_str(), sr, channels);
 	//vectors are guaranteed to be contiguous. Using a vector here guarantees proper cleanup.
@@ -266,11 +267,11 @@ Lav_PUBLIC_FUNCTION LavError Lav_simulationSetBlockCallback(LavHandle handle, La
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_simulationWriteFile(LavHandle simulationHandle, const char* path, int channels, int blocks, int mayApplyMixingMatrix) {
+Lav_PUBLIC_FUNCTION LavError Lav_simulationWriteFile(LavHandle simulationHandle, const char* path, int channels, double duration, int mayApplyMixingMatrix) {
 	PUB_BEGIN
 	auto sim = incomingObject<Simulation>(simulationHandle);
 	LOCK(*sim);
-	sim->writeFile(path, channels, blocks, mayApplyMixingMatrix);
+	sim->writeFile(path, channels, duration, mayApplyMixingMatrix);
 	PUB_END
 }
 

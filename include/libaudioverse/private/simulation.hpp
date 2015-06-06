@@ -65,7 +65,7 @@ class Simulation: public ExternalObject {
 	void setBlockCallback(LavBlockCallback cb, void* userdata);
 
 	//Write to a file.
-	void writeFile(std::string path, int channels, int blocks, bool mayApplyMixingMatrix);
+	void writeFile(std::string path, int channels, double duration, bool mayApplyMixingMatrix);
 	
 	protected:
 	//the connection to which nodes connect themselves if their output should be audible.
