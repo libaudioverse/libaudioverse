@@ -86,7 +86,6 @@ void SourceNode::update(Environment environment) {
 	float gain = calculateGainForDistanceModel(distanceModel, distance, maxDistance, referenceDistance);
 	//Add in our mul.
 	gain *= getProperty(Lav_NODE_MUL).getFloatValue();
-	printf("%f\n", gain);
 
 	//set the panner.
 	panner_node->getProperty(Lav_PANNER_AZIMUTH).setFloatValue(azimuth);

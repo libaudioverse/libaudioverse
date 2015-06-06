@@ -333,7 +333,7 @@ void SubgraphNode::tick() {
 	subgraph_output->tick();
 	//Handle our add and mul, on top of the output object of the subgraph.
 	//We prefer this over forwarding because this allows the subgraph to change all internal volumes without them being overridden by the user.
-	auto &mulProp = getProperty(Lav_NODE_MUL), &addProp = getProperty(Lav_NODE_ADD);
+		auto &mulProp = getProperty(Lav_NODE_MUL), &addProp = getProperty(Lav_NODE_ADD);
 	float** outputs =getOutputBufferArray();
 	if(mulProp.needsARate()) {
 		for(int i = 0; i < block_size; i++) {
