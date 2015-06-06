@@ -482,7 +482,7 @@ class Float6Property(VectorProperty):
 	"""Represents a float6 property."""
 	
 	def __init__(self, node, slot):
-		super(Float6Property, self).__init__(node = node, slot = slot, gettter =_lav.node_get_float6_property, setter =_lav.node_set_float6_property, length = 6)
+		super(Float6Property, self).__init__(node = node, slot = slot, getter =_lav.node_get_float6_property, setter =_lav.node_set_float6_property, length = 6)
 
 #Array properties.
 #This is a base class because we have 2, but they have to lock their parent node.
