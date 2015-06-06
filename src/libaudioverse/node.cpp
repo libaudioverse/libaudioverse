@@ -60,6 +60,9 @@ Node::Node(int type, std::shared_ptr<Simulation> simulation, unsigned int numInp
 
 	//allocations can be done simply by redirecting through resize after our initialization step.
 	resize(numInputBuffers, numOutputBuffers);
+	
+	//Block sizes never change:
+	block_size = simulation->getBlockSize();
 }
 
 Node::~Node() {
@@ -95,29 +98,28 @@ void Node::tick() {
 	is_processing = true;
 	num_input_buffers = input_buffers.size();
 	num_output_buffers = output_buffers.size();
-	block_size = simulation->getBlockSize();
 	process();
 	auto &mulProp = getProperty(Lav_NODE_MUL), &addProp = getProperty(Lav_NODE_ADD);
 	float** outputs =getOutputBufferArray();
 	if(mulProp.needsARate()) {
 		for(int i = 0; i < block_size; i++) {
 			float mul = mulProp.getFloatValue(i);
-			for(int j = 0; j < num_output_buffers; j++) outputs[j][i]*=mul;
+			for(int j = 0; j < getOutputBufferCount(); j++) outputs[j][i]*=mul;
 		}
 	}
 	else if(mulProp.getFloatValue() !=1.0) {
-		for(int i = 0; i < num_output_buffers; i++) {
+		for(int i = 0; i < getOutputBufferCount(); i++) {
 			scalarMultiplicationKernel(block_size, mulProp.getFloatValue(), outputs[i], outputs[i]);
 		}
 	}
 	if(addProp.needsARate()) {
 		for(int i = 0; i < block_size; i++) {
 		float add=addProp.getFloatValue(i);
-			for(int j = 0; j < num_output_buffers; j++) outputs[j][i]+=add;
+			for(int j = 0; j < getOutputBufferCount(); j++) outputs[j][i]+=add;
 		}
 	}
 	else if(addProp.getFloatValue() !=0.0) {
-		for(int i = 0; i < num_output_buffers; i++) {
+		for(int i = 0; i < getOutputBufferCount(); i++) {
 			scalarAdditionKernel(block_size, addProp.getFloatValue(), outputs[i], outputs[i]);
 		}
 	}
@@ -333,27 +335,26 @@ void SubgraphNode::tick() {
 	subgraph_output->tick();
 	//Handle our add and mul, on top of the output object of the subgraph.
 	//We prefer this over forwarding because this allows the subgraph to change all internal volumes without them being overridden by the user.
-		auto &mulProp = getProperty(Lav_NODE_MUL), &addProp = getProperty(Lav_NODE_ADD);
-	float** outputs =getOutputBufferArray();
-	if(mulProp.needsARate()) {
+	auto &mulProp = getProperty(Lav_NODE_MUL), &addProp = getProperty(Lav_NODE_ADD);
+		float** outputs = getOutputBufferArray();	if(mulProp.needsARate()) {
 		for(int i = 0; i < block_size; i++) {
 			float mul = mulProp.getFloatValue(i);
-			for(int j = 0; j < num_output_buffers; j++) outputs[j][i]*=mul;
+			for(int j = 0; j < getOutputBufferCount(); j++) outputs[j][i]*=mul;
 		}
 	}
 	else if(mulProp.getFloatValue() !=1.0) {
-		for(int i = 0; i < num_output_buffers; i++) {
+		for(int i = 0; i < getOutputBufferCount(); i++) {
 			scalarMultiplicationKernel(block_size, mulProp.getFloatValue(), outputs[i], outputs[i]);
 		}
 	}
 	if(addProp.needsARate()) {
 		for(int i = 0; i < block_size; i++) {
 		float add=addProp.getFloatValue(i);
-			for(int j = 0; j < num_output_buffers; j++) outputs[j][i]+=add;
+			for(int j = 0; j < getOutputBufferCount(); j++) outputs[j][i]+=add;
 		}
 	}
 	else if(addProp.getFloatValue() !=0.0) {
-		for(int i = 0; i < num_output_buffers; i++) {
+		for(int i = 0; i < getOutputBufferCount(); i++) {
 			scalarAdditionKernel(block_size, addProp.getFloatValue(), outputs[i], outputs[i]);
 		}
 	}
