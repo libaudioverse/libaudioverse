@@ -187,12 +187,7 @@ void HrtfData::computeCoefficientsMono(float elevation, float azimuth, float* ou
 	if(ringmoddedElevation > degreesPerElevation) ringmoddedElevation = degreesPerElevation;
 	elevationWeights[0] = (degreesPerElevation-ringmoddedElevation)/degreesPerElevation;
 	elevationWeights[1] = ringmoddedElevation/degreesPerElevation;
-	//We need to normalize this:
-	double normfactor= 1.0f/(elevationWeights[0]+elevationWeights[1]);
-	elevationWeights[0]*=normfactor;
-	elevationWeights[1]*=normfactor;
 
-	//printf("%i=%f, %i=%f\n", elevationIndex[0], elevationWeights[0], elevationIndex[1], elevationWeights[1]);
 	memset(out, 0, sizeof(float)*hrir_length);
 	for(int i = 0; i < 2; i++) {
 		//ElevationIndex lets us get an array of azimuth coefficients.  Go ahead and pull it out now, so we can conceptually forget about all the above variables.
