@@ -70,7 +70,7 @@ class HrtfWriter(object):
 		self.elevation_count, self.min_elevation, self.max_elevation],
 		self.azimuth_counts,
 		[self.response_length],
-		[response for response in  elevation for elevation in self.responses])
+		[list(response) for response in  elevation for elevation in self.responses])
 		data=list(iter)
 		self.packed_data = struct.pack(self.format_string, *data)
 		if self.print_progress:
@@ -84,8 +84,29 @@ class HrtfWriter(object):
 		if self.print_progress:
 			print "Data written to {}".format(path)
 
+	def data_to_float64():
+		new_responses = []
+		for elev in self.responses:
+			new_elev = []
+			for response in elev:
+				if numpy.issubdtype(response.dtype, int):
+					minimum = numpy.iinfo(response.dtype).min
+					maximum = numpy.iinfo(response.dtype).max
+					subtract=0
+					if minimum == 0: #if the type is unsigned.
+						subtract = maximum/2
+					new_response = response.astype(numpy.int64)-subtract
+					new_response = new_response/float(maximum+1) #+1 guarantees that we have novalues below -1
+					new_response = new_response.astype(numpy.float64)
+				else:
+					new_response = response.astype(numpy.float64) #it's already a floating piont type.
+				elev.append(new_response)
+			new_responses.append(elev)
+		self.responses = new_responses
+
 	def standard_build(path):
 		"""Does a standard build, that is the transformations that should be made on most HRIRs."""
+		self.data_to_float64()
 		self.make_format_string()
 		self.pack_data()
 		self.write_file(path)
