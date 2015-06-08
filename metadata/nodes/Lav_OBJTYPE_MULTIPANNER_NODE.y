@@ -34,6 +34,7 @@ properties:
   Lav_PANNER_HEAD_WIDTH:
     type: float
     name: head_width
+    default: 0.1
     range: [0.0, INFINITY]
     doc_description: |
       The width of the head of the listener, in meters.
