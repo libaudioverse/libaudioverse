@@ -29,6 +29,8 @@ class CrossfadingDelayLine {
 	public:
 	CrossfadingDelayLine(float maxDelay, float sr);
 	void setDelay(float delay);
+	//convenience function: combination compute and advance.
+	float tick(float sample);
 	float computeSample();
 	void advance(float sample);
 	void write(float delay, float value);

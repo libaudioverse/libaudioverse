@@ -26,6 +26,12 @@ void CrossfadingDelayLine::setInterpolationTime(float t) {
 	interpolation_delta = 1.0/(t*sr);
 }
 
+float CrossfadingDelayLine::tick(float sample) {
+	float retval = computeSample();
+	advance(sample);
+	return retval;
+}
+
 float CrossfadingDelayLine::computeSample() {
 	if(is_interpolating) return weight1*line.read(delay)+weight2*line.read(new_delay);
 	return line.read(delay);
