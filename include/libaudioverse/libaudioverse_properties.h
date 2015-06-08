@@ -55,14 +55,6 @@ enum Lav_NOISE_TYPES {
 	Lav_NOISE_TYPE_BROWN = 2,
 };
 
-/**This enumeration is used for all panners because it is necessary to be able to treat them identically internally in some circumstances.
-For those using the C API, this matters; see the following comment. Higher-level languages need not be concerned as the higher-level language interfaces reflect this directly.
-HRTF: Azimuth, elevation, crossfading.
-Amplitude: everything except panning strategy.
-Multipanner: Azimuth, elevation, crossfading, strategy
-
-the multipanner fixes the channel maps to the standard hard-coded maps for surround51 and surround71.  Apps needing more control should use an amplitude panner directly.
-*/
 enum Lav_PANNER_PROPERTIES {
 	Lav_PANNER_AZIMUTH = -1,
 	Lav_PANNER_ELEVATION = -2,
@@ -71,6 +63,9 @@ enum Lav_PANNER_PROPERTIES {
 	Lav_PANNER_SKIP_LFE = -5,
 	Lav_PANNER_SKIP_CENTER = -6,
 	Lav_PANNER_STRATEGY = -7,
+	Lav_PANNER_SPEED_OF_SOUND = -8,
+	Lav_PANNER_DISTANCE = -9,
+	Lav_PANNER_HEAD_WIDTH = -10,
 };
 
 enum Lav_PANNING_STRATEGIES {
