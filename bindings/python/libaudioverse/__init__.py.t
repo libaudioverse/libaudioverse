@@ -425,7 +425,7 @@ class DoubleProperty(LibaudioverseProperty):
 	"""Proxy to a double property."""
 
 	def __init__(self, node, slot):
-		super(DoubleProperty, self).__init__(node = node, slot = slot, getter = _lav.node_get_double_property, settre = _lav.node_set_double_property)
+		super(DoubleProperty, self).__init__(node = node, slot = slot, getter = _lav.node_get_double_property, setter = _lav.node_set_double_property)
 
 class StringProperty(LibaudioverseProperty):
 	"""Proxy to a string property."""
