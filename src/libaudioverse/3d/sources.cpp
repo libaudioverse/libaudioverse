@@ -90,6 +90,7 @@ void SourceNode::update(Environment environment) {
 	//set the panner.
 	panner_node->getProperty(Lav_PANNER_AZIMUTH).setFloatValue(azimuth);
 	panner_node->getProperty(Lav_PANNER_ELEVATION).setFloatValue(elevation);
+	panner_node->getProperty(Lav_PANNER_DISTANCE).setFloatValue(distance);
 	panner_node ->getProperty(Lav_NODE_MUL).setFloatValue(gain);
 }
 
