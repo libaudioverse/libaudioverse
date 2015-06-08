@@ -88,9 +88,18 @@ void MultipannerNode::willProcessParents() {
 	float az = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
 	float elev = getProperty(Lav_PANNER_ELEVATION).getFloatValue();
 	int cf=getProperty(Lav_PANNER_SHOULD_CROSSFADE).getIntValue();
+	float sos = getProperty(Lav_PANNER_SPEED_OF_SOUND).getFloatValue();
+	float headWidth =getProperty(Lav_PANNER_HEAD_WIDTH).getFloatValue();
+	float distance= getProperty(Lav_PANNER_DISTANCE).getFloatValue();
 	current_panner->getProperty(Lav_PANNER_AZIMUTH).setFloatValue(az);
 	current_panner->getProperty(Lav_PANNER_ELEVATION).setFloatValue(elev);
 	current_panner->getProperty(Lav_PANNER_SHOULD_CROSSFADE).setIntValue(cf);
+	//these only exist on hrtf, so be careful.
+	if(current_panner == hrtf_panner) {
+		current_panner->getProperty(Lav_PANNER_DISTANCE).setFloatValue(distance);
+		current_panner->getProperty(Lav_PANNER_SPEED_OF_SOUND).setFloatValue(sos);
+		current_panner->getProperty(Lav_PANNER_HEAD_WIDTH).setFloatValue(headWidth);
+	}
 }
 
 //begin public api
