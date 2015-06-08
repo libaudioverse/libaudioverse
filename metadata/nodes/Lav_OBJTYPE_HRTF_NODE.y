@@ -26,7 +26,7 @@ properties:
       Unlike other panner types, the audio artifacts produced by disabling crossfading are noticeable, even for updates of only a few degrees.
   Lav_PANNER_HEAD_WIDTH:
     type: float
-    default: 0.1
+    default: 0.15
     name: head_width
     range: [0.0, INFINITY]
     doc_description: |
