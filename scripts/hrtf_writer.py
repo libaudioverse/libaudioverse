@@ -118,7 +118,9 @@ class HrtfWriter(object):
 			for response in elev:
 				#ifft of the abs of the fft throws out all phase.
 				#Because libaudioverse doesn't do minimum phase, it's automatically delayed and all is (theoretically) happy.
-				response = fft.irfft(numpy.abs(fft.rfft(response))).astype(numpy.float64)
+				#We overdo the fft to minimize any possible error, and then truncate.
+				response = fft.irfft(numpy.abs(fft.rfft(response, max(self.response_length, 512)))).astype(numpy.float64)
+				response = response[:self.response_length]
 				new_elev.append(response)
 			new_responses.append(new_elev)
 		self.responses=new_responses
