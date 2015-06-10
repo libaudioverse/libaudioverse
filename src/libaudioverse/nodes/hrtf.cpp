@@ -135,6 +135,8 @@ float HrtfNode::computeInterauralDelay() {
 	float speedOfSound = getProperty(Lav_PANNER_SPEED_OF_SOUND).getFloatValue();
 	float distance=getProperty(Lav_PANNER_DISTANCE).getFloatValue();
 	float headRadius = headWidth/2;
+	float earPosition = getProperty(Lav_PANNER_EAR_POSITION).getFloatValue();
+	earPosition *= -headRadius;
 	distance=std::max(distance, headRadius);
 	//take these to radians immediately.
 	float azimuth = getProperty(Lav_PANNER_AZIMUTH).getFloatValue()*PI/180.0f;
@@ -147,8 +149,8 @@ float HrtfNode::computeInterauralDelay() {
 	sy = xyPlane*cosf(azimuth);
 	sz = distance*sinf(elevation);
 	//apply pythagorean theorem.
-	float leftDistance = sqrtf((sx-(-headRadius))*(sx-(-headRadius))+sy*sy+sz*sz);
-	float rightDistance = sqrtf((sx-headRadius)*(sx-headRadius)+sy*sy+sz*sz);
+	float leftDistance = sqrtf((sx-(-headRadius))*(sx-(-headRadius))+(sy-earPosition)*(sy-earPosition)+sz*sz);
+	float rightDistance = sqrtf((sx-headRadius)*(sx-headRadius)+(sy-earPosition)*(sy-earPosition)+sz*sz);
 	//the order of the subtraction here makes us return positive when right ear has greater delay.
 	float delta = rightDistance-leftDistance;
 	//Finally, divide by speed of sound and return.

@@ -90,6 +90,7 @@ void MultipannerNode::willProcessParents() {
 	int cf=getProperty(Lav_PANNER_SHOULD_CROSSFADE).getIntValue();
 	float sos = getProperty(Lav_PANNER_SPEED_OF_SOUND).getFloatValue();
 	float headWidth =getProperty(Lav_PANNER_HEAD_WIDTH).getFloatValue();
+	float earPosition = getProperty(Lav_PANNER_EAR_POSITION).getFloatValue();
 	float distance= getProperty(Lav_PANNER_DISTANCE).getFloatValue();
 	current_panner->getProperty(Lav_PANNER_AZIMUTH).setFloatValue(az);
 	current_panner->getProperty(Lav_PANNER_ELEVATION).setFloatValue(elev);
@@ -99,6 +100,7 @@ void MultipannerNode::willProcessParents() {
 		current_panner->getProperty(Lav_PANNER_DISTANCE).setFloatValue(distance);
 		current_panner->getProperty(Lav_PANNER_SPEED_OF_SOUND).setFloatValue(sos);
 		current_panner->getProperty(Lav_PANNER_HEAD_WIDTH).setFloatValue(headWidth);
+		current_panner->getProperty(Lav_PANNER_EAR_POSITION).setFloatValue(earPosition);
 	}
 }
 

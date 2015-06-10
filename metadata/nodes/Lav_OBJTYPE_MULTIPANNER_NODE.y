@@ -65,7 +65,7 @@ properties:
       This property applies only to the HRTF panning strategy.
   Lav_PANNER_EAR_POSITION:
     name: ear_position
-    default: 0.05
+    default: 0.1
     range: [-1.0, 1.0]
     type: float
     doc_description: |
