@@ -63,6 +63,18 @@ properties:
       This property is clamped to be greater than the head width at runtime.
       
       This property applies only to the HRTF panning strategy.
+  Lav_PANNER_EAR_POSITION:
+    name: ear_position
+    default: 0.05
+    range: [-1.0, 1.0]
+    type: float
+    doc_description: |
+      The horizontal offset of the axis defined by the ears from that of the center of the head.
+      
+      This is represented as a multiplier of the head's radius, half the head's width.
+      Positive values are backward and negative ones forward.
+      
+      This property applies only to the HRTF panning strategy.
 inputs:
   - [1, "The signal to pan."]
 outputs:
