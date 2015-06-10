@@ -23,8 +23,7 @@ class DelayRingbuffer {
 };
 
 //A single-channel delay line, but with built-in crossfading.
-//note: this is for the delay object. It does not always do the intuitive thing from a DSP perspective.
-//The point is that it does the intuitive thing for external-facing components and users, and it is robust against even frequent delay changes.
+//Changing delays are handled by crossfading, as though we had two delay lines.
 class CrossfadingDelayLine {
 	public:
 	CrossfadingDelayLine(float maxDelay, float sr);
@@ -41,6 +40,25 @@ class CrossfadingDelayLine {
 	bool is_interpolating = false;
 	float interpolation_delta = 1.0f;
 	float sr = 0.0f, weight1=1.0f, weight2=0.0f;
+};
+
+//This is nearly the same as the crossfading delay line except:
+//No feedback, and changes in delay cause changes in pitch while the new delay settles.
+class DopleringDelayLine {
+	public:
+	DopleringDelayLine(float maxDelay, float sr);
+	void setDelay(float d);
+	void setDelta(float t);
+	float tick(float sample);
+	float computeSample();
+	void advance(float sample);
+	private:
+	int delay = 0, new_delay = 0, max_delay = 0, interpolating_direction = 0;
+	bool interpolating = false;
+	float delay_offset = 0.0f;
+	float interpolation_delta = 1.0f; //this is in samples per sample.
+	float sr = 0;
+	DelayRingbuffer line;
 };
 
 }
