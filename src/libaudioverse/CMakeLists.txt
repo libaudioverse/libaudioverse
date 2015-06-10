@@ -64,7 +64,7 @@ implementations/feedback_delay_network.cpp
 nodes/sine.cpp
 nodes/hard_limiter.cpp
 nodes/hrtf.cpp
-nodes/delay.cpp
+nodes/crossfading_delay.cpp
 nodes/amplitude_panner.cpp
 nodes/push.cpp
 nodes/biquad.cpp

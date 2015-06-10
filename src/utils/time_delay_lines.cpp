@@ -39,7 +39,7 @@ void main(int argc, char** args) {
 	lines.resize(NUM_LINES, 0);
 	for(auto i = lines.begin(); i != lines.end(); i++) {
 		LavHandle newObj;
-		ERRCHECK(Lav_createDelayNode(simulation, 1.0, 1, &newObj));
+		ERRCHECK(Lav_createCrossfadingDelayNode(simulation, 1.0, 1, &newObj));
 		*i = newObj;
 		ERRCHECK(Lav_nodeSetIntProperty(newObj, Lav_NODE_STATE, Lav_NODESTATE_ALWAYS_PLAYING));
 		ERRCHECK(Lav_nodeSetFloatProperty(newObj, Lav_DELAY_DELAY, 0.5f));
