@@ -3,29 +3,35 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/private/dspmath.hpp>
 #include <libaudioverse/implementations/delayline.hpp>
+#include <libaudioverse/private/memory.hpp>
 #include <algorithm>
 #include <functional>
 #include <math.h>
 
 namespace libaudioverse_implementation {
 
-DoppleringDelayLine::DoppleringDelayLine(float maxDelay, float sr): line((int)(maxDelay*sr)+1) {
+DoppleringDelayLine::DoppleringDelayLine(float maxDelay, float sr) {
 	max_delay = (int)(maxDelay*sr)+1; //same as the ringbuffer above.
 	this->sr = sr;
+	line = allocArray<float>(max_delay);
+}
+
+DoppleringDelayLine::~DoppleringDelayLine() {
+	freeArray(line);
 }
 
 void DoppleringDelayLine::setDelta(float d) {
-	interpolation_delta = d;
+	delta = d;
 }
 
 void DoppleringDelayLine::setDelay(float d) {
 	//end any interpolating.
-	delay = new_delay;
-	delay_offset = 0.0f;
-	new_delay = std::min<unsigned int>(d*sr, max_delay);
+	read_head  =new_read_head;
+	new_read_head = ringmodi(write_head-std::min<unsigned int>(d*sr, max_delay), max_delay);
 	//set up the new interpolation.
 	interpolating = true;
-	interpolating_direction = new_delay-delay; //what to add/subtract to move in the right direction.
+	interpolating_direction = read_head-new_read_head < 0.0 ? -1 : 1;
+	current_delta = delta;
 }
 
 float DoppleringDelayLine::tick(float sample) {
@@ -35,31 +41,36 @@ float DoppleringDelayLine::tick(float sample) {
 }
 
 float DoppleringDelayLine::computeSample() {
-	if(interpolating == false) return line.read(delay);
-	//otherwise, we are interpolating, so.
-	//First, compute the samples on either side of us.
+	float w1, w2;
+	w2 = read_head-floorf(read_head);
+	w1 = 1-w2;
 	int i1, i2;
-	i1 = delay;
-	i2 = std::min(delay+1, max_delay); 
-	float w1 = 1-delay_offset, w2 = delay_offset;
-	return line.read(i1)*w1+line.read(i2)*w2;
+	i1 = (int)read_head;
+	i2 = i1+1;
+	//i1 is guaranteed to always be okay per the advance function, but i2 can go past the end.
+	i2 = ringmodi(i2, max_delay);
+	return w1*line[i1]+w2*line[i2];
 }
 
 void DoppleringDelayLine::advance(float sample) {
-	//advance the line.
-	line.advance(sample);
-	if(interpolating == false) return;
-	delay_offset += interpolation_delta;
-	delay += interpolating_direction*(int)floorf(delay_offset);
-	delay_offset=delay_offset-floorf(delay_offset);
-	//this is a very ugly condition.
-	//Basically, we stop if we've moved to the other side or onto the new delay position.
-	if(
-	(delay == new_delay)
-	|| (interpolating_direction > 0 && new_delay < delay)
-	|| (interpolating_direction < 0 && delay < new_delay)) {
-		delay = new_delay;
+	//add 1 to the write head and write our sample.
+	write_head=(write_head+1)%max_delay;
+	line[write_head] = sample;
+	if(interpolating == false) {
+		read_head += 1;
+		read_head=ringmod(read_head, max_delay);
+		return;
+	}
+	//otherwise, we're interpolating, the new read head gets 1 and the read head gets delta.
+	read_head+= (current_delta+1)*interpolating_direction;
+	read_head=ringmod(read_head, max_delay);
+	new_read_head=ringmod(new_read_head+1, max_delay);
+	double dist = abs(read_head-new_read_head);
+	//we might be able to stop. We define stopping as less than a hundredth of a sample.
+	if(dist <=current_delta) {
+		read_head =new_read_head;
 		interpolating = false;
+		return;
 	}
 }
 

@@ -50,18 +50,22 @@ class DoppleringDelayLine {
 	public:
 	DoppleringDelayLine(float maxDelay, float sr);
 	DoppleringDelayLine(const DoppleringDelayLine& other) = delete;
+	~DoppleringDelayLine();
 	void setDelay(float d);
 	void setDelta(float d);
 	float tick(float sample);
 	float computeSample();
 	void advance(float sample);
 	private:
-	int delay = 0, new_delay = 0, max_delay = 0, interpolating_direction = 0;
+	int write_head = 0, max_delay = 0, interpolating_direction = 0;
+	//doubles can safely store 32-bit integers, and avoid a great number of problems heree.
+	double read_head = 0.0, new_read_head = 0.0;
 	bool interpolating = false;
-	float delay_offset = 0.0f;
-	float interpolation_delta = 1.0f; //this is in samples per sample.
+	float delta = 1.0f;
+	//this one changes so we can slow down over a couple samples.
+	float current_delta;
 	float sr = 0;
-	DelayRingbuffer line;
+	float* line;
 };
 
 }
