@@ -21,17 +21,20 @@ namespace libaudioverse_implementation {
 class CrossfadingDelayNode: public Node {
 	public:
 	CrossfadingDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, unsigned int lineCount);
+	~CrossfadingDelayNode();
 	void process();
 	protected:
 	void delayChanged();
 	void recomputeDelta();
 	unsigned int delay_line_length = 0;
-	std::vector<CrossfadingDelayLine> lines;
+	unsigned int line_count;
+	CrossfadingDelayLine** lines;
 };
 
-CrossfadingDelayNode::CrossfadingDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, unsigned int lineCount): Node(Lav_OBJTYPE_CROSSFADING_DELAY_NODE, simulation, lineCount, lineCount) {
+CrossfadingDelayNode::CrossfadingDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, unsigned int lineCount): Node(Lav_OBJTYPE_CROSSFADING_DELAY_NODE, simulation, lineCount, lineCount), line_count(lineCount) {
 	if(lineCount == 0) throw LavErrorException(Lav_ERROR_RANGE);
-	for(unsigned int i = 0; i < lineCount; i++) lines.emplace_back(maxDelay, simulation->getSr());
+	lines = new CrossfadingDelayLine*[lineCount];
+	for(unsigned int i = 0; i < lineCount; i++) lines[i] = new CrossfadingDelayLine(maxDelay, simulation->getSr());
 	getProperty(Lav_DELAY_DELAY).setFloatRange(0.0f, maxDelay);
 	getProperty(Lav_DELAY_INTERPOLATION_TIME).setPostChangedCallback([this] () {recomputeDelta();});
 	getProperty(Lav_DELAY_DELAY).setPostChangedCallback([this] () {delayChanged();});
@@ -49,14 +52,21 @@ std::shared_ptr<Node> createCrossfadingDelayNode(std::shared_ptr<Simulation> sim
 	return tmp;
 }
 
+CrossfadingDelayNode::~CrossfadingDelayNode() {
+	for(unsigned int i = 0; i < line_count; i++) {
+		delete lines[i];
+	}
+	delete[] lines;
+}
+
 void CrossfadingDelayNode::recomputeDelta() {
 	float time = getProperty(Lav_DELAY_INTERPOLATION_TIME).getFloatValue();
-	for(auto &line: lines) line.setInterpolationTime(time);
+	for(unsigned int i = 0; i < line_count; i++) lines[i]->setInterpolationTime(time);
 }
 
 void CrossfadingDelayNode::delayChanged() {
 	float newDelay = getProperty(Lav_DELAY_DELAY).getFloatValue();
-	for(auto &line: lines) line.setDelay(newDelay);
+	for(unsigned int i = 0; i < line_count; i++) lines[i]->setDelay(newDelay);
 }
 
 void CrossfadingDelayNode::process() {
@@ -65,7 +75,7 @@ void CrossfadingDelayNode::process() {
 	//the only difference between these blocks is in the advance line.
 	if(feedback == 0.0f) {
 		for(unsigned int output = 0; output < num_output_buffers; output++) {
-			auto &line = lines[output];
+			auto &line = *lines[output];
 			for(unsigned int i = 0; i < block_size; i++) {
 				output_buffers[output][i] = line.computeSample();
 				line.advance(input_buffers[output][i]);
@@ -74,7 +84,7 @@ void CrossfadingDelayNode::process() {
 	}
 	else {
 		for(unsigned int output = 0; output < num_output_buffers; output++) {
-			auto &line = lines[output];
+			auto &line = *lines[output];
 			for(unsigned int i = 0; i < block_size; i++) {
 				output_buffers[output][i] = line.computeSample();
 				line.advance(input_buffers[output][i]+output_buffers[output][i]*feedback);

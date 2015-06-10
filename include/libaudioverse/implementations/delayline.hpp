@@ -10,6 +10,7 @@ namespace libaudioverse_implementation {
 class DelayRingbuffer {
 	public:
 	DelayRingbuffer(int length);
+	DelayRingbuffer(const DelayRingbuffer& other) = delete;
 	~DelayRingbuffer();
 	float read(int offset);
 	int getLength();
@@ -27,6 +28,7 @@ class DelayRingbuffer {
 class CrossfadingDelayLine {
 	public:
 	CrossfadingDelayLine(float maxDelay, float sr);
+	CrossfadingDelayLine(const CrossfadingDelayLine& other) = delete;
 	void setDelay(float delay);
 	float computeSample();
 	void advance(float sample);
@@ -44,11 +46,12 @@ class CrossfadingDelayLine {
 
 //This is nearly the same as the crossfading delay line except:
 //No feedback, and changes in delay cause changes in pitch while the new delay settles.
-class DopleringDelayLine {
+class DoppleringDelayLine {
 	public:
-	DopleringDelayLine(float maxDelay, float sr);
+	DoppleringDelayLine(float maxDelay, float sr);
+	DoppleringDelayLine(const DoppleringDelayLine& other) = delete;
 	void setDelay(float d);
-	void setDelta(float t);
+	void setDelta(float d);
 	float tick(float sample);
 	float computeSample();
 	void advance(float sample);
