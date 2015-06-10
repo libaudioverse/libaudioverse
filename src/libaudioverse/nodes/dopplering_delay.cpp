@@ -36,7 +36,7 @@ DoppleringDelayNode::DoppleringDelayNode(std::shared_ptr<Simulation> simulation,
 	lines = new DoppleringDelayLine*[lineCount];
 	for(unsigned int i = 0; i < lineCount; i++) lines[i] = new DoppleringDelayLine(maxDelay, simulation->getSr());
 	getProperty(Lav_DELAY_DELAY).setFloatRange(0.0f, maxDelay);
-	getProperty(Lav_DELAY_INTERPOLATION_DELTA).setPostChangedCallback([this] () {recomputeDelta();});
+	getProperty(Lav_DELAY_DELTA).setPostChangedCallback([this] () {recomputeDelta();});
 	getProperty(Lav_DELAY_DELAY).setPostChangedCallback([this] () {delayChanged();});
 	recomputeDelta();
 	delayChanged();
@@ -58,7 +58,7 @@ DoppleringDelayNode::~DoppleringDelayNode() {
 }
 
 void DoppleringDelayNode::recomputeDelta() {
-	float delta = getProperty(Lav_DELAY_INTERPOLATION_DELTA).getFloatValue();
+	float delta = getProperty(Lav_DELAY_DELTA).getFloatValue();
 	for(unsigned int i = 0; i < line_count; i++) lines[i]->setDelta(delta);
 }
 

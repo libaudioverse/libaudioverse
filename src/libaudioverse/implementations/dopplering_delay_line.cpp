@@ -62,7 +62,7 @@ void DoppleringDelayLine::advance(float sample) {
 		return;
 	}
 	//otherwise, we're interpolating, the new read head gets 1 and the read head gets delta.
-	read_head+= (current_delta+1)*interpolating_direction;
+	read_head+= current_delta*interpolating_direction;
 	read_head=ringmod(read_head, max_delay);
 	new_read_head=ringmod(new_read_head+1, max_delay);
 	double dist = abs(read_head-new_read_head);
