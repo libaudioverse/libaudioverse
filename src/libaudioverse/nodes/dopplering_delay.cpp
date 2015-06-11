@@ -18,20 +18,23 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 namespace libaudioverse_implementation {
 
-class DelayNode: public Node {
+class DoppleringDelayNode: public Node {
 	public:
-	DelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, unsigned int lineCount);
+	DoppleringDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, unsigned int lineCount);
 	void process();
 	protected:
 	void delayChanged();
 	void recomputeDelta();
 	unsigned int delay_line_length = 0;
-	std::vector<CrossfadingDelayLine> lines;
+	DoppleringDelayLine **lines;
+	int line_count;
 };
 
-DelayNode::DelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, unsigned int lineCount): Node(Lav_OBJTYPE_DELAY_NODE, simulation, lineCount, lineCount) {
+DoppleringDelayNode::DoppleringDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, unsigned int lineCount): Node(Lav_OBJTYPE_DOPPLERING_DELAY_NODE, simulation, lineCount, lineCount) {
 	if(lineCount == 0) throw LavErrorException(Lav_ERROR_RANGE);
-	for(unsigned int i = 0; i < lineCount; i++) lines.emplace_back(maxDelay, simulation->getSr());
+	line_count = lineCount;
+	lines = new DoppleringDelayLine*[lineCount]();
+	for(unsigned int i = 0; i < lineCount; i++) lines[i] = new DoppleringDelayLine(maxDelay, simulation->getSr());
 	getProperty(Lav_DELAY_DELAY).setFloatRange(0.0f, maxDelay);
 	getProperty(Lav_DELAY_INTERPOLATION_TIME).setPostChangedCallback([this] () {recomputeDelta();});
 	getProperty(Lav_DELAY_DELAY).setPostChangedCallback([this] () {delayChanged();});
@@ -43,52 +46,35 @@ DelayNode::DelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, uns
 	appendOutputConnection(0, lineCount);
 }
 
-std::shared_ptr<Node> createDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, unsigned int lineCount) {
-	auto tmp = std::shared_ptr<DelayNode>(new DelayNode(simulation, maxDelay, lineCount), ObjectDeleter(simulation));
+std::shared_ptr<Node> createDoppleringDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, unsigned int lineCount) {
+	auto tmp = std::shared_ptr<DoppleringDelayNode>(new DoppleringDelayNode(simulation, maxDelay, lineCount), ObjectDeleter(simulation));
 	simulation->associateNode(tmp);
 	return tmp;
 }
 
-void DelayNode::recomputeDelta() {
+void DoppleringDelayNode::recomputeDelta() {
 	float time = getProperty(Lav_DELAY_INTERPOLATION_TIME).getFloatValue();
-	for(auto &line: lines) line.setInterpolationTime(time);
+	for(int i = 0; i < line_count; i++) lines[i]->setInterpolationTime(time);
 }
 
-void DelayNode::delayChanged() {
+void DoppleringDelayNode::delayChanged() {
 	float newDelay = getProperty(Lav_DELAY_DELAY).getFloatValue();
-	for(auto &line: lines) line.setDelay(newDelay);
+	for(int i = 0; i < line_count; i++) lines[i]->setDelay(newDelay);
 }
 
-void DelayNode::process() {
-	float feedback = getProperty(Lav_DELAY_FEEDBACK).getFloatValue();
-	//optimize the common case of not having feedback.
-	//the only difference between these blocks is in the advance line.
-	if(feedback == 0.0f) {
-		for(unsigned int output = 0; output < num_output_buffers; output++) {
-			auto &line = lines[output];
-			for(unsigned int i = 0; i < block_size; i++) {
-				output_buffers[output][i] = line.computeSample();
-				line.advance(input_buffers[output][i]);
-			}
-		}
-	}
-	else {
-		for(unsigned int output = 0; output < num_output_buffers; output++) {
-			auto &line = lines[output];
-			for(unsigned int i = 0; i < block_size; i++) {
-				output_buffers[output][i] = line.computeSample();
-				line.advance(input_buffers[output][i]+output_buffers[output][i]*feedback);
-			}
-		}
+void DoppleringDelayNode::process() {
+	for(int output = 0; output < num_output_buffers; output++) {
+		auto &line = *lines[output];
+		for(int i = 0; i < block_size; i++) output_buffers[output][i] = line.tick(input_buffers[output][i]);
 	}
 }
 
 //begin public api
-Lav_PUBLIC_FUNCTION LavError Lav_createDelayNode(LavHandle simulationHandle, float maxDelay, unsigned int lineCount, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createDoppleringDelayNode(LavHandle simulationHandle, float maxDelay, unsigned int lineCount, LavHandle* destination) {
 	PUB_BEGIN
 	auto simulation =incomingObject<Simulation>(simulationHandle);
 	LOCK(*simulation);
-	auto d = createDelayNode(simulation, maxDelay, lineCount);
+	auto d = createDoppleringDelayNode(simulation, maxDelay, lineCount);
 	*destination = outgoingObject(d);
 	PUB_END
 }

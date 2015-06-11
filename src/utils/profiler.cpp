@@ -44,7 +44,7 @@ return v;\
 
 std::tuple<std::string, int, std::function<std::vector<LavHandle>(LavHandle, int)>> to_profile[] = {
 ENTRY("sine", 1000, Lav_createSineNode(sim, &h)),
-ENTRY("delay line", 1000, Lav_createDelayNode(sim, 0.1, 1, &h)),
+ENTRY("crossfading delay line", 1000, Lav_createCrossfadingDelayNode(sim, 0.1, 1, &h)),
 ENTRY("biquad", 1000, Lav_createBiquadNode(sim, 1, &h)),
 ENTRY("amplitude panner", 1000, Lav_createAmplitudePannerNode(sim, &h)),
 ENTRY("HRTF panner", 30, Lav_createHrtfNode(sim, "default", &h)),

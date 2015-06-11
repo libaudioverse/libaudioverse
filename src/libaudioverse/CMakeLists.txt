@@ -73,13 +73,15 @@ kernels/multiplying.cpp
 implementations/panner.cpp
 implementations/delayringbuffer.cpp
 implementations/crossfadingdelayline.cpp
+implementations/dopplering_delay_line.cpp
 implementations/feedback_delay_network.cpp
 
 #specific node types.
 nodes/sine.cpp
 nodes/hard_limiter.cpp
 nodes/hrtf.cpp
-nodes/delay.cpp
+nodes/crossfading_delay.cpp
+nodes/dopplering_delay.cpp
 nodes/amplitude_panner.cpp
 nodes/push.cpp
 nodes/biquad.cpp

@@ -35,7 +35,7 @@ inputs:
   - [constructor, "The signal to delay."]
 outputs:
   - [constructor, "The delayed signal."]
-doc_name: delay line
+doc_name: crossfading delay line
 doc_description: |
   Implements a crossfading delay line.
   Delay lines have uses in echo and reverb, as well as many more esoteric effects.
