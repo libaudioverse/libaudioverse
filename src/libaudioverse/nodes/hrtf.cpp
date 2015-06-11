@@ -56,8 +56,10 @@ right_delay_line(0.02, simulation->getSr()) {
 	prev_elevation = getProperty(Lav_PANNER_ELEVATION).getFloatValue();
 	appendInputConnection(0, 1);
 	appendOutputConnection(0, 2);
-	//the crossffading time of both delay lines should be one block.
-	left_delay_line.setInterpolationTime(simulation->getBlockSize()/simulation->getSr());
+	//the crossffading time of both delay lines should be barely less than one block.
+	//If it's not, as we're using dopplering delay lines, we can interrupt the  final step.
+	//Recall that blocks have to be at least 4.
+	left_delay_line.setInterpolationTime(simulation->getBlockSize()/simulation->getSr()-1/simulation->getSr());
 	right_delay_line.setInterpolationTime(simulation->getBlockSize()/simulation->getSr());
 }
 
