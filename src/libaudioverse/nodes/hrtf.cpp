@@ -35,7 +35,7 @@ class HrtfNode: public Node {
 	std::shared_ptr<HrtfData> hrtf = nullptr;
 	float prev_azimuth = 0.0f, prev_elevation = 0.0f;
 	//variables for the interaural time difference.
-	CrossfadingDelayLine left_delay_line, right_delay_line;
+	DoppleringDelayLine left_delay_line, right_delay_line;
 	const float max_interaural_delay = 0.02;
 };
 
