@@ -44,19 +44,20 @@ class CrossfadingDelayLine {
 
 //This is nearly the same as the crossfading delay line except:
 //No feedback, and changes in delay cause changes in pitch while the new delay settles.
-class DopleringDelayLine {
+class DoppleringDelayLine {
 	public:
-	DopleringDelayLine(float maxDelay, float sr);
+	DoppleringDelayLine(float maxDelay, float sr);
 	void setDelay(float d);
-	void setDelta(float t);
+	void setInterpolationTime(float t);
 	float tick(float sample);
 	float computeSample();
 	void advance(float sample);
 	private:
-	int delay = 0, new_delay = 0, max_delay = 0, interpolating_direction = 0;
-	bool interpolating = false;
-	float delay_offset = 0.0f;
-	float interpolation_delta = 1.0f; //this is in samples per sample.
+	int max_delay = 0, interpolating_direction = 0;
+	double delay = 0.0, new_delay = 0.0;
+	int counter = 0; //counts down delay changes
+	float velocity = 0.0; //what to change the delay by.
+	float interpolation_time =0.1f;
 	float sr = 0;
 	DelayRingbuffer line;
 };
