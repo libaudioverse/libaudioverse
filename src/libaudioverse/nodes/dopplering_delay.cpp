@@ -21,6 +21,7 @@ namespace libaudioverse_implementation {
 class DoppleringDelayNode: public Node {
 	public:
 	DoppleringDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, unsigned int lineCount);
+	~DoppleringDelayNode();
 	void process();
 	protected:
 	void delayChanged();
@@ -50,6 +51,11 @@ std::shared_ptr<Node> createDoppleringDelayNode(std::shared_ptr<Simulation> simu
 	auto tmp = std::shared_ptr<DoppleringDelayNode>(new DoppleringDelayNode(simulation, maxDelay, lineCount), ObjectDeleter(simulation));
 	simulation->associateNode(tmp);
 	return tmp;
+}
+
+DoppleringDelayNode::~DoppleringDelayNode() {
+	for(int i = 0; i < line_count; i++) delete lines[i];
+	delete[] lines;
 }
 
 void DoppleringDelayNode::recomputeDelta() {

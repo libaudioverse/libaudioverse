@@ -10,6 +10,7 @@ namespace libaudioverse_implementation {
 class DelayRingbuffer {
 	public:
 	DelayRingbuffer(int length);
+	DelayRingbuffer(const DelayRingbuffer& other) = delete;
 	~DelayRingbuffer();
 	float read(int offset);
 	int getLength();
