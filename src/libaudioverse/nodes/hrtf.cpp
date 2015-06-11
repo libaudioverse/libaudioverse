@@ -35,7 +35,7 @@ class HrtfNode: public Node {
 	std::shared_ptr<HrtfData> hrtf = nullptr;
 	float prev_azimuth = 0.0f, prev_elevation = 0.0f;
 	//variables for the interaural time difference.
-	DoppleringDelayLine left_delay_line, right_delay_line;
+	CrossfadingDelayLine left_delay_line, right_delay_line;
 	const float max_interaural_delay = 0.02;
 };
 
@@ -56,10 +56,8 @@ right_delay_line(0.02, simulation->getSr()) {
 	prev_elevation = getProperty(Lav_PANNER_ELEVATION).getFloatValue();
 	appendInputConnection(0, 1);
 	appendOutputConnection(0, 2);
-	//the crossffading time of both delay lines should be barely less than one block.
-	//If it's not, as we're using dopplering delay lines, we can interrupt the  final step.
-	//Recall that blocks have to be at least 4.
-	left_delay_line.setInterpolationTime(simulation->getBlockSize()/simulation->getSr()-1/simulation->getSr());
+	//the crossffading time of both delay lines should be one block.
+	left_delay_line.setInterpolationTime(simulation->getBlockSize()/simulation->getSr());
 	right_delay_line.setInterpolationTime(simulation->getBlockSize()/simulation->getSr());
 }
 
