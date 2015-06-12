@@ -7,20 +7,22 @@ namespace libaudioverse_implementation {
 
 //used by all delay lines.
 //This is a fixed-sized ringbuffer that can be advanced and written to as a single operation or read at a single offset.
+//The length is made to be a power of two when constructed, enabling use of bit tricks for performance.
 class DelayRingbuffer {
 	public:
-	DelayRingbuffer(int length);
+	DelayRingbuffer(unsigned int length);
 	DelayRingbuffer(const DelayRingbuffer& other) = delete;
 	~DelayRingbuffer();
-	float read(int offset);
-	int getLength();
+	float read(unsigned int offset);
+	unsigned int getLength();
 	void advance(float sample);
-	void write(int offset, float value);
-	void add(int index, float value);
+	void write(unsigned int offset, float value);
+	void add(unsigned int index, float value);
 	void reset();
 	private:
 	float* buffer = nullptr;
-	int buffer_length = 0, write_head = 0;
+	//mask is used for modulus with bitwise and.
+	unsigned int buffer_length = 0, write_head = 0, mask = 0;
 };
 
 //A single-channel delay line, but with built-in crossfading.
