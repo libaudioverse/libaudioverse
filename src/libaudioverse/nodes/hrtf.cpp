@@ -124,9 +124,9 @@ void HrtfNode::process() {
 		left_delay_line.setDelay(std::min(-interauralDelay, max_interaural_delay));
 		right_delay_line.setDelay(0.0);
 	}
-	//apply the delay lines by ticking over our outputs.
-	for(int i=0; i < block_size; i++) output_buffers[0][i] = left_delay_line.tick(output_buffers[0][i]);
-	for(int i=0; i < block_size; i++) output_buffers[1][i] = right_delay_line.tick(output_buffers[1][i]);
+	//apply the delay lines.
+	left_delay_line.processBuffer(block_size, output_buffers[0], output_buffers[0]);
+	right_delay_line.processBuffer(block_size, output_buffers[0], output_buffers[0]);
 }
 
 float HrtfNode::computeInterauralDelay() {
