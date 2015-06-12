@@ -16,7 +16,7 @@ CrossfadingDelayLine::CrossfadingDelayLine(float maxDelay, float sr): line((int)
 void CrossfadingDelayLine::setDelay(float delay) {
 	int newDelay = (unsigned int)(delay*sr);
 	if(newDelay >= line.getLength()) newDelay = line.getLength()-1;
-	delay = 
+	delay = new_delay;
 	new_delay = newDelay;
 	weight1 = 1.0f;
 	weight2 = 0.0f;
@@ -39,21 +39,25 @@ float CrossfadingDelayLine::tick(float sample) {
 void CrossfadingDelayLine::processBuffer(int length, float* input, float* output) {
 	int cf = std::min(counter, length);
 	int remaining =length-cf;
+	float sample;
 	for(int i = 0; i < cf; i++) {
+		sample=input[i]; //save in case of in-place.
 		output[i] = weight1*line.read(delay)+weight2*line.read(new_delay);
-		line.advance(input[i]);
+		line.advance(sample);
 		counter--;
 		weight1-=interpolation_delta;
 		weight2+=interpolation_delta;
 	}
-	if(remaining) {
+	if(counter == 0 && cf > 0) { //we crossfaded, but finished this block.
 		weight1 =1.0f;
 		weight2=0.0f;
 		delay = new_delay;
-		for(int i = cf; i < length; i++) {
-			output[i] = line.read(delay);
-			line.advance(input[i]);
-		}
+	}
+	//We might have a bit more.
+	for(int i = cf; i < length; i++) {
+		sample= input[i];
+		output[i] = line.read(delay);
+		line.advance(sample);
 	}
 }
 

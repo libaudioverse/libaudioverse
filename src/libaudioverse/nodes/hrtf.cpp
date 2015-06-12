@@ -126,7 +126,7 @@ void HrtfNode::process() {
 	}
 	//apply the delay lines.
 	left_delay_line.processBuffer(block_size, output_buffers[0], output_buffers[0]);
-	right_delay_line.processBuffer(block_size, output_buffers[0], output_buffers[0]);
+	right_delay_line.processBuffer(block_size, output_buffers[1], output_buffers[1]);
 }
 
 float HrtfNode::computeInterauralDelay() {
