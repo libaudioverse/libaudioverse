@@ -7,20 +7,22 @@ namespace libaudioverse_implementation {
 
 //used by all delay lines.
 //This is a fixed-sized ringbuffer that can be advanced and written to as a single operation or read at a single offset.
+//The length is made to be a power of two when constructed, enabling use of bit tricks for performance.
 class DelayRingbuffer {
 	public:
-	DelayRingbuffer(int length);
+	DelayRingbuffer(unsigned int length);
 	DelayRingbuffer(const DelayRingbuffer& other) = delete;
 	~DelayRingbuffer();
-	float read(int offset);
-	int getLength();
+	float read(unsigned int offset);
+	unsigned int getLength();
 	void advance(float sample);
-	void write(int offset, float value);
-	void add(int index, float value);
+	void write(unsigned int offset, float value);
+	void add(unsigned int index, float value);
 	void reset();
 	private:
 	float* buffer = nullptr;
-	int buffer_length = 0, write_head = 0;
+	//mask is used for modulus with bitwise and.
+	unsigned int buffer_length = 0, write_head = 0, mask = 0;
 };
 
 //A single-channel delay line, but with built-in crossfading.
@@ -29,6 +31,11 @@ class CrossfadingDelayLine {
 	public:
 	CrossfadingDelayLine(float maxDelay, float sr);
 	void setDelay(float delay);
+	//convenience function: combination compute and advance.
+	float tick(float sample);
+	//feedback has to use the slow path, but this one is optimized.
+	//in-place is okay.
+	void processBuffer(int length, float* input, float* output);
 	float computeSample();
 	void advance(float sample);
 	void write(float delay, float value);
@@ -38,8 +45,8 @@ class CrossfadingDelayLine {
 	private:
 	DelayRingbuffer line;
 	unsigned int line_length = 0, delay = 0, new_delay = 0;
-	bool is_interpolating = false;
-	float interpolation_delta = 1.0f;
+	int counter;
+	float interpolation_delta = 1.0f, interpolation_time=0.0f;
 	float sr = 0.0f, weight1=1.0f, weight2=0.0f;
 };
 

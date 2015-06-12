@@ -2,15 +2,30 @@
 add_custom_target(metadata
 COMMAND python "${CMAKE_SOURCE_DIR}/metadata/metadata.py" "${CMAKE_CURRENT_BINARY_DIR}/metadata.cpp")
 
+#These two drive the building of the default hrtf.
+add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/default_hrtf.hrtf"
+COMMAND python
+ARGS
+"${CMAKE_SOURCE_DIR}/scripts/diffuse_mit_hrtf.py"
+"${CMAKE_SOURCE_DIR}/diffuse mit kemar dataset"
+"${CMAKE_CURRENT_BINARY_DIR}/default_hrtf.hrtf"
+DEPENDS
+"${CMAKE_SOURCE_DIR}/scripts/diffuse_mit_hrtf.py"
+"${CMAKE_SOURCE_DIR}/scripts/hrtf_writer.py"
+)
+
 add_custom_command(
 OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/data/default_hrtf.cpp"
-COMMAND python "${CMAKE_SOURCE_DIR}/scripts/convert_to_cpp_file.py" 
+COMMAND python
+ARGS
+"${CMAKE_SOURCE_DIR}/scripts/convert_to_cpp_file.py" 
 "libaudioverse_implementation"
 "default_hrtf"
-"${CMAKE_SOURCE_DIR}/default_hrtf.hrtf"
+"${CMAKE_CURRENT_BINARY_DIR}/default_hrtf.hrtf"
 "${CMAKE_CURRENT_BINARY_DIR}/data/default_hrtf.cpp"
 DEPENDS "${CMAKE_SOURCE_DIR}/scripts/convert_to_cpp_file.py"
-"${CMAKE_SOURCE_DIR}/default_hrtf.hrtf")
+"${CMAKE_CURRENT_BINARY_DIR}/default_hrtf.hrtf"
+)
 
 add_definitions(-DOUTSIDE_SPEEX -DRANDOM_PREFIX=LIBAUDIOVERSE_SPEEX -DFLOATING_POINT)
 

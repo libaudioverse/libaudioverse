@@ -8,8 +8,10 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/hrtf.hpp>
+#include <libaudioverse/implementations/delayline.hpp>
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/kernels.hpp>
+#include <libaudioverse/private/constants.hpp>
 #include <limits>
 #include <functional>
 #include <algorithm>
@@ -24,14 +26,22 @@ class HrtfNode: public Node {
 	~HrtfNode();
 	virtual void process();
 	void reset();
+	//the difference between the time the sound would reach the left ear and the time it would reach the right.
+	//returns positive values if the right ear is greater, negative if the left ear is greater.
+	float computeInterauralDelay();
 	private:
 	int history_length = 0;
 	float *history = nullptr, *left_response = nullptr, *right_response = nullptr, *old_left_response = nullptr, *old_right_response = nullptr;
 	std::shared_ptr<HrtfData> hrtf = nullptr;
 	float prev_azimuth = 0.0f, prev_elevation = 0.0f;
+	//variables for the interaural time difference.
+	CrossfadingDelayLine left_delay_line, right_delay_line;
+	const float max_interaural_delay = 0.02;
 };
 
-HrtfNode::HrtfNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf): Node(Lav_OBJTYPE_HRTF_NODE, simulation, 1, 2) {
+HrtfNode::HrtfNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf): Node(Lav_OBJTYPE_HRTF_NODE, simulation, 1, 2),
+left_delay_line(0.02, simulation->getSr()),
+right_delay_line(0.02, simulation->getSr()) {
 	type = Lav_OBJTYPE_HRTF_NODE;
 	this->hrtf = hrtf;
 	left_response = allocArray<float>(hrtf->getLength()*sizeof(float));
@@ -46,6 +56,9 @@ HrtfNode::HrtfNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfD
 	prev_elevation = getProperty(Lav_PANNER_ELEVATION).getFloatValue();
 	appendInputConnection(0, 1);
 	appendOutputConnection(0, 2);
+	//the crossffading time of both delay lines should be one block.
+	left_delay_line.setInterpolationTime(simulation->getBlockSize()/simulation->getSr());
+	right_delay_line.setInterpolationTime(simulation->getBlockSize()/simulation->getSr());
 }
 
 HrtfNode::~HrtfNode() {
@@ -101,6 +114,47 @@ void HrtfNode::process() {
 		convolutionKernel(history, block_size, output_buffers[0], hrtf->getLength(), left_response);
 		convolutionKernel(history, block_size, output_buffers[1], hrtf->getLength(), right_response);
 	}
+	//we compute the interaural delay and apply it to the lines.
+	float interauralDelay = computeInterauralDelay();
+	if(interauralDelay > 0) {
+		left_delay_line.setDelay(0.0);
+		right_delay_line.setDelay(std::min(interauralDelay, max_interaural_delay));
+	}
+	else {
+		left_delay_line.setDelay(std::min(-interauralDelay, max_interaural_delay));
+		right_delay_line.setDelay(0.0);
+	}
+	//apply the delay lines.
+	left_delay_line.processBuffer(block_size, output_buffers[0], output_buffers[0]);
+	right_delay_line.processBuffer(block_size, output_buffers[1], output_buffers[1]);
+}
+
+float HrtfNode::computeInterauralDelay() {
+	float headWidth=getProperty(Lav_PANNER_HEAD_WIDTH).getFloatValue();
+	if(headWidth==0.0f) return 0.0f; //Heads of no width can't have interaural delays.
+	float speedOfSound = getProperty(Lav_PANNER_SPEED_OF_SOUND).getFloatValue();
+	float distance=getProperty(Lav_PANNER_DISTANCE).getFloatValue();
+	float headRadius = headWidth/2;
+	float earPosition = getProperty(Lav_PANNER_EAR_POSITION).getFloatValue();
+	earPosition *= -headRadius;
+	distance=std::max(distance, headRadius);
+	//take these to radians immediately.
+	float azimuth = getProperty(Lav_PANNER_AZIMUTH).getFloatValue()*PI/180.0f;
+	float elevation = getProperty(Lav_PANNER_ELEVATION).getFloatValue()*PI/180.0f;
+	//first, compute the point of the sound.
+	//s for sound.
+	float sx, sy, sz;
+	float xyPlane = distance*cosf(elevation);
+	sx = xyPlane*sinf(azimuth);
+	sy = xyPlane*cosf(azimuth);
+	sz = distance*sinf(elevation);
+	//apply pythagorean theorem.
+	float leftDistance = sqrtf((sx-(-headRadius))*(sx-(-headRadius))+(sy-earPosition)*(sy-earPosition)+sz*sz);
+	float rightDistance = sqrtf((sx-headRadius)*(sx-headRadius)+(sy-earPosition)*(sy-earPosition)+sz*sz);
+	//the order of the subtraction here makes us return positive when right ear has greater delay.
+	float delta = rightDistance-leftDistance;
+	//Finally, divide by speed of sound and return.
+	return delta/speedOfSound;
 }
 
 void HrtfNode::reset() {

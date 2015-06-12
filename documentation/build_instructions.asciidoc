@@ -12,8 +12,10 @@ All of the following dependencies are required to build Libaudioverse.
 - CMake
 - Python 2.7.x.
 
-And the following Python packages (all available on PyPI):
+And the following Python packages:
 
+- Numpy
+- Scipy
 - Jinja2
 - Enum34 (for running the Python bindings only)
 - Pycparser

@@ -9,34 +9,37 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 namespace libaudioverse_implementation {
 
-DelayRingbuffer::DelayRingbuffer(int length) {
-	buffer_length = length;
-	buffer = new float[length]();
+DelayRingbuffer::DelayRingbuffer(unsigned int length) {
+	unsigned int neededLength = 1;
+	while(neededLength <=length) neededLength<<= 1; //left shift until first power of two greater.
+	buffer_length = neededLength;
+	buffer = new float[buffer_length]();
+	mask=buffer_length-1; //all bits set.
 }
 
 DelayRingbuffer::~DelayRingbuffer() {
 	delete[] buffer;
 }
 
-float DelayRingbuffer::read(int offset) {
-	return buffer[ringmodi(write_head-offset, buffer_length)];
+float DelayRingbuffer::read(unsigned int offset) {
+	return buffer[(write_head-offset) & mask];
 }
 
-int DelayRingbuffer::getLength() {
+unsigned int DelayRingbuffer::getLength() {
 	return buffer_length;
 }
 
 void DelayRingbuffer::advance(float sample) {
 	write_head++;
-	buffer[ringmodi(write_head, buffer_length)] = sample;
+	buffer[write_head & mask] = sample;
 }
 
-void DelayRingbuffer::write(int index, float value) {
-	buffer[ringmodi(write_head-index, buffer_length)] = value;
+void DelayRingbuffer::write(unsigned int offset, float value) {
+	buffer[(write_head-offset) & mask] = value;
 }
 
-void DelayRingbuffer::add(int index, float value) {
-	buffer[ringmodi(write_head-index, buffer_length)] += value;
+void DelayRingbuffer::add(unsigned int index, float value) {
+	buffer[(write_head-index) & mask] += value;
 }
 
 void DelayRingbuffer::reset() {

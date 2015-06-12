@@ -1,6 +1,7 @@
 """This is a helper class for scripts to ipmport from various HRTF sources."""
 
 import numpy
+import numpy.fft as fft
 import struct
 import enum
 import itertools
@@ -107,10 +108,29 @@ class HrtfWriter(object):
 			new_responses.append(new_elev)
 		self.responses = new_responses
 
+	def linear_phase(self):
+		"""Convert all the data to linear phse."""
+		if self.print_progress:
+			print "Converting data to linear phase..."
+		new_responses=[]
+		for elev in self.responses:
+			new_elev=[]
+			for response in elev:
+				#ifft of the abs of the fft throws out all phase.
+				#Because libaudioverse doesn't do minimum phase, it's automatically delayed and all is (theoretically) happy.
+				#We overdo the fft to minimize any possible error, and then truncate.
+				response = fft.irfft(numpy.abs(fft.rfft(response, max(self.response_length, 512)))).astype(numpy.float64)
+				response = response[:self.response_length]
+				new_elev.append(response)
+			new_responses.append(new_elev)
+		self.responses=new_responses
+
+
 	def standard_build(self, path):
 		"""Does a standard build, that is the transformations that should be made on most HRIRs."""
 		if self.print_progress:
 			print "Standard build requested."
 		self.data_to_float64()
+		self.linear_phase()
 		self.pack_data()
 		self.write_file(path)
