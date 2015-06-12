@@ -40,8 +40,8 @@ class CrossfadingDelayLine {
 	private:
 	DelayRingbuffer line;
 	unsigned int line_length = 0, delay = 0, new_delay = 0;
-	bool is_interpolating = false;
-	float interpolation_delta = 1.0f;
+	int counter;
+	float interpolation_delta = 1.0f, interpolation_time=0.0f;
 	float sr = 0.0f, weight1=1.0f, weight2=0.0f;
 };
 
