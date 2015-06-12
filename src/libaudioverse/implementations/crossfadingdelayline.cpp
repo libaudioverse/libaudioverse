@@ -36,6 +36,27 @@ float CrossfadingDelayLine::tick(float sample) {
 	return retval;
 }
 
+void CrossfadingDelayLine::processBuffer(int length, float* input, float* output) {
+	int cf = std::min(counter, length);
+	int remaining =length-cf;
+	for(int i = 0; i < cf; i++) {
+		output[i] = weight1*line.read(delay)+weight2*line.read(new_delay);
+		line.advance(input[i]);
+		counter--;
+		weight1-=interpolation_delta;
+		weight2+=interpolation_delta;
+	}
+	if(remaining) {
+		weight1 =1.0f;
+		weight2=0.0f;
+		delay = new_delay;
+		for(int i = cf; i < length; i++) {
+			output[i] = line.read(delay);
+			line.advance(input[i]);
+		}
+	}
+}
+
 float CrossfadingDelayLine::computeSample() {
 	if(counter) return weight1*line.read(delay)+weight2*line.read(new_delay);
 	return line.read(delay);

@@ -74,10 +74,7 @@ void CrossfadingDelayNode::process() {
 	if(feedback == 0.0f) {
 		for(unsigned int output = 0; output < num_output_buffers; output++) {
 			auto &line = *lines[output];
-			for(unsigned int i = 0; i < block_size; i++) {
-				output_buffers[output][i] = line.computeSample();
-				line.advance(input_buffers[output][i]);
-			}
+			line.processBuffer(block_size, input_buffers[output], output_buffers[output]);
 		}
 	}
 	else {

@@ -31,6 +31,9 @@ class CrossfadingDelayLine {
 	void setDelay(float delay);
 	//convenience function: combination compute and advance.
 	float tick(float sample);
+	//feedback has to use the slow path, but this one is optimized.
+	//in-place is okay.
+	void processBuffer(int length, float* input, float* output);
 	float computeSample();
 	void advance(float sample);
 	void write(float delay, float value);
