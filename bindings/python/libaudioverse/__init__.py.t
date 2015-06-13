@@ -347,6 +347,9 @@ class LibaudioverseProperty(object):
 		"""The property's type."""
 		return PropertyTypes(_lav.node_get_property_type(self._node, self._slot))
 
+	def __repr__(self):
+		return "<{} {}>".format(self.__class__.__name__, self.value)
+
 class BooleanProperty(LibaudioverseProperty):
 	"""Represents a boolean property.
 	
