@@ -90,7 +90,7 @@ nodes/graph_listener.cpp
 nodes/custom.cpp
 nodes/ringmod.cpp
 nodes/multipanner.cpp
-#nodes/feedback_delay_network.cpp
+nodes/feedback_delay_network.cpp
 nodes/square.cpp
 nodes/noise.cpp
 nodes/iir.cpp

@@ -26,7 +26,6 @@ Node(Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK_NODE, simulation, lines, lines) {
 	line_count = lines;
 	network = new FeedbackDelayNetwork(lines, maxDelay, simulation->getSr());
 	lastOutput = allocArray<float>(lines);
-	nextInput = allocArray<float>(lines);
 	gains = allocArray<float>(lines);
 	for(int i = 0; i < lines; i++) gains[i] = 1.0f;
 	getProperty(Lav_FDN_MAX_DELAY).setFloatValue(maxDelay);
@@ -37,7 +36,6 @@ Node(Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK_NODE, simulation, lines, lines) {
 FeedbackDelayNetworkNode::~FeedbackDelayNetworkNode() {
 	delete network;
 	freeArray(lastOutput);
-	freeArray(nextInput);
 	freeArray(gains);
 }
 
@@ -51,16 +49,16 @@ void FeedbackDelayNetworkNode::process() {
 	for(int i = 0; i < block_size; i++) {
 		network->computeFrame(lastOutput);
 		for(int j = 0; j < num_output_buffers; j++) {
-			nextInput[j] = input_buffers[j][i];
 			output_buffers[j][i] = lastOutput[j]*gains[j];
+			lastOutput[j] += input_buffers[j][i];
 		}
-		network->advance(nextInput, lastOutput);
+		network->advance(lastOutput);
 	}
 }
 
-void FeedbackDelayNetworkNode::setFeedbackMatrix(int length, float* values) {
+void FeedbackDelayNetworkNode::setMatrix(int length, float* values) {
 	if(length != line_count*line_count) throw LavErrorException(Lav_ERROR_RANGE);
-	network->setFeedbackMatrix(values);
+	network->setMatrix(values);
 }
 
 void FeedbackDelayNetworkNode::setOutputGains(int count, float* values) {
@@ -70,12 +68,10 @@ void FeedbackDelayNetworkNode::setOutputGains(int count, float* values) {
 
 void FeedbackDelayNetworkNode::setDelays(int length, float* values) {
 	if(length != line_count) throw LavErrorException(Lav_ERROR_RANGE);
+	for(int i=0; i < line_count; i++) {
+		if(values[i] > max_delay) throw LavErrorException(Lav_ERROR_RANGE);
+	}
 	network->setDelays(values);
-}
-
-void FeedbackDelayNetworkNode::setFeedbackDelayMatrix(int length, float* values) {
-	if(length != line_count*line_count) throw LavErrorException(Lav_ERROR_RANGE);
-	network->setFeedbackDelayMatrix(values);
 }
 
 //begin public api.
@@ -91,13 +87,13 @@ Lav_PUBLIC_FUNCTION LavError Lav_createFeedbackDelayNetworkNode(LavHandle simula
 
 #define FDN_OR_ERROR if(node->getType() != Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK_NODE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
 
-Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetFeedbackMatrix(LavHandle nodeHandle, int count, float* values) {
+Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetMatrix(LavHandle nodeHandle, int count, float* values) {
 	PUB_BEGIN
 	auto node=incomingObject<Node>(nodeHandle);
 	LOCK(*node);
 	FDN_OR_ERROR
 	auto fdn=std::static_pointer_cast<FeedbackDelayNetworkNode>(node);
-	fdn->setFeedbackMatrix(count, values);
+	fdn->setMatrix(count, values);
 	PUB_END
 }
 
@@ -118,16 +114,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetDelays(LavHandle nod
 	FDN_OR_ERROR
 	auto fdn=std::static_pointer_cast<FeedbackDelayNetworkNode>(node);
 	fdn->setDelays(count, values);
-	PUB_END
-}
-
-Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetFeedbackDelayMatrix(LavHandle nodeHandle, int count, float* values) {
-	PUB_BEGIN
-	auto node = incomingObject<Node>(nodeHandle);
-	LOCK(*node);
-	FDN_OR_ERROR
-	auto fdn=std::static_pointer_cast<FeedbackDelayNetworkNode>(node);
-	fdn->setFeedbackDelayMatrix(count, values);
 	PUB_END
 }
 

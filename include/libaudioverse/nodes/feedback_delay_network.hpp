@@ -13,15 +13,14 @@ class FeedbackDelayNetworkNode: public Node {
 	FeedbackDelayNetworkNode(std::shared_ptr<Simulation> simulation, float maxDelay, int lines);
 	~FeedbackDelayNetworkNode();
 	void process();
-	void setFeedbackMatrix(int length, float* values);
+	void setMatrix(int length, float* values);
 	void setOutputGains(int count, float* values);
 	void setDelays(int length, float* values);
-	void setFeedbackDelayMatrix(int length, float* values);
 	private:
 	FeedbackDelayNetwork*network = nullptr;
 	float max_delay = 0.0f;
 	int line_count = 0;
-	float*lastOutput = nullptr, *nextInput = nullptr;
+	float*lastOutput = nullptr;
 	float* gains = nullptr;
 };
 
