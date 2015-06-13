@@ -12,6 +12,12 @@
 {%else%}
 		return {{prop['type']|underscores_to_camelcase(True)}}Property(node=self, slot = _libaudioverse.{{enumerant}})
 {%endif%}
+
+{%if not prop['read_only']%}
+	@{{prop['name']}}.setter
+	def {{prop['name']}}(self, value):
+		self.{{prop['name']}}.value=value
+{%endif%}
 {%endmacro%}
 
 {%macro implement_event(name, index, info)%}
