@@ -29,10 +29,11 @@ bool doesEdgePreserveAcyclicity(std::shared_ptr<Node> start, std::shared_ptr<Nod
 	//To that end, we use recursion as follows.
 	//if we are called with start==end, it's a cycle.
 	if(start==end) return false;
-	//Otherwise, move end back a level.
-	//the rationale for this is that we want to seeee if an indirect connection from anything we're pulling from to our end causes a cycle.  If it doesn't, we're good.
-	for(auto n: end->getDependencies()) {
-		if(doesEdgePreserveAcyclicity(start, n) == false) return false;
+	//Inductive step:
+	//connecting start to end connects everything "behind" start to end,
+	//so there's a cycle if end is already behind start.
+	for(auto n: start->getDependencies()) {
+		if(doesEdgePreserveAcyclicity(n, end) == false) return false;
 	}
 	return true;
 }
