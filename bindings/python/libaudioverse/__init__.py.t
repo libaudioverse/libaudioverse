@@ -624,12 +624,12 @@ class GenericNode(_HandleComparer):
 			_lav.node_disconnect(self, output)
 			for i in self._state['outputs'][output]:
 				input, weak =i
-				obj=weak.get()
+				obj=weak()
 				if obj is not None and (output, self) in obj._state['inputs']:
 					obj._state['inputs'].remove((output, self))
 			for i in self._state['outputs_properties'][output]:
 				slot, weak = i
-				obj = weak.get()
+				obj = weak()
 				if obj is not None and (output, self) in obj._state['inputs_properties']:
 					obj._state['inputs_properties'].remove((output, self))
 			if self in self._state['simulation']._state['inputs']:
