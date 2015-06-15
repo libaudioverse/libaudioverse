@@ -4,6 +4,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 /**Implements addition kernel.*/
 #include <libaudioverse/private/kernels.hpp>
+#include <libaudioverse/private/memory.hpp>
 #include <mmintrin.h>
 #include <emmintrin.h>
 #include <xmmintrin.h>
@@ -19,7 +20,12 @@ void scalarAdditionKernelSimple(int length, float c, float* a1, float* dest) {
 }
 
 #if defined(LIBAUDIOVERSE_USE_SSE2)
+
 void additionKernel(int length, float* a1, float* a2, float* dest) {
+	if((isAligned(a1) && isAligned(a2) && isAligned(dest)) == false) {
+		additionKernelSimple(length, a1, a2, dest);
+		return;
+	}
 	int neededLength = (length/4)*4;
 	__m128 a1r, a2r;
 	for(int i = 0; i < neededLength; i+= 4) {
@@ -32,6 +38,9 @@ void additionKernel(int length, float* a1, float* a2, float* dest) {
 }
 
 void scalarAdditionKernel(int length, float c, float* a1, float* dest) {
+	if((isAligned(a1) && isAligned(dest)) == false) {
+		scalarAdditionKernelSimple(length, c, a1, dest);
+	}
 	__m128 cr = _mm_load1_ps(&c);
 	int blocks = length/4;
 	for(int i = 0; i < blocks*4; i+=4) {

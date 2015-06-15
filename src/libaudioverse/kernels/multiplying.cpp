@@ -4,6 +4,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 /**Implements multiplication kernel and vairiants.*/
 #include <libaudioverse/private/kernels.hpp>
+#include <libaudioverse/private/memory.hpp>
 #include <mmintrin.h>
 #include <emmintrin.h>
 #include <xmmintrin.h>
@@ -24,6 +25,10 @@ void scalarMultiplicationKernelSimple(int length, float c, float* a1, float* des
 
 #if defined(LIBAUDIOVERSE_USE_SSE2)
 void multiplicationKernel(int length, float* a1, float* a2, float* dest) {
+	if((isAligned(a1) && isAligned(a2) && isAligned(dest)) == false) {
+		multiplicationKernelSimple(length, a1, a2, dest);
+		return;
+	}
 	int neededLength = (length/4)*4;
 	__m128 a1r, a2r;
 	for(int i = 0; i < neededLength; i+= 4) {
@@ -36,6 +41,10 @@ void multiplicationKernel(int length, float* a1, float* a2, float* dest) {
 }
 
 void scalarMultiplicationKernel(int length, float c, float* a1, float* dest) {
+	if((isAligned(a1) && isAligned(dest)) == false) {
+		scalarMultiplicationKernelSimple(length, c, a1, dest);
+		return;
+	}
 	int neededLength = (length/4)*4;
 	__m128 a1r, cr;
 	cr = _mm_load1_ps(&c);
@@ -48,6 +57,10 @@ void scalarMultiplicationKernel(int length, float c, float* a1, float* dest) {
 }
 
 void multiplicationAdditionKernel(int length, float c, float* a1, float* a2, float* dest) {
+	if((isAligned(a1) && isAligned(a2) && isAligned(dest)) == false) {
+		multiplicationAdditionKernelSimple(length, c, a1, a2, dest);
+		return;
+	}
 	int neededLength = (length/4)*4;
 	__m128 cr = _mm_load1_ps(&c);
 	for(int i = 0; i < neededLength; i+=4) {
