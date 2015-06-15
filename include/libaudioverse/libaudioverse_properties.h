@@ -131,6 +131,10 @@ enum Lav_BUFFER_PROPERTIES {
 	Lav_BUFFER_END_EVENT = -1,
 };
 
+enum Lav_CONVOLVER_PROPERTIES {
+	Lav_CONVOLVER_IMPULSE_RESPONSE = -1,
+};
+
 #ifdef __cplusplus
 }
 #endif

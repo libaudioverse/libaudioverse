@@ -110,6 +110,7 @@ enum Lav_OBJECT_TYPES {
 	Lav_OBJTYPE_BUFFER_NODE,
 	Lav_OBJTYPE_BUFFER_TIMELINE_NODE,
 	Lav_OBJTYPE_RECORDER_NODE,
+	Lav_OBJTYPE_CONVOLVER_NODE,
 };
 
 /**Node states.*/
@@ -381,6 +382,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_bufferTimelineNodeScheduleBuffer(LavHandle node
 Lav_PUBLIC_FUNCTION LavError Lav_createRecorderNode(LavHandle simulationHandle, int channels, LavHandle* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_recorderNodeStartRecording(LavHandle nodeHandle, const char* path);
 Lav_PUBLIC_FUNCTION LavError Lav_recorderNodeStopRecording(LavHandle nodeHandle);
+
+Lav_PUBLIC_FUNCTION LavError Lav_createConvolverNode(LavHandle simulationHandle, int channels, LavHandle* destination);
 
 #ifdef __cplusplus
 }
