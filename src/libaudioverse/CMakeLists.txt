@@ -75,6 +75,7 @@ implementations/delayringbuffer.cpp
 implementations/crossfadingdelayline.cpp
 implementations/dopplering_delay_line.cpp
 implementations/feedback_delay_network.cpp
+implementations/convolver.cpp
 
 #specific node types.
 nodes/sine.cpp
