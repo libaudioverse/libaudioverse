@@ -5,4 +5,18 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 namespace libaudioverse_implementation {
 
+class BlockConvolver {
+	public:
+	BlockConvolver(int blockSize);
+	~BlockConvolver();
+	//Error if length<1.
+	//This is not checked.
+	//Note: this function zeros the history if the new response has a different length.
+	void setResponse(int length, float* newResponse);
+	void convolve(float* input, float* output);
+	private:
+	float* response = nullptr, *history = nullptr;
+	int block_size = 0, response_length = 0;
+};
+
 }
