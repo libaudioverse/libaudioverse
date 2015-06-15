@@ -29,7 +29,7 @@ void BlockConvolver::setResponse(int length, float* newResponse) {
 		freeArray(response);
 		response=allocArray<float>(length);
 	}
-	std::copy(response, response+length, newResponse);
+	std::copy(newResponse, newResponse+length, response);
 	if(history == nullptr) {
 		history = allocArray<float>(block_size+length);
 	}
@@ -42,9 +42,10 @@ void BlockConvolver::setResponse(int length, float* newResponse) {
 
 void BlockConvolver::convolve(float* input, float* output) {
 	//First, move the history back.
-	int historyLength =response_length+block_size-1;
-	std::copy(history, history+response_length, history+historyLength-response_length);
-	convolutionKernel(history+response_length, block_size, output, response_length, response);
+	int historyLength =response_length+block_size;
+	std::copy(history+historyLength-response_length, history+historyLength, history);
+	std::copy(input, input+block_size, history+historyLength-block_size);
+	convolutionKernel(history, block_size, output, response_length, response);
 }
 
 }

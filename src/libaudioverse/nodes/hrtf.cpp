@@ -12,6 +12,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/kernels.hpp>
 #include <libaudioverse/private/constants.hpp>
+#include <libaudioverse/implementations/convolvers.hpp>
 #include <limits>
 #include <functional>
 #include <algorithm>
@@ -30,13 +31,21 @@ class HrtfNode: public Node {
 	//returns positive values if the right ear is greater, negative if the left ear is greater.
 	float computeInterauralDelay();
 	private:
-	int history_length = 0;
-	float *history = nullptr, *left_response = nullptr, *right_response = nullptr, *old_left_response = nullptr, *old_right_response = nullptr;
+	//the hrtf.
 	std::shared_ptr<HrtfData> hrtf = nullptr;
+	//for determining when we should and shouldn't crossfade.
 	float prev_azimuth = 0.0f, prev_elevation = 0.0f;
+	//buffers and length for the convolvers.
+	float* left_response, *right_response;
+	int response_length;
+	//the convolvers themselves.
+	BlockConvolver *left_convolver, *right_convolver, *new_left_convolver, *new_right_convolver;
+	//A delta used in crossfading.
+	float crossfade_delta=0.0f;
+	float* crossfade_workspace;
 	//variables for the interaural time difference.
 	CrossfadingDelayLine left_delay_line, right_delay_line;
-	const float max_interaural_delay = 0.02;
+	const float max_interaural_delay = 0.02f;
 };
 
 HrtfNode::HrtfNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf): Node(Lav_OBJTYPE_HRTF_NODE, simulation, 1, 2),
@@ -44,16 +53,21 @@ left_delay_line(0.02, simulation->getSr()),
 right_delay_line(0.02, simulation->getSr()) {
 	type = Lav_OBJTYPE_HRTF_NODE;
 	this->hrtf = hrtf;
-	left_response = allocArray<float>(hrtf->getLength()*sizeof(float));
-	right_response = allocArray<float>(hrtf->getLength()*sizeof(float));
-	//used for moving objects.
-	old_left_response = allocArray<float>(hrtf->getLength());
-	old_right_response = allocArray<float>(hrtf->getLength());
-	history_length = hrtf->getLength() + simulation->getBlockSize();
-	history = allocArray<float>(history_length);
+	response_length=hrtf->getLength();
+	left_response=allocArray<float>(response_length);
+	right_response=allocArray<float>(response_length);
 	hrtf->computeCoefficientsStereo(0.0f, 0.0f, left_response, right_response);
+	//set up the convolvers.
+	left_convolver=new BlockConvolver(simulation->getBlockSize());
+	right_convolver=new BlockConvolver(simulation->getBlockSize());
+	new_left_convolver=new BlockConvolver(simulation->getBlockSize());
+	new_right_convolver=new BlockConvolver(simulation->getBlockSize());
+	left_convolver->setResponse(response_length, left_response);
+	right_convolver->setResponse(response_length, right_response);
 	prev_azimuth = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
 	prev_elevation = getProperty(Lav_PANNER_ELEVATION).getFloatValue();
+	crossfade_delta=1.0f/simulation->getBlockSize();
+	crossfade_workspace = allocArray<float>(simulation->getBlockSize());
 	appendInputConnection(0, 1);
 	appendOutputConnection(0, 2);
 	//the crossffading time of both delay lines should be one block.
@@ -62,11 +76,13 @@ right_delay_line(0.02, simulation->getSr()) {
 }
 
 HrtfNode::~HrtfNode() {
-	freeArray(history);
 	freeArray(left_response);
 	freeArray(right_response);
-	freeArray(old_left_response);
-	freeArray(old_right_response);
+	freeArray(crossfade_workspace);
+	delete left_convolver;
+	delete right_convolver;
+	delete new_left_convolver;
+	delete new_right_convolver;
 }
 
 std::shared_ptr<Node>createHrtfNode(std::shared_ptr<Simulation>simulation, std::shared_ptr<HrtfData> hrtf) {
@@ -79,40 +95,43 @@ void HrtfNode::process() {
 	//calculating the hrir is expensive, do it only if needed.
 	bool didRecompute = false;
 	bool allowCrossfade = getProperty(Lav_PANNER_SHOULD_CROSSFADE).getIntValue();
-	float current_azimuth = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
-	float current_elevation = getProperty(Lav_PANNER_ELEVATION).getFloatValue();
-	if(fabs(current_elevation-prev_elevation) > 0.5f || fabs(current_azimuth-prev_azimuth) > 0.5f) {
+	float currentAzimuth = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
+	float currentElevation = getProperty(Lav_PANNER_ELEVATION).getFloatValue();
+	if(fabs(currentElevation-prev_elevation) > 0.5f || fabs(currentAzimuth-prev_azimuth) > 0.5f) {
+		hrtf->computeCoefficientsStereo(currentElevation, currentAzimuth, left_response, right_response);
 		if(allowCrossfade) {
-			std::copy(left_response, left_response+hrtf->getLength(), old_left_response);
-			std::copy(right_response, right_response+hrtf->getLength(), old_right_response);
-		}
-		hrtf->computeCoefficientsStereo(current_elevation, current_azimuth, left_response, right_response);
-		didRecompute = true;
-	}
-	float *start = history+hrtf->getLength(), *end = history+hrtf->getLength()+simulation->getBlockSize();
-	//get the block size.
-	const unsigned int hrtfLength = hrtf->getLength();
-	//roll back the history...
-	std::copy(end-hrtf->getLength(), end, history);
-	//stick our input on the end...
-	std::copy(input_buffers[0], input_buffers[0]+block_size, start);
-	//finally, do the usual convolution loop.
-	if(didRecompute) {
-		if(allowCrossfade) {
-			crossfadeConvolutionKernel(history, block_size, output_buffers[0], hrtfLength, old_left_response, left_response);
-			crossfadeConvolutionKernel(history, block_size, output_buffers[1], hrtfLength, old_right_response, right_response);
+			new_left_convolver->setResponse(response_length, left_response);
+			new_right_convolver->setResponse(response_length, right_response);
 		}
 		else {
-			convolutionKernel(history, block_size, output_buffers[0], hrtf->getLength(), left_response);
-			convolutionKernel(history, block_size, output_buffers[1], hrtf->getLength(), right_response);
+			left_convolver->setResponse(response_length, left_response);
+			right_convolver->setResponse(response_length, right_response);
 		}
+		didRecompute=true;
 		//note: putting these anywhere in the didnt-recompute path causes things to never move.
-		prev_elevation = current_elevation;
-		prev_azimuth = current_azimuth;
+		prev_elevation = currentElevation;
+		prev_azimuth = currentAzimuth;
 	}
-	else {
-		convolutionKernel(history, block_size, output_buffers[0], hrtf->getLength(), left_response);
-		convolutionKernel(history, block_size, output_buffers[1], hrtf->getLength(), right_response);
+	//These happen regardless of if we are crossfading or recomputed.
+	left_convolver->convolve(input_buffers[0], output_buffers[0]);
+	right_convolver->convolve(input_buffers[0], output_buffers[1]);
+	//If we crossfaded, we need to apply the following change.
+	if(didRecompute && allowCrossfade) {
+		//Shape the buffers as follows, enabling a simple add.
+		for(int i=0; i < block_size; i++) {
+			float w = 1.0f-i*crossfade_delta;
+			output_buffers[0][i]*=w;
+			output_buffers[1][i] *= w;
+		}
+		//Run the new convolver for the left channel and crossfade.
+		//Then, repeat for the right.
+		new_left_convolver->convolve(input_buffers[0], crossfade_workspace);
+		for(int i =0; i < block_size; i++) output_buffers[0][i] += crossfade_workspace[i]*i*crossfade_delta;
+		new_right_convolver->convolve(input_buffers[0], crossfade_workspace);
+		for(int i=0; i < block_size; i++) output_buffers[1][i] += crossfade_workspace[i]*i*crossfade_delta;
+		//Finally, swap them.
+		std::swap(left_convolver, new_left_convolver);
+		std::swap(right_convolver, new_right_convolver);
 	}
 	//we compute the interaural delay and apply it to the lines.
 	float interauralDelay = computeInterauralDelay();
@@ -158,7 +177,6 @@ float HrtfNode::computeInterauralDelay() {
 }
 
 void HrtfNode::reset() {
-	memset(history, 0, sizeof(float)*history_length);
 }
 
 //begin public api

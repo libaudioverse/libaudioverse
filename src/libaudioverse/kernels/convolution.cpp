@@ -5,10 +5,25 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 /**Implements the convolution kernel.*/
 #include <libaudioverse/private/kernels.hpp>
 #include <string.h>
+#include <libaudioverse/private/memory.hpp>
 
 namespace libaudioverse_implementation {
 
+//This is the case we fall through to if not all the pointers are aligned.
+void convolutionKernelUnaligned(float* input, unsigned int outputSampleCount, float* output, unsigned int responseLength, float* response) {
+	memset(output, 0, outputSampleCount*sizeof(float));
+	for(int i = 0; i < responseLength; i++) {
+		float c=response[responseLength-i-1];
+		for(int j = 0; j < outputSampleCount; j++) output[j]+=input[j]*c;
+		input++;
+	}
+}
+
 void convolutionKernel(float* input, unsigned int outputSampleCount, float* output, unsigned int responseLength, float* response) {
+	if((isAligned(input) & isAligned(output) && isAligned(response)) == false) {
+		convolutionKernelUnaligned(input, outputSampleCount, output, responseLength, response);
+		return;
+	}
 	scalarMultiplicationKernel(outputSampleCount, response[responseLength-1], input, output);
 	input++;
 	for(int i = 1; i < responseLength; i++) {

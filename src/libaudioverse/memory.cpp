@@ -12,6 +12,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <mutex>
 #include <string.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <inttypes.h>
 #include <atomic>
 #include <functional>
@@ -62,6 +63,16 @@ void freeArray(void* ptr) {
 	#endif
 }
 
+bool isAligned(void* ptr) {
+	#if LIBAUDIOVERSE_MALLOC_ALIGNMENT==1
+	return true;
+	#else
+	intptr_t mask = LIBAUDIOVERSE_MALLOC_ALIGNMENT-1;
+	intptr_t  i = (intptr_t)ptr;
+	//all the low bits have to be clear.
+	return (i & mask) == 0;
+	#endif
+}
 std::function<void(ExternalObject*)> ObjectDeleter(std::shared_ptr<Simulation> simulation) {
 	return [=](ExternalObject* obj) {
 		LOCK(*simulation);

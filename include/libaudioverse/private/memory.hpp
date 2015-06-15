@@ -120,6 +120,9 @@ t* allocArray(unsigned int size) {
 
 void freeArray(void* ptr);
 
+//Check if a pointer is safe for SIMD.
+bool isAligned(void* ptr);
+
 //custom deleter for smart pointer that guarantees thread safety.
 std::function<void(ExternalObject*)> ObjectDeleter(std::shared_ptr<Simulation> simulation);
 
