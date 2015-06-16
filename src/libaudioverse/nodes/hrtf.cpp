@@ -39,7 +39,7 @@ class HrtfNode: public Node {
 	float* left_response, *right_response;
 	int response_length;
 	//the convolvers themselves.
-	BlockConvolver *left_convolver, *right_convolver, *new_left_convolver, *new_right_convolver;
+	FftConvolver *left_convolver, *right_convolver, *new_left_convolver, *new_right_convolver;
 	//A delta used in crossfading.
 	float crossfade_delta=0.0f;
 	float* crossfade_workspace;
@@ -58,10 +58,10 @@ right_delay_line(0.02, simulation->getSr()) {
 	right_response=allocArray<float>(response_length);
 	hrtf->computeCoefficientsStereo(0.0f, 0.0f, left_response, right_response);
 	//set up the convolvers.
-	left_convolver=new BlockConvolver(simulation->getBlockSize());
-	right_convolver=new BlockConvolver(simulation->getBlockSize());
-	new_left_convolver=new BlockConvolver(simulation->getBlockSize());
-	new_right_convolver=new BlockConvolver(simulation->getBlockSize());
+	left_convolver=new FftConvolver(simulation->getBlockSize());
+	right_convolver=new FftConvolver(simulation->getBlockSize());
+	new_left_convolver=new FftConvolver(simulation->getBlockSize());
+	new_right_convolver=new FftConvolver(simulation->getBlockSize());
 	left_convolver->setResponse(response_length, left_response);
 	right_convolver->setResponse(response_length, right_response);
 	prev_azimuth = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
