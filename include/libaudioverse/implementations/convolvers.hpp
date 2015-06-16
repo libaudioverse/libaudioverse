@@ -28,7 +28,7 @@ class FftConvolver {
 	void convolve(float* input, float* output);
 	private:
 	int block_size, fft_size;
-	float* response_workspace = nullptr, *block_workspace = nullptr, *tail = nulptr;
+	float* response_workspace = nullptr, *block_workspace = nullptr, *tail = nullptr;
 	kiss_fft_cfg fft = nullptr, ifft = nullptr;
 };
 
