@@ -54,7 +54,9 @@ FftConvolverNode::~FftConvolverNode() {
 }
 
 void FftConvolverNode::process() {
-	for(int i= 0; i < channels; i++) convolvers[i]->convolve(input_buffers[i], output_buffers[i]);
+	for(int i= 0; i < channels; i++) {
+		convolvers[i]->convolve(input_buffers[i], output_buffers[i]);
+	}
 }
 
 void FftConvolverNode::setResponse(int channel, int length, float* response) {
@@ -80,7 +82,7 @@ void FftConvolverNode::setResponseFromFile(std::string path, int fileChannel, in
 	int resampledTmpLength;
 	staticResamplerKernel(reader.getSr(), simulation->getSr(), 1, reader.getFrameCount(), tmp, &resampledTmpLength, &resampledTmp);
 	//Finally, set the specified convolver.
-	convolvers[convolverChannel]->setResponse(resampledTmpLength, resampledTmp);
+	setResponse(convolverChannel, resampledTmpLength, resampledTmp);
 	freeArray(tmp);
 	freeArray(resampledTmp);
 }

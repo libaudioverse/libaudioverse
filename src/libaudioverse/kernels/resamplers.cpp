@@ -25,20 +25,30 @@ void staticResamplerKernel(int inputSr, int outputSr, int channels, int frames, 
 	int err;
 	auto resampler=speex_resampler_init(channels, inputSr, outputSr, 10, &err);
 	if(resampler==nullptr) throw LavErrorException(Lav_ERROR_MEMORY);
+	if(err != RESAMPLER_ERR_SUCCESS) throw LavErrorException(Lav_ERROR_INTERNAL);
 	unsigned int numer, denom;
 	speex_resampler_get_ratio(resampler, &numer, &denom);
 	//The 200 makes sure that we grab all of it.
-	//It is not inconceivable that we might resample by ahuge rate.
+	//It is not inconceivable that we might resample by a huge rate.
 	//And speex doesn't let us estimate output.
 	//Instead of reallocating, we waste a small amount of ram here.
 	//this is input rate/output rate, so multiply by denom.
 	int size=frames*channels*denom/numer+channels*200;
 	float* o = allocArray<float>(size);
 	//uframes is because speex needs an address to an unsigned int.
-	unsigned int written = 0, uframes= frames;
-	speex_resampler_process_interleaved_float(resampler, data, &uframes, o, &written);
-	*outLength=written;
+	unsigned int written = 0, consumed;
+	*outLength= 0;
+	int remaining_in =frames, remaining_out = frames*denom/numer+200;
+	while(remaining_in > 0 && remaining_out > 0) {
+		consumed=std::min<int>(1024, remaining_in);
+		written=std::min(1024, remaining_out);
+		speex_resampler_process_interleaved_float(resampler, data, &consumed, o, &written);
+		remaining_in -= consumed;
+		remaining_out -= written;
+		*outLength +=written;
+	}
 	*outData = o;
+	speex_resampler_destroy(resampler);
 }
 
 }

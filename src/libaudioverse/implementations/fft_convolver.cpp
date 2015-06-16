@@ -48,8 +48,6 @@ void FftConvolver::setResponse(int length, float* newResponse) {
 	memset(tail, 0, sizeof(float)*tail_size);
 	//Store the fft of the response.
 	std::copy(newResponse, newResponse+length, workspace);
-	//We bake in the 1/nfft scaling that kissfft wants here.
-	scalarMultiplicationKernel(length, 1.0f/workspace_size, workspace, workspace);
 	kiss_fftr(fft, workspace, response_fft);
 }
 
@@ -80,12 +78,13 @@ void FftConvolver::convolveFft(kiss_fft_cpx *fft, float* output) {
 		block_fft[i] = tmp;
 	}
 	kiss_fftri(ifft, block_fft, workspace);
-	//Scaling required by kissfft is handled when the impulse response is set.
 	//Add the tail over the block.
 	additionKernel(tail_size, tail, workspace, workspace);
 	//Copy out the block and the tail.
 	std::copy(workspace, workspace+block_size, output);
 	std::copy(workspace+block_size, workspace+workspace_size, tail);
+	//downscale the block
+	scalarMultiplicationKernel(block_size, 1.0f/workspace_size, output, output);
 }
 
 }
