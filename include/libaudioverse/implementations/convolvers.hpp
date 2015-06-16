@@ -38,7 +38,7 @@ class FftConvolver {
 	kiss_fft_cpx* getFft(float* input);
 	private:
 	int block_size = 0, fft_size = 0, tail_size= 0, workspace_size = 0;
-	float *workspace = nullptr, *tail = nullptr;
+	kiss_fft_scalar *workspace = nullptr, *tail = nullptr;
 	kiss_fft_cpx *response_fft = nullptr, *block_fft = nullptr;
 	kiss_fftr_cfg fft = nullptr, ifft = nullptr;
 };

@@ -29,9 +29,9 @@ void FftConvolver::setResponse(int length, float* newResponse) {
 	int newTailSize=neededLength-block_size;
 	if(neededLength !=fft_size || tail_size !=newTailSize) {
 		if(workspace) freeArray(workspace);
-		workspace=allocArray<float>(neededLength);
+		workspace=allocArray<kiss_fft_scalar>(neededLength);
 		if(tail) freeArray(tail);
-		tail=allocArray<float>(newTailSize);
+		tail=allocArray<kiss_fft_scalar>(newTailSize);
 		fft_size=neededLength/2+1;
 		workspace_size=neededLength;
 		tail_size=newTailSize;
@@ -60,8 +60,8 @@ int FftConvolver::getFftSize() {
 }
 
 kiss_fft_cpx *FftConvolver::getFft(float* input) {
-		//We reuse workspace, so have to zero the tail part of it.
-	std::fill(workspace+block_size, workspace+workspace_size, 0.0f);
+	//We reuse workspace, so have to zero the tail part of it.
+	std::fill(workspace+block_size, workspace+workspace_size, 0.0);
 	//Copy input to the workspace, and take its fft.
 	std::copy(input, input+block_size, workspace);
 	kiss_fftr(fft, workspace, block_fft);
@@ -79,12 +79,13 @@ void FftConvolver::convolveFft(kiss_fft_cpx *fft, float* output) {
 	}
 	kiss_fftri(ifft, block_fft, workspace);
 	//Add the tail over the block.
-	additionKernel(tail_size, tail, workspace, workspace);
+	for(int i =0; i < tail_size; i++) workspace[i] += tail[i];
+	//Downscale the first part, our output.
+	//We do this now because we will lose too much precision if we go to float.
+	for(int i = 0; i < block_size; i++) workspace[i]/=workspace_size;
 	//Copy out the block and the tail.
 	std::copy(workspace, workspace+block_size, output);
 	std::copy(workspace+block_size, workspace+workspace_size, tail);
-	//downscale the block
-	scalarMultiplicationKernel(block_size, 1.0f/workspace_size, output, output);
 }
 
 }
