@@ -26,7 +26,7 @@ class ConvolverNode: public Node {
 	virtual void process();
 	void setImpulseResponse();
 	int channels;
-	BlockConvolver **convolvers;
+	FftConvolver **convolvers;
 };
 
 ConvolverNode::ConvolverNode(std::shared_ptr<Simulation> simulation, int channels): Node(Lav_OBJTYPE_CONVOLVER_NODE, simulation, channels, channels) {
@@ -34,8 +34,8 @@ ConvolverNode::ConvolverNode(std::shared_ptr<Simulation> simulation, int channel
 	appendInputConnection(0, channels);
 	this->channels=channels;
 	appendOutputConnection(0, channels);
-	convolvers=new BlockConvolver*[channels]();
-	for(int i= 0; i < channels; i++) convolvers[i] = new BlockConvolver(simulation->getBlockSize());
+	convolvers=new FftConvolver*[channels]();
+	for(int i= 0; i < channels; i++) convolvers[i] = new FftConvolver(simulation->getBlockSize());
 	getProperty(Lav_CONVOLVER_IMPULSE_RESPONSE).setPostChangedCallback([=] () {setImpulseResponse();});
 	setImpulseResponse();
 }

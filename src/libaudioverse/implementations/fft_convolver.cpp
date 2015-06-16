@@ -26,7 +26,7 @@ FftConvolver::~FftConvolver() {
 }
 
 void FftConvolver::setResponse(int length, float* newResponse) {
-	int neededLength= (block_size+length)+(block_size+length)%2; //next multiple of 2.
+	int neededLength= kiss_fftr_next_fast_size_real	(block_size+length);
 	int newTailSize=neededLength-block_size;
 	if(neededLength !=fft_size || tail_size !=newTailSize) {
 		if(block_workspace) freeArray(block_workspace);
@@ -65,8 +65,10 @@ void FftConvolver::convolve(float* input, float* output) {
 	//Do a complex multiply.
 	//Note that the first line is subtraction because of the i^2.
 	for(int i=0; i < fft_size; i++) {
-		block_fft[i].r=block_fft[i].r*response_fft[i].r-block_fft[i].i*response_fft[i].i;
-		block_fft[i].i = block_fft[i].r*response_fft[i].i+block_fft[i].i*response_fft[i].r;
+		kiss_fft_cpx tmp;
+		tmp.r = block_fft[i].r*response_fft[i].r-block_fft[i].i*response_fft[i].i;
+		tmp.i = block_fft[i].r*response_fft[i].i+block_fft[i].i*response_fft[i].r;
+		block_fft[i] = tmp;
 	}
 	kiss_fftri(ifft, block_fft, block_workspace);
 	//Scaling required by kissfft
