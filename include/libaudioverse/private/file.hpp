@@ -9,7 +9,7 @@ namespace libaudioverse_implementation {
 
 /**A completely stand-alone wrapper around Libsndfile for file reading: implements both a  streaming and non-streaming interface.
 
-This can theoreticaly handle any type of file, including codec decoding, but uses Libsndfile for the moment.*/
+This can theoretically handle any type of file, including codec decoding, but uses Libsndfile for the moment.*/
 class FileReader: std::enable_shared_from_this<FileReader>  {
 	public:
 	FileReader(): info() {} //vc++ crashes if we try to do this the c++11 way.

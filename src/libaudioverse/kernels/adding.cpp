@@ -45,8 +45,7 @@ void scalarAdditionKernel(int length, float c, float* a1, float* dest) {
 	int blocks = length/4;
 	for(int i = 0; i < blocks*4; i+=4) {
 		__m128 r1=_mm_load_ps(a1+i);
-		__m128 r2= _mm_load_ps(dest+i);
-		r1 = _mm_add_ps(r1, r2);
+		r1 = _mm_add_ps(r1, cr);
 		_mm_store_ps(dest+i, r1);
 	}
 	scalarAdditionKernelSimple(length-blocks*4, c, a1, dest);

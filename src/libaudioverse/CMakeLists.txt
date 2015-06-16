@@ -76,6 +76,7 @@ implementations/crossfadingdelayline.cpp
 implementations/dopplering_delay_line.cpp
 implementations/feedback_delay_network.cpp
 implementations/block_convolver.cpp
+implementations/fft_convolver.cpp
 
 #specific node types.
 nodes/sine.cpp
@@ -101,6 +102,7 @@ nodes/buffer.cpp
 nodes/buffer_timeline.cpp
 nodes/recorder.cpp
 nodes/convolver.cpp
+nodes/fft_convolver.cpp
 
 #automators
 automators/automators.cpp
