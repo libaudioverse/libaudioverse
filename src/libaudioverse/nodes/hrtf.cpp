@@ -49,7 +49,7 @@ class HrtfNode: public Node {
 	const float max_interaural_delay = 0.02f;
 	//Used to guarantee that we only compute the fft once.
 	kiss_fftr_cfg fft = nullptr;
-	kiss_fft_scalar* fft_workspace=nullptr;
+	float* fft_workspace=nullptr;
 	kiss_fft_cpx *input_fft = nullptr;
 };
 
@@ -79,7 +79,7 @@ right_delay_line(0.02, simulation->getSr()) {
 	left_delay_line.setInterpolationTime(simulation->getBlockSize()/simulation->getSr());
 	right_delay_line.setInterpolationTime(simulation->getBlockSize()/simulation->getSr());
 	//Set up the fft-related stuff.
-	fft_workspace=allocArray<kiss_fft_scalar>(left_convolver->getFftSize());
+	fft_workspace=allocArray<float>(left_convolver->getFftSize());
 	input_fft=allocArray<kiss_fft_cpx>(left_convolver->getFftSize());
 	fft=kiss_fftr_alloc(left_convolver->getFftSize(), 0, nullptr, nullptr);
 }

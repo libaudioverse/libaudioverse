@@ -29,9 +29,9 @@ void FftConvolver::setResponse(int length, float* newResponse) {
 	int newTailSize=neededLength-block_size;
 	if(neededLength !=fft_size || tail_size !=newTailSize) {
 		if(workspace) freeArray(workspace);
-		workspace=allocArray<kiss_fft_scalar>(neededLength);
+		workspace=allocArray<float>(neededLength);
 		if(tail) freeArray(tail);
-		tail=allocArray<kiss_fft_scalar>(newTailSize);
+		tail=allocArray<float>(newTailSize);
 		fft_size=neededLength/2+1;
 		workspace_size=neededLength;
 		tail_size=newTailSize;
