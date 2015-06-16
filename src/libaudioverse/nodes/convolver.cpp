@@ -55,6 +55,9 @@ void ConvolverNode::process() {
 }
 
 void ConvolverNode::setImpulseResponse() {
+	auto ir=getProperty(Lav_CONVOLVER_IMPULSE_RESPONSE).getFloatArrayPtr();
+	int len =getProperty(Lav_CONVOLVER_IMPULSE_RESPONSE).getFloatArrayLength();
+	for(int i = 0; i < channels; i++) convolvers[i]->setResponse(len, ir);
 }
 
 //begin public api

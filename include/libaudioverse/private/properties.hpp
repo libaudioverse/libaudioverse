@@ -117,6 +117,7 @@ class Property {
 	void writeFloatArray(unsigned int start, unsigned int stop, float* values);
 	void replaceFloatArray(unsigned int length, float* values);
 	unsigned int getFloatArrayLength();
+	float* getFloatArrayPtr();
 	std::vector<float> getFloatArrayDefault();
 	void setFloatArrayDefault(std::vector<float> d);
 	
@@ -125,6 +126,7 @@ class Property {
 	void writeIntArray(unsigned int start, unsigned int stop, int* values);
 	void replaceIntArray(unsigned int length, int* values);
 	unsigned int getIntArrayLength();
+	int* getIntArrayPtr();
 	std::vector<int> getIntArrayDefault();
 	void setIntArrayDefault(std::vector<int> d);
 

@@ -342,6 +342,11 @@ void Property::replaceFloatArray(unsigned int length, float* values) {
 	if(post_changed_callback) post_changed_callback();
 }
 
+float* Property::getFloatArrayPtr() {
+	if(farray_value.size()) return &farray_value[0];
+	else return nullptr;
+}
+
 unsigned int Property::getFloatArrayLength() {
 	return farray_value.size();
 }
@@ -372,6 +377,11 @@ void Property::replaceIntArray(unsigned int length, int* values) {
 	iarray_value.resize(length);
 	std::copy(values, values+length, iarray_value.begin());
 	if(post_changed_callback) post_changed_callback();
+}
+
+int* Property::getIntArrayPtr() {
+	if(iarray_value.size()) return &iarray_value[0];
+	else return nullptr;
 }
 
 unsigned int Property::getIntArrayLength() {
