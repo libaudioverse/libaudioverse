@@ -15,6 +15,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/constants.hpp>
 #include <libaudioverse/private/file.hpp>
+#include <libaudioverse/private/kernels.hpp>
 #include <libaudioverse/implementations/convolvers.hpp>
 #include <limits>
 #include <string>
@@ -74,9 +75,14 @@ void FftConvolverNode::setResponseFromFile(std::string path, int fileChannel, in
 	//This is a strange trick.  Because we only care about the specified channel, we can kill the others.
 	//Consequently, we copy the channel of interest to the beginning of the buffer.
 	for(int i = 0; i < reader.getFrameCount(); i++) tmp[i] = tmp[i*reader.getChannelCount()+fileChannel];
+	//Resample if needed.
+	float* resampledTmp;
+	int resampledTmpLength;
+	staticResamplerKernel(reader.getSr(), simulation->getSr(), 1, reader.getFrameCount(), tmp, &resampledTmpLength, &resampledTmp);
 	//Finally, set the specified convolver.
-	convolvers[convolverChannel]->setResponse(reader.getFrameCount(), tmp);
+	convolvers[convolverChannel]->setResponse(resampledTmpLength, resampledTmp);
 	freeArray(tmp);
+	freeArray(resampledTmp);
 }
 
 //begin public api
