@@ -27,9 +27,10 @@ class FftConvolver {
 	void setResponse(int length, float* response);
 	void convolve(float* input, float* output);
 	private:
-	int block_size, fft_size;
+	int block_size = 0, fft_size = 0, tail_size= 0, workspace_size = 0;
 	float* response_workspace = nullptr, *block_workspace = nullptr, *tail = nullptr;
-	kiss_fft_cfg fft = nullptr, ifft = nullptr;
+	kiss_fft_cpx *response_fft = nullptr, *block_fft = nullptr;
+	kiss_fftr_cfg fft = nullptr, ifft = nullptr;
 };
 
 }
