@@ -54,17 +54,29 @@ void FftConvolver::setResponse(int length, float* newResponse) {
 }
 
 void FftConvolver::convolve(float* input, float* output) {
-	//We reuse workspace, so have to zero the tail part of it.
+	convolveFft(getFft(input), output);
+}
+
+int FftConvolver::getFftSize() {
+	return workspace_size;
+}
+
+kiss_fft_cpx *FftConvolver::getFft(float* input) {
+		//We reuse workspace, so have to zero the tail part of it.
 	std::fill(workspace+block_size, workspace+workspace_size, 0.0f);
 	//Copy input to the workspace, and take its fft.
 	std::copy(input, input+block_size, workspace);
 	kiss_fftr(fft, workspace, block_fft);
+	return block_fft;
+}
+
+void FftConvolver::convolveFft(kiss_fft_cpx *fft, float* output) {
 	//Do a complex multiply.
 	//Note that the first line is subtraction because of the i^2.
 	for(int i=0; i < fft_size; i++) {
 		kiss_fft_cpx tmp;
-		tmp.r = block_fft[i].r*response_fft[i].r-block_fft[i].i*response_fft[i].i;
-		tmp.i = block_fft[i].r*response_fft[i].i+block_fft[i].i*response_fft[i].r;
+		tmp.r = fft[i].r*response_fft[i].r-fft[i].i*response_fft[i].i;
+		tmp.i = fft[i].r*response_fft[i].i+fft[i].i*response_fft[i].r;
 		block_fft[i] = tmp;
 	}
 	kiss_fftri(ifft, block_fft, workspace);
