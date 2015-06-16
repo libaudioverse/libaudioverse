@@ -62,8 +62,8 @@ void FftConvolver::setResponse(int length, float* newResponse) {
 }
 
 void FftConvolver::convolve(float* input, float* output) {
-	//We reuse block_workspace, so have to zero it.
-	memset(block_workspace, 0, workspace_size*sizeof(float));
+	//We reuse block_workspace, so have to zero the tail part of it.
+	std::fill(block_workspace+block_size, block_workspace+workspace_size, 0.0f);
 	//Copy input to the block_workspace, and take its fft.
 	std::copy(input, input+block_size, block_workspace);
 	kiss_fftr(fft, block_workspace, block_fft);
