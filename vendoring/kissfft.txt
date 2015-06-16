@@ -1,4 +1,4 @@
-include_directories("${CMAKE_SOURCE_DIR}/kissffft")
+include_directories("${CMAKE_SOURCE_DIR}/kissfft")
 add_library(kissfft
 "${CMAKE_SOURCE_DIR}/kissfft/kiss_fft.c"
 "${CMAKE_SOURCE_DIR}/kissfft/kiss_fftr.c"
