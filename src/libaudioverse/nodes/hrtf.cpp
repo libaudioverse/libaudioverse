@@ -18,6 +18,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <algorithm>
 #include <memory>
 #include <math.h>
+#include <kiss_fftr.h>
 
 namespace libaudioverse_implementation {
 
@@ -46,6 +47,10 @@ class HrtfNode: public Node {
 	//variables for the interaural time difference.
 	CrossfadingDelayLine left_delay_line, right_delay_line;
 	const float max_interaural_delay = 0.02f;
+	//Used to guarantee that we only compute the fft once.
+	kiss_fftr_cfg fft = nullptr;
+	float* fft_workspace=nullptr;
+	kiss_fft_cpx *input_fft = nullptr;
 };
 
 HrtfNode::HrtfNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf): Node(Lav_OBJTYPE_HRTF_NODE, simulation, 1, 2),
@@ -73,12 +78,19 @@ right_delay_line(0.02, simulation->getSr()) {
 	//the crossffading time of both delay lines should be one block.
 	left_delay_line.setInterpolationTime(simulation->getBlockSize()/simulation->getSr());
 	right_delay_line.setInterpolationTime(simulation->getBlockSize()/simulation->getSr());
+	//Set up the fft-related stuff.
+	fft_workspace=allocArray<float>(left_convolver->getFftSize());
+	input_fft=allocArray<kiss_fft_cpx>(left_convolver->getFftSize());
+	fft=kiss_fftr_alloc(left_convolver->getFftSize(), 0, nullptr, nullptr);
 }
 
 HrtfNode::~HrtfNode() {
 	freeArray(left_response);
 	freeArray(right_response);
 	freeArray(crossfade_workspace);
+	freeArray(input_fft);
+	freeArray(fft_workspace);
+	kiss_fftr_free(fft);
 	delete left_convolver;
 	delete right_convolver;
 	delete new_left_convolver;
@@ -92,6 +104,9 @@ std::shared_ptr<Node>createHrtfNode(std::shared_ptr<Simulation>simulation, std::
 }
 
 void HrtfNode::process() {
+	//Get the fft of the input.
+	std::copy(input_buffers[0], input_buffers[0]+block_size, fft_workspace);
+	kiss_fftr(fft, fft_workspace, input_fft);
 	//calculating the hrir is expensive, do it only if needed.
 	bool didRecompute = false;
 	bool allowCrossfade = getProperty(Lav_PANNER_SHOULD_CROSSFADE).getIntValue();
@@ -113,8 +128,8 @@ void HrtfNode::process() {
 		prev_azimuth = currentAzimuth;
 	}
 	//These happen regardless of if we are crossfading or recomputed.
-	left_convolver->convolve(input_buffers[0], output_buffers[0]);
-	right_convolver->convolve(input_buffers[0], output_buffers[1]);
+	left_convolver->convolveFft(input_fft, output_buffers[0]);
+	right_convolver->convolveFft(input_fft, output_buffers[1]);
 	//If we crossfaded, we need to apply the following change.
 	if(didRecompute && allowCrossfade) {
 		//Shape the buffers as follows, enabling a simple add.
@@ -125,9 +140,9 @@ void HrtfNode::process() {
 		}
 		//Run the new convolver for the left channel and crossfade.
 		//Then, repeat for the right.
-		new_left_convolver->convolve(input_buffers[0], crossfade_workspace);
+		new_left_convolver->convolveFft(input_fft, crossfade_workspace);
 		for(int i =0; i < block_size; i++) output_buffers[0][i] += crossfade_workspace[i]*i*crossfade_delta;
-		new_right_convolver->convolve(input_buffers[0], crossfade_workspace);
+		new_right_convolver->convolveFft(input_fft, crossfade_workspace);
 		for(int i=0; i < block_size; i++) output_buffers[1][i] += crossfade_workspace[i]*i*crossfade_delta;
 		//Finally, swap them.
 		std::swap(left_convolver, new_left_convolver);
