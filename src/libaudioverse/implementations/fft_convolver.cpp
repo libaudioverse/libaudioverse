@@ -21,10 +21,12 @@ FftConvolver::~FftConvolver() {
 	if(response_workspace) freeArray(response_workspace);
 	if(block_workspace) freeArray(block_workspace);
 	if(tail) freeArray(tail);
+	if(fft) kiss_fftr_free(fft);
+	if(ifft) kiss_fftr_free(ifft);
 }
 
 void FftConvolver::setResponse(int length, float* newResponse) {
-	int neededLength=(block_size+length)+(block_size+length)%2; //next multiple of 2.
+	int neededLength= (block_size+length)+(block_size+length)%2; //next multiple of 2.
 	int newTailSize=neededLength-block_size;
 	if(neededLength !=fft_size || tail_size !=newTailSize) {
 		if(block_workspace) freeArray(block_workspace);
@@ -52,21 +54,6 @@ void FftConvolver::setResponse(int length, float* newResponse) {
 	//Store the fft of the response.
 	std::copy(newResponse, newResponse+length, response_workspace);
 	kiss_fftr(fft, response_workspace, response_fft);
-	/*Explanation:
-	Kissfft has really poor documentation.
-	Nfft is the number of data points we are taking the fft of.
-	Taking the real fft scales all magnitudes by nfft, and taking the inverse scales all magnitudes by 1/2, source:
-	http://stackoverflow.com/questions/5628056/kissfft-scaling
-	There are two ways to deal with this.
-	We can multiply by 1/nfft after convolution.  Or we can bake the scaling in here.
-	*/
-	//disabled for now:
-	/*
-	for(int i = 0; i < fft_size; i++) {
-		response_fft[i].r /= workspace_size;
-		response_fft[i].i /=workspace_size;
-	}
-	*/
 }
 
 void FftConvolver::convolve(float* input, float* output) {
@@ -76,23 +63,19 @@ void FftConvolver::convolve(float* input, float* output) {
 	std::copy(input, input+block_size, block_workspace);
 	kiss_fftr(fft, block_workspace, block_fft);
 	//Do a complex multiply.
+	//Note that the first line is subtraction because of the i^2.
 	for(int i=0; i < fft_size; i++) {
-		block_fft[i].r=block_fft[i].r*response_fft[i].r+block_fft[i].i*response_fft[i].i;
+		block_fft[i].r=block_fft[i].r*response_fft[i].r-block_fft[i].i*response_fft[i].i;
 		block_fft[i].i = block_fft[i].r*response_fft[i].i+block_fft[i].i*response_fft[i].r;
 	}
 	kiss_fftri(ifft, block_fft, block_workspace);
-	//Copy out the next block.
+	//Scaling required by kissfft
+	scalarMultiplicationKernel(workspace_size, 1.0f/workspace_size, block_workspace, block_workspace);
+	//Add the tail over the block.
+	additionKernel(tail_size, tail, block_workspace, block_workspace);
+	//Copy out the block and the tail.
 	std::copy(block_workspace, block_workspace+block_size, output);
-	//add the tail.
-	additionKernel(std::min(block_size, tail_size), tail, output, output);
-	//Roll back the tail.
-	//std::copy(tail+tail_size-std::min(tail_size, block_size), tail+tail_size, tail);
-	//Zero the end that is now empty.
-	std::fill(tail, tail+tail_size, 0.0f);
-	//Set the next tail.
-	additionKernel(tail_size, block_workspace+block_size, tail, tail);
-	//Downscale the output
-	scalarMultiplicationKernel(block_size, 1.0f/workspace_size, output, output);
+	std::copy(block_workspace+block_size, block_workspace+workspace_size, tail);
 }
 
 }
