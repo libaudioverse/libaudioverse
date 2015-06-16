@@ -54,6 +54,11 @@ void FftConvolver::setResponse(int length, float* newResponse) {
 	//Store the fft of the response.
 	std::copy(newResponse, newResponse+length, response_workspace);
 	kiss_fftr(fft, response_workspace, response_fft);
+	//We bake in the scaling by 1/nfft here.
+	for(int i= 0; i < fft_size; i++) {
+		response_fft[i].r /= fft_size;
+		response_fft[i].i /= fft_size;
+	}
 }
 
 void FftConvolver::convolve(float* input, float* output) {
@@ -71,8 +76,7 @@ void FftConvolver::convolve(float* input, float* output) {
 		block_fft[i] = tmp;
 	}
 	kiss_fftri(ifft, block_fft, block_workspace);
-	//Scaling required by kissfft
-	scalarMultiplicationKernel(workspace_size, 1.0f/workspace_size, block_workspace, block_workspace);
+	//Scaling required by kissfft is handled when the impulse response is set.
 	//Add the tail over the block.
 	additionKernel(tail_size, tail, block_workspace, block_workspace);
 	//Copy out the block and the tail.
