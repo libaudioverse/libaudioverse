@@ -39,13 +39,16 @@ void staticResamplerKernel(int inputSr, int outputSr, int channels, int frames, 
 	unsigned int written = 0, consumed;
 	*outLength= 0;
 	int remaining_in =frames, remaining_out = frames*denom/numer+200;
+	float* tempData=data, *tempO=o;
 	while(remaining_in > 0 && remaining_out > 0) {
 		consumed=std::min<int>(1024, remaining_in);
 		written=std::min(1024, remaining_out);
-		speex_resampler_process_interleaved_float(resampler, data, &consumed, o, &written);
+		speex_resampler_process_interleaved_float(resampler, tempData, &consumed, tempO, &written);
 		remaining_in -= consumed;
 		remaining_out -= written;
 		*outLength +=written;
+		tempData += consumed*channels;
+		tempO += written*channels;
 	}
 	*outData = o;
 	speex_resampler_destroy(resampler);
