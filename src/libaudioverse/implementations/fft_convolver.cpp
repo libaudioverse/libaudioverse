@@ -53,12 +53,9 @@ void FftConvolver::setResponse(int length, float* newResponse) {
 	memset(tail, 0, sizeof(float)*tail_size);
 	//Store the fft of the response.
 	std::copy(newResponse, newResponse+length, response_workspace);
+	//We bake in the 1/nfft scaling that kissfft wants here.
+	scalarMultiplicationKernel(length, 1.0f/workspace_size, response_workspace, response_workspace);
 	kiss_fftr(fft, response_workspace, response_fft);
-	//We bake in the scaling by 1/nfft here.
-	for(int i= 0; i < fft_size; i++) {
-		response_fft[i].r /= fft_size;
-		response_fft[i].i /= fft_size;
-	}
 }
 
 void FftConvolver::convolve(float* input, float* output) {
