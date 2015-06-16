@@ -32,6 +32,7 @@ class ConvolverNode: public Node {
 ConvolverNode::ConvolverNode(std::shared_ptr<Simulation> simulation, int channels): Node(Lav_OBJTYPE_CONVOLVER_NODE, simulation, channels, channels) {
 	if(channels < 1) throw LavErrorException(Lav_ERROR_RANGE);
 	appendInputConnection(0, channels);
+	this->channels=channels;
 	appendOutputConnection(0, channels);
 	convolvers=new BlockConvolver*[channels]();
 	for(int i= 0; i < channels; i++) convolvers[i] = new BlockConvolver(simulation->getBlockSize());
