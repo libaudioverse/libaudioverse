@@ -9,6 +9,8 @@
 {%else%}
 		return IntProperty(node = self, slot = _libaudioverse.{{enumerant}})
 {%endif%}
+{%elif prop['type'] in ['int_array','float_array']%}
+		return {{prop['type']|underscores_to_camelcase(True)}}Property(self, slot=_libaudioverse.{{enumerant}})
 {%else%}
 		return {{prop['type']|underscores_to_camelcase(True)}}Property(node=self, slot = _libaudioverse.{{enumerant}})
 {%endif%}

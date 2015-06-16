@@ -511,13 +511,13 @@ class ArrayProperty(LibaudioverseProperty):
 
 	@value.setter
 	def value(self, val):
-		self._replacer(self._node, self._slot, len(val), *val)
+		self._replacer(self._node, self._slot, len(val), val)
 
 class IntArrayProperty(ArrayProperty):
 	"""Represents an int array property."""
 	def __init__(self, node, slot):
 		super(IntArrayProperty, self).__init__(node = node, slot = slot, reader = _lav.node_read_int_array_property,
-			writer =_lav.node_write_int_array_property, length = _lav.node_get_int_array_property_length)
+			replacer =_lav.node_replace_int_array_property, length = _lav.node_get_int_array_property_length)
 
 class FloatArrayProperty(ArrayProperty):
 	"""Represents a float array property."""
@@ -525,7 +525,7 @@ class FloatArrayProperty(ArrayProperty):
 	def __init__(self, node, slot):
 		super(FloatArrayProperty, self).__init__(node = node, slot = slot,
 			reader =_lav.node_read_float_array_property,
-			writer= _lav.node_write_float_array_property,
+			replacer = _lav.node_replace_float_array_property,
 			length = _lav.node_get_float_array_property_length
 		)
 
