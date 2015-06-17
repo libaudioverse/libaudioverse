@@ -14,13 +14,7 @@ void convolutionKernel(float* input, unsigned int outputSampleCount, float* outp
 	input++;
 	for(int i = 1; i < responseLength; i++) {
 		float c=response[responseLength-i-1];
-	//3/4 of the time we do this. But sometimes i is divisible by 4, and we can offload to the potentially sse kernel.
-		if(i%4) {
-			for(int j = 0; j < outputSampleCount; j++) output[j]+=input[j]*c;
-		}
-		else {
-			multiplicationAdditionKernel(outputSampleCount, c, input, output, output);
-		}
+		multiplicationAdditionKernel(outputSampleCount, c, input, output, output);
 		input++;
 	}
 }
