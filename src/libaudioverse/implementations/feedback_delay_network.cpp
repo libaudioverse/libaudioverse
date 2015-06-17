@@ -16,7 +16,6 @@ FeedbackDelayNetwork::FeedbackDelayNetwork(int n, float maxDelay, float sr) {
 	lines = new CrossfadingDelayLine*[n];
 	for(int i = 0; i < n; i++) lines[i] = new CrossfadingDelayLine(maxDelay, sr);
 	matrix = new float[n*n]();
-	delays = new float[n]();
 	workspace = new float[n*n]();
 }
 
@@ -24,7 +23,6 @@ FeedbackDelayNetwork::~FeedbackDelayNetwork() {
 	for(int i = 0; i < n; i++) delete lines[i];
 	delete[] lines;
 	delete[] matrix;
-	delete[] delays;
 	delete[] workspace;
 }
 
@@ -50,8 +48,11 @@ void FeedbackDelayNetwork::setMatrix(float* feedbacks) {
 }
 
 void FeedbackDelayNetwork::setDelays(float* delays) {
-	std::copy(delays, delays+n, this->delays);
-	for(int i = 0; i < n; i++) lines[i]->setDelay(delays[i]);
+	for(int i = 0; i < n; i++) setDelay(i, delays[i]);
+}
+
+void FeedbackDelayNetwork::setDelay(int which, float newDelay) {
+	lines[which]->setDelay(newDelay);
 }
 
 void FeedbackDelayNetwork::setDelayCrossfadingTime(float time) {

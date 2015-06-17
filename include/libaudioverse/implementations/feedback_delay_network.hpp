@@ -23,6 +23,7 @@ class FeedbackDelayNetwork {
 	void advance(float* inputs);
 	void setMatrix(float* feedbacks);
 	void setDelays(float* delays);
+	void setDelay(int which, float newDelay);
 	void setDelayCrossfadingTime(float time);
 	void reset();
 	private:
