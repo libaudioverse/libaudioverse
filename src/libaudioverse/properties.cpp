@@ -432,6 +432,10 @@ bool Property::needsARate() {
 }
 
 void Property::tick() {
+	//protect against duplicate ticks.
+	//This is needed because of forwarding.
+	if(last_ticked==simulation->getTickCount()) return;
+	last_ticked=simulation->getTickCount();
 	if(type !=Lav_PROPERTYTYPE_FLOAT && type != Lav_PROPERTYTYPE_DOUBLE) return; //nothing to do for other types.
 	//we don't know for sure if we want this yet, so reset it.
 	should_use_value_buffer = false;

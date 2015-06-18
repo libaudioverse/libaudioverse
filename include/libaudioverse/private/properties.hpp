@@ -178,6 +178,9 @@ class Property {
 	bool should_use_value_buffer = false;
 	float* node_buffer=nullptr; //temporary place for putting node outputs.
 	std::shared_ptr<InputConnection> incoming_nodes = nullptr; //The nodes connected to this property. Pointer to break an include cycle.
+	
+	//Allows protecting against duplicate ticks.
+	int last_ticked=-1; //simulation starts at zero.
 };
 
 //helper methods to quickly make properties.
