@@ -35,6 +35,8 @@ Constructor: `{{functions[node['constructor']]|function_to_string}}`
 This node has no inputs.
 {%elif node['inputs'] == "constructor"%}
 The number of inputs to this node depends on parameters to its constructor.
+{%elif node['inputs'] == "described"%}
+The number of inputs to this node is described below.
 {%else%}
 [caption=""]
 .Inputs
@@ -56,6 +58,8 @@ The number of inputs to this node depends on parameters to its constructor.
 This node has no outputs.
 {%elif node['outputs'] == "constructor"%}
 The number of outputs from this node depends on parameters to its constructor.
+{%elif node['output'] == "described"%}
+The outputs of this node are described below.
 {%else%}
 [caption=""]
 .Outputs

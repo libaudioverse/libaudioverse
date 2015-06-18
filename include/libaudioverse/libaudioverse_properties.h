@@ -135,6 +135,10 @@ enum Lav_CONVOLVER_PROPERTIES {
 	Lav_CONVOLVER_IMPULSE_RESPONSE = -1,
 };
 
+enum Lav_LATE_REFLECTIONS_PROPERTIES {
+	Lav_LATE_REFLECTIONS_T60 = -1,
+};
+
 #ifdef __cplusplus
 }
 #endif
