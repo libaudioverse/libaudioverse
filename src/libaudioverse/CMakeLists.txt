@@ -103,6 +103,7 @@ nodes/buffer_timeline.cpp
 nodes/recorder.cpp
 nodes/convolver.cpp
 nodes/fft_convolver.cpp
+nodes/late_reflections.cpp
 
 #automators
 automators/automators.cpp
