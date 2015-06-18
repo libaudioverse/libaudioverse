@@ -24,8 +24,8 @@ class MultipannerNode: public SubgraphNode {
 	public:
 	MultipannerNode(std::shared_ptr<Simulation> sim, std::shared_ptr<HrtfData> hrtf);
 	std::shared_ptr<Node> hrtf_panner = nullptr, amplitude_panner = nullptr, input= nullptr, current_panner = nullptr;
+	void configureForwardedProperties();
 	void strategyChanged();
-	void willProcessParents() override;
 };
 
 MultipannerNode::MultipannerNode(std::shared_ptr<Simulation> sim, std::shared_ptr<HrtfData> hrtf): SubgraphNode(Lav_OBJTYPE_MULTIPANNER_NODE, sim)  {
@@ -47,8 +47,27 @@ std::shared_ptr<Node> createMultipannerNode(std::shared_ptr<Simulation> simulati
 	auto retval = std::shared_ptr<MultipannerNode>(new MultipannerNode(simulation, hrtf), ObjectDeleter(simulation));
 	simulation->associateNode(retval);
 	//this call must be here because it involves shared_from_this.
+	retval->configureForwardedProperties();
 	retval->strategyChanged();
 	return retval;
+}
+
+void MultipannerNode::configureForwardedProperties() {
+	auto us = std::static_pointer_cast<Node>(shared_from_this());
+	//forward everything common from both, and hrtf stuff from hrtf.
+	amplitude_panner->forwardProperty(Lav_PANNER_AZIMUTH, us, Lav_PANNER_AZIMUTH);
+	amplitude_panner->forwardProperty(Lav_PANNER_ELEVATION, us, Lav_PANNER_ELEVATION);
+	hrtf_panner->forwardProperty(Lav_PANNER_AZIMUTH, us, Lav_PANNER_AZIMUTH);
+	hrtf_panner->forwardProperty(Lav_PANNER_ELEVATION, us, Lav_PANNER_ELEVATION);
+	//crossfading.
+	amplitude_panner->forwardProperty(Lav_PANNER_SHOULD_CROSSFADE, us, Lav_PANNER_SHOULD_CROSSFADE);
+	hrtf_panner->forwardProperty(Lav_PANNER_SHOULD_CROSSFADE, us, Lav_PANNER_SHOULD_CROSSFADE);
+	//strategy is already only us.
+	//hrtf specifics:
+	hrtf_panner->forwardProperty(Lav_PANNER_SPEED_OF_SOUND, us, Lav_PANNER_SPEED_OF_SOUND);
+	hrtf_panner->forwardProperty(Lav_PANNER_DISTANCE, us, Lav_PANNER_DISTANCE);
+	hrtf_panner->forwardProperty(Lav_PANNER_HEAD_WIDTH, us, Lav_PANNER_HEAD_WIDTH);
+	hrtf_panner->forwardProperty(Lav_PANNER_EAR_POSITION, us, Lav_PANNER_EAR_POSITION);
 }
 
 void MultipannerNode::strategyChanged() {
@@ -81,26 +100,6 @@ void MultipannerNode::strategyChanged() {
 		getOutputConnection(0)->reconfigure(0, 2);
 		setOutputNode(hrtf_panner);
 		current_panner = hrtf_panner;
-	}
-}
-
-void MultipannerNode::willProcessParents() {
-	float az = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
-	float elev = getProperty(Lav_PANNER_ELEVATION).getFloatValue();
-	int cf=getProperty(Lav_PANNER_SHOULD_CROSSFADE).getIntValue();
-	float sos = getProperty(Lav_PANNER_SPEED_OF_SOUND).getFloatValue();
-	float headWidth =getProperty(Lav_PANNER_HEAD_WIDTH).getFloatValue();
-	float earPosition = getProperty(Lav_PANNER_EAR_POSITION).getFloatValue();
-	float distance= getProperty(Lav_PANNER_DISTANCE).getFloatValue();
-	current_panner->getProperty(Lav_PANNER_AZIMUTH).setFloatValue(az);
-	current_panner->getProperty(Lav_PANNER_ELEVATION).setFloatValue(elev);
-	current_panner->getProperty(Lav_PANNER_SHOULD_CROSSFADE).setIntValue(cf);
-	//these only exist on hrtf, so be careful.
-	if(current_panner == hrtf_panner) {
-		current_panner->getProperty(Lav_PANNER_DISTANCE).setFloatValue(distance);
-		current_panner->getProperty(Lav_PANNER_SPEED_OF_SOUND).setFloatValue(sos);
-		current_panner->getProperty(Lav_PANNER_HEAD_WIDTH).setFloatValue(headWidth);
-		current_panner->getProperty(Lav_PANNER_EAR_POSITION).setFloatValue(earPosition);
 	}
 }
 

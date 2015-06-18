@@ -231,8 +231,24 @@ std::shared_ptr<Simulation> Node::getSimulation() {
 }
 
 Property& Node::getProperty(int slot) {
-	if(properties.count(slot) == 0) throw LavErrorException(Lav_ERROR_RANGE);
+	//first the forwarded case.
+	if(forwarded_properties.count(slot) !=0) {
+		auto n=std::get<0>(forwarded_properties[slot]).lock();
+		auto s=std::get<1>(forwarded_properties[slot]);
+		if(n) return n->getProperty(s);
+		else throw LavErrorException(Lav_ERROR_INTERNAL); //better to crash here.
+	}
+	else if(properties.count(slot) == 0) throw LavErrorException(Lav_ERROR_RANGE);
 	else return properties[slot];
+}
+
+void Node::forwardProperty(int ourProperty, std::shared_ptr<Node> toNode, int toProperty) {
+	forwarded_properties[ourProperty] = std::make_tuple(toNode, toProperty);
+}
+
+void Node::stopForwardingProperty(int ourProperty) {
+	if(forwarded_properties.count(ourProperty)) forwarded_properties.erase(ourProperty);
+	else throw LavErrorException(Lav_ERROR_INTERNAL);
 }
 
 Event& Node::getEvent(int which) {

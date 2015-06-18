@@ -11,6 +11,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <memory>
 #include <vector>
 #include <set>
+#include <utility>
 
 namespace libaudioverse_implementation {
 
@@ -30,7 +31,7 @@ class Node: public ExternalObject { //enable_shared_from_this is for event infra
 	virtual float** getInputBufferArray();
 
 	//equivalent to reading lav_NODE_STATE.
-	virtual int getState();
+	int getState();
 
 	//public view of connections.
 	virtual int getInputConnectionCount();
@@ -72,6 +73,10 @@ class Node: public ExternalObject { //enable_shared_from_this is for event infra
 	virtual std::shared_ptr<Simulation> getSimulation();
 	virtual Property& getProperty(int slot);
 
+	//Property forwarding support.
+	void forwardProperty(int ourProperty, std::shared_ptr<Node> toNode, int toProperty);
+	void stopForwardingProperty(int ourProperty);
+	
 	//event helper methods.
 	Event& getEvent(int which);
 
@@ -91,6 +96,8 @@ class Node: public ExternalObject { //enable_shared_from_this is for event infra
 	protected:
 	std::shared_ptr<Simulation> simulation = nullptr;
 	std::map<int, Property> properties;
+	//the tuple is of (node, property).
+	std::map<int, std::tuple<std::weak_ptr<Node>, int>> forwarded_properties;
 	std::map<int, Event> events;
 	std::vector<float*> input_buffers;
 	std::vector<float*> output_buffers;
