@@ -190,8 +190,8 @@ Property* createDoubleProperty(const char* name, double default, double min, dou
 Property* createFloat3Property(const char* name, float default[3]);
 Property* createFloat6Property(const char* name, float default[6]);
 Property* createStringProperty(const char* name, const char* default);
-Property* createIntArrayProperty(const char* name, unsigned int minLength, unsigned int maxLength, unsigned int defaultLength, int* defaultData);
-Property* createFloatArrayProperty(const char* name, unsigned int minLength, unsigned int maxLength, unsigned int defaultLength, float* defaultData);
+Property* createIntArrayProperty(const char* name, unsigned int minLength, unsigned int maxLength, unsigned int defaultLength, int minVal, int maxVal, int* defaultData);
+Property* createFloatArrayProperty(const char* name, unsigned int minLength, unsigned int maxLength, unsigned int defaultLength, float min, float max, float* defaultData);
 Property* createBufferProperty(const char* name);
 
 }

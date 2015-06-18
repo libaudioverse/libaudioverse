@@ -329,14 +329,20 @@ float Property::readFloatArray(unsigned int index) {
 
 void Property::writeFloatArray(unsigned int start, unsigned int stop, float* values) {
 	if(start >= farray_value.size() || stop > farray_value.size()) throw LavErrorException(Lav_ERROR_RANGE);
+	for(int i=start; i < stop; i++) {
+		RC(values[i], fval);
+	}
 	for(unsigned int i = start; i < stop; i++) {
-		farray_value[start] = values[i];
+		farray_value[i] = values[i];
 	}
 	if(post_changed_callback) post_changed_callback();
 }
 
 void Property::replaceFloatArray(unsigned int length, float* values) {
 	if((length < min_array_length || length > max_array_length) && read_only == false) throw LavErrorException(Lav_ERROR_RANGE);
+	for(int i =0; i < length; i++) {
+		RC(values[i], fval);
+	}
 	farray_value.resize(length);
 	std::copy(values, values+length, farray_value.begin());
 	if(post_changed_callback) post_changed_callback();
@@ -366,14 +372,20 @@ int Property::readIntArray(unsigned int index) {
 
 void Property::writeIntArray(unsigned int start, unsigned int stop, int* values) {
 	if(start >= iarray_value.size() || stop > iarray_value.size()) throw LavErrorException(Lav_ERROR_RANGE);
+	for(int i =start; i < stop; i++) {
+		RC(values[i], ival);
+	}
 	for(unsigned int i = start; i < stop; i++) {
-		iarray_value[start] = values[i];
+		iarray_value[i] = values[i];
 	}
 	if(post_changed_callback) post_changed_callback();
 }
 
 void Property::replaceIntArray(unsigned int length, int* values) {
 	if((length < min_array_length || length > max_array_length) && read_only == false) throw LavErrorException(Lav_ERROR_RANGE);
+	for(int i =0; i < length; i++) {
+		RC(values[i], ival);
+	}
 	iarray_value.resize(length);
 	std::copy(values, values+length, iarray_value.begin());
 	if(post_changed_callback) post_changed_callback();
@@ -544,9 +556,10 @@ Property* createStringProperty(const char* name, const char* default) {
 	return retval;
 }
 
-Property* createIntArrayProperty(const char* name, unsigned int minLength, unsigned int maxLength, unsigned int defaultLength, int* defaultData) {
+Property* createIntArrayProperty(const char* name, unsigned int minLength, unsigned int maxLength, unsigned int defaultLength, int min, int max, int* defaultData) {
 	auto prop = new Property(Lav_PROPERTYTYPE_INT_ARRAY);
 	prop->setArrayLengthRange(minLength, maxLength);
+	prop->setIntRange(min, max);
 	std::vector<int> new_default;
 	new_default.resize(defaultLength);
 	std::copy(defaultData, defaultData+defaultLength, new_default.begin());
@@ -556,9 +569,10 @@ Property* createIntArrayProperty(const char* name, unsigned int minLength, unsig
 	return prop;
 }
 
-Property* createFloatArrayProperty(const char* name, unsigned int minLength, unsigned int maxLength, unsigned int defaultLength, float* defaultData) {
+Property* createFloatArrayProperty(const char* name, unsigned int minLength, unsigned int maxLength, unsigned int defaultLength, float min, float max, float* defaultData) {
 	auto prop = new Property(Lav_PROPERTYTYPE_FLOAT_ARRAY);
 	prop->setArrayLengthRange(minLength, maxLength);
+	prop->setFloatRange(min, max);
 	std::vector<float> new_default;
 	new_default.resize(defaultLength);
 	std::copy(defaultData, defaultData+defaultLength, new_default.begin());

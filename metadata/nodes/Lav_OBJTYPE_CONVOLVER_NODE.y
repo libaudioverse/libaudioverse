@@ -4,6 +4,7 @@ properties:
     type: float_array
     min_length: 1
     max_length: MAX_INT
+    range: [-INFINITY, INFINITY]
     default: [1.0]
     doc_description: |
       The impulse response to convolve the input with.

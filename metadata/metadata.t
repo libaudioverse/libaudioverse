@@ -64,10 +64,10 @@ void initializeMetadata() {
 	unsigned int defaultLength = <%prop['default']|length%>;
 	{%if prop['type'] == 'int_array'%}
 	int defaultData[] = {<%prop['default']|join(', ')%>};
-	tempProp = createIntArrayProperty("<%prop['name']%>", minLength, maxLength, defaultLength, defaultData);
+	tempProp = createIntArrayProperty("<%prop['name']%>", minLength, maxLength, defaultLength, <%prop['range'][0]%>, <%prop['range'][1]%>, defaultData);
 	{%elif prop['type'] == 'float_array'%}
 	float defaultData[] = {<%prop['default'] | join(', ')%>};
-	tempProp = createFloatArrayProperty("<%prop['name']%>", minLength, maxLength, defaultLength, defaultData);
+	tempProp = createFloatArrayProperty("<%prop['name']%>", minLength, maxLength, defaultLength, <%prop['range'][0]%>, <%prop['range'][1]%>, defaultData);
 	{%endif%}
 	{%elif prop['type'] == 'buffer'%}
 	tempProp=createBufferProperty("<%prop['name']%>");

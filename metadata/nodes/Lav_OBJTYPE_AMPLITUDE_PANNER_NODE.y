@@ -30,6 +30,7 @@ properties:
     type: float_array
     min_length: 2
     max_length: MAX_INT
+    range: [-INFINITY, INFINITY]
     default: [-90, 90]
     doc_description: |
       The angles of the speakers in the order in which they are to be mapped to channels.
