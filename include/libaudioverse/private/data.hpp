@@ -37,6 +37,6 @@ extern char default_hrtf[];
 extern unsigned int default_hrtf_size;
 
 //hadamard matrix, 16x16.
-const extern int hadamard16[];
+const extern float hadamard16[];
 
 }

@@ -15,14 +15,16 @@ Many nodes will wish to customize this process via the insertion of filters, so 
 This matches the formulation given in Physical Audio Processing for Virtual Musical Instruments and Audio Effects by julius O. Smith III.
 */
 
+class CrossfadingDelayLine;
+
 class FeedbackDelayNetwork {
 	public:
 	FeedbackDelayNetwork(int n, float maxDelay, float sr);
 	~FeedbackDelayNetwork();
 	void computeFrame(float* outputs);
-	void advance(float* inputs);
-	void setMatrix(float* feedbacks);
-	void setDelays(float* delays);
+	void advance(const float* inputs);
+	void setMatrix(const float* feedbacks);
+	void setDelays(const float* delays);
 	void setDelay(int which, float newDelay);
 	void setDelayCrossfadingTime(float time);
 	void reset();

@@ -5,7 +5,19 @@ properties:
     default: 0.3
     range: [0.05, INFINITY]
     doc_description: |
-      The time it takes for the late reflections to decay to {{"-60 DB"|codelit}}.
+      The time it takes for the late reflections to decay by {{"-60 DB"|codelit}}.
+      
+      Higher values are indicative of larger spaces.
+  Lav_LATE_REFLECTIONS_DENSITY:
+    name: density
+    default: 500
+    type: float
+    range: [100.0, 1000.0]
+    doc_description: |
+      The average number of reflections per second.
+      
+      Higher values are generally indicative of more complex and reflective surfaces, placed closer together.
+      As an example, a carpetted cathedral would have a lower value than a small, concrete room.
 inputs: described
 outputs: described
 doc_name: late reflections

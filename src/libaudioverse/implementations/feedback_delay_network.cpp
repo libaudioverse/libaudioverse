@@ -36,18 +36,18 @@ void FeedbackDelayNetwork::computeFrame(float* outputs) {
 	}
 }
 
-void FeedbackDelayNetwork::advance(float* inputs) {
+void FeedbackDelayNetwork::advance(const float* inputs) {
 	//Just write all the delay lines.
 	for(int i=0; i < n; i++) lines[i]->advance(inputs[i]);
 }
 
 //below here is not very algorithmic, just setters.
 
-void FeedbackDelayNetwork::setMatrix(float* feedbacks) {
+void FeedbackDelayNetwork::setMatrix(const float* feedbacks) {
 	std::copy(feedbacks, feedbacks+n*n, matrix);
 }
 
-void FeedbackDelayNetwork::setDelays(float* delays) {
+void FeedbackDelayNetwork::setDelays(const float* delays) {
 	for(int i = 0; i < n; i++) setDelay(i, delays[i]);
 }
 
