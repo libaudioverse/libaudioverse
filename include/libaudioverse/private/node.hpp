@@ -70,8 +70,8 @@ class Node: public ExternalObject { //enable_shared_from_this is for event infra
 	//the default does nothing.
 	virtual void willProcessParents();
 
-	virtual std::shared_ptr<Simulation> getSimulation();
-	virtual Property& getProperty(int slot);
+	std::shared_ptr<Simulation> getSimulation();
+	Property& getProperty(int slot);
 
 	//Property forwarding support.
 	void forwardProperty(int ourProperty, std::shared_ptr<Node> toNode, int toProperty);
