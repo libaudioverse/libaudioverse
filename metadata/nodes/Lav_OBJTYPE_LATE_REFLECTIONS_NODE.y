@@ -18,28 +18,20 @@ properties:
       
       Higher values are generally indicative of more complex and reflective surfaces, placed closer together.
       As an example, a carpetted cathedral would have a lower value than a small, concrete room.
-  Lav_LATE_REFLECTIONS_HF_T60_RATIO:
+  Lav_LATE_REFLECTIONS_HF_T60:
     type: float
     name: hf_t60_ratio
-    default: 1.0
+    default: 0.3
     range: [0.0, INFINITY]
     doc_description: |
-      The ratio of the decay time for the high frequency band to the decay time for the late reflections as a whole.
-      
-      This property controls how frequencies in the highest of the three configurable bands decay.
-      If less than one, high frequencies will decay before those in the mid-range.
-      
-      This property is a ratio so that changes to {{"t60"|codelit}} will predictably effect the reverb.
-  Lav_LATE_REFLECTIONS_LF_T60_RATIO:
+      The decay time of the high frequency band.
+  Lav_LATE_REFLECTIONS_LF_T60:
     type: float
     name: lf_t60_ratio
-    default: 1.0
+    default: 0.3
     range: [0.0, INFINITY]
     doc_description: |
-      The ratio of the decay time for the reflections in the low frequency band to the reflections as a whole.
-      
-      This property controls how fast the low band decays.
-      For values less than 1, the low frequencies will decay faster than the frequencies in the middle band.
+      The decay time for the reflections in the low frequency band.
   Lav_LATE_REFLECTIONS_HF_REFERENCE:
     type: float
     name: hf_reference
