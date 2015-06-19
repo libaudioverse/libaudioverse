@@ -44,7 +44,7 @@ class LateReflectionsNode: public Node {
 
 LateReflectionsNode::LateReflectionsNode(std::shared_ptr<Simulation> simulation):
 Node(Lav_OBJTYPE_LATE_REFLECTIONS_NODE, simulation, 16, 16),
-fdn(16, 1.0/50.0, simulation->getSr()) {
+fdn(16, (1.0/50.0)*16.0, simulation->getSr()) {
 	for(int i=0; i < 16; i++) {
 		appendInputConnection(i, 1);
 		appendOutputConnection(i, 1);
@@ -80,6 +80,9 @@ LateReflectionsNode::~LateReflectionsNode() {
 
 void LateReflectionsNode::recompute() {
 	float density = getProperty(Lav_LATE_REFLECTIONS_DENSITY).getFloatValue();
+	//We see 16 times as many reflections as we expect because there are 16 inputs and outputs.
+	//Put another way, each delay line is contributing, on average, density reflections.
+	density /= 16.0;
 	float t60=getProperty(Lav_LATE_REFLECTIONS_T60).getFloatValue();
 	//The base delay is the amount we are delaying all delay lines by.
 	float base_delay=1.0f/density;
