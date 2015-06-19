@@ -6,16 +6,18 @@ namespace libaudioverse_implementation {
 
 class IIRFilter {
 	public:
-	IIRFilter() = default;
+	IIRFilter(double sr);
 	float tick(float sample);
 	void configure(int newNumeratorLength, double* newNumerator, int newDenominatorLength,  double* newDenominator);
 	void setGain(double gain);
 	void clearHistories();
-	void configureBiquad(int type, double sr, double frequency, double dbGain, double q);
+	void configureBiquad(int type, double frequency, double dbGain, double q);
+	double qFromBw(double frequency, double bw);
 	private:
 	double *history = nullptr, *recursion_history = nullptr, *numerator = nullptr, *denominator = nullptr;
 	int numerator_length = 0, denominator_length = 0;
 	double gain = 1.0;
+	double sr;
 };
 
 }

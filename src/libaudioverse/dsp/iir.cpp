@@ -16,6 +16,10 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 namespace libaudioverse_implementation {
 
+IIRFilter::IIRFilter(double sr) {
+	this->sr = sr;
+}
+
 void IIRFilter::configure(int newNumeratorLength, double* newNumerator, int newDenominatorLength, double* newDenominator) {
 	if(newNumeratorLength == 0 || newDenominatorLength == 0) throw LavErrorException(Lav_ERROR_RANGE);
 	//we normalize by the first coefficient but throw it out; consequently, it must be nonzero.
@@ -62,7 +66,7 @@ float IIRFilter::tick(float sample) {
 	return (float)recursion_history[0];
 }
 
-void IIRFilter::configureBiquad(int type, double sr, double frequency, double dbGain, double q) {
+void IIRFilter::configureBiquad(int type, double frequency, double dbGain, double q) {
 	//this entire function is a straightforward implementation of the Audio EQ cookbook, included with this repository.
 	//we move these onto the class at the end of the function explicitly.
 	double a0, a1, a2, b0, b1, b2, gain;
@@ -154,6 +158,13 @@ void IIRFilter::configureBiquad(int type, double sr, double frequency, double db
 	double denominator[] = {1, a1/a0, a2/a0};
 	configure(3, numerator, 3, denominator);
 	setGain(b0/a0);
+}
+
+double IIRFilter::qFromBw(double frequency, double bw) {
+	double w0 = 2*PI*frequency/sr;
+	//from audio eq cookbook.
+	double qRecip=2*sinh(log(2)/2*bw*w0/sin(w0));
+	return 1.0/qRecip;
 }
 
 }

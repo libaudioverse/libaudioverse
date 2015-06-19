@@ -21,16 +21,19 @@ namespace libaudioverse_implementation {
 class BiquadNode: public Node {
 	public:
 	BiquadNode(std::shared_ptr<Simulation> sim, unsigned int channels);
+	~BiquadNode();
 	void process();
 	void reconfigure();
 	private:
-	std::vector<IIRFilter> biquads;
+	IIRFilter** biquads;
+	int channels;
 	int prev_type;
 };
 
 BiquadNode::BiquadNode(std::shared_ptr<Simulation> sim, unsigned int channels): Node(Lav_OBJTYPE_BIQUAD_NODE, sim, channels, channels) {
-	biquads.resize(channels);
-	//configure all of them.
+	this->channels=channels;
+	biquads = new IIRFilter*[channels]();
+	for(int i= 0; i < channels; i++) biquads[i] = new IIRFilter(simulation->getSr());
 	prev_type = getProperty(Lav_BIQUAD_FILTER_TYPE).getIntValue();
 	appendInputConnection(0, channels);
 	appendOutputConnection(0, channels);
@@ -42,15 +45,20 @@ std::shared_ptr<Node> createBiquadNode(std::shared_ptr<Simulation> simulation, u
 	return retval;
 }
 
+BiquadNode::~BiquadNode() {
+	for(int i=0; i < channels; i++) delete biquads[i];
+	delete[] biquads;
+}
+
 void BiquadNode::reconfigure() {
 	int type = getProperty(Lav_BIQUAD_FILTER_TYPE).getIntValue();
 	float sr = simulation->getSr();
 	float frequency = getProperty(Lav_BIQUAD_FREQUENCY).getFloatValue();
 	float q = getProperty(Lav_BIQUAD_Q).getFloatValue();
 	float dbgain= getProperty(Lav_BIQUAD_DBGAIN).getFloatValue();
-	for(auto &i: biquads) {
-		i.configureBiquad(type, sr, frequency, dbgain, q);
-		if(type != prev_type) i.clearHistories();
+	for(int i=0; i < channels; i++) {
+		biquads[i]->configureBiquad(type, frequency, dbgain, q);
+		if(type != prev_type) biquads[i]->clearHistories();
 	}
 	prev_type = type;
 }
@@ -59,8 +67,8 @@ void BiquadNode::process() {
 	reconfigure(); //always reconfigure the biquad, so that properties are k-rate.
 	//doing this this way may make the algorithm morecache- friendly on some compilers/systems.
 	//It also avoids a large number of extraneous lookups in the vctor.
-	for(int j = 0; j < biquads.size(); j++) {
-		IIRFilter &bq = biquads[j];
+	for(int j = 0; j < channels; j++) {
+		IIRFilter &bq = *biquads[j];
 		for(unsigned int i = 0; i < block_size; i++) {
 			output_buffers[j][i] = bq.tick(input_buffers[j][i]);
 		}

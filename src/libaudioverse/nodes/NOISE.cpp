@@ -35,7 +35,9 @@ class NoiseNode: public Node {
 
 //we give the random number generator a fixed seed for debugging purposes.
 NoiseNode::NoiseNode(std::shared_ptr<Simulation> simulation): Node(Lav_OBJTYPE_NOISE_NODE, simulation, 0, 1),
-random_number_generator(1234), uniform_distribution(-1.0f, 1.0f)  {
+random_number_generator(1234), uniform_distribution(-1.0f, 1.0f),
+pinkifier(simulation->getSr()),
+brownifier(simulation->getSr()) {
 	/**We have to configure the pinkifier.
 This was originally taken from Spectral Audio processing by JOS.*/
 	//zeros

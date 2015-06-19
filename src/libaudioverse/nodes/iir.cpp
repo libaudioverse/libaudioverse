@@ -21,14 +21,18 @@ namespace libaudioverse_implementation {
 class IirNode: public Node {
 	public:
 	IirNode(std::shared_ptr<Simulation> simulation, int channels);
+	~IirNode();
 	virtual void process();
 	void setCoefficients(int numeratorLength, double* numerator, int denominatorLength, double* denominator, int shouldClearHistory);
-	std::vector<IIRFilter> filters;
+	IIRFilter** filters;
+	int channels;
 };
 
 IirNode::IirNode(std::shared_ptr<Simulation> simulation, int channels): Node(Lav_OBJTYPE_IIR_NODE, simulation, channels, channels) {
 	if(channels <= 0) throw LavErrorException(Lav_ERROR_RANGE);
-	filters.resize(channels);
+	this->channels=channels;
+	filters=new IIRFilter*[channels]();
+	for(int i= 0; i < channels; i++) filters[i] = new IIRFilter(simulation->getSr());
 	double defaultNumerator[] = {1.0};
 	double defaultDenominator[] = {1.0, 0.0}; //identity filter.
 	setCoefficients(1, defaultNumerator, 2, defaultDenominator, 1);
@@ -42,17 +46,22 @@ std::shared_ptr<Node> createIirNode(std::shared_ptr<Simulation> simulation, int 
 	return retval;
 }
 
+IirNode::~IirNode() {
+	for(int i = 0; i < channels; i++) delete filters[i];
+	delete[] filters;
+}
+
 void IirNode::process() {
-	for(unsigned int i = 0; i < filters.size(); i++) {
-		auto &f =filters[i];
+	for(unsigned int i = 0; i < channels; i++) {
+		auto &f = *filters[i];
 		for(int j = 0; j < block_size; j++) output_buffers[i][j] = f.tick(input_buffers[i][j]);
 	}
 }
 
 void IirNode::setCoefficients(int numeratorLength, double* numerator, int denominatorLength, double* denominator, int shouldClearHistory) {
-	for(auto &i: filters) {
-		i.configure(numeratorLength, numerator, denominatorLength, denominator);
-		if(shouldClearHistory !=0) i.clearHistories();
+	for(int i =0; i < channels; i++) {
+		filters[i]->configure(numeratorLength, numerator, denominatorLength, denominator);
+		if(shouldClearHistory !=0) filters[i]->clearHistories();
 	}
 }
 
