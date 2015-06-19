@@ -15,6 +15,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/kernels.hpp>
+#include <libaudioverse/private/iir.hpp>
 #include <limits>
 #include <algorithm>
 #include <random>
@@ -40,6 +41,9 @@ class LateReflectionsNode: public Node {
 	float* gains = nullptr;
 	float* output_frame=nullptr;
 	float* normalized_hadamard = nullptr;
+	//Filters for the band separation.
+	IIRFilter** highband_filters;
+	IIRFilter** lowband_filters;
 };
 
 LateReflectionsNode::LateReflectionsNode(std::shared_ptr<Simulation> simulation):
@@ -63,6 +67,14 @@ fdn(16, (1.0/50.0)*16.0, simulation->getSr()) {
 	//property callbacks.
 	getProperty(Lav_LATE_REFLECTIONS_T60).setPostChangedCallback([=] () {recompute();});
 	getProperty(Lav_LATE_REFLECTIONS_DENSITY).setPostChangedCallback([=](){recompute();});
+	//allocate the filters.
+	highband_filters=new IIRFilter*[16];
+	lowband_filters=new IIRFilter*[16];
+	for(int i = 0; i < 16; i++) {
+		highband_filters[i] = new IIRFilter(simulation->getSr());
+		lowband_filters[i] = new IIRFilter(simulation->getSr());
+	}
+	//initial configuration.
 	recompute();
 }
 
@@ -76,6 +88,12 @@ LateReflectionsNode::~LateReflectionsNode() {
 	freeArray(gains);
 	freeArray(output_frame);
 	freeArray(delays);
+	for(int i=0; i < 16; i++) {
+		delete highband_filters[i];
+		delete lowband_filters[i];
+	}
+	delete[] highband_filters;
+	delete[] lowband_filters;
 }
 
 void LateReflectionsNode::recompute() {
