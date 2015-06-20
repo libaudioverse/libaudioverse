@@ -20,14 +20,14 @@ properties:
       As an example, a carpetted cathedral would have a lower value than a small, concrete room.
   Lav_LATE_REFLECTIONS_HF_T60:
     type: float
-    name: hf_t60_ratio
+    name: hf_t60
     default: 0.3
     range: [0.0, INFINITY]
     doc_description: |
       The decay time of the high frequency band.
   Lav_LATE_REFLECTIONS_LF_T60:
     type: float
-    name: lf_t60_ratio
+    name: lf_t60
     default: 0.3
     range: [0.0, INFINITY]
     doc_description: |

@@ -38,11 +38,12 @@ class LateReflectionsNode: public Node {
 	void recompute();
 	FeedbackDelayNetwork fdn;
 	float* delays = nullptr;
-	float* gains = nullptr;
+	float *highband_gains = nullptr, *midband_gains=nullptr, *lowband_gains=nullptr;
 	float* output_frame=nullptr;
 	float* normalized_hadamard = nullptr;
 	//Filters for the band separation.
 	IIRFilter** highband_filters;
+	IIRFilter** midband_filters;
 	IIRFilter** lowband_filters;
 };
 
@@ -61,17 +62,29 @@ fdn(16, (1.0/50.0)*16.0, simulation->getSr()) {
 	fdn.setMatrix(normalized_hadamard);
 	//this is fixed...for now.
 	fdn.setDelayCrossfadingTime(0.1);
-	gains = allocArray<float>(16);
+	highband_gains=allocArray<float>(16);
+	midband_gains = allocArray<float>(16);
+	lowband_gains=allocArray<float>(16);
 	output_frame=allocArray<float>(16);
 	delays=allocArray<float>(16);
 	//property callbacks.
 	getProperty(Lav_LATE_REFLECTIONS_T60).setPostChangedCallback([=] () {recompute();});
 	getProperty(Lav_LATE_REFLECTIONS_DENSITY).setPostChangedCallback([=](){recompute();});
+	getProperty(Lav_LATE_REFLECTIONS_HF_T60).setPostChangedCallback([=] () {recompute();});
+	getProperty(Lav_LATE_REFLECTIONS_LF_T60).setPostChangedCallback([=] () {recompute();});
+	getProperty(Lav_LATE_REFLECTIONS_HF_REFERENCE).setPostChangedCallback([=] () {recompute();});
+	getProperty(Lav_LATE_REFLECTIONS_LF_REFERENCE).setPostChangedCallback([=] () {recompute();});
+	//range for hf and lf.
+	double nyquist=simulation->getSr()/2.0;
+	getProperty(Lav_LATE_REFLECTIONS_HF_REFERENCE).setFloatRange(0.0, nyquist);
+	getProperty(Lav_LATE_REFLECTIONS_LF_REFERENCE).setFloatRange(0.0, nyquist);
 	//allocate the filters.
 	highband_filters=new IIRFilter*[16];
+	midband_filters = new IIRFilter*[16];
 	lowband_filters=new IIRFilter*[16];
 	for(int i = 0; i < 16; i++) {
 		highband_filters[i] = new IIRFilter(simulation->getSr());
+		midband_filters[i] = new IIRFilter(simulation->getSr());
 		lowband_filters[i] = new IIRFilter(simulation->getSr());
 	}
 	//initial configuration.
@@ -85,15 +98,27 @@ std::shared_ptr<Node> createLateReflectionsNode(std::shared_ptr<Simulation> simu
 }
 
 LateReflectionsNode::~LateReflectionsNode() {
-	freeArray(gains);
+	freeArray(highband_gains);
+	freeArray(midband_gains);
+	freeArray(lowband_gains);
 	freeArray(output_frame);
 	freeArray(delays);
 	for(int i=0; i < 16; i++) {
 		delete highband_filters[i];
+		delete midband_filters[i];
 		delete lowband_filters[i];
 	}
 	delete[] highband_filters;
+	delete[] midband_filters;
 	delete[] lowband_filters;
+}
+
+double t60ToGain(double t60, double lineLength) {
+	double dbPerSec= -60.0/t60;
+	//Db decrease for one circulation of the delay line.
+	double dbPerPeriod = dbPerSec*lineLength;
+	//convert to a gain.
+	return pow(10, dbPerPeriod/20.0);
 }
 
 void LateReflectionsNode::recompute() {
@@ -102,6 +127,10 @@ void LateReflectionsNode::recompute() {
 	//Put another way, each delay line is contributing, on average, density reflections.
 	density /= 16.0;
 	float t60=getProperty(Lav_LATE_REFLECTIONS_T60).getFloatValue();
+	float t60_high =getProperty(Lav_LATE_REFLECTIONS_HF_T60).getFloatValue();
+	float t60_low =getProperty(Lav_LATE_REFLECTIONS_LF_T60).getFloatValue();
+	float hf_reference=getProperty(Lav_LATE_REFLECTIONS_HF_REFERENCE).getFloatValue();
+	float lf_reference = getProperty(Lav_LATE_REFLECTIONS_LF_REFERENCE).getFloatValue();
 	//The base delay is the amount we are delaying all delay lines by.
 	float base_delay=1.0f/density;
 	for(int i= 0; i < 16; i++) {
@@ -110,14 +139,20 @@ void LateReflectionsNode::recompute() {
 		delays[i] = (delay_percents[i]+1)*base_delay;
 	}
 	fdn.setDelays(delays);
-	//Amount of db decrease in one second.
-	double dbPerSec=-60.0/t60;
+	//configure the gains.
 	for(int i= 0; i < 16; i++) {
-		//Db decrease for one circulation of the delay line.
-		double dbPerPeriod = dbPerSec*delays[i];
-		//convert to a gain.
-		gains[i] = pow(10, dbPerPeriod/20.0);
+		lowband_gains[i] = t60ToGain(t60_low, delays[i]);
+		midband_gains[i] = t60ToGain(t60, delays[i]);
+		highband_gains[i] = t60ToGain(t60_high, delays[i]);
 	}
+	//Configure the filters.
+	double bandwidth = lf_reference-hf_reference;
+	for(int i = 0; i < 16; i++) {
+		lowband_filters[i]->configureBiquad(Lav_BIQUAD_TYPE_LOWPASS, lf_reference, 0.0, 0.5);
+		midband_filters[i]->configureBiquad(Lav_BIQUAD_TYPE_BANDPASS, lf_reference+bandwidth/2.0, 0.0, midband_filters[i]->qFromBw(lf_reference+bandwidth/2.0, bandwidth));
+		highband_filters[i]->configureBiquad(Lav_BIQUAD_TYPE_HIGHPASS, hf_reference, 0.0, 0.5);
+	}
+	printf("%f %f %f\n", lowband_gains[0], midband_gains[0], highband_gains[0]);
 }
 
 void LateReflectionsNode::process() {
@@ -125,7 +160,13 @@ void LateReflectionsNode::process() {
 		//Get the fdn's output.
 		fdn.computeFrame(output_frame);
 		for(int j= 0; j < 16; j++) output_buffers[j][i] = output_frame[j];
-		multiplicationKernel(16, gains, output_frame, output_frame);
+		for(int j=0; j < 16; j++)  {
+			double lg =lowband_gains[j], mg=midband_gains[j], hg=highband_gains[j];
+			float lp = lowband_filters[j]->tick(output_frame[j]);
+			float bp = midband_filters[j]->tick(output_frame[j]);
+			float hp = highband_filters[j]->tick(output_frame[j]);
+			output_frame[j] = lp*lg+bp*mg+hp*hg;
+		}
 		//bring in the inputs.
 		for(int j = 0; j < 16; j++) output_frame[j] += input_buffers[j][i];
 		fdn.advance(output_frame);
