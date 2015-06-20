@@ -24,6 +24,7 @@ class BiquadNode: public Node {
 	~BiquadNode();
 	void process();
 	void reconfigure();
+	void reset() override;
 	private:
 	IIRFilter** biquads;
 	int channels;
@@ -73,6 +74,10 @@ void BiquadNode::process() {
 			output_buffers[j][i] = bq.tick(input_buffers[j][i]);
 		}
 	}
+}
+
+void BiquadNode::reset() {
+	for(int i= 0; i < channels; i++) biquads[i]->clearHistories();
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_createBiquadNode(LavHandle simulationHandle, unsigned int channels, LavHandle* destination) {
