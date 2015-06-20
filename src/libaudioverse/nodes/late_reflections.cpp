@@ -153,8 +153,8 @@ void LateReflectionsNode::recompute() {
 		//We get the mid and high t60 gains, and turn them into db.
 		double highGain=t60ToGain(t60_high, delays[i]);
 		double midGain=t60ToGain(t60, delays[i]);
-		double highDb = scalarToDb(highGain, gains[i]);
 		double midDb=scalarToDb(midGain, gains[i]);
+		double highDb = scalarToDb(highGain, midGain);
 		//Careful reading of the audio eq cookbook reveals that when s=1, q is always sqrt(2).
 		//We add a very tiny bit to help against numerical error.
 		highshelves[i]->configureBiquad(Lav_BIQUAD_TYPE_HIGHSHELF, hf_reference, highDb, 1/sqrt(2.0)+1e-4);
