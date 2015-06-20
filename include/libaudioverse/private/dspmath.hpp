@@ -11,4 +11,12 @@ int ringmodi(int dividend, int divisor);
 float ringmodf(float dividend, float divisor);
 double ringmod(double dividend,double divisor);
 
+//Work with decibals.
+//These two are for gain conversions, and assume 0 db is 1.0.
+double gainToDb(double gain);
+double dbToGain(double gain);
+
+double scalarToDb(double scalar, double reference);
+double dbToScalar(double db, double reference);
+
 }

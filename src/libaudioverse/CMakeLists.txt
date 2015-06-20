@@ -56,6 +56,7 @@ file_io/file_writer.cpp
 #classes and functionality for DSp that are stateful, and miscellaneous DSP-related math functions.
 dsp/ringmod.cpp
 dsp/iir.cpp
+dsp/db.cpp
 
 #the metadata store
 #It appears that CMake dies hard if this isn't an absolute path.
