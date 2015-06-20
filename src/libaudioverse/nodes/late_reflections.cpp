@@ -22,7 +22,20 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 namespace libaudioverse_implementation {
 
+/**Algorithm explanation:
+This algorithm consists of a 16-line FDN and two highshelf filters inserted in the feedback:
+fdn->mid_highshelf->high_highshelf->fdn
+
+We compute individual gains for each line, using math taken from Physical Audio Processing by JOS.
+
+These gains are the "low band", and two shelving filters are then applied to shape the remaining two bands.
+
+Unfortunately, the biquad formulas for lowshelf are unstable at low frequencies, something which needs debugging.
+Consequently, we have to start from the lowest band and move up with highshelves.
+*/
+
 //Delay line offsets as percents.
+//This table is hand-crafted so that we have a predictable algorithm.
 const float delay_percents[16] = {
 0.0, -0.21, 0.12, -0.13,
 0.256, -0.349, 0.513, -0.515,
@@ -43,8 +56,8 @@ class LateReflectionsNode: public Node {
 	float* output_frame=nullptr;
 	float* normalized_hadamard = nullptr;
 	//Filters for the band separation.
-	IIRFilter** highshelves;
-	IIRFilter** midshelves;
+	IIRFilter** highshelves; //Shapes from mid to high band.
+	IIRFilter** midshelves; //Shapes from low to mid band.
 };
 
 LateReflectionsNode::LateReflectionsNode(std::shared_ptr<Simulation> simulation):
