@@ -44,7 +44,7 @@ class LateReflectionsNode: public Node {
 	float* normalized_hadamard = nullptr;
 	//Filters for the band separation.
 	IIRFilter** highshelves;
-	IIRFilter** lowshelves;
+	IIRFilter** midshelves;
 };
 
 LateReflectionsNode::LateReflectionsNode(std::shared_ptr<Simulation> simulation):
@@ -78,10 +78,10 @@ fdn(16, (1.0/50.0)*16.0, simulation->getSr()) {
 	getProperty(Lav_LATE_REFLECTIONS_LF_REFERENCE).setFloatRange(0.0, nyquist);
 	//allocate the filters.
 	highshelves=new IIRFilter*[16];
-	lowshelves = new IIRFilter*[16];
+	midshelves = new IIRFilter*[16];
 	for(int i = 0; i < 16; i++) {
 		highshelves[i] = new IIRFilter(simulation->getSr());
-		lowshelves[i] = new IIRFilter(simulation->getSr());
+		midshelves[i] = new IIRFilter(simulation->getSr());
 	}
 	//initial configuration.
 	recompute();
@@ -99,10 +99,10 @@ LateReflectionsNode::~LateReflectionsNode() {
 	freeArray(delays);
 	for(int i=0; i < 16; i++) {
 		delete highshelves[i];
-		delete lowshelves[i];
+		delete midshelves[i];
 	}
 	delete[] highshelves;
-	delete[] lowshelves;
+	delete[] midshelves;
 }
 
 double t60ToGain(double t60, double lineLength) {
@@ -133,19 +133,19 @@ void LateReflectionsNode::recompute() {
 	fdn.setDelays(delays);
 	//configure the gains.
 	for(int i= 0; i < 16; i++) {
-		gains[i] = t60ToGain(t60, delays[i]);
+		gains[i] = t60ToGain(t60_low, delays[i]);
 	}
 	//Configure the filters.
 	for(int i = 0; i < 16; i++) {
-		//We get the low and high t60 gains, and turn them into db.k
+		//We get the mid and high t60 gains, and turn them into db.
 		double highGain=t60ToGain(t60_high, delays[i]);
-		double lowGain=t60ToGain(t60_low, delays[i]);
+		double midGain=t60ToGain(t60, delays[i]);
 		double highDb = scalarToDb(highGain, gains[i]);
-		double lowDb=scalarToDb(lowGain, gains[i]);
+		double midDb=scalarToDb(midGain, gains[i]);
 		//Careful reading of the audio eq cookbook reveals that when s=1, q is always sqrt(2).
 		//We add a very tiny bit to help against numerical error.
 		highshelves[i]->configureBiquad(Lav_BIQUAD_TYPE_HIGHSHELF, hf_reference, highDb, 1/sqrt(2.0)+1e-4);
-		lowshelves[i]->configureBiquad(Lav_BIQUAD_TYPE_LOWSHELF, lf_reference, lowDb, 1.0/sqrt(2.0)+1e-4);
+		midshelves[i]->configureBiquad(Lav_BIQUAD_TYPE_HIGHSHELF, lf_reference, midDb, 1.0/sqrt(2.0)+1e-4);
 	}
 }
 
@@ -156,7 +156,7 @@ void LateReflectionsNode::process() {
 		for(int j= 0; j < 16; j++) output_buffers[j][i] = output_frame[j];
 		for(int j=0; j < 16; j++)  {
 			//Through the highshelf, then the lowshelf.
-			output_frame[j] = lowshelves[j]->tick(highshelves[j]->tick(gains[j]*output_frame[j]));
+			output_frame[j] = midshelves[j]->tick(highshelves[j]->tick(gains[j]*output_frame[j]));
 		}
 		//bring in the inputs.
 		for(int j = 0; j < 16; j++) output_frame[j] += input_buffers[j][i];
@@ -167,7 +167,7 @@ void LateReflectionsNode::process() {
 void LateReflectionsNode::reset() {
 	fdn.reset();
 	for(int i = 0; i < 16; i++) {
-		lowshelves[i]->clearHistories();
+		midshelves[i]->clearHistories();
 		highshelves[i]->clearHistories();
 	}
 }
