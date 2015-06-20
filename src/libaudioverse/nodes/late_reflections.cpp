@@ -142,8 +142,10 @@ void LateReflectionsNode::recompute() {
 		double lowGain=t60ToGain(t60_low, delays[i]);
 		double highDb = scalarToDb(highGain, gains[i]);
 		double lowDb=scalarToDb(lowGain, gains[i]);
-		highshelves[i]->configureBiquad(Lav_BIQUAD_TYPE_HIGHSHELF, hf_reference, highDb, highshelves[i]->qFromS(highDb, 1.0));
-		lowshelves[i]->configureBiquad(Lav_BIQUAD_TYPE_LOWSHELF, lf_reference, lowDb, lowshelves[i]->qFromS(lowDb, 1.0));
+		//Careful reading of the audio eq cookbook reveals that when s=1, q is always sqrt(2).
+		//We add a very tiny bit to help against numerical error.
+		highshelves[i]->configureBiquad(Lav_BIQUAD_TYPE_HIGHSHELF, hf_reference, highDb, 1/sqrt(2.0)+1e-4);
+		lowshelves[i]->configureBiquad(Lav_BIQUAD_TYPE_LOWSHELF, lf_reference, lowDb, 1.0/sqrt(2.0)+1e-4);
 	}
 }
 
