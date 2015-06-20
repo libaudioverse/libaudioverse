@@ -13,6 +13,8 @@ class IIRFilter {
 	void clearHistories();
 	void configureBiquad(int type, double frequency, double dbGain, double q);
 	double qFromBw(double frequency, double bw);
+	double qFromS(double frequency, double s);
+	
 	private:
 	double *history = nullptr, *recursion_history = nullptr, *numerator = nullptr, *denominator = nullptr;
 	int numerator_length = 0, denominator_length = 0;

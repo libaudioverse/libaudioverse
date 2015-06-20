@@ -167,4 +167,9 @@ double IIRFilter::qFromBw(double frequency, double bw) {
 	return 1.0/qRecip;
 }
 
+double IIRFilter::qFromS(double dbgain, double s) {
+	double a=pow(10.0, dbgain/40.0);
+	return sqrt((a+1/a)*(1/s-1) + 2);
+}
+
 }
