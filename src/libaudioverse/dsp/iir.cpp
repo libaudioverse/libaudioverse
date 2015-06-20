@@ -74,76 +74,81 @@ void IIRFilter::configureBiquad(int type, double frequency, double dbGain, doubl
 	double fs = sr;
 	double f0 = frequency;
 	//only common intermediate variable for all of these.
-	double w0 = 2.0*PI*f0/fs;
-	double alpha = sin(w0) / (2.0 * q);
+	double omega = 2.0*PI*f0/fs;
+	double sinv=sin(omega);
+	double cosv=cos(omega);
+	double alpha = sinv/ (2.0 * q);
 	double  a = sqrt(pow(10, dbGain/20.0)); //this is recalculated for 3 special cases later.
+	double beta = 0.0; //recomputed below.
 	switch(type) {
 		case Lav_BIQUAD_TYPE_LOWPASS:
-		b0 = (1 - cos(w0))/2.0;
-		b1 = 1 - cos(w0);
-		b2 = (1 - cos(w0)) /2.0;
+		b0 = (1 - cosv)/2.0;
+		b1 = 1 - cosv;
+		b2 = (1 -cosv) /2.0;
 		a0 = 1 + alpha;
-		a1 = -2.0 * cos(w0);
+		a1 = -2.0 * cosv;
 		a2 = 1 - alpha;
 		break;
 		case Lav_BIQUAD_TYPE_HIGHPASS:
-		b0 = (1 + cos(w0))/2.0;
-		b1 = -(1 + cos(w0));
-		b2 = (1 + cos(w0)) / 2.0;
+		b0 = (1 + cosv)/2.0;
+		b1 = -(1 + cosv);
+		b2 = (1 + cosv) / 2.0;
 		a0 = 1 + alpha;
-		a1 = -2.0*cos(w0);
+		a1 = -2.0*cosv;
 		a2 = 1 - alpha;
 		break;
 		case Lav_BIQUAD_TYPE_BANDPASS:
-		b0 = sin(w0) / 2.0;
+		b0 = alpha;
 		b1 = 0;
-		b2 = -sin(w0)/2.0;
+		b2 = -alpha;
 		a0 = 1 + alpha;
-		a1 = -2.0*cos(w0);
+		a1 = -2.0*cosv;
 		a2 = 1 - alpha;
 		break;
 		case Lav_BIQUAD_TYPE_NOTCH:
 		b0 = 1;
-		b1 = -2.0 * cos(w0);
+		b1 = -2.0 * cosv;
 		b2 = 1.0;
 		a0 = 1 + alpha;
-		a1 = -2.0 * cos(w0);
+		a1 = -2.0 * cosv;
 		a2 = 1 - alpha;
 		break;
 		case Lav_BIQUAD_TYPE_ALLPASS:
 		b0 = 1 - alpha;
-		b1 = -2.0 * cos(w0);
+		b1 = -2.0 * cosv;
 		b2 = 1 + alpha;
 		a0 = 1 + alpha;
-		a1 = -2.0 * cos(w0);
+		a1 = -2.0 * cosv;
 		a2 = 1 - alpha;
 		break;
 		case Lav_BIQUAD_TYPE_PEAKING:
 		a = pow(10, dbGain/40.0);
 		b0 = 1 + alpha*a;
-		b1 = -2.0 * cos(w0);
+		b1 = -2.0 * cosv;
 		b2 = 1 - alpha * a;
 		a0 = 1 + alpha / a;
-		a1 = -2.0 * cos(w0);
+		a1 = -2.0 * cosv;
 		a2 = 1 - alpha / a;
 		break;
 		case Lav_BIQUAD_TYPE_LOWSHELF:
 		a = pow(10, dbGain/40.0);
-		b0 = a*((a+1) - (a - 1)*cos(w0) + 2.0 * sqrt(a) * alpha);
-		b1 = 2 * a * ((a - 1) - (a + 1) * cos(w0));
-		b2 = a * ((a + 1) - (a - 1) * cos(w0) - 2.0 * sqrt(a)*alpha);
-		a0 = (a + 1) + (a - 1)*cos(w0) + 2*sqrt(a)*alpha;
-		a1 = -2.0*((a - 1)+ (a+1) * cos(w0));
-		a2 = (a + 1) - (a - 1)*cos(w0) - 2*sqrt(a)*alpha;
+		beta = sqrt(a)/q;
+		b0 = a*((a+1) - (a - 1)*cosv + beta*sinv);
+		b1 = 2 * a * ((a - 1) - (a + 1) * cosv);
+		b2 = a * ((a + 1) - (a - 1) * cosv - beta*sinv);
+		a0 = (a + 1) + (a - 1)*cosv + beta*sinv;
+		a1 = -2.0*((a - 1)+ (a+1) * cosv);
+		a2 = (a + 1) - (a - 1)*cosv-beta*sinv;
 		break;
 		case Lav_BIQUAD_TYPE_HIGHSHELF:
 		a = pow(10, dbGain/40.0);
-		b0 = a*((a+1)+(a-1)*cos(w0) + 2*sqrt(a)*alpha);
-		b1 = -2.0*a*((a - 1)+(a+1)*cos(w0));
-		b2 = a*((a+1)+(a-1)*cos(w0)-2*sqrt(a)*alpha);
-		a0 = (a+1) - (a - 1)*cos(w0) + 2*sqrt(a)*alpha;
-		a1 = 2.0*((a-1)-(a+1)*cos(w0));
-		a2 = (a+1)-(a-1)*cos(w0)-2*sqrt(a)*alpha;
+		beta =sqrt(a)/q;
+		b0 = a*((a+1)+(a-1)*cosv + beta*sinv);
+		b1 = -2.0*a*((a - 1)+(a+1)*cosv);
+		b2 = a*((a+1)+(a-1)*cosv-beta*sinv);
+		a0 = (a+1) - (a - 1)*cosv+beta*sinv;
+		a1 = 2.0*((a-1)-(a+1)*cosv);
+		a2 = (a+1)-(a-1)*cosv-beta*sinv;
 		break;
 		case Lav_BIQUAD_TYPE_IDENTITY:
 		b0 = 1;
@@ -161,9 +166,9 @@ void IIRFilter::configureBiquad(int type, double frequency, double dbGain, doubl
 }
 
 double IIRFilter::qFromBw(double frequency, double bw) {
-	double w0 = 2*PI*frequency/sr;
+	double omega = 2*PI*frequency/sr;
 	//from audio eq cookbook.
-	double qRecip=2*sinh(log(2)/2*bw*w0/sin(w0));
+	double qRecip=2*sinh(log(2)/2*bw*omega/sin(omega));
 	return 1.0/qRecip;
 }
 
