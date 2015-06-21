@@ -79,13 +79,14 @@ void ThreeBandEqNode::recompute() {
 	double midbandDb=getProperty(Lav_THREE_BAND_EQ_MIDBAND_DBGAIN).getFloatValue();
 	double highbandFreq = getProperty(Lav_THREE_BAND_EQ_HIGHBAND_FREQUENCY).getFloatValue();
 	double highbandDb= getProperty(Lav_THREE_BAND_EQ_HIGHBAND_DBGAIN).getFloatValue();
-	double midbandFreq=(highbandFreq-lowbandFreq);
+	double midbandFreq = lowbandFreq+(highbandFreq-lowbandFreq)/2.0;
 	//low band's gain is the simplest.
 	lowband_gain=dbToScalar(lowbandDb, 1.0);
 	//The peaking filter for the middle band needs to go from lowbandDb to midbandDb, i.e.:
 	double peakingDbgain =midbandDb-lowbandDb;
 	//And the highband needs to go from the middle band to the high.
 	double highshelfDbgain=highbandDb-midbandDb;
+	printf("%f %f %f %f\n", lowband_gain, lowbandDb, peakingDbgain, highshelfDbgain);
 	//Compute q from bw and s, using an arbetrary IIR filter.
 	//The iir filters only care about sr, so we can just pick one.
 	double peakingQ=midband_peaks[0]->qFromBw(midbandFreq, (highbandFreq-midbandFreq)*2);
@@ -101,12 +102,16 @@ void ThreeBandEqNode::process() {
 		auto &peak= *midband_peaks[channel];
 		auto &shelf = *highband_shelves[channel];
 		for(int i= 0; i < block_size; i++) {
-			output_buffers[channel][i] = peak.tick(shelf.tick(lowband_gain*input_buffers[channel][i]));
+			output_buffers[channel][i] = lowband_gain*peak.tick(shelf.tick(input_buffers[channel][i]));
 		}
 	}
 }
 
 void ThreeBandEqNode::reset() {
+	for(int i = 0; i < channels; i++) {
+		midband_peaks[i]->clearHistories();
+		highband_shelves[i]->clearHistories();
+	}
 }
 
 //begin public api
