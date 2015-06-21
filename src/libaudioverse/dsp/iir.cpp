@@ -166,10 +166,7 @@ void IIRFilter::configureBiquad(int type, double frequency, double dbGain, doubl
 }
 
 double IIRFilter::qFromBw(double frequency, double bw) {
-	double omega = 2*PI*frequency/sr;
-	//from audio eq cookbook.
-	double qRecip=2*sinh(log(2)/2*bw*omega/sin(omega));
-	return 1.0/qRecip;
+	return frequency/bw;
 }
 
 double IIRFilter::qFromS(double dbgain, double s) {
