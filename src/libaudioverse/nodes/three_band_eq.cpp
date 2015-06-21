@@ -44,6 +44,14 @@ ThreeBandEqNode::ThreeBandEqNode(std::shared_ptr<Simulation> simulation, int cha
 		midband_peaks[i] = new IIRFilter(simulation->getSr());
 		highband_shelves[i] = new IIRFilter(simulation->getSr());
 	}
+	//set the callbacks.
+	multisetPostChangedCallback(this,
+	[=] () {recompute();},
+	Lav_THREE_BAND_EQ_LOWBAND_DBGAIN,
+	Lav_THREE_BAND_EQ_LOWBAND_FREQUENCY,
+	Lav_THREE_BAND_EQ_MIDBAND_DBGAIN,
+	Lav_THREE_BAND_EQ_HIGHBAND_DBGAIN,
+	Lav_THREE_BAND_EQ_HIGHBAND_FREQUENCY);
 }
 
 std::shared_ptr<Node> createThreeBandEqNode(std::shared_ptr<Simulation> simulation, int channels) {

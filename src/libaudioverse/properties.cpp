@@ -588,4 +588,9 @@ Property* createBufferProperty(const char* name) {
 	return prop;
 }
 
+//base case for the multisetPostChangedCallback template.
+void multisetPostChangedCallback(Node* node, std::function<void(void)> cb, int property) {
+	node->getProperty(property).setPostChangedCallback(cb);
+}
+
 }

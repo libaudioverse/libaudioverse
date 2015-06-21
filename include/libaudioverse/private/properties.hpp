@@ -194,4 +194,18 @@ Property* createIntArrayProperty(const char* name, unsigned int minLength, unsig
 Property* createFloatArrayProperty(const char* name, unsigned int minLength, unsigned int maxLength, unsigned int defaultLength, float min, float max, float* defaultData);
 Property* createBufferProperty(const char* name);
 
+//The following templates allow setting the post changed callback 
+//First, the base case, one property on one node.
+//This has to be in the .cpp file so we can use Node.
+void multisetPostChangedCallback(Node* node, std::function<void(void)> cb, int property);
+
+//The not-base case:
+template<typename... Args>
+void multisetPostChangedCallback(Node* node, std::function<void(void)> cb, int first, Args... args) {
+	//call the base case.
+	multisetPostChangedCallback(node, cb, first);
+	//and recurse into ourselves.
+	multisetPostChangedCallback(node, cb, args...);
+}
+
 }
