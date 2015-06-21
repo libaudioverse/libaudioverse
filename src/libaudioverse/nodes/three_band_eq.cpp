@@ -62,6 +62,26 @@ ThreeBandEqNode::~ThreeBandEqNode() {
 }
 
 void ThreeBandEqNode::recompute() {
+	double lowbandFreq=getProperty(Lav_THREE_BAND_EQ_LOWBAND_FREQUENCY).getFloatValue();
+	double lowbandDb=getProperty(Lav_THREE_BAND_EQ_LOWBAND_DBGAIN).getFloatValue();
+	double midbandDb=getProperty(Lav_THREE_BAND_EQ_MIDBAND_DBGAIN).getFloatValue();
+	double highbandFreq = getProperty(Lav_THREE_BAND_EQ_HIGHBAND_FREQUENCY).getFloatValue();
+	double highbandDb= getProperty(Lav_THREE_BAND_EQ_HIGHBAND_DBGAIN).getFloatValue();
+	double midbandFreq=(highbandFreq-lowbandFreq);
+	//low band's gain is the simplest.
+	lowband_gain=dbToScalar(lowbandDb, 1.0);
+	//The peaking filter for the middle band needs to go from lowbandDb to midbandDb, i.e.:
+	double peakingDbgain =midbandDb-lowbandDb;
+	//And the highband needs to go from the middle band to the high.
+	double highshelfDbgain=highbandDb-midbandDb;
+	//Compute q from bw and s, using an arbetrary IIR filter.
+	//The iir filters only care about sr, so we can just pick one.
+	double peakingQ=midband_peaks[0]->qFromBw(midbandFreq, (highbandFreq-midbandFreq)*2);
+	double highshelfQ = highband_shelves[0]->qFromS(highbandFreq, 1.0);
+	for(int i = 0; i < channels; i++) {
+		midband_peaks[i]->configureBiquad(Lav_BIQUAD_TYPE_PEAKING, midbandFreq, peakingDbgain, peakingQ);
+		highband_shelves[i]->configureBiquad(Lav_BIQUAD_TYPE_HIGHSHELF, highbandFreq, highshelfDbgain, highshelfQ);
+	}
 }
 
 void ThreeBandEqNode::process() {
