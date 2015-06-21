@@ -105,6 +105,7 @@ nodes/recorder.cpp
 nodes/convolver.cpp
 nodes/fft_convolver.cpp
 nodes/late_reflections.cpp
+nodes/three_band_eq.cpp
 
 #automators
 automators/automators.cpp
