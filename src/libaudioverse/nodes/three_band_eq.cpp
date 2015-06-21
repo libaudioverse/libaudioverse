@@ -23,17 +23,27 @@ namespace libaudioverse_implementation {
 class ThreeBandEqNode: public Node {
 	public:
 	ThreeBandEqNode(std::shared_ptr<Simulation> simulation, int channels);
+	~ThreeBandEqNode();
 	void recompute();
 	virtual void process() override;
 	virtual void reset() override;
+	float lowband_gain;
 	IIRFilter** midband_peaks= nullptr;
 	IIRFilter** highband_shelves = nullptr;
 	int channels;
 };
 
 ThreeBandEqNode::ThreeBandEqNode(std::shared_ptr<Simulation> simulation, int channels): Node(Lav_OBJTYPE_THREE_BAND_EQ_NODE, simulation, channels, channels) {
+	if(channels <= 0) throw LavErrorException(Lav_ERROR_RANGE);
 	appendInputConnection(0, channels);
 	appendOutputConnection(0, channels);
+	this->channels=channels;
+	midband_peaks = new IIRFilter*[channels];
+	highband_shelves= new IIRFilter*[channels];
+	for(int i = 0; i < channels; i++) {
+		midband_peaks[i] = new IIRFilter(simulation->getSr());
+		highband_shelves[i] = new IIRFilter(simulation->getSr());
+	}
 }
 
 std::shared_ptr<Node> createThreeBandEqNode(std::shared_ptr<Simulation> simulation, int channels) {
@@ -42,10 +52,26 @@ std::shared_ptr<Node> createThreeBandEqNode(std::shared_ptr<Simulation> simulati
 	return retval;
 }
 
+ThreeBandEqNode::~ThreeBandEqNode() {
+	for(int i = 0; i < channels; i++) {
+		delete midband_peaks[i];
+		delete highband_shelves[i];
+	}
+	delete[] midband_peaks;
+	delete[] highband_shelves;
+}
+
 void ThreeBandEqNode::recompute() {
 }
 
 void ThreeBandEqNode::process() {
+	for(int channel=0; channel < channels; channel++) {
+		auto &peak= *midband_peaks[channel];
+		auto &shelf = *highband_shelves[channel];
+		for(int i= 0; i < block_size; i++) {
+			output_buffers[channel][i] = peak.tick(shelf.tick(lowband_gain*input_buffers[channel][i]));
+		}
+	}
 }
 
 void ThreeBandEqNode::reset() {
