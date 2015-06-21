@@ -52,6 +52,9 @@ ThreeBandEqNode::ThreeBandEqNode(std::shared_ptr<Simulation> simulation, int cha
 	Lav_THREE_BAND_EQ_MIDBAND_DBGAIN,
 	Lav_THREE_BAND_EQ_HIGHBAND_DBGAIN,
 	Lav_THREE_BAND_EQ_HIGHBAND_FREQUENCY);
+	//Set ranges of the nyqiuist properties.
+	getProperty(Lav_THREE_BAND_EQ_HIGHBAND_FREQUENCY).setFloatRange(0.0, simulation->getSr()/2.0);
+	getProperty(Lav_THREE_BAND_EQ_LOWBAND_FREQUENCY).setFloatRange(0.0, simulation->getSr()/2.0);
 	recompute();
 }
 
