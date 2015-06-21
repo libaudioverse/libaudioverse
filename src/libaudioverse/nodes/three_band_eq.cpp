@@ -86,7 +86,6 @@ void ThreeBandEqNode::recompute() {
 	double peakingDbgain =midbandDb-lowbandDb;
 	//And the highband needs to go from the middle band to the high.
 	double highshelfDbgain=highbandDb-midbandDb;
-	printf("%f %f %f %f\n", lowband_gain, lowbandDb, peakingDbgain, highshelfDbgain);
 	//Compute q from bw and s, using an arbetrary IIR filter.
 	//The iir filters only care about sr, so we can just pick one.
 	double peakingQ=midband_peaks[0]->qFromBw(midbandFreq, (highbandFreq-midbandFreq)*2);
