@@ -52,6 +52,7 @@ ThreeBandEqNode::ThreeBandEqNode(std::shared_ptr<Simulation> simulation, int cha
 	Lav_THREE_BAND_EQ_MIDBAND_DBGAIN,
 	Lav_THREE_BAND_EQ_HIGHBAND_DBGAIN,
 	Lav_THREE_BAND_EQ_HIGHBAND_FREQUENCY);
+	recompute();
 }
 
 std::shared_ptr<Node> createThreeBandEqNode(std::shared_ptr<Simulation> simulation, int channels) {
