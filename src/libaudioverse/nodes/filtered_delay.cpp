@@ -24,6 +24,7 @@ class FilteredDelayNode: public Node {
 	FilteredDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, unsigned int channels);
 	~FilteredDelayNode();
 	void process();
+	void reset() override;
 	protected:
 	void delayChanged();
 	void recomputeDelta();
@@ -116,6 +117,13 @@ void FilteredDelayNode::process() {
 				line.advance(input_buffers[output][i]+output_buffers[output][i]*feedback);
 			}
 		}
+	}
+}
+
+void FilteredDelayNode::reset() {
+	for(int i = 0; i < channels; i++) {
+		biquads[i]->clearHistories();
+		lines[i]->reset();
 	}
 }
 
