@@ -26,6 +26,7 @@ def cleanup_property(i):
 	i['doc_description'] = i.get('doc_description', 'No description available.')
 	i['is_dynamic'] = i.get('is_dynamic', False)
 	i['read_only'] = i.get('read_only', False)
+	i['rate'] = i.get('rate', 'k')
 
 def cleanup_callback(all_info, name, callback, for_node):
 	#We need two things: the name of the setter and the function object for the underlying typedef.
