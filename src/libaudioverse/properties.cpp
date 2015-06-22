@@ -440,7 +440,11 @@ void Property::setPostChangedCallback(std::function<void(void)> cb) {
 
 bool Property::needsARate() {
 	//This is not reliable until the property is ticked, which shouldn't be a problem.
-	return should_use_value_buffer;
+	return allows_arate && should_use_value_buffer;
+}
+
+void Property::enableARate() {
+	allows_arate = true;
 }
 
 void Property::tick() {
@@ -448,6 +452,8 @@ void Property::tick() {
 	//This is needed because of forwarding.
 	if(last_ticked==simulation->getTickCount()) return;
 	last_ticked=simulation->getTickCount();
+	//used for the post-changed callback.
+	bool modified=false;
 	if(type !=Lav_PROPERTYTYPE_FLOAT && type != Lav_PROPERTYTYPE_DOUBLE) return; //nothing to do for other types.
 	//we don't know for sure if we want this yet, so reset it.
 	should_use_value_buffer = false;
@@ -464,6 +470,7 @@ void Property::tick() {
 			}
 			else value_buffer[i] = last;
 		}
+		modified=true;
 	}
 	//We might have nodes:
 	if(incoming_nodes->getConnectedNodeCount()) {
@@ -476,7 +483,10 @@ void Property::tick() {
 		incoming_nodes->addNodeless(&node_buffer, true); //downmix to mono.
 		for(int i = 0; i < block_size; i++) value_buffer[i]+=node_buffer[i];
 		should_use_value_buffer =true;
+		modified=true;
 	}
+	//if we modified and have a callback, call it.
+	if(modified && post_changed_callback) post_changed_callback();
 	//Time advances 
 	time += block_size/sr;
 	//If we have automators and the last automator is done, free all of them and clear the list.

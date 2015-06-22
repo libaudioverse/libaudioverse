@@ -147,6 +147,8 @@ class Property {
 	//In other words, can we optimize the application by not computing the same thing over and over?
 	//Very important for add and mul.
 	bool needsARate();
+	//Called by metadata.cpp to enable arate.
+	void enableARate();
 
 	//Advance time for this property 
 	void tick();
@@ -154,6 +156,7 @@ class Property {
 	//get/set dynamic range status.
 	bool getHasDynamicRange();
 	void setHasDynamicRange(bool v);
+
 
 	private:
 	int type, tag;
@@ -170,6 +173,7 @@ class Property {
 	std::shared_ptr<Simulation> simulation;
 
 	//These are for automation and node connections:
+	bool allows_arate = false;
 	int block_size= 0;
 	unsigned int automator_index = 0;
 	double time = 0.0, sr = 0.0;
