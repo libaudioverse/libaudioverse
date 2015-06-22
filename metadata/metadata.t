@@ -74,6 +74,10 @@ void initializeMetadata() {
 	{%endif%}
 	tempProp->setReadOnly(<%prop['read_only']|lower%>);
 	tempProp->setHasDynamicRange(<%prop['is_dynamic']|lower%>);
+	{#Handle a-rate.#}
+	{%if prop['rate'] == 'a'%}
+	tempProp->enableARate();
+	{%endif%}
 	{#Use the copy constructor to put this into the default instances#}
 	(*default_property_instances)[std::tuple<int, int>(<%objid%>, <%propid%>)] = *tempProp;
 	delete tempProp;
