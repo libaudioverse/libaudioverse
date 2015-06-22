@@ -4,6 +4,7 @@ properties:
     type: float
     default: 440.0
     range: [0, INFINITY]
+    rate: a
     doc_description: |
       The frequency of the sine wave in HZ.
   Lav_SINE_PHASE:
