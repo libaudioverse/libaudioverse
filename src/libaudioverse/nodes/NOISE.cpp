@@ -26,7 +26,7 @@ class NoiseNode: public Node {
 	void white();
 	void pink();
 	void brown();
-	std::mt19937_64 random_number_generator;
+	std::minstd_rand random_number_generator;
 	std::uniform_real_distribution<float> uniform_distribution;
 	IIRFilter pinkifier; //filter to turn white noise into pink noise.
 	IIRFilter brownifier; //and likewise for brown.
