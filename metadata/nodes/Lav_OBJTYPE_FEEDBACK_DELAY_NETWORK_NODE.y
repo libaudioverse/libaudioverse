@@ -31,12 +31,14 @@ extra_functions:
     params:
       count: The number of delays.  This must match the FDN's internal delay count as set by the constructor.
       values: The new values for the delays.
-inputs:
-  - [constructor, "The input to the FDN."]
-outputs:
-  - [constructor, "The output of the FDN."]
+inputs: described
+outputs: described
 doc_name: feedback delay network
 doc_description: |
   Implements a feedback delay network.
   This is possibly the single-most complicated node in Libaudioverse, and full documentation of it goes well beyond the manual.
   Unless you know  what a  feedback delay network is and have a specific reason for using one, this node will probably not help you.
+
+  This node has `n` inputs and outputs, where `n` is the `lines` parameter to the constructor.
+  Each input and output pair represent the input and output of a specific delay line, respectively.
+  

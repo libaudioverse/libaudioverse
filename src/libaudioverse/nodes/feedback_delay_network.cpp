@@ -29,8 +29,10 @@ Node(Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK_NODE, simulation, lines, lines) {
 	gains = allocArray<float>(lines);
 	for(int i = 0; i < lines; i++) gains[i] = 1.0f;
 	getProperty(Lav_FDN_MAX_DELAY).setFloatValue(maxDelay);
-	appendInputConnection(0, lines);
-	appendOutputConnection(0, lines);
+	for(int i= 0; i < lines; i++) {
+		appendInputConnection(i, 1);
+		appendOutputConnection(i, 1);
+	}
 }
 
 FeedbackDelayNetworkNode::~FeedbackDelayNetworkNode() {
