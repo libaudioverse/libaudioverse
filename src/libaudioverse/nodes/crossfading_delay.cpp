@@ -37,10 +37,6 @@ CrossfadingDelayNode::CrossfadingDelayNode(std::shared_ptr<Simulation> simulatio
 	lines = new CrossfadingDelayLine*[lineCount];
 	for(unsigned int i = 0; i < lineCount; i++) lines[i] = new CrossfadingDelayLine(maxDelay, simulation->getSr());
 	getProperty(Lav_DELAY_DELAY).setFloatRange(0.0f, maxDelay);
-	getProperty(Lav_DELAY_INTERPOLATION_TIME).setPostChangedCallback([this] () {recomputeDelta();});
-	getProperty(Lav_DELAY_DELAY).setPostChangedCallback([this] () {delayChanged();});
-	recomputeDelta();
-	delayChanged();
 	//finally, set the read-only max delay.
 	getProperty(Lav_DELAY_DELAY_MAX).setFloatValue(maxDelay);
 	appendInputConnection(0, lineCount);
@@ -68,6 +64,8 @@ void CrossfadingDelayNode::delayChanged() {
 }
 
 void CrossfadingDelayNode::process() {
+	if(werePropertiesModified(this, Lav_DELAY_DELAY)) delayChanged();
+	if(werePropertiesModified(this, Lav_DELAY_INTERPOLATION_TIME)) recomputeDelta();
 	float feedback = getProperty(Lav_DELAY_FEEDBACK).getFloatValue();
 	//optimize the common case of not having feedback.
 	//the only difference between these blocks is in the advance line.
