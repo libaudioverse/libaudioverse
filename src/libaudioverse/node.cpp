@@ -134,7 +134,6 @@ void Node::doMaintenance() {
 
 /*Default Processing function.*/
 void Node::process() {
-	zeroOutputBuffers();
 }
 
 void Node::zeroOutputBuffers() {
