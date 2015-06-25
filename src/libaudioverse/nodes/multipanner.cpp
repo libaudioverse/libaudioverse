@@ -26,6 +26,7 @@ class MultipannerNode: public SubgraphNode {
 	std::shared_ptr<Node> hrtf_panner = nullptr, amplitude_panner = nullptr, input= nullptr, current_panner = nullptr;
 	void configureForwardedProperties();
 	void strategyChanged();
+	void willProcessParents() override;
 };
 
 MultipannerNode::MultipannerNode(std::shared_ptr<Simulation> sim, std::shared_ptr<HrtfData> hrtf): SubgraphNode(Lav_OBJTYPE_MULTIPANNER_NODE, sim)  {
@@ -37,10 +38,8 @@ MultipannerNode::MultipannerNode(std::shared_ptr<Simulation> sim, std::shared_pt
 	input->appendOutputConnection(0, 1);
 	input->connect(0, hrtf_panner, 0);
 	input->connect(0, amplitude_panner, 0);
-
 	appendOutputConnection(0, 0);
 	setInputNode(input);
-	getProperty(Lav_PANNER_STRATEGY).setPostChangedCallback([this](){strategyChanged();});
 }
 
 std::shared_ptr<Node> createMultipannerNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf) {
@@ -101,6 +100,10 @@ void MultipannerNode::strategyChanged() {
 		setOutputNode(hrtf_panner);
 		current_panner = hrtf_panner;
 	}
+}
+
+void MultipannerNode::willProcessParents() {
+	if(werePropertiesModified(this, Lav_PANNER_STRATEGY)) strategyChanged();
 }
 
 //begin public api

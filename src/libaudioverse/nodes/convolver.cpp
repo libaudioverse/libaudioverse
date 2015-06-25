@@ -36,8 +36,6 @@ ConvolverNode::ConvolverNode(std::shared_ptr<Simulation> simulation, int channel
 	appendOutputConnection(0, channels);
 	convolvers=new BlockConvolver*[channels]();
 	for(int i= 0; i < channels; i++) convolvers[i] = new BlockConvolver(simulation->getBlockSize());
-	getProperty(Lav_CONVOLVER_IMPULSE_RESPONSE).setPostChangedCallback([=] () {setImpulseResponse();});
-	setImpulseResponse();
 }
 
 std::shared_ptr<Node> createConvolverNode(std::shared_ptr<Simulation> simulation, int channels) {
@@ -52,6 +50,7 @@ ConvolverNode::~ConvolverNode() {
 }
 
 void ConvolverNode::process() {
+	if(werePropertiesModified(this, Lav_CONVOLVER_IMPULSE_RESPONSE)) setImpulseResponse();
 	for(int i= 0; i < channels; i++) convolvers[i]->convolve(input_buffers[i], output_buffers[i]);
 }
 

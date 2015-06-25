@@ -42,10 +42,6 @@ FilteredDelayNode::FilteredDelayNode(std::shared_ptr<Simulation> simulation, flo
 	lines = new CrossfadingDelayLine*[channels];
 	for(unsigned int i = 0; i < channels; i++) lines[i] = new CrossfadingDelayLine(maxDelay, simulation->getSr());
 	getProperty(Lav_FILTERED_DELAY_DELAY).setFloatRange(0.0f, maxDelay);
-	getProperty(Lav_FILTERED_DELAY_INTERPOLATION_TIME).setPostChangedCallback([this] () {recomputeDelta();});
-	getProperty(Lav_FILTERED_DELAY_DELAY).setPostChangedCallback([this] () {delayChanged();});
-	recomputeDelta();
-	delayChanged();
 	//finally, set the read-only max delay.
 	getProperty(Lav_FILTERED_DELAY_DELAY_MAX).setFloatValue(maxDelay);
 	appendInputConnection(0, channels);
@@ -95,6 +91,8 @@ void FilteredDelayNode::reconfigureBiquads() {
 }
 
 void FilteredDelayNode::process() {
+	if(werePropertiesModified(this, Lav_FILTERED_DELAY_DELAY)) delayChanged();
+	if(werePropertiesModified(this, Lav_FILTERED_DELAY_INTERPOLATION_TIME)) recomputeDelta();
 	reconfigureBiquads();
 	float feedback = getProperty(Lav_FILTERED_DELAY_FEEDBACK).getFloatValue();
 	//optimize the common case of not having feedback.

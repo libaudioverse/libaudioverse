@@ -24,7 +24,6 @@ namespace libaudioverse_implementation {
 SimpleEnvironmentNode::SimpleEnvironmentNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf): EnvironmentBase(Lav_OBJTYPE_SIMPLE_ENVIRONMENT_NODE, simulation)  {
 	this->hrtf = hrtf;
 	int channels = getProperty(Lav_ENVIRONMENT_OUTPUT_CHANNELS).getIntValue();
-	getProperty(Lav_ENVIRONMENT_OUTPUT_CHANNELS).setPostChangedCallback([&] () {outputChannelsChanged();});
 	output = createGainNode(simulation);
 	output->resize(channels, channels);
 	output->appendInputConnection(0, channels);
@@ -44,6 +43,7 @@ std::shared_ptr<SimpleEnvironmentNode> createSimpleEnvironmentNode(std::shared_p
 }
 
 void SimpleEnvironmentNode::willProcessParents() {
+	if(werePropertiesModified(this, Lav_ENVIRONMENT_OUTPUT_CHANNELS)) outputChannelsChanged();
 	//update the matrix.
 	const float* pos = getProperty(Lav_3D_POSITION).getFloat3Value();
 	const float* atup = getProperty(Lav_3D_ORIENTATION).getFloat6Value();

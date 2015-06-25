@@ -37,10 +37,6 @@ DoppleringDelayNode::DoppleringDelayNode(std::shared_ptr<Simulation> simulation,
 	lines = new DoppleringDelayLine*[lineCount]();
 	for(unsigned int i = 0; i < lineCount; i++) lines[i] = new DoppleringDelayLine(maxDelay, simulation->getSr());
 	getProperty(Lav_DELAY_DELAY).setFloatRange(0.0f, maxDelay);
-	getProperty(Lav_DELAY_INTERPOLATION_TIME).setPostChangedCallback([this] () {recomputeDelta();});
-	getProperty(Lav_DELAY_DELAY).setPostChangedCallback([this] () {delayChanged();});
-	recomputeDelta();
-	delayChanged();
 	//finally, set the read-only max delay.
 	getProperty(Lav_DELAY_DELAY_MAX).setFloatValue(maxDelay);
 	appendInputConnection(0, lineCount);
@@ -69,6 +65,8 @@ void DoppleringDelayNode::delayChanged() {
 }
 
 void DoppleringDelayNode::process() {
+	if(werePropertiesModified(this, Lav_DELAY_DELAY)) delayChanged();
+	if(werePropertiesModified(this, Lav_DELAY_INTERPOLATION_TIME)) recomputeDelta();
 	for(int output = 0; output < num_output_buffers; output++) {
 		auto &line = *lines[output];
 		for(int i = 0; i < block_size; i++) output_buffers[output][i] = line.tick(input_buffers[output][i]);

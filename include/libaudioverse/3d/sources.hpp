@@ -13,6 +13,8 @@ class SourceNode: public SubgraphNode {
 	public:
 	SourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentBase> world);
 	void update(Environment env);
+	//involves shared poitners.
+	void forwardProperties();
 	private:
 	std::shared_ptr<Node> panner_node, input;
 	std::shared_ptr<EnvironmentBase> manager;

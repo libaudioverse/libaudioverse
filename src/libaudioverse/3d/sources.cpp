@@ -29,9 +29,6 @@ SourceNode::SourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<E
 	input->appendOutputConnection(0, 1);
 	panner_node = manager->createPannerNode();
 	this->manager = manager;
-	getProperty(Lav_SOURCE_PANNER_STRATEGY).setPostChangedCallback([this] () {
-		this->panner_node->getProperty(Lav_PANNER_STRATEGY).setIntValue(this->getProperty(Lav_SOURCE_PANNER_STRATEGY).getIntValue());
-	});
 	//we have to read off these defaults manually, and it must always be the last thing in the constructor.
 	getProperty(Lav_SOURCE_DISTANCE_MODEL).setIntValue(manager->getProperty(Lav_ENVIRONMENT_DEFAULT_DISTANCE_MODEL).getIntValue());
 	getProperty(Lav_SOURCE_MAX_DISTANCE).setFloatValue(manager->getProperty(Lav_ENVIRONMENT_DEFAULT_MAX_DISTANCE).getFloatValue());
@@ -41,10 +38,15 @@ SourceNode::SourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<E
 	setInputNode(input);
 }
 
+void SourceNode::forwardProperties() {
+	panner_node->forwardProperty(Lav_PANNER_STRATEGY, std::static_pointer_cast<Node>(this->shared_from_this()), Lav_SOURCE_PANNER_STRATEGY);
+}
+
 std::shared_ptr<Node> createSourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentBase> manager) {
 	auto temp = std::shared_ptr<SourceNode>(new SourceNode(simulation, manager), ObjectDeleter(simulation));
 	manager->registerSourceForUpdates(temp);
 	simulation->associateNode(temp);
+	temp->forwardProperties();
 	return temp;
 }
 

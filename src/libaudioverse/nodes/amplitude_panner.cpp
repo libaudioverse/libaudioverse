@@ -27,9 +27,6 @@ float standard_map_71[] = {-22.5f, 22.5f, -150.0f, 150.0f, -110.0f, 110.0f};
 //see include/libaudioverse/objects/panner.hpp.
 
 AmplitudePannerNode::AmplitudePannerNode(std::shared_ptr<Simulation> simulation): Node(Lav_OBJTYPE_AMPLITUDE_PANNER_NODE, simulation, 1, 0) {
-	getProperty(Lav_PANNER_CHANNEL_MAP).setPostChangedCallback([this](){recomputeChannelMap();});
-	getProperty(Lav_PANNER_SKIP_LFE).setPostChangedCallback([this] () {recomputeChannelMap();});
-	getProperty(Lav_PANNER_SKIP_CENTER).setPostChangedCallback([this] (){recomputeChannelMap();});
 	appendInputConnection(0, 1);
 	appendOutputConnection(0, 0);
 }
@@ -63,6 +60,7 @@ void AmplitudePannerNode::recomputeChannelMap() {
 }
 
 void AmplitudePannerNode::process() {
+	if(werePropertiesModified(this, Lav_PANNER_CHANNEL_MAP, Lav_PANNER_SKIP_CENTER, Lav_PANNER_SKIP_LFE)) recomputeChannelMap();
 	float azimuth = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
 	panner.pan(azimuth, block_size, input_buffers[0], num_output_buffers, &output_buffers[0]);
 }

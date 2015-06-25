@@ -2,8 +2,11 @@ properties:
   Lav_BUFFER_BUFFER:
     name: buffer
     type: buffer
+    read_only: true
     doc_description: |
-      The buffer to play.
+      The currently playing buffer.
+      
+      In order to set this property, the extra function {{"Lav_bufferNodeSetBuffer"|extra_function}} must be used.
   Lav_BUFFER_POSITION:
     name: position
     type: double
@@ -29,6 +32,15 @@ properties:
     default: 0
     doc_description: |
       If true, this node continues playing the same buffer from the beginning after it reaches the end.
+
+extra_functions:
+  Lav_bufferNodeSetBuffer:
+    doc_description: 
+      Set the buffer to play.
+      
+      This will reset the position to the beginning.
+    params:
+      buffer: The buffer to use.
 events:
   Lav_BUFFER_END_EVENT:
     name: end

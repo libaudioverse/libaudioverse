@@ -44,14 +44,6 @@ ThreeBandEqNode::ThreeBandEqNode(std::shared_ptr<Simulation> simulation, int cha
 		midband_peaks[i] = new IIRFilter(simulation->getSr());
 		highband_shelves[i] = new IIRFilter(simulation->getSr());
 	}
-	//set the callbacks.
-	multisetPostChangedCallback(this,
-	[=] () {recompute();},
-	Lav_THREE_BAND_EQ_LOWBAND_DBGAIN,
-	Lav_THREE_BAND_EQ_LOWBAND_FREQUENCY,
-	Lav_THREE_BAND_EQ_MIDBAND_DBGAIN,
-	Lav_THREE_BAND_EQ_HIGHBAND_DBGAIN,
-	Lav_THREE_BAND_EQ_HIGHBAND_FREQUENCY);
 	//Set ranges of the nyqiuist properties.
 	getProperty(Lav_THREE_BAND_EQ_HIGHBAND_FREQUENCY).setFloatRange(0.0, simulation->getSr()/2.0);
 	getProperty(Lav_THREE_BAND_EQ_LOWBAND_FREQUENCY).setFloatRange(0.0, simulation->getSr()/2.0);
@@ -97,6 +89,13 @@ void ThreeBandEqNode::recompute() {
 }
 
 void ThreeBandEqNode::process() {
+	if(werePropertiesModified(this,
+	Lav_THREE_BAND_EQ_LOWBAND_DBGAIN,
+	Lav_THREE_BAND_EQ_LOWBAND_FREQUENCY,
+	Lav_THREE_BAND_EQ_MIDBAND_DBGAIN,
+	Lav_THREE_BAND_EQ_HIGHBAND_DBGAIN,
+	Lav_THREE_BAND_EQ_HIGHBAND_FREQUENCY
+	)) recompute();
 	for(int channel=0; channel < channels; channel++) {
 		auto &peak= *midband_peaks[channel];
 		auto &shelf = *highband_shelves[channel];

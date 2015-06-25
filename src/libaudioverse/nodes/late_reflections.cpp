@@ -78,13 +78,6 @@ fdn(16, (1.0/50.0)*16.0, simulation->getSr()) {
 	gains=allocArray<float>(16);
 	output_frame=allocArray<float>(16);
 	delays=allocArray<float>(16);
-	//property callbacks.
-	getProperty(Lav_LATE_REFLECTIONS_T60).setPostChangedCallback([=] () {recompute();});
-	getProperty(Lav_LATE_REFLECTIONS_DENSITY).setPostChangedCallback([=](){recompute();});
-	getProperty(Lav_LATE_REFLECTIONS_HF_T60).setPostChangedCallback([=] () {recompute();});
-	getProperty(Lav_LATE_REFLECTIONS_LF_T60).setPostChangedCallback([=] () {recompute();});
-	getProperty(Lav_LATE_REFLECTIONS_HF_REFERENCE).setPostChangedCallback([=] () {recompute();});
-	getProperty(Lav_LATE_REFLECTIONS_LF_REFERENCE).setPostChangedCallback([=] () {recompute();});
 	//range for hf and lf.
 	double nyquist=simulation->getSr()/2.0;
 	getProperty(Lav_LATE_REFLECTIONS_HF_REFERENCE).setFloatRange(0.0, nyquist);
@@ -163,6 +156,10 @@ void LateReflectionsNode::recompute() {
 }
 
 void LateReflectionsNode::process() {
+	if(werePropertiesModified(this,
+	Lav_LATE_REFLECTIONS_T60, Lav_LATE_REFLECTIONS_DENSITY, Lav_LATE_REFLECTIONS_HF_T60,
+	Lav_LATE_REFLECTIONS_LF_T60, Lav_LATE_REFLECTIONS_HF_REFERENCE, Lav_LATE_REFLECTIONS_LF_REFERENCE
+	)) recompute();
 	for(int i= 0; i < block_size; i++) {
 		//Get the fdn's output.
 		fdn.computeFrame(output_frame);

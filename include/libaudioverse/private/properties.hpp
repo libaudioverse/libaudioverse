@@ -3,7 +3,6 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #pragma once
 #include <string>
-#include <functional>
 #include <vector>
 #include <limits>
 #include <algorithm>
@@ -142,9 +141,6 @@ class Property {
 	std::shared_ptr<Buffer> getBufferValue();
 	void setBufferValue(std::shared_ptr<Buffer> b);
 
-	//set the callback...
-	void setPostChangedCallback(std::function<void(void)> cb);
-
 	//Can we assume that the value for i=0 in the get* functions is the value for the whole block?
 	//In other words, can we optimize the application by not computing the same thing over and over?
 	//Very important for add and mul.
@@ -168,7 +164,6 @@ class Property {
 	std::vector<int> iarray_value, default_iarray_value;
 	std::shared_ptr<Buffer> buffer_value = nullptr;
 	unsigned int min_array_length = 0, max_array_length = std::numeric_limits<unsigned int>::max();
-	std::function<void(void)> post_changed_callback;
 	bool read_only = false;
 	bool has_dynamic_range = false;
 	Node* node;
@@ -202,27 +197,13 @@ Property* createIntArrayProperty(const char* name, unsigned int minLength, unsig
 Property* createFloatArrayProperty(const char* name, unsigned int minLength, unsigned int maxLength, unsigned int defaultLength, float min, float max, float* defaultData);
 Property* createBufferProperty(const char* name);
 
-//The following templates allow setting the post changed callback 
-//First, the base case, one property on one node.
-//This has to be in the .cpp file so we can use Node.
-void multisetPostChangedCallback(Node* node, std::function<void(void)> cb, int property);
-
-//The not-base case:
-template<typename... Args>
-void multisetPostChangedCallback(Node* node, std::function<void(void)> cb, int first, Args... args) {
-	//call the base case.
-	multisetPostChangedCallback(node, cb, first);
-	//and recurse into ourselves.
-	multisetPostChangedCallback(node, cb, args...);
-}
-
-//Similar to the above templates, but for written
+//werePropertiesChanged: return true if any specified property is modified since the last block.
 //Base case has to be in the .cpp file to use nodes.
 bool werePropertiesModified(Node* node, int which);
 
 template <typename... args>
 bool werePropertiesModified(Node* node, int first, args... rest) {
-	if(werePropertiesModified(node, first)) return True;
+	if(werePropertiesModified(node, first)) return true;
 	else return werePropertiesModified(node, rest...);
 }
 
