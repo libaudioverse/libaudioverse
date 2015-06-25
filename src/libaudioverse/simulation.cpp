@@ -100,7 +100,10 @@ void Simulation::setOutputDevice(int index, int channels, int mixahead) {
 	auto cb =[wptr, blockSize](float* buffer, int channels)->void {
 		auto strong =wptr.lock();
 		if(strong==nullptr) memset(buffer, 0, sizeof(float)*blockSize*channels);
-		else strong->getBlock(buffer, channels);
+		else {
+			std::lock_guard<Simulation> guard(*strong);
+			strong->getBlock(buffer, channels);
+		}
 	};
 	auto dev =factory->createDevice(cb, index, channels, getSr(), getBlockSize(), mixahead);
 	if(dev == nullptr) throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);

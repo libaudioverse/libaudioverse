@@ -24,7 +24,7 @@ class BufferNode: public Node {
 	public:
 	BufferNode(std::shared_ptr<Simulation> simulation);
 	void setBuffer(std::shared_ptr<Buffer> buff);
-	virtual void positionChanged();
+	void positionChanged();
 	virtual void process();
 	int frame = 0;
 	int buffer_length=0;
