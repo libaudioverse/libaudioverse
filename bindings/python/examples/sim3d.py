@@ -12,7 +12,7 @@ filepath = raw_input()
 n = libaudioverse.BufferNode(sim)
 b = libaudioverse.Buffer(sim)
 b.load_from_file(filepath)
-n.buffer.value = b
+n.set_buffer(b)
 n.connect(0, source, 0)
 
 n.looping.value = True

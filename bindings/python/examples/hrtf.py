@@ -12,7 +12,7 @@ path = os.path.abspath(path)
 fnode = libaudioverse.BufferNode(sim)
 buffer=libaudioverse.Buffer(sim)
 buffer.load_from_file(path)
-fnode.buffer.value = buffer
+fnode.set_buffer(buffer)
 fnode.looping.value = True
 panner = libaudioverse.HrtfNode(sim, "default")
 fnode.connect(0, panner, 0)
