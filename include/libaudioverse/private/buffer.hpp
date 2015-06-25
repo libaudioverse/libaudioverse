@@ -44,4 +44,6 @@ class Buffer: public ExternalObject {
 	std::shared_ptr<Simulation> simulation;
 };
 
+std::shared_ptr<Buffer> createBuffer(std::shared_ptr<Simulation>simulation);
+
 }
