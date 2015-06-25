@@ -78,7 +78,6 @@ std::vector<Node*> OutputConnection::getConnectedNodes() {
 	return retval;
 }
 
-
 InputConnection::InputConnection(std::shared_ptr<Simulation> simulation, Node* node, int start, int count) {
 	this->simulation = simulation;
 	this->node= node;
@@ -112,7 +111,7 @@ void InputConnection::forgetConnection(OutputConnection* which) {
 	for(auto &i: connected_to) {
 		auto i_s=i.lock();
 		//we might as well take this opportunity to clean up dead weak pointers since we're already creating the temporary set.
-		if(i_s == nullptr || i_s.get()== which) removing.insert(i);
+		if(i_s == nullptr || i_s.get() == which) removing.insert(i);
 	}
 	for(auto &i: removing) {
 		connected_to.erase(i);
@@ -134,13 +133,13 @@ std::vector<Node*> InputConnection::getConnectedNodes() {
 	return retval;
 }
 
+int InputConnection::getConnectedNodeCount() {
+	return (int)getConnectedNodes().size();
+}
+
 void makeConnection(std::shared_ptr<OutputConnection> output, std::shared_ptr<InputConnection> input) {
 	output->connectHalf(input);
 	input->connectHalf(output);
-}
-
-int InputConnection::getConnectedNodeCount() {
-	return (int)getConnectedNodes().size();
 }
 
 }
