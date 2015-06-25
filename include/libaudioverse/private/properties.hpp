@@ -54,6 +54,8 @@ class Property {
 	double getSr();
 	double getTime();
 	std::shared_ptr<InputConnection> getInputConnection();
+	//returns true if this property was written after it was last ticked.
+	bool wasWritten();
 
 	void updateAutomatorIndex(double t);
 	void scheduleAutomator(Automator* automator);
@@ -185,6 +187,8 @@ class Property {
 	
 	//Allows protecting against duplicate ticks.
 	int last_ticked=-1; //simulation starts at zero.
+	int last_written = 0; //so we can detect writes. We are first written on tick 0.
+	bool was_written = false;
 };
 
 //helper methods to quickly make properties.

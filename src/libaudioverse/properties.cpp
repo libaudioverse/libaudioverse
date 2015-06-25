@@ -84,6 +84,10 @@ std::shared_ptr<InputConnection> Property::getInputConnection() {
 	return incoming_nodes;
 }
 
+bool Property::wasWritten() {
+	return was_written;
+}
+
 void Property::updateAutomatorIndex(double t) {
 	//This should be a small number of compares.
 	//This is O(n), lower_bound is O(log n), but c probably makes a huge difference here.
@@ -159,6 +163,7 @@ int Property::getIntValue() {
 void Property::setIntValue(int v) {
 	RC(v, ival);
 	value.ival = v;
+	last_written=simulation->getTickCount();
 	if(post_changed_callback) post_changed_callback();
 }	
 
@@ -193,6 +198,7 @@ void Property::setFloatValue(float v) {
 	RC(v, fval);
 	automators.clear();
 	value.fval = v;
+	last_written=simulation->getTickCount();
 	if(post_changed_callback) post_changed_callback();
 }
 
@@ -226,6 +232,7 @@ void Property::setDoubleValue(double v) {
 	RC(v, dval);
 	automators.clear();
 	value.dval = v;
+	last_written =simulation->getTickCount();
 	if(post_changed_callback) post_changed_callback();
 }
 
@@ -256,6 +263,7 @@ const float* Property::getFloat3Default() {
 
 void Property::setFloat3Value(const float* const v) {
 	memcpy(value.f3val, v, sizeof(float)*3);
+	last_written = simulation->getTickCount();
 	if(post_changed_callback) post_changed_callback();
 }
 
@@ -263,6 +271,7 @@ void Property::setFloat3Value(float v1, float v2, float v3) {
 	value.f3val[0] = v1;
 	value.f3val[1] = v2;
 	value.f3val[2] = v3;
+	last_written=simulation->getTickCount();
 	if(post_changed_callback) post_changed_callback();
 }
 
@@ -286,6 +295,7 @@ const float* Property::getFloat6Default() {
 
 void Property::setFloat6Value(const float* const v) {
 	memcpy(&value.f6val, v, sizeof(float)*6);
+	last_written = simulation->getTickCount();
 	if(post_changed_callback) post_changed_callback();
 }
 
@@ -296,6 +306,7 @@ void Property::setFloat6Value(float v1, float v2, float v3, float v4, float v5, 
 	value.f6val[3] = v4;
 	value.f6val[4] = v5;
 	value.f6val[5] = v6;
+	last_written =simulation->getTickCount();
 	if(post_changed_callback) post_changed_callback();
 }
 
@@ -335,6 +346,7 @@ void Property::writeFloatArray(unsigned int start, unsigned int stop, float* val
 	for(unsigned int i = start; i < stop; i++) {
 		farray_value[i] = values[i];
 	}
+	last_written=simulation->getTickCount();
 	if(post_changed_callback) post_changed_callback();
 }
 
@@ -345,6 +357,7 @@ void Property::replaceFloatArray(unsigned int length, float* values) {
 	}
 	farray_value.resize(length);
 	std::copy(values, values+length, farray_value.begin());
+	last_written=simulation->getTickCount();
 	if(post_changed_callback) post_changed_callback();
 }
 
@@ -378,6 +391,7 @@ void Property::writeIntArray(unsigned int start, unsigned int stop, int* values)
 	for(unsigned int i = start; i < stop; i++) {
 		iarray_value[i] = values[i];
 	}
+	last_written = simulation->getTickCount();
 	if(post_changed_callback) post_changed_callback();
 }
 
@@ -388,6 +402,7 @@ void Property::replaceIntArray(unsigned int length, int* values) {
 	}
 	iarray_value.resize(length);
 	std::copy(values, values+length, iarray_value.begin());
+	last_written=simulation->getTickCount();
 	if(post_changed_callback) post_changed_callback();
 }
 
@@ -414,6 +429,7 @@ const char* Property::getStringValue() {
 
 void Property::setStringValue(const char* s) {
 	string_value = s;
+	last_written=simulation->getTickCount();
 	if(post_changed_callback) post_changed_callback();
 }
 
@@ -451,6 +467,8 @@ void Property::tick() {
 	//protect against duplicate ticks.
 	//This is needed because of forwarding.
 	if(last_ticked==simulation->getTickCount()) return;
+	if(last_written > last_ticked) was_written=true;
+	else was_written=false;
 	last_ticked=simulation->getTickCount();
 	//used for the post-changed callback.
 	bool modified=false;
@@ -471,6 +489,7 @@ void Property::tick() {
 			else value_buffer[i] = last;
 		}
 		modified=true;
+		was_written = true;
 	}
 	//We might have nodes:
 	if(incoming_nodes->getConnectedNodeCount()) {
@@ -484,6 +503,7 @@ void Property::tick() {
 		for(int i = 0; i < block_size; i++) value_buffer[i]+=node_buffer[i];
 		should_use_value_buffer =true;
 		modified=true;
+		was_written=true;
 	}
 	//if we modified and have a callback, call it.
 	if(modified && post_changed_callback) post_changed_callback();
