@@ -137,14 +137,18 @@ void Node::process() {
 }
 
 void Node::zeroOutputBuffers() {
-	for(unsigned int i = 0; i < output_buffers.size(); i++) {
-		memset(output_buffers[i], 0, block_size*sizeof(float));
+	float** outputBuffers=getOutputBufferArray();
+	int outputBufferCount = getOutputBufferCount();
+	for(int i = 0; i < outputBufferCount; i++) {
+		memset(outputBuffers[i], 0, block_size*sizeof(float));
 	}
 }
 
 void Node::zeroInputBuffers() {
-	for(unsigned int i = 0; i < input_buffers.size(); i++) {
-		memset(input_buffers[i], 0, sizeof(float)*simulation->getBlockSize());
+	int inputBufferCount=getInputBufferCount();
+	float** inputBuffers=getInputBufferArray();
+	for(int i = 0; i < inputBufferCount; i++) {
+		memset(inputBuffers[i], 0, sizeof(float)*simulation->getBlockSize());
 	}
 }
 
