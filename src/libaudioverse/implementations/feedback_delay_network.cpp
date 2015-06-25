@@ -27,18 +27,18 @@ FeedbackDelayNetwork::~FeedbackDelayNetwork() {
 }
 
 void FeedbackDelayNetwork::computeFrame(float* outputs) {
-	//This is a matrix multiplication, but arranged to avoid reading lines repeatedly.
-	memset(outputs, 0, n*sizeof(float));
-	//I is column, j is row.
 	for(int i = 0; i < n; i++) {
-		float sample = lines[i]->computeSample();
-		for(int j = 0; j < n; j++) outputs[j] += matrix[j*n+i]*sample;
+		outputs[i] = lines[i]->computeSample();
 	}
 }
 
-void FeedbackDelayNetwork::advance(const float* inputs) {
-	//Just write all the delay lines.
-	for(int i=0; i < n; i++) lines[i]->advance(inputs[i]);
+void FeedbackDelayNetwork::advance(const float* inputs, const float* lastOutputFrame) {
+	for(int i=0; i < n; i++) {
+		float sample=0.0f;
+		for(int j = 0; j < n; j++) sample += matrix[i*n+j]*lastOutputFrame[j];
+		sample+=inputs[i];
+		lines[i]->advance(sample);
+	}
 }
 
 //below here is not very algorithmic, just setters.

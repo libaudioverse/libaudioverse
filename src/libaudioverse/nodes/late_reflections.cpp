@@ -53,7 +53,7 @@ class LateReflectionsNode: public Node {
 	FeedbackDelayNetwork fdn;
 	float* delays = nullptr;
 	float *gains;
-	float* output_frame=nullptr;
+	float* output_frame=nullptr, *next_input_frame =nullptr;
 	float* normalized_hadamard = nullptr;
 	//Filters for the band separation.
 	IIRFilter** highshelves; //Shapes from mid to high band.
@@ -77,6 +77,7 @@ fdn(16, (1.0/50.0)*16.0, simulation->getSr()) {
 	fdn.setDelayCrossfadingTime(0.1);
 	gains=allocArray<float>(16);
 	output_frame=allocArray<float>(16);
+	next_input_frame=allocArray<float>(16);
 	delays=allocArray<float>(16);
 	//range for hf and lf.
 	double nyquist=simulation->getSr()/2.0;
@@ -102,6 +103,7 @@ std::shared_ptr<Node> createLateReflectionsNode(std::shared_ptr<Simulation> simu
 LateReflectionsNode::~LateReflectionsNode() {
 	freeArray(gains);
 	freeArray(output_frame);
+	freeArray(next_input_frame);
 	freeArray(delays);
 	for(int i=0; i < 16; i++) {
 		delete highshelves[i];
@@ -169,8 +171,8 @@ void LateReflectionsNode::process() {
 			output_frame[j] = midshelves[j]->tick(highshelves[j]->tick(gains[j]*output_frame[j]));
 		}
 		//bring in the inputs.
-		for(int j = 0; j < 16; j++) output_frame[j] += input_buffers[j][i];
-		fdn.advance(output_frame);
+		for(int j = 0; j < 16; j++) next_input_frame[j] = input_buffers[j][i];
+		fdn.advance(next_input_frame, output_frame);
 	}
 }
 

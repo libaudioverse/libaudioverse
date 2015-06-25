@@ -20,7 +20,7 @@ class FeedbackDelayNetworkNode: public Node {
 	FeedbackDelayNetwork*network = nullptr;
 	float max_delay = 0.0f;
 	int line_count = 0;
-	float*lastOutput = nullptr;
+	float*last_output = nullptr, *next_input=nullptr;
 	float* gains = nullptr;
 };
 

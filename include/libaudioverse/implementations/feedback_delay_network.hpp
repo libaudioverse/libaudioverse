@@ -22,7 +22,7 @@ class FeedbackDelayNetwork {
 	FeedbackDelayNetwork(int n, float maxDelay, float sr);
 	~FeedbackDelayNetwork();
 	void computeFrame(float* outputs);
-	void advance(const float* inputs);
+	void advance(const float* inputs, const float* lastOutputFrame);
 	void setMatrix(const float* feedbacks);
 	void setDelays(const float* delays);
 	void setDelay(int which, float newDelay);
