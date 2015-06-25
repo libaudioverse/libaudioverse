@@ -36,7 +36,6 @@ class Node: public ExternalObject { //enable_shared_from_this is for event infra
 	//public view of connections.
 	virtual int getInputConnectionCount();
 	virtual int getOutputConnectionCount();
-	//these next two return shared pointers which "alias" this object.
 	virtual std::shared_ptr<InputConnection> getInputConnection(int which);
 	virtual std::shared_ptr<OutputConnection> getOutputConnection(int which);
 	//intended to be used by subclasses to add input and output connections.
@@ -101,8 +100,8 @@ class Node: public ExternalObject { //enable_shared_from_this is for event infra
 	std::map<int, Event> events;
 	std::vector<float*> input_buffers;
 	std::vector<float*> output_buffers;
-	std::vector<InputConnection> input_connections;
-	std::vector<OutputConnection> output_connections;
+	std::vector<std::shared_ptr<InputConnection>> input_connections;
+	std::vector<std::shared_ptr<OutputConnection>> output_connections;
 	bool is_processing = false, is_suspended = false;
 	int num_input_buffers = 0, num_output_buffers = 0, block_size = 0;
 	//used to make no-op state changes free.

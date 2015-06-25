@@ -186,20 +186,20 @@ int Node::getOutputConnectionCount() {
 
 std::shared_ptr<InputConnection> Node::getInputConnection(int which) {
 	if(which >= getInputConnectionCount() || which < 0) throw LavErrorException(Lav_ERROR_RANGE);
-	return std::shared_ptr<InputConnection>(this->shared_from_this(), &input_connections[which]);
+	return input_connections[which];
 }
 
 std::shared_ptr<OutputConnection> Node::getOutputConnection(int which) {
 	if(which < 0 || which >= getOutputConnectionCount()) throw LavErrorException(Lav_ERROR_RANGE);
-	return std::shared_ptr<OutputConnection>(this->shared_from_this(), &output_connections[which]);
+	return output_connections[which];
 }
 
 void Node::appendInputConnection(int start, int count) {
-	input_connections.emplace_back(simulation, this, start, count);
+	input_connections.emplace_back(new InputConnection(simulation, this, start, count));
 }
 
 void Node::appendOutputConnection(int start, int count) {
-	output_connections.emplace_back(simulation, this, start, count);
+	output_connections.emplace_back(new OutputConnection(simulation, this, start, count));
 }
 
 void Node::connect(int output, std::shared_ptr<Node> toNode, int input) {
