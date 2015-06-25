@@ -27,15 +27,16 @@ class NoiseNode: public Node {
 	void pink();
 	void brown();
 	std::minstd_rand random_number_generator;
-	std::uniform_real_distribution<float> uniform_distribution;
+	std::normal_distribution<float> normal_distribution;
 	IIRFilter pinkifier; //filter to turn white noise into pink noise.
 	IIRFilter brownifier; //and likewise for brown.
 	float pink_max = 0.0f, brown_max = 0.0f; //used for normalizing noise.
 };
 
 //we give the random number generator a fixed seed for debugging purposes.
+//Normal distribution with standard deviation 0.25, more than 99% of values are less than 1.
 NoiseNode::NoiseNode(std::shared_ptr<Simulation> simulation): Node(Lav_OBJTYPE_NOISE_NODE, simulation, 0, 1),
-random_number_generator(1234), uniform_distribution(-1.0f, 1.0f),
+random_number_generator(1234), normal_distribution(0.0f, 0.25f),
 pinkifier(simulation->getSr()),
 brownifier(simulation->getSr()) {
 	/**We have to configure the pinkifier.
@@ -67,12 +68,11 @@ std::shared_ptr<Node> createNoiseNode(std::shared_ptr<Simulation> simulation) {
 
 void NoiseNode::white() {
 	for(int i = 0; i < block_size; i++) {
-		float noiseSample = 0.0f;
-		//use the central limit theorem to generate white noise.
 		//if this proves too costly, revisit and examine the box-muller method.
-		for(int j = 0; j < 20; j++) noiseSample += uniform_distribution(random_number_generator);
-		//divide by 20 to get it back into range.
-		noiseSample /= 20.0f;
+		float noiseSample = 0.0;
+		do {
+			noiseSample = normal_distribution(random_number_generator);
+		} while(noiseSample < -1.0f || noiseSample > 1.0f);
 		output_buffers[0][i] = noiseSample;
 	}
 }
