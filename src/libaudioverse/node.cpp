@@ -165,7 +165,8 @@ int Node::getOutputBufferCount() {
 
 float** Node::getOutputBufferArray() {
 	//vectors are guaranteed to be contiguous in most if not all implementations as well as (possibly, no source handy) the C++11 standard.
-	return &output_buffers[0];
+	if(output_buffers.size())  return &output_buffers[0];
+	else return nullptr;
 }
 
 int Node::getInputBufferCount() {
@@ -173,7 +174,8 @@ int Node::getInputBufferCount() {
 }
 
 float** Node::getInputBufferArray() {
-	return &input_buffers[0];
+	if(input_buffers.size()) return &input_buffers[0];
+	else return nullptr;
 }
 
 int Node::getInputConnectionCount() {
