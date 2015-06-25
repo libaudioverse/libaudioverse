@@ -55,7 +55,7 @@ class Property {
 	double getTime();
 	std::shared_ptr<InputConnection> getInputConnection();
 	//returns true if this property was written after it was last ticked.
-	bool wasWritten();
+	bool wasModified();
 
 	void updateAutomatorIndex(double t);
 	void scheduleAutomator(Automator* automator);
@@ -187,8 +187,8 @@ class Property {
 	
 	//Allows protecting against duplicate ticks.
 	int last_ticked=-1; //simulation starts at zero.
-	int last_written = 0; //so we can detect writes. We are first written on tick 0.
-	bool was_written = false;
+	int last_modified = 0; //so we can detect writes. We are first written on tick 0.
+	bool was_modified = false; //If we were modified since the last time we ticked.
 };
 
 //helper methods to quickly make properties.
@@ -214,6 +214,16 @@ void multisetPostChangedCallback(Node* node, std::function<void(void)> cb, int f
 	multisetPostChangedCallback(node, cb, first);
 	//and recurse into ourselves.
 	multisetPostChangedCallback(node, cb, args...);
+}
+
+//Similar to the above templates, but for written
+//Base case has to be in the .cpp file to use nodes.
+bool werePropertiesModified(Node* node, int which);
+
+template <typename... args>
+bool werePropertiesModified(Node* node, int first, args... rest) {
+	if(werePropertiesModified(node, first)) return True;
+	else return werePropertiesModified(node, rest...);
 }
 
 }
