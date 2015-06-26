@@ -107,6 +107,7 @@ nodes/fft_convolver.cpp
 nodes/late_reflections.cpp
 nodes/three_band_eq.cpp
 nodes/filtered_delay.cpp
+nodes/panner_bank.cpp
 
 #automators
 automators/automators.cpp

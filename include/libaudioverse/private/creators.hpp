@@ -34,6 +34,7 @@ std::shared_ptr<Node> createIirNode(std::shared_ptr<Simulation> simulation, int 
 std::shared_ptr<Node> createLateReflectionsNode(std::shared_ptr<Simulation> simulation);
 std::shared_ptr<Node> createMultipannerNode(std::shared_ptr<Simulation> sim, std::shared_ptr<HrtfData> hrtf);
 std::shared_ptr<Node> createNoiseNode(std::shared_ptr<Simulation> simulation);
+std::shared_ptr<Node> createPannerBankNode(std::shared_ptr<Simulation> simulation, int pannerCount, std::shared_ptr<HrtfData> hrtf);
 std::shared_ptr<Node> createPullNode(std::shared_ptr<Simulation> sim, unsigned int inputSr, unsigned int channels);
 std::shared_ptr<Node> createPushNode(std::shared_ptr<Simulation> sim, unsigned int inputSr, unsigned int channels);
 std::shared_ptr<Node> createRecorderNode(std::shared_ptr<Simulation> simulation, int channels);

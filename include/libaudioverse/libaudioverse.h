@@ -116,6 +116,7 @@ enum Lav_OBJECT_TYPES {
 	Lav_OBJTYPE_LATE_REFLECTIONS_NODE,
 	Lav_OBJTYPE_THREE_BAND_EQ_NODE,
 	Lav_OBJTYPE_FILTERED_DELAY_NODE,
+	Lav_OBJTYPE_PANNER_BANK_NODE,
 };
 
 /**Node states.*/
@@ -401,6 +402,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_createLateReflectionsNode(LavHandle simulationH
 Lav_PUBLIC_FUNCTION LavError Lav_createThreeBandEqNode(LavHandle simulationHandle, int channels, LavHandle* destination);
 
 Lav_PUBLIC_FUNCTION LavError Lav_createFilteredDelayNode(LavHandle simulationHandle, float maxDelay, unsigned int channels, LavHandle* destination);
+
+Lav_PUBLIC_FUNCTION LavError Lav_createPannerBankNode(LavHandle simulationHandle, int pannerCount, char* hrtfPath, LavHandle* destination);
 
 #ifdef __cplusplus
 }
