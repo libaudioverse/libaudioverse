@@ -57,6 +57,7 @@ file_io/file_writer.cpp
 dsp/ringmod.cpp
 dsp/iir.cpp
 dsp/db.cpp
+dsp/euclid.cpp
 
 #the metadata store
 #It appears that CMake dies hard if this isn't an absolute path.

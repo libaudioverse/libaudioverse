@@ -19,4 +19,8 @@ double dbToGain(double gain);
 double scalarToDb(double scalar, double reference);
 double dbToScalar(double db, double reference);
 
+//Run euclid's algorithm on two integers:
+//Only works on positive integers.
+int greatestCommonDivisor(int a, int b);
+
 }
