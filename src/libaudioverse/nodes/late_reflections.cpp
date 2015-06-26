@@ -34,15 +34,6 @@ Unfortunately, the biquad formulas for lowshelf are unstable at low frequencies,
 Consequently, we have to start from the lowest band and move up with highshelves.
 */
 
-//Delay line offsets as percents.
-//This table is hand-crafted so that we have a predictable algorithm.
-const float delay_percents[16] = {
-0.0, -0.21, 0.12, -0.13,
-0.256, -0.349, 0.513, -0.515,
-0.07, -0.09, 0.011, 0.032,
-0.43, 0.47, 0.23, 0.19,
-};
-
 class LateReflectionsNode: public Node {
 	public:
 	LateReflectionsNode(std::shared_ptr<Simulation> simulation);
@@ -134,9 +125,7 @@ void LateReflectionsNode::recompute() {
 	//The base delay is the amount we are delaying all delay lines by.
 	float base_delay=1.0f/density;
 	for(int i= 0; i < 16; i++) {
-		//percent increase/decrease: p=new/old-1
-		//new from old: new=(p+1)*old
-		delays[i] = (delay_percents[i]+1)*base_delay;
+		delays[i] = base_delay;
 	}
 	fdn.setDelays(delays);
 	//configure the gains.
