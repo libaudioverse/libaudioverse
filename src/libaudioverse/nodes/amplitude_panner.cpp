@@ -59,8 +59,11 @@ void AmplitudePannerNode::recomputeChannelMap() {
 	}
 }
 
-void AmplitudePannerNode::process() {
+void AmplitudePannerNode::willProcessParents() {
 	if(werePropertiesModified(this, Lav_PANNER_CHANNEL_MAP, Lav_PANNER_SKIP_CENTER, Lav_PANNER_SKIP_LFE)) recomputeChannelMap();
+}
+
+void AmplitudePannerNode::process() {
 	float azimuth = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
 	panner.pan(azimuth, block_size, input_buffers[0], num_output_buffers, &output_buffers[0]);
 }
