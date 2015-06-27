@@ -10,7 +10,7 @@ namespace libaudioverse_implementation {
 void hadamard(int n, float* buffer, bool shouldNormalize) {
 	buffer[0] = 1.0f;
 	if(n == 1) return; //because it's a matrix of order 1.
-	for(int powerOfTwo = 2; powerOfTwo <= n; powerOfTwo*2) { //step through powers of 2.
+	for(int powerOfTwo = 2; powerOfTwo <= n; powerOfTwo *= 2) { //step through powers of 2.
 		//Step through the smaller matrix we've already generated.
 		int prevPowerOfTwo = powerOfTwo/2;
 		for(int row = 0; row < prevPowerOfTwo; row++) {

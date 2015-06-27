@@ -70,9 +70,8 @@ fdn(16, 1.0f, simulation->getSr()) {
 		appendOutputConnection(i, 1);
 	}
 	normalized_hadamard=allocArray<float>(16*16);
-	//normalize the hadamard.
-	float norm = 1.0f/sqrtf(16);
-	for(int i = 0; i < 16*16; i++) normalized_hadamard[i] = norm*hadamard16[i];
+	//get a hadamard.
+hadamard(16, normalized_hadamard);
 	//feed the fdn the initial matrix.
 	fdn.setMatrix(normalized_hadamard);
 	//this is fixed...for now.
