@@ -11,6 +11,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/implementations/panner.hpp>
 #include <libaudioverse/nodes/panner.hpp>
 #include <libaudioverse/private/constants.hpp>
+#include <libaudioverse/private/kernels.hpp>
 #include <limits>
 #include <memory>
 #include <algorithm>
@@ -65,7 +66,15 @@ void AmplitudePannerNode::willProcessParents() {
 
 void AmplitudePannerNode::process() {
 	float azimuth = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
+	float passthrough =getProperty(Lav_PANNER_PASSTHROUGH).getFloatValue();
 	panner.pan(azimuth, block_size, input_buffers[0], num_output_buffers, &output_buffers[0]);
+	if(passthrough != 0.0f) {
+		scalarMultiplicationKernel(block_size, passthrough, input_buffers[0], input_buffers[0]);
+		for(int i = 0; i < num_output_buffers; i++) {
+			scalarMultiplicationKernel(block_size, 1.0f-passthrough, output_buffers[i], output_buffers[i]);
+			additionKernel(block_size, input_buffers[0], output_buffers[i], output_buffers[i]);
+		}
+	}
 }
 
 void AmplitudePannerNode::configureStandardChannelMap(unsigned int channels) {

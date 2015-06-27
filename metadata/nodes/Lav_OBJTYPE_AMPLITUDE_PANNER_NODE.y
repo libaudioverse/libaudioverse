@@ -60,6 +60,17 @@ properties:
       In order to make this work, the third and later speakers are shifted in order to leave silent channels for the center and LFE speakers.
       This property controls whether or not the center channel is reserved, i.e. skipped.
       You  almost always want this on.
+  Lav_PANNER_PASSTHROUGH:
+    name: passthrough
+    type: float
+    range: [0.0, 1.0]
+    default: 0.0
+    doc_description: |
+      Controls how much of the "dry" signal is passed through.
+      
+      Higher values make the panning less obvious.
+      
+      Specifically, the input signal is added to all outputs with {{"passthrough"|codelit}} as the gain, and {{"1-passthrough"|codelit}} as the gain of the panned signal.
 extra_functions:
   Lav_amplitudePannerNodeConfigureStandardMap:
     doc_description: |
