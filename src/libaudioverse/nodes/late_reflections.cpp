@@ -23,7 +23,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 namespace libaudioverse_implementation {
 
 /**Algorithm explanation:
-This algorithm consists of a 16-line FDN and two highshelf filters inserted in the feedback:
+This algorithm consists of a FDN and two highshelf filters inserted in the feedback:
 fdn->mid_highshelf->high_highshelf->fdn
 
 We compute individual gains for each line, using math taken from Physical Audio Processing by JOS.
@@ -34,7 +34,13 @@ Unfortunately, the biquad formulas for lowshelf are unstable at low frequencies,
 Consequently, we have to start from the lowest band and move up with highshelves.
 
 The delay lines have coprime lengths.
+
+In order to increase the accuracy of panning, only 16 unique delay line lengths are used.
+Each delay is copied to fill a range, namely order/16, of adjacent lines.
 */
+
+//The order must be a multiple of 16 and power of two.
+const int order=32;
 
 //Used for computing the delay line lengths.
 //A set of coprime integers.
@@ -63,31 +69,31 @@ class LateReflectionsNode: public Node {
 };
 
 LateReflectionsNode::LateReflectionsNode(std::shared_ptr<Simulation> simulation):
-Node(Lav_OBJTYPE_LATE_REFLECTIONS_NODE, simulation, 16, 16),
-fdn(16, 1.0f, simulation->getSr()) {
-	for(int i=0; i < 16; i++) {
+Node(Lav_OBJTYPE_LATE_REFLECTIONS_NODE, simulation, order, order),
+fdn(order, 1.0f, simulation->getSr()) {
+	for(int i=0; i < order; i++) {
 		appendInputConnection(i, 1);
 		appendOutputConnection(i, 1);
 	}
-	normalized_hadamard=allocArray<float>(16*16);
+	normalized_hadamard=allocArray<float>(order*order);
 	//get a hadamard.
-hadamard(16, normalized_hadamard);
+hadamard(order, normalized_hadamard);
 	//feed the fdn the initial matrix.
 	fdn.setMatrix(normalized_hadamard);
 	//this is fixed...for now.
 	fdn.setDelayCrossfadingTime(0.05);
-	gains=allocArray<float>(16);
-	output_frame=allocArray<float>(16);
-	next_input_frame=allocArray<float>(16);
-	delays=allocArray<float>(16);
+	gains=allocArray<float>(order);
+	output_frame=allocArray<float>(order);
+	next_input_frame=allocArray<float>(order);
+	delays=allocArray<float>(order);
 	//range for hf and lf.
 	double nyquist=simulation->getSr()/2.0;
 	getProperty(Lav_LATE_REFLECTIONS_HF_REFERENCE).setFloatRange(0.0, nyquist);
 	getProperty(Lav_LATE_REFLECTIONS_LF_REFERENCE).setFloatRange(0.0, nyquist);
 	//allocate the filters.
-	highshelves=new IIRFilter*[16];
-	midshelves = new IIRFilter*[16];
-	for(int i = 0; i < 16; i++) {
+	highshelves=new IIRFilter*[order];
+	midshelves = new IIRFilter*[order];
+	for(int i = 0; i < order; i++) {
 		highshelves[i] = new IIRFilter(simulation->getSr());
 		midshelves[i] = new IIRFilter(simulation->getSr());
 	}
@@ -106,7 +112,7 @@ LateReflectionsNode::~LateReflectionsNode() {
 	freeArray(output_frame);
 	freeArray(next_input_frame);
 	freeArray(delays);
-	for(int i=0; i < 16; i++) {
+	for(int i=0; i < order; i++) {
 		delete highshelves[i];
 		delete midshelves[i];
 	}
@@ -124,9 +130,9 @@ double t60ToGain(double t60, double lineLength) {
 
 void LateReflectionsNode::recompute() {
 	float density = getProperty(Lav_LATE_REFLECTIONS_DENSITY).getFloatValue();
-	//We see 16 times as many reflections as we expect because there are 16 inputs and outputs.
+	//We see order times as many reflections as we expect because there are order inputs and outputs.
 	//Put another way, each delay line is contributing, on average, density reflections.
-	density /= 16.0;
+	density /= order;
 	float t60=getProperty(Lav_LATE_REFLECTIONS_T60).getFloatValue();
 	float t60_high =getProperty(Lav_LATE_REFLECTIONS_HF_T60).getFloatValue();
 	float t60_low =getProperty(Lav_LATE_REFLECTIONS_LF_T60).getFloatValue();
@@ -135,7 +141,8 @@ void LateReflectionsNode::recompute() {
 	//The base delay is the amount we are delaying all delay lines by.
 	float baseDelay=1.0f/density;
 	//Approximate delay line lengths using powers of primes.
-	for(int i = 0; i < 16; i++) {
+	int step =order/16;
+	for(int i = 0; i < 16; i+=1) {
 		//We need to read them in a different order, namely:
 		//0, 4, 8, 12, 1, 5, 9, 13...
 		int prime= coprimes[(i%4)*4+i/4];
@@ -144,15 +151,16 @@ void LateReflectionsNode::recompute() {
 		int neededPower=round(powerApprox);
 		double delayInSamples = pow(prime, neededPower);
 		double delay=delayInSamples/simulation->getSr();
-		delays[i] = std::min(delay, 1.0);
+		delay = std::min(delay, 1.0);
+		for(int j=0; j < step; j++) delays[i*step+j] = delay;
 	}
 	fdn.setDelays(delays);
 	//configure the gains.
-	for(int i= 0; i < 16; i++) {
+	for(int i= 0; i < order; i++) {
 		gains[i] = t60ToGain(t60_low, delays[i]);
 	}
 	//Configure the filters.
-	for(int i = 0; i < 16; i++) {
+	for(int i = 0; i < order; i++) {
 		//We get the mid and high t60 gains, and turn them into db.
 		double highGain=t60ToGain(t60_high, delays[i]);
 		double midGain=t60ToGain(t60, delays[i]);
@@ -173,20 +181,20 @@ void LateReflectionsNode::process() {
 	for(int i= 0; i < block_size; i++) {
 		//Get the fdn's output.
 		fdn.computeFrame(output_frame);
-		for(int j= 0; j < 16; j++) output_buffers[j][i] = output_frame[j];
-		for(int j=0; j < 16; j++)  {
+		for(int j= 0; j < order; j++) output_buffers[j][i] = output_frame[j];
+		for(int j=0; j < order; j++)  {
 			//Through the highshelf, then the lowshelf.
 			output_frame[j] = midshelves[j]->tick(highshelves[j]->tick(gains[j]*output_frame[j]));
 		}
 		//bring in the inputs.
-		for(int j = 0; j < 16; j++) next_input_frame[j] = input_buffers[j][i];
+		for(int j = 0; j < order; j++) next_input_frame[j] = input_buffers[j][i];
 		fdn.advance(next_input_frame, output_frame);
 	}
 }
 
 void LateReflectionsNode::reset() {
 	fdn.reset();
-	for(int i = 0; i < 16; i++) {
+	for(int i = 0; i < order; i++) {
 		midshelves[i]->clearHistories();
 		highshelves[i]->clearHistories();
 	}
