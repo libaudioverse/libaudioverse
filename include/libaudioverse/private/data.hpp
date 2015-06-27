@@ -36,7 +36,4 @@ extern float mixing_matrix_8_6[];
 extern char default_hrtf[];
 extern unsigned int default_hrtf_size;
 
-//hadamard matrix, 16x16.
-const extern float hadamard16[];
-
 }

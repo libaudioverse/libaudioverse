@@ -128,7 +128,6 @@ audio_output.cpp
 #The hrtf is generated above.
 data/mixing_matrices.cpp
 data/default_hrtf.cpp
-data/hadamard.cpp
 )
 TARGET_LINK_LIBRARIES(libaudioverse ${libaudioverse_required_libraries})
 
