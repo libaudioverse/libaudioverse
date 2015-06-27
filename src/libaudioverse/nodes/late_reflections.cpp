@@ -136,7 +136,7 @@ void LateReflectionsNode::recompute() {
 	float hf_reference=getProperty(Lav_LATE_REFLECTIONS_HF_REFERENCE).getFloatValue();
 	float lf_reference = getProperty(Lav_LATE_REFLECTIONS_LF_REFERENCE).getFloatValue();
 	//The base delay is the amount we are delaying all delay lines by.
-	float baseDelay = 0.01+(1.0f-density)*0.03;
+	float baseDelay = 0.003+(1.0f-density)*0.03;
 	//Approximate delay line lengths using powers of primes.
 	int step =order/16;
 	for(int i = 0; i < 16; i+=1) {
