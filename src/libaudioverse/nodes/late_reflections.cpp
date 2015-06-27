@@ -32,7 +32,18 @@ These gains are the "low band", and two shelving filters are then applied to sha
 
 Unfortunately, the biquad formulas for lowshelf are unstable at low frequencies, something which needs debugging.
 Consequently, we have to start from the lowest band and move up with highshelves.
+
+The delay lines have coprime lengths.
 */
+
+//Used for computing the delay line lengths.
+//The first 16 prime numbers.
+	int primes[] = {
+	2, 3, 5, 7,
+	11, 13, 17, 19,
+	23, 29, 31, 37,
+	41, 47, 53, 59
+};
 
 class LateReflectionsNode: public Node {
 	public:
@@ -53,7 +64,7 @@ class LateReflectionsNode: public Node {
 
 LateReflectionsNode::LateReflectionsNode(std::shared_ptr<Simulation> simulation):
 Node(Lav_OBJTYPE_LATE_REFLECTIONS_NODE, simulation, 16, 16),
-fdn(16, (1.0/50.0)*16.0, simulation->getSr()) {
+fdn(16, 1.0f, simulation->getSr()) {
 	for(int i=0; i < 16; i++) {
 		appendInputConnection(i, 1);
 		appendOutputConnection(i, 1);
@@ -65,7 +76,7 @@ fdn(16, (1.0/50.0)*16.0, simulation->getSr()) {
 	//feed the fdn the initial matrix.
 	fdn.setMatrix(normalized_hadamard);
 	//this is fixed...for now.
-	fdn.setDelayCrossfadingTime(0.1);
+	fdn.setDelayCrossfadingTime(0.05);
 	gains=allocArray<float>(16);
 	output_frame=allocArray<float>(16);
 	next_input_frame=allocArray<float>(16);
@@ -123,9 +134,18 @@ void LateReflectionsNode::recompute() {
 	float hf_reference=getProperty(Lav_LATE_REFLECTIONS_HF_REFERENCE).getFloatValue();
 	float lf_reference = getProperty(Lav_LATE_REFLECTIONS_LF_REFERENCE).getFloatValue();
 	//The base delay is the amount we are delaying all delay lines by.
-	float base_delay=1.0f/density;
-	for(int i= 0; i < 16; i++) {
-		delays[i] = base_delay;
+	float baseDelay=1.0f/density;
+	//Approximate delay line lengths using powers of primes.
+	for(int i = 0; i < 16; i++) {
+		//We need to read them in a different order, namely:
+		//0, 4, 8, 12, 1, 5, 9, 13...
+		int prime=primes[(i%4)*4+i/4];
+		//use change of base.
+		double powerApprox = log(baseDelay*simulation->getSr())/log(prime);
+		int neededPower=round(powerApprox);
+		double delayInSamples = pow(prime, neededPower);
+		double delay=delayInSamples/simulation->getSr();
+		delays[i] = std::min(delay, 1.0);
 	}
 	fdn.setDelays(delays);
 	//configure the gains.
