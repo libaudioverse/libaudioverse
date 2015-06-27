@@ -67,10 +67,14 @@ void AmplitudePannerNode::willProcessParents() {
 void AmplitudePannerNode::process() {
 	float azimuth = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
 	float passthrough =getProperty(Lav_PANNER_PASSTHROUGH).getFloatValue();
+	bool skipCenter=getProperty(Lav_PANNER_SKIP_CENTER).getIntValue() == 1;
+	bool skipLfe=getProperty(Lav_PANNER_SKIP_LFE).getIntValue() == 1;
 	panner.pan(azimuth, block_size, input_buffers[0], num_output_buffers, &output_buffers[0]);
 	if(passthrough != 0.0f) {
 		scalarMultiplicationKernel(block_size, passthrough, input_buffers[0], input_buffers[0]);
 		for(int i = 0; i < num_output_buffers; i++) {
+			if(i ==2 && skipCenter) continue;
+			if(i==3 && skipLfe) continue;
 			scalarMultiplicationKernel(block_size, 1.0f-passthrough, output_buffers[i], output_buffers[i]);
 			additionKernel(block_size, input_buffers[0], output_buffers[i], output_buffers[i]);
 		}
