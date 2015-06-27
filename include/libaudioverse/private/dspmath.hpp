@@ -23,4 +23,7 @@ double dbToScalar(double db, double reference);
 //Only works on positive integers.
 int greatestCommonDivisor(int a, int b);
 
+//Fill a buffer with a hadamard matrix of order n (n must be power of 2).
+void hadamard(int n, float* buffer, bool shouldNormalize=true);
+
 }

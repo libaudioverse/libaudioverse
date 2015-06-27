@@ -58,6 +58,7 @@ dsp/ringmod.cpp
 dsp/iir.cpp
 dsp/db.cpp
 dsp/euclid.cpp
+dsp/hadamard_matrix.cpp
 
 #the metadata store
 #It appears that CMake dies hard if this isn't an absolute path.
