@@ -130,16 +130,13 @@ double t60ToGain(double t60, double lineLength) {
 
 void LateReflectionsNode::recompute() {
 	float density = getProperty(Lav_LATE_REFLECTIONS_DENSITY).getFloatValue();
-	//We see order times as many reflections as we expect because there are order inputs and outputs.
-	//Put another way, each delay line is contributing, on average, density reflections.
-	density /= order;
 	float t60=getProperty(Lav_LATE_REFLECTIONS_T60).getFloatValue();
 	float t60_high =getProperty(Lav_LATE_REFLECTIONS_HF_T60).getFloatValue();
 	float t60_low =getProperty(Lav_LATE_REFLECTIONS_LF_T60).getFloatValue();
 	float hf_reference=getProperty(Lav_LATE_REFLECTIONS_HF_REFERENCE).getFloatValue();
 	float lf_reference = getProperty(Lav_LATE_REFLECTIONS_LF_REFERENCE).getFloatValue();
 	//The base delay is the amount we are delaying all delay lines by.
-	float baseDelay=1.0f/density;
+	float baseDelay = 0.01+(1.0f-density)*0.03;
 	//Approximate delay line lengths using powers of primes.
 	int step =order/16;
 	for(int i = 0; i < 16; i+=1) {

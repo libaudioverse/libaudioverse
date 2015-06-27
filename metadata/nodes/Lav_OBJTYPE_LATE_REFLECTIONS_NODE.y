@@ -10,11 +10,11 @@ properties:
       Higher values are indicative of larger spaces.
   Lav_LATE_REFLECTIONS_DENSITY:
     name: density
-    default: 500
+    default: 0.5
     type: float
-    range: [100.0, 1000.0]
+    range: [0.0, 1.0]
     doc_description: |
-      The average number of reflections per second.
+      Controls the number of reflections heard per second.
       
       Higher values are generally indicative of more complex and reflective surfaces, placed closer together.
       As an example, a carpetted cathedral would have a lower value than a small, concrete room.
