@@ -37,12 +37,12 @@ The delay lines have coprime lengths.
 */
 
 //Used for computing the delay line lengths.
-//The first 16 prime numbers.
-	int primes[] = {
-	2, 3, 5, 7,
-	11, 13, 17, 19,
-	23, 29, 31, 37,
-	41, 47, 53, 59
+//A set of coprime integers.
+int coprimes[] = {
+	3, 4, 5, 7,
+	9, 11, 13, 16,
+	17, 19, 23, 27,
+	29, 31, 35, 37
 };
 
 class LateReflectionsNode: public Node {
@@ -139,7 +139,7 @@ void LateReflectionsNode::recompute() {
 	for(int i = 0; i < 16; i++) {
 		//We need to read them in a different order, namely:
 		//0, 4, 8, 12, 1, 5, 9, 13...
-		int prime=primes[(i%4)*4+i/4];
+		int prime= coprimes[(i%4)*4+i/4];
 		//use change of base.
 		double powerApprox = log(baseDelay*simulation->getSr())/log(prime);
 		int neededPower=round(powerApprox);

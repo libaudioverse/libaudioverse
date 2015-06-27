@@ -23,4 +23,5 @@ while len(coprimes) < count:
 			j+=1
 	coprimes.add(j)
 result=sorted(coprimes)
-print result
+
+print ", ".join((str(i) for i in result))
