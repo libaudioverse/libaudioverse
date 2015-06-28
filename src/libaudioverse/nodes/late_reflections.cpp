@@ -42,7 +42,7 @@ Each delay is copied to fill a range, namely order/16, of adjacent lines.
 */
 
 //The order must be a multiple of 16 and power of two.
-const int order=32;
+const int order= 16;
 
 //Used for computing the delay line lengths.
 //A set of coprime integers.
