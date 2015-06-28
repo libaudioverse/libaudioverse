@@ -49,11 +49,30 @@ properties:
     default: 500.0
     range: dynamic
     doc_description: |
-      Frequencies below this valuea re in the "low band" of the late reflections.
+      Frequencies below this valuea are in the "low band" of the late reflections.
       
       Frequencies above this value but below {{"hf_reference"|codelit}} are in the middle band of the late reflections.
       
       This property ranges from 0 to nyquist, or half the sampling rate.
+  Lav_LATE_REFLECTIONS_AMPLITUDE_MODULATION_DEPTH:
+    name: amplitude_modulation_depth
+    type: float
+    default: 0.0
+    range: [0.0, 1.0]
+    doc_description: |
+      Applies internal amplitude modulation to the reverb.
+      
+      This property is best described as adding wobble or rotation.
+      Explaining the exact effect of this property is difficult without a detailed discussion of the implementation of this node; experiment and see what happens.
+  Lav_LATE_REFLECTIONS_AMPLITUDE_MODULATION_FREQUENCY:
+    name: amplitude_modulation_frequency
+    type: float
+    default: 10.0
+    range: [0.0, 1000.0]
+    doc_description: |
+      Controls the rate of change of the amplitude modulation.
+      
+      Higher values increase the rate of the "wobble".
 inputs: described
 outputs: described
 doc_name: late reflections

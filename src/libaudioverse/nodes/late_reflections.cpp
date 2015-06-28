@@ -12,6 +12,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/data.hpp>
 #include <libaudioverse/private/dspmath.hpp>
 #include <libaudioverse/implementations/feedback_delay_network.hpp>
+#include <libaudioverse/implementations/sin_osc.hpp>
+#include <libaudioverse/implementations/delayline.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/kernels.hpp>
@@ -66,11 +68,16 @@ class LateReflectionsNode: public Node {
 	//Filters for the band separation.
 	IIRFilter** highshelves; //Shapes from mid to high band.
 	IIRFilter** midshelves; //Shapes from low to mid band.
+	//used for amplitude modulation.
+	DelayRingbuffer amplitude_modulation_ringbuffer;
+	SinOsc amplitude_modulation_oscillator;
 };
 
 LateReflectionsNode::LateReflectionsNode(std::shared_ptr<Simulation> simulation):
 Node(Lav_OBJTYPE_LATE_REFLECTIONS_NODE, simulation, order, order),
-fdn(order, 1.0f, simulation->getSr()) {
+fdn(order, 1.0f, simulation->getSr()),
+amplitude_modulation_ringbuffer(order),
+amplitude_modulation_oscillator(simulation->getSr()) {
 	for(int i=0; i < order; i++) {
 		appendInputConnection(i, 1);
 		appendOutputConnection(i, 1);
@@ -97,6 +104,9 @@ hadamard(order, normalized_hadamard);
 		highshelves[i] = new IIRFilter(simulation->getSr());
 		midshelves[i] = new IIRFilter(simulation->getSr());
 	}
+	//Prime the delay line.
+	amplitude_modulation_oscillator.setFrequency(10);
+	for(int i = 0; i < order; i++) amplitude_modulation_ringbuffer.advance(amplitude_modulation_oscillator.tick());
 	//initial configuration.
 	recompute();
 }
@@ -191,6 +201,11 @@ void LateReflectionsNode::process() {
 	Lav_LATE_REFLECTIONS_T60, Lav_LATE_REFLECTIONS_DENSITY, Lav_LATE_REFLECTIONS_HF_T60,
 	Lav_LATE_REFLECTIONS_LF_T60, Lav_LATE_REFLECTIONS_HF_REFERENCE, Lav_LATE_REFLECTIONS_LF_REFERENCE
 	)) recompute();
+	amplitude_modulation_oscillator.normalize();
+	float amplitudeModulationDepth = getProperty(Lav_LATE_REFLECTIONS_AMPLITUDE_MODULATION_DEPTH).getFloatValue();
+	//divide by 2 because it's the upper half of a sine wave.
+	float amplitudeModulationFrequency = getProperty(Lav_LATE_REFLECTIONS_AMPLITUDE_MODULATION_FREQUENCY).getFloatValue()/2.0;
+	amplitude_modulation_oscillator.setFrequency(amplitudeModulationFrequency);
 	for(int i= 0; i < block_size; i++) {
 		//Get the fdn's output.
 		fdn.computeFrame(output_frame);
@@ -199,9 +214,19 @@ void LateReflectionsNode::process() {
 			//Through the highshelf, then the lowshelf.
 			output_frame[j] = midshelves[j]->tick(highshelves[j]->tick(gains[j]*output_frame[j]));
 		}
+		multiplicationKernel(order, gains, output_frame, output_frame);
+		//appluy the amplitude modulation.
+		for(int j = 0; j < order; j++) {
+			float modulator=amplitude_modulation_ringbuffer.read(15-j);
+			modulator *= amplitudeModulationDepth;
+			//scale to not be negative.
+			modulator += amplitudeModulationDepth/2.0f;
+			output_buffers[j][i] *= (1.0f-amplitudeModulationDepth+modulator);
+		}
 		//bring in the inputs.
 		for(int j = 0; j < order; j++) next_input_frame[j] = input_buffers[j][i];
 		fdn.advance(next_input_frame, output_frame);
+		amplitude_modulation_ringbuffer.advance(amplitude_modulation_oscillator.tick());
 	}
 }
 
