@@ -59,6 +59,8 @@ class LateReflectionsNode: public Node {
 	~LateReflectionsNode();
 	virtual void process();
 	void recompute();
+	void amplitudeModulationFrequencyChanged();
+	void normalizeOscillators();
 	void reset() override;
 	FeedbackDelayNetwork fdn;
 	float* delays = nullptr;
@@ -69,15 +71,12 @@ class LateReflectionsNode: public Node {
 	IIRFilter** highshelves; //Shapes from mid to high band.
 	IIRFilter** midshelves; //Shapes from low to mid band.
 	//used for amplitude modulation.
-	DelayRingbuffer amplitude_modulation_ringbuffer;
-	SinOsc amplitude_modulation_oscillator;
+	SinOsc **amplitude_modulators;
 };
 
 LateReflectionsNode::LateReflectionsNode(std::shared_ptr<Simulation> simulation):
 Node(Lav_OBJTYPE_LATE_REFLECTIONS_NODE, simulation, order, order),
-fdn(order, 1.0f, simulation->getSr()),
-amplitude_modulation_ringbuffer(order),
-amplitude_modulation_oscillator(simulation->getSr()) {
+fdn(order, 1.0f, simulation->getSr()) {
 	for(int i=0; i < order; i++) {
 		appendInputConnection(i, 1);
 		appendOutputConnection(i, 1);
@@ -104,9 +103,11 @@ hadamard(order, normalized_hadamard);
 		highshelves[i] = new IIRFilter(simulation->getSr());
 		midshelves[i] = new IIRFilter(simulation->getSr());
 	}
-	//Prime the delay line.
-	amplitude_modulation_oscillator.setFrequency(10);
-	for(int i = 0; i < order; i++) amplitude_modulation_ringbuffer.advance(amplitude_modulation_oscillator.tick());
+	amplitude_modulators = new SinOsc*[order]();
+	for(int i = 0; i < order; i++) {
+		amplitude_modulators[i] = new SinOsc(simulation->getSr());
+		amplitude_modulators[i]->setPhase((float)i/order);
+	}
 	//initial configuration.
 	recompute();
 }
@@ -125,9 +126,11 @@ LateReflectionsNode::~LateReflectionsNode() {
 	for(int i=0; i < order; i++) {
 		delete highshelves[i];
 		delete midshelves[i];
+		delete amplitude_modulators[i];
 	}
 	delete[] highshelves;
 	delete[] midshelves;
+	delete[] amplitude_modulators;
 }
 
 double t60ToGain(double t60, double lineLength) {
@@ -196,16 +199,29 @@ void LateReflectionsNode::recompute() {
 	}
 }
 
+void LateReflectionsNode::amplitudeModulationFrequencyChanged() {
+	float freq=getProperty(Lav_LATE_REFLECTIONS_AMPLITUDE_MODULATION_FREQUENCY).getFloatValue();
+	for(int i = 0; i < order; i++) {
+		amplitude_modulators[i]->setFrequency(freq);
+	}
+}
+
+void LateReflectionsNode::normalizeOscillators() {
+	for(int i = 0; i < order; i++) {
+		amplitude_modulators[i]->normalize();
+	}
+}
+
 void LateReflectionsNode::process() {
 	if(werePropertiesModified(this,
 	Lav_LATE_REFLECTIONS_T60, Lav_LATE_REFLECTIONS_DENSITY, Lav_LATE_REFLECTIONS_HF_T60,
 	Lav_LATE_REFLECTIONS_LF_T60, Lav_LATE_REFLECTIONS_HF_REFERENCE, Lav_LATE_REFLECTIONS_LF_REFERENCE
 	)) recompute();
-	amplitude_modulation_oscillator.normalize();
+	if(werePropertiesModified(this, Lav_LATE_REFLECTIONS_AMPLITUDE_MODULATION_FREQUENCY)) amplitudeModulationFrequencyChanged();
+	normalizeOscillators();
 	float amplitudeModulationDepth = getProperty(Lav_LATE_REFLECTIONS_AMPLITUDE_MODULATION_DEPTH).getFloatValue();
 	//divide by 2 because it's the upper half of a sine wave.
 	float amplitudeModulationFrequency = getProperty(Lav_LATE_REFLECTIONS_AMPLITUDE_MODULATION_FREQUENCY).getFloatValue()/2.0;
-	amplitude_modulation_oscillator.setFrequency(amplitudeModulationFrequency);
 	for(int i= 0; i < block_size; i++) {
 		//Get the fdn's output.
 		fdn.computeFrame(output_frame);
@@ -217,7 +233,7 @@ void LateReflectionsNode::process() {
 		multiplicationKernel(order, gains, output_frame, output_frame);
 		//appluy the amplitude modulation.
 		for(int j = 0; j < order; j++) {
-			float modulator=amplitude_modulation_ringbuffer.read(15-j);
+			float modulator=amplitude_modulators[j]->tick();
 			modulator *= amplitudeModulationDepth;
 			//scale to not be negative.
 			modulator += amplitudeModulationDepth/2.0f;
@@ -226,7 +242,6 @@ void LateReflectionsNode::process() {
 		//bring in the inputs.
 		for(int j = 0; j < order; j++) next_input_frame[j] = input_buffers[j][i];
 		fdn.advance(next_input_frame, output_frame);
-		amplitude_modulation_ringbuffer.advance(amplitude_modulation_oscillator.tick());
 	}
 }
 
@@ -235,6 +250,7 @@ void LateReflectionsNode::reset() {
 	for(int i = 0; i < order; i++) {
 		midshelves[i]->clearHistories();
 		highshelves[i]->clearHistories();
+		amplitude_modulators[i]->setPhase((float)i/order);
 	}
 }
 

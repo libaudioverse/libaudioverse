@@ -62,17 +62,19 @@ properties:
     doc_description: |
       Applies internal amplitude modulation to the reverb.
       
-      This property is best described as adding wobble or rotation.
-      Explaining the exact effect of this property is difficult without a detailed discussion of the implementation of this node; experiment and see what happens.
+      The effect of this property for low values of {{"amplitude_modulation_frequency"|codelit}} is to add spin to the reverb.
+      At higher values of {{"amplitude_modulation_frequency"|codelit}}, this property is best described as adding granularity;
+      at still higher values of {{"amplitude_modulation_frequency"|codelit}}, strange harmonics are introduced into the reverb.
   Lav_LATE_REFLECTIONS_AMPLITUDE_MODULATION_FREQUENCY:
     name: amplitude_modulation_frequency
     type: float
     default: 10.0
-    range: [0.0, 1000.0]
+    range: [-INFINITY, INFINITY]
     doc_description: |
       Controls the rate of change of the amplitude modulation.
       
-      Higher values increase the rate of the "wobble".
+      Higher values increase the rate of the circular effect, eventually transitioning to ring modulation.
+      Negative values reverse the direction.
 inputs: described
 outputs: described
 doc_name: late reflections
