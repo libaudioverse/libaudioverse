@@ -72,6 +72,8 @@ class LateReflectionsNode: public Node {
 	IIRFilter** midshelves; //Shapes from low to mid band.
 	//used for amplitude modulation.
 	SinOsc **amplitude_modulators;
+	//Used to optimize by allowing us to use SSE.
+	float* amplitude_modulation_buffer;
 };
 
 LateReflectionsNode::LateReflectionsNode(std::shared_ptr<Simulation> simulation):
@@ -108,6 +110,7 @@ hadamard(order, normalized_hadamard);
 		amplitude_modulators[i] = new SinOsc(simulation->getSr());
 		amplitude_modulators[i]->setPhase((float)i/order);
 	}
+	amplitude_modulation_buffer=allocArray<float>(simulation->getBlockSize());
 	//initial configuration.
 	recompute();
 }
@@ -123,6 +126,7 @@ LateReflectionsNode::~LateReflectionsNode() {
 	freeArray(output_frame);
 	freeArray(next_input_frame);
 	freeArray(delays);
+	freeArray(amplitude_modulation_buffer);
 	for(int i=0; i < order; i++) {
 		delete highshelves[i];
 		delete midshelves[i];
@@ -231,17 +235,21 @@ void LateReflectionsNode::process() {
 			output_frame[j] = midshelves[j]->tick(highshelves[j]->tick(gains[j]*output_frame[j]));
 		}
 		multiplicationKernel(order, gains, output_frame, output_frame);
-		//appluy the amplitude modulation.
-		for(int j = 0; j < order; j++) {
-			float modulator=amplitude_modulators[j]->tick();
-			modulator *= amplitudeModulationDepth;
-			//scale to not be negative.
-			modulator += amplitudeModulationDepth/2.0f;
-			output_buffers[j][i] *= (1.0f-amplitudeModulationDepth+modulator);
-		}
 		//bring in the inputs.
 		for(int j = 0; j < order; j++) next_input_frame[j] = input_buffers[j][i];
 		fdn.advance(next_input_frame, output_frame);
+	}
+	//appluy the amplitude modulation.
+	for(int output = 0; output < num_output_buffers; output++) {
+		float* output_buffer=output_buffers[output];
+		SinOsc& osc= *amplitude_modulators[output];
+		//get  A sine wave.
+		osc.fillBuffer(block_size, amplitude_modulation_buffer);
+		//Implement 1.0-amplitudeModulationDepth/2+amplitudeModulationDepth*oscillatorValue.
+		scalarMultiplicationKernel(block_size, amplitudeModulationDepth, amplitude_modulation_buffer, amplitude_modulation_buffer);
+		scalarAdditionKernel(block_size, 1.0f-amplitudeModulationDepth/2.0f, amplitude_modulation_buffer, amplitude_modulation_buffer);
+		//Apply the modulation.
+		multiplicationKernel(block_size, amplitude_modulation_buffer, output_buffer, output_buffer);
 	}
 }
 
