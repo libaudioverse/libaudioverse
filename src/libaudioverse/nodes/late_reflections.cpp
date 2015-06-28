@@ -139,7 +139,8 @@ void LateReflectionsNode::recompute() {
 	float baseDelay = 0.003+(1.0f-density)*0.03;
 	//Approximate delay line lengths using powers of primes.
 	for(int i = 0; i < 16; i+=1) {
-		int prime= coprimes[i];
+		//0, 4, 8, 12, 1, 5, 9, 13...
+		int prime= coprimes[(i%4)*4+i/4];
 		//use change of base.
 		double powerApprox = log(baseDelay*simulation->getSr())/log(prime);
 		int neededPower=round(powerApprox);
@@ -150,16 +151,16 @@ void LateReflectionsNode::recompute() {
 	}
 	for(int i=1; i < order/16; i++) {
 		std::copy(delays, delays+16, delays+i*16);
-		//reverse every other range.
-		if(i %2) std::reverse(delays+i*16, delays+i*16+16);
+		//Helps avoid panning effects.
+		//Without this line, the reverb sounds panned to one side.
+		//This is probably because the longest delay lines end up in the back right and front left.
+		if(i%2) std::reverse(delays+i*16, delays+i*16+16);
 	}
-	//These are interpolated delay lines.
-	//If we have "opposite" pairs with exactly the same delay, we get points in the reverb that do not sound like all others.
-	//To that end, move them by half a sample.
+	//If we have adjacent pairs with exactly the same delay, we get points in the reverb that do not sound like all others.
+	//We can avoid this by swapping the delay lines at the end of each range with the delay lines at the beginning of the current range.
 	for(int i =0; i < order/16; i++) {
-		float delta=1.0/simulation->getSr()/2.0;
-		if(i%2) delta*=-1;
-		delays[i*16]+=delta;
+		std::swap(delays[i*16], delays[i*16+15]);
+		std::swap(delays[i*16+1], delays[i*16+14]);
 	}
 	fdn.setDelays(delays);
 	//configure the gains.
