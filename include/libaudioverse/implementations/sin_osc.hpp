@@ -28,6 +28,24 @@ class SinOsc {
 		return osx*cp+ocx*sp;
 	}
 
+	//version of tick that applies to a buffer.
+	void fillBuffer(int length, float* buffer) {
+		//making these locals and putting them back increases the chance they'll get registers.
+		float lcx=cx, lsx=sx;
+		float lcd=cd, lsd=sd;
+		float lcp=cp, lsp =sp;
+		for(int i= 0; i < length; i++) {
+			float ocx=lcx, osx=lsx;
+			lsx = osx*lcd+ocx*lsd;
+			lcx = ocx*lcd-osx*lsd;
+			//we account for phase here.
+			buffer[i] = osx*lcp+ocx*lsp;
+		}
+		//put them back.
+		cx=lcx;
+		sx=lsx;
+	}
+	
 	void setFrequency(float f) {
 		//We don't lose phase, so don't touch cx and sx.
 		sd= sinf(2*PI*f/sr);

@@ -43,9 +43,7 @@ void SineNode::process() {
 	auto &freqProp = getProperty(Lav_SINE_FREQUENCY);
 	if(freqProp.needsARate()==false) {
 		oscillator.setFrequency(freqProp.getFloatValue());
-		for(unsigned int i = 0; i< block_size; i++) {
-			output_buffers[0][i] = oscillator.tick();
-		}
+		oscillator.fillBuffer(block_size, output_buffers[0]);
 	}
 	else {
 		for(int i=0; i < block_size; i++) {
