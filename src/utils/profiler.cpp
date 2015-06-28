@@ -54,6 +54,9 @@ ENTRY("channel merger", 1000, Lav_createChannelMergerNode(sim, 10, &h)),
 ENTRY("noise", 100, Lav_createNoiseNode(sim, &h)),
 ENTRY("square", 500, Lav_createSquareNode(sim, &h)),
 ENTRY("ringmod", 1000, Lav_createRingmodNode(sim, &h)),
+ENTRY("16x16 FDN", 1, Lav_createFeedbackDelayNetworkNode(sim, 1.0f, 16, &h)),
+ENTRY("32x32 FDN", 1, Lav_createFeedbackDelayNetworkNode(sim, 1.0f, 32, &h)),
+ENTRY("late reflections generator", 1, Lav_createLateReflectionsNode(sim, &h)),
 };
 int to_profile_size=sizeof(to_profile)/sizeof(to_profile[0]);
 
