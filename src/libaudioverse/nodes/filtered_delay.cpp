@@ -10,7 +10,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/dspmath.hpp>
 #include <libaudioverse/implementations/delayline.hpp>
-#include <libaudioverse/private/iir.hpp>
+#include <libaudioverse/implementations/biquad.hpp>
 #include <vector>
 #include <limits>
 #include <memory>
@@ -31,7 +31,7 @@ class FilteredDelayNode: public Node {
 	void reconfigureBiquads();
 	unsigned int delay_line_length = 0;
 	CrossfadingDelayLine **lines;
-	IIRFilter** biquads;
+	BiquadFilter** biquads;
 	int prev_type; //used for biquad history resets.
 	int channels;
 };
@@ -47,8 +47,8 @@ FilteredDelayNode::FilteredDelayNode(std::shared_ptr<Simulation> simulation, flo
 	appendInputConnection(0, channels);
 	appendOutputConnection(0, channels);
 	//This node was made by merging delay and biquad, everything below here is biquad:
-	biquads = new IIRFilter*[channels]();
-	for(int i= 0; i < channels; i++) biquads[i] = new IIRFilter(simulation->getSr());
+	biquads = new BiquadFilter*[channels]();
+	for(int i= 0; i < channels; i++) biquads[i] = new BiquadFilter(simulation->getSr());
 	prev_type = getProperty(Lav_BIQUAD_FILTER_TYPE).getIntValue();
 }
 
@@ -84,7 +84,7 @@ void FilteredDelayNode::reconfigureBiquads() {
 	float q = getProperty(Lav_FILTERED_DELAY_Q).getFloatValue();
 	float dbgain= getProperty(Lav_FILTERED_DELAY_DBGAIN).getFloatValue();
 	for(int i=0; i < channels; i++) {
-		biquads[i]->configureBiquad(type, frequency, dbgain, q);
+		biquads[i]->configure(type, frequency, dbgain, q);
 		if(type != prev_type) biquads[i]->clearHistories();
 	}
 	prev_type = type;

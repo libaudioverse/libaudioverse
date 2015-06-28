@@ -17,7 +17,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/kernels.hpp>
-#include <libaudioverse/private/iir.hpp>
+#include <libaudioverse/implementations/biquad.hpp>
 #include <limits>
 #include <algorithm>
 #include <random>
@@ -68,8 +68,8 @@ class LateReflectionsNode: public Node {
 	float* output_frame=nullptr, *next_input_frame =nullptr;
 	float* normalized_hadamard = nullptr;
 	//Filters for the band separation.
-	IIRFilter** highshelves; //Shapes from mid to high band.
-	IIRFilter** midshelves; //Shapes from low to mid band.
+	BiquadFilter** highshelves; //Shapes from mid to high band.
+	BiquadFilter** midshelves; //Shapes from low to mid band.
 	//used for amplitude modulation.
 	SinOsc **amplitude_modulators;
 	//Used to optimize by allowing us to use SSE.
@@ -99,11 +99,11 @@ hadamard(order, normalized_hadamard);
 	getProperty(Lav_LATE_REFLECTIONS_HF_REFERENCE).setFloatRange(0.0, nyquist);
 	getProperty(Lav_LATE_REFLECTIONS_LF_REFERENCE).setFloatRange(0.0, nyquist);
 	//allocate the filters.
-	highshelves=new IIRFilter*[order];
-	midshelves = new IIRFilter*[order];
+	highshelves=new BiquadFilter*[order];
+	midshelves = new BiquadFilter*[order];
 	for(int i = 0; i < order; i++) {
-		highshelves[i] = new IIRFilter(simulation->getSr());
-		midshelves[i] = new IIRFilter(simulation->getSr());
+		highshelves[i] = new BiquadFilter(simulation->getSr());
+		midshelves[i] = new BiquadFilter(simulation->getSr());
 	}
 	amplitude_modulators = new SinOsc*[order]();
 	for(int i = 0; i < order; i++) {
@@ -198,8 +198,8 @@ void LateReflectionsNode::recompute() {
 		double highDb = scalarToDb(highGain, midGain);
 		//Careful reading of the audio eq cookbook reveals that when s=1, q is always sqrt(2).
 		//We add a very tiny bit to help against numerical error.
-		highshelves[i]->configureBiquad(Lav_BIQUAD_TYPE_HIGHSHELF, hf_reference, highDb, 1/sqrt(2.0)+1e-4);
-		midshelves[i]->configureBiquad(Lav_BIQUAD_TYPE_HIGHSHELF, lf_reference, midDb, 1.0/sqrt(2.0)+1e-4);
+		highshelves[i]->configure(Lav_BIQUAD_TYPE_HIGHSHELF, hf_reference, highDb, 1/sqrt(2.0)+1e-4);
+		midshelves[i]->configure(Lav_BIQUAD_TYPE_HIGHSHELF, lf_reference, midDb, 1.0/sqrt(2.0)+1e-4);
 	}
 }
 
