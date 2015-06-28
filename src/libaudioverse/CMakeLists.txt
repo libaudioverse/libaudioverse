@@ -71,6 +71,7 @@ kernels/interleaving.cpp
 kernels/mixing_matrix.cpp
 kernels/adding.cpp
 kernels/multiplying.cpp
+kernels/dot.cpp
 
 #Like kernels, but stateful.
 implementations/panner.cpp

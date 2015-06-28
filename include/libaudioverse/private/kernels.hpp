@@ -52,4 +52,6 @@ The matrix rows represent output channels and the columns input channels.
 The result is that each output buffer is the sum of the input buffers multiplied by the scalars in the matrix row representing it.*/
 void applyMixingMatrix(int sampleCount, int inputChannels, float** inputs, int outputChannels, float** outputs, const float* mixingMatrix);
 
+/**Dot two vectors.*/
+float dotKernel(int length, float* v1, float* v2);
 }
