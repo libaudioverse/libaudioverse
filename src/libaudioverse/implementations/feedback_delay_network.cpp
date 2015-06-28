@@ -1,9 +1,11 @@
 /**Copyright (C) Austin Hicks, 2014
 This file is part of Libaudioverse, a library for 3D and environmental audio simulation, and is released under the terms of the Gnu General Public License Version 3 or (at your option) any later version.
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
+#include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/dspmath.hpp>
 #include <libaudioverse/implementations/delayline.hpp>
 #include <libaudioverse/implementations/feedback_delay_network.hpp>
+#include <libaudioverse/private/kernels.hpp>
 #include <algorithm>
 #include <functional>
 #include <math.h>
@@ -15,14 +17,14 @@ FeedbackDelayNetwork::FeedbackDelayNetwork(int n, float maxDelay, float sr) {
 	this->sr = sr;
 	lines = new CrossfadingDelayLine*[n];
 	for(int i = 0; i < n; i++) lines[i] = new CrossfadingDelayLine(maxDelay, sr);
-	matrix = new float[n*n]();
+	matrix = allocArray<float>(n*n);
 	workspace = new float[n*n]();
 }
 
 FeedbackDelayNetwork::~FeedbackDelayNetwork() {
 	for(int i = 0; i < n; i++) delete lines[i];
 	delete[] lines;
-	delete[] matrix;
+	freeArray(matrix);
 	delete[] workspace;
 }
 
@@ -34,8 +36,7 @@ void FeedbackDelayNetwork::computeFrame(float* outputs) {
 
 void FeedbackDelayNetwork::advance(const float* inputs, const float* lastOutputFrame) {
 	for(int i=0; i < n; i++) {
-		float sample=0.0f;
-		for(int j = 0; j < n; j++) sample += matrix[i*n+j]*lastOutputFrame[j];
+		float sample=dotKernel(n, matrix+n*i, lastOutputFrame);
 		sample+=inputs[i];
 		lines[i]->advance(sample);
 	}

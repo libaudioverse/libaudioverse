@@ -63,7 +63,7 @@ void freeArray(void* ptr) {
 	#endif
 }
 
-bool isAligned(void* ptr) {
+bool isAligned(const void* ptr) {
 	#if LIBAUDIOVERSE_MALLOC_ALIGNMENT==1
 	return true;
 	#else

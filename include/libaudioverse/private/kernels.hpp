@@ -53,5 +53,5 @@ The result is that each output buffer is the sum of the input buffers multiplied
 void applyMixingMatrix(int sampleCount, int inputChannels, float** inputs, int outputChannels, float** outputs, const float* mixingMatrix);
 
 /**Dot two vectors.*/
-float dotKernel(int length, float* v1, float* v2);
+float dotKernel(int length, const float* v1, const float* v2);
 }
