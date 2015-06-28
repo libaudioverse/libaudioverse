@@ -154,7 +154,12 @@ void LateReflectionsNode::recompute() {
 		//Helps avoid panning effects.
 		//Without this line, the reverb sounds panned to one side.
 		//This is probably because the longest delay lines end up in the back right and front left.
-		if(i%2) std::reverse(delays+i*16, delays+i*16+16);
+		if(i%2) {
+			std::reverse(delays+i*16, delays+i*16+16);
+			//at the moment, we have adjacent pairs of similar delay lines, which adds a "string" effect.
+			//To fix this, reverse the first half of the range.
+			std::reverse(delays+i*16, delays+i*16+8);
+		}
 	}
 	//If we have adjacent pairs with exactly the same delay, we get points in the reverb that do not sound like all others.
 	//We can avoid this by swapping the delay lines at the end of each range with the delay lines at the beginning of the current range.
