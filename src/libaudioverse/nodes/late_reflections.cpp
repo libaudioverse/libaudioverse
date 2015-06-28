@@ -166,6 +166,8 @@ void LateReflectionsNode::recompute() {
 		delay = std::min(delay, 1.0);
 		delays[i] = delay;
 	}
+	//For higher orders, we have to fix the delay lines some.
+	//Without this loop, 32 and higher orders are prone to metallic distortion.
 	for(int i=1; i < order/16; i++) {
 		std::copy(delays, delays+16, delays+i*16);
 		//Helps avoid panning effects.
