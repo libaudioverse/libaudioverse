@@ -9,12 +9,13 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/kernels.hpp>
+#include <libaudioverse/implementations/biquad.hpp>
 #include <limits>
 #include <memory>
 #include <algorithm>
 #include <utility>
 #include <vector>
-#include <libaudioverse/private/iir.hpp>
+
 
 namespace libaudioverse_implementation {
 
@@ -26,15 +27,15 @@ class BiquadNode: public Node {
 	void reconfigure();
 	void reset() override;
 	private:
-	IIRFilter** biquads;
+	BiquadFilter** biquads;
 	int channels;
 	int prev_type;
 };
 
 BiquadNode::BiquadNode(std::shared_ptr<Simulation> sim, unsigned int channels): Node(Lav_OBJTYPE_BIQUAD_NODE, sim, channels, channels) {
 	this->channels=channels;
-	biquads = new IIRFilter*[channels]();
-	for(int i= 0; i < channels; i++) biquads[i] = new IIRFilter(simulation->getSr());
+	biquads = new BiquadFilter*[channels]();
+	for(int i= 0; i < channels; i++) biquads[i] = new BiquadFilter(simulation->getSr());
 	prev_type = getProperty(Lav_BIQUAD_FILTER_TYPE).getIntValue();
 	appendInputConnection(0, channels);
 	appendOutputConnection(0, channels);
@@ -58,7 +59,7 @@ void BiquadNode::reconfigure() {
 	float q = getProperty(Lav_BIQUAD_Q).getFloatValue();
 	float dbgain= getProperty(Lav_BIQUAD_DBGAIN).getFloatValue();
 	for(int i=0; i < channels; i++) {
-		biquads[i]->configureBiquad(type, frequency, dbgain, q);
+		biquads[i]->configure(type, frequency, dbgain, q);
 		if(type != prev_type) biquads[i]->clearHistories();
 	}
 	prev_type = type;
@@ -69,7 +70,7 @@ void BiquadNode::process() {
 	//doing this this way may make the algorithm morecache- friendly on some compilers/systems.
 	//It also avoids a large number of extraneous lookups in the vctor.
 	for(int j = 0; j < channels; j++) {
-		IIRFilter &bq = *biquads[j];
+		BiquadFilter &bq = *biquads[j];
 		for(unsigned int i = 0; i < block_size; i++) {
 			output_buffers[j][i] = bq.tick(input_buffers[j][i]);
 		}

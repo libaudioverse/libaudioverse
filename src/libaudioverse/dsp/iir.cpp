@@ -5,6 +5,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 /**Implement a generic IIR filter.*/
 #include <algorithm>
 #include <libaudioverse/private/iir.hpp>
+#include <libaudioverse/implementations/biquad.hpp> //for biquadConfigurationImplementation
 //for biquad types.
 #include <libaudioverse/libaudioverse_properties.h>
 //for error codes
@@ -67,98 +68,8 @@ float IIRFilter::tick(float sample) {
 }
 
 void IIRFilter::configureBiquad(int type, double frequency, double dbGain, double q) {
-	//this entire function is a straightforward implementation of the Audio EQ cookbook, included with this repository.
-	//we move these onto the class at the end of the function explicitly.
-	double a0, a1, a2, b0, b1, b2, gain;
-	//alias our parameters to match the Audio EQ cookbook.
-	double fs = sr;
-	double f0 = frequency;
-	//only common intermediate variable for all of these.
-	double omega = 2.0*PI*f0/fs;
-	double sinv=sin(omega);
-	double cosv=cos(omega);
-	double alpha = sinv/ (2.0 * q);
-	double  a = sqrt(pow(10, dbGain/20.0)); //this is recalculated for 3 special cases later.
-	double beta = 0.0; //recomputed below.
-	switch(type) {
-		case Lav_BIQUAD_TYPE_LOWPASS:
-		b0 = (1 - cosv)/2.0;
-		b1 = 1 - cosv;
-		b2 = (1 -cosv) /2.0;
-		a0 = 1 + alpha;
-		a1 = -2.0 * cosv;
-		a2 = 1 - alpha;
-		break;
-		case Lav_BIQUAD_TYPE_HIGHPASS:
-		b0 = (1 + cosv)/2.0;
-		b1 = -(1 + cosv);
-		b2 = (1 + cosv) / 2.0;
-		a0 = 1 + alpha;
-		a1 = -2.0*cosv;
-		a2 = 1 - alpha;
-		break;
-		case Lav_BIQUAD_TYPE_BANDPASS:
-		b0 = alpha;
-		b1 = 0;
-		b2 = -alpha;
-		a0 = 1 + alpha;
-		a1 = -2.0*cosv;
-		a2 = 1 - alpha;
-		break;
-		case Lav_BIQUAD_TYPE_NOTCH:
-		b0 = 1;
-		b1 = -2.0 * cosv;
-		b2 = 1.0;
-		a0 = 1 + alpha;
-		a1 = -2.0 * cosv;
-		a2 = 1 - alpha;
-		break;
-		case Lav_BIQUAD_TYPE_ALLPASS:
-		b0 = 1 - alpha;
-		b1 = -2.0 * cosv;
-		b2 = 1 + alpha;
-		a0 = 1 + alpha;
-		a1 = -2.0 * cosv;
-		a2 = 1 - alpha;
-		break;
-		case Lav_BIQUAD_TYPE_PEAKING:
-		a = pow(10, dbGain/40.0);
-		b0 = 1 + alpha*a;
-		b1 = -2.0 * cosv;
-		b2 = 1 - alpha * a;
-		a0 = 1 + alpha / a;
-		a1 = -2.0 * cosv;
-		a2 = 1 - alpha / a;
-		break;
-		case Lav_BIQUAD_TYPE_LOWSHELF:
-		a = pow(10, dbGain/40.0);
-		beta = sqrt(a)/q;
-		b0 = a*((a+1) - (a - 1)*cosv + beta*sinv);
-		b1 = 2 * a * ((a - 1) - (a + 1) * cosv);
-		b2 = a * ((a + 1) - (a - 1) * cosv - beta*sinv);
-		a0 = (a + 1) + (a - 1)*cosv + beta*sinv;
-		a1 = -2.0*((a - 1)+ (a+1) * cosv);
-		a2 = (a + 1) - (a - 1)*cosv-beta*sinv;
-		break;
-		case Lav_BIQUAD_TYPE_HIGHSHELF:
-		a = pow(10, dbGain/40.0);
-		beta =sqrt(a)/q;
-		b0 = a*((a+1)+(a-1)*cosv + beta*sinv);
-		b1 = -2.0*a*((a - 1)+(a+1)*cosv);
-		b2 = a*((a+1)+(a-1)*cosv-beta*sinv);
-		a0 = (a+1) - (a - 1)*cosv+beta*sinv;
-		a1 = 2.0*((a-1)-(a+1)*cosv);
-		a2 = (a+1)-(a-1)*cosv-beta*sinv;
-		break;
-		case Lav_BIQUAD_TYPE_IDENTITY:
-		b0 = 1;
-		b1 = 0;
-		b2 = 0;
-		a0 = 1;
-		a1 = 0;
-		a2 = 0;
-		break;
-	};
+	double a0, a1, a2, b0, b1, b2;
+	biquadConfigurationImplementation(sr, type, frequency, dbGain, q, b0, b1, b2, a0, a1, a2);
 	double numerator[] = {1, b1/b0, b2/b0};
 	double denominator[] = {1, a1/a0, a2/a0};
 	configure(3, numerator, 3, denominator);
