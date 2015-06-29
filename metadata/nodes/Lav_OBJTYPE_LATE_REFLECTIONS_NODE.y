@@ -98,7 +98,7 @@ properties:
   Lav_LATE_REFLECTIONS_ALLPASS_MINFREQ:
     name: allpass_minfreq
     type: float
-    range: [0.0, INFINITY]
+    range: [200.0, 2000.0]
     default: 400.0
     doc_description: |
       The minimum frequencies of the modulatable allpasses.
@@ -107,7 +107,7 @@ properties:
   Lav_LATE_REFLECTIONS_ALLPASS_MAXFREQ:
     name: allpass_maxfreq
     type: float
-    range: [0.0, INFINITY]
+    range: [200.0, 2000.0]
     default: 500.0
     doc_description: |
       The maximum frequency of the modulatable allpasses.

@@ -78,7 +78,6 @@ class InterpolatedDelayLine {
 	float tick(float sample);
 	float computeSample();
 	void advance(float sample);
-	//Does nothing, left for compatibility with the fdn.
 	void reset();
 	private:
 	int max_delay = 0;

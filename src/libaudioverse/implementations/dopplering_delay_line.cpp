@@ -63,6 +63,7 @@ void DoppleringDelayLine::reset() {
 		delay=new_delay;
 		counter=0;
 	}
+	line.reset();
 }
 
 }

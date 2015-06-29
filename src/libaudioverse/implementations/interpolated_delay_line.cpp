@@ -40,7 +40,7 @@ void InterpolatedDelayLine::advance(float sample) {
 }
 
 void InterpolatedDelayLine::reset() {
-	//does nothing.
+	line.reset();
 }
 
 }
