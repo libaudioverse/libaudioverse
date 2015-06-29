@@ -60,6 +60,7 @@ class LateReflectionsNode: public Node {
 	virtual void process();
 	void recompute();
 	void amplitudeModulationFrequencyChanged();
+	void delayModulationFrequencyChanged();
 	void normalizeOscillators();
 	void reset() override;
 	FeedbackDelayNetwork<InterpolatedDelayLine> fdn;
@@ -74,6 +75,8 @@ class LateReflectionsNode: public Node {
 	SinOsc **amplitude_modulators;
 	//Used to optimize by allowing us to use SSE.
 	float* amplitude_modulation_buffer;
+	//Modulate the internal delay lines.
+	SinOsc **delay_modulators;
 };
 
 LateReflectionsNode::LateReflectionsNode(std::shared_ptr<Simulation> simulation):
@@ -104,9 +107,12 @@ fdn(order, 1.0f, simulation->getSr()) {
 		midshelves[i] = new BiquadFilter(simulation->getSr());
 	}
 	amplitude_modulators = new SinOsc*[order]();
+	delay_modulators=new SinOsc*[order];
 	for(int i = 0; i < order; i++) {
 		amplitude_modulators[i] = new SinOsc(simulation->getSr());
 		amplitude_modulators[i]->setPhase((float)i/order);
+		delay_modulators[i] = new SinOsc(simulation->getSr());
+		delay_modulators[i]->setPhase((float)i/order);
 	}
 	amplitude_modulation_buffer=allocArray<float>(simulation->getBlockSize());
 	//initial configuration.
@@ -129,10 +135,12 @@ LateReflectionsNode::~LateReflectionsNode() {
 		delete highshelves[i];
 		delete midshelves[i];
 		delete amplitude_modulators[i];
+		delete delay_modulators[i];
 	}
 	delete[] highshelves;
 	delete[] midshelves;
 	delete[] amplitude_modulators;
+	delete[] delay_modulators;
 }
 
 double t60ToGain(double t60, double lineLength) {
@@ -210,9 +218,17 @@ void LateReflectionsNode::amplitudeModulationFrequencyChanged() {
 	}
 }
 
+void LateReflectionsNode::delayModulationFrequencyChanged() {
+	float freq=getProperty(Lav_LATE_REFLECTIONS_DELAY_MODULATION_FREQUENCY).getFloatValue();
+	for(int i = 0; i < order; i++) {
+		delay_modulators[i]->setFrequency(freq);
+	}
+}
+
 void LateReflectionsNode::normalizeOscillators() {
 	for(int i = 0; i < order; i++) {
 		amplitude_modulators[i]->normalize();
+		delay_modulators[i]->normalize();
 	}
 }
 
@@ -222,11 +238,18 @@ void LateReflectionsNode::process() {
 	Lav_LATE_REFLECTIONS_LF_T60, Lav_LATE_REFLECTIONS_HF_REFERENCE, Lav_LATE_REFLECTIONS_LF_REFERENCE
 	)) recompute();
 	if(werePropertiesModified(this, Lav_LATE_REFLECTIONS_AMPLITUDE_MODULATION_FREQUENCY)) amplitudeModulationFrequencyChanged();
+	if(werePropertiesModified(this, Lav_LATE_REFLECTIONS_DELAY_MODULATION_FREQUENCY)) delayModulationFrequencyChanged();
 	normalizeOscillators();
 	float amplitudeModulationDepth = getProperty(Lav_LATE_REFLECTIONS_AMPLITUDE_MODULATION_DEPTH).getFloatValue();
-	//divide by 2 because it's the upper half of a sine wave.
-	float amplitudeModulationFrequency = getProperty(Lav_LATE_REFLECTIONS_AMPLITUDE_MODULATION_FREQUENCY).getFloatValue()/2.0;
+	float delayModulationDepth = getProperty(Lav_LATE_REFLECTIONS_DELAY_MODULATION_DEPTH).getFloatValue();
 	for(int i= 0; i < block_size; i++) {
+		//We modulate the delay lines first.
+		for(int modulating = 0; modulating < 16; modulating++) {
+			float delay = delays[modulating];
+			delay =delay+delay*delayModulationDepth*delay_modulators[modulating]->tick();
+			delay = std::min(delay, 1.0f);
+			fdn.setDelay(modulating, delay);
+		}
 		//Get the fdn's output.
 		fdn.computeFrame(output_frame);
 		for(int j= 0; j < order; j++) output_buffers[j][i] = output_frame[j];
