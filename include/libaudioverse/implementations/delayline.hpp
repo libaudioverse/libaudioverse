@@ -71,4 +71,20 @@ class DoppleringDelayLine {
 	DelayRingbuffer line;
 };
 
+class InterpolatedDelayLine {
+	public:
+	InterpolatedDelayLine(float maxDelay, float sr);
+	void setDelay(float d);
+	float tick(float sample);
+	float computeSample();
+	void advance(float sample);
+	//Does nothing, left for compatibility with the fdn.
+	void reset();
+	private:
+	int max_delay = 0;
+	double delay = 0.0;
+	float sr = 0;
+	DelayRingbuffer line;
+};
+
 }
