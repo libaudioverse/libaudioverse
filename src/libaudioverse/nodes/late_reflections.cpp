@@ -62,7 +62,7 @@ class LateReflectionsNode: public Node {
 	void amplitudeModulationFrequencyChanged();
 	void normalizeOscillators();
 	void reset() override;
-	FeedbackDelayNetwork<DoppleringDelayLine> fdn;
+	FeedbackDelayNetwork<InterpolatedDelayLine> fdn;
 	float* delays = nullptr;
 	float *gains;
 	float* output_frame=nullptr, *next_input_frame =nullptr;
@@ -88,8 +88,6 @@ fdn(order, 1.0f, simulation->getSr()) {
 	hadamard(order, fdn_matrix);
 	//feed the fdn the initial matrix.
 	fdn.setMatrix(fdn_matrix);
-	//this is fixed...for now.
-	fdn.setDelayCrossfadingTime(0.05);
 	gains=allocArray<float>(order);
 	output_frame=allocArray<float>(order);
 	next_input_frame=allocArray<float>(order);

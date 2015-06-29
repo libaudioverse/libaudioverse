@@ -63,10 +63,10 @@ class FeedbackDelayNetwork {
 		lines[which]->setDelay(newDelay);
 	}
 	
-	void setDelayCrossfadingTime(float time) {
-		for(int i = 0; i < n; i++) lines[i]->setInterpolationTime(time);
+	LineType& getDelayLine(int which) {
+		return *lines[which];
 	}
-	
+
 	void reset() {
 		for(int i = 0; i < n; i++) lines[i]->reset();
 	}

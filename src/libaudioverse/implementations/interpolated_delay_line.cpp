@@ -15,7 +15,7 @@ InterpolatedDelayLine::InterpolatedDelayLine(float maxDelay, float sr): line((in
 }
 
 void InterpolatedDelayLine::setDelay(float d) {
-	delay = d;
+	delay = d*sr;
 }
 
 float InterpolatedDelayLine::tick(float sample) {
