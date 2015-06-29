@@ -328,7 +328,10 @@ void LateReflectionsNode::reset() {
 	for(int i = 0; i < order; i++) {
 		midshelves[i]->clearHistories();
 		highshelves[i]->clearHistories();
+		allpasses[i]->clearHistories();
 		amplitude_modulators[i]->setPhase((float)i/order);
+		delay_modulators[i]->setPhase((float)i/order);
+		allpass_modulators[i]->setPhase((float)i/order);
 	}
 }
 
