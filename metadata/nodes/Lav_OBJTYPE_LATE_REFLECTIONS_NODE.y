@@ -75,6 +75,20 @@ properties:
       
       Higher values increase the rate of the circular effect, eventually transitioning to ring modulation.
       Negative values reverse the direction.
+  Lav_LATE_REFLECTIONS_DELAY_MODULATION_DEPTH:
+    name: delay_modulation_depth
+    type: float
+    default: 0.0
+    range: [0.0, 1.0]
+    doc_description: |
+      Controls the emphasis provided by modulation of the internal delay lines.
+  Lav_LATE_REFLECTIONS_DELAY_MODULATION_FREQUENCY:
+    name: delay_modulation_frequency
+    type: float
+    default: 10.0
+    range: [-INFINITY, INFINITY]
+    doc_description: |
+      Controls the frequency of the delay line modulation.
 inputs: described
 outputs: described
 doc_name: late reflections
