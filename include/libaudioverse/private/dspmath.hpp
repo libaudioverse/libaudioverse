@@ -26,4 +26,7 @@ int greatestCommonDivisor(int a, int b);
 //Fill a buffer with a hadamard matrix of order n (n must be power of 2).
 void hadamard(int n, float* buffer, bool shouldNormalize=true);
 
+//Fill a buffer with a matrix representing a reflectiona bout a plane whose normal is (1, 1, 1, 1...)
+//This is also known as a householder matrix.
+void householder(int n, float* buffer, bool shouldNormalize =true);
 }
