@@ -24,7 +24,7 @@ FeedbackDelayNetworkNode::FeedbackDelayNetworkNode(std::shared_ptr<Simulation> s
 Node(Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK_NODE, simulation, lines, lines) {
 	max_delay = maxDelay;
 	line_count = lines;
-	network = new FeedbackDelayNetwork(lines, maxDelay, simulation->getSr());
+	network = new FeedbackDelayNetwork<>(lines, maxDelay, simulation->getSr());
 	last_output = allocArray<float>(lines);
 	next_input=allocArray<float>(lines);
 	gains = allocArray<float>(lines);

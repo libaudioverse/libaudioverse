@@ -17,7 +17,7 @@ class FeedbackDelayNetworkNode: public Node {
 	void setOutputGains(int count, float* values);
 	void setDelays(int length, float* values);
 	private:
-	FeedbackDelayNetwork*network = nullptr;
+	FeedbackDelayNetwork<>*network = nullptr;
 	float max_delay = 0.0f;
 	int line_count = 0;
 	float*last_output = nullptr, *next_input=nullptr;
