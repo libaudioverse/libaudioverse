@@ -62,7 +62,7 @@ class LateReflectionsNode: public Node {
 	void amplitudeModulationFrequencyChanged();
 	void normalizeOscillators();
 	void reset() override;
-	FeedbackDelayNetwork<> fdn;
+	FeedbackDelayNetwork<DoppleringDelayLine> fdn;
 	float* delays = nullptr;
 	float *gains;
 	float* output_frame=nullptr, *next_input_frame =nullptr;

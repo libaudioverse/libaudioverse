@@ -57,4 +57,12 @@ void DoppleringDelayLine::advance(float sample) {
 	}
 }
 
+void DoppleringDelayLine::reset() {
+	velocity = 0.0;
+	if(counter) {
+		delay=new_delay;
+		counter=0;
+	}
+}
+
 }

@@ -60,6 +60,7 @@ class DoppleringDelayLine {
 	float tick(float sample);
 	float computeSample();
 	void advance(float sample);
+	void reset();
 	private:
 	int max_delay = 0, interpolating_direction = 0;
 	double delay = 0.0, new_delay = 0.0;
