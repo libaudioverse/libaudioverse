@@ -90,7 +90,7 @@ properties:
     doc_description: |
       Controls the frequency of the delay line modulation.
   Lav_LATE_REFLECTIONS_ALLPASS_ENABLED:
-    name: allpass_eanbled
+    name: allpass_enabled
     type: boolean
     default: 0
     doc_description: |

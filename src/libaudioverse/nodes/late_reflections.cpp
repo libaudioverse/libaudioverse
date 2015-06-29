@@ -26,7 +26,7 @@ namespace libaudioverse_implementation {
 
 /**Algorithm explanation:
 This algorithm consists of a FDN and two highshelf filters inserted in the feedback:
-fdn->mid_highshelf->high_highshelf->fdn
+fdn->mid_highshelf->high_highshelf->modulatable_allpasses->fdn
 
 We compute individual gains for each line, using math taken from Physical Audio Processing by JOS.
 
@@ -61,6 +61,8 @@ class LateReflectionsNode: public Node {
 	void recompute();
 	void amplitudeModulationFrequencyChanged();
 	void delayModulationFrequencyChanged();
+	void allpassModulationFrequencyChanged();
+	void allpassEnabledChanged();
 	void normalizeOscillators();
 	void reset() override;
 	FeedbackDelayNetwork<InterpolatedDelayLine> fdn;
@@ -71,12 +73,16 @@ class LateReflectionsNode: public Node {
 	//Filters for the band separation.
 	BiquadFilter** highshelves; //Shapes from mid to high band.
 	BiquadFilter** midshelves; //Shapes from low to mid band.
+	//The modulatable allpasses.
+	BiquadFilter** allpasses;
 	//used for amplitude modulation.
 	SinOsc **amplitude_modulators;
 	//Used to optimize by allowing us to use SSE.
 	float* amplitude_modulation_buffer;
 	//Modulate the internal delay lines.
 	SinOsc **delay_modulators;
+	//Allpass modulators.
+	SinOsc **allpass_modulators;
 };
 
 LateReflectionsNode::LateReflectionsNode(std::shared_ptr<Simulation> simulation):
@@ -102,17 +108,22 @@ fdn(order, 1.0f, simulation->getSr()) {
 	//allocate the filters.
 	highshelves=new BiquadFilter*[order];
 	midshelves = new BiquadFilter*[order];
+	allpasses=new BiquadFilter*[order];
 	for(int i = 0; i < order; i++) {
 		highshelves[i] = new BiquadFilter(simulation->getSr());
 		midshelves[i] = new BiquadFilter(simulation->getSr());
+		allpasses[i] = new BiquadFilter(simulation->getSr());
 	}
 	amplitude_modulators = new SinOsc*[order]();
 	delay_modulators=new SinOsc*[order];
+	allpass_modulators = new SinOsc*[order];
 	for(int i = 0; i < order; i++) {
 		amplitude_modulators[i] = new SinOsc(simulation->getSr());
 		amplitude_modulators[i]->setPhase((float)i/order);
 		delay_modulators[i] = new SinOsc(simulation->getSr());
 		delay_modulators[i]->setPhase((float)i/order);
+		allpass_modulators[i] = new SinOsc(simulation->getSr());
+		allpass_modulators[i]->setPhase((float)i/order);
 	}
 	amplitude_modulation_buffer=allocArray<float>(simulation->getBlockSize());
 	//initial configuration.
@@ -136,11 +147,13 @@ LateReflectionsNode::~LateReflectionsNode() {
 		delete midshelves[i];
 		delete amplitude_modulators[i];
 		delete delay_modulators[i];
+		delete allpass_modulators[i];
 	}
 	delete[] highshelves;
 	delete[] midshelves;
 	delete[] amplitude_modulators;
 	delete[] delay_modulators;
+	delete[] allpass_modulators;
 }
 
 double t60ToGain(double t60, double lineLength) {
@@ -225,6 +238,19 @@ void LateReflectionsNode::delayModulationFrequencyChanged() {
 	}
 }
 
+void LateReflectionsNode::allpassModulationFrequencyChanged() {
+	float freq = getProperty(Lav_LATE_REFLECTIONS_ALLPASS_MODULATION_FREQUENCY).getFloatValue();
+	for(int i= 0; i < order; i++) {
+		allpass_modulators[i]->setFrequency(freq);
+	}
+}
+
+void LateReflectionsNode::allpassEnabledChanged() {
+	for(int i= 0; i < order; i++) {
+		allpasses[i]->clearHistories();
+	}
+}
+
 void LateReflectionsNode::normalizeOscillators() {
 	for(int i = 0; i < order; i++) {
 		amplitude_modulators[i]->normalize();
@@ -239,9 +265,19 @@ void LateReflectionsNode::process() {
 	)) recompute();
 	if(werePropertiesModified(this, Lav_LATE_REFLECTIONS_AMPLITUDE_MODULATION_FREQUENCY)) amplitudeModulationFrequencyChanged();
 	if(werePropertiesModified(this, Lav_LATE_REFLECTIONS_DELAY_MODULATION_FREQUENCY)) delayModulationFrequencyChanged();
+	if(werePropertiesModified(this, Lav_LATE_REFLECTIONS_ALLPASS_ENABLED)) allpassEnabledChanged();
+	if(werePropertiesModified(this, Lav_LATE_REFLECTIONS_ALLPASS_MODULATION_FREQUENCY)) allpassModulationFrequencyChanged();
 	normalizeOscillators();
 	float amplitudeModulationDepth = getProperty(Lav_LATE_REFLECTIONS_AMPLITUDE_MODULATION_DEPTH).getFloatValue();
 	float delayModulationDepth = getProperty(Lav_LATE_REFLECTIONS_DELAY_MODULATION_DEPTH).getFloatValue();
+	float allpassMinFreq=getProperty(Lav_LATE_REFLECTIONS_ALLPASS_MINFREQ).getFloatValue();
+	float allpassMaxFreq = getProperty(Lav_LATE_REFLECTIONS_ALLPASS_MAXFREQ).getFloatValue();
+	float allpassQ=getProperty(Lav_LATE_REFLECTIONS_ALLPASS_Q).getFloatValue();
+	bool allpassEnabled = getProperty(Lav_LATE_REFLECTIONS_ALLPASS_ENABLED).getIntValue() == 1;
+	float allpassDelta= (allpassMaxFreq-allpassMinFreq)/2.0f;
+	//we move delta upward and delta downward of this point.
+	//consequently, we therefore range from the min to the max.
+	float allpassModulationStart =allpassMinFreq+allpassDelta;
 	for(int i= 0; i < block_size; i++) {
 		//We modulate the delay lines first.
 		for(int modulating = 0; modulating < 16; modulating++) {
@@ -250,12 +286,23 @@ void LateReflectionsNode::process() {
 			delay = std::min(delay, 1.0f);
 			fdn.setDelay(modulating, delay);
 		}
+		//Prepare the allpasses, if enabled.
+		if(allpassEnabled) {
+			for(int modulating =0; modulating < order; modulating++) {
+				allpasses[modulating]->configure(Lav_BIQUAD_TYPE_ALLPASS, allpassModulationStart+allpassDelta*allpass_modulators[modulating]->tick(), 0.0, allpassQ);
+			}
+		}
+		else { //just advance the modulators.
+			for(int modulating =0; modulating < order; modulating++) allpass_modulators[modulating]->tick();
+		}
 		//Get the fdn's output.
 		fdn.computeFrame(output_frame);
 		for(int j= 0; j < order; j++) output_buffers[j][i] = output_frame[j];
 		for(int j=0; j < order; j++)  {
 			//Through the highshelf, then the lowshelf.
 			output_frame[j] = midshelves[j]->tick(highshelves[j]->tick(gains[j]*output_frame[j]));
+			//and maybe through the allpass
+			if(allpassEnabled) output_frame[j] = allpasses[j]->tick(output_frame[j]);
 		}
 		multiplicationKernel(order, gains, output_frame, output_frame);
 		//bring in the inputs.
