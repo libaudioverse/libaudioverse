@@ -89,6 +89,44 @@ properties:
     range: [-INFINITY, INFINITY]
     doc_description: |
       Controls the frequency of the delay line modulation.
+  Lav_LATE_REFLECTIONS_ALLPASS_ENABLED:
+    name: allpass_eanbled
+    type: boolean
+    default: 0
+    doc_description: |
+      Whether or not to enable a set of modulatable allpass filters on the feedback path.
+  Lav_LATE_REFLECTIONS_ALLPASS_MINFREQ:
+    name: allpass_minfreq
+    type: float
+    range: [0.0, INFINITY]
+    default: 400.0
+    doc_description: |
+      The minimum frequencies of the modulatable allpasses.
+      
+      Behavior is undefined if this property is ever set to a value greater than {{"allpass_maxfreq"|codelit}}.
+  Lav_LATE_REFLECTIONS_ALLPASS_MAXFREQ:
+    name: allpass_maxfreq
+    type: float
+    range: [0.0, INFINITY]
+    default: 500.0
+    doc_description: |
+      The maximum frequency of the modulatable allpasses.
+      
+      The behavior is undefined if this property is set to a value less than {{"allpass_minfreq"|codelit}}.
+  Lav_LATE_REFLECTIONS_ALLPASS_MODULATION_FREQUENCY:
+    name: allpass_modulation_frequency
+    type: float
+    range: [0.0, INFINITY]
+    default: 20.0
+    doc_description: |
+      The rate of change of the modulatable allpass frequencies.
+  Lav_LATE_REFLECTIONS_ALLPASS_Q:
+    name: allpass_q
+    type: float
+    range: [0.5, INFINITY]
+    default: 0.5
+    doc_description: |
+      Controls the Q of the modulatable allpasses.
 inputs: described
 outputs: described
 doc_name: late reflections
