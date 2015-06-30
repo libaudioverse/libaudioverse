@@ -71,6 +71,7 @@ void MultipannerNode::configureForwardedProperties() {
 
 void MultipannerNode::strategyChanged() {
 	int newStrategy = getProperty(Lav_PANNER_STRATEGY).getIntValue();
+	int newOutputSize=2;
 	bool hookHrtf = false, hookAmplitude = false;
 	switch(newStrategy) {
 		case Lav_PANNING_STRATEGY_HRTF:
@@ -83,14 +84,15 @@ void MultipannerNode::strategyChanged() {
 		case Lav_PANNING_STRATEGY_SURROUND51:
 		std::dynamic_pointer_cast<AmplitudePannerNode>(amplitude_panner)->configureStandardChannelMap(6);
 		hookAmplitude = true;
+		newOutputSize=6;
 		break;
 		case Lav_PANNING_STRATEGY_SURROUND71:
 		std::dynamic_pointer_cast<AmplitudePannerNode>(amplitude_panner)->configureStandardChannelMap(8);
 		hookAmplitude=true;
+		newOutputSize=8;
 		break;
 	}
 	if(hookAmplitude) {
-		int newOutputSize = amplitude_panner->getOutputConnection(0)->getCount();
 		getOutputConnection(0)->reconfigure(0, newOutputSize);
 		setOutputNode(amplitude_panner);
 		current_panner = amplitude_panner;
