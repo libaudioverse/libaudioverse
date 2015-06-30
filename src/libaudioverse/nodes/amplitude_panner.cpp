@@ -83,13 +83,13 @@ void AmplitudePannerNode::process() {
 
 void AmplitudePannerNode::configureStandardChannelMap(unsigned int channels) {
 	switch(channels) {
-		case Lav_PANNING_STRATEGY_STEREO:
+		case 2:
 		getProperty(Lav_PANNER_CHANNEL_MAP).replaceFloatArray(2, standard_map_stereo);
 		break;
-		case Lav_PANNING_STRATEGY_SURROUND51:
+		case 6:
 		getProperty(Lav_PANNER_CHANNEL_MAP).replaceFloatArray(4, standard_map_51);
 		break;
-		case Lav_PANNING_STRATEGY_SURROUND71:
+		case 8:
 		getProperty(Lav_PANNER_CHANNEL_MAP).replaceFloatArray(6, standard_map_71);
 		break;
 	};
