@@ -276,9 +276,7 @@ void LateReflectionsNode::process() {
 				allpasses[modulating]->configure(Lav_BIQUAD_TYPE_ALLPASS, allpassModulationStart+allpassDelta*allpass_modulators[modulating]->tick(), 0.0, allpassQ);
 			}
 		}
-		else { //just advance the modulators.
-			for(int modulating =0; modulating < order; modulating++) allpass_modulators[modulating]->tick();
-		}
+		//If disabled, the modulators are advanced later.
 		//Get the fdn's output.
 		fdn.computeFrame(output_frame);
 		for(int j= 0; j < order; j++) output_buffers[j][i] = output_frame[j];
@@ -304,6 +302,10 @@ void LateReflectionsNode::process() {
 		scalarAdditionKernel(block_size, 1.0f-amplitudeModulationDepth/2.0f, amplitude_modulation_buffer, amplitude_modulation_buffer);
 		//Apply the modulation.
 		multiplicationKernel(block_size, amplitude_modulation_buffer, output_buffer, output_buffer);
+	}
+	//Advance modulators for anything we aren't modulating:
+	if(allpassEnabled == false) {
+		for(int i=0; i < order; i++)allpass_modulators[i]->skipSamples(block_size);
 	}
 }
 
