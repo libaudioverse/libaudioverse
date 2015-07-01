@@ -291,21 +291,28 @@ void LateReflectionsNode::process() {
 		for(int j = 0; j < order; j++) next_input_frame[j] = input_buffers[j][i];
 		fdn.advance(next_input_frame, output_frame);
 	}
-	//appluy the amplitude modulation.
-	for(int output = 0; output < num_output_buffers; output++) {
-		float* output_buffer=output_buffers[output];
-		SinOsc& osc= *amplitude_modulators[output];
-		//get  A sine wave.
-		osc.fillBuffer(block_size, amplitude_modulation_buffer);
-		//Implement 1.0-amplitudeModulationDepth/2+amplitudeModulationDepth*oscillatorValue.
-		scalarMultiplicationKernel(block_size, amplitudeModulationDepth, amplitude_modulation_buffer, amplitude_modulation_buffer);
-		scalarAdditionKernel(block_size, 1.0f-amplitudeModulationDepth/2.0f, amplitude_modulation_buffer, amplitude_modulation_buffer);
-		//Apply the modulation.
-		multiplicationKernel(block_size, amplitude_modulation_buffer, output_buffer, output_buffer);
+	//appluy the amplitude modulation, if it's needed.
+	if(amplitudeModulationDepth!=0.0f) {
+		for(int output = 0; output < num_output_buffers; output++) {
+			float* output_buffer=output_buffers[output];
+			SinOsc& osc= *amplitude_modulators[output];
+			//get  A sine wave.
+			osc.fillBuffer(block_size, amplitude_modulation_buffer);
+			//Implement 1.0-amplitudeModulationDepth/2+amplitudeModulationDepth*oscillatorValue.
+			scalarMultiplicationKernel(block_size, amplitudeModulationDepth, amplitude_modulation_buffer, amplitude_modulation_buffer);
+			scalarAdditionKernel(block_size, 1.0f-amplitudeModulationDepth/2.0f, amplitude_modulation_buffer, amplitude_modulation_buffer);
+			//Apply the modulation.
+			multiplicationKernel(block_size, amplitude_modulation_buffer, output_buffer, output_buffer);
+		}
 	}
 	//Advance modulators for anything we aren't modulating:
 	if(allpassEnabled == false) {
 		for(int i=0; i < order; i++)allpass_modulators[i]->skipSamples(block_size);
+	}
+	if(amplitudeModulationDepth == 0.0f) {
+		for(int i = 0; i < 16; i++) {
+			amplitude_modulators[i]->skipSamples(block_size);
+		}
 	}
 }
 
