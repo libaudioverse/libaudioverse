@@ -206,6 +206,14 @@ void LateReflectionsNode::recompute() {
 		highshelves[i]->configure(Lav_BIQUAD_TYPE_HIGHSHELF, hf_reference, highDb, 1/sqrt(2.0)+1e-4);
 		midshelves[i]->configure(Lav_BIQUAD_TYPE_HIGHSHELF, lf_reference, midDb, 1.0/sqrt(2.0)+1e-4);
 	}
+	//Finally, bake the gains into the fdn matrix:
+	hadamard(order, fdn_matrix);
+	for(int i=0; i < order; i++) {
+		for(int j = 0; j < order; j++) {
+			fdn_matrix[i*order+j]*=gains[i];
+		}
+	}
+	fdn.setMatrix(fdn_matrix);
 }
 
 void LateReflectionsNode::amplitudeModulationFrequencyChanged() {
@@ -286,7 +294,7 @@ void LateReflectionsNode::process() {
 			//and maybe through the allpass
 			if(allpassEnabled) output_frame[j] = allpasses[j]->tick(output_frame[j]);
 		}
-		multiplicationKernel(order, gains, output_frame, output_frame);
+		//Gains are baked into the fdn matrix.
 		//bring in the inputs.
 		for(int j = 0; j < order; j++) next_input_frame[j] = input_buffers[j][i];
 		fdn.advance(next_input_frame, output_frame);
