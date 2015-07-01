@@ -306,6 +306,8 @@ void LateReflectionsNode::process() {
 		}
 	}
 	//Advance modulators for anything we aren't modulating:
+	//We do this so that the same parameters always produce the same reverb, even after transitioning through multiple presets.
+	//Without the following, the modulators for different stages can get out of phase with each other.
 	if(allpassEnabled == false) {
 		for(int i=0; i < order; i++)allpass_modulators[i]->skipSamples(block_size);
 	}
