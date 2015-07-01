@@ -2,7 +2,7 @@
 from libaudioverse import *
 import math
 import random
-order=32
+order=16
 initialize()
 s=Simulation()
 
