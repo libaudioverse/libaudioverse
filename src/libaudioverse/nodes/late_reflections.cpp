@@ -41,7 +41,7 @@ In order to increase the accuracy of panning, only 16 unique delay line lengths 
 Each delay is copied to fill a range, namely order/16, of adjacent lines.
 */
 
-//The order must be a multiple of 16 and power of two.
+//The order must be 16.
 const int order= 16;
 
 //Used for computing the delay line lengths.
@@ -185,26 +185,10 @@ void LateReflectionsNode::recompute() {
 		delay = std::min(delay, 1.0);
 		delays[i] = delay;
 	}
-	//For higher orders, we have to fix the delay lines some.
-	//Without this loop, 32 and higher orders are prone to metallic distortion.
-	for(int i=1; i < order/16; i++) {
-		std::copy(delays, delays+16, delays+i*16);
-		//Helps avoid panning effects.
-		//Without this line, the reverb sounds panned to one side.
-		//This is probably because the longest delay lines end up in the back right and front left.
-		if(i%2) {
-			std::reverse(delays+i*16, delays+i*16+16);
-			//at the moment, we have adjacent pairs of similar delay lines, which adds a "string" effect.
-			//To fix this, reverse the first half of the range.
-			std::reverse(delays+i*16, delays+i*16+8);
-		}
-	}
-	//If we have adjacent pairs with exactly the same delay, we get points in the reverb that do not sound like all others.
-	//We can avoid this by swapping the delay lines at the end of each range with the delay lines at the beginning of the current range.
-	for(int i =0; i < order/16; i++) {
-		std::swap(delays[i*16], delays[i*16+15]);
-		std::swap(delays[i*16+1], delays[i*16+14]);
-	}
+	//The following two lines were determined experimentaly, and greatly reduce metallicness.
+	//This is probably because, by default, the shortest and longest delay line are adjacent and this node  is typically used with panners at the input and output.
+	std::swap(delays[0], delays[15]);
+	std::swap(delays[1], delays[14]);
 	fdn.setDelays(delays);
 	//configure the gains.
 	for(int i= 0; i < order; i++) {
