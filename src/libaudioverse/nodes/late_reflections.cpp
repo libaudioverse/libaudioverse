@@ -41,7 +41,7 @@ In order to increase the accuracy of panning, only 16 unique delay line lengths 
 Each delay is copied to fill a range, namely order/16, of adjacent lines.
 */
 
-//The order must be a multiple of 16 and power of two.
+//The order must be 16.
 const int order= 16;
 
 //Used for computing the delay line lengths.
@@ -185,26 +185,10 @@ void LateReflectionsNode::recompute() {
 		delay = std::min(delay, 1.0);
 		delays[i] = delay;
 	}
-	//For higher orders, we have to fix the delay lines some.
-	//Without this loop, 32 and higher orders are prone to metallic distortion.
-	for(int i=1; i < order/16; i++) {
-		std::copy(delays, delays+16, delays+i*16);
-		//Helps avoid panning effects.
-		//Without this line, the reverb sounds panned to one side.
-		//This is probably because the longest delay lines end up in the back right and front left.
-		if(i%2) {
-			std::reverse(delays+i*16, delays+i*16+16);
-			//at the moment, we have adjacent pairs of similar delay lines, which adds a "string" effect.
-			//To fix this, reverse the first half of the range.
-			std::reverse(delays+i*16, delays+i*16+8);
-		}
-	}
-	//If we have adjacent pairs with exactly the same delay, we get points in the reverb that do not sound like all others.
-	//We can avoid this by swapping the delay lines at the end of each range with the delay lines at the beginning of the current range.
-	for(int i =0; i < order/16; i++) {
-		std::swap(delays[i*16], delays[i*16+15]);
-		std::swap(delays[i*16+1], delays[i*16+14]);
-	}
+	//The following two lines were determined experimentaly, and greatly reduce metallicness.
+	//This is probably because, by default, the shortest and longest delay line are adjacent and this node  is typically used with panners at the input and output.
+	std::swap(delays[0], delays[15]);
+	std::swap(delays[1], delays[14]);
 	fdn.setDelays(delays);
 	//configure the gains.
 	for(int i= 0; i < order; i++) {
@@ -222,6 +206,14 @@ void LateReflectionsNode::recompute() {
 		highshelves[i]->configure(Lav_BIQUAD_TYPE_HIGHSHELF, hf_reference, highDb, 1/sqrt(2.0)+1e-4);
 		midshelves[i]->configure(Lav_BIQUAD_TYPE_HIGHSHELF, lf_reference, midDb, 1.0/sqrt(2.0)+1e-4);
 	}
+	//Finally, bake the gains into the fdn matrix:
+	hadamard(order, fdn_matrix);
+	for(int i=0; i < order; i++) {
+		for(int j = 0; j < order; j++) {
+			fdn_matrix[i*order+j]*=gains[i];
+		}
+	}
+	fdn.setMatrix(fdn_matrix);
 }
 
 void LateReflectionsNode::amplitudeModulationFrequencyChanged() {
@@ -292,9 +284,7 @@ void LateReflectionsNode::process() {
 				allpasses[modulating]->configure(Lav_BIQUAD_TYPE_ALLPASS, allpassModulationStart+allpassDelta*allpass_modulators[modulating]->tick(), 0.0, allpassQ);
 			}
 		}
-		else { //just advance the modulators.
-			for(int modulating =0; modulating < order; modulating++) allpass_modulators[modulating]->tick();
-		}
+		//If disabled, the modulators are advanced later.
 		//Get the fdn's output.
 		fdn.computeFrame(output_frame);
 		for(int j= 0; j < order; j++) output_buffers[j][i] = output_frame[j];
@@ -304,22 +294,35 @@ void LateReflectionsNode::process() {
 			//and maybe through the allpass
 			if(allpassEnabled) output_frame[j] = allpasses[j]->tick(output_frame[j]);
 		}
-		multiplicationKernel(order, gains, output_frame, output_frame);
+		//Gains are baked into the fdn matrix.
 		//bring in the inputs.
 		for(int j = 0; j < order; j++) next_input_frame[j] = input_buffers[j][i];
 		fdn.advance(next_input_frame, output_frame);
 	}
-	//appluy the amplitude modulation.
-	for(int output = 0; output < num_output_buffers; output++) {
-		float* output_buffer=output_buffers[output];
-		SinOsc& osc= *amplitude_modulators[output];
-		//get  A sine wave.
-		osc.fillBuffer(block_size, amplitude_modulation_buffer);
-		//Implement 1.0-amplitudeModulationDepth/2+amplitudeModulationDepth*oscillatorValue.
-		scalarMultiplicationKernel(block_size, amplitudeModulationDepth, amplitude_modulation_buffer, amplitude_modulation_buffer);
-		scalarAdditionKernel(block_size, 1.0f-amplitudeModulationDepth/2.0f, amplitude_modulation_buffer, amplitude_modulation_buffer);
-		//Apply the modulation.
-		multiplicationKernel(block_size, amplitude_modulation_buffer, output_buffer, output_buffer);
+	//appluy the amplitude modulation, if it's needed.
+	if(amplitudeModulationDepth!=0.0f) {
+		for(int output = 0; output < num_output_buffers; output++) {
+			float* output_buffer=output_buffers[output];
+			SinOsc& osc= *amplitude_modulators[output];
+			//get  A sine wave.
+			osc.fillBuffer(block_size, amplitude_modulation_buffer);
+			//Implement 1.0-amplitudeModulationDepth/2+amplitudeModulationDepth*oscillatorValue.
+			scalarMultiplicationKernel(block_size, amplitudeModulationDepth, amplitude_modulation_buffer, amplitude_modulation_buffer);
+			scalarAdditionKernel(block_size, 1.0f-amplitudeModulationDepth/2.0f, amplitude_modulation_buffer, amplitude_modulation_buffer);
+			//Apply the modulation.
+			multiplicationKernel(block_size, amplitude_modulation_buffer, output_buffer, output_buffer);
+		}
+	}
+	//Advance modulators for anything we aren't modulating:
+	//We do this so that the same parameters always produce the same reverb, even after transitioning through multiple presets.
+	//Without the following, the modulators for different stages can get out of phase with each other.
+	if(allpassEnabled == false) {
+		for(int i=0; i < order; i++)allpass_modulators[i]->skipSamples(block_size);
+	}
+	if(amplitudeModulationDepth == 0.0f) {
+		for(int i = 0; i < 16; i++) {
+			amplitude_modulators[i]->skipSamples(block_size);
+		}
 	}
 }
 

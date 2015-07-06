@@ -45,11 +45,25 @@ class SinOsc {
 		cx=lcx;
 		sx=lsx;
 	}
+
+	//Skips count samples.
+	//Same as calling tick count times.
+	void skipSamples(int count) {
+		//First, our angle may be derived from sx and cx:
+		float angle=atan2(sx, cx);
+		//The amount to advance by in radians.
+		//Compute periods, multiply by 2PI.
+		float advanceBy = (count/sr)*frequency*2*PI;
+		angle+=advanceBy;
+		cx=cosf(angle);
+		sx=sinf(angle);
+	}
 	
 	void setFrequency(float f) {
 		//We don't lose phase, so don't touch cx and sx.
 		sd= sinf(2*PI*f/sr);
 		cd=cosf(2*PI*f/sr);
+		frequency = f;
 	}
 	
 	void normalize() {
@@ -82,6 +96,8 @@ class SinOsc {
 	float sr; //sampling rate.
 	//sine and cosine of phase offset.
 	float cp=1, sp = 0;
+	//frequency is saved for purposes of skipping samples.
+	float frequency =0;
 };
 
 }
