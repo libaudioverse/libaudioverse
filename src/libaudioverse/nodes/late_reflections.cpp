@@ -83,6 +83,8 @@ class LateReflectionsNode: public Node {
 	SinOsc **delay_modulators;
 	//Allpass modulators.
 	SinOsc **allpass_modulators;
+	//used to reduce panning effects introduced by the varying delay line lengths.
+	InterpolatedDelayLine **pan_reducers;
 };
 
 LateReflectionsNode::LateReflectionsNode(std::shared_ptr<Simulation> simulation):
@@ -126,6 +128,10 @@ fdn(order, 1.0f, simulation->getSr()) {
 		allpass_modulators[i]->setPhase((float)i/order);
 	}
 	amplitude_modulation_buffer=allocArray<float>(simulation->getBlockSize());
+	pan_reducers=new InterpolatedDelayLine*[order]();
+	for(int i=0; i < order; i++) {
+		pan_reducers[i] = new InterpolatedDelayLine(1.0f, simulation->getSr());
+	}
 	//initial configuration.
 	recompute();
 }
@@ -148,12 +154,14 @@ LateReflectionsNode::~LateReflectionsNode() {
 		delete amplitude_modulators[i];
 		delete delay_modulators[i];
 		delete allpass_modulators[i];
+		delete pan_reducers[i];
 	}
 	delete[] highshelves;
 	delete[] midshelves;
 	delete[] amplitude_modulators;
 	delete[] delay_modulators;
 	delete[] allpass_modulators;
+	delete[] pan_reducers;
 }
 
 double t60ToGain(double t60, double lineLength) {
@@ -214,6 +222,15 @@ void LateReflectionsNode::recompute() {
 		}
 	}
 	fdn.setMatrix(fdn_matrix);
+	//Reduce the panning effect.
+	//Explanation: the first sample of output should reach all of the 16 outputs at the same time, before degrading normally.
+	//This offset basically helps the reflections feel more "centered" when all channels are fed by the source.
+	//We add one sample here so that we never have a delay of 0, which reduces some possible compatability issues with delay lines.
+	double panReductionDelay = *std::max_element(delays, delays+order)+1.0/simulation->getSr();
+	for(int i=0; i < order; i++) {
+		double neededDelay = panReductionDelay-delays[i];
+		pan_reducers[i]->setDelay(neededDelay);
+	}
 }
 
 void LateReflectionsNode::amplitudeModulationFrequencyChanged() {
@@ -322,6 +339,13 @@ void LateReflectionsNode::process() {
 	if(amplitudeModulationDepth == 0.0f) {
 		for(int i = 0; i < 16; i++) {
 			amplitude_modulators[i]->skipSamples(block_size);
+		}
+	}
+	//Apply the pan reduction:
+	for(int i = 0; i < order; i++) {
+		auto &line = *pan_reducers[i];
+		for(int j = 0; j < block_size; j++) {
+			output_buffers[i][j] = line.tick(output_buffers[i][j]);
 		}
 	}
 }
