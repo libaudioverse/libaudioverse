@@ -109,7 +109,7 @@ class HrtfWriter(object):
 		self.responses = new_responses
 
 	def linear_phase(self):
-		"""Convert all the data to linear phse."""
+		"""Convert all the data to linear phase."""
 		if self.print_progress:
 			print "Converting data to linear phase..."
 		new_responses=[]
@@ -131,6 +131,5 @@ class HrtfWriter(object):
 		if self.print_progress:
 			print "Standard build requested."
 		self.data_to_float64()
-		self.linear_phase()
 		self.pack_data()
 		self.write_file(path)

@@ -67,6 +67,8 @@ void MultipannerNode::configureForwardedProperties() {
 	hrtf_panner->forwardProperty(Lav_PANNER_DISTANCE, us, Lav_PANNER_DISTANCE);
 	hrtf_panner->forwardProperty(Lav_PANNER_HEAD_WIDTH, us, Lav_PANNER_HEAD_WIDTH);
 	hrtf_panner->forwardProperty(Lav_PANNER_EAR_POSITION, us, Lav_PANNER_EAR_POSITION);
+	hrtf_panner->forwardProperty(Lav_PANNER_APPLY_ITD, us, Lav_PANNER_APPLY_ITD);
+	hrtf_panner->forwardProperty(Lav_PANNER_USE_LINEAR_PHASE, us, Lav_PANNER_USE_LINEAR_PHASE);
 }
 
 void MultipannerNode::strategyChanged() {

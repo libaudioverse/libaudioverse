@@ -71,6 +71,8 @@ void PannerBankNode::configureForwardedProperties() {
 		n->forwardProperty(Lav_PANNER_DISTANCE, us, Lav_PANNER_DISTANCE);
 		n->forwardProperty(Lav_PANNER_HEAD_WIDTH, us, Lav_PANNER_HEAD_WIDTH);
 		n->forwardProperty(Lav_PANNER_EAR_POSITION, us, Lav_PANNER_EAR_POSITION);
+		n->forwardProperty(Lav_PANNER_APPLY_ITD, us, Lav_PANNER_APPLY_ITD);
+		n->forwardProperty(Lav_PANNER_USE_LINEAR_PHASE, us, Lav_PANNER_USE_LINEAR_PHASE);
 	}
 }
 

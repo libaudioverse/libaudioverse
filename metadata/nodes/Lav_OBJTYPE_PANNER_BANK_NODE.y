@@ -92,6 +92,32 @@ properties:
     doc_description: |
       If true, then the azimuth controls the center of the cone.
       Otherwise, the azimuth controls the left edge of the cone.
+  Lav_PANNER_APPLY_ITD:
+    name: apply_itd
+    type: boolean
+    default: 0
+    doc_description: |
+      Whether or not to apply the interaural time difference.
+      
+      When sound is heard, it will arrive at one ear before the other.
+      This property controls whether or not to add additional delay to the panning effect in order to simulate this.
+      If enabled, HRTFs become more computationally expensive, but allow for configurability via the {{"distance"|codelit}}, {{"head_width"|codelit}}, and {{"ear_position"|codelit}} properties.
+      
+      Changing this property will cause an audible glitch in audio.
+      
+      This property applies only to the HRTF panning strategy.
+  Lav_PANNER_USE_LINEAR_PHASE:
+    name: use_linear_phase
+    type: boolean
+    default: 0
+    doc_desccription: |
+      Whether or not to convert the HRTF to linear phase.
+      
+      This is typically used when {{"apply_idt"|codelit}} is enabled, in order to work properly with datasets that are not already converted to linear phase.
+      
+      Enabling this property adds 8 FFT/IFFT pairs to the computation of the HRIR.
+      
+      This property applies only to the HRTF panning strategy.
 inputs: constructor
 outputs:
   - [dynamic, "Depends on the currently set panning strategy.", "The signal, panned according to the configured panning strategy."]

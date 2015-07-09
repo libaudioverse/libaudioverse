@@ -11,6 +11,9 @@ int ringmodi(int dividend, int divisor);
 float ringmodf(float dividend, float divisor);
 double ringmod(double dividend,double divisor);
 
+//Complex absolute value.
+float cabs(float real, float imag);
+
 //Work with decibals.
 //These two are for gain conversions, and assume 0 db is 1.0.
 double gainToDb(double gain);

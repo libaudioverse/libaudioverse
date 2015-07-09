@@ -19,6 +19,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <math.h>
 #include <memory>
 #include <algorithm>
+#include <kiss_fftr.h>
 
 namespace libaudioverse_implementation {
 
@@ -47,6 +48,25 @@ HrtfData::~HrtfData() {
 	}
 	delete[] hrirs;
 	delete[] azimuth_counts;
+	freeArray(fft_time_data);
+	freeArray(fft_data);
+	kiss_fftr_free(fft);
+	kiss_fftr_free(ifft);
+}
+
+void HrtfData::linearPhase(float* buffer) {
+	//Note that this is in effect circular convolution with a truncation.
+	std::copy(buffer, buffer+hrir_length, fft_time_data);
+	std::fill(fft_time_data+hrir_length, fft_time_data+hrir_length*2, 0.0f);
+	kiss_fftr(fft, fft_time_data, fft_data);
+	for(int i = 0; i < hrir_length+1; i++) {
+		fft_data[i].r = cabs(fft_data[i].r, fft_data[i].i);
+		fft_data[i].i = 0.0f;
+	}
+	kiss_fftri(ifft, fft_data, fft_time_data);
+	//Apply the downscaling that kissfft requires, otherwise this is too loud.
+	//Also accomplish copying back to the starting piont.
+	scalarMultiplicationKernel(hrir_length, 1.0f/(2*hrir_length), fft_time_data, buffer);
 }
 
 int HrtfData::getLength() {
@@ -151,13 +171,19 @@ void HrtfData::loadFromBuffer(unsigned int length, char* buffer, unsigned int fo
 	if(temporary_buffer2) freeArray(temporary_buffer2);
 	temporary_buffer1 = allocArray<float>(hrir_length);
 	temporary_buffer2 = allocArray<float>(hrir_length);
+	
+	//stuff for linear phase filters.
+	fft_time_data = allocArray<float>(hrir_length*2);
+	fft_data = allocArray<kiss_fft_cpx>(hrir_length+1); //half the bins, plus dc.
+	fft = kiss_fftr_alloc(hrir_length*2, 0, nullptr, nullptr);
+	ifft = kiss_fftr_alloc(hrir_length*2, 1, nullptr, nullptr);
 }
 
 //a complete HRTF for stereo is two calls to this function.
 //some final preparation is done afterwords.
 //This is very complicated, thus the heavy commenting.
 //todo: can this be made simpler?
-void HrtfData::computeCoefficientsMono(float elevation, float azimuth, float* out) {
+void HrtfData::computeCoefficientsMono(float elevation, float azimuth, float* out, bool linphase) {
 	//clamp the elevation.
 	if(elevation < min_elevation) {elevation = (float)min_elevation;}
 	else if(elevation > max_elevation) {elevation = (float)max_elevation;}
@@ -206,20 +232,32 @@ void HrtfData::computeCoefficientsMono(float elevation, float azimuth, float* ou
 		azimuthIndex2 = ringmodi(azimuthIndex2, azimuthCount);
 
 		//this is probably the only part of this that can't go wrong, assuming the above calculations are all correct.  Interpolate between the two azimuths.
-		for(int j = 0; j < hrir_length; j++) {
-			out[j] += elevationWeights[i]*(azimuthWeight1*azimuths[azimuthIndex1][j]+azimuthWeight2*azimuths[azimuthIndex2][j]);
+		if(linphase == false) {
+			for(int j = 0; j < hrir_length; j++) {
+				out[j] += elevationWeights[i]*(azimuthWeight1*azimuths[azimuthIndex1][j]+azimuthWeight2*azimuths[azimuthIndex2][j]);
+			}
+		}
+		//otherwise, the slower version; this involves copies and the fft.
+		else {
+			std::copy(azimuths[azimuthIndex1], azimuths[azimuthIndex1]+hrir_length, temporary_buffer1);
+			std::copy(azimuths[azimuthIndex2], azimuths[azimuthIndex2]+hrir_length, temporary_buffer2);
+			linearPhase(temporary_buffer1);
+			linearPhase(temporary_buffer2);
+			for(int j = 0; j < hrir_length; j++) {
+				out[j] += elevationWeights[i]*(temporary_buffer1[j]*azimuthWeight1+temporary_buffer2[j]*azimuthWeight2);
+			}
 		}
 	}
 }
 
-void HrtfData::computeCoefficientsStereo(float elevation, float azimuth, float *left, float* right) {
+void HrtfData::computeCoefficientsStereo(float elevation, float azimuth, float *left, float* right, bool linphase) {
 	//wrap azimuth to be > 0 and < 360.
 	azimuth = ringmodf(azimuth, 360.0f);
 	//the hrtf datasets are right ear coefficients.  Consequently, the right ear requires no changes.
-	computeCoefficientsMono(elevation, azimuth, right);
+	computeCoefficientsMono(elevation, azimuth, right, linphase);
 	//the left ear is found at an azimuth which is reflectred about 0 degrees.
 	azimuth = ringmodf(360-azimuth, 360.0f);
-	computeCoefficientsMono(elevation, azimuth, left);
+	computeCoefficientsMono(elevation, azimuth, left, linphase);
 }
 
 }

@@ -31,6 +31,7 @@ class HrtfNode: public Node {
 	//the difference between the time the sound would reach the left ear and the time it would reach the right.
 	//returns positive values if the right ear is greater, negative if the left ear is greater.
 	float computeInterauralDelay();
+	void applyIdtChanged();
 	private:
 	//the hrtf.
 	std::shared_ptr<HrtfData> hrtf = nullptr;
@@ -104,6 +105,9 @@ std::shared_ptr<Node>createHrtfNode(std::shared_ptr<Simulation>simulation, std::
 }
 
 void HrtfNode::process() {
+	if(werePropertiesModified(this, Lav_PANNER_APPLY_ITD)) applyIdtChanged();
+	bool applyingItd = getProperty(Lav_PANNER_APPLY_ITD).getIntValue() == 1;
+	bool linearPhase = getProperty(Lav_PANNER_USE_LINEAR_PHASE).getIntValue() == 1;
 	//Get the fft of the input.
 	std::copy(input_buffers[0], input_buffers[0]+block_size, fft_workspace);
 	kiss_fftr(fft, fft_workspace, input_fft);
@@ -113,7 +117,7 @@ void HrtfNode::process() {
 	float currentAzimuth = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
 	float currentElevation = getProperty(Lav_PANNER_ELEVATION).getFloatValue();
 	if(fabs(currentElevation-prev_elevation) > 0.5f || fabs(currentAzimuth-prev_azimuth) > 0.5f) {
-		hrtf->computeCoefficientsStereo(currentElevation, currentAzimuth, left_response, right_response);
+		hrtf->computeCoefficientsStereo(currentElevation, currentAzimuth, left_response, right_response, linearPhase);
 		if(allowCrossfade) {
 			new_left_convolver->setResponse(response_length, left_response);
 			new_right_convolver->setResponse(response_length, right_response);
@@ -148,6 +152,8 @@ void HrtfNode::process() {
 		std::swap(left_convolver, new_left_convolver);
 		std::swap(right_convolver, new_right_convolver);
 	}
+	//break out early if we aren't doing interaural delay.
+	if(applyingItd == false) return;
 	//we compute the interaural delay and apply it to the lines.
 	float interauralDelay = computeInterauralDelay();
 	if(interauralDelay > 0) {
@@ -189,6 +195,11 @@ float HrtfNode::computeInterauralDelay() {
 	float delta = rightDistance-leftDistance;
 	//Finally, divide by speed of sound and return.
 	return delta/speedOfSound;
+}
+
+void HrtfNode::applyIdtChanged() {
+	left_delay_line.reset();
+	right_delay_line.reset();
 }
 
 void HrtfNode::reset() {
