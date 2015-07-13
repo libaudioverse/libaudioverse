@@ -36,6 +36,8 @@ SourceNode::SourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<E
 	getProperty(Lav_SOURCE_SIZE).setFloatValue(manager->getProperty(Lav_ENVIRONMENT_DEFAULT_SIZE).getFloatValue());
 	input->connect(0, panner_node, 0);
 	setInputNode(input);
+	//Todo: we can't only work properly when always playing.
+	getProperty(Lav_NODE_STATE).setIntValue(Lav_NODESTATE_ALWAYS_PLAYING);
 }
 
 void SourceNode::forwardProperties() {
@@ -44,9 +46,9 @@ void SourceNode::forwardProperties() {
 
 std::shared_ptr<Node> createSourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentBase> manager) {
 	auto temp = std::shared_ptr<SourceNode>(new SourceNode(simulation, manager), ObjectDeleter(simulation));
+	temp->forwardProperties();
 	manager->registerSourceForUpdates(temp);
 	simulation->associateNode(temp);
-	temp->forwardProperties();
 	return temp;
 }
 
