@@ -47,6 +47,16 @@ properties:
     type: int
     doc_description: |
       The strategy for the internal multipanner.
+  Lav_SOURCE_HEAD_RELATIVE:
+    name: head_relative
+    type: boolean
+    default: 0
+    doc_description: |
+      Whether or not to consider this source's position to always be relative to the listener.
+      
+      Sources which are head relative interpret their positions in the default coordinate system, relative to the listener.
+      Positive x is right, positive y is up, and positive z is behind the listener.
+      The orientation and position properties of an environment do not affect head relative sources, making them ideal for such things as footsteps and/or HUD effects that should be panned.
 inputs:
   - [1, "The audio to enter the 3D environment."]
 outputs: null

@@ -75,7 +75,10 @@ float calculateGainForDistanceModel(int model, float distance, float maxDistance
 void SourceNode::update(Environment environment) {
 	//first, extract the vector of our position.
 	const float* pos = getProperty(Lav_3D_POSITION).getFloat3Value();
-	glm::vec4 npos = environment.world_to_listener_transform*glm::vec4(pos[0], pos[1], pos[2], 1.0f);
+	bool isHeadRelative = getProperty(Lav_SOURCE_HEAD_RELATIVE).getIntValue() == 1;
+	glm::vec4 npos;
+	if(isHeadRelative) npos = glm::vec4(pos[0], pos[1], pos[2], 1.0);
+	else npos = environment.world_to_listener_transform*glm::vec4(pos[0], pos[1], pos[2], 1.0f);
 	//npos is now easy to work with.
 	float distance = glm::length(npos);
 	float xz = sqrtf(npos.x*npos.x+npos.z*npos.z);
