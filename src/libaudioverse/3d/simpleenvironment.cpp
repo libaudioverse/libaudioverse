@@ -52,22 +52,22 @@ void SimpleEnvironmentNode::willProcessParents() {
 		auto at = glm::vec3(atup[0], atup[1], atup[2]);
 		auto up = glm::vec3(atup[3], atup[4], atup[5]);
 		auto right = glm::cross(at, up);
-		auto m = glm::inverse(glm::mat4(
-		right.x, up.x, at.x, 0,
-		right.y, up.y, at.y, 0,
-		right.z, up.z, at.z, 0,
-		0, 0, 0, 1));
+		auto m = glm::mat4(
+		right.x, up.x, -at.x, 0,
+		right.y, up.y, -at.y, 0,
+		right.z, up.z, -at.z, 0,
+		0, 0, 0, 1);
 		//Above is a rotation matrix, which works presuming the player is at (0, 0).
 		//Pass the translation through it, so that we can bake the translation in.
 		auto posvec = m*glm::vec4(pos[0], pos[1], pos[2], 1.0f);
 		//[column][row] because GLSL.
-		m[3][0] = posvec.x;
-		m[3][1] = posvec.y;
-		m[3][2] = posvec.z;
+		m[3][0] = -posvec.x;
+		m[3][1] = -posvec.y;
+		m[3][2] = -posvec.z;
 		environment.world_to_listener_transform = m;
 		//this debug code left in case this is still all broken.
-/*		printf("\n%f %f %f %f\n", m[0][0], m[1][0], m[2][0], m[3][0]);
-		printf("%f %f %f %f\n", m[0][1], m[1][1], m[2][1], m[3][1]);
+		printf("\n%f %f %f %f\n", m[0][0], m[1][0], m[2][0], m[3][0]);
+		/*printf("%f %f %f %f\n", m[0][1], m[1][1], m[2][1], m[3][1]);
 		printf("%f %f %f %f\n", m[0][2], m[1][2], m[2][2], m[3][2]);
 		printf("%f %f %f %f\n\n", m[0][3], m[1][3], m[2][3], m[3][3]);*/
 	}
