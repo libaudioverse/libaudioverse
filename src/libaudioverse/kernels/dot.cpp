@@ -20,13 +20,10 @@ float dotKernelSimple(int length, const float* v1, const float* v2) {
 #if defined(LIBAUDIOVERSE_USE_SSE2)
 
 float dotKernel(int length, const float* v1, const float* v2) {
-	if((isAligned(v1) && isAligned(v2)) == false) {
-		return dotKernelSimple(length, v1, v2);
-	}
 	__m128 accum = _mm_setzero_ps();
 	float result = 0.0f;
 	for(int i= 0; i < length/4*4; i+=4) {
-		accum = _mm_add_ps(accum, _mm_mul_ps(_mm_load_ps(v1+i), _mm_load_ps(v2+i)));
+		accum = _mm_add_ps(accum, _mm_mul_ps(_mm_loadu_ps(v1+i), _mm_loadu_ps(v2+i)));
 	}
 	for(int i =length/4*4; i < length; i++) result += v1[i]*v2[i];
 	//This next sequence gets accum[0] to be the sum of the floats in accum, so we can store it into result.
@@ -47,7 +44,7 @@ float dotKernel(int length, const float* v1, const float* v2) {
 #else
 
 float dotKernel(int length, const float* v1, const float* v2) {
-	return dotkernel(length, v1, v2);
+	return dotKernelSimple(length, v1, v2);
 }
 
 #endif

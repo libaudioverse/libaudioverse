@@ -22,31 +22,24 @@ void scalarAdditionKernelSimple(int length, float c, float* a1, float* dest) {
 #if defined(LIBAUDIOVERSE_USE_SSE2)
 
 void additionKernel(int length, float* a1, float* a2, float* dest) {
-	if((isAligned(a1) && isAligned(a2) && isAligned(dest)) == false) {
-		additionKernelSimple(length, a1, a2, dest);
-		return;
-	}
 	int neededLength = (length/4)*4;
 	__m128 a1r, a2r;
 	for(int i = 0; i < neededLength; i+= 4) {
-		a1r = _mm_load_ps(a1+i);
-		a2r = _mm_load_ps(a2+i);
+		a1r = _mm_loadu_ps(a1+i);
+		a2r = _mm_loadu_ps(a2+i);
 		a2r=_mm_add_ps(a1r, a2r);
-		_mm_store_ps(dest+i, a2r);
+		_mm_storeu_ps(dest+i, a2r);
 	}
 	additionKernelSimple(length-neededLength, a1+neededLength, a2+neededLength, dest+neededLength);
 }
 
 void scalarAdditionKernel(int length, float c, float* a1, float* dest) {
-	if((isAligned(a1) && isAligned(dest)) == false) {
-		scalarAdditionKernelSimple(length, c, a1, dest);
-	}
 	__m128 cr = _mm_load1_ps(&c);
 	int blocks = length/4;
 	for(int i = 0; i < blocks*4; i+=4) {
-		__m128 r1=_mm_load_ps(a1+i);
+		__m128 r1=_mm_loadu_ps(a1+i);
 		r1 = _mm_add_ps(r1, cr);
-		_mm_store_ps(dest+i, r1);
+		_mm_storeu_ps(dest+i, r1);
 	}
 	scalarAdditionKernelSimple(length-blocks*4, c, a1, dest);
 }

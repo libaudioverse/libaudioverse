@@ -25,50 +25,38 @@ void scalarMultiplicationKernelSimple(int length, float c, float* a1, float* des
 
 #if defined(LIBAUDIOVERSE_USE_SSE2)
 void multiplicationKernel(int length, float* a1, float* a2, float* dest) {
-	if((isAligned(a1) && isAligned(a2) && isAligned(dest)) == false) {
-		multiplicationKernelSimple(length, a1, a2, dest);
-		return;
-	}
 	int neededLength = (length/4)*4;
 	__m128 a1r, a2r;
 	for(int i = 0; i < neededLength; i+= 4) {
-		a1r = _mm_load_ps(a1+i);
-		a2r = _mm_load_ps(a2+i);
+		a1r = _mm_loadu_ps(a1+i);
+		a2r = _mm_loadu_ps(a2+i);
 		a2r=_mm_mul_ps(a1r, a2r);
-		_mm_store_ps(dest+i, a2r);
+		_mm_storeu_ps(dest+i, a2r);
 	}
 	multiplicationKernelSimple(length-neededLength, a1+neededLength, a2+neededLength, dest+neededLength);
 }
 
 void scalarMultiplicationKernel(int length, float c, float* a1, float* dest) {
-	if((isAligned(a1) && isAligned(dest)) == false) {
-		scalarMultiplicationKernelSimple(length, c, a1, dest);
-		return;
-	}
 	int neededLength = (length/4)*4;
 	__m128 a1r, cr;
 	cr = _mm_load1_ps(&c);
 	for(int i = 0; i < neededLength; i+= 4) {
-		a1r = _mm_load_ps(a1+i);
+		a1r = _mm_loadu_ps(a1+i);
 		a1r=_mm_mul_ps(a1r, cr);
-		_mm_store_ps(dest+i, a1r);
+		_mm_storeu_ps(dest+i, a1r);
 	}
 	scalarMultiplicationKernelSimple(length-neededLength, c, a1+neededLength, dest+neededLength);
 }
 
 void multiplicationAdditionKernel(int length, float c, float* a1, float* a2, float* dest) {
-	if((isAligned(a1) && isAligned(a2) && isAligned(dest)) == false) {
-		multiplicationAdditionKernelSimple(length, c, a1, a2, dest);
-		return;
-	}
 	int neededLength = (length/4)*4;
 	__m128 cr = _mm_load1_ps(&c);
 	for(int i = 0; i < neededLength; i+=4) {
 		__m128 a1r, a2r;
-		a1r = _mm_load_ps(a1+i);
-		a2r = _mm_load_ps(a2+i);
+		a1r = _mm_loadu_ps(a1+i);
+		a2r = _mm_loadu_ps(a2+i);
 		a2r = _mm_add_ps(a2r, _mm_mul_ps(a1r, cr));
-		_mm_store_ps(dest+i, a2r);
+		_mm_storeu_ps(dest+i, a2r);
 	}
 	multiplicationAdditionKernelSimple(length-neededLength, c, a1+neededLength, a2+neededLength, dest+neededLength);
 }
