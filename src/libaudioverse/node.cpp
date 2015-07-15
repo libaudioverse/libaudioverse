@@ -100,7 +100,13 @@ void Node::tick() {
 	num_input_buffers = input_buffers.size();
 	num_output_buffers = output_buffers.size();
 	process();
-	auto &mulProp = getProperty(Lav_NODE_MUL), &addProp = getProperty(Lav_NODE_ADD);
+	applyMul();
+	applyAdd();
+	is_processing = false;
+}
+
+void Node::applyMul() {
+	auto &mulProp = getProperty(Lav_NODE_MUL);
 	float** outputs =getOutputBufferArray();
 	if(mulProp.needsARate()) {
 		for(int i = 0; i < block_size; i++) {
@@ -113,6 +119,11 @@ void Node::tick() {
 			scalarMultiplicationKernel(block_size, mulProp.getFloatValue(), outputs[i], outputs[i]);
 		}
 	}
+}
+
+void Node::applyAdd() {
+	auto &addProp = getProperty(Lav_NODE_ADD);
+	float** outputs = getOutputBufferArray();
 	if(addProp.needsARate()) {
 		for(int i = 0; i < block_size; i++) {
 		float add=addProp.getFloatValue(i);
@@ -124,7 +135,6 @@ void Node::tick() {
 			scalarAdditionKernel(block_size, addProp.getFloatValue(), outputs[i], outputs[i]);
 		}
 	}
-	is_processing = false;
 }
 
 //cleans up stuff.
@@ -355,31 +365,8 @@ void SubgraphNode::tick() {
 	willProcessParents();
 	if(subgraph_output == nullptr) return;
 	subgraph_output->tick();
-	//Handle our add and mul, on top of the output object of the subgraph.
-	//We prefer this over forwarding because this allows the subgraph to change all internal volumes without them being overridden by the user.
-	auto &mulProp = getProperty(Lav_NODE_MUL), &addProp = getProperty(Lav_NODE_ADD);
-		float** outputs = getOutputBufferArray();	if(mulProp.needsARate()) {
-		for(int i = 0; i < block_size; i++) {
-			float mul = mulProp.getFloatValue(i);
-			for(int j = 0; j < getOutputBufferCount(); j++) outputs[j][i]*=mul;
-		}
-	}
-	else if(mulProp.getFloatValue() !=1.0) {
-		for(int i = 0; i < getOutputBufferCount(); i++) {
-			scalarMultiplicationKernel(block_size, mulProp.getFloatValue(), outputs[i], outputs[i]);
-		}
-	}
-	if(addProp.needsARate()) {
-		for(int i = 0; i < block_size; i++) {
-		float add=addProp.getFloatValue(i);
-			for(int j = 0; j < getOutputBufferCount(); j++) outputs[j][i]+=add;
-		}
-	}
-	else if(addProp.getFloatValue() !=0.0) {
-		for(int i = 0; i < getOutputBufferCount(); i++) {
-			scalarAdditionKernel(block_size, addProp.getFloatValue(), outputs[i], outputs[i]);
-		}
-	}
+	applyMul();
+	applyAdd();
 }
 
 //begin public api

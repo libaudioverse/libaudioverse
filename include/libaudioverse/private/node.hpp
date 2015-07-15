@@ -57,6 +57,9 @@ class Node: public ExternalObject { //enable_shared_from_this is for event infra
 	virtual void tick();
 	//override this one instead. Default implementation merely zeros the outputs.
 	virtual void process();
+	//Apply mul and add.
+	virtual void applyMul();
+	virtual void applyAdd();
 	//zero the output buffers.
 	virtual void zeroOutputBuffers();
 	virtual void zeroInputBuffers();
