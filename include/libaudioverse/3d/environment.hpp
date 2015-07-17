@@ -13,6 +13,7 @@ namespace libaudioverse_implementation {
 class SourceNode;
 class HrtfData;
 class Simulation;
+class Buffer;
 
 /**This holds info on listener positions, defaults, etc.
 Anything a source needs for updating, basically.*/
@@ -29,6 +30,8 @@ class EnvironmentNode: public SubgraphNode {
 	virtual void willProcessParents();
 	std::shared_ptr<Node> createPannerNode();
 	virtual void outputChannelsChanged();
+	//Play buffer asynchronously at specified position, destroying the source when done.
+	void playAsync(std::shared_ptr<Buffer> buffer, float x, float y, float z);
 	private:
 	//while these may be parents (through virtue of the panners we give out), they also have to hold a reference to us-and that reference must be strong.
 	//the world is more capable of handling a source that dies than a source a world that dies.

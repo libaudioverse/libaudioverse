@@ -66,6 +66,17 @@ properties:
       If you are using something greater than stereo, i.e. 5.1, you need to change this property.
       The specific issue solved by this property is the case in which one source is set to something different than all others,
       or where the app changes the panning strategies of sources after creation.
+extra_functions:
+  Lav_environmentNodePlayAsync:
+    doc_description: |
+      Play a buffer, using the specified position and the currently set defaults on the world for distance model and panning strategy.
+      This is the same as creating a buffer and a source, but Libaudioverse retains control of these objects.
+      When the buffer finishes playing, the source is automatically disposed of.
+    params:
+      buffer: The buffer to play.
+      x: The x-component of the  position.
+      y: The y-component of the position.
+      z: The z-component of the position.
 inputs: null
 outputs:
   - [dynamic, "Depends on the output_channels property.", "The output of the 3D environment."]
