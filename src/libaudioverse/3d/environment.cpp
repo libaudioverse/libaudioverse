@@ -113,9 +113,12 @@ void EnvironmentNode::playAsync(std::shared_ptr<Buffer> buffer, float x, float y
 	b->connect(0, s, 0);
 	s->getProperty(Lav_3D_POSITION).setFloat3Value(x, y, z);
 	//The key here is that we capture the shared pointers, holding them until the event fires.
-	//When the event fires, the closure object gets destroyed, the shared pointers decrement, and everything is scheduled for deletion.
-	b->getEvent(Lav_BUFFER_END_EVENT).setHandler([b, e, s, buffer] (Node* unused1, void* unused2) {
-		b->disconnect(0);
+	//When the event fires, we null the pointers we captured, and then everything schedules for deletion.
+	b->getEvent(Lav_BUFFER_END_EVENT).setHandler([b, e, s] (Node* unused1, void* unused2) mutable {
+		if(b) b->disconnect(0);
+		b.reset();
+		s.reset();
+		e.reset();
 	});
 }
 
