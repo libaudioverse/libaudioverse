@@ -114,6 +114,17 @@ std::set<std::shared_ptr<Node>> SimpleEnvironmentNode::getDependencies() {
 	return r;
 }
 
+void SimpleEnvironmentNode::visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) {
+	SubgraphNode::visitDependencies(pred);
+	for(auto w: sources) {
+		auto n = w.lock();
+		if(n) {
+			auto j = std::static_pointer_cast<Job>(n);
+			pred(j);
+		}
+	}
+}
+
 //begin public api
 
 Lav_PUBLIC_FUNCTION LavError Lav_createSimpleEnvironmentNode(LavHandle simulationHandle, const char*hrtfPath, LavHandle* destination) {

@@ -69,7 +69,7 @@ class Simulation: public ExternalObject, public Job {
 	void writeFile(std::string path, int channels, double duration, bool mayApplyMixingMatrix);
 	
 	//Conform to job.
-	virtual void visitDependencies(std::function<void(std::shared_ptr<Job>)> pred) override;
+	virtual void visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) override;
 	//called when connections are formed or lost, or when a node is deleted.
 	void invalidatePlan();
 	protected:

@@ -337,9 +337,23 @@ std::set<std::shared_ptr<Node>> Node::getDependencies() {
 }
 
 //Conform to job, using getDependencies.
-void Node::visitDependencies(std::function<void(std::shared_ptr<Job>)> pred) {
-	for(auto &n: getDependencies()) {
-		pred(n);
+void Node::visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) {
+	for(int i = 0; i < getInputConnectionCount(); i++) {
+		auto conn = getInputConnection(i)->getConnectedNodes();
+		for(auto &p: conn) {
+			auto j = std::dynamic_pointer_cast<Job>(p->shared_from_this());
+			pred(j);
+		}
+	}
+	for(auto &p: properties) {
+		auto &prop = p.second;
+		auto conn = prop.getInputConnection();
+		if(conn) {
+			for(auto n: conn->getConnectedNodes()) {
+				auto j = std::dynamic_pointer_cast<Job>(n->shared_from_this());
+				pred(j);
+			}
+		}
 	}
 }
 
@@ -387,10 +401,19 @@ float** SubgraphNode::getOutputBufferArray() {
 }
 
 //Use getDependencies to tell the planner and other code about our output.
+//Since we alias input connections, our only dependency is our output node, if any.
 std::set<std::shared_ptr<Node>> SubgraphNode::getDependencies() {
-	std::set<std::shared_ptr<Node>> r = Node::getDependencies();
+	std::set<std::shared_ptr<Node>> r;
 	if(subgraph_output) r.insert(subgraph_output);
 	return r;
+}
+
+//We can provide an optimization by visitinjg our output, if any.
+void SubgraphNode::visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) {
+	if(subgraph_output) {
+		auto j = std::static_pointer_cast<Job>(subgraph_output);
+		pred(j);
+	}
 }
 
 //This override is needed because nodes try to add their inputs, but we override where input connections come from.

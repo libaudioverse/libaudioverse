@@ -102,7 +102,7 @@ class Node: public ExternalObject, public Job {
 	virtual std::set<std::shared_ptr<Node>> getDependencies();
 	
 	//Conform to Job.
-	virtual void visitDependencies(std::function<void(std::shared_ptr<Job>)> pred) override;
+	virtual void visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) override;
 	virtual void willExecuteDependencies();
 	virtual void execute();
 	protected:
@@ -146,6 +146,7 @@ class SubgraphNode: public Node {
 
 	//this override is to make processing work properly. We must do a willProcessParents on ourselves and then forward to the output, if any.
 	std::set<std::shared_ptr<Node>> getDependencies()override ;
+	void visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) override;
 
 	//Override tick because we can't try to use connections.
 	//We don't have proper input buffers, default tick will override who knows what.

@@ -18,8 +18,16 @@ Planner::~Planner() {
 void tagger(std::shared_ptr<Job> job, int tag, std::vector<std::shared_ptr<Job>> &destination) {
 	tag = std::min(tag, job->job_sort_tag);
 	job->job_sort_tag = tag;
-	destination.push_back(job);
-	job->visitDependencies([&](std::shared_ptr<Job> j) {tagger(j, tag-1, destination);});
+	if(job->job_recorded == false) {
+		destination.push_back(job);
+		job->job_recorded = true;
+	}
+	std::function<void(std::shared_ptr<Job>&)> f = [&](std::shared_ptr<Job> &j) {tagger(j, tag-1, destination);};
+	job->visitDependencies(f);
+}
+
+bool jobComparer(const std::shared_ptr<Job> &a, const std::shared_ptr<Job> &b) {
+	return a->job_sort_tag < b->job_sort_tag;
 }
 
 void Planner::execute(std::shared_ptr<Job> start) {
@@ -29,14 +37,14 @@ void Planner::execute(std::shared_ptr<Job> start) {
 	std::reverse(plan.begin(), plan.end());
 	//sort the vector.
 	//Since the deepest jobs are negative, this works.
-	std::sort(plan.begin(), plan.end(),
-	[](const std::shared_ptr<Job> &a, const std::shared_ptr<Job> &b)->bool {return a->job_sort_tag < b->job_sort_tag;});
+	std::sort(plan.begin(), plan.end(), jobComparer);
 	//Execute from right to left  and then from left to right.
 	for(auto i = plan.rbegin(); i != plan.rend(); i++) {
 		(*i)->willExecuteDependencies();
 	}
 	for(auto i = plan.begin(); i != plan.end(); i++) {
 		(*i)->execute();
+		(*i)->job_recorded = false; //clear for the next time we plan.
 	}
 	//Kill the shared pointers.
 	plan.clear();
