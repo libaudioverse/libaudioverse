@@ -105,17 +105,9 @@ void SimpleEnvironmentNode::willTick() {
 	}
 }
 
-std::set<std::shared_ptr<Node>> SimpleEnvironmentNode::getDependencies() {
-	auto r = SubgraphNode::getDependencies();
-	for(auto &i: sources) {
-		auto &n = i.lock();
-		if(n) r.insert(n);
-	}
-	return r;
-}
-
 void SimpleEnvironmentNode::visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) {
 	SubgraphNode::visitDependencies(pred);
+	//Other dependencies: all our sources.
 	for(auto w: sources) {
 		auto n = w.lock();
 		if(n) {

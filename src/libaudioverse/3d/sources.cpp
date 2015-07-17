@@ -100,10 +100,10 @@ void SourceNode::update(Environment environment) {
 	panner_node ->getProperty(Lav_NODE_MUL).setFloatValue(gain);
 }
 
-std::set<std::shared_ptr<Node>> SourceNode::getDependencies() {
-	auto r = SubgraphNode::getDependencies();
-	r.insert(panner_node); //we don't assign this as our output.
-	return r;
+void SourceNode::visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) {
+	SubgraphNode::visitDependencies(pred);
+	auto j = std::static_pointer_cast<Job>(panner_node);
+	pred(j);
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_createSourceNode(LavHandle simulationHandle, LavHandle environmentHandle, LavHandle* destination) {

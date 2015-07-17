@@ -17,7 +17,7 @@ class SourceNode: public SubgraphNode {
 	void update(Environment env);
 	//involves shared pointers.
 	void forwardProperties();
-	std::set<std::shared_ptr<Node>> getDependencies() override;
+	void visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) override;
 	private:
 	std::shared_ptr<Node> panner_node, input;
 	std::shared_ptr<EnvironmentBase> manager;

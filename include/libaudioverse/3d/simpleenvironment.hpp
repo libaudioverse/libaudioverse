@@ -23,7 +23,6 @@ class SimpleEnvironmentNode: public EnvironmentBase {
 	//call update on all sources.
 	virtual void willProcessParents();
 	std::shared_ptr<Node> createPannerNode();
-	std::set<std::shared_ptr<Node>> getDependencies() override;
 	void visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) override;
 	private:
 	//while these may be parents (through virtue of the panners we give out), they also have to hold a reference to us-and that reference must be strong.

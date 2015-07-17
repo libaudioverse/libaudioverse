@@ -98,13 +98,11 @@ class Node: public ExternalObject, public Job {
 	//change number of input and output buffers.
 	virtual void resize(int newInputCount, int newOutputCount);
 
-	//Return a set containing all nodes upon which we depend.
-	virtual std::set<std::shared_ptr<Node>> getDependencies();
-	
 	//Conform to Job.
 	virtual void visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) override;
 	virtual void willExecuteDependencies();
 	virtual void execute();
+
 	protected:
 	std::shared_ptr<Simulation> simulation = nullptr;
 	std::map<int, Property> properties;
@@ -144,8 +142,7 @@ class SubgraphNode: public Node {
 	int getOutputBufferCount() override;
 	float** getOutputBufferArray() override;
 
-	//this override is to make processing work properly. We must do a willProcessParents on ourselves and then forward to the output, if any.
-	std::set<std::shared_ptr<Node>> getDependencies()override ;
+	//Our dependency is our single output node.
 	void visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) override;
 
 	//Override tick because we can't try to use connections.
