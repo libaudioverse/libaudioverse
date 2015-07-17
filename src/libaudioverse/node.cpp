@@ -83,10 +83,6 @@ void Node::tickProperties() {
 }
 
 void Node::tick() {
-	if(last_processed== simulation->getTickCount()) {
-		return; //we processed this tick already.
-	}
-	//Incrementing this counter here prevents duplication of zeroing outputs if we're in the paused state.
 	last_processed = simulation->getTickCount();
 	zeroOutputBuffers(); //we always do this because sometimes we're not going to actually do anything else.
 	if(getState() == Lav_NODESTATE_PAUSED) return; //nothing to do, for we are paused.
@@ -419,10 +415,6 @@ void SubgraphNode::visitDependencies(std::function<void(std::shared_ptr<Job>&)> 
 //This override is needed because nodes try to add their inputs, but we override where input connections come from.
 //In addition, we have no input buffers.
 void SubgraphNode::tick() {
-	if(last_processed== simulation->getTickCount()) {
-		return; //we processed this tick already.
-	}
-	//Incrementing this counter here prevents duplication of zeroing outputs if we're in the paused state.
 	last_processed = simulation->getTickCount();
 	//Zeroing the output buffers will silence our output.
 	if(getState() == Lav_NODESTATE_PAUSED) return; //nothing to do, for we are paused.
