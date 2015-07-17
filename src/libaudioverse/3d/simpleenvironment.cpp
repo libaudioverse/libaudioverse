@@ -105,6 +105,15 @@ void SimpleEnvironmentNode::willTick() {
 	}
 }
 
+std::set<std::shared_ptr<Node>> SimpleEnvironmentNode::getDependencies() {
+	auto r = SubgraphNode::getDependencies();
+	for(auto &i: sources) {
+		auto &n = i.lock();
+		if(n) r.insert(n);
+	}
+	return r;
+}
+
 //begin public api
 
 Lav_PUBLIC_FUNCTION LavError Lav_createSimpleEnvironmentNode(LavHandle simulationHandle, const char*hrtfPath, LavHandle* destination) {
