@@ -42,4 +42,7 @@ void Planner::execute(std::shared_ptr<Job> start) {
 	plan.clear();
 }
 
+void Planner::invalidatePlan() {
+}
+
 }

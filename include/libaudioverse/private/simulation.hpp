@@ -70,6 +70,8 @@ class Simulation: public ExternalObject, public Job {
 	
 	//Conform to job.
 	virtual void visitDependencies(std::function<void(std::shared_ptr<Job>)> pred) override;
+	//called when connections are formed or lost, or when a node is deleted.
+	void invalidatePlan();
 	protected:
 	//the connection to which nodes connect themselves if their output should be audible.
 	std::shared_ptr<InputConnection> final_output_connection;

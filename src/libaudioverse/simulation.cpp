@@ -214,6 +214,10 @@ void Simulation::visitDependencies(std::function<void(std::shared_ptr<Job>)> pre
 	}
 }
 
+void Simulation::invalidatePlan() {
+	planner->invalidatePlan();
+}
+
 //begin public API
 
 Lav_PUBLIC_FUNCTION LavError Lav_createSimulation(unsigned int sr, unsigned int blockSize, LavHandle* destination) {

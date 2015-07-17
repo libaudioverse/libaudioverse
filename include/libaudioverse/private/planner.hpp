@@ -35,6 +35,7 @@ class Planner {
 	Planner();
 	~Planner();
 	void execute(std::shared_ptr<Job> start);
+	void invalidatePlan();
 	private:
 	std::vector<std::shared_ptr<Job>> plan;
 };
