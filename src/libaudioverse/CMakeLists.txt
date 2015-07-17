@@ -126,8 +126,8 @@ automators/set.cpp
 audio_output.cpp
 
 #the 3D abstraction on top of libaudioverse.
-3d/simpleenvironment.cpp
-3d/sources.cpp
+3d/environment.cpp
+3d/source.cpp
 
 #c files containing embedded tables and data that don't change.
 #The hrtf is generated above.

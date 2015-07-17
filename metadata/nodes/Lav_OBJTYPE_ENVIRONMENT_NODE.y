@@ -69,11 +69,11 @@ properties:
 inputs: null
 outputs:
   - [dynamic, "Depends on the output_channels property.", "The output of the 3D environment."]
-doc_name: simple environment
+doc_name: environment
 doc_description: |
   This is the entry point to the 3D simulation capabilities.
   Environment nodes hold the information needed to pan sources, as well as acting as an aggregate output for all sources that use this environment.
-  The simple environment is the simplest environment possible, having no functionality beyond positioning.
+  
   
   Note that the various properties for default values do not affect already created sources.
   It is best to configure these first.

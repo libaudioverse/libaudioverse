@@ -3,10 +3,10 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #pragma once
 #include "../libaudioverse.h"
-#include "environmentbase.hpp"
 #include <vector>
 #include <set>
 #include <memory>
+#include <glm/glm.hpp>
 
 namespace libaudioverse_implementation {
 
@@ -14,9 +14,16 @@ class SourceNode;
 class HrtfData;
 class Simulation;
 
-class SimpleEnvironmentNode: public EnvironmentBase {
+/**This holds info on listener positions, defaults, etc.
+Anything a source needs for updating, basically.*/
+class EnvironmentInfo {
 	public:
-	SimpleEnvironmentNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf);
+	glm::mat4 world_to_listener_transform;
+};
+
+class EnvironmentNode: public SubgraphNode {
+	public:
+	EnvironmentNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf);
 	void registerSourceForUpdates(std::shared_ptr<SourceNode> source);
 	//Maybe change our output channels.
 	virtual void willTick() override;
@@ -30,7 +37,7 @@ class SimpleEnvironmentNode: public EnvironmentBase {
 	std::set<std::weak_ptr<SourceNode>, std::owner_less<std::weak_ptr<SourceNode>>> sources;
 	std::shared_ptr<HrtfData > hrtf;
 	std::shared_ptr<Node> output=nullptr;
-	Environment environment;
+	EnvironmentInfo environment_info;
 };
 
 }

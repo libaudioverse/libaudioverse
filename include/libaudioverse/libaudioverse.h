@@ -83,7 +83,7 @@ enum Lav_OBJECT_TYPES {
 
 	//Nodes from here.
 	Lav_OBJTYPE_GENERIC_NODE, //this is not something you should ever see outside the library, and basically means none.
-	Lav_OBJTYPE_SIMPLE_ENVIRONMENT_NODE,
+	Lav_OBJTYPE_ENVIRONMENT_NODE,
 	Lav_OBJTYPE_SOURCE_NODE,
 
 	Lav_OBJTYPE_HRTF_NODE,

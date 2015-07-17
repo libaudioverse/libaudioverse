@@ -2,8 +2,8 @@
 This file is part of Libaudioverse, a library for 3D and environmental audio simulation, and is released under the terms of the Gnu General Public License Version 3 or (at your option) any later version.
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 
-#include <libaudioverse/3d/sources.hpp>
-#include <libaudioverse/3d/simpleenvironment.hpp>
+#include <libaudioverse/3d/source.hpp>
+#include <libaudioverse/3d/environment.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/creators.hpp>
@@ -21,7 +21,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 namespace libaudioverse_implementation {
 
-SimpleEnvironmentNode::SimpleEnvironmentNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf): EnvironmentBase(Lav_OBJTYPE_SIMPLE_ENVIRONMENT_NODE, simulation)  {
+EnvironmentNode::EnvironmentNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf): SubgraphNode(Lav_OBJTYPE_ENVIRONMENT_NODE, simulation)  {
 	this->hrtf = hrtf;
 	int channels = getProperty(Lav_ENVIRONMENT_OUTPUT_CHANNELS).getIntValue();
 	output = createGainNode(simulation);
@@ -30,19 +30,19 @@ SimpleEnvironmentNode::SimpleEnvironmentNode(std::shared_ptr<Simulation> simulat
 	output->appendOutputConnection(0, channels);
 	appendOutputConnection(0, channels);
 	setOutputNode(output);
-	environment.world_to_listener_transform = glm::lookAt(
+	environment_info.world_to_listener_transform = glm::lookAt(
 		glm::vec3(0.0f, 0.0f, 0.0f),
 		glm::vec3(0.0f, 0.0f, -1.0f),
 		glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
-std::shared_ptr<SimpleEnvironmentNode> createSimpleEnvironmentNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf) {
-	auto retval = std::shared_ptr<SimpleEnvironmentNode>(new SimpleEnvironmentNode(simulation, hrtf), ObjectDeleter(simulation));
+std::shared_ptr<EnvironmentNode> createEnvironmentNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf) {
+	auto retval = std::shared_ptr<EnvironmentNode>(new EnvironmentNode(simulation, hrtf), ObjectDeleter(simulation));
 	simulation->associateNode(retval);
 	return retval;
 }
 
-void SimpleEnvironmentNode::willProcessParents() {	
+void EnvironmentNode::willProcessParents() {
 	if(werePropertiesModified(this, Lav_3D_POSITION, Lav_3D_ORIENTATION)) {
 		//update the matrix.
 		//Important: look at the glsl constructors. Glm copies them, and there is nonintuitive stuff here.
@@ -63,7 +63,7 @@ void SimpleEnvironmentNode::willProcessParents() {
 		m[3][0] = -posvec.x;
 		m[3][1] = -posvec.y;
 		m[3][2] = -posvec.z;
-		environment.world_to_listener_transform = m;
+		environment_info.world_to_listener_transform = m;
 		//this debug code left in case this is still all broken.
 		/*printf("\n%f %f %f %f\n", m[0][0], m[1][0], m[2][0], m[3][0]);
 		printf("%f %f %f %f\n", m[0][1], m[1][1], m[2][1], m[3][1]);
@@ -79,24 +79,24 @@ void SimpleEnvironmentNode::willProcessParents() {
 			needsRemoval.insert(i);
 			continue;
 		}
-		tmp->update(environment);
+		tmp->update(environment_info);
 	}
 	//do cleanup of dead sources.
 	for(auto i: needsRemoval) sources.erase(i);
 }
 
-std::shared_ptr<Node> SimpleEnvironmentNode::createPannerNode() {
+std::shared_ptr<Node> EnvironmentNode::createPannerNode() {
 	auto pan = createMultipannerNode(simulation, hrtf);
 	pan->connect(0, output, 0);
 	return pan;
 }
 
-void SimpleEnvironmentNode::registerSourceForUpdates(std::shared_ptr<SourceNode> source) {
+void EnvironmentNode::registerSourceForUpdates(std::shared_ptr<SourceNode> source) {
 	sources.insert(source);
 	simulation->invalidatePlan();
 }
 
-void SimpleEnvironmentNode::willTick() {
+void EnvironmentNode::willTick() {
 	if(werePropertiesModified(this, Lav_ENVIRONMENT_OUTPUT_CHANNELS)) {
 		int channels = getProperty(Lav_ENVIRONMENT_OUTPUT_CHANNELS).getIntValue();
 		output->resize(channels, channels);
@@ -106,7 +106,7 @@ void SimpleEnvironmentNode::willTick() {
 	}
 }
 
-void SimpleEnvironmentNode::visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) {
+void EnvironmentNode::visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) {
 	SubgraphNode::visitDependencies(pred);
 	//Other dependencies: all our sources.
 	for(auto w: sources) {
@@ -120,7 +120,7 @@ void SimpleEnvironmentNode::visitDependencies(std::function<void(std::shared_ptr
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createSimpleEnvironmentNode(LavHandle simulationHandle, const char*hrtfPath, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createEnvironmentNode(LavHandle simulationHandle, const char*hrtfPath, LavHandle* destination) {
 	PUB_BEGIN
 	auto simulation = incomingObject<Simulation>(simulationHandle);
 	LOCK(*simulation);
@@ -130,7 +130,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSimpleEnvironmentNode(LavHandle simulatio
 	} else {
 		hrtf->loadFromDefault(simulation->getSr());
 	}
-	auto retval = createSimpleEnvironmentNode(simulation, hrtf);
+	auto retval = createEnvironmentNode(simulation, hrtf);
 	*destination = outgoingObject<Node>(retval);
 	PUB_END
 }
