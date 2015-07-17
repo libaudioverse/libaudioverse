@@ -14,20 +14,19 @@ Planner::Planner() {
 Planner::~Planner() {
 }
 
+//Small helper  function, which needn't know about the class (thus avoiding capture requirements).
+void tagger(std::shared_ptr<Job> job, int tag, std::vector<std::shared_ptr<Job>> &destination) {
+	tag = std::min(tag, job->job_sort_tag);
+	job->job_sort_tag = tag;
+	destination.push_back(job);
+	job->visitDependencies([&](std::shared_ptr<Job> j) {tagger(j, tag-1, destination);});
+}
+
 void Planner::execute(std::shared_ptr<Job> start) {
-	std::set<std::shared_ptr<Job>> seen;
-	std::function<void(std::shared_ptr<Job>, int)> visitor; //needs to be a function object for recursion.
-	visitor = [&](std::shared_ptr<Job> j, int t) {
-		if(j == nullptr) return;
-		t = std::min(j->job_sort_tag, t); //First job is 0 for sorting purposes, and we proceed negatively.
-		j->job_sort_tag = t;
-		seen.insert(j);
-		//Visit dependencies.
-		j->visitDependencies([&] (std::shared_ptr<Job> j2) {visitor(j2, t-1);});
-	};
-	//Call the first visitor:
-	visitor(start, 0);
-	plan.assign(seen.begin(), seen.end());
+	//Fill the vector with the jobs.
+	tagger(start, 0, plan);
+	//In the common case, the vector is sorted by a reverse.
+	std::reverse(plan.begin(), plan.end());
 	//sort the vector.
 	//Since the deepest jobs are negative, this works.
 	std::sort(plan.begin(), plan.end(),

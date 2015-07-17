@@ -9,6 +9,11 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 namespace libaudioverse_implementation {
 
+class Job;
+
+/**Tags jobs with a number indicating when theya re to run.*/
+void tagger(std::shared_ptr<Job> job, int tag, std::vector<std::shared_ptr<Job>> &destination);
+
 /**Represents a repeatable unit of work.*/
 class  Job {
 	public:
@@ -22,6 +27,7 @@ class  Job {
 	friend class Planner;
 	private:
 	int job_sort_tag = 0;
+	friend void tagger(std::shared_ptr<Job> job, int tag, std::vector<std::shared_ptr<Job>> &destination);
 };
 
 class Planner {
