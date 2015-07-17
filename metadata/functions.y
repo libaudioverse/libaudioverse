@@ -265,6 +265,29 @@ functions:
       channels: The number of audio channels in the data; frames*channels is the total length of the array in samples.
       frames: The number of frames of audio data; frames*channels is the length of the array in samples.
       data: A pointer to the beginning of the array to load from.
+  Lav_bufferNormalize:
+    category: buffers
+    dosc_descriptionL: |
+      Normalize the buffer.
+      This function divides by the sample whose value is furthest from zero.
+      The effect is to make sounds as loud as possible without clipping or otherwise distorting the sound.
+    params:
+      bufferHandle: The buffer to normalize.
+  Lav_bufferGetDuration:
+    category: buffers
+    doc_description: |
+      Get the duration of the buffer in seconds.
+    params:
+      bufferHandle: The buffer to retrieve the duration for.
+  Lav_bufferGetLengthInSamples:
+    category: buffers
+    doc_description: |
+      Get the length of the specified buffer in samples.
+      
+      The sample rate of a buffer is the sample rate of the simulation for which that buffer was created.
+      This function is primarily useful for estimating ram usage in caching structures.
+    params:
+      bufferHandle: The buffer whose length is to be queried.
   Lav_nodeGetSimulation:
     category: nodes
     doc_description: |
