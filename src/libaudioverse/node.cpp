@@ -73,6 +73,7 @@ Node::~Node() {
 	for(auto i: input_buffers) {
 		freeArray(i);
 	}
+	simulation->invalidatePlan();
 }
 
 void Node::tickProperties() {
@@ -224,12 +225,14 @@ void Node::connect(int output, std::shared_ptr<Node> toNode, int input) {
 	auto outputConnection =getOutputConnection(output);
 	auto inputConnection = toNode->getInputConnection(input);
 	makeConnection(outputConnection, inputConnection);
+	simulation->invalidatePlan();
 }
 
 void Node::connectSimulation(int which) {
 	auto outputConnection=getOutputConnection(which);
 	auto inputConnection = simulation->getFinalOutputConnection();
 	makeConnection(outputConnection, inputConnection);
+	simulation->invalidatePlan();
 }
 
 void Node::connectProperty(int output, std::shared_ptr<Node> node, int slot) {
@@ -239,11 +242,13 @@ void Node::connectProperty(int output, std::shared_ptr<Node> node, int slot) {
 	if(conn ==nullptr) throw LavErrorException(Lav_ERROR_CANNOT_CONNECT_TO_PROPERTY);
 	auto outputConn =getOutputConnection(output);
 	makeConnection(outputConn, conn);
+	simulation->invalidatePlan();
 }
 
 void Node::disconnect(int which) {
 	auto o =getOutputConnection(which);
 	o->clear();
+	simulation->invalidatePlan();
 }
 
 std::shared_ptr<Simulation> Node::getSimulation() {
@@ -264,11 +269,13 @@ Property& Node::getProperty(int slot) {
 
 void Node::forwardProperty(int ourProperty, std::shared_ptr<Node> toNode, int toProperty) {
 	forwarded_properties[ourProperty] = std::make_tuple(toNode, toProperty);
+	simulation->invalidatePlan();
 }
 
 void Node::stopForwardingProperty(int ourProperty) {
 	if(forwarded_properties.count(ourProperty)) forwarded_properties.erase(ourProperty);
 	else throw LavErrorException(Lav_ERROR_INTERNAL);
+	simulation->invalidatePlan();
 }
 
 Event& Node::getEvent(int which) {
@@ -351,10 +358,12 @@ SubgraphNode::SubgraphNode(int type, std::shared_ptr<Simulation> simulation): No
 
 void SubgraphNode::setInputNode(std::shared_ptr<Node> node) {
 	subgraph_input= node;
+	simulation->invalidatePlan();
 }
 
 void SubgraphNode::setOutputNode(std::shared_ptr<Node> node) {
 	subgraph_output=node;
+	simulation->invalidatePlan();
 }
 
 int SubgraphNode::getInputConnectionCount() {
