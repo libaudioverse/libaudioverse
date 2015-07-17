@@ -12,7 +12,7 @@ filepath = os.path.abspath(filepath)
 filenode = libaudioverse.BufferNode(sim)
 buffer = libaudioverse.Buffer(sim)
 buffer.load_from_file(filepath)
-filenode.set_buffer(buffer)
+filenode.buffer = buffer
 
 #callback for when the file finishes.
 def finished(obj):

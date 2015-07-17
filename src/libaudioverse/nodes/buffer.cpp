@@ -23,7 +23,7 @@ namespace libaudioverse_implementation {
 class BufferNode: public Node {
 	public:
 	BufferNode(std::shared_ptr<Simulation> simulation);
-	void setBuffer(std::shared_ptr<Buffer> buff);
+	void bufferChanged();
 	void positionChanged();
 	virtual void process();
 	int frame = 0;
@@ -33,6 +33,7 @@ class BufferNode: public Node {
 
 BufferNode::BufferNode(std::shared_ptr<Simulation> simulation): Node(Lav_OBJTYPE_BUFFER_NODE, simulation, 0, 1) {
 	appendOutputConnection(0, 1);
+	getProperty(Lav_BUFFER_BUFFER).setPostChangedCallback([&] () {bufferChanged();});
 }
 
 std::shared_ptr<Node> createBufferNode(std::shared_ptr<Simulation> simulation) {
@@ -41,7 +42,8 @@ std::shared_ptr<Node> createBufferNode(std::shared_ptr<Simulation> simulation) {
 	return retval;
 }
 
-void BufferNode::setBuffer(std::shared_ptr<Buffer> buff) {
+void BufferNode::bufferChanged() {
+	auto buff = getProperty(Lav_BUFFER_BUFFER).getBufferValue();
 	double maxPosition= 0.0;
 	int newChannels= 0;
 	int newBufferLength=0;
@@ -59,7 +61,6 @@ void BufferNode::setBuffer(std::shared_ptr<Buffer> buff) {
 	getProperty(Lav_BUFFER_POSITION).setDoubleValue(0.0); //the callback handles changing everything else.
 	getProperty(Lav_BUFFER_POSITION).setDoubleRange(0.0, maxPosition);
 	buffer_length = newBufferLength;
-	getProperty(Lav_BUFFER_BUFFER).setBufferValue(buff);
 }
 
 void BufferNode::positionChanged() {
@@ -107,15 +108,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createBufferNode(LavHandle simulationHandle, La
 	LOCK(*simulation);
 	auto retval = createBufferNode(simulation);
 	*destination = outgoingObject<Node>(retval);
-	PUB_END
-}
-
-Lav_PUBLIC_FUNCTION LavError Lav_bufferNodeSetBuffer(LavHandle nodeHandle, LavHandle bufferHandle) {
-	PUB_BEGIN
-	auto n = incomingObject<BufferNode>(nodeHandle);
-	auto b = incomingObject<Buffer>(bufferHandle);
-	LOCK(*n);
-	n->setBuffer(b);
 	PUB_END
 }
 

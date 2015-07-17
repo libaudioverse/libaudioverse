@@ -39,7 +39,7 @@ void main(int argc, char** args) {
 	LavHandle buffer;
 	ERRCHECK(Lav_createBuffer(simulation, &buffer));
 	ERRCHECK(Lav_bufferLoadFromFile(buffer, args[1]));
-	ERRCHECK(Lav_bufferNodeSetBuffer(bufferNode, buffer));
+	ERRCHECK(Lav_nodeSetBufferProperty(bufferNode, Lav_BUFFER_BUFFER, buffer));
 	ERRCHECK(Lav_createMultipannerNode(simulation, "default", &panNode));
 	int pantype =Lav_PANNING_STRATEGY_STEREO;
 	switch(channels) {

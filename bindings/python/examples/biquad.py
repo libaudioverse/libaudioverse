@@ -13,7 +13,7 @@ filepath = os.path.abspath(filepath)
 filenode = libaudioverse.BufferNode(sim)
 buffer = libaudioverse.Buffer(sim)
 buffer.load_from_file(filepath)
-filenode.set_buffer(buffer)
+filenode.buffer = buffer
 bq = libaudioverse.BiquadNode(sim, 2)
 filenode.connect(0, bq, 0)
 bq.connect_simulation(0)
