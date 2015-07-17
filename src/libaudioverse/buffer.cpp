@@ -153,4 +153,20 @@ Lav_PUBLIC_FUNCTION LavError Lav_bufferNormalize(LavHandle bufferHandle) {
 	PUB_END
 }
 
+Lav_PUBLIC_FUNCTION LavError Lav_bufferGetDuration(LavHandle bufferHandle, float* destination) {
+	PUB_BEGIN
+	auto b = incomingObject<Buffer>(bufferHandle);
+	LOCK(*b);
+	*destination = b->getDuration();
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_bufferGetLengthInSamples(LavHandle bufferHandle, int* destination) {
+	PUB_BEGIN
+	auto b = incomingObject<Buffer>(bufferHandle);
+	LOCK(*b);
+	*destination = b->getLength();
+	PUB_END
+}
+
 }
