@@ -18,10 +18,11 @@ class SimpleEnvironmentNode: public EnvironmentBase {
 	public:
 	SimpleEnvironmentNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf);
 	void registerSourceForUpdates(std::shared_ptr<SourceNode> source);
+	//Maybe change our output channels.
+	virtual void willTick() override;
 	//call update on all sources.
 	virtual void willProcessParents();
 	std::shared_ptr<Node> createPannerNode();
-	virtual void outputChannelsChanged();
 	private:
 	//while these may be parents (through virtue of the panners we give out), they also have to hold a reference to us-and that reference must be strong.
 	//the world is more capable of handling a source that dies than a source a world that dies.

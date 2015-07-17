@@ -28,7 +28,7 @@ class PannerBankNode: public SubgraphNode {
 	void configureForwardedProperties();
 	void strategyChanged();
 	void needsRepositioning(); //called when the cone's parameters change.
-	void willProcessParents() override;
+	void willTick() override;
 };
 
 PannerBankNode::PannerBankNode(std::shared_ptr<Simulation> sim, int pannerCount, std::shared_ptr<HrtfData> hrtf): SubgraphNode(Lav_OBJTYPE_PANNER_BANK_NODE, sim)  {
@@ -117,7 +117,7 @@ void PannerBankNode::needsRepositioning() {
 	}
 }
 
-void PannerBankNode::willProcessParents() {
+void PannerBankNode::willTick() {
 	if(werePropertiesModified(this, Lav_PANNER_STRATEGY)) strategyChanged();
 	if(werePropertiesModified(this, Lav_PANNER_AZIMUTH, Lav_PANNER_BANK_SPREAD, Lav_PANNER_BANK_IS_CENTERED)) needsRepositioning();
 }

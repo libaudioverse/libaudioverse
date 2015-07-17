@@ -82,15 +82,17 @@ void Node::tickProperties() {
 }
 
 void Node::tick() {
-	if(last_processed== simulation->getTickCount()) return; //we processed this tick already.
+	if(last_processed== simulation->getTickCount()) {
+		return; //we processed this tick already.
+	}
 	//Incrementing this counter here prevents duplication of zeroing outputs if we're in the paused state.
 	last_processed = simulation->getTickCount();
 	zeroOutputBuffers(); //we always do this because sometimes we're not going to actually do anything else.
 	if(getState() == Lav_NODESTATE_PAUSED) return; //nothing to do, for we are paused.
 	tickProperties();
-	willProcessParents();
+	//willProcessParents is handled by the planner.
 	zeroInputBuffers();
-	//tick all alive parents, collecting their outputs onto ours.
+	//Collect parent outputs onto ours.
 	//by using the getInputConnection and getInputConnectionCount functions, we allow subgraphs to override effectively.
 	bool needsMixing = getProperty(Lav_NODE_CHANNEL_INTERPRETATION).getIntValue()==Lav_CHANNEL_INTERPRETATION_SPEAKERS;
 	for(int i = 0; i < getInputConnectionCount(); i++) {
@@ -163,6 +165,9 @@ void Node::zeroInputBuffers() {
 }
 
 void Node::willProcessParents() {
+}
+
+void Node::willTick() {
 }
 
 int Node::getState() {
@@ -324,6 +329,21 @@ std::set<std::shared_ptr<Node>> Node::getDependencies() {
 	return retval;
 }
 
+//Conform to job, using getDependencies.
+void Node::visitDependencies(std::function<void(std::shared_ptr<Job>)> pred) {
+	for(auto &n: getDependencies()) {
+		pred(n);
+	}
+}
+
+void Node::willExecuteDependencies() {
+	willProcessParents();
+}
+
+void Node::execute() {
+	tick();
+}
+
 //LavSubgraphNode
 
 SubgraphNode::SubgraphNode(int type, std::shared_ptr<Simulation> simulation): Node(type, simulation, 0, 0) {
@@ -357,16 +377,32 @@ float** SubgraphNode::getOutputBufferArray() {
 	return nullptr;
 }
 
+//Use getDependencies to tell the planner and other code about our output.
+std::set<std::shared_ptr<Node>> SubgraphNode::getDependencies() {
+	std::set<std::shared_ptr<Node>> r = Node::getDependencies();
+	if(subgraph_output) r.insert(subgraph_output);
+	return r;
+}
+
+//This override is needed because nodes try to add their inputs, but we override where input connections come from.
+//In addition, we have no input buffers.
 void SubgraphNode::tick() {
-	if(last_processed== simulation->getTickCount()) return;
-	last_processed=simulation->getTickCount();
-	if(getState() == Lav_NODESTATE_PAUSED) return;
+	if(last_processed== simulation->getTickCount()) {
+		return; //we processed this tick already.
+	}
+	//Incrementing this counter here prevents duplication of zeroing outputs if we're in the paused state.
+	last_processed = simulation->getTickCount();
+	//Zeroing the output buffers will silence our output.
+	if(getState() == Lav_NODESTATE_PAUSED) return; //nothing to do, for we are paused.
 	tickProperties();
-	willProcessParents();
-	if(subgraph_output == nullptr) return;
-	subgraph_output->tick();
+	zeroInputBuffers();
+	is_processing = true;
+	num_input_buffers = input_buffers.size();
+	num_output_buffers = output_buffers.size();
+	//No process call, subgraphs  don't support it.
 	applyMul();
 	applyAdd();
+	is_processing = false;
 }
 
 //begin public api

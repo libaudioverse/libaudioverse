@@ -42,8 +42,7 @@ std::shared_ptr<SimpleEnvironmentNode> createSimpleEnvironmentNode(std::shared_p
 	return retval;
 }
 
-void SimpleEnvironmentNode::willProcessParents() {
-	if(werePropertiesModified(this, Lav_ENVIRONMENT_OUTPUT_CHANNELS)) outputChannelsChanged();
+void SimpleEnvironmentNode::willProcessParents() {	
 	if(werePropertiesModified(this, Lav_3D_POSITION, Lav_3D_ORIENTATION)) {
 		//update the matrix.
 		//Important: look at the glsl constructors. Glm copies them, and there is nonintuitive stuff here.
@@ -96,12 +95,14 @@ void SimpleEnvironmentNode::registerSourceForUpdates(std::shared_ptr<SourceNode>
 	sources.insert(source);
 }
 
-void SimpleEnvironmentNode::outputChannelsChanged() {
-	int channels = getProperty(Lav_ENVIRONMENT_OUTPUT_CHANNELS).getIntValue();
-	output->resize(channels, channels);
-	getOutputConnection(0)->reconfigure(0, channels);
-	output->getOutputConnection(0)->reconfigure(0, channels);
-	output->getInputConnection(0)->reconfigure(0, channels);
+void SimpleEnvironmentNode::willTick() {
+	if(werePropertiesModified(this, Lav_ENVIRONMENT_OUTPUT_CHANNELS)) {
+		int channels = getProperty(Lav_ENVIRONMENT_OUTPUT_CHANNELS).getIntValue();
+		output->resize(channels, channels);
+		getOutputConnection(0)->reconfigure(0, channels);
+		output->getOutputConnection(0)->reconfigure(0, channels);
+		output->getInputConnection(0)->reconfigure(0, channels);
+	}
 }
 
 //begin public api

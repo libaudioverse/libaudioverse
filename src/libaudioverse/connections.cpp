@@ -29,8 +29,7 @@ OutputConnection::OutputConnection(std::shared_ptr<Simulation> simulation, Node*
 }
 
 void OutputConnection::add(int inputBufferCount, float** inputBuffers, bool shouldApplyMixingMatrix) {
-	//make sure our node has been ticked (nodes short-circuit if the simulation has not advanced).
-	node->tick();
+	//Ticking is now handled by the planner, see planner.cpp.
 	//get the array of outputs from our node.
 	float** outputArray=node->getOutputBufferArray();
 	//it is the responsibility of our node to keep us configured, so we assume what info we have is accurate. If it is not, that is the fault of our node.
