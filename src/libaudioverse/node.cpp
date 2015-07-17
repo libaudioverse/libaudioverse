@@ -260,9 +260,8 @@ Property& Node::getProperty(int slot, bool allowForwarding) {
 		auto n=std::get<0>(forwarded_properties[slot]).lock();
 		auto s=std::get<1>(forwarded_properties[slot]);
 		if(n) return n->getProperty(s);
-		else throw LavErrorException(Lav_ERROR_INTERNAL); //better to crash here.
 	}
-	else if(properties.count(slot) == 0) throw LavErrorException(Lav_ERROR_RANGE);
+	if(properties.count(slot) == 0) throw LavErrorException(Lav_ERROR_RANGE);
 	else return properties[slot];
 }
 
