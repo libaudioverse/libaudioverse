@@ -315,7 +315,26 @@ Use load_from_file to read a file or load_from_array to load an iterable."""
 		"""Load from an array of interleaved floats.
 		
 		Wraps Lav_bufferLoadFromArray."""
-		_lav.buffer_load_from_array(sr, channels, frames, data)
+		_lav.buffer_load_from_array(self, sr, channels, frames, data)
+
+	def get_duration(self):
+		"""Get the duration of the buffer in seconds.
+		
+		Wraps Lav_bufferGetDuration."""
+		return _lav.buffer_get_duration(self)
+
+	def get_length_in_samples(self):
+		"""Returns the length of the buffer in samples.
+		
+		Wraps Lav_bufferGetLengthInSamples."""
+		return _lav.buffer_get_length_in_samples(self)
+
+	def normalize(self):
+		"""Normalizes the buffer.
+		
+		
+		Wraps Lav_bufferNormalize."""
+		_lav.buffer_normalize(self)
 
 _types_to_classes[ObjectTypes.buffer] = Buffer
 
