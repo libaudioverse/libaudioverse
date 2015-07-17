@@ -24,7 +24,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 namespace libaudioverse_implementation {
 
 /**Given two nodes, determine if connecting an output of start to an input of end causes a cycle.*/
-bool doesEdgePreserveAcyclicity(std::shared_ptr<Node> start, std::shared_ptr<Node> end) {
+bool doesEdgePreserveAcyclicity(std::shared_ptr<Job> start, std::shared_ptr<Job> end) {
 	//A cycle exists if end is directly or indirectly conneccted to an input of start.
 	//To that end, we use recursion as follows.
 	//if we are called with start==end, it's a cycle.
@@ -32,10 +32,16 @@ bool doesEdgePreserveAcyclicity(std::shared_ptr<Node> start, std::shared_ptr<Nod
 	//Inductive step:
 	//connecting start to end connects everything "behind" start to end,
 	//so there's a cycle if end is already behind start.
-	for(auto n: start->getDependencies()) {
-		if(doesEdgePreserveAcyclicity(n, end) == false) return false;
-	}
-	return true;
+	//We check by walking all dependencies of start looking for end.
+	//This is slow, in that it visits extra nodes on a cycle; but if there is no cycle, we visit everything anyway.
+	std::function<void(std::shared_ptr<Job>&)> f ;
+	bool cycled = false;
+	f = [&] (std::shared_ptr<Job> &j) {
+		if(j == end) cycled = true;
+		else if(cycled == false) j->visitDependencies(f);
+	};
+	start->visitDependencies(f);
+	return cycled == false;
 }
 
 Node::Node(int type, std::shared_ptr<Simulation> simulation, unsigned int numInputBuffers, unsigned int numOutputBuffers): ExternalObject(type) {
