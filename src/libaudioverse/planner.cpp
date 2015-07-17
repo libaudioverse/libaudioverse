@@ -14,6 +14,35 @@ Planner::Planner() {
 Planner::~Planner() {
 }
 
+void Planner::execute(std::shared_ptr<Job> start) {
+	if(is_valid == false || last_start.lock() != start) replan(start);
+	plan.assign(weak_plan.begin(), weak_plan.end());
+	//Check it for nulls.  This is theoretically possible.
+	for(auto &p: plan) {
+		if(p == nullptr) {
+			invalidatePlan();
+			plan.clear();
+			//recurse into ourselves and try to plan again.
+			execute(start);
+		}
+	}
+	for(auto i = plan.rbegin(); i != plan.rend(); i++) {
+		(*i)->willExecuteDependencies();
+	}
+	for(auto i = plan.begin(); i != plan.end(); i++) {
+		(*i)->execute();
+		(*i)->job_recorded = false; //clear for the next time we plan.
+	}
+	//Kill the shared pointers.
+	plan.clear();
+	last_start = start;
+}
+
+void Planner::invalidatePlan() {
+	is_valid = false;
+}
+
+//Actually do the planning below here:
 //Small helper  function, which needn't know about the class (thus avoiding capture requirements).
 void tagger(std::shared_ptr<Job> job, int tag, std::vector<std::shared_ptr<Job>> &destination) {
 	tag = std::min(tag, job->job_sort_tag);
@@ -30,7 +59,7 @@ bool jobComparer(const std::shared_ptr<Job> &a, const std::shared_ptr<Job> &b) {
 	return a->job_sort_tag < b->job_sort_tag;
 }
 
-void Planner::execute(std::shared_ptr<Job> start) {
+void Planner::replan(std::shared_ptr<Job> start) {
 	//Fill the vector with the jobs.
 	tagger(start, 0, plan);
 	//In the common case, the vector is sorted by a reverse.
@@ -38,19 +67,10 @@ void Planner::execute(std::shared_ptr<Job> start) {
 	//sort the vector.
 	//Since the deepest jobs are negative, this works.
 	std::sort(plan.begin(), plan.end(), jobComparer);
-	//Execute from right to left  and then from left to right.
-	for(auto i = plan.rbegin(); i != plan.rend(); i++) {
-		(*i)->willExecuteDependencies();
-	}
-	for(auto i = plan.begin(); i != plan.end(); i++) {
-		(*i)->execute();
-		(*i)->job_recorded = false; //clear for the next time we plan.
-	}
-	//Kill the shared pointers.
+	is_valid = true;
+	//Put in weak_plan, the cache.
+	weak_plan.assign(plan.begin(), plan.end());
 	plan.clear();
-}
-
-void Planner::invalidatePlan() {
 }
 
 }

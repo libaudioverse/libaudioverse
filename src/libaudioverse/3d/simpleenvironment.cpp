@@ -93,6 +93,7 @@ std::shared_ptr<Node> SimpleEnvironmentNode::createPannerNode() {
 
 void SimpleEnvironmentNode::registerSourceForUpdates(std::shared_ptr<SourceNode> source) {
 	sources.insert(source);
+	simulation->invalidatePlan();
 }
 
 void SimpleEnvironmentNode::willTick() {

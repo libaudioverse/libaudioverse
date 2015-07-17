@@ -41,7 +41,11 @@ class Planner {
 	void execute(std::shared_ptr<Job> start);
 	void invalidatePlan();
 	private:
+	void replan(std::shared_ptr<Job> start);
 	std::vector<std::shared_ptr<Job>> plan;
+	std::vector<std::weak_ptr<Job>> weak_plan;
+	bool is_valid = false;
+	std::weak_ptr<Job> last_start;
 };
 
 }
