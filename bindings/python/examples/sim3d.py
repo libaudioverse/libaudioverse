@@ -5,7 +5,7 @@ libaudioverse.initialize()
 
 sim = libaudioverse.Simulation()
 sim.set_output_device(-1)
-world = libaudioverse.SimpleEnvironmentNode(sim, "default")
+world = libaudioverse.EnvironmentNode(sim, "default")
 source = libaudioverse.SourceNode(sim, world)
 print "Enter a path to a sound file."
 filepath = raw_input()

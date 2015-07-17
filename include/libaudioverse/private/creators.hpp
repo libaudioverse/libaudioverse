@@ -9,8 +9,7 @@ namespace libaudioverse_implementation {
 class Node;
 class Simulation;
 class HrtfData;
-class EnvironmentBase;
-class SimpleEnvironmentNode;
+class EnvironmentNode;
 
 //normal nodes in order by the file they are in, and the position in that file.
 std::shared_ptr<Node>createAmplitudePannerNode(std::shared_ptr<Simulation> Simulation);
@@ -45,7 +44,7 @@ std::shared_ptr<Node> createThreeBandEqNode(std::shared_ptr<Simulation> simulati
 
 
 //3d nodes.
-std::shared_ptr<SimpleEnvironmentNode> createSimpleEnvironmentNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf);
-std::shared_ptr<Node> createSourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentBase> manager);
+std::shared_ptr<EnvironmentNode> createEnvironmentNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf);
+std::shared_ptr<Node> createSourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentNode> environment);
 
 }

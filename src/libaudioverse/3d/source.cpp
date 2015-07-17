@@ -2,8 +2,8 @@
 This file is part of Libaudioverse, a library for 3D and environmental audio simulation, and is released under the terms of the Gnu General Public License Version 3 or (at your option) any later version.
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 
-#include <libaudioverse/3d/sources.hpp>
-#include <libaudioverse/3d/environmentbase.hpp>
+#include <libaudioverse/3d/source.hpp>
+#include <libaudioverse/3d/environment.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/constants.hpp>
@@ -22,18 +22,18 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 namespace libaudioverse_implementation {
 
-SourceNode::SourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentBase> manager): SubgraphNode(Lav_OBJTYPE_SOURCE_NODE, simulation) {
+SourceNode::SourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentNode> environment): SubgraphNode(Lav_OBJTYPE_SOURCE_NODE, simulation) {
 	input = createGainNode(simulation);
 	input->resize(1, 1);
 	input->appendInputConnection(0, 1);
 	input->appendOutputConnection(0, 1);
-	panner_node = manager->createPannerNode();
-	this->manager = manager;
+	panner_node = environment->createPannerNode();
+	this->environment = environment;
 	//we have to read off these defaults manually, and it must always be the last thing in the constructor.
-	getProperty(Lav_SOURCE_DISTANCE_MODEL).setIntValue(manager->getProperty(Lav_ENVIRONMENT_DEFAULT_DISTANCE_MODEL).getIntValue());
-	getProperty(Lav_SOURCE_MAX_DISTANCE).setFloatValue(manager->getProperty(Lav_ENVIRONMENT_DEFAULT_MAX_DISTANCE).getFloatValue());
-	getProperty(Lav_SOURCE_PANNER_STRATEGY).setIntValue(manager->getProperty(Lav_ENVIRONMENT_DEFAULT_PANNER_STRATEGY).getIntValue());
-	getProperty(Lav_SOURCE_SIZE).setFloatValue(manager->getProperty(Lav_ENVIRONMENT_DEFAULT_SIZE).getFloatValue());
+	getProperty(Lav_SOURCE_DISTANCE_MODEL).setIntValue(environment->getProperty(Lav_ENVIRONMENT_DEFAULT_DISTANCE_MODEL).getIntValue());
+	getProperty(Lav_SOURCE_MAX_DISTANCE).setFloatValue(environment->getProperty(Lav_ENVIRONMENT_DEFAULT_MAX_DISTANCE).getFloatValue());
+	getProperty(Lav_SOURCE_PANNER_STRATEGY).setIntValue(environment->getProperty(Lav_ENVIRONMENT_DEFAULT_PANNER_STRATEGY).getIntValue());
+	getProperty(Lav_SOURCE_SIZE).setFloatValue(environment->getProperty(Lav_ENVIRONMENT_DEFAULT_SIZE).getFloatValue());
 	input->connect(0, panner_node, 0);
 	setInputNode(input);
 	//Todo: we can't only work properly when always playing.
@@ -44,10 +44,10 @@ void SourceNode::forwardProperties() {
 	panner_node->forwardProperty(Lav_PANNER_STRATEGY, std::static_pointer_cast<Node>(this->shared_from_this()), Lav_SOURCE_PANNER_STRATEGY);
 }
 
-std::shared_ptr<Node> createSourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentBase> manager) {
-	auto temp = std::shared_ptr<SourceNode>(new SourceNode(simulation, manager), ObjectDeleter(simulation));
+std::shared_ptr<Node> createSourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentNode> environment) {
+	auto temp = std::shared_ptr<SourceNode>(new SourceNode(simulation, environment), ObjectDeleter(simulation));
 	temp->forwardProperties();
-	manager->registerSourceForUpdates(temp);
+	environment->registerSourceForUpdates(temp);
 	simulation->associateNode(temp);
 	return temp;
 }
@@ -72,13 +72,13 @@ float calculateGainForDistanceModel(int model, float distance, float maxDistance
 	return retval;
 }
 
-void SourceNode::update(Environment environment) {
+void SourceNode::update(EnvironmentInfo &env) {
 	//first, extract the vector of our position.
 	const float* pos = getProperty(Lav_3D_POSITION).getFloat3Value();
 	bool isHeadRelative = getProperty(Lav_SOURCE_HEAD_RELATIVE).getIntValue() == 1;
 	glm::vec4 npos;
 	if(isHeadRelative) npos = glm::vec4(pos[0], pos[1], pos[2], 1.0);
-	else npos = environment.world_to_listener_transform*glm::vec4(pos[0], pos[1], pos[2], 1.0f);
+	else npos = env.world_to_listener_transform*glm::vec4(pos[0], pos[1], pos[2], 1.0f);
 	//npos is now easy to work with.
 	float distance = glm::length(npos);
 	float xz = sqrtf(npos.x*npos.x+npos.z*npos.z);
@@ -105,7 +105,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSourceNode(LavHandle simulationHandle, La
 	PUB_BEGIN
 	auto simulation = incomingObject<Simulation>(simulationHandle);
 	LOCK(*simulation);
-	auto retval = createSourceNode(simulation, incomingObject<EnvironmentBase>(environmentHandle));
+	auto retval = createSourceNode(simulation, incomingObject<EnvironmentNode>(environmentHandle));
 	*destination = outgoingObject<Node>(retval);
 	PUB_END
 }
