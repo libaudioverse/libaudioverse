@@ -79,7 +79,7 @@ class Node: public ExternalObject { //enable_shared_from_this is for event infra
 	virtual void willProcessParents();
 
 	std::shared_ptr<Simulation> getSimulation();
-	Property& getProperty(int slot);
+	Property& getProperty(int slot, bool allowForwarding = true);
 
 	//Property forwarding support.
 	void forwardProperty(int ourProperty, std::shared_ptr<Node> toNode, int toProperty);
@@ -87,6 +87,8 @@ class Node: public ExternalObject { //enable_shared_from_this is for event infra
 	//Record that toProperty on toNode is forwarded to us.
 	void addPropertyBackref(int ourProperty, std::shared_ptr<Node> toNode, int toProperty);
 	void removePropertyBackref(int ourProperty, std::shared_ptr<Node> toNode, int toProperty);
+	//call pred on all the properties that immediately forward to which.
+	void visitPropertyBackrefs(int which, std::function<void(Property&)> pred);
 	
 	//event helper methods.
 	Event& getEvent(int which);

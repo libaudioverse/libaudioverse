@@ -8,6 +8,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <algorithm>
 #include <memory>
 #include <map>
+#include <functional>
 #include "../libaudioverse.h"
 #include "errors.hpp"
 
@@ -155,7 +156,10 @@ class Property {
 	bool getHasDynamicRange();
 	void setHasDynamicRange(bool v);
 
-
+	//Callback support.
+	void setPostChangedCallback(std::function<void(void)> cb);
+	void firePostChangedCallback();
+	
 	private:
 	int type, tag;
 	PropertyValue value, default_value, minimum_value, maximum_value;
@@ -184,7 +188,12 @@ class Property {
 	int last_ticked=-1; //simulation starts at zero.
 	int last_modified = 0; //so we can detect writes. We are first written on tick 0.
 	bool was_modified = false; //If we were modified since the last time we ticked.
+	
+	//callbacks
+	std::function<void(void)> post_changed_callback;
 };
+
+
 
 //helper methods to quickly make properties.
 Property* createIntProperty(const char* name, int default, int min, int max);

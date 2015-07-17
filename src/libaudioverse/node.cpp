@@ -254,9 +254,9 @@ std::shared_ptr<Simulation> Node::getSimulation() {
 	return simulation;
 }
 
-Property& Node::getProperty(int slot) {
+Property& Node::getProperty(int slot, bool allowForwarding) {
 	//first the forwarded case.
-	if(forwarded_properties.count(slot) !=0) {
+	if(allowForwarding && forwarded_properties.count(slot) !=0) {
 		auto n=std::get<0>(forwarded_properties[slot]).lock();
 		auto s=std::get<1>(forwarded_properties[slot]);
 		if(n) return n->getProperty(s);
@@ -291,6 +291,18 @@ void Node::removePropertyBackref(int ourProperty, std::shared_ptr<Node> toNode, 
 	auto t = std::make_tuple(toNode, toProperty);
 	if(forwarded_property_backrefs.count(ourProperty)) {
 		if(forwarded_property_backrefs[ourProperty].count(t)) forwarded_property_backrefs[ourProperty].erase(t);
+	}
+}
+
+void Node::visitPropertyBackrefs(int which, std::function<void(Property&)> pred) {
+	for(auto &t: forwarded_property_backrefs[which]) {
+		auto &n = std::get<0>(t);
+		auto n_s = n.lock();
+		if(n_s) {
+			auto w = std::get<1>(t);
+			//get the property without forwarding.
+			pred(n_s->getProperty(w, false));
+		}
 	}
 }
 
