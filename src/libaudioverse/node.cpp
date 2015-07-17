@@ -38,6 +38,15 @@ bool doesEdgePreserveAcyclicity(std::shared_ptr<Node> start, std::shared_ptr<Nod
 	return true;
 }
 
+//For property backrefs.
+bool PropertyBackrefComparer::operator() (const std::tuple<std::weak_ptr<Node>, int> &a, const std::tuple<std::weak_ptr<Node>, int> &b) {
+	auto &aw = std::get<0>(a);
+	auto &bw = std::get<0>(b);
+	if(aw.owner_before(bw)) return true;
+	else if(bw.owner_before(aw)) return false;
+	else return std::get<1>(a) < std::get<1>(b);
+}
+
 Node::Node(int type, std::shared_ptr<Simulation> simulation, unsigned int numInputBuffers, unsigned int numOutputBuffers): ExternalObject(type) {
 	this->simulation= simulation;
 	//request properties from the metadata module.
@@ -259,11 +268,30 @@ Property& Node::getProperty(int slot) {
 
 void Node::forwardProperty(int ourProperty, std::shared_ptr<Node> toNode, int toProperty) {
 	forwarded_properties[ourProperty] = std::make_tuple(toNode, toProperty);
+	toNode->addPropertyBackref(toProperty, std::static_pointer_cast<Node>(shared_from_this()), ourProperty);
 }
 
 void Node::stopForwardingProperty(int ourProperty) {
-	if(forwarded_properties.count(ourProperty)) forwarded_properties.erase(ourProperty);
+	if(forwarded_properties.count(ourProperty)) {
+		auto t = forwarded_properties[ourProperty];
+		forwarded_properties.erase(ourProperty);
+		auto n = std::get<0>(t).lock();
+		if(n) {
+			n->removePropertyBackref(std::get<1>(t), std::static_pointer_cast<Node>(shared_from_this()), ourProperty);
+		}
+	}
 	else throw LavErrorException(Lav_ERROR_INTERNAL);
+}
+
+void Node::addPropertyBackref(int ourProperty, std::shared_ptr<Node> toNode, int toProperty) {
+	forwarded_property_backrefs[ourProperty].insert(std::make_tuple(toNode, toProperty));
+}
+
+void Node::removePropertyBackref(int ourProperty, std::shared_ptr<Node> toNode, int toProperty) {
+	auto t = std::make_tuple(toNode, toProperty);
+	if(forwarded_property_backrefs.count(ourProperty)) {
+		if(forwarded_property_backrefs[ourProperty].count(t)) forwarded_property_backrefs[ourProperty].erase(t);
+	}
 }
 
 Event& Node::getEvent(int which) {
