@@ -31,7 +31,7 @@ void main(int argc, char** args) {
 	LavHandle buffer;
 	ERRCHECK(Lav_createBuffer(simulation, &buffer));
 	ERRCHECK(Lav_bufferLoadFromFile(buffer, args[1]));
-	ERRCHECK(Lav_bufferNodeSetBuffer(bufferNode, buffer));
+	ERRCHECK(Lav_nodeSetBufferProperty(bufferNode, Lav_BUFFER_BUFFER, buffer));
 	ERRCHECK(Lav_nodeSetIntProperty(bufferNode, Lav_BUFFER_LOOPING, 1));
 	ERRCHECK(Lav_createHrtfNode(simulation, args[2], &hrtfNode));
 	ERRCHECK(Lav_nodeConnect(bufferNode, 0, hrtfNode, 0));

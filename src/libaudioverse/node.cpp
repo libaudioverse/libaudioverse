@@ -44,6 +44,15 @@ bool doesEdgePreserveAcyclicity(std::shared_ptr<Job> start, std::shared_ptr<Job>
 	return cycled == false;
 }
 
+//For property backrefs.
+bool PropertyBackrefComparer::operator() (const std::tuple<std::weak_ptr<Node>, int> &a, const std::tuple<std::weak_ptr<Node>, int> &b) {
+	auto &aw = std::get<0>(a);
+	auto &bw = std::get<0>(b);
+	if(aw.owner_before(bw)) return true;
+	else if(bw.owner_before(aw)) return false;
+	else return std::get<1>(a) < std::get<1>(b);
+}
+
 Node::Node(int type, std::shared_ptr<Simulation> simulation, unsigned int numInputBuffers, unsigned int numOutputBuffers): ExternalObject(type) {
 	this->simulation= simulation;
 	//request properties from the metadata module.
@@ -257,9 +266,9 @@ std::shared_ptr<Simulation> Node::getSimulation() {
 	return simulation;
 }
 
-Property& Node::getProperty(int slot) {
+Property& Node::getProperty(int slot, bool allowForwarding) {
 	//first the forwarded case.
-	if(forwarded_properties.count(slot) !=0) {
+	if(allowForwarding && forwarded_properties.count(slot) !=0) {
 		auto n=std::get<0>(forwarded_properties[slot]).lock();
 		auto s=std::get<1>(forwarded_properties[slot]);
 		if(n) return n->getProperty(s);
@@ -271,13 +280,44 @@ Property& Node::getProperty(int slot) {
 
 void Node::forwardProperty(int ourProperty, std::shared_ptr<Node> toNode, int toProperty) {
 	forwarded_properties[ourProperty] = std::make_tuple(toNode, toProperty);
+	toNode->addPropertyBackref(toProperty, std::static_pointer_cast<Node>(shared_from_this()), ourProperty);
 	simulation->invalidatePlan();
 }
 
 void Node::stopForwardingProperty(int ourProperty) {
-	if(forwarded_properties.count(ourProperty)) forwarded_properties.erase(ourProperty);
+	if(forwarded_properties.count(ourProperty)) {
+		auto t = forwarded_properties[ourProperty];
+		forwarded_properties.erase(ourProperty);
+		auto n = std::get<0>(t).lock();
+		if(n) {
+			n->removePropertyBackref(std::get<1>(t), std::static_pointer_cast<Node>(shared_from_this()), ourProperty);
+		}
+	}
 	else throw LavErrorException(Lav_ERROR_INTERNAL);
 	simulation->invalidatePlan();
+}
+
+void Node::addPropertyBackref(int ourProperty, std::shared_ptr<Node> toNode, int toProperty) {
+	forwarded_property_backrefs[ourProperty].insert(std::make_tuple(toNode, toProperty));
+}
+
+void Node::removePropertyBackref(int ourProperty, std::shared_ptr<Node> toNode, int toProperty) {
+	auto t = std::make_tuple(toNode, toProperty);
+	if(forwarded_property_backrefs.count(ourProperty)) {
+		if(forwarded_property_backrefs[ourProperty].count(t)) forwarded_property_backrefs[ourProperty].erase(t);
+	}
+}
+
+void Node::visitPropertyBackrefs(int which, std::function<void(Property&)> pred) {
+	for(auto &t: forwarded_property_backrefs[which]) {
+		auto &n = std::get<0>(t);
+		auto n_s = n.lock();
+		if(n_s) {
+			auto w = std::get<1>(t);
+			//get the property without forwarding.
+			pred(n_s->getProperty(w, false));
+		}
+	}
 }
 
 Event& Node::getEvent(int which) {

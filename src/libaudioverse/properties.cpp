@@ -163,6 +163,7 @@ void Property::setIntValue(int v) {
 	RC(v, ival);
 	value.ival = v;
 	last_modified=simulation->getTickCount();
+	firePostChangedCallback();
 }	
 
 int Property::getIntDefault() {
@@ -197,6 +198,7 @@ void Property::setFloatValue(float v) {
 	automators.clear();
 	value.fval = v;
 	last_modified=simulation->getTickCount();
+	firePostChangedCallback();
 }
 
 float Property::getFloatDefault() {
@@ -230,6 +232,7 @@ void Property::setDoubleValue(double v) {
 	automators.clear();
 	value.dval = v;
 	last_modified =simulation->getTickCount();
+	firePostChangedCallback();
 }
 
 double Property::getDoubleMin() {
@@ -260,6 +263,7 @@ const float* Property::getFloat3Default() {
 void Property::setFloat3Value(const float* const v) {
 	memcpy(value.f3val, v, sizeof(float)*3);
 	last_modified = simulation->getTickCount();
+	firePostChangedCallback();
 }
 
 void Property::setFloat3Value(float v1, float v2, float v3) {
@@ -267,6 +271,7 @@ void Property::setFloat3Value(float v1, float v2, float v3) {
 	value.f3val[1] = v2;
 	value.f3val[2] = v3;
 	last_modified=simulation->getTickCount();
+	firePostChangedCallback();
 }
 
 void Property::setFloat3Default(const float* const v) {
@@ -290,6 +295,7 @@ const float* Property::getFloat6Default() {
 void Property::setFloat6Value(const float* const v) {
 	memcpy(&value.f6val, v, sizeof(float)*6);
 	last_modified = simulation->getTickCount();
+	firePostChangedCallback();
 }
 
 void Property::setFloat6Value(float v1, float v2, float v3, float v4, float v5, float v6) {
@@ -300,6 +306,7 @@ void Property::setFloat6Value(float v1, float v2, float v3, float v4, float v5, 
 	value.f6val[4] = v5;
 	value.f6val[5] = v6;
 	last_modified =simulation->getTickCount();
+	firePostChangedCallback();
 }
 
 void Property::setFloat6Default(const float* const v) {
@@ -339,6 +346,7 @@ void Property::writeFloatArray(unsigned int start, unsigned int stop, float* val
 		farray_value[i] = values[i];
 	}
 	last_modified=simulation->getTickCount();
+	firePostChangedCallback();
 }
 
 void Property::replaceFloatArray(unsigned int length, float* values) {
@@ -349,6 +357,7 @@ void Property::replaceFloatArray(unsigned int length, float* values) {
 	farray_value.resize(length);
 	std::copy(values, values+length, farray_value.begin());
 	last_modified=simulation->getTickCount();
+	firePostChangedCallback();
 }
 
 float* Property::getFloatArrayPtr() {
@@ -382,6 +391,7 @@ void Property::writeIntArray(unsigned int start, unsigned int stop, int* values)
 		iarray_value[i] = values[i];
 	}
 	last_modified = simulation->getTickCount();
+	firePostChangedCallback();
 }
 
 void Property::replaceIntArray(unsigned int length, int* values) {
@@ -392,6 +402,7 @@ void Property::replaceIntArray(unsigned int length, int* values) {
 	iarray_value.resize(length);
 	std::copy(values, values+length, iarray_value.begin());
 	last_modified=simulation->getTickCount();
+	firePostChangedCallback();
 }
 
 int* Property::getIntArrayPtr() {
@@ -418,6 +429,7 @@ const char* Property::getStringValue() {
 void Property::setStringValue(const char* s) {
 	string_value = s;
 	last_modified=simulation->getTickCount();
+	firePostChangedCallback();
 }
 
 const char* Property::getStringDefault() {
@@ -434,6 +446,8 @@ std::shared_ptr<Buffer> Property::getBufferValue() {
 
 void Property::setBufferValue(std::shared_ptr<Buffer> b) {
 	buffer_value=b;
+	last_modified = simulation->getTickCount();
+	firePostChangedCallback();
 }
 
 bool Property::needsARate() {
@@ -503,6 +517,17 @@ bool Property::getHasDynamicRange() {
 
 void Property::setHasDynamicRange(bool v) {
 	has_dynamic_range = v;
+}
+
+void Property::setPostChangedCallback(std::function<void(void)> cb) {
+	post_changed_callback = cb;
+}
+
+void Property::firePostChangedCallback() {
+	if(post_changed_callback) post_changed_callback();
+	node->visitPropertyBackrefs(tag, [](Property& p) {
+		if(p.post_changed_callback) p.post_changed_callback();
+	});
 }
 
 //Property creators.

@@ -36,7 +36,7 @@ void main(int argc, char** args) {
 	LavHandle buffer;
 	ERRCHECK(Lav_createBuffer(simulation, &buffer));
 	ERRCHECK(Lav_bufferLoadFromFile(buffer, path));
-	ERRCHECK(Lav_bufferNodeSetBuffer(node, buffer));
+	ERRCHECK(Lav_nodeSetBufferProperty(node, Lav_BUFFER_BUFFER, buffer));
 	LavHandle limit;
 	ERRCHECK(Lav_createHardLimiterNode(simulation, 2, &limit));
 	ERRCHECK(Lav_nodeConnect(node, 0, limit, 0));

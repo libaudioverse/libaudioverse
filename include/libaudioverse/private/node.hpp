@@ -17,6 +17,12 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 namespace libaudioverse_implementation {
 
 class Property;
+//Needed to make comparing property backrefs sane.
+class PropertyBackrefComparer {
+	public:
+	bool operator() (const std::tuple<std::weak_ptr<Node>, int> &a, const std::tuple<std::weak_ptr<Node>, int> &b);
+};
+
 
 /**Things all Libaudioverse nodes have.*/
 class Node: public ExternalObject, public Job {
@@ -78,11 +84,16 @@ class Node: public ExternalObject, public Job {
 	virtual void willTick();
 	
 	std::shared_ptr<Simulation> getSimulation();
-	Property& getProperty(int slot);
+	Property& getProperty(int slot, bool allowForwarding = true);
 
 	//Property forwarding support.
 	void forwardProperty(int ourProperty, std::shared_ptr<Node> toNode, int toProperty);
 	void stopForwardingProperty(int ourProperty);
+	//Record that toProperty on toNode is forwarded to us.
+	void addPropertyBackref(int ourProperty, std::shared_ptr<Node> toNode, int toProperty);
+	void removePropertyBackref(int ourProperty, std::shared_ptr<Node> toNode, int toProperty);
+	//call pred on all the properties that immediately forward to which.
+	void visitPropertyBackrefs(int which, std::function<void(Property&)> pred);
 	
 	//event helper methods.
 	Event& getEvent(int which);
@@ -108,6 +119,9 @@ class Node: public ExternalObject, public Job {
 	std::map<int, Property> properties;
 	//the tuple is of (node, property).
 	std::map<int, std::tuple<std::weak_ptr<Node>, int>> forwarded_properties;
+	//These are the back references, used for property callbacks.
+	std::map<int, std::set<std::tuple<std::weak_ptr<Node>, int>, PropertyBackrefComparer>> forwarded_property_backrefs;
+	
 	std::map<int, Event> events;
 	std::vector<float*> input_buffers;
 	std::vector<float*> output_buffers;
