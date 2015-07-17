@@ -226,6 +226,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createBuffer(LavHandle simulationHandle, LavHan
 Lav_PUBLIC_FUNCTION LavError Lav_bufferGetSimulation(LavHandle bufferHandle, LavHandle* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_bufferLoadFromFile(LavHandle bufferHandle, const char* path);
 Lav_PUBLIC_FUNCTION LavError Lav_bufferLoadFromArray(LavHandle bufferHandle, int sr, int channels, int frames, float* data);
+Lav_PUBLIC_FUNCTION LavError Lav_bufferNormalize(LavHandle bufferHandle);
 
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetSimulation(LavHandle nodeHandle, LavHandle* destination);
 /**Connect two nodes.*/
