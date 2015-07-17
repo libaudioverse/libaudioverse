@@ -73,7 +73,7 @@ extra_functions:
       This is the same as creating a buffer and a source, but Libaudioverse retains control of these objects.
       When the buffer finishes playing, the source is automatically disposed of.
     params:
-      buffer: The buffer to play.
+      bufferHandle: The buffer to play.
       x: The x-component of the  position.
       y: The y-component of the position.
       z: The z-component of the position.
