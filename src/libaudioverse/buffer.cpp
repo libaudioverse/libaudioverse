@@ -45,7 +45,7 @@ int Buffer::getChannels() {
 void Buffer::loadFromArray(int sr, int channels, int frames, float* inputData) {
 	int simulationSr= (int)simulation->getSr();
 	staticResamplerKernel(sr, simulationSr, channels, frames, inputData, &(this->frames), &data);
-	if(data==nullptr) throw ErrorException(Lav_ERROR_MEMORY);
+	if(data==nullptr) ERROR(Lav_ERROR_MEMORY);
 	data_end=data+this->frames*channels;
 	this->channels = channels;
 }

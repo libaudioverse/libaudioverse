@@ -29,7 +29,7 @@ class IirNode: public Node {
 };
 
 IirNode::IirNode(std::shared_ptr<Simulation> simulation, int channels): Node(Lav_OBJTYPE_IIR_NODE, simulation, channels, channels) {
-	if(channels <= 0) throw ErrorException(Lav_ERROR_RANGE);
+	if(channels <= 0) ERROR(Lav_ERROR_RANGE);
 	this->channels=channels;
 	filters=new IIRFilter*[channels]();
 	for(int i= 0; i < channels; i++) filters[i] = new IIRFilter(simulation->getSr());
@@ -80,7 +80,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_iirNodeSetCoefficients(LavHandle nodeHandle, in
 	PUB_BEGIN
 	auto node = incomingObject<Node>(nodeHandle);
 	LOCK(*node);
-	if(node->getType() != Lav_OBJTYPE_IIR_NODE) throw ErrorException(Lav_ERROR_TYPE_MISMATCH);
+	if(node->getType() != Lav_OBJTYPE_IIR_NODE) ERROR(Lav_ERROR_TYPE_MISMATCH);
 	std::static_pointer_cast<IirNode>(node)->setCoefficients(numeratorLength, numerator, denominatorLength, denominator, shouldClearHistory);
 	PUB_END
 }

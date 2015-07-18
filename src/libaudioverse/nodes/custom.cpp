@@ -60,7 +60,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_customNodeSetProcessingCallback(LavHandle nodeH
 	PUB_BEGIN
 	auto node= incomingObject<Node>(nodeHandle);
 	LOCK(*node);
-	if(node->getType() != Lav_OBJTYPE_CUSTOM_NODE) throw ErrorException(Lav_ERROR_TYPE_MISMATCH);
+	if(node->getType() != Lav_OBJTYPE_CUSTOM_NODE) ERROR(Lav_ERROR_TYPE_MISMATCH);
 	auto node2 = std::static_pointer_cast<CustomNode>(node);
 	node2->callback = callback;
 	node2->callback_userdata = userdata;

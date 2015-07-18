@@ -82,7 +82,7 @@ void PushNode::process() {
 
 void PushNode::feed(unsigned int length, float* buffer) {
 	fired_out_callback = false;
-	if(length%push_channels != 0) throw ErrorException(Lav_ERROR_RANGE);
+	if(length%push_channels != 0) ERROR(Lav_ERROR_RANGE);
 	unsigned int frames = length/push_channels;
 	unsigned int offset = 0;
 	while(offset < frames) {
@@ -111,7 +111,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_pushNodeFeed(LavHandle nodeHandle, unsigned int
 	PUB_BEGIN
 	auto node=incomingObject<Node>(nodeHandle);
 	LOCK(*node);
-	if(node->getType() != Lav_OBJTYPE_PUSH_NODE) throw ErrorException(Lav_ERROR_TYPE_MISMATCH);
+	if(node->getType() != Lav_OBJTYPE_PUSH_NODE) ERROR(Lav_ERROR_TYPE_MISMATCH);
 	std::static_pointer_cast<PushNode>(node)->feed(length, buffer);
 	PUB_END
 }

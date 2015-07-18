@@ -5,6 +5,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 /**Implement a generic IIR filter.*/
 #include <algorithm>
 #include <libaudioverse/private/iir.hpp>
+#include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/implementations/biquad.hpp> //for biquadConfigurationImplementation
 //for biquad types.
 #include <libaudioverse/libaudioverse_properties.h>
@@ -22,9 +23,9 @@ IIRFilter::IIRFilter(double sr) {
 }
 
 void IIRFilter::configure(int newNumeratorLength, double* newNumerator, int newDenominatorLength, double* newDenominator) {
-	if(newNumeratorLength == 0 || newDenominatorLength == 0) throw ErrorException(Lav_ERROR_RANGE);
+	if(newNumeratorLength == 0 || newDenominatorLength == 0) ERROR(Lav_ERROR_RANGE);
 	//we normalize by the first coefficient but throw it out; consequently, it must be nonzero.
-	if(newDenominator[0] == 0.0) throw ErrorException(Lav_ERROR_RANGE);
+	if(newDenominator[0] == 0.0) ERROR(Lav_ERROR_RANGE);
 	if(numerator_length != newNumeratorLength || denominator_length != newDenominatorLength) { //only clear these if absolutely necessary.
 		if(history) delete[] history;
 		if(numerator) delete[] numerator;

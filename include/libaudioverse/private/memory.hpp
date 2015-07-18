@@ -8,6 +8,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <mutex>
 #include <atomic>
 #include <functional>
+#include "macros.hpp"
 //contains some various memory-related bits and pieces, as well as the smart pointer marshalling.
 
 namespace libaudioverse_implementation {
@@ -43,7 +44,7 @@ class ExternalObject: public std::enable_shared_from_this<ExternalObject>  {
 template <class t>
 std::shared_ptr<t> incomingPointer(void* ptr) {
 	auto guard = std::lock_guard<std::mutex>(*memory_lock);
-	if(external_ptrs->count(ptr) == 0) return throw ErrorException(Lav_ERROR_INVALID_POINTER);
+	if(external_ptrs->count(ptr) == 0) return ERROR(Lav_ERROR_INVALID_POINTER);
 	return std::static_pointer_cast<t, void>(external_ptrs->at(ptr));
 }
 
@@ -77,10 +78,10 @@ std::shared_ptr<t> incomingObject(int handle, bool allowNull =false) {
 	auto guard=std::lock_guard<std::mutex>(*memory_lock);
 	if(external_handles->count(handle)) {
 		auto res=std::dynamic_pointer_cast<t>(external_handles->at(handle));
-		if(res == nullptr) throw ErrorException(Lav_ERROR_TYPE_MISMATCH);
+		if(res == nullptr) ERROR(Lav_ERROR_TYPE_MISMATCH);
 		return res;
 	}
-	else throw ErrorException(Lav_ERROR_INVALID_HANDLE);
+	else ERROR(Lav_ERROR_INVALID_HANDLE);
 	//we can't get here, but some compilers probably complain anyway:
 	return nullptr;
 }

@@ -34,7 +34,7 @@ class ThreeBandEqNode: public Node {
 };
 
 ThreeBandEqNode::ThreeBandEqNode(std::shared_ptr<Simulation> simulation, int channels): Node(Lav_OBJTYPE_THREE_BAND_EQ_NODE, simulation, channels, channels) {
-	if(channels <= 0) throw ErrorException(Lav_ERROR_RANGE);
+	if(channels <= 0) ERROR(Lav_ERROR_RANGE);
 	appendInputConnection(0, channels);
 	appendOutputConnection(0, channels);
 	this->channels=channels;

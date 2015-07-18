@@ -32,7 +32,7 @@ class PannerBankNode: public SubgraphNode {
 };
 
 PannerBankNode::PannerBankNode(std::shared_ptr<Simulation> sim, int pannerCount, std::shared_ptr<HrtfData> hrtf): SubgraphNode(Lav_OBJTYPE_PANNER_BANK_NODE, sim)  {
-	if(pannerCount < 2) throw ErrorException(Lav_ERROR_RANGE);
+	if(pannerCount < 2) ERROR(Lav_ERROR_RANGE);
 	input_gain = createGainNode(simulation);
 	output_gain =createGainNode(simulation);
 	input_gain->resize(pannerCount, pannerCount);

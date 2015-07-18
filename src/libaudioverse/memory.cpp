@@ -86,7 +86,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_free(void* ptr) {
 	PUB_BEGIN
 	auto guard = std::lock_guard<std::mutex>(*memory_lock);
 	if(external_ptrs->count(ptr)) external_ptrs->erase(ptr);
-	else throw ErrorException(Lav_ERROR_INVALID_HANDLE);
+	else ERROR(Lav_ERROR_INVALID_HANDLE);
 	PUB_END
 }
 

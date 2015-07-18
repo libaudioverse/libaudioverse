@@ -34,7 +34,7 @@ void initializeDeviceFactory() {
 		return;
 	}
 	else {
-		throw ErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
+		ERROR(Lav_ERROR_CANNOT_INIT_AUDIO);
 	}
 }
 
@@ -57,7 +57,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_deviceGetCount(unsigned int* destination) {
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetName(unsigned int index, char** destination) {
 	PUB_BEGIN
 	auto n = (*audio_output_factory)->getOutputNames();
-	if(index >= n.size()) throw ErrorException(Lav_ERROR_RANGE);
+	if(index >= n.size()) ERROR(Lav_ERROR_RANGE);
 	auto s = n[index];
 	char* outgoingStr = new char[s.size()+1];
 	std::copy(s.c_str(), s.c_str()+s.size(), outgoingStr);
@@ -70,7 +70,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_deviceGetName(unsigned int index, char** destin
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetChannels(unsigned int index, unsigned int* destination) {
 	PUB_BEGIN
 	auto c = (*audio_output_factory)->getOutputMaxChannels();
-	if(index >= c.size()) throw ErrorException(Lav_ERROR_RANGE);
+	if(index >= c.size()) ERROR(Lav_ERROR_RANGE);
 	*destination = c[index];
 	PUB_END
 }

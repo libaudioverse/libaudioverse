@@ -11,6 +11,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <functional>
 #include "../libaudioverse.h"
 #include "error.hpp"
+#include "macros.hpp"
 
 namespace libaudioverse_implementation {
 
@@ -24,7 +25,7 @@ union PropertyValue {
 
 //quick range check helper...
 //this disables on readonly because it is expected that the library can handle that itself, and bumping ranges for writes on readonly properties would be annoying.
-#define RC(val, fld) if((val > maximum_value.fld || val < minimum_value.fld) && read_only == false) throw ErrorException(Lav_ERROR_RANGE)
+#define RC(val, fld) if((val > maximum_value.fld || val < minimum_value.fld) && read_only == false) ERROR(Lav_ERROR_RANGE, "Property value out of range.")
 
 class Buffer;
 class Simulation;

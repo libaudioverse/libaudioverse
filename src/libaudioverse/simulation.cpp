@@ -23,7 +23,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 namespace libaudioverse_implementation {
 
 Simulation::Simulation(unsigned int sr, unsigned int blockSize, unsigned int mixahead): ExternalObject(Lav_OBJTYPE_SIMULATION) {
-	if(blockSize%4 || blockSize== 0) throw ErrorException(Lav_ERROR_RANGE); //only afe to have this be a multiple of four.
+	if(blockSize%4 || blockSize== 0) ERROR(Lav_ERROR_RANGE); //only afe to have this be a multiple of four.
 	this->sr = (float)sr;
 	this->block_size = blockSize;
 	this->mixahead = mixahead;
@@ -93,9 +93,9 @@ void Simulation::doMaintenance() {
 }
 
 void Simulation::setOutputDevice(int index, int channels, int mixahead) {
-	if(index < -1) throw ErrorException(Lav_ERROR_RANGE);
+	if(index < -1) ERROR(Lav_ERROR_RANGE);
 	auto factory = getOutputDeviceFactory();
-	if(factory == nullptr) throw ErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
+	if(factory == nullptr) ERROR(Lav_ERROR_CANNOT_INIT_AUDIO);
 	auto sptr = std::static_pointer_cast<Simulation>(shared_from_this());
 	std::weak_ptr<Simulation> wptr(sptr);
 	int blockSize=getBlockSize();
@@ -108,7 +108,7 @@ void Simulation::setOutputDevice(int index, int channels, int mixahead) {
 		}
 	};
 	auto dev =factory->createDevice(cb, index, channels, getSr(), getBlockSize(), mixahead);
-	if(dev == nullptr) throw ErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
+	if(dev == nullptr) ERROR(Lav_ERROR_CANNOT_INIT_AUDIO);
 	output_device=dev;
 }
 

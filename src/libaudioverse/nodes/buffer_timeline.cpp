@@ -84,7 +84,7 @@ class BufferTimelineNode: public Node {
 };
 
 BufferTimelineNode::BufferTimelineNode(std::shared_ptr<Simulation> simulation, int channels): Node(Lav_OBJTYPE_BUFFER_TIMELINE_NODE, simulation, 0, channels) {
-	if(channels == 0) throw ErrorException(Lav_ERROR_RANGE);
+	if(channels == 0) ERROR(Lav_ERROR_RANGE);
 	appendOutputConnection(0, channels);
 	output_channels= channels;
 }
@@ -138,7 +138,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createBufferTimelineNode(LavHandle simulationHa
 	PUB_BEGIN
 	auto sim = incomingObject<Simulation>(simulationHandle);
 	LOCK(*sim);
-	if(channels == 0) throw ErrorException(Lav_ERROR_RANGE);
+	if(channels == 0) ERROR(Lav_ERROR_RANGE);
 	auto n =createBufferTimelineNode(sim, channels);
 	*destination = outgoingObject(n);
 	PUB_END
@@ -148,9 +148,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_bufferTimelineNodeScheduleBuffer(LavHandle node
 	PUB_BEGIN
 	auto n = incomingObject<BufferTimelineNode>(nodeHandle);
 	auto b = incomingObject<Buffer>(bufferHandle);
-	if(n->getType() !=Lav_OBJTYPE_BUFFER_TIMELINE_NODE || b->getType() !=Lav_OBJTYPE_BUFFER) throw ErrorException(Lav_ERROR_TYPE_MISMATCH);
-	if(time < 0.0) throw ErrorException(Lav_ERROR_RANGE);
-	if(pitchBend <0.0) throw ErrorException(Lav_ERROR_RANGE);
+	if(n->getType() !=Lav_OBJTYPE_BUFFER_TIMELINE_NODE || b->getType() !=Lav_OBJTYPE_BUFFER) ERROR(Lav_ERROR_TYPE_MISMATCH);
+	if(time < 0.0) ERROR(Lav_ERROR_RANGE);
+	if(pitchBend <0.0) ERROR(Lav_ERROR_RANGE);
 	LOCK(*n);
 	n->scheduleBuffer(time, pitchBend, b);
 	PUB_END

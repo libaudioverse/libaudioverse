@@ -214,12 +214,12 @@ int Node::getOutputConnectionCount() {
 }
 
 std::shared_ptr<InputConnection> Node::getInputConnection(int which) {
-	if(which >= getInputConnectionCount() || which < 0) throw ErrorException(Lav_ERROR_RANGE);
+	if(which >= getInputConnectionCount() || which < 0) ERROR(Lav_ERROR_RANGE);
 	return input_connections[which];
 }
 
 std::shared_ptr<OutputConnection> Node::getOutputConnection(int which) {
-	if(which < 0 || which >= getOutputConnectionCount()) throw ErrorException(Lav_ERROR_RANGE);
+	if(which < 0 || which >= getOutputConnectionCount()) ERROR(Lav_ERROR_RANGE);
 	return output_connections[which];
 }
 
@@ -232,7 +232,7 @@ void Node::appendOutputConnection(int start, int count) {
 }
 
 void Node::connect(int output, std::shared_ptr<Node> toNode, int input) {
-	if(doesEdgePreserveAcyclicity(std::static_pointer_cast<Node>(this->shared_from_this()), toNode) == false) throw ErrorException(Lav_ERROR_CAUSES_CYCLE);
+	if(doesEdgePreserveAcyclicity(std::static_pointer_cast<Node>(this->shared_from_this()), toNode) == false) ERROR(Lav_ERROR_CAUSES_CYCLE);
 	auto outputConnection =getOutputConnection(output);
 	auto inputConnection = toNode->getInputConnection(input);
 	makeConnection(outputConnection, inputConnection);
@@ -247,10 +247,10 @@ void Node::connectSimulation(int which) {
 }
 
 void Node::connectProperty(int output, std::shared_ptr<Node> node, int slot) {
-	if(doesEdgePreserveAcyclicity(std::static_pointer_cast<Node>(this->shared_from_this()), node) == false) throw ErrorException(Lav_ERROR_CAUSES_CYCLE);
+	if(doesEdgePreserveAcyclicity(std::static_pointer_cast<Node>(this->shared_from_this()), node) == false) ERROR(Lav_ERROR_CAUSES_CYCLE);
 	auto &prop = node->getProperty(slot);
 	auto conn = prop.getInputConnection();
-	if(conn ==nullptr) throw ErrorException(Lav_ERROR_CANNOT_CONNECT_TO_PROPERTY);
+	if(conn ==nullptr) ERROR(Lav_ERROR_CANNOT_CONNECT_TO_PROPERTY);
 	auto outputConn =getOutputConnection(output);
 	makeConnection(outputConn, conn);
 	simulation->invalidatePlan();
@@ -273,7 +273,7 @@ Property& Node::getProperty(int slot, bool allowForwarding) {
 		auto s=std::get<1>(forwarded_properties[slot]);
 		if(n) return n->getProperty(s);
 	}
-	if(properties.count(slot) == 0) throw ErrorException(Lav_ERROR_RANGE);
+	if(properties.count(slot) == 0) ERROR(Lav_ERROR_RANGE);
 	else return properties[slot];
 }
 
@@ -292,7 +292,7 @@ void Node::stopForwardingProperty(int ourProperty) {
 			n->removePropertyBackref(std::get<1>(t), std::static_pointer_cast<Node>(shared_from_this()), ourProperty);
 		}
 	}
-	else throw ErrorException(Lav_ERROR_INTERNAL);
+	else ERROR(Lav_ERROR_INTERNAL);
 	simulation->invalidatePlan();
 }
 
@@ -320,7 +320,7 @@ void Node::visitPropertyBackrefs(int which, std::function<void(Property&)> pred)
 }
 
 Event& Node::getEvent(int which) {
-	if(events.count(which) == 0) throw ErrorException(Lav_ERROR_RANGE);
+	if(events.count(which) == 0) ERROR(Lav_ERROR_RANGE);
 	return events[which];
 }
 
@@ -406,7 +406,7 @@ int SubgraphNode::getInputConnectionCount() {
 }
 
 std::shared_ptr<InputConnection> SubgraphNode::getInputConnection(int which) {
-	if(which < 0|| which >= getInputConnectionCount()) throw ErrorException(Lav_ERROR_RANGE);
+	if(which < 0|| which >= getInputConnectionCount()) ERROR(Lav_ERROR_RANGE);
 	else return subgraph_input->getInputConnection(which);
 }
 
@@ -520,10 +520,10 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeReset(LavHandle nodeHandle) {
 LOCK(*node_ptr);\
 auto &prop = node_ptr->getProperty((s));\
 if(prop.getType() != (t)) {\
-throw ErrorException(Lav_ERROR_TYPE_MISMATCH);\
+ERROR(Lav_ERROR_TYPE_MISMATCH);\
 }
 
-#define READONLY_CHECK if(prop.isReadOnly()) throw ErrorException(Lav_ERROR_PROPERTY_IS_READ_ONLY);
+#define READONLY_CHECK if(prop.isReadOnly()) ERROR(Lav_ERROR_PROPERTY_IS_READ_ONLY);
 
 Lav_PUBLIC_FUNCTION LavError Lav_nodeResetProperty(LavHandle nodeHandle, int slot) {
 	PUB_BEGIN
@@ -794,7 +794,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeGetArrayPropertyLengthRange(LavHandle nodeH
 	LOCK(*ptr);
 	auto &prop = ptr->getProperty(slot);
 	int type = prop.getType();
-	if(type != Lav_PROPERTYTYPE_FLOAT_ARRAY || type != Lav_PROPERTYTYPE_INT_ARRAY) throw ErrorException(Lav_ERROR_TYPE_MISMATCH);
+	if(type != Lav_PROPERTYTYPE_FLOAT_ARRAY || type != Lav_PROPERTYTYPE_INT_ARRAY) ERROR(Lav_ERROR_TYPE_MISMATCH);
 	PUB_END
 }
 

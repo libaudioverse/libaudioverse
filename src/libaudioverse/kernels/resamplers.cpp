@@ -24,8 +24,8 @@ void staticResamplerKernel(int inputSr, int outputSr, int channels, int frames, 
 	}
 	int err;
 	auto resampler=speex_resampler_init(channels, inputSr, outputSr, 10, &err);
-	if(resampler==nullptr) throw ErrorException(Lav_ERROR_MEMORY);
-	if(err != RESAMPLER_ERR_SUCCESS) throw ErrorException(Lav_ERROR_INTERNAL);
+	if(resampler==nullptr) ERROR(Lav_ERROR_MEMORY);
+	if(err != RESAMPLER_ERR_SUCCESS) ERROR(Lav_ERROR_INTERNAL);
 	unsigned int numer, denom;
 	speex_resampler_get_ratio(resampler, &numer, &denom);
 	//The 200 makes sure that we grab all of it.

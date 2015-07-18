@@ -86,7 +86,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_pullNodeSetAudioCallback(LavHandle nodeHandle, 
 	PUB_BEGIN
 	auto node = incomingObject<Node>(nodeHandle);
 	LOCK(*node);
-	if(node->getType() != Lav_OBJTYPE_PULL_NODE) throw ErrorException(Lav_ERROR_TYPE_MISMATCH);
+	if(node->getType() != Lav_OBJTYPE_PULL_NODE) ERROR(Lav_ERROR_TYPE_MISMATCH);
 	auto p = std::static_pointer_cast<PullNode>(node);
 	p->callback = callback;
 	p->callback_userdata = userdata;

@@ -53,9 +53,9 @@ double EnvelopeAutomator::getFinalValue() {
 Lav_PUBLIC_FUNCTION LavError Lav_automationEnvelope(LavHandle nodeHandle, int slot, double time, double duration, int valuesLength, double *values) {
 	PUB_BEGIN
 	//preconditions first.
-	if(valuesLength ==0) throw ErrorException(Lav_ERROR_RANGE);
-	if(values == nullptr) throw ErrorException(Lav_ERROR_RANGE);
-	if(duration <= 0.0) throw ErrorException(Lav_ERROR_RANGE);
+	if(valuesLength ==0) ERROR(Lav_ERROR_RANGE);
+	if(values == nullptr) ERROR(Lav_ERROR_RANGE);
+	if(duration <= 0.0) ERROR(Lav_ERROR_RANGE);
 	auto node = incomingObject<Node>(nodeHandle);
 	LOCK(*node);
 	auto &prop= node->getProperty(slot);
