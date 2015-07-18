@@ -12,7 +12,8 @@ class ErrorException {
 	public:
 	ErrorException() = default;
 	//f is file, l is line, m is message, e is code.
-	ErrorException(LavError e, std::string m = "", std::string f = "", int l = 0): error(e), line(l), message(m), file(f) {}
+	ErrorException(LavError e, std::string f, int l): error(e), file(f), line(l) {}
+	ErrorException(LavError e, std::string m, std::string f, int l): error(e), line(l), message(m), file(f) {}
 	LavError error = Lav_ERROR_NONE;
 	std::string file, message;
 	int line = 0;

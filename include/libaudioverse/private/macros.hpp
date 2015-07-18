@@ -25,4 +25,7 @@ return Lav_ERROR_UNKNOWN;\
 }\
 return Lav_ERROR_NONE;
 
+//Either EWRROR(code) or ERROR(code, message):
+#define ERROR(...) throw ErrorException(__VA_ARGS__, __FILE__, __LINE__)
+
 #define STANDARD_PROPERTIES_BEGIN (-100)
