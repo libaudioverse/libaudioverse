@@ -460,9 +460,6 @@ void Property::enableARate() {
 }
 
 void Property::tick() {
-	//protect against duplicate ticks.
-	//This is needed because of forwarding.
-	if(last_ticked==simulation->getTickCount()) return;
 	if(last_modified > last_ticked) was_modified=true;
 	else was_modified=false;
 	last_ticked=simulation->getTickCount();

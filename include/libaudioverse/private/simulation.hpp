@@ -15,6 +15,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <random>
 #include "../libaudioverse.h"
 #include "memory.hpp"
+#include "planner.hpp"
 
 namespace libaudioverse_implementation {
 
@@ -26,7 +27,7 @@ class InputConnection;
 class ThreadTerminationException {
 };
 
-class Simulation: public ExternalObject {
+class Simulation: public ExternalObject, public Job {
 	public:
 	Simulation(unsigned int sr, unsigned int blockSize, unsigned int mixahead);
 	//needed because the InputConnection needs us to use shared_from_this.
@@ -67,6 +68,10 @@ class Simulation: public ExternalObject {
 	//Write to a file.
 	void writeFile(std::string path, int channels, double duration, bool mayApplyMixingMatrix);
 	
+	//Conform to job.
+	virtual void visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) override;
+	//called when connections are formed or lost, or when a node is deleted.
+	void invalidatePlan();
 	protected:
 	//the connection to which nodes connect themselves if their output should be audible.
 	std::shared_ptr<InputConnection> final_output_connection;
@@ -99,6 +104,8 @@ class Simulation: public ExternalObject {
 	double block_callback_time = 0.0;
 	LavBlockCallback block_callback = nullptr;
 	void* block_callback_userdata =nullptr;
+	
+	Planner* planner = nullptr;
 };
 
 }

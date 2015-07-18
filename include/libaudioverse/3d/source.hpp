@@ -4,6 +4,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include "../private/node.hpp"
 #include <memory>
+#include <set>
+
 
 namespace libaudioverse_implementation {
 
@@ -17,6 +19,7 @@ class SourceNode: public SubgraphNode {
 	void update(EnvironmentInfo &env);
 	//involves shared pointers.
 	void forwardProperties();
+	void visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) override;
 	private:
 	std::shared_ptr<Node> panner_node, input;
 	std::shared_ptr<EnvironmentNode> environment;

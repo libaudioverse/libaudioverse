@@ -24,7 +24,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 namespace libaudioverse_implementation {
 
 /**Given two nodes, determine if connecting an output of start to an input of end causes a cycle.*/
-bool doesEdgePreserveAcyclicity(std::shared_ptr<Node> start, std::shared_ptr<Node> end) {
+bool doesEdgePreserveAcyclicity(std::shared_ptr<Job> start, std::shared_ptr<Job> end) {
 	//A cycle exists if end is directly or indirectly conneccted to an input of start.
 	//To that end, we use recursion as follows.
 	//if we are called with start==end, it's a cycle.
@@ -32,10 +32,16 @@ bool doesEdgePreserveAcyclicity(std::shared_ptr<Node> start, std::shared_ptr<Nod
 	//Inductive step:
 	//connecting start to end connects everything "behind" start to end,
 	//so there's a cycle if end is already behind start.
-	for(auto n: start->getDependencies()) {
-		if(doesEdgePreserveAcyclicity(n, end) == false) return false;
-	}
-	return true;
+	//We check by walking all dependencies of start looking for end.
+	//This is slow, in that it visits extra nodes on a cycle; but if there is no cycle, we visit everything anyway.
+	std::function<void(std::shared_ptr<Job>&)> f ;
+	bool cycled = false;
+	f = [&] (std::shared_ptr<Job> &j) {
+		if(j == end) cycled = true;
+		else if(cycled == false) j->visitDependencies(f);
+	};
+	start->visitDependencies(f);
+	return cycled == false;
 }
 
 //For property backrefs.
@@ -82,6 +88,7 @@ Node::~Node() {
 	for(auto i: input_buffers) {
 		freeArray(i);
 	}
+	simulation->invalidatePlan();
 }
 
 void Node::tickProperties() {
@@ -91,15 +98,13 @@ void Node::tickProperties() {
 }
 
 void Node::tick() {
-	if(last_processed== simulation->getTickCount()) return; //we processed this tick already.
-	//Incrementing this counter here prevents duplication of zeroing outputs if we're in the paused state.
 	last_processed = simulation->getTickCount();
 	zeroOutputBuffers(); //we always do this because sometimes we're not going to actually do anything else.
 	if(getState() == Lav_NODESTATE_PAUSED) return; //nothing to do, for we are paused.
 	tickProperties();
-	willProcessParents();
+	//willProcessParents is handled by the planner.
 	zeroInputBuffers();
-	//tick all alive parents, collecting their outputs onto ours.
+	//Collect parent outputs onto ours.
 	//by using the getInputConnection and getInputConnectionCount functions, we allow subgraphs to override effectively.
 	bool needsMixing = getProperty(Lav_NODE_CHANNEL_INTERPRETATION).getIntValue()==Lav_CHANNEL_INTERPRETATION_SPEAKERS;
 	for(int i = 0; i < getInputConnectionCount(); i++) {
@@ -174,6 +179,9 @@ void Node::zeroInputBuffers() {
 void Node::willProcessParents() {
 }
 
+void Node::willTick() {
+}
+
 int Node::getState() {
 	return getProperty(Lav_NODE_STATE).getIntValue();
 }
@@ -228,12 +236,14 @@ void Node::connect(int output, std::shared_ptr<Node> toNode, int input) {
 	auto outputConnection =getOutputConnection(output);
 	auto inputConnection = toNode->getInputConnection(input);
 	makeConnection(outputConnection, inputConnection);
+	simulation->invalidatePlan();
 }
 
 void Node::connectSimulation(int which) {
 	auto outputConnection=getOutputConnection(which);
 	auto inputConnection = simulation->getFinalOutputConnection();
 	makeConnection(outputConnection, inputConnection);
+	simulation->invalidatePlan();
 }
 
 void Node::connectProperty(int output, std::shared_ptr<Node> node, int slot) {
@@ -243,11 +253,13 @@ void Node::connectProperty(int output, std::shared_ptr<Node> node, int slot) {
 	if(conn ==nullptr) throw LavErrorException(Lav_ERROR_CANNOT_CONNECT_TO_PROPERTY);
 	auto outputConn =getOutputConnection(output);
 	makeConnection(outputConn, conn);
+	simulation->invalidatePlan();
 }
 
 void Node::disconnect(int which) {
 	auto o =getOutputConnection(which);
 	o->clear();
+	simulation->invalidatePlan();
 }
 
 std::shared_ptr<Simulation> Node::getSimulation() {
@@ -268,6 +280,7 @@ Property& Node::getProperty(int slot, bool allowForwarding) {
 void Node::forwardProperty(int ourProperty, std::shared_ptr<Node> toNode, int toProperty) {
 	forwarded_properties[ourProperty] = std::make_tuple(toNode, toProperty);
 	toNode->addPropertyBackref(toProperty, std::static_pointer_cast<Node>(shared_from_this()), ourProperty);
+	simulation->invalidatePlan();
 }
 
 void Node::stopForwardingProperty(int ourProperty) {
@@ -280,6 +293,7 @@ void Node::stopForwardingProperty(int ourProperty) {
 		}
 	}
 	else throw LavErrorException(Lav_ERROR_INTERNAL);
+	simulation->invalidatePlan();
 }
 
 void Node::addPropertyBackref(int ourProperty, std::shared_ptr<Node> toNode, int toProperty) {
@@ -343,12 +357,12 @@ void Node::resize(int newInputCount, int newOutputCount) {
 	}
 }
 
-std::set<std::shared_ptr<Node>> Node::getDependencies() {
-	std::set<std::shared_ptr<Node>> retval;
+void Node::visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) {
 	for(int i = 0; i < getInputConnectionCount(); i++) {
-		auto j = getInputConnection(i)->getConnectedNodes();
-		for(auto &p: j) {
-			retval.insert(std::static_pointer_cast<Node>(p->shared_from_this()));
+		auto conn = getInputConnection(i)->getConnectedNodes();
+		for(auto &p: conn) {
+			auto j = std::dynamic_pointer_cast<Job>(p->shared_from_this());
+			pred(j);
 		}
 	}
 	for(auto &p: properties) {
@@ -356,11 +370,19 @@ std::set<std::shared_ptr<Node>> Node::getDependencies() {
 		auto conn = prop.getInputConnection();
 		if(conn) {
 			for(auto n: conn->getConnectedNodes()) {
-				retval.insert(std::static_pointer_cast<Node>(n->shared_from_this()));
+				auto j = std::dynamic_pointer_cast<Job>(n->shared_from_this());
+				pred(j);
 			}
 		}
 	}
-	return retval;
+}
+
+void Node::willExecuteDependencies() {
+	willProcessParents();
+}
+
+void Node::execute() {
+	tick();
 }
 
 //LavSubgraphNode
@@ -370,10 +392,12 @@ SubgraphNode::SubgraphNode(int type, std::shared_ptr<Simulation> simulation): No
 
 void SubgraphNode::setInputNode(std::shared_ptr<Node> node) {
 	subgraph_input= node;
+	simulation->invalidatePlan();
 }
 
 void SubgraphNode::setOutputNode(std::shared_ptr<Node> node) {
 	subgraph_output=node;
+	simulation->invalidatePlan();
 }
 
 int SubgraphNode::getInputConnectionCount() {
@@ -396,16 +420,29 @@ float** SubgraphNode::getOutputBufferArray() {
 	return nullptr;
 }
 
+//Our only dependency is our output node, if set.
+void SubgraphNode::visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) {
+	if(subgraph_output) {
+		auto j = std::static_pointer_cast<Job>(subgraph_output);
+		pred(j);
+	}
+}
+
+//This override is needed because nodes try to add their inputs, but we override where input connections come from.
+//In addition, we have no input buffers.
 void SubgraphNode::tick() {
-	if(last_processed== simulation->getTickCount()) return;
-	last_processed=simulation->getTickCount();
-	if(getState() == Lav_NODESTATE_PAUSED) return;
+	last_processed = simulation->getTickCount();
+	//Zeroing the output buffers will silence our output.
+	if(getState() == Lav_NODESTATE_PAUSED) return; //nothing to do, for we are paused.
 	tickProperties();
-	willProcessParents();
-	if(subgraph_output == nullptr) return;
-	subgraph_output->tick();
+	zeroInputBuffers();
+	is_processing = true;
+	num_input_buffers = input_buffers.size();
+	num_output_buffers = output_buffers.size();
+	//No process call, subgraphs  don't support it.
 	applyMul();
 	applyAdd();
+	is_processing = false;
 }
 
 //begin public api

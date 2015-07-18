@@ -19,6 +19,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <glm/glm.hpp>
 #include <limits>
 #include <memory>
+#include <set>
 
 namespace libaudioverse_implementation {
 
@@ -36,8 +37,6 @@ SourceNode::SourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<E
 	getProperty(Lav_SOURCE_SIZE).setFloatValue(environment->getProperty(Lav_ENVIRONMENT_DEFAULT_SIZE).getFloatValue());
 	input->connect(0, panner_node, 0);
 	setInputNode(input);
-	//Todo: we can't only work properly when always playing.
-	getProperty(Lav_NODE_STATE).setIntValue(Lav_NODESTATE_ALWAYS_PLAYING);
 }
 
 void SourceNode::forwardProperties() {
@@ -99,6 +98,12 @@ void SourceNode::update(EnvironmentInfo &env) {
 	panner_node->getProperty(Lav_PANNER_ELEVATION).setFloatValue(elevation);
 	panner_node->getProperty(Lav_PANNER_DISTANCE).setFloatValue(distance);
 	panner_node ->getProperty(Lav_NODE_MUL).setFloatValue(gain);
+}
+
+void SourceNode::visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) {
+	SubgraphNode::visitDependencies(pred);
+	auto j = std::static_pointer_cast<Job>(panner_node);
+	pred(j);
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_createSourceNode(LavHandle simulationHandle, LavHandle environmentHandle, LavHandle* destination) {

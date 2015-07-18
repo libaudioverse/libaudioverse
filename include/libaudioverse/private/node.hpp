@@ -12,6 +12,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <vector>
 #include <set>
 #include <utility>
+#include "planner.hpp"
 
 namespace libaudioverse_implementation {
 
@@ -24,7 +25,7 @@ class PropertyBackrefComparer {
 
 
 /**Things all Libaudioverse nodes have.*/
-class Node: public ExternalObject { //enable_shared_from_this is for event infrastructure.
+class Node: public ExternalObject, public Job {
 	public:
 	Node(int type, std::shared_ptr<Simulation> simulation, unsigned int numInputBuffers, unsigned int numOutputBuffers);
 	virtual ~Node();
@@ -76,8 +77,12 @@ class Node: public ExternalObject { //enable_shared_from_this is for event infra
 	//additionally, a parent will have its willProcessParents called after this node.
 	//that is, nothing else will touch this node but the mixer thread, and the next thing to be called (at some point in future) is willProcess.
 	//the default does nothing.
+	//Do not change connections.
 	virtual void willProcessParents();
-
+	//Called after the simulation is locked but before ticking, in some arbetrary order.
+	//It is safe to change connections here.
+	virtual void willTick();
+	
 	std::shared_ptr<Simulation> getSimulation();
 	Property& getProperty(int slot, bool allowForwarding = true);
 
@@ -104,8 +109,11 @@ class Node: public ExternalObject { //enable_shared_from_this is for event infra
 	//change number of input and output buffers.
 	virtual void resize(int newInputCount, int newOutputCount);
 
-	//Return a set containing all nodes upon which we depend.
-	std::set<std::shared_ptr<Node>> getDependencies();
+	//Conform to Job.
+	virtual void visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) override;
+	virtual void willExecuteDependencies();
+	virtual void execute();
+
 	protected:
 	std::shared_ptr<Simulation> simulation = nullptr;
 	std::map<int, Property> properties;
@@ -148,9 +156,13 @@ class SubgraphNode: public Node {
 	int getOutputBufferCount() override;
 	float** getOutputBufferArray() override;
 
-	//this override is to make processing work properly. We must do a willProcessParents on ourselves and then forward to the output, if any.
-	void tick() override;
+	//Our dependency is our single output node.
+	void visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) override;
 
+	//Override tick because we can't try to use connections.
+	//We don't have proper input buffers, default tick will override who knows what.
+	void tick() override;
+	
 	protected:
 	std::shared_ptr<Node> subgraph_input, subgraph_output;
 };

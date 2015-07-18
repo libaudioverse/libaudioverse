@@ -44,7 +44,6 @@ std::shared_ptr<EnvironmentNode> createEnvironmentNode(std::shared_ptr<Simulatio
 }
 
 void EnvironmentNode::willProcessParents() {
-	if(werePropertiesModified(this, Lav_ENVIRONMENT_OUTPUT_CHANNELS)) outputChannelsChanged();
 	if(werePropertiesModified(this, Lav_3D_POSITION, Lav_3D_ORIENTATION)) {
 		//update the matrix.
 		//Important: look at the glsl constructors. Glm copies them, and there is nonintuitive stuff here.
@@ -95,14 +94,29 @@ std::shared_ptr<Node> EnvironmentNode::createPannerNode() {
 
 void EnvironmentNode::registerSourceForUpdates(std::shared_ptr<SourceNode> source) {
 	sources.insert(source);
+	simulation->invalidatePlan();
 }
 
-void EnvironmentNode::outputChannelsChanged() {
-	int channels = getProperty(Lav_ENVIRONMENT_OUTPUT_CHANNELS).getIntValue();
-	output->resize(channels, channels);
-	getOutputConnection(0)->reconfigure(0, channels);
-	output->getOutputConnection(0)->reconfigure(0, channels);
-	output->getInputConnection(0)->reconfigure(0, channels);
+void EnvironmentNode::willTick() {
+	if(werePropertiesModified(this, Lav_ENVIRONMENT_OUTPUT_CHANNELS)) {
+		int channels = getProperty(Lav_ENVIRONMENT_OUTPUT_CHANNELS).getIntValue();
+		output->resize(channels, channels);
+		getOutputConnection(0)->reconfigure(0, channels);
+		output->getOutputConnection(0)->reconfigure(0, channels);
+		output->getInputConnection(0)->reconfigure(0, channels);
+	}
+}
+
+void EnvironmentNode::visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) {
+	SubgraphNode::visitDependencies(pred);
+	//Other dependencies: all our sources.
+	for(auto w: sources) {
+		auto n = w.lock();
+		if(n) {
+			auto j = std::static_pointer_cast<Job>(n);
+			pred(j);
+		}
+	}
 }
 
 void EnvironmentNode::playAsync(std::shared_ptr<Buffer> buffer, float x, float y, float z) {

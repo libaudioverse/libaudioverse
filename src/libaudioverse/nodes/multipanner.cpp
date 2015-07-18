@@ -26,7 +26,7 @@ class MultipannerNode: public SubgraphNode {
 	std::shared_ptr<Node> hrtf_panner = nullptr, amplitude_panner = nullptr, input= nullptr, current_panner = nullptr;
 	void configureForwardedProperties();
 	void strategyChanged();
-	void willProcessParents() override;
+	void willTick() override;
 };
 
 MultipannerNode::MultipannerNode(std::shared_ptr<Simulation> sim, std::shared_ptr<HrtfData> hrtf): SubgraphNode(Lav_OBJTYPE_MULTIPANNER_NODE, sim)  {
@@ -106,7 +106,7 @@ void MultipannerNode::strategyChanged() {
 	}
 }
 
-void MultipannerNode::willProcessParents() {
+void MultipannerNode::willTick() {
 	if(werePropertiesModified(this, Lav_PANNER_STRATEGY)) strategyChanged();
 }
 

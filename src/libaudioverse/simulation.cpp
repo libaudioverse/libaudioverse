@@ -30,8 +30,10 @@ Simulation::Simulation(unsigned int sr, unsigned int blockSize, unsigned int mix
 	registerDefaultMixingMatrices();
 	//fire up the background thread.
 	backgroundTaskThread = std::thread([this]() {backgroundTaskThreadFunction();});
+	planner = new Planner();
 	start();
 }
+
 void Simulation::completeInitialization() {
 	final_output_connection =std::make_shared<InputConnection>(std::static_pointer_cast<Simulation>(this->shared_from_this()), nullptr, 0, 0);
 }
@@ -40,6 +42,7 @@ Simulation::~Simulation() {
 	//enqueue a task which will stop the background thread.
 	enqueueTask([]() {throw ThreadTerminationException();});
 	backgroundTaskThread.join();
+	delete planner;
 }
 
 //Yes, this uses goto. Yes, goto is evil. We need a single point of exit.
@@ -53,18 +56,17 @@ void Simulation::getBlock(float* out, unsigned int channels, bool mayApplyMixing
 	while(final_outputs.size() < channels) final_outputs.push_back(allocArray<float>(block_size));
 	//zero the outputs we need.
 	for(unsigned int i= 0; i < channels; i++) memset(final_outputs[i], 0, sizeof(float)*block_size);
+	//Inform nodes that we are going to tick.
+	for(auto &i: nodes) {
+		auto n = i.lock();
+		if(n) n->willTick();
+	}
+	//Use the planner.
+	planner->execute(std::dynamic_pointer_cast<Job>(shared_from_this()));
 	//write, applying mixing matrices as needed.
 	final_output_connection->addNodeless(&final_outputs[0], true);
 	//interleave the samples.
 	interleaveSamples(channels, block_size, channels, &final_outputs[0], out);
-	//handle the always playing nodes.
-	//recall that nodes will only allow themselves to tick once in each block.
-	for(auto &i: nodes) {
-		auto i_s = i.lock();
-		if(i_s== nullptr) continue;
-		if(i_s->getState()!=Lav_NODESTATE_ALWAYS_PLAYING) continue;
-		i_s->tick();
-	}
 	block_callback_time +=block_size/sr;
 	end:
 	int maintenance_count=maintenance_start;
@@ -198,6 +200,25 @@ void Simulation::writeFile(std::string path, int channels, double duration, bool
 		while(written < getBlockSize()) written += file.write(getBlockSize(), &block[0]);
 	}
 	file.close();
+}
+
+//Conform to job:
+void Simulation::visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) {
+	for(auto &i: final_output_connection->getConnectedNodes()) {
+		auto n = std::dynamic_pointer_cast<Job>(i->shared_from_this());
+		if(n) pred(n);
+	}
+	for(auto i: nodes) {
+		auto n = i.lock();
+		if(n && n->getState() == Lav_NODESTATE_ALWAYS_PLAYING) {
+			auto j = std::static_pointer_cast<Job>(n);
+			pred(j);
+		}
+	}
+}
+
+void Simulation::invalidatePlan() {
+	planner->invalidatePlan();
 }
 
 //begin public API
