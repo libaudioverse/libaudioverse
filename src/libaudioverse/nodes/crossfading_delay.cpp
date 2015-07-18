@@ -32,7 +32,7 @@ class CrossfadingDelayNode: public Node {
 };
 
 CrossfadingDelayNode::CrossfadingDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, unsigned int lineCount): Node(Lav_OBJTYPE_CROSSFADING_DELAY_NODE, simulation, lineCount, lineCount) {
-	if(lineCount == 0) throw LavErrorException(Lav_ERROR_RANGE);
+	if(lineCount == 0) throw ErrorException(Lav_ERROR_RANGE);
 	line_count = lineCount;
 	lines = new CrossfadingDelayLine*[lineCount];
 	for(unsigned int i = 0; i < lineCount; i++) lines[i] = new CrossfadingDelayLine(maxDelay, simulation->getSr());

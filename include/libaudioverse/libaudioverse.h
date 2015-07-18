@@ -143,6 +143,12 @@ So too are any pointers that Libaudioverse gave you, of any form.*/
 Lav_PUBLIC_FUNCTION LavError Lav_shutdown();
 Lav_PUBLIC_FUNCTION LavError Lav_isInitialized(int* destination);
 
+/**Query the thread's current error.
+Pointers are valid until the next time an error happens on this thread.*/
+Lav_PUBLIC_FUNCTION LavError Lav_errorGetMessage(const char** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_errorGetFile(const char** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_errorGetLine(int* destination);
+
 /**Free any pointer that libaudioverse gives you.  If something goes wrong, namely that the pointer isn't from Libaudioverse in the first place, this tries to fail gracefully and give you an error, but don't rely on this.*/
 Lav_PUBLIC_FUNCTION LavError Lav_free(void* ptr);
 

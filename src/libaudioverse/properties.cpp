@@ -106,10 +106,10 @@ void Property::scheduleAutomator(Automator* automator) {
 	//It is not possible for an event to overlap us if the one immediately before us does not.
 	for(auto i = lower; i != upper; i++) {
 		auto &a = *i;
-		if(a->getScheduledTime()+a->getDuration() > automator->getScheduledTime()) throw LavErrorException(Lav_ERROR_OVERLAPPING_AUTOMATORS);
+		if(a->getScheduledTime()+a->getDuration() > automator->getScheduledTime()) throw ErrorException(Lav_ERROR_OVERLAPPING_AUTOMATORS);
 	}
 	//If our time + our delay time overlaps upper, we have the same problem.
-	if(upper != automators.end() && automator->getScheduledTime()+automator->getDuration() > (*upper)->getScheduledTime()) throw LavErrorException(Lav_ERROR_OVERLAPPING_AUTOMATORS);
+	if(upper != automators.end() && automator->getScheduledTime()+automator->getDuration() > (*upper)->getScheduledTime()) throw ErrorException(Lav_ERROR_OVERLAPPING_AUTOMATORS);
 	//Okay, we're good, insert the automator.
 	auto inserted=automators.insert(upper, automator);
 	//Re-establish the peacewise function.
@@ -133,7 +133,7 @@ void Property::scheduleAutomator(Automator* automator) {
 }
 
 void Property::cancelAutomators(double time) {
-	if(type != Lav_PROPERTYTYPE_FLOAT && type != Lav_PROPERTYTYPE_DOUBLE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
+	if(type != Lav_PROPERTYTYPE_FLOAT && type != Lav_PROPERTYTYPE_DOUBLE) throw ErrorException(Lav_ERROR_TYPE_MISMATCH);
 	double currentValue = type == Lav_PROPERTYTYPE_FLOAT ? getFloatValue(0) : getDoubleValue(0); //shold onto this.
 	time+=this->time;
 	auto b = automators.begin();
@@ -333,12 +333,12 @@ void Property::getArraylengthRange(unsigned int* min, unsigned int* max) {
 }
 
 float Property::readFloatArray(unsigned int index) {
-	if(index >= farray_value.size()) throw LavErrorException(Lav_ERROR_RANGE);
+	if(index >= farray_value.size()) throw ErrorException(Lav_ERROR_RANGE);
 	return farray_value[index];
 }
 
 void Property::writeFloatArray(unsigned int start, unsigned int stop, float* values) {
-	if(start >= farray_value.size() || stop > farray_value.size()) throw LavErrorException(Lav_ERROR_RANGE);
+	if(start >= farray_value.size() || stop > farray_value.size()) throw ErrorException(Lav_ERROR_RANGE);
 	for(int i=start; i < stop; i++) {
 		RC(values[i], fval);
 	}
@@ -350,7 +350,7 @@ void Property::writeFloatArray(unsigned int start, unsigned int stop, float* val
 }
 
 void Property::replaceFloatArray(unsigned int length, float* values) {
-	if((length < min_array_length || length > max_array_length) && read_only == false) throw LavErrorException(Lav_ERROR_RANGE);
+	if((length < min_array_length || length > max_array_length) && read_only == false) throw ErrorException(Lav_ERROR_RANGE);
 	for(int i =0; i < length; i++) {
 		RC(values[i], fval);
 	}
@@ -378,12 +378,12 @@ void Property::setFloatArrayDefault(std::vector<float> d) {
 }
 
 int Property::readIntArray(unsigned int index) {
-	if(index >= iarray_value.size()) throw LavErrorException(Lav_ERROR_RANGE);
+	if(index >= iarray_value.size()) throw ErrorException(Lav_ERROR_RANGE);
 	return iarray_value[index];
 }
 
 void Property::writeIntArray(unsigned int start, unsigned int stop, int* values) {
-	if(start >= iarray_value.size() || stop > iarray_value.size()) throw LavErrorException(Lav_ERROR_RANGE);
+	if(start >= iarray_value.size() || stop > iarray_value.size()) throw ErrorException(Lav_ERROR_RANGE);
 	for(int i =start; i < stop; i++) {
 		RC(values[i], ival);
 	}
@@ -395,7 +395,7 @@ void Property::writeIntArray(unsigned int start, unsigned int stop, int* values)
 }
 
 void Property::replaceIntArray(unsigned int length, int* values) {
-	if((length < min_array_length || length > max_array_length) && read_only == false) throw LavErrorException(Lav_ERROR_RANGE);
+	if((length < min_array_length || length > max_array_length) && read_only == false) throw ErrorException(Lav_ERROR_RANGE);
 	for(int i =0; i < length; i++) {
 		RC(values[i], ival);
 	}

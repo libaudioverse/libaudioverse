@@ -7,7 +7,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/resampler.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/memory.hpp>
-#include <libaudioverse/private/errors.hpp>
+#include <libaudioverse/private/error.hpp>
 #include <audio_io/audio_io.hpp>
 #include <string>
 #include <vector>
@@ -34,7 +34,7 @@ void initializeDeviceFactory() {
 		return;
 	}
 	else {
-		throw LavErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
+		throw ErrorException(Lav_ERROR_CANNOT_INIT_AUDIO);
 	}
 }
 
@@ -57,7 +57,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_deviceGetCount(unsigned int* destination) {
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetName(unsigned int index, char** destination) {
 	PUB_BEGIN
 	auto n = (*audio_output_factory)->getOutputNames();
-	if(index >= n.size()) throw LavErrorException(Lav_ERROR_RANGE);
+	if(index >= n.size()) throw ErrorException(Lav_ERROR_RANGE);
 	auto s = n[index];
 	char* outgoingStr = new char[s.size()+1];
 	std::copy(s.c_str(), s.c_str()+s.size(), outgoingStr);
@@ -70,7 +70,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_deviceGetName(unsigned int index, char** destin
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetChannels(unsigned int index, unsigned int* destination) {
 	PUB_BEGIN
 	auto c = (*audio_output_factory)->getOutputMaxChannels();
-	if(index >= c.size()) throw LavErrorException(Lav_ERROR_RANGE);
+	if(index >= c.size()) throw ErrorException(Lav_ERROR_RANGE);
 	*destination = c[index];
 	PUB_END
 }

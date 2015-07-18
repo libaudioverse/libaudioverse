@@ -13,7 +13,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <math.h>
 #include <libaudioverse/private/constants.hpp>
 #include <stdio.h>
-#include <libaudioverse/private/errors.hpp>
+#include <libaudioverse/private/error.hpp>
 
 namespace libaudioverse_implementation {
 
@@ -22,9 +22,9 @@ IIRFilter::IIRFilter(double sr) {
 }
 
 void IIRFilter::configure(int newNumeratorLength, double* newNumerator, int newDenominatorLength, double* newDenominator) {
-	if(newNumeratorLength == 0 || newDenominatorLength == 0) throw LavErrorException(Lav_ERROR_RANGE);
+	if(newNumeratorLength == 0 || newDenominatorLength == 0) throw ErrorException(Lav_ERROR_RANGE);
 	//we normalize by the first coefficient but throw it out; consequently, it must be nonzero.
-	if(newDenominator[0] == 0.0) throw LavErrorException(Lav_ERROR_RANGE);
+	if(newDenominator[0] == 0.0) throw ErrorException(Lav_ERROR_RANGE);
 	if(numerator_length != newNumeratorLength || denominator_length != newDenominatorLength) { //only clear these if absolutely necessary.
 		if(history) delete[] history;
 		if(numerator) delete[] numerator;

@@ -13,7 +13,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/libaudioverse3d.h>
-#include <libaudioverse/private/errors.hpp>
+#include <libaudioverse/private/error.hpp>
 #include <math.h>
 #include <stdlib.h>
 #include <glm/glm.hpp>

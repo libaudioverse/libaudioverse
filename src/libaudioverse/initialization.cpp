@@ -21,6 +21,7 @@ typedef void (*initfunc_t)();
 //Errors will be returned as appropriate.
 //Initialization stops at the first failed function and does not continue.
 initfunc_t initializers[] = {
+	initializeErrorModule,
 	initializeMemoryModule,
 	initializeFunctionTables,
 	initializeDeviceFactory,
@@ -37,6 +38,7 @@ typedef void (*shutdownfunc_t)();
 shutdownfunc_t shutdown_funcs[] = {
 shutdownDeviceFactory,
 shutdownMemoryModule,
+shutdownErrorModule,
 shutdownLogging,
 };
 

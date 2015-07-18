@@ -12,7 +12,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/hrtf.hpp>
 #include <libaudioverse/private/dspmath.hpp>
 #include <libaudioverse/private/macros.hpp>
-#include <libaudioverse/private/errors.hpp>
+#include <libaudioverse/private/error.hpp>
 #include <libaudioverse/private/kernels.hpp>
 #include <libaudioverse/private/data.hpp>
 #include <libaudioverse/private/memory.hpp>
@@ -76,7 +76,7 @@ int HrtfData::getLength() {
 void HrtfData::loadFromFile(std::string path, unsigned int forSr) {
 	//first, load the file if we can.
 	FILE *fp = fopen(path.c_str(), "rb");
-	if(fp == nullptr) throw LavErrorException(Lav_ERROR_FILE);
+	if(fp == nullptr) throw ErrorException(Lav_ERROR_FILE);
 	size_t size = 0;
 	fseek(fp, 0, SEEK_END);
 	size = ftell(fp);
@@ -105,7 +105,7 @@ void HrtfData::loadFromBuffer(unsigned int length, char* buffer, unsigned int fo
 	if(endianness_marker != 1) reverse_endianness(buffer, length, 4);
 	//read it again; if it is still not 1, something has gone badly wrong.
 	endianness_marker = convi(buffer);
-	if(endianness_marker != 1) throw LavErrorException(Lav_ERROR_HRTF_INVALID);
+	if(endianness_marker != 1) throw ErrorException(Lav_ERROR_HRTF_INVALID);
 
 	char* iterator = buffer;
 	const unsigned int window_size = 4;
@@ -134,7 +134,7 @@ void HrtfData::loadFromBuffer(unsigned int length, char* buffer, unsigned int fo
 	//sanity check: we must have as many hrirs as the sum of the above array.
 	int32_t sum_sanity_check = 0;
 	for(int i = 0; i < elev_count; i++) sum_sanity_check +=azimuth_counts[i];
-	if(sum_sanity_check != hrir_count) throw LavErrorException(Lav_ERROR_HRTF_INVALID);
+	if(sum_sanity_check != hrir_count) throw ErrorException(Lav_ERROR_HRTF_INVALID);
 
 	int before_hrir_length = convi(iterator);
 	iterator += window_size;
@@ -143,7 +143,7 @@ void HrtfData::loadFromBuffer(unsigned int length, char* buffer, unsigned int fo
 	size_t size_remaining = length-length_so_far;
 	//we must have enough remaining to be all hrir hrirs.
 	size_t hrir_size = before_hrir_length*hrir_count*sizeof(float);
-	if(hrir_size != size_remaining) throw LavErrorException(Lav_ERROR_HRTF_INVALID);
+	if(hrir_size != size_remaining) throw ErrorException(Lav_ERROR_HRTF_INVALID);
 
 	//last step.  Initialize the HRIR array.
 	hrirs = new float**[elev_count];

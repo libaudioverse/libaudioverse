@@ -45,6 +45,7 @@ events.cpp
 simulation.cpp
 logging.cpp
 planner.cpp
+error.cpp
 
 #Speex resampler.
 speex_resample.c

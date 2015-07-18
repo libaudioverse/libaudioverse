@@ -70,7 +70,12 @@ _global_events= collections.defaultdict(set)
 #build and register all the error classes.
 class GenericError(Exception):
 	"""Base for all libaudioverse errors."""
-	pass
+
+	def __init__(self):
+		self.file = _lav.error_get_file()
+		self.line = _lav.error_get_line()
+		self.message = _lav.error_get_message()
+		super(GenericError, self).__init__("{} ({}:{})".format(self.message, self.file, self.line))
 
 {%for error_name in constants.iterkeys()|prefix_filter("Lav_ERROR_")|remove_filter("Lav_ERROR_NONE")%}
 {%set friendly_name = error_name|strip_prefix("Lav_ERROR_")|lower|underscores_to_camelcase(True)%}

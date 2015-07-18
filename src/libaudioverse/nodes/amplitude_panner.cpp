@@ -110,10 +110,10 @@ Lav_PUBLIC_FUNCTION LavError Lav_createAmplitudePannerNode(LavHandle simulationH
 
 Lav_PUBLIC_FUNCTION LavError Lav_amplitudePannerNodeConfigureStandardMap(LavHandle nodeHandle, unsigned int channels) {
 	PUB_BEGIN
-	if(channels != 2 && channels != 6 && channels != 8) throw LavErrorException(Lav_ERROR_RANGE);
+	if(channels != 2 && channels != 6 && channels != 8) throw ErrorException(Lav_ERROR_RANGE);
 	auto node= incomingObject<Node>(nodeHandle);
 	LOCK(*node);
-	if(node->getType() != Lav_OBJTYPE_AMPLITUDE_PANNER_NODE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
+	if(node->getType() != Lav_OBJTYPE_AMPLITUDE_PANNER_NODE) throw ErrorException(Lav_ERROR_TYPE_MISMATCH);
 	std::static_pointer_cast<AmplitudePannerNode>(node)->configureStandardChannelMap(channels);
 	PUB_END
 }

@@ -129,7 +129,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createRecorderNode(LavHandle simulationHandle, 
 Lav_PUBLIC_FUNCTION LavError Lav_recorderNodeStartRecording(LavHandle nodeHandle, const char* path) {
 	PUB_BEGIN
 	auto node = incomingObject<Node>(nodeHandle);
-	if(node->getType() != Lav_OBJTYPE_RECORDER_NODE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
+	if(node->getType() != Lav_OBJTYPE_RECORDER_NODE) throw ErrorException(Lav_ERROR_TYPE_MISMATCH);
 	auto recorder=std::static_pointer_cast<RecorderNode>(node);
 	LOCK(*recorder);
 	recorder->startRecording(path);
@@ -139,7 +139,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_recorderNodeStartRecording(LavHandle nodeHandle
 Lav_PUBLIC_FUNCTION LavError Lav_recorderNodeStopRecording(LavHandle nodeHandle) {
 	PUB_BEGIN
 	auto node = incomingObject<Node>(nodeHandle);
-	if(node->getType() != Lav_OBJTYPE_RECORDER_NODE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
+	if(node->getType() != Lav_OBJTYPE_RECORDER_NODE) throw ErrorException(Lav_ERROR_TYPE_MISMATCH);
 	auto recorder=std::static_pointer_cast<RecorderNode>(node);
 	LOCK(*recorder);
 	recorder->stopRecording();

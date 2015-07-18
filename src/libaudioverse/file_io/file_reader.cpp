@@ -4,7 +4,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/file.hpp>
 #include <libaudioverse/libaudioverse.h>
 #include <sndfile.h>
-#include <libaudioverse/private/errors.hpp>
+#include <libaudioverse/private/error.hpp>
 
 namespace libaudioverse_implementation {
 
@@ -13,10 +13,10 @@ FileReader::~FileReader() {
 }
 
 void FileReader::open(const char* path) {
-	if(handle) throw LavErrorException(Lav_ERROR_FILE);
+	if(handle) throw ErrorException(Lav_ERROR_FILE);
 	handle = sf_open(path, SFM_READ, &info);
 	if(handle == nullptr) {
-		throw LavErrorException(Lav_ERROR_FILE);
+		throw ErrorException(Lav_ERROR_FILE);
 	}
 }
 
@@ -26,7 +26,7 @@ void FileReader::close() {
 		handle = NULL;
 		info = {0};
 	} else {
-		throw LavErrorException(Lav_ERROR_FILE);
+		throw ErrorException(Lav_ERROR_FILE);
 	}
 }
 

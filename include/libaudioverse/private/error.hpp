@@ -3,14 +3,24 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #pragma once
 #include "../libaudioverse.h"
+#include <string>
 
 namespace libaudioverse_implementation {
 
 /*This class serves one purpose: preventing us from catching and throwing integers.*/
-class LavErrorException {
+class ErrorException {
 	public:
-	LavErrorException(LavError e): err(e) {}
-	LavError err;
+	ErrorException() = default;
+	//f is file, l is line, m is message, e is code.
+	ErrorException(LavError e, std::string m = "", std::string f = "", int l = 0): error(e), line(l), message(m), file(f) {}
+	LavError error = Lav_ERROR_NONE;
+	std::string file, message;
+	int line = 0;
 };
+
+void initializeErrorModule();
+void shutdownErrorModule();
+//Records this error for the current thread.
+void recordError(ErrorException e);
 
 }

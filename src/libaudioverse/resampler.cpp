@@ -3,7 +3,7 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 
 #include <libaudioverse/libaudioverse.h>
-#include <libaudioverse/private/errors.hpp>
+#include <libaudioverse/private/error.hpp>
 #include <libaudioverse/private/resampler.hpp>
 #include <libaudioverse/private/dspmath.hpp>
 #include <libaudioverse/private/kernels.hpp>
@@ -19,7 +19,7 @@ namespace libaudioverse_implementation {
 Resampler::Resampler(int inputFrameCount, int inputChannels, int inputSr, int outputSr): input_frame_count(inputFrameCount), input_channels(inputChannels), input_sr(inputSr), output_sr(outputSr) {
 	delta = (float)inputSr/(float)outputSr;
 	spx_resampler = speex_resampler_init(inputChannels, inputSr, outputSr, 1, &spx_error);
-	if(spx_resampler==nullptr) throw LavErrorException(Lav_ERROR_MEMORY);
+	if(spx_resampler==nullptr) throw ErrorException(Lav_ERROR_MEMORY);
 }
 
 void Resampler::read(float* source) {

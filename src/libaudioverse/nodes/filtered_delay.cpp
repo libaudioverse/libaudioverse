@@ -37,7 +37,7 @@ class FilteredDelayNode: public Node {
 };
 
 FilteredDelayNode::FilteredDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, unsigned int channels): Node(Lav_OBJTYPE_FILTERED_DELAY_NODE, simulation, channels, channels) {
-	if(channels == 0) throw LavErrorException(Lav_ERROR_RANGE);
+	if(channels == 0) throw ErrorException(Lav_ERROR_RANGE);
 	this->channels = channels;
 	lines = new CrossfadingDelayLine*[channels];
 	for(unsigned int i = 0; i < channels; i++) lines[i] = new CrossfadingDelayLine(maxDelay, simulation->getSr());

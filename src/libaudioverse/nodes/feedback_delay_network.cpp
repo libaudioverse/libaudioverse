@@ -61,19 +61,19 @@ void FeedbackDelayNetworkNode::process() {
 }
 
 void FeedbackDelayNetworkNode::setMatrix(int length, float* values) {
-	if(length != line_count*line_count) throw LavErrorException(Lav_ERROR_RANGE);
+	if(length != line_count*line_count) throw ErrorException(Lav_ERROR_RANGE);
 	network->setMatrix(values);
 }
 
 void FeedbackDelayNetworkNode::setOutputGains(int count, float* values) {
-	if(count != line_count) throw LavErrorException(Lav_ERROR_RANGE);
+	if(count != line_count) throw ErrorException(Lav_ERROR_RANGE);
 	std::copy(values, values+count, gains);
 }
 
 void FeedbackDelayNetworkNode::setDelays(int length, float* values) {
-	if(length != line_count) throw LavErrorException(Lav_ERROR_RANGE);
+	if(length != line_count) throw ErrorException(Lav_ERROR_RANGE);
 	for(int i=0; i < line_count; i++) {
-		if(values[i] > max_delay) throw LavErrorException(Lav_ERROR_RANGE);
+		if(values[i] > max_delay) throw ErrorException(Lav_ERROR_RANGE);
 	}
 	network->setDelays(values);
 }
@@ -89,7 +89,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createFeedbackDelayNetworkNode(LavHandle simula
 	PUB_END
 }
 
-#define FDN_OR_ERROR if(node->getType() != Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK_NODE) throw LavErrorException(Lav_ERROR_TYPE_MISMATCH);
+#define FDN_OR_ERROR if(node->getType() != Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK_NODE) throw ErrorException(Lav_ERROR_TYPE_MISMATCH);
 
 Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetMatrix(LavHandle nodeHandle, int count, float* values) {
 	PUB_BEGIN

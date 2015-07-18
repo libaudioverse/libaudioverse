@@ -5,18 +5,19 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <mutex>
 #include <new>
 #include "../libaudioverse.h"
-#include "errors.hpp" //needed by the standard catchblock macro, below.
+#include "error.hpp" //needed by the standard catchblock macro, below.
 
 //use __LINE__ for a quick unique variable.
 #define LOCK(object) std::lock_guard<decltype((object))> lock_##__LINE__((object))
 
 /*These macros define the beginning and end of a function intended to be exposed publicly.
-Such functions should indicate errors by throwing LavErrorException, not returning.  The first macro simply sets up a try block; the latter is a group of standard catch blocks that makes sure that
+Such functions should indicate errors by throwing ErrorException, not returning.  The first macro simply sets up a try block; the latter is a group of standard catch blocks that makes sure that
 under no circumstances will an exception leave the public api and propagate into user code, ever.  This is necessary because we wish to bind to many languages, and very few actually support marshalling exceptions across the boundary.*/
 #define PUB_BEGIN try {
 
-#define PUB_END } catch(LavErrorException e) {\
-return e.err; \
+#define PUB_END } catch(ErrorException e) {\
+recordError(e);\
+return e.error; \
 } catch(std::bad_alloc e) {\
 return Lav_ERROR_MEMORY;\
 } catch(...) {\
