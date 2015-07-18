@@ -8,7 +8,10 @@ extern "C" {
 #endif
 
 /**This is the interface to the 3d simulation of Libaudioverse, including its properties.*/
+
 Lav_PUBLIC_FUNCTION LavError Lav_createEnvironmentNode(LavHandle simulationHandle, const char*hrtfPath, LavHandle* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_environmentNodePlayAsync(LavHandle nodeHandle, LavHandle bufferHandle, float x, float y, float z);
+
 Lav_PUBLIC_FUNCTION LavError Lav_createSourceNode(LavHandle simulationHandle, LavHandle environmentHandle, LavHandle* destination);
 
 //A few properties common to most objects in the 3d simulation including all environments.

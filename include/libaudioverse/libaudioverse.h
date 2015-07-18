@@ -226,6 +226,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_createBuffer(LavHandle simulationHandle, LavHan
 Lav_PUBLIC_FUNCTION LavError Lav_bufferGetSimulation(LavHandle bufferHandle, LavHandle* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_bufferLoadFromFile(LavHandle bufferHandle, const char* path);
 Lav_PUBLIC_FUNCTION LavError Lav_bufferLoadFromArray(LavHandle bufferHandle, int sr, int channels, int frames, float* data);
+Lav_PUBLIC_FUNCTION LavError Lav_bufferNormalize(LavHandle bufferHandle);
+Lav_PUBLIC_FUNCTION LavError Lav_bufferGetDuration(LavHandle bufferHandle, float* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_bufferGetLengthInSamples(LavHandle bufferHandle, int* destination);
 
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetSimulation(LavHandle nodeHandle, LavHandle* destination);
 /**Connect two nodes.*/
@@ -364,7 +367,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createRingmodNode(LavHandle simulationHandle, L
 //these are for feedback delay networks.
 //Warning: this is one of if not the single most complex nodes in Libaudioverse.
 Lav_PUBLIC_FUNCTION LavError Lav_createFeedbackDelayNetworkNode(LavHandle simulationHandle, float maxDelay, int lines, LavHandle* destination);
-Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetMatrix(LavHandle node, int count, float* values);
+Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetMatrix(LavHandle nodeHandle, int count, float* values);
 Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetOutputGains(LavHandle nodeHandle, int count, float* values);
 Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetDelays(LavHandle nodeHandle , int count, float* values);
 

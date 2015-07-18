@@ -97,6 +97,14 @@ float Buffer::getSampleWithMixingMatrix(int frame, int channel, int maxChannels)
 	else return 0.0;
 }
 
+void Buffer::normalize() {
+	float min = *std::min_element(data, data+channels*frames);
+	float max = *std::max_element(data, data+channels*frames);
+	float normfactor = std::max(abs(min), abs(max));
+	normfactor = 1.0/normfactor;
+	scalarMultiplicationKernel(channels*frames, normfactor, data, data);
+}
+
 //begin public api
 
 Lav_PUBLIC_FUNCTION LavError Lav_createBuffer(LavHandle simulationHandle, LavHandle* destination) {
@@ -106,6 +114,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createBuffer(LavHandle simulationHandle, LavHan
 	*destination = outgoingObject(createBuffer(simulation));
 	PUB_END
 }
+
 Lav_PUBLIC_FUNCTION LavError Lav_bufferGetSimulation(LavHandle handle, LavHandle* destination) {
 	PUB_BEGIN
 	auto b= incomingObject<Buffer>(handle);
@@ -133,6 +142,30 @@ Lav_PUBLIC_FUNCTION LavError Lav_bufferLoadFromArray(LavHandle bufferHandle, int
 	auto buff=incomingObject<Buffer>(bufferHandle);
 	LOCK(*buff);
 	buff->loadFromArray(sr, channels, frames, data);
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_bufferNormalize(LavHandle bufferHandle) {
+	PUB_BEGIN
+	auto b = incomingObject<Buffer>(bufferHandle);
+	LOCK(*b);
+	b->normalize();
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_bufferGetDuration(LavHandle bufferHandle, float* destination) {
+	PUB_BEGIN
+	auto b = incomingObject<Buffer>(bufferHandle);
+	LOCK(*b);
+	*destination = b->getDuration();
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_bufferGetLengthInSamples(LavHandle bufferHandle, int* destination) {
+	PUB_BEGIN
+	auto b = incomingObject<Buffer>(bufferHandle);
+	LOCK(*b);
+	*destination = b->getLength();
 	PUB_END
 }
 

@@ -58,7 +58,7 @@ The number of inputs to this node is described below.
 This node has no outputs.
 {%elif node['outputs'] == "constructor"%}
 The number of outputs from this node depends on parameters to its constructor.
-{%elif node['output'] == "described"%}
+{%elif node['outputs'] == "described"%}
 The outputs of this node are described below.
 {%else%}
 [caption=""]

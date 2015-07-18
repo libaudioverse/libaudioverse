@@ -1,2 +1,425 @@
 [[tutorials]]
 == Tutorials
+
+The following is a collection of tutorials using Python, presented heree because the rest of this manual can be somewhat dense.
+if you are using C or another binding, the translation should be clear in most cases.
+C is describedin this manual.
+For other languages, your bindings should indicate how specific things work.
+
+These tutorials start with code examples and work their way to design patterns and informal descriptions of Libaudioverse concepts.
+Reading all of this section is not necessary, as later tutorials may discuss things you do not need at the moment.
+It is suggested that you treat this section like a recipe book: read it until you get the idea, and then return when you need to know how specific things work.
+
+=== Playing a Sine Wave
+
+The following is the simplest Libaudioverse program that does something, namely output a sine wave for 5 seconds.
+A full explanation follows.
+
+....
+import libaudioverse
+import time
+
+libaudioverse.initialize()
+
+#Create a simulation using the defaults.
+simulation = libaudioverse.Simulation()
+
+#A sine node synthesizes a sine wave:
+sine = libaudioverse.SineNode(simulation)
+
+#In order to output, we connect to the simulation.
+sine.connect_simulation(output = 0)
+
+#The simulation will play once it has been told to use a specific output device.
+simulation.set_output_device(-1)
+
+time.sleep(5.0)
+libaudioverse.shutdown()
+....
+
+Most programs using Libaudioverse look similar to this pattern, though they usually involve more nodes.
+
+The first and last lines initialize and shut down Libaudioverse.
+Your program should always have these without fail.
+After Libaudioverse is shut down, accessing objects created from it is undefined behavior.
+
+After initialization, we create a simulation, the gateway to Libaudioverse functionality.
+Every other object in the library requires  one when it is created;
+we refer to such simulations as the object's simulation.
+It is not possible to change the object's simulation after it is created, but most applications will only create one simulation anyway.
+
+Simulations fix the sample rate and the block size.
+The block size is the number of samples to be synthesized at once.
+While Libaudioverse is synthesizing a block of samples, it is not possible for your application to make changes that involve the simulation for which samples are being synthesized.
+
+Next, we create a sine node.
+Nodes are responsible for producing or modifying audio.
+They have inputs, outputs, and properties.
+Inputs and properties will be explained later.
+
+In order for us to hear audio, or indeed for the sine node to do anything at all, we need to send its output somewhere.
+We refer to outputs with numeric indices.
+In the case of sine nodes, there is only one output, namely the syntehsized sine wave.
+
+In order to actually hear audio, some outputs must connect to the simulation.
+Simulations pull on all connected nodes, causing them to process audio.
+The purpose of `connect_simulation` is to connect an output to the simulation, causing the node in question to be asked for audio by the simulation directly.
+All outputs which are connected to the simulation are added together and produced as its output.
+It is possible to make changes after the simulation has an output device.
+Assigning the output device after all setup is a common characteristic of demos, but real programs are obviously much more complicated.
+
+Finally, there are a number of ways to get output from the simulation.
+We can ask for a block of samples, write audio directly to files, or send it to the sound card.
+We use the last option here.
+The purpose of `set_output_device` is to tell the simulation which output device to use.
+The index `-1` specifies that we wish to use the default audio device.
+There are other parameters to this function, namely the channels and mixahead, but once again the defaults are good enough.
+
+=== Sweeping Sine Waves with properties
+
+The second most important concept of Libaudioverse is properties.
+Properties are responsible for controlling aspects of audio, for example the frequency of the above sine wave.
+The following snippet demonstrates sweeping the sine wave in the above example from 0 to 1000 HZ, as well as changing its volume.
+
+....
+#Recall that Python omits the last value.
+for i in xrange(0, 1010, 10):
+    sine.mul.value = i/1000.0
+    sine.frequency.value = i
+    time.sleep(0.02)
+....
+
+There are a number of various operations which may be performed on a property.
+Setting and getting the value are the most obvious.
+Others include resetting it, querying the range, and scheduling changes to happen in the future.
+To that end, languages with classes will often hide the property behind an additional class.
+This is the case in Python, which requires syntax as in the example above.
+
+There is a better way to handle this example.  We will revisit the above loop shortly.
+
+=== Buffers and Playing Files
+
+The following loops a file until enter is pressed.
+
+....
+import libaudioverse
+
+libaudioverse.initialize()
+
+simulation = libaudioverse.Simulation()
+
+print "Enter a path to a sound file."
+path = raw_input()
+
+buffer=libaudioverse.Buffer(simulation)
+buffer.load_from_file(path)
+buffer_player=libaudioverse.BufferNode(simulation)
+buffer_player.buffer.value = buffer
+buffer_player.looping.value = True
+
+#Connect the buffer.
+buffer_player.connect_simulation(0)
+
+#The simulation will play once it has been told to use a specific output device.
+simulation.set_output_device(-1)
+
+print "Press enter to exit."
+raw_input()
+libaudioverse.shutdown()
+....
+
+Buffers hold audio data and, most importantly, allow for sharing.
+If we were simpply to have a file node, something which was the case in an early stage of development, playing the same file multiple times would result in loading it into memory multiple times.
+A buffer representing some data can be used with as many buffer nodes as desired without using more memory.
+
+Another disadvantage of loading files directly is that the file will need to be resampled multiple times, once for each duplicate load.
+Buffers avoid this by resampling when data is loaded into them.
+
+
+Finally, it is possible to load any data you wish into a buffer.
+The `load_from_file` function, corresponding to `Lav_bufferLoadFromFile` in the C API, is merely convenience.
+All that is required is to load the audio data into an array and call `buffer.load_from_array`.
+
+==== Simple File Caching
+
+If you care only about learning Libaudioverse, feel free to skip this section.
+
+The following is a simple class extracted from one of my other projects.
+It demonstrates the creation of a cache for files, such that they are loaded only once.
+
+....
+import libaudioverse
+import os
+import os.path
+
+class SoundLoader(object):
+
+    def __init__(self, simulation, sound_directory):
+        self.simulation = simulation
+        self.cache=dict()
+        self.sound_directory = sound_directory
+
+    def load_sound(self, key):
+        #our sounds are ogg, so just add .ogg 
+        if key not in self.cache:
+            b = libaudioverse.Buffer(self.simulation)
+            b.load_from_file(os.path.join(self.sound_directory, key+".ogg"))
+            self.cache[key] = b
+        b = self.cache[key]
+        n = libaudioverse.BufferNode(self.simulation)
+        n.buffer.value = b
+        return n
+....
+
+To use it, instantiate the class with a simulation and call `load_sound` to get buffer nodes.
+Libaudioverse does support other file formats, but you will almost always want to use `ogg` for size reasons.
+
+Doing a loader like this  also allows tricks like grabbing files from the internet, decrypting, raeding from databases, or any number of other things limited only by imagination and time constraints.
+
+=== Panning
+
+The following are the required steps to wire a buffer node, here `buffer_player`, up for playback through an amplitude  panner.
+
+....
+panner=libaudioverse.AmplitudePannerNode(simulation)
+buffer_player.connect(output = 0, node = panner, input = 0)
+panner.connect_simulation(0)
+....
+
+Usually, the line with `.connect` does not use keyword arguments.
+They are added here for clarity, but connecting is a very common operation.
+The line `buffer_player.connect(0, panner, 0)` is exactly equivalent.
+
+All panners have two properties of note, `azimuth` and `elevation`.
+Both are measured in degrees.
+Azimuth is the angle clockwise from the listener and elevation the angle between the horizontal and a line from the listener to the sound source.
+Azimuth may be set to any value.
+Elevation is constrained to be between -90 and 90.
+Elevation is available on the amplitude panner for compatability with the HRTF panner, but otherwise has no effect.
+
+This example introduces a node with inputs.
+Inputs expect outputs to be connected to them.
+If they don't have anything, they default to zero.
+Failure to connect to the panner would be the same as panning a completely silent sound.
+If you connect multiple outputs to the same input, they are added before being passed through the node.
+If the same input is connected to multiple outputs, the audio is duplicated in the obvious manner.
+
+Inputs and outputs  both have associated channel counts.
+In most cases, Libaudioverse will do the right thing and convert between different channel counts appropriately.
+You can find the specifics of such conversion <<basics-channels,here>>.
+
+
+Nodes advance if  something needs them or if you specifically tell them to do so anyway.
+If you are familiar with graph terminology or simply wish to see pseudocode of this algorithm, see the <<basics-audio-processing,section on audio processing>>.
+
+=== HRTf and the Multipanner
+
+For most applications, the flexibility of the amplitude panner is overkill.
+HRTF is also sometimes desirable.
+The multipanner is like an amplitude panner, but with easier reconfiguration options.
+Using it resembles the following:
+
+....
+panner=libaudioverse.MultipannerNode(simulation, hrtf_path ="default")
+buffer_player.connect(output = 0, node = panner, input = 0)
+panner.connect_simulation(0)
+....
+
+Multipanners have the same properties as all other panners.
+The addition is the `strategy` property, which must be set to one of the members of the `Lav_PANNING_STRATEGIES` enumeration.
+In languages with classes, like Python, enumerations are mapped to a class with attributes; `Lav_PANNING_STRATEGIES` becomes `PanningStrategies`.
+For example, the following line configures HRTF:
+
+....
+panner.strategy =panningStrategies.hrtf
+....
+
+And the following 5.1 surround sound:
+
+....
+panner.strategy=PanningStrategies.surround51
+....
+
+Libaudioverse also features HRTF support.
+At the lowest level, this is accessed through the HRTF node.
+In almost all cases, however, a multipanner should be used instead.
+
+The `hrtf_path` argument is the path of an HRTF file in a format specific to Libaudioverse.
+Making your own is both unnecessary and very advanced.
+
+As a special case, anywhere that Libaudioverse expects a path to an HRTF file, it will also allow the special string `default`.
+This is an indicator that Libaudioverse should load from an internal HRTF and is usually what you want.
+If you are using `default`, there are no additional files to distribute.
+This HRTF is built directly into the Libaudioverse DLL itself.
+
+
+HRTFs work at any sampling rate, but the experience is suboptimal if the sampling rate of the simulation does not match the sampling rate of the HRTF dataset in use.
+The default dataset has a sampling rate of 44100 HZ.
+As a quite intensional design decision, the default arguments when constructing simulations also specify this sampling rate.
+To that end, `simulation = libaudioverse.simulation()` or your language's analog is sufficient to use the default dataset.
+
+=== Higher-level 3D components
+
+Libaudioverse provides higher level 3D components modeled after OpenGL, OpenAL, and Web Audio.
+This section is primarily conceptual.
+For an example, see the `sim3d` example for your bindings.
+
+These components are divided across two nodes: a source and an environment.
+There is only one node representing sources, namely <<node-Lav_OBJTYPE_SOURCE_NODE,the source node>>, but multiple environments are allowed for.
+At this stage in development, the only  environment is the <<node-Lav_OBJTYPE_SIMPLE_ENVIRONMENT_NODE,simple environment>>, which provides basic 3D positioning facilities.
+
+Sources can be thought of as mixers.
+They have one input.
+Any audio that passes through the source is panned.
+
+Environments represent the listener and properties on the listener's environment.
+Sources require environments in order to be created.
+At creation, every source is associated with an environment, and this environment never changes.
+
+Before turning to how to use them, it should be noted that sources and environments break the input-output model.
+A source has 0 outputs and an environment 0 inputs.
+Sources and environments are too tightly coupled to be managed separately, so Libaudioverse handles the connections for you.
+When sources are created and audio connected to them, the combined audio of all sources magically appears at the environment's output.
+How this occurs should be considered an implementation detail.
+
+NOTE: While we have not discussed note states yet,  changing the environment to paused pauses all sources.
+Changing individual sources to paused pauses that individual source.
+
+Using environments and sources requires some trigonometry, as well as the introduction of two new property types.
+Float3 and float6 properties are special-case properties for holding vectors of floats.
+A float3 usually represents a position `(x, y, z)` and a float6 an orientation `(front_x, front_y, front_z, up_x, up_y, up_z)`.
+
+Both sources and environments have a `position` property.  In Python, float3 maps to tuples of 3 items, so `environment.position.value = (5, 3, 2)`.
+On the environment, the `position` property represents the listeners' position in 3D space.
+On sources, `position` is that source's position.
+
+The default coordinate system is as follows: positive x is right, positive y is up, and positive z is backward.
+This is the same as the OpenAL defaults.
+
+Changing this involves the `orientation` property on environments, a float6.
+
+Orientations are made up of two components.
+The at vector is the direction in which the listener is facing, and the up vector the direction of the top of the listener's head.
+Both of these must be unit vectors, and they must be orthoganal.
+To that end, we pack them in a float6 so that it is impossible to change one without also changing the other.
+
+The mathematical explanation is as follows.
+Common formulas are given below.
+The right vector is at cross up.
+A transformation matrix can then be constructed representing the listener's local coordinate system, and the position of every source transformed by it.
+
+If the above is greek, then the following   is probably what you want.
+Usually, x is east/west, y is north/south, and z is up/down.
+Given degrees clockwise from north, the following formula will set the orientation such that this is the case:
+`(math.sin(angle*math.pi/180.0), math.cos(angle*math.pi/180.0), 0, 0, 0, 1)`.
+
+Finally, by default, the environment and sources are configured for stereo panning.
+Every source can be configured individually for various types of panning, but by far the easiest is to set two properties on the environment.
+`default_panning_strategy` is the panning strategy that new sources should be configured with by default.
+`output_channels` is the number of channels that the environment's output should have.
+We need both because sources can be reconfigured later, and it is therefore not sufficient to assume that `default_panning_strategy` infers `output_channels`.
+
+The following lines turn on HRTF:
+....
+environment.default_panning_strategy = PanningStrategies.hrtf
+environment.output_channels = 2
+....
+
+And the following configures 5.1 surround sound:
+
+....
+environment.default_panning_strategy = PanningStrategies.surround51
+environment.output_channels = 6
+....
+
+=== Property Automation and Locking the Simulation
+
+Earlier in these tutorials, we made a sine wave whose frequency varies over time.
+I promised to revisit this topic, as the implementation has a number of problems:
+
+- It can happen that we change the property twice in one block, hearing only one change.
+
+- If the thread driving the changes suddenly gets preempted by the OS, changes stop.
+
+- If the block size is sufficiently large, the first problem causes every change to be audible.
+
+Fortunately, there is a simple fix: we can ask Libaudioverse to move the properties for us.
+
+Every property is either an a-rate property or a k-rate property.
+If a property is an a-rate property, its value is computed every sample.
+If a property is a k-rate property, its value is computed only at the beginning of the block.
+
+Sine wave frequencies are an example of an a-rate property.
+If we ask Libaudioverse to handle moving it for us, it will be updated every sample.
+
+The following assumes  a sine node called sine, and is completely equivalent to the program from earlier.
+
+....
+sine.frequency.value = 0
+sine.frequency.linear_ramp_to_value(time = 2.0, value = 1000)
+....
+
+`linear_ramp_to_value` schedules a change to a value at a specific time in the future.
+We call this an automation method, and it schedules an automator--an object which orchestrates a change in a property in a specific manner.
+The `time` parameter is relative to now and specifies a time by which the property's value must be at the specified value.
+Starting at the end of the previous automator, a linear ramp will begin moving the property's value toward the final value you specify, and it will be there by the time you specify.
+
+Here is an example of an adsr envelope on the aforementioned sine node.
+It also demonstrates the `set` automation method, which serves the purpose of setting a property to a specific value at a specific time.
+Since automators usually start from the previously scheduled automator, `set` is sometimes required in order to prevent changes.
+Keep in mind that the times are relative to "now", not durations from the last scheduled event.
+
+....
+sine.mul.value = 0.0
+sine.mul.linear_ramp_to_value(time = 0.2, value = 1.0)
+sine.mul.linear_ramp_to_value(time = 0.4, value = 0.6)
+sine.mul.set(time = 1.0, value =0.6)
+sine.mul.linear_ramp_to_value(time = 1.5, value = 0.0)
+....
+
+Setting a value directly cancels all automators immediately.
+In addition, while we don't see them here, some automators have durations.
+If you try to schedule an automator during another automator's duration, an error results.
+The only automator that currently has a duration is the `envelope` automator, which affects its value starting at the specified time and not before.
+
+This example is the first that has  a particular problem, and it is one shared by most complex programs.
+When you make two calls into Libaudioverse, Libaudioverse can decide to synthesize a block between them.
+There are two ways to deal with it.
+
+The first is to wait to connect the node to the simulation, either directly or indirectly.
+This prevents the node from being "needed", which means that it never processes and no change to it can be audible.
+Once all changes are made, the node can then be wired up in the appropriate position, whereupon it will begin playing.
+This enables building complex node hierarchies, but has the disadvantage that it does not work effectively on already playing nodes.
+
+The second method is to lock the simulation.
+In Python, this is achieved by making the simulation a context manager.
+When the simulation is locked, the audio thread is unable to synthesize a block of audio.
+This lets us  prevent the problem with the above example as follows.
+
+....
+with simulation:
+    sine    .mul.value = 0.0
+    sine.mul.linear_ramp_to_value(time = 0.2, value = 1.0)
+    sine.mul.linear_ramp_to_value(time = 0.4, value = 0.6)
+    sine.mul.set(time = 1.0, value =0.6)
+    sine.mul.linear_ramp_to_value(time = 1.5, value = 0.0)
+....
+
+In general, Libaudioverse makes up for lost blocks.
+It is not a good idea to sleep or do anything time-consuming while the simulation is locked, as this may lead to Libaudioverse being unable to synthesize audio in time.
+A good sign you are having this problem is clicking or periods of silence after introducing the above change to your programs.
+It is safe to throw this around even sizeable chunks of code that need to modify Libaudioverse, just avoid blocking if you can.
+The first method is better if creating new nodes, however, and thus both are mentioned here.
+
+All the caution that applies to locks applies to this construct.
+You are holding a lock into a thread of Libaudioverse.
+If anything else in your app needs to access this simulation from a different thread, it will not be able to do so until the simulation is once more unlocked.
+To that end, beware holding locks after the simulation is locked, as this can lead to a deadlock.
+Since every language has best practices for dealing with Locks, Libaudioverse binds this construct in the safest way it can.
+To figure out how to use it in your language of choice, see the documentation for your bindings.
+
+You may have been wondering why the algorithm for processing nodes is not "all nodes always process".
+This is part of the reason.
+By not processing unnecessary nodes, you can make multiple calls into Libaudioverse while the node does nothing.
+Imagine what your program would look like if you had to lock and unlock the simulation every couple of calls, as well as deal with all the safety concerns such calls introduce.
+Instead, it is often sufficient to configure the node before connecting it.

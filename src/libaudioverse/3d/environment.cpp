@@ -10,6 +10,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/simulation.hpp>
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/hrtf.hpp>
+#include <libaudioverse/private/buffer.hpp>
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/libaudioverse3d.h>
@@ -118,6 +119,23 @@ void EnvironmentNode::visitDependencies(std::function<void(std::shared_ptr<Job>&
 	}
 }
 
+void EnvironmentNode::playAsync(std::shared_ptr<Buffer> buffer, float x, float y, float z) {
+	auto e = std::static_pointer_cast<EnvironmentNode>(shared_from_this());
+	auto s = createSourceNode(simulation, e);
+	auto b = createBufferNode(simulation);
+	b->getProperty(Lav_BUFFER_BUFFER).setBufferValue(buffer);
+	b->connect(0, s, 0);
+	s->getProperty(Lav_3D_POSITION).setFloat3Value(x, y, z);
+	//The key here is that we capture the shared pointers, holding them until the event fires.
+	//When the event fires, we null the pointers we captured, and then everything schedules for deletion.
+	b->getEvent(Lav_BUFFER_END_EVENT).setHandler([b, e, s] (Node* unused1, void* unused2) mutable {
+		if(b) b->disconnect(0);
+		b.reset();
+		s.reset();
+		e.reset();
+	});
+}
+
 //begin public api
 
 Lav_PUBLIC_FUNCTION LavError Lav_createEnvironmentNode(LavHandle simulationHandle, const char*hrtfPath, LavHandle* destination) {
@@ -132,6 +150,15 @@ Lav_PUBLIC_FUNCTION LavError Lav_createEnvironmentNode(LavHandle simulationHandl
 	}
 	auto retval = createEnvironmentNode(simulation, hrtf);
 	*destination = outgoingObject<Node>(retval);
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_environmentNodePlayAsync(LavHandle nodeHandle, LavHandle bufferHandle, float x, float y, float z) {
+	PUB_BEGIN
+	auto e = incomingObject<EnvironmentNode>(nodeHandle);
+	auto b = incomingObject<Buffer>(bufferHandle);
+	LOCK(*e);
+	e->playAsync(b, x, y, z);
 	PUB_END
 }
 

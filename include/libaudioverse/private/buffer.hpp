@@ -36,6 +36,9 @@ class Buffer: public ExternalObject {
 	void lock() {simulation->lock();}
 	void unlock() {simulation->unlock();}
 
+	//Normalize the buffer: divide by the sample furthest from zero.
+	//This can't be undone.
+	void normalize();
 	private:
 	int channels = 0;
 	int frames = 0;
