@@ -6,7 +6,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/kernels.hpp>
 #include <libaudioverse/private/dspmath.hpp>
 #include <libaudioverse/private/constants.hpp>
-#include <libaudioverse/private/error.hpp>
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/speex_resampler.h>
 #include <algorithm>
@@ -24,8 +23,8 @@ void staticResamplerKernel(int inputSr, int outputSr, int channels, int frames, 
 	}
 	int err;
 	auto resampler=speex_resampler_init(channels, inputSr, outputSr, 10, &err);
-	if(resampler==nullptr) ERROR(Lav_ERROR_MEMORY);
-	if(err != RESAMPLER_ERR_SUCCESS) ERROR(Lav_ERROR_INTERNAL);
+	if(resampler==nullptr) ERROR(Lav_ERROR_MEMORY, "Could not allocate speex resampler.");
+	if(err != RESAMPLER_ERR_SUCCESS) ERROR(Lav_ERROR_INTERNAL, "Resampler error.");
 	unsigned int numer, denom;
 	speex_resampler_get_ratio(resampler, &numer, &denom);
 	//The 200 makes sure that we grab all of it.

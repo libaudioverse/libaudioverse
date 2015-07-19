@@ -30,7 +30,7 @@ class ConvolverNode: public Node {
 };
 
 ConvolverNode::ConvolverNode(std::shared_ptr<Simulation> simulation, int channels): Node(Lav_OBJTYPE_CONVOLVER_NODE, simulation, channels, channels) {
-	if(channels < 1) ERROR(Lav_ERROR_RANGE);
+	if(channels < 1) ERROR(Lav_ERROR_RANGE, "Channels must be greater than 0.");
 	appendInputConnection(0, channels);
 	this->channels=channels;
 	appendOutputConnection(0, channels);

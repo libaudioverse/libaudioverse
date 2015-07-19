@@ -106,10 +106,10 @@ void Property::scheduleAutomator(Automator* automator) {
 	//It is not possible for an event to overlap us if the one immediately before us does not.
 	for(auto i = lower; i != upper; i++) {
 		auto &a = *i;
-		if(a->getScheduledTime()+a->getDuration() > automator->getScheduledTime()) ERROR(Lav_ERROR_OVERLAPPING_AUTOMATORS);
+		if(a->getScheduledTime()+a->getDuration() > automator->getScheduledTime()) ERROR(Lav_ERROR_OVERLAPPING_AUTOMATORS, "Automator overlaps an automator scheduled in the past.");
 	}
 	//If our time + our delay time overlaps upper, we have the same problem.
-	if(upper != automators.end() && automator->getScheduledTime()+automator->getDuration() > (*upper)->getScheduledTime()) ERROR(Lav_ERROR_OVERLAPPING_AUTOMATORS);
+	if(upper != automators.end() && automator->getScheduledTime()+automator->getDuration() > (*upper)->getScheduledTime()) ERROR(Lav_ERROR_OVERLAPPING_AUTOMATORS, "Automator overlaps an automation event in the future.");
 	//Okay, we're good, insert the automator.
 	auto inserted=automators.insert(upper, automator);
 	//Re-establish the peacewise function.
@@ -133,7 +133,7 @@ void Property::scheduleAutomator(Automator* automator) {
 }
 
 void Property::cancelAutomators(double time) {
-	if(type != Lav_PROPERTYTYPE_FLOAT && type != Lav_PROPERTYTYPE_DOUBLE) ERROR(Lav_ERROR_TYPE_MISMATCH);
+	if(type != Lav_PROPERTYTYPE_FLOAT && type != Lav_PROPERTYTYPE_DOUBLE) ERROR(Lav_ERROR_TYPE_MISMATCH, "Only float and double properties have automators.");
 	double currentValue = type == Lav_PROPERTYTYPE_FLOAT ? getFloatValue(0) : getDoubleValue(0); //shold onto this.
 	time+=this->time;
 	auto b = automators.begin();
@@ -333,12 +333,12 @@ void Property::getArraylengthRange(unsigned int* min, unsigned int* max) {
 }
 
 float Property::readFloatArray(unsigned int index) {
-	if(index >= farray_value.size()) ERROR(Lav_ERROR_RANGE);
+	if(index >= farray_value.size()) ERROR(Lav_ERROR_RANGE, "Index out of bounds.");
 	return farray_value[index];
 }
 
 void Property::writeFloatArray(unsigned int start, unsigned int stop, float* values) {
-	if(start >= farray_value.size() || stop > farray_value.size()) ERROR(Lav_ERROR_RANGE);
+	if(start >= farray_value.size() || stop > farray_value.size()) ERROR(Lav_ERROR_RANGE, "Attempt to write outside bounds of array.");
 	for(int i=start; i < stop; i++) {
 		RC(values[i], fval);
 	}
@@ -350,7 +350,10 @@ void Property::writeFloatArray(unsigned int start, unsigned int stop, float* val
 }
 
 void Property::replaceFloatArray(unsigned int length, float* values) {
-	if((length < min_array_length || length > max_array_length) && read_only == false) ERROR(Lav_ERROR_RANGE);
+	if(read_only == false) {
+		if(length < min_array_length ) ERROR(Lav_ERROR_RANGE, "New array is too short.");
+		if(length > max_array_length) ERROR(Lav_ERROR_RANGE, "New array is too long.");
+	}
 	for(int i =0; i < length; i++) {
 		RC(values[i], fval);
 	}
@@ -378,12 +381,12 @@ void Property::setFloatArrayDefault(std::vector<float> d) {
 }
 
 int Property::readIntArray(unsigned int index) {
-	if(index >= iarray_value.size()) ERROR(Lav_ERROR_RANGE);
+	if(index >= iarray_value.size()) ERROR(Lav_ERROR_RANGE, "Attempt to read past end of array.");
 	return iarray_value[index];
 }
 
 void Property::writeIntArray(unsigned int start, unsigned int stop, int* values) {
-	if(start >= iarray_value.size() || stop > iarray_value.size()) ERROR(Lav_ERROR_RANGE);
+	if(start >= iarray_value.size() || stop > iarray_value.size()) ERROR(Lav_ERROR_RANGE, "Attempt to write past end of array.");
 	for(int i =start; i < stop; i++) {
 		RC(values[i], ival);
 	}
@@ -395,7 +398,10 @@ void Property::writeIntArray(unsigned int start, unsigned int stop, int* values)
 }
 
 void Property::replaceIntArray(unsigned int length, int* values) {
-	if((length < min_array_length || length > max_array_length) && read_only == false) ERROR(Lav_ERROR_RANGE);
+	if(read_only == false) {
+		if(length < min_array_length) ERROR(Lav_ERROR_RANGE, "New array is too short.");
+		if(length > max_array_length) ERROR(Lav_ERROR_RANGE, "New array is too long.");
+	}
 	for(int i =0; i < length; i++) {
 		RC(values[i], ival);
 	}

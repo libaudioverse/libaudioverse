@@ -44,7 +44,7 @@ class ExternalObject: public std::enable_shared_from_this<ExternalObject>  {
 template <class t>
 std::shared_ptr<t> incomingPointer(void* ptr) {
 	auto guard = std::lock_guard<std::mutex>(*memory_lock);
-	if(external_ptrs->count(ptr) == 0) return ERROR(Lav_ERROR_INVALID_POINTER);
+	if(external_ptrs->count(ptr) == 0) return ERROR(Lav_ERROR_INVALID_POINTER, "Pointer did not originate from Libaudioverse or was deleted.");
 	return std::static_pointer_cast<t, void>(external_ptrs->at(ptr));
 }
 
@@ -78,10 +78,10 @@ std::shared_ptr<t> incomingObject(int handle, bool allowNull =false) {
 	auto guard=std::lock_guard<std::mutex>(*memory_lock);
 	if(external_handles->count(handle)) {
 		auto res=std::dynamic_pointer_cast<t>(external_handles->at(handle));
-		if(res == nullptr) ERROR(Lav_ERROR_TYPE_MISMATCH);
+		if(res == nullptr) ERROR(Lav_ERROR_TYPE_MISMATCH, "Incoming pointer did not match requested type.");
 		return res;
 	}
-	else ERROR(Lav_ERROR_INVALID_HANDLE);
+	else ERROR(Lav_ERROR_INVALID_HANDLE, "Handle did not originate from Libaudioverse or was deleted.");
 	//we can't get here, but some compilers probably complain anyway:
 	return nullptr;
 }

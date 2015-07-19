@@ -129,7 +129,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createRecorderNode(LavHandle simulationHandle, 
 Lav_PUBLIC_FUNCTION LavError Lav_recorderNodeStartRecording(LavHandle nodeHandle, const char* path) {
 	PUB_BEGIN
 	auto node = incomingObject<Node>(nodeHandle);
-	if(node->getType() != Lav_OBJTYPE_RECORDER_NODE) ERROR(Lav_ERROR_TYPE_MISMATCH);
+	if(node->getType() != Lav_OBJTYPE_RECORDER_NODE) ERROR(Lav_ERROR_TYPE_MISMATCH, "Expected a recorder node.");
 	auto recorder=std::static_pointer_cast<RecorderNode>(node);
 	LOCK(*recorder);
 	recorder->startRecording(path);

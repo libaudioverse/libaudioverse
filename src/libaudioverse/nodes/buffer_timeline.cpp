@@ -84,7 +84,7 @@ class BufferTimelineNode: public Node {
 };
 
 BufferTimelineNode::BufferTimelineNode(std::shared_ptr<Simulation> simulation, int channels): Node(Lav_OBJTYPE_BUFFER_TIMELINE_NODE, simulation, 0, channels) {
-	if(channels == 0) ERROR(Lav_ERROR_RANGE);
+	if(channels <= 0) ERROR(Lav_ERROR_RANGE, "Channels must be greater than 0.");
 	appendOutputConnection(0, channels);
 	output_channels= channels;
 }

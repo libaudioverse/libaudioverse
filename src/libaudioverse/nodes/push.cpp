@@ -36,6 +36,7 @@ class PushNode: public Node {
 };
 
 PushNode::PushNode(std::shared_ptr<Simulation> sim, unsigned int inputSr, unsigned int channels): Node(Lav_OBJTYPE_PUSH_NODE, sim, 0, channels) {
+	if(channels == 0) ERROR(Lav_ERROR_RANGE, "Channels must be greater than 0.");
 	input_sr = inputSr;
 	resampler = std::make_shared<Resampler>(push_frames, channels, inputSr, (int)sim->getSr());
 	this->push_channels = channels;
@@ -82,7 +83,7 @@ void PushNode::process() {
 
 void PushNode::feed(unsigned int length, float* buffer) {
 	fired_out_callback = false;
-	if(length%push_channels != 0) ERROR(Lav_ERROR_RANGE);
+	if(length%push_channels != 0) ERROR(Lav_ERROR_RANGE, "Length must be a multiple of the configured channels.");
 	unsigned int frames = length/push_channels;
 	unsigned int offset = 0;
 	while(offset < frames) {
@@ -111,7 +112,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_pushNodeFeed(LavHandle nodeHandle, unsigned int
 	PUB_BEGIN
 	auto node=incomingObject<Node>(nodeHandle);
 	LOCK(*node);
-	if(node->getType() != Lav_OBJTYPE_PUSH_NODE) ERROR(Lav_ERROR_TYPE_MISMATCH);
+	if(node->getType() != Lav_OBJTYPE_PUSH_NODE) ERROR(Lav_ERROR_TYPE_MISMATCH, "Expected a push node.");
 	std::static_pointer_cast<PushNode>(node)->feed(length, buffer);
 	PUB_END
 }

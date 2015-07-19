@@ -61,19 +61,21 @@ void FeedbackDelayNetworkNode::process() {
 }
 
 void FeedbackDelayNetworkNode::setMatrix(int length, float* values) {
-	if(length != line_count*line_count) ERROR(Lav_ERROR_RANGE);
+	if(length != line_count*line_count) ERROR(Lav_ERROR_RANGE, "Matrix size mismatch.");
 	network->setMatrix(values);
 }
 
 void FeedbackDelayNetworkNode::setOutputGains(int count, float* values) {
-	if(count != line_count) ERROR(Lav_ERROR_RANGE);
+	if(count < line_count) ERROR(Lav_ERROR_RANGE, "Not enough gains.");
+	if(count > line_count) ERROR(Lav_ERROR_RANGE, "Too many gains.");
 	std::copy(values, values+count, gains);
 }
 
 void FeedbackDelayNetworkNode::setDelays(int length, float* values) {
-	if(length != line_count) ERROR(Lav_ERROR_RANGE);
+	if(length < line_count) ERROR(Lav_ERROR_RANGE, "Too few delays.");
+	if(length > line_count) ERROR(Lav_ERROR_RANGE, "Too many delays.");
 	for(int i=0; i < line_count; i++) {
-		if(values[i] > max_delay) ERROR(Lav_ERROR_RANGE);
+		if(values[i] > max_delay) ERROR(Lav_ERROR_RANGE, "Delay too long.");
 	}
 	network->setDelays(values);
 }
@@ -89,7 +91,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createFeedbackDelayNetworkNode(LavHandle simula
 	PUB_END
 }
 
-#define FDN_OR_ERROR if(node->getType() != Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK_NODE) ERROR(Lav_ERROR_TYPE_MISMATCH);
+#define FDN_OR_ERROR if(node->getType() != Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK_NODE) ERROR(Lav_ERROR_TYPE_MISMATCH, "Expected a feedback delay network node.");
 
 Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetMatrix(LavHandle nodeHandle, int count, float* values) {
 	PUB_BEGIN

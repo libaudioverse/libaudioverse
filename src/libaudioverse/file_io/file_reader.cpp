@@ -14,10 +14,10 @@ FileReader::~FileReader() {
 }
 
 void FileReader::open(const char* path) {
-	if(handle) ERROR(Lav_ERROR_FILE);
+	if(handle) ERROR(Lav_ERROR_FILE, "Attempt to open file without closing.");
 	handle = sf_open(path, SFM_READ, &info);
 	if(handle == nullptr) {
-		ERROR(Lav_ERROR_FILE);
+		ERROR(Lav_ERROR_FILE, std::string(path)+" not found or invalid format.");
 	}
 }
 
@@ -27,7 +27,7 @@ void FileReader::close() {
 		handle = NULL;
 		info = {0};
 	} else {
-		ERROR(Lav_ERROR_FILE);
+		ERROR(Lav_ERROR_FILE, "Attempt to close file without opening first.");
 	}
 }
 

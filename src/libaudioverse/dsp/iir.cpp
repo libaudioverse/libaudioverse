@@ -23,7 +23,7 @@ IIRFilter::IIRFilter(double sr) {
 }
 
 void IIRFilter::configure(int newNumeratorLength, double* newNumerator, int newDenominatorLength, double* newDenominator) {
-	if(newNumeratorLength == 0 || newDenominatorLength == 0) ERROR(Lav_ERROR_RANGE);
+	if(newNumeratorLength == 0 || newDenominatorLength == 0) ERROR(Lav_ERROR_RANGE, "Both numerator and denominator must have nonzero length.");
 	//we normalize by the first coefficient but throw it out; consequently, it must be nonzero.
 	if(newDenominator[0] == 0.0) ERROR(Lav_ERROR_RANGE);
 	if(numerator_length != newNumeratorLength || denominator_length != newDenominatorLength) { //only clear these if absolutely necessary.

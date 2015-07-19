@@ -19,13 +19,15 @@ under no circumstances will an exception leave the public api and propagate into
 recordError(e);\
 return e.error; \
 } catch(std::bad_alloc e) {\
+recordError(ErrorException(Lav_ERROR_MEMORY, "Memory allocation error." __FILE__, __LINE__));\
 return Lav_ERROR_MEMORY;\
 } catch(...) {\
+recordError(ErrorException(Lav_ERROR_UNKNOWN, "Unable to determine error. Thrown exception was not ErrorException.", __FILE__, __LINE__));\
 return Lav_ERROR_UNKNOWN;\
 }\
 return Lav_ERROR_NONE;
 
-//Either EWRROR(code) or ERROR(code, message):
+//Either ERROR(code) or ERROR(code, message):
 #define ERROR(...) throw ErrorException(__VA_ARGS__, __FILE__, __LINE__)
 
 #define STANDARD_PROPERTIES_BEGIN (-100)

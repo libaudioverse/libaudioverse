@@ -214,12 +214,12 @@ int Node::getOutputConnectionCount() {
 }
 
 std::shared_ptr<InputConnection> Node::getInputConnection(int which) {
-	if(which >= getInputConnectionCount() || which < 0) ERROR(Lav_ERROR_RANGE);
+	if(which >= getInputConnectionCount() || which < 0) ERROR(Lav_ERROR_RANGE, "Invalid input.");
 	return input_connections[which];
 }
 
 std::shared_ptr<OutputConnection> Node::getOutputConnection(int which) {
-	if(which < 0 || which >= getOutputConnectionCount()) ERROR(Lav_ERROR_RANGE);
+	if(which < 0 || which >= getOutputConnectionCount()) ERROR(Lav_ERROR_RANGE, "Invalid output.");
 	return output_connections[which];
 }
 
@@ -232,7 +232,7 @@ void Node::appendOutputConnection(int start, int count) {
 }
 
 void Node::connect(int output, std::shared_ptr<Node> toNode, int input) {
-	if(doesEdgePreserveAcyclicity(std::static_pointer_cast<Node>(this->shared_from_this()), toNode) == false) ERROR(Lav_ERROR_CAUSES_CYCLE);
+	if(doesEdgePreserveAcyclicity(std::static_pointer_cast<Node>(this->shared_from_this()), toNode) == false) ERROR(Lav_ERROR_CAUSES_CYCLE, "Connection would cause infinite loop.");
 	auto outputConnection =getOutputConnection(output);
 	auto inputConnection = toNode->getInputConnection(input);
 	makeConnection(outputConnection, inputConnection);
@@ -247,10 +247,10 @@ void Node::connectSimulation(int which) {
 }
 
 void Node::connectProperty(int output, std::shared_ptr<Node> node, int slot) {
-	if(doesEdgePreserveAcyclicity(std::static_pointer_cast<Node>(this->shared_from_this()), node) == false) ERROR(Lav_ERROR_CAUSES_CYCLE);
+	if(doesEdgePreserveAcyclicity(std::static_pointer_cast<Node>(this->shared_from_this()), node) == false) ERROR(Lav_ERROR_CAUSES_CYCLE, "Connection would cause infinite loop.");
 	auto &prop = node->getProperty(slot);
 	auto conn = prop.getInputConnection();
-	if(conn ==nullptr) ERROR(Lav_ERROR_CANNOT_CONNECT_TO_PROPERTY);
+	if(conn ==nullptr) ERROR(Lav_ERROR_CANNOT_CONNECT_TO_PROPERTY, "Property does not support connections.");
 	auto outputConn =getOutputConnection(output);
 	makeConnection(outputConn, conn);
 	simulation->invalidatePlan();
@@ -273,7 +273,7 @@ Property& Node::getProperty(int slot, bool allowForwarding) {
 		auto s=std::get<1>(forwarded_properties[slot]);
 		if(n) return n->getProperty(s);
 	}
-	if(properties.count(slot) == 0) ERROR(Lav_ERROR_RANGE);
+	if(properties.count(slot) == 0) ERROR(Lav_ERROR_RANGE, "Invalid property index or identifier.");
 	else return properties[slot];
 }
 
@@ -292,7 +292,7 @@ void Node::stopForwardingProperty(int ourProperty) {
 			n->removePropertyBackref(std::get<1>(t), std::static_pointer_cast<Node>(shared_from_this()), ourProperty);
 		}
 	}
-	else ERROR(Lav_ERROR_INTERNAL);
+	else ERROR(Lav_ERROR_INTERNAL, "Backref does not exist.");
 	simulation->invalidatePlan();
 }
 
@@ -320,7 +320,7 @@ void Node::visitPropertyBackrefs(int which, std::function<void(Property&)> pred)
 }
 
 Event& Node::getEvent(int which) {
-	if(events.count(which) == 0) ERROR(Lav_ERROR_RANGE);
+	if(events.count(which) == 0) ERROR(Lav_ERROR_RANGE, "Event does not exist.");
 	return events[which];
 }
 
@@ -406,7 +406,7 @@ int SubgraphNode::getInputConnectionCount() {
 }
 
 std::shared_ptr<InputConnection> SubgraphNode::getInputConnection(int which) {
-	if(which < 0|| which >= getInputConnectionCount()) ERROR(Lav_ERROR_RANGE);
+	if(which < 0|| which >= getInputConnectionCount()) ERROR(Lav_ERROR_RANGE, "Invalid input.");
 	else return subgraph_input->getInputConnection(which);
 }
 
@@ -520,10 +520,22 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeReset(LavHandle nodeHandle) {
 LOCK(*node_ptr);\
 auto &prop = node_ptr->getProperty((s));\
 if(prop.getType() != (t)) {\
-ERROR(Lav_ERROR_TYPE_MISMATCH);\
+auto _t = prop.getType();\
+std::string msg = "Property is a ";\
+if(_t == Lav_PROPERTYTYPE_INT) msg+="int";\
+else if(_t == Lav_PROPERTYTYPE_FLOAT) msg += "float";\
+else if(_t == Lav_PROPERTYTYPE_DOUBLE) msg += "double";\
+else if(_t == Lav_PROPERTYTYPE_STRING) msg += "string";\
+else if(_t == Lav_PROPERTYTYPE_FLOAT3) msg += "float3";\
+else if(_t == Lav_PROPERTYTYPE_FLOAT6) msg += "float6";\
+else if(_t == Lav_PROPERTYTYPE_INT_ARRAY) msg += "int array";\
+else if(_t == Lav_PROPERTYTYPE_FLOAT_ARRAY) msg += "float array";\
+else if(_t == Lav_PROPERTYTYPE_BUFFER) msg += "buffer";\
+msg += " property.";\
+ERROR(Lav_ERROR_TYPE_MISMATCH, msg);\
 }
 
-#define READONLY_CHECK if(prop.isReadOnly()) ERROR(Lav_ERROR_PROPERTY_IS_READ_ONLY);
+#define READONLY_CHECK if(prop.isReadOnly()) ERROR(Lav_ERROR_PROPERTY_IS_READ_ONLY, "Attempt to write a read-only property.");
 
 Lav_PUBLIC_FUNCTION LavError Lav_nodeResetProperty(LavHandle nodeHandle, int slot) {
 	PUB_BEGIN
@@ -580,7 +592,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeSetFloat6Property(LavHandle nodeHandle, int
 	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_FLOAT6);
 	READONLY_CHECK
 	prop.setFloat6Value(v1, v2, v3, v4, v5, v6);
-	return Lav_ERROR_NONE;
 	PUB_END
 }
 
@@ -794,7 +805,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeGetArrayPropertyLengthRange(LavHandle nodeH
 	LOCK(*ptr);
 	auto &prop = ptr->getProperty(slot);
 	int type = prop.getType();
-	if(type != Lav_PROPERTYTYPE_FLOAT_ARRAY || type != Lav_PROPERTYTYPE_INT_ARRAY) ERROR(Lav_ERROR_TYPE_MISMATCH);
+	if(type != Lav_PROPERTYTYPE_FLOAT_ARRAY || type != Lav_PROPERTYTYPE_INT_ARRAY) ERROR(Lav_ERROR_TYPE_MISMATCH, "Property is not an array.");
 	PUB_END
 }
 

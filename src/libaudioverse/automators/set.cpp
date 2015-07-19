@@ -34,7 +34,7 @@ double SetAutomator::getFinalValue() {
 
 Lav_PUBLIC_FUNCTION LavError Lav_automationSet(LavHandle nodeHandle, int slot, double time, double value) {
 	PUB_BEGIN
-	if(time < 0.0) ERROR(Lav_ERROR_RANGE);
+	if(time < 0.0) ERROR(Lav_ERROR_RANGE, "Time must be positive or 0.");
 	auto node = incomingObject<Node>(nodeHandle);
 	LOCK(*node);
 	auto &prop= node->getProperty(slot);

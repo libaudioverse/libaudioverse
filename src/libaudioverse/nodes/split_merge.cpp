@@ -34,6 +34,7 @@ std::shared_ptr<Node> createSplitMergeNode(std::shared_ptr<Simulation> simulatio
 }
 
 std::shared_ptr<Node> createChannelSplitterNode(std::shared_ptr<Simulation> simulation, int channels) {
+	if(channels <= 0) ERROR(Lav_ERROR_RANGE, "Channels must be greater than 0.");
 	auto retval= createSplitMergeNode(simulation, Lav_OBJTYPE_CHANNEL_SPLITTER_NODE);
 	retval->resize(channels, 0);
 	for(int i =0; i < channels; i++) retval->appendOutputConnection(i, 1);
@@ -43,6 +44,7 @@ std::shared_ptr<Node> createChannelSplitterNode(std::shared_ptr<Simulation> simu
 }
 
 std::shared_ptr<Node> createChannelMergerNode(std::shared_ptr<Simulation> simulation, int channels) {
+	if(channels <= 0) ERROR(Lav_ERROR_RANGE, "Channels must be greater than 0.");
 	auto retval = createSplitMergeNode(simulation, Lav_OBJTYPE_CHANNEL_MERGER_NODE);
 	retval->resize(channels, 0);
 	retval->appendOutputConnection(0, channels);

@@ -34,7 +34,7 @@ class FftConvolverNode: public Node {
 };
 
 FftConvolverNode::FftConvolverNode(std::shared_ptr<Simulation> simulation, int channels): Node(Lav_OBJTYPE_FFT_CONVOLVER_NODE, simulation, channels, channels) {
-	if(channels < 1) ERROR(Lav_ERROR_RANGE);
+	if(channels < 1) ERROR(Lav_ERROR_RANGE, "Channels must be greater than 0.");
 	appendInputConnection(0, channels);
 	this->channels=channels;
 	appendOutputConnection(0, channels);
@@ -60,17 +60,17 @@ void FftConvolverNode::process() {
 }
 
 void FftConvolverNode::setResponse(int channel, int length, float* response) {
-	if(channel >= channels || channel < 0) ERROR(Lav_ERROR_RANGE);
-	if(length < 1) ERROR(Lav_ERROR_RANGE);
+	if(channel >= channels || channel < 0) ERROR(Lav_ERROR_RANGE, "Channel out of range.");
+	if(length < 1) ERROR(Lav_ERROR_RANGE, "Response must be at least one sample.");
 	convolvers[channel]->setResponse(length, response);
 }
 
 void FftConvolverNode::setResponseFromFile(std::string path, int fileChannel, int convolverChannel) {
-	if(convolverChannel < 0 || convolverChannel >= channels) ERROR(Lav_ERROR_RANGE);
-	if(fileChannel < 0) ERROR(Lav_ERROR_RANGE);
+	if(convolverChannel < 0 || convolverChannel >= channels) ERROR(Lav_ERROR_RANGE, "Channel out of range.");
+	if(fileChannel < 0) ERROR(Lav_ERROR_RANGE, "File channel must be positive.");
 	FileReader reader{};
 	reader.open(path.c_str());
-	if(fileChannel >= reader.getChannelCount()) ERROR(Lav_ERROR_RANGE);
+	if(fileChannel >= reader.getChannelCount()) ERROR(Lav_ERROR_RANGE, "Channel greater than channels in file.");
 	unsigned int bufferSize= reader.getSampleCount();
 	float* tmp=allocArray<float>(bufferSize);
 	reader.readAll(tmp);

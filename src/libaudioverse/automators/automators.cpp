@@ -35,7 +35,7 @@ bool compareAutomators(Automator *a, Automator *b) {
 
 Lav_PUBLIC_FUNCTION LavError Lav_automationCancelAutomators(LavHandle nodeHandle, int slot, double time) {
 	PUB_BEGIN
-	if(time < 0.0) ERROR(Lav_ERROR_RANGE);
+	if(time < 0.0) ERROR(Lav_ERROR_RANGE, "Time must be positive or zero.");
 	auto n = incomingObject<Node>(nodeHandle);
 	LOCK(*n);
 	auto &prop = n->getProperty(slot);
