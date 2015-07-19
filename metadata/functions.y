@@ -18,6 +18,23 @@ functions:
     category: core
     doc_description: |
       Indicates whether Libaudioverse is initialized.
+  Lav_errorGetMessage:
+    category: core
+    doc_description: |
+      Get the message corresponding to the last error that happened on this thread.
+      The returned pionter is valid until another error occurs.
+      The main purpose of this function is debugging and bindings.
+  Lav_errorGetFile:
+    category: core
+    doc_description: |
+      Get the Libaudioverse cpp file where the most recent error on this thread occured.
+      The pointer returned is valid until another error occurs on this thread.
+      This function is mainly for debugging and bindings.
+  Lav_errorGetLine:
+    category: core
+    doc_description: |
+      Return the source line for the last error that occured on this thread.
+      This function is mainly for debugging and bindings.
   Lav_free:
     category: core
     doc_description: |
