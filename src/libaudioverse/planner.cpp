@@ -46,13 +46,18 @@ void Planner::invalidatePlan() {
 //Small helper  function, which needn't know about the class (thus avoiding capture requirements).
 void tagger(std::shared_ptr<Job> job, int tag, std::vector<std::shared_ptr<Job>> &destination) {
 	tag = std::min(tag, job->job_sort_tag);
+	//If we are not changing the tag and this job was seen, we can abort the recursion early;
+	//In such a case, we will not change anything.
+	bool skipRecursion = (job->job_sort_tag == tag && job->job_recorded);
 	job->job_sort_tag = tag;
 	if(job->job_recorded == false) {
 		destination.push_back(job);
 		job->job_recorded = true;
 	}
-	std::function<void(std::shared_ptr<Job>&)> f = [&](std::shared_ptr<Job> &j) {tagger(j, tag-1, destination);};
-	job->visitDependencies(f);
+	if(skipRecursion == false) {
+		std::function<void(std::shared_ptr<Job>&)> f = [&](std::shared_ptr<Job> &j) {tagger(j, tag-1, destination);};
+		job->visitDependencies(f);
+	}
 }
 
 bool jobComparer(const std::shared_ptr<Job> &a, const std::shared_ptr<Job> &b) {
