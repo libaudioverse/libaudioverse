@@ -12,7 +12,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <vector>
 #include <set>
 #include <utility>
-#include "planner.hpp"
+#include "job.hpp"
 
 namespace libaudioverse_implementation {
 

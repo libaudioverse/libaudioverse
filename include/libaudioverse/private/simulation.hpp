@@ -15,13 +15,14 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <random>
 #include "../libaudioverse.h"
 #include "memory.hpp"
-#include "planner.hpp"
+#include "job.hpp"
 
 namespace libaudioverse_implementation {
 
 class Node;
 class Device;
 class InputConnection;
+class Planner;
 
 /*When thrown on the background thread, terminates it.*/
 class ThreadTerminationException {

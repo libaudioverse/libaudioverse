@@ -11,6 +11,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/audio_devices.hpp>
 #include <libaudioverse/private/data.hpp>
 #include <libaudioverse/private/file.hpp>
+#include <libaudioverse/private/planner.hpp>
 #include <audio_io/audio_io.hpp>
 #include <stdlib.h>
 #include <functional>

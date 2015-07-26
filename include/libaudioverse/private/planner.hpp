@@ -7,34 +7,11 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <vector>
 #include <memory>
 #include <powercores/thread_pool.hpp>
+#include "job.hpp"
+
+/**job.hpp contains the rest of this code.*/
 
 namespace libaudioverse_implementation {
-
-class Job;
-
-/**Tags jobs with a number indicating when theya re to run.*/
-void tagger(std::shared_ptr<Job> job, int tag, std::vector<std::shared_ptr<Job>> &destination);
-/**Compares smart pointers to jobs: terue if job a comes-before job b.
-bool jobComparer(const std::shared_ptr<Job> &a, const std::shared_ptr<Job> &b);
-
-/**Represents a repeatable unit of work.*/
-class  Job {
-	public:
-	virtual ~Job() {}
-	//Call pred on all dependent jobs.
-	//It's okay to visit a dependency twice, the planners protect against this.
-	virtual void visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) = 0;
-	//Override points for executing.
-	virtual void willExecuteDependencies() {}
-	virtual void execute() {}
-	private:
-	int job_sort_tag = 0;
-	bool job_recorded = false;
-	friend void tagger(std::shared_ptr<Job> job, int tag, std::vector<std::shared_ptr<Job>> &destination);
-	friend bool jobComparer(const std::shared_ptr<Job> &a, const std::shared_ptr<Job> &b);
-	friend class Planner;
-};
-
 class Planner {
 	public:
 	Planner();

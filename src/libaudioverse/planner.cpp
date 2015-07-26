@@ -33,8 +33,14 @@ void Planner::execute(std::shared_ptr<Job> start, int threads) {
 		runJobsSync();
 	}
 	else {
-		if(last_thread_count != threads) thread_pool.setThreadCount(threads);
-		if(started_thread_pool == false) thread_pool.start();
+		if(last_thread_count != threads) {
+			thread_pool.setThreadCount(threads);
+			last_thread_count = threads;
+		}
+		if(started_thread_pool == false) {
+			thread_pool.start();
+			started_thread_pool = true;
+		}
 		runJobsAsync();
 	}
 	//Kill the shared pointers.
@@ -53,11 +59,12 @@ void Planner::runJobsAsync() {
 	if(plan.size() == 0) return; //nothing to do.
 	int prev_tag = plan[0]->job_sort_tag;
 	auto i = plan.begin();
+	auto end = plan.end();
 	//Run through it, enqueueing jobs and barriers.
-	while(i != plan.end()) {
-		while(i != plan.end() && (*	i)->job_sort_tag == prev_tag) { //While jobs are guaranteed to not depend on each other.
-			auto jobPtr = *i;
-			thread_pool.submitJob([jobPtr] () {
+	while(i != end) {
+		while(i != end && (*	i)->job_sort_tag == prev_tag) { //While jobs are guaranteed to not depend on each other.
+			thread_pool.submitJob([i] () {
+				auto jobPtr = *i;
 				jobPtr->execute();
 				jobPtr->job_recorded = false;
 			});
@@ -65,7 +72,7 @@ void Planner::runJobsAsync() {
 		}
 		//Make sure everything finishes before we start the next ones.
 		thread_pool.submitBarrier();
-		if(i != plan.end()) prev_tag = (*i)->job_sort_tag;
+		if(i != end) prev_tag = (*i)->job_sort_tag;
 	}
 	//At this point, submit a meaningless job that does nothing.
 	//This lets us synchronize with the end of this batch.

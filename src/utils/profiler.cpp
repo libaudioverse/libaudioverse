@@ -61,13 +61,22 @@ ENTRY("late reflections generator", 1, Lav_createLateReflectionsNode(sim, &h)),
 int to_profile_size=sizeof(to_profile)/sizeof(to_profile[0]);
 
 void main(int argc, char** args) {
-	printf("Running profile tests\n");
+	int threads = 1;
+	if(argc == 2) {
+		sscanf(args[1], "%i", &threads);
+		if(threads < 1) {
+			printf("Threads must be greater 1.\n");
+			return;
+		}
+	}
+	printf("Running profile tests on %i threads\n", threads);
 	ERRCHECK(Lav_initialize());
 	for(int i = 0; i < to_profile_size; i++) {
 		auto &info = to_profile[i];
 		printf("Estimate for %s nodes: ", std::get<0>(info).c_str());
 		LavHandle sim;
 		ERRCHECK(Lav_createSimulation(SR, BLOCK_SIZE, &sim));
+		ERRCHECK(Lav_simulationSetThreads(sim, threads));
 		auto handles=std::get<2>(info)(sim, std::get<1>(info));
 		int times=std::get<1>(info);
 		for(auto h: handles) {

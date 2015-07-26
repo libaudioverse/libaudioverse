@@ -28,8 +28,8 @@ if((x) != Lav_ERROR_NONE) {\
 
 void main(int argc, char** args) {
 	ERRCHECK(Lav_initialize());
-	if(argc != 2) {
-		printf("Usage: %s <hrtf file>", args[0]);
+	if(argc < 2) {
+		printf("Usage: %s <hrtf file> [thread_count]", args[0]);
 		return;
 	}
 	LavHandle simulation;
@@ -37,14 +37,22 @@ void main(int argc, char** args) {
 	std::vector<LavHandle> sources;
 	LavHandle sineObj;
 	unsigned int numSources = 0;
-
+	int threads = 1;
+	if(argc == 3) {
+		sscanf(args[2], "%i", &threads);
+		if(threads < 1) {
+			printf("Threads must be greater than 0.\n");
+			return;
+		}
+	}
 	//some setup: create a world and a simulation.
 	ERRCHECK(Lav_createSimulation(44100, BLOCK_SIZE, &simulation));
+	ERRCHECK(Lav_simulationSetThreads(simulation, threads));
 	ERRCHECK(Lav_createEnvironmentNode(simulation, args[1], &world));
 	ERRCHECK(Lav_nodeSetIntProperty(world, Lav_ENVIRONMENT_DEFAULT_PANNER_STRATEGY, Lav_PANNING_STRATEGY_HRTF));
 	ERRCHECK(Lav_createSineNode(simulation, &sineObj));
 	ERRCHECK(Lav_nodeConnectSimulation(world, 0));
-	printf("Running %u times with %u sources\n", NUM_TIMES, NUM_SOURCES);
+	printf("Running %u times with %u sources on %i threads\n", NUM_TIMES, NUM_SOURCES, threads);
 	sources.resize(NUM_SOURCES, 0);
 	//anywhere there's a null pointer, replace it with a source.
 	for(auto i = sources.begin(); i != sources.end(); i++) {
