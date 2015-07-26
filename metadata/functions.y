@@ -253,6 +253,20 @@ functions:
       channels: The number of channels in the resulting file.
       duration: Duration of the resulting file, in seconds.
       mayApplyMixingMatrix: 1 if applying a mixing matrix should be attempted, 0 if extra channels should be treated as 0 or dropped.  This is the same behavior as with {{"Lav_simulationGetBlock"|function}}.
+  Lav_simulationSetThreads:
+    category: simulations
+    doc_description: |
+      Set the number of threads that the simulation is allowed to use.
+      
+      The value of the threads parameter may be from 1 to infinity.
+      When set to 1, processing happens in the thread who calls {{"Lav_simulationGetBlock"|function}}.
+      All other values sleep the thread calling {{"Lav_simulationGetBlock"|function}} and perform processing in background threads.
+    params:
+      threads: The number of threads to use for processing.  Must be at least 1.  Typical values include 1 and 1 less than the available cores.
+  Lav_simulationGetThreads:
+    category: simulations
+    doc_description: |
+      Get the number of threads that the simulation is currently using.
   Lav_createBuffer:
     category: buffers
     doc_description: |

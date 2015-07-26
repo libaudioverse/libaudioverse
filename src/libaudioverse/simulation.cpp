@@ -202,6 +202,14 @@ void Simulation::writeFile(std::string path, int channels, double duration, bool
 	file.close();
 }
 
+void Simulation::setThreads(int n) {
+	threads = n;
+}
+
+int Simulation::getThreads() {
+	return threads;
+}
+
 //Conform to job:
 void Simulation::visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) {
 	for(auto &i: final_output_connection->getConnectedNodes()) {
@@ -296,6 +304,22 @@ Lav_PUBLIC_FUNCTION LavError Lav_simulationWriteFile(LavHandle simulationHandle,
 	auto sim = incomingObject<Simulation>(simulationHandle);
 	LOCK(*sim);
 	sim->writeFile(path, channels, duration, mayApplyMixingMatrix);
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_simulationSetThreads(LavHandle simulationHandle, int threads) {
+	PUB_BEGIN
+	auto sim = incomingObject<Simulation>(simulationHandle);
+	LOCK(*sim);
+	sim->setThreads(threads);
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_simulationGetThreads(LavHandle simulationHandle, int* destination) {
+	PUB_BEGIN
+	auto sim = incomingObject<Simulation>(simulationHandle);
+	LOCK(*sim);
+	*destination = sim->getThreads();
 	PUB_END
 }
 

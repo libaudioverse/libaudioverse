@@ -287,6 +287,17 @@ For full details of this class, see the Libaudioverse manual."""
 		This function wraps Lav_simulationWriteFile."""
 		_lav.simulation_write_file(self, path, channels, duration, may_apply_mixing_matrix)
 
+	@property
+	def threads(self):
+		"""The number of threads the simulation is using for processing.
+		
+		This wraps Lav_simulationGetThreads and Lav_simulationSetThreads."""
+		return _lav.simulation_get_threads(self)
+		
+	@threads.setter
+	def threads(self, value):
+		_lav.simulation_set_threads(self, value)
+
 _types_to_classes[ObjectTypes.simulation] = Simulation
 
 #Buffer objects.

@@ -67,6 +67,10 @@ class Simulation: public ExternalObject, public Job {
 
 	//Write to a file.
 	void writeFile(std::string path, int channels, double duration, bool mayApplyMixingMatrix);
+
+	//Thread support.
+	void setThreads(int n);
+	int getThreads();
 	
 	//Conform to job.
 	virtual void visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) override;
@@ -106,6 +110,7 @@ class Simulation: public ExternalObject, public Job {
 	void* block_callback_userdata =nullptr;
 	
 	Planner* planner = nullptr;
+	int threads = 1;
 };
 
 }

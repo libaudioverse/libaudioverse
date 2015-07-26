@@ -226,6 +226,9 @@ typedef void (*LavBlockCallback)(LavHandle handle, double time, void* userdata);
 Lav_PUBLIC_FUNCTION LavError Lav_simulationSetBlockCallback(LavHandle simulationHandle, LavBlockCallback callback, void* userdata);
 Lav_PUBLIC_FUNCTION LavError Lav_simulationWriteFile(LavHandle simulationHandle, const char* path, int channels, double duration, int mayApplyMixingMatrix);
 
+Lav_PUBLIC_FUNCTION LavError Lav_simulationSetThreads(LavHandle simulationHandle, int threads);
+Lav_PUBLIC_FUNCTION LavError Lav_simulationGetThreads(LavHandle simulationHandle, int* destination);
+
 /**Buffers.
 Buffers are chunks of audio data from any source.  A variety of nodes to work with buffers exist.*/
 Lav_PUBLIC_FUNCTION LavError Lav_createBuffer(LavHandle simulationHandle, LavHandle* destination);
