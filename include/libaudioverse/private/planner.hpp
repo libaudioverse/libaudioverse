@@ -6,6 +6,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <set>
 #include <vector>
 #include <memory>
+#include <powercores/thread_pool.hpp>
 
 namespace libaudioverse_implementation {
 
@@ -38,7 +39,13 @@ class Planner {
 	public:
 	Planner();
 	~Planner();
-	void execute(std::shared_ptr<Job> start);
+	
+	//These three functions make up the planning logic; the entry point is execute.
+	//Threads must be greater than 0.	
+	void execute(std::shared_ptr<Job> start, int threads = 1);
+	void runJobsSync();
+	void runJobsAsync();
+	
 	void invalidatePlan();
 	private:
 	void replan(std::shared_ptr<Job> start);
@@ -46,6 +53,10 @@ class Planner {
 	std::vector<std::weak_ptr<Job>> weak_plan;
 	bool is_valid = false;
 	std::weak_ptr<Job> last_start;
+	//For threads:
+	bool started_thread_pool = false;
+	int last_thread_count = 0;
+	powercores::ThreadPool thread_pool{0};
 };
 
 }

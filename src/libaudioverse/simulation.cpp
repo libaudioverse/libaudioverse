@@ -62,7 +62,7 @@ void Simulation::getBlock(float* out, unsigned int channels, bool mayApplyMixing
 		if(n) n->willTick();
 	}
 	//Use the planner.
-	planner->execute(std::dynamic_pointer_cast<Job>(shared_from_this()));
+	planner->execute(std::dynamic_pointer_cast<Job>(shared_from_this()), threads);
 	//write, applying mixing matrices as needed.
 	final_output_connection->addNodeless(&final_outputs[0], true);
 	//interleave the samples.
@@ -309,6 +309,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_simulationWriteFile(LavHandle simulationHandle,
 
 Lav_PUBLIC_FUNCTION LavError Lav_simulationSetThreads(LavHandle simulationHandle, int threads) {
 	PUB_BEGIN
+	if(threads < 1) ERROR(Lav_ERROR_RANGE, "Cannot run simulation with less than one thread.");
 	auto sim = incomingObject<Simulation>(simulationHandle);
 	LOCK(*sim);
 	sim->setThreads(threads);
