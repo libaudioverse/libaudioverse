@@ -128,7 +128,13 @@ void EnvironmentNode::playAsync(std::shared_ptr<Buffer> buffer, float x, float y
 	s->getProperty(Lav_3D_POSITION).setFloat3Value(x, y, z);
 	//The key here is that we capture the shared pointers, holding them until the event fires.
 	//When the event fires, we null the pointers we captured, and then everything schedules for deletion.
-	b->getEvent(Lav_BUFFER_END_EVENT).setHandler([b, e, s] (Node* unused1, void* unused2) mutable {
+	//We need the simulation shared pointer.
+	auto simulation = this->simulation;
+	b->getEvent(Lav_BUFFER_END_EVENT).setHandler([b, e, s, simulation] (Node* unused1, void* unused2) mutable {
+		//Recall that events do not hold locks when fired.
+		//If we lock anything we delete here, it will not unlock properly.
+		//So lock the simulation.
+		LOCK(*simulation);
 		if(b) b->disconnect(0);
 		b.reset();
 		s.reset();
