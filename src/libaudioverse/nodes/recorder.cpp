@@ -14,6 +14,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/kernels.hpp>
 #include <powercores/threadsafe_queue.hpp>
 #include <powercores/exceptions.hpp>
+#include <powercores/utilities.hpp>
 #include <limits>
 #include <thread>
 #include <mutex>
@@ -103,7 +104,7 @@ void RecorderNode::startRecording(std::string path) {
 	recording_to.open(path.c_str(), simulation->getSr(), channels);
 	recording = true;
 	should_keep_recording.test_and_set(); //so the thread doesn't immediately stop.
-	recording_thread= std::thread([this]() {recordingThreadFunction();});
+	recording_thread= powercores::safeStartThread(&RecorderNode::recordingThreadFunction, this);
 }
 
 void RecorderNode::stopRecording() {

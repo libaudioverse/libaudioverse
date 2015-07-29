@@ -12,6 +12,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/data.hpp>
 #include <libaudioverse/private/file.hpp>
 #include <libaudioverse/private/planner.hpp>
+#include <powercores/utilities.hpp>
 #include <audio_io/audio_io.hpp>
 #include <stdlib.h>
 #include <functional>
@@ -30,7 +31,7 @@ Simulation::Simulation(unsigned int sr, unsigned int blockSize, unsigned int mix
 	this->mixahead = mixahead;
 	registerDefaultMixingMatrices();
 	//fire up the background thread.
-	backgroundTaskThread = std::thread([this]() {backgroundTaskThreadFunction();});
+	backgroundTaskThread = powercores::safeStartThread(&Simulation::backgroundTaskThreadFunction, this);
 	planner = new Planner();
 	start();
 }
