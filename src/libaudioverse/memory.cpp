@@ -108,8 +108,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_handleIncRef(LavHandle handle) {
 Lav_PUBLIC_FUNCTION LavError Lav_handleDecRef(LavHandle handle) {
 	PUB_BEGIN
 	auto e = incomingObject<ExternalObject>(handle);
-	e->refcount.fetch_add(-1);
-	int rc = e->refcount.load();
+	auto rc = e->refcount.fetch_add(-1);
+	rc-=1;
 	if(rc == 0) {
 		auto guard=std::lock_guard<std::mutex>(*memory_lock);
 		external_handles->erase(e->externalObjectHandle);
