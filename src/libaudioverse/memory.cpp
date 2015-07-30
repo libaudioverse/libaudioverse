@@ -76,17 +76,15 @@ bool isAligned(const void* ptr) {
 }
 std::function<void(ExternalObject*)> ObjectDeleter(std::shared_ptr<Simulation> simulation) {
 	return [=](ExternalObject* obj) {
-		//We have to make sure to call the callbacvk outside the lock.
+		//We have to make sure to call the callback outside the lock.
 		//To that end, we gather information as follows, and then call it.
 		bool isExternal;
 		int handle;
-		{
-			LOCK(*simulation);
-			isExternal = obj->isExternalObject;
-			handle = obj->externalObjectHandle;
-			delete obj;
-		}
-		if(isExternal && handle_destroyed_callback) handle_destroyed_callback(handle);
+		LOCK(*simulation);
+		isExternal = obj->isExternalObject;
+		handle = obj->externalObjectHandle;
+		delete obj;
+		if(isExternal && handle_destroyed_callback) simulation->enqueueTask([handle] () {handle_destroyed_callback(handle);});
 	};
 }
 
