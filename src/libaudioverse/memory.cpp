@@ -47,7 +47,8 @@ ExternalObject::ExternalObject(int type) {
 }
 
 ExternalObject::~ExternalObject() {
-	if(isExternalObject && handle_destroyed_callback) handle_destroyed_callback(externalObjectHandle);
+	//We can't call the handleDestroyedCallback here, if we do we're inside a lock.
+	//This is here because the ExternalObject constructor is virtual and this used to contain code (and might again).
 }
 
 int ExternalObject::getType() {
@@ -75,8 +76,17 @@ bool isAligned(const void* ptr) {
 }
 std::function<void(ExternalObject*)> ObjectDeleter(std::shared_ptr<Simulation> simulation) {
 	return [=](ExternalObject* obj) {
-		LOCK(*simulation);
-		delete obj;
+		//We have to make sure to call the callbacvk outside trhe lock.
+		//To that end, we gather information as follows, and then call it.
+		bool isExternal;
+		int handle;
+		{
+			LOCK(*simulation);
+			isExternal = obj->isExternalObject;
+			handle = obj->externalObjectHandle;
+			delete obj;
+		}
+		if(isExternal && handle_destroyed_callback) handle_destroyed_callback(handle);
 	};
 }
 
