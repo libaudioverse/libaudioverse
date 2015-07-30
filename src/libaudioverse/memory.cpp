@@ -77,13 +77,15 @@ bool isAligned(const void* ptr) {
 std::function<void(ExternalObject*)> ObjectDeleter(std::shared_ptr<Simulation> simulation) {
 	return [=](ExternalObject* obj) {
 		//We have to make sure to call the callback outside the lock.
-		//To that end, we gather information as follows, and then call it.
+		//To that end, we gather information as follows, and then queue it.
 		bool isExternal;
 		int handle;
 		LOCK(*simulation);
 		isExternal = obj->isExternalObject;
 		handle = obj->externalObjectHandle;
+		//WARNING: this line can call this deleter recursively, if obj contains the final shared pointer to another ExternalObject.
 		delete obj;
+		//Because of the recursion, shell out to the simulation's task thread.
 		if(isExternal && handle_destroyed_callback) simulation->enqueueTask([handle] () {handle_destroyed_callback(handle);});
 	};
 }
