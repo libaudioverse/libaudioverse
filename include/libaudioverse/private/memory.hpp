@@ -27,7 +27,7 @@ class Simulation;
 
 extern std::map<void*, std::shared_ptr<void>> *external_ptrs;
 extern std::map<int, std::shared_ptr<ExternalObject>> *external_handles;
-extern std::mutex *memory_lock;
+extern std::recursive_mutex *memory_lock;
 //max handle we've used for an outgoing object. Ensures no duplication.
 extern std::atomic<int> *max_handle;
 
@@ -43,14 +43,14 @@ class ExternalObject: public std::enable_shared_from_this<ExternalObject>  {
 
 template <class t>
 std::shared_ptr<t> incomingPointer(void* ptr) {
-	auto guard = std::lock_guard<std::mutex>(*memory_lock);
+	auto guard = std::lock_guard<std::recursive_mutex>(*memory_lock);
 	if(external_ptrs->count(ptr) == 0) return ERROR(Lav_ERROR_INVALID_POINTER, "Pointer did not originate from Libaudioverse or was deleted.");
 	return std::static_pointer_cast<t, void>(external_ptrs->at(ptr));
 }
 
 template <class t>
 t* outgoingPointer(std::shared_ptr<t> ptr) {
-	auto guard = std::lock_guard<std::mutex>(*memory_lock);
+	auto guard = std::lock_guard<std::recursive_mutex>(*memory_lock);
 	t* out = ptr.get();
 	if(out == nullptr) return nullptr;
 	if(external_ptrs->count(out) == 1) return out;
@@ -63,7 +63,7 @@ int outgoingObject(std::shared_ptr<t> what) {
 	//null is a special case for which we pass out 0.
 	if(what == nullptr) return 0;
 	if(what->isExternalObject == false) {
-		auto guard=std::lock_guard<std::mutex>(*memory_lock);
+		auto guard=std::lock_guard<std::recursive_mutex>(*memory_lock);
 		what->isExternalObject =true;
 		what->isFirstExternalAccess = true;
 		what->refcount.fetch_add(1);
@@ -75,7 +75,7 @@ int outgoingObject(std::shared_ptr<t> what) {
 template<class t>
 std::shared_ptr<t> incomingObject(int handle, bool allowNull =false) {
 	if(allowNull&& handle==0) return nullptr;
-	auto guard=std::lock_guard<std::mutex>(*memory_lock);
+	auto guard=std::lock_guard<std::recursive_mutex>(*memory_lock);
 	if(external_handles->count(handle)) {
 		auto res=std::dynamic_pointer_cast<t>(external_handles->at(handle));
 		if(res == nullptr) ERROR(Lav_ERROR_TYPE_MISMATCH, "Incoming pointer did not match requested type.");

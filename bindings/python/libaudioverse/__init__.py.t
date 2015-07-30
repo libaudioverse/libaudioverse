@@ -59,6 +59,11 @@ def _resurrect(handle):
 def _handle_destroyed(handle):
 	with _object_states_lock:
 		if handle in _object_states:
+			#If we gc here and the user is using the simulation as a context manager, then
+			#We block until they finish.
+			#If they do anything that needs the lock we're holding, lock inversion.
+			#This variable holds the dict until after the function ends.
+			ensure_gc_later = _object_states[handle]
 			del _object_states[handle]
 
 _handle_destroyed_callback=_libaudioverse.LavHandleDestroyedCallback(_handle_destroyed)

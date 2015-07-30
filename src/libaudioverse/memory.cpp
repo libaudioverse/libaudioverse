@@ -20,13 +20,13 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 namespace libaudioverse_implementation {
 
 std::map<void*, std::shared_ptr<void>> *external_ptrs = nullptr;
-std::mutex *memory_lock = nullptr;
+std::recursive_mutex *memory_lock = nullptr;
 std::map<int, std::shared_ptr<ExternalObject>> *external_handles = nullptr;
 std::atomic<int> *max_handle = nullptr;
 LavHandleDestroyedCallback handle_destroyed_callback = nullptr;
 
 void initializeMemoryModule() {
-	memory_lock=new std::mutex();
+	memory_lock=new std::recursive_mutex();
 	max_handle = new std::atomic<int>();
 	max_handle->store(1);
 	external_ptrs= new std::map<void*, std::shared_ptr<void>>();
@@ -94,7 +94,7 @@ std::function<void(ExternalObject*)> ObjectDeleter(std::shared_ptr<Simulation> s
 
 Lav_PUBLIC_FUNCTION LavError Lav_free(void* ptr) {
 	PUB_BEGIN
-	auto guard = std::lock_guard<std::mutex>(*memory_lock);
+	auto guard = std::lock_guard<std::recursive_mutex>(*memory_lock);
 	if(external_ptrs->count(ptr)) external_ptrs->erase(ptr);
 	else ERROR(Lav_ERROR_INVALID_HANDLE);
 	PUB_END
@@ -110,10 +110,10 @@ Lav_PUBLIC_FUNCTION LavError Lav_handleIncRef(LavHandle handle) {
 Lav_PUBLIC_FUNCTION LavError Lav_handleDecRef(LavHandle handle) {
 	PUB_BEGIN
 	auto e = incomingObject<ExternalObject>(handle);
-	e->refcount.fetch_add(-1);
-	int rc = e->refcount.load();
+	auto rc = e->refcount.fetch_add(-1);
+	rc-=1;
 	if(rc == 0) {
-		auto guard=std::lock_guard<std::mutex>(*memory_lock);
+		auto guard=std::lock_guard<std::recursive_mutex>(*memory_lock);
 		external_handles->erase(e->externalObjectHandle);
 	}
 	PUB_END
