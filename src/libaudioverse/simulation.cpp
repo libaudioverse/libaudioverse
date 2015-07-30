@@ -12,6 +12,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/data.hpp>
 #include <libaudioverse/private/file.hpp>
 #include <libaudioverse/private/planner.hpp>
+#include <libaudioverse/private/logging.hpp>
 #include <powercores/utilities.hpp>
 #include <audio_io/audio_io.hpp>
 #include <stdlib.h>
@@ -33,6 +34,15 @@ Simulation::Simulation(unsigned int sr, unsigned int blockSize, unsigned int mix
 	//fire up the background thread.
 	backgroundTaskThread = powercores::safeStartThread(&Simulation::backgroundTaskThreadFunction, this);
 	planner = new Planner();
+	//Get thread count.
+	int defaultThreadCount = std::thread::hardware_concurrency();
+	if(defaultThreadCount == 0) {
+		log(Lav_LOG_LEVEL_INFO, "Simulation: threading implementation does not support querying hardware concurrency.");
+		defaultThreadCount = 1;
+	}
+	if(defaultThreadCount > 1) log(Lav_LOG_LEVEL_INFO, "Simulation: enabling concurrency with %i threads.", defaultThreadCount);
+	else log(Lav_LOG_LEVEL_INFO, "Simulation: not enabling concurrency.  CPU only supports one thread.");
+	setThreads(defaultThreadCount);
 	start();
 }
 
