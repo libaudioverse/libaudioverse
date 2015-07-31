@@ -94,7 +94,7 @@ std::function<void(ExternalObject*)> ObjectDeleter(std::shared_ptr<Simulation> s
 
 Lav_PUBLIC_FUNCTION LavError Lav_free(void* ptr) {
 	PUB_BEGIN
-	auto guard = std::lock_guard<std::recursive_mutex>(*memory_lock);
+	std::lock_guard<std::recursive_mutex> guard(*memory_lock);
 	if(external_ptrs->count(ptr)) external_ptrs->erase(ptr);
 	else ERROR(Lav_ERROR_INVALID_HANDLE);
 	PUB_END
@@ -113,7 +113,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_handleDecRef(LavHandle handle) {
 	auto rc = e->refcount.fetch_add(-1);
 	rc-=1;
 	if(rc == 0) {
-		auto guard=std::lock_guard<std::recursive_mutex>(*memory_lock);
+		std::lock_guard<std::recursive_mutex> guard(*memory_lock);
 		external_handles->erase(e->externalObjectHandle);
 	}
 	PUB_END

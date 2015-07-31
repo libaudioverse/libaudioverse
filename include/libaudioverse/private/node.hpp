@@ -20,7 +20,7 @@ class Property;
 //Needed to make comparing property backrefs sane.
 class PropertyBackrefComparer {
 	public:
-	bool operator() (const std::tuple<std::weak_ptr<Node>, int> &a, const std::tuple<std::weak_ptr<Node>, int> &b);
+	bool operator() (const std::tuple<std::weak_ptr<Node>, int> &a, const std::tuple<std::weak_ptr<Node>, int> &b) const;
 };
 
 

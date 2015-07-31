@@ -45,7 +45,7 @@ bool doesEdgePreserveAcyclicity(std::shared_ptr<Job> start, std::shared_ptr<Job>
 }
 
 //For property backrefs.
-bool PropertyBackrefComparer::operator() (const std::tuple<std::weak_ptr<Node>, int> &a, const std::tuple<std::weak_ptr<Node>, int> &b) {
+bool PropertyBackrefComparer::operator() (const std::tuple<std::weak_ptr<Node>, int> &a, const std::tuple<std::weak_ptr<Node>, int> &b) const {
 	auto &aw = std::get<0>(a);
 	auto &bw = std::get<0>(b);
 	if(aw.owner_before(bw)) return true;
@@ -83,10 +83,10 @@ Node::Node(int type, std::shared_ptr<Simulation> simulation, unsigned int numInp
 
 Node::~Node() {
 	for(auto i: output_buffers) {
-		freeArray(i);
+		if(i) freeArray(i);
 	}
 	for(auto i: input_buffers) {
-		freeArray(i);
+		if(i) freeArray(i);
 	}
 	simulation->invalidatePlan();
 }
@@ -338,13 +338,14 @@ void Node::reset() {
 //protected resize function.
 void Node::resize(int newInputCount, int newOutputCount) {
 	int oldInputCount = input_buffers.size();
-	for(int i = oldInputCount-1; i >= newInputCount; i--) freeArray(input_buffers[i]);
+	for(int i = oldInputCount-1; i >= newInputCount; i--) if(input_buffers[i]) freeArray(input_buffers[i]);
 	input_buffers.resize(newInputCount, nullptr);
 	for(int i = oldInputCount; i < newInputCount; i++) input_buffers[i] = allocArray<float>(simulation->getBlockSize());
 
 	int oldOutputCount = output_buffers.size();
 	if(newOutputCount < oldOutputCount) { //we need to free some arrays.
 		for(auto i = newOutputCount; i < oldOutputCount; i++) {
+			if(output_buffers[i])
 			freeArray(output_buffers[i]);
 		}
 	}
