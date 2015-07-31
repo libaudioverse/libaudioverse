@@ -436,7 +436,7 @@ float** SubgraphNode::getOutputBufferArray() {
 //Our only dependency is our output node, if set.
 void SubgraphNode::visitDependenciesUnconditional(std::function<void(std::shared_ptr<Job>&)> &pred) {
 	auto j = std::static_pointer_cast<Job>(subgraph_output);
-	pred(j);
+	if(j) pred(j);
 }
 
 //This override is needed because nodes try to add their inputs, but we override where input connections come from.
