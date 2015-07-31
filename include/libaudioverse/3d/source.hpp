@@ -21,6 +21,7 @@ class SourceNode: public SubgraphNode {
 	void forwardProperties();
 	void visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) override;
 	private:
+	bool culled = false;
 	std::shared_ptr<Node> panner_node, input;
 	std::shared_ptr<EnvironmentNode> environment;
 };

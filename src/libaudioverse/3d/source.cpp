@@ -98,6 +98,18 @@ void SourceNode::update(EnvironmentInfo &env) {
 	panner_node->getProperty(Lav_PANNER_ELEVATION).setFloatValue(elevation);
 	panner_node->getProperty(Lav_PANNER_DISTANCE).setFloatValue(distance);
 	panner_node ->getProperty(Lav_NODE_MUL).setFloatValue(gain);
+	
+	//If we're beyond the max distance and not culled:
+	if(culled == false && distance >= maxDistance) {
+		panner_node->getProperty(Lav_NODE_STATE).setIntValue(Lav_NODESTATE_PAUSED);
+		input->getProperty(Lav_NODE_STATE).setIntValue(Lav_NODESTATE_ALWAYS_PLAYING);
+		culled = true;
+	}
+	else if(distance < maxDistance) {
+		culled = false;
+		input->getProperty(Lav_NODE_STATE).setIntValue(Lav_NODESTATE_PLAYING);
+		panner_node->getProperty(Lav_NODE_STATE).setIntValue(Lav_NODESTATE_PLAYING);
+	}
 }
 
 void SourceNode::visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) {
