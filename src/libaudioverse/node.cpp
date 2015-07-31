@@ -34,13 +34,16 @@ bool doesEdgePreserveAcyclicity(std::shared_ptr<Job> start, std::shared_ptr<Job>
 	//so there's a cycle if end is already behind start.
 	//We check by walking all dependencies of start looking for end.
 	//This is slow, in that it visits extra nodes on a cycle; but if there is no cycle, we visit everything anyway.
+	//We go via visitDependenciesUnconditional to avoid the state check;
+	//this unfortunately involves casting.
 	std::function<void(std::shared_ptr<Job>&)> f ;
 	bool cycled = false;
 	f = [&] (std::shared_ptr<Job> &j) {
+		auto n = std::dynamic_pointer_cast<Node>(j);
 		if(j == end) cycled = true;
-		else if(cycled == false) j->visitDependencies(f);
+		else if(cycled == false && n) n->visitDependenciesUnconditional(f);
 	};
-	start->visitDependencies(f);
+	std::dynamic_pointer_cast<Node>(start)->visitDependencies(f);
 	return cycled == false;
 }
 
@@ -364,7 +367,18 @@ void Node::resize(int newInputCount, int newOutputCount) {
 }
 
 void Node::visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) {
-	if(getState() == Lav_NODESTATE_PAUSED) return;
+	if(getState() != Lav_NODESTATE_PAUSED) visitDependenciesUnconditional(pred);
+}
+
+void Node::willExecuteDependencies() {
+	willProcessParents();
+}
+
+void Node::execute() {
+	tick();
+}
+
+void Node::visitDependenciesUnconditional(std::function<void(std::shared_ptr<Job>&)> &pred) {
 	for(int i = 0; i < getInputConnectionCount(); i++) {
 		auto conn = getInputConnection(i)->getConnectedNodes();
 		for(auto &p: conn) {
@@ -381,15 +395,7 @@ void Node::visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) {
 				pred(j);
 			}
 		}
-	}
-}
-
-void Node::willExecuteDependencies() {
-	willProcessParents();
-}
-
-void Node::execute() {
-	tick();
+	}	
 }
 
 //LavSubgraphNode
@@ -428,11 +434,9 @@ float** SubgraphNode::getOutputBufferArray() {
 }
 
 //Our only dependency is our output node, if set.
-void SubgraphNode::visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) {
-	if(subgraph_output && getState() != Lav_NODESTATE_PAUSED) {
-		auto j = std::static_pointer_cast<Job>(subgraph_output);
-		pred(j);
-	}
+void SubgraphNode::visitDependenciesUnconditional(std::function<void(std::shared_ptr<Job>&)> &pred) {
+	auto j = std::static_pointer_cast<Job>(subgraph_output);
+	pred(j);
 }
 
 //This override is needed because nodes try to add their inputs, but we override where input connections come from.

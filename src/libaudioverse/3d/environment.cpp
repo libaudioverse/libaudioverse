@@ -107,8 +107,8 @@ void EnvironmentNode::willTick() {
 	}
 }
 
-void EnvironmentNode::visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) {
-	SubgraphNode::visitDependencies(pred);
+void EnvironmentNode::visitDependenciesUnconditional(std::function<void(std::shared_ptr<Job>&)> &pred) {
+	SubgraphNode::visitDependenciesUnconditional(pred);
 	//Other dependencies: all our sources.
 	for(auto w: sources) {
 		auto n = w.lock();

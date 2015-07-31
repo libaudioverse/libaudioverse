@@ -114,6 +114,11 @@ class Node: public ExternalObject, public Job {
 	virtual void willExecuteDependencies();
 	virtual void execute();
 
+	//This is the actual implementation of visitDependencies.
+	//visitDependencies will only call this function if the state is unpaused.
+	//This exists for cycle detection.
+	virtual void visitDependenciesUnconditional(std::function<void(std::shared_ptr<Job>&)> &pred);
+	
 	protected:
 	std::shared_ptr<Simulation> simulation = nullptr;
 	std::map<int, Property> properties;
@@ -157,7 +162,7 @@ class SubgraphNode: public Node {
 	float** getOutputBufferArray() override;
 
 	//Our dependency is our single output node.
-	void visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) override;
+	void visitDependenciesUnconditional(std::function<void(std::shared_ptr<Job>&)> &pred) override;
 
 	//Override tick because we can't try to use connections.
 	//We don't have proper input buffers, default tick will override who knows what.

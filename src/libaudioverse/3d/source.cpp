@@ -112,8 +112,8 @@ void SourceNode::update(EnvironmentInfo &env) {
 	}
 }
 
-void SourceNode::visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) {
-	SubgraphNode::visitDependencies(pred);
+void SourceNode::visitDependenciesUnconditional(std::function<void(std::shared_ptr<Job>&)> &pred) {
+	SubgraphNode::visitDependenciesUnconditional(pred);
 	auto j = std::static_pointer_cast<Job>(panner_node);
 	pred(j);
 }
