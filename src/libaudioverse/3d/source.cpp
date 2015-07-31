@@ -105,7 +105,7 @@ void SourceNode::update(EnvironmentInfo &env) {
 		input->getProperty(Lav_NODE_STATE).setIntValue(Lav_NODESTATE_ALWAYS_PLAYING);
 		culled = true;
 	}
-	else if(distance < maxDistance) {
+	else if(distance < maxDistance && culled) {
 		culled = false;
 		input->getProperty(Lav_NODE_STATE).setIntValue(Lav_NODESTATE_PLAYING);
 		panner_node->getProperty(Lav_NODE_STATE).setIntValue(Lav_NODESTATE_PLAYING);
