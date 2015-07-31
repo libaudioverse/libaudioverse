@@ -77,8 +77,9 @@ void main(int argc, char** args) {
 		LavHandle sim;
 		ERRCHECK(Lav_createSimulation(SR, BLOCK_SIZE, &sim));
 		ERRCHECK(Lav_simulationSetThreads(sim, threads));
-		//We need to account for threads here, as some nodes only execute once.
-		int times=std::get<1>(info)*threads;
+		int times=std::get<1>(info);
+		//If it's not at least threads, make it threads.
+		if(times < threads) times = threads;
 		auto handles=std::get<2>(info)(sim, times);
 		for(auto h: handles) {
 			ERRCHECK(Lav_nodeSetIntProperty(h, Lav_NODE_STATE, Lav_NODESTATE_ALWAYS_PLAYING));
