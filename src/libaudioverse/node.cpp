@@ -364,6 +364,7 @@ void Node::resize(int newInputCount, int newOutputCount) {
 }
 
 void Node::visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) {
+	if(getState() == Lav_NODESTATE_PAUSED) return;
 	for(int i = 0; i < getInputConnectionCount(); i++) {
 		auto conn = getInputConnection(i)->getConnectedNodes();
 		for(auto &p: conn) {
@@ -428,7 +429,7 @@ float** SubgraphNode::getOutputBufferArray() {
 
 //Our only dependency is our output node, if set.
 void SubgraphNode::visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) {
-	if(subgraph_output) {
+	if(subgraph_output && getState() != Lav_NODESTATE_PAUSED) {
 		auto j = std::static_pointer_cast<Job>(subgraph_output);
 		pred(j);
 	}
@@ -439,7 +440,10 @@ void SubgraphNode::visitDependencies(std::function<void(std::shared_ptr<Job>&)> 
 void SubgraphNode::tick() {
 	last_processed = simulation->getTickCount();
 	//Zeroing the output buffers will silence our output.
-	if(getState() == Lav_NODESTATE_PAUSED) return; //nothing to do, for we are paused.
+	if(getState() == Lav_NODESTATE_PAUSED) {
+		zeroOutputBuffers();
+		return;
+	}
 	tickProperties();
 	zeroInputBuffers();
 	is_processing = true;
