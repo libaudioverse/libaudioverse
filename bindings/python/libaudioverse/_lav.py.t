@@ -26,7 +26,7 @@ def make_error_from_code(err):
 class _HandleBox(object):
 
 	def __init__(self, handle):
-		self.handle=handle
+		self.handle= int(handle)
 		first_access= _libaudioverse.LavHandle()
 		_libaudioverse.Lav_handleGetAndClearFirstAccess(handle, ctypes.byref(first_access))
 		if not first_access:
@@ -41,7 +41,7 @@ class _HandleBox(object):
 		return self.handle < other.handle
 
 	def __hash__(self):
-		return self.handle.__hash__()
+		return self.handle
 
 	def __del__(self):
 		#Guard against interpreter shutdown.

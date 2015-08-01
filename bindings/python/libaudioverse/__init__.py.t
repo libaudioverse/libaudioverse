@@ -205,7 +205,8 @@ class _HandleComparer(object):
 		return self.handle < other.handle
 
 	def __hash__(self):
-		return self.handle.__hash__()
+		#We need to return the handle itself.  The box could be unique.
+		return self.handle.handle
 
 class Simulation(_HandleComparer):
 	"""Represents a running simulation.  All libaudioverse nodes must be passed a simulation at creation time and cannot migrate between them.  Furthermore, it is an error to try to connect objects from different simulations.
@@ -569,6 +570,7 @@ class FloatArrayProperty(ArrayProperty):
 			length = _lav.node_get_float_array_property_length
 		)
 
+
 #This is the class hierarchy.
 #GenericNode is at the bottom, and we should never see one; and GenericObject should hold most implementation.
 class GenericNode(_HandleComparer):
@@ -591,7 +593,7 @@ class GenericNode(_HandleComparer):
 				self._state['callbacks'] = dict()
 				self._state['input_connection_count'] =_lav.node_get_input_connection_count(self)
 				self._state['output_connection_count'] = _lav.node_get_output_connection_count(self)
-				self._state['inputs'] =set()
+				self._state['inputs'] =collections.defaultdict(set)
 				self._state['outputs'] = collections.defaultdict(set)
 				#Holds (slot, other) tuples for disconnection logic with properties.
 				self._state['outputs_properties'] = collections.defaultdict(set)
@@ -634,8 +636,8 @@ class GenericNode(_HandleComparer):
 		So long as some node which this node is connected to is alive, this node will also be alive."""
 		with self._lock:
 			_lav.node_connect(self, output, node, input)
-			self._state['outputs'][output].add((output, weakref.ref(self)))
-			node._state['inputs'].add((output, self))
+			self._state['outputs'][output].add((input, weakref.ref(node)))
+			node._state['inputs'][input].add((output, self))
 
 	def connect_simulation(self, output):
 		"""Connect the specified output of this node to  this node's simulation.
@@ -643,7 +645,7 @@ class GenericNode(_HandleComparer):
 		Nodes which are connected to the simulation are kept alive as long as they are connected to the simulation."""
 		with self._lock:
 			_lav.node_connect_simulation(self, output)
-			self._state['simulation']._state['inputs'].add(self)
+			self._state['simulation']._state['inputs'].add((output, self))
 
 	def connect_property(self, output, property):
 		"""Connect an output of this node to an automatable property.
@@ -664,16 +666,19 @@ class GenericNode(_HandleComparer):
 			_lav.node_disconnect(self, output)
 			for i in self._state['outputs'][output]:
 				input, weak =i
-				obj=weak()
-				if obj is not None and (output, self) in obj._state['inputs']:
-					obj._state['inputs'].remove((output, self))
+				other = weak()
+				if not other:
+					continue
+				other_input = other._state['inputs'][input]
+				if (output, self) in other_input:
+					other_input.remove((output, self))
 			for i in self._state['outputs_properties'][output]:
 				slot, weak = i
 				obj = weak()
 				if obj is not None and (output, self) in obj._state['inputs_properties']:
 					obj._state['inputs_properties'].remove((output, self))
-			if self in self._state['simulation']._state['inputs']:
-				self._state['simulation']._state['inputs'].remove(self)
+			if (output, self) in self._state['simulation']._state['inputs']:
+				self._state['simulation']._state['inputs'].remove((output, self))
 
 {%for enumerant, prop in metadata['nodes']['Lav_OBJTYPE_GENERIC_NODE']['properties'].iteritems()%}
 {{macros.implement_property(enumerant, prop)}}
