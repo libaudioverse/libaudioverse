@@ -69,9 +69,6 @@ def _handle_destroyed(handle):
 _handle_destroyed_callback=_libaudioverse.LavHandleDestroyedCallback(_handle_destroyed)
 _libaudioverse.Lav_setHandleDestroyedCallback(_handle_destroyed_callback)
 
-#this makes sure that callback objects do not die.
-_global_events= collections.defaultdict(set)
-
 #build and register all the error classes.
 class GenericError(Exception):
 	"""Base for all libaudioverse errors."""

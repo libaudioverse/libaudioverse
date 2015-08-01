@@ -40,5 +40,4 @@
 		cb, extra_args = val_tuple
 		event_obj = _EventCallbackWrapper(self, {{index}}, cb, extra_args)
 		self._state['events'][{{index}}] = event_obj
-		_global_events[self.handle.handle].add(event_obj)
 {%endmacro%}
