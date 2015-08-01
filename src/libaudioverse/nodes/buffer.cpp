@@ -29,6 +29,9 @@ class BufferNode: public Node {
 	int frame = 0;
 	int buffer_length=0;
 	double offset=0.0;
+	//Used to not fire the end event every block for which we're ended.
+	//This is on by default because we don't by default have a buffer.
+	bool ended = true;
 };
 
 BufferNode::BufferNode(std::shared_ptr<Simulation> simulation): Node(Lav_OBJTYPE_BUFFER_NODE, simulation, 0, 1) {
@@ -50,6 +53,7 @@ void BufferNode::bufferChanged() {
 	if(buff==nullptr) {
 		resize(0, 1);
 		getOutputConnection(0)->reconfigure(0, 1);
+		ended = true; //No buffer, let'ss not spam.
 	}
 	else {
 		newChannels = buff->getChannels() > 0 ? buff->getChannels() : 1;
@@ -57,6 +61,7 @@ void BufferNode::bufferChanged() {
 		getOutputConnection(0)->reconfigure(0, newChannels);
 		maxPosition =buff->getDuration();
 		newBufferLength=buff->getLength();
+		ended = false; //We have a buffer, we've moved position, let's fire again.
 	}
 	getProperty(Lav_BUFFER_POSITION).setDoubleValue(0.0); //the callback handles changing everything else.
 	getProperty(Lav_BUFFER_POSITION).setDoubleRange(0.0, maxPosition);
@@ -66,6 +71,7 @@ void BufferNode::bufferChanged() {
 void BufferNode::positionChanged() {
 	frame = (int)(getProperty(Lav_BUFFER_POSITION).getDoubleValue()*simulation->getSr());
 	offset = 0.0;
+	ended = false; //If you touch the position property, we consider it to not be ended anymore.
 }
 
 void BufferNode::process() {
@@ -78,9 +84,13 @@ void BufferNode::process() {
 	//We do the looping check first so we can break out if we have issues.
 	for(int i =0; i < block_size; i++) {
 		if(frame >= buffer_length) { //past end.
-			getEvent(Lav_BUFFER_END_EVENT).fire();
-			if(isLooping == false) break;
+			if(ended == false) getEvent(Lav_BUFFER_END_EVENT).fire();
+			if(isLooping == false) {
+				ended = true;
+				break;
+			}
 			frame= 0;
+			ended = false; //We looped.
 		}
 		for(int chan =0; chan < num_output_buffers; chan++) {
 			//We always have as many samples as output channels.
