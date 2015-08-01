@@ -15,7 +15,7 @@ ENDIF()
 #sets up compiler flags for things: sse, vc++ silencing, etc.
 include("cmake_include/compiler_flags.txt")
 
-#include("vendoring/openalsoft.txt")
+#Libraries we vendor.
 include("vendoring/libsndfile.txt")
 include("vendoring/glm.txt")
 include("vendoring/kissfft.txt")
