@@ -10,3 +10,6 @@
 [submodule "audio_io"]
 	path = audio_io
 	url = http://github.com/camlorn/audio_io.git
+[submodule "speex_resampler_cpp"]
+	path = speex_resampler_cpp
+	url = https://github.com/camlorn/speex_resampler_cpp.git
