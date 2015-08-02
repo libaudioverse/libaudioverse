@@ -30,7 +30,6 @@ Simulation::Simulation(unsigned int sr, unsigned int blockSize, unsigned int mix
 	this->sr = (float)sr;
 	this->block_size = blockSize;
 	this->mixahead = mixahead;
-	registerDefaultMixingMatrices();
 	//fire up the background thread.
 	backgroundTaskThread = powercores::safeStartThread(&Simulation::backgroundTaskThreadFunction, this);
 	planner = new Planner();
@@ -149,35 +148,6 @@ LavError Simulation::associateNode(std::shared_ptr<Node> node) {
 
 void Simulation::enqueueTask(std::function<void(void)> cb) {
 	tasks.enqueue(cb);
-}
-
-void Simulation::registerMixingMatrix(unsigned int inChannels, unsigned int outChannels, float* matrix) {
-	mixing_matrices[std::tuple<unsigned int, unsigned int>(inChannels, outChannels)] = matrix;
-	if(inChannels > largest_seen_mixing_matrix_input) {
-		if(mixing_matrix_workspace) delete[] mixing_matrix_workspace;
-		mixing_matrix_workspace = new float[block_size*inChannels]();
-		largest_seen_mixing_matrix_input = inChannels;
-	}
-}
-
-void Simulation::resetMixingMatrix(unsigned int  inChannels, unsigned int outChannels) {
-	for(MixingMatrixInfo* i = mixing_matrix_list; i->pointer; i++) {
-		if(i->in_channels == inChannels && i->out_channels == outChannels) {
-			mixing_matrices[std::tuple<unsigned int, unsigned int>(inChannels, outChannels)] = i->pointer;
-			return;
-		}
-	}
-	if(mixing_matrices.count(std::tuple<unsigned int, unsigned int>(inChannels, outChannels)) != 0) mixing_matrices.erase(std::tuple<unsigned int, unsigned int>(inChannels, outChannels));
-}
-
-void Simulation::registerDefaultMixingMatrices() {
-	for(MixingMatrixInfo* i = mixing_matrix_list; i->pointer; i++) registerMixingMatrix(i->in_channels, i->out_channels, i->pointer);
-}
-
-const float* Simulation::getMixingMatrix(unsigned int inChannels, unsigned int outChannels) {
-	std::tuple<unsigned int, unsigned int> key(inChannels, outChannels);
-	if(mixing_matrices.count(key) != 0) return mixing_matrices[key];
-	else return nullptr;
 }
 
 //Default callback implementation.

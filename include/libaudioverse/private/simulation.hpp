@@ -56,13 +56,6 @@ class Simulation: public ExternalObject, public Job {
 
 	//Tasks that need to run in the background.
 	void enqueueTask(std::function<void(void)>);
-
-	//register a mixing matrix with this device.
-	void registerMixingMatrix(unsigned int inChannels, unsigned int outChannels, float* matrix);
-	void resetMixingMatrix(unsigned int inChannels, unsigned int outChannels);
-	void registerDefaultMixingMatrices();
-	const float* getMixingMatrix(unsigned int inChannels, unsigned int outChannels);
-
 	//Set the block callback.
 	void setBlockCallback(LavBlockCallback cb, void* userdata);
 
@@ -96,11 +89,6 @@ class Simulation: public ExternalObject, public Job {
 	//our output, if any.
 	std::shared_ptr<audio_io::OutputDevice> output_device = nullptr;
 
-	//the registered mixing matrices for this simulation.
-	std::map<std::tuple<unsigned int, unsigned int>, float*> mixing_matrices;
-	unsigned int largest_seen_mixing_matrix_input = 0;
-	//used to apply mixing matrices when downmixing.
-	float* mixing_matrix_workspace = nullptr;
 	int tick_count = 0; //counts ticks.  This is part of node processing.
 	int maintenance_start = 0; //also part of node processing. Used to stagger calls to doMaintenance on nodes so that we're not randomly spiking the tick length.
 	int maintenance_rate = 5; //call on every 5th object.

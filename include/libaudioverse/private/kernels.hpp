@@ -47,11 +47,6 @@ void amplitudePanKernel(float azimuth, float elevation, unsigned int inputLength
 This is slow and inefficient.  Frequent calls will cause heap fragmentation.  This is as high quality as possible. Intended use is one-off data that must be converted.*/
 void staticResamplerKernel(int inputSr, int outputSr, int channels, int frames, float* data, int *framesOut, float** dataOut);
 
-/*Apply a mixing matrix.
-The matrix rows represent output channels and the columns input channels.
-The result is that each output buffer is the sum of the input buffers multiplied by the scalars in the matrix row representing it.*/
-void applyMixingMatrix(int sampleCount, int inputChannels, float** inputs, int outputChannels, float** outputs, const float* mixingMatrix);
-
 /**Dot two vectors.*/
 float dotKernel(int length, const float* v1, const float* v2);
 }

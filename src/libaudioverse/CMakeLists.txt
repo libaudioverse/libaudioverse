@@ -66,7 +66,6 @@ dsp/complex.cpp
 kernels/convolution.cpp
 kernels/resamplers.cpp
 kernels/interleaving.cpp
-kernels/mixing_matrix.cpp
 kernels/adding.cpp
 kernels/multiplying.cpp
 kernels/dot.cpp
@@ -126,7 +125,6 @@ audio_output.cpp
 
 #c files containing embedded tables and data that don't change.
 #The hrtf is generated above.
-data/mixing_matrices.cpp
 data/default_hrtf.cpp
 )
 TARGET_LINK_LIBRARIES(libaudioverse ${libaudioverse_required_libraries})
