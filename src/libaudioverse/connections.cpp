@@ -13,6 +13,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/metadata.hpp>
 #include <libaudioverse/private/kernels.hpp>
+#include <audio_io/audio_io.hpp>
 #include <algorithm>
 #include <memory>
 #include <stdlib.h>
@@ -33,9 +34,9 @@ void OutputConnection::add(int inputBufferCount, float** inputBuffers, bool shou
 	//get the array of outputs from our node.
 	float** outputArray=node->getOutputBufferArray();
 	//it is the responsibility of our node to keep us configured, so we assume what info we have is accurate. If it is not, that is the fault of our node.
-	const float* mixingMatrix= simulation->getMixingMatrix(count, inputBufferCount); //mixing from our outputs to their inputs.
-	if(shouldApplyMixingMatrix && mixingMatrix) {
-		applyMixingMatrix(simulation->getBlockSize(), count, outputArray+start, inputBufferCount, inputBuffers, mixingMatrix);
+	if(shouldApplyMixingMatrix) {
+		//Remix, but don't zero first.
+		audio_io::remixAudioUninterleaved(simulation->getBlockSize(), count, outputArray+start, inputBufferCount, inputBuffers, false);
 	}
 	else { //copy and drop.
 		int channelsToAdd =std::min(count, inputBufferCount);
