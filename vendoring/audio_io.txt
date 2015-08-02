@@ -1,3 +1,5 @@
 set(AUDIO_IO_BUILD_TESTS OFF CACHE BOOL "Whether to build tests from audio_io")
+set(AUDIO_IO_HANDLED_DEPENDENCIES ON CACHE BOOL "We handle audio_io's dependencies.")
+
 include_directories("${CMAKE_SOURCE_DIR}/audio_io/include")
 add_subdirectory("audio_io")
