@@ -4,7 +4,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/libaudioverse.h>
 
 #include <libaudioverse/private/simulation.hpp>
-#include <libaudioverse/private/resampler.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/error.hpp>

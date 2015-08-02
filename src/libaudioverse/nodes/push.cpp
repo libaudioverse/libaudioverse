@@ -4,12 +4,12 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/private/simulation.hpp>
-#include <libaudioverse/private/resampler.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/kernels.hpp>
+#include <speex_resampler_cpp.hpp>
 #include <limits>
 #include <memory>
 #include <algorithm>
@@ -25,7 +25,7 @@ class PushNode: public Node {
 	void process();
 	void feed(unsigned int length, float* buffer);
 	unsigned int input_sr = 0;
-	std::shared_ptr<Resampler> resampler = nullptr;
+	std::shared_ptr<speex_resampler_cpp::Resampler> resampler = nullptr;
 	float* workspace = nullptr;
 	//the push_* variables are for the public api to feed us.
 	float* push_buffer = nullptr;
@@ -38,7 +38,7 @@ class PushNode: public Node {
 PushNode::PushNode(std::shared_ptr<Simulation> sim, unsigned int inputSr, unsigned int channels): Node(Lav_OBJTYPE_PUSH_NODE, sim, 0, channels) {
 	if(channels == 0) ERROR(Lav_ERROR_RANGE, "Channels must be greater than 0.");
 	input_sr = inputSr;
-	resampler = std::make_shared<Resampler>(push_frames, channels, inputSr, (int)sim->getSr());
+	resampler = speex_resampler_cpp::createResampler(push_frames, channels, inputSr, (int)sim->getSr());
 	this->push_channels = channels;
 	workspace = allocArray<float>(push_channels*simulation->getBlockSize());
 	push_buffer = allocArray<float>(push_frames*channels);

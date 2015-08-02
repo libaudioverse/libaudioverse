@@ -4,12 +4,12 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/private/simulation.hpp>
-#include <libaudioverse/private/resampler.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/kernels.hpp>
+#include <speex_resampler_cpp.hpp>
 #include <limits>
 #include <memory>
 #include <algorithm>
@@ -24,7 +24,7 @@ class PullNode: public Node {
 	~PullNode();
 	void process();
 	unsigned int input_sr = 0, channels = 0;
-	std::shared_ptr<Resampler> resampler = nullptr;
+	std::shared_ptr<speex_resampler_cpp::Resampler> resampler = nullptr;
 	float* incoming_buffer = nullptr, *resampled_buffer = nullptr;
 	LavPullNodeAudioCallback callback = nullptr;
 	void* callback_userdata = nullptr;
@@ -33,7 +33,7 @@ class PullNode: public Node {
 PullNode::PullNode(std::shared_ptr<Simulation> sim, unsigned int inputSr, unsigned int channels): Node(Lav_OBJTYPE_PULL_NODE, sim, 0, channels) {
 	this->channels = channels;
 	input_sr = inputSr;
-	resampler = std::make_shared<Resampler>(sim->getBlockSize(), channels, inputSr, (int)sim->getSr());
+	resampler = speex_resampler_cpp::createResampler(sim->getBlockSize(), channels, inputSr, (int)sim->getSr());
 	this->channels = channels;
 	incoming_buffer = allocArray<float>(channels*simulation->getBlockSize());
 	resampled_buffer = allocArray<float>(channels*sim->getBlockSize());

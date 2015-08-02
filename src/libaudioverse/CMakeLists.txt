@@ -27,8 +27,6 @@ DEPENDS "${CMAKE_SOURCE_DIR}/scripts/convert_to_cpp_file.py"
 "${CMAKE_CURRENT_BINARY_DIR}/default_hrtf.hrtf"
 )
 
-add_definitions(-DOUTSIDE_SPEEX -DRANDOM_PREFIX=LIBAUDIOVERSE_SPEEX -DFLOATING_POINT)
-
 #We must marke metadata.cpp as generated.
 set_property(SOURCE "${CMAKE_CURRENT_BINARY_DIR}/metadata.cpp" PROPERTY GENERATED TRUE)
 
@@ -46,11 +44,7 @@ simulation.cpp
 logging.cpp
 planner.cpp
 error.cpp
-
-#Speex resampler.
-speex_resample.c
 hrtf.cpp
-resampler.cpp
 
 file_io/file_reader.cpp
 file_io/file_writer.cpp
