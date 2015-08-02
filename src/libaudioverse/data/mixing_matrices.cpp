@@ -17,8 +17,9 @@ Order: mixing_matrix_1_n for all n, mixing_matrix_2_n for all n...we exclude n=m
 Note: this file exists so that we can do something reasonable when the output object is not the device format.  For most apps, this will not trigger.  It is expected that the user will be asked or the backend will provide the info.
 It is not inconceivable that this will be useful for testing, and those apps which make the request will still need reasonable audio until they have input from the user.
 
-Note 2: This file will need revision as practical examples of these configurations are found in the wild.*/
+Note 2: This file will need revision as practical examples of these configurations are found in the wild.
 
+The matrices here are based on the WebAudio spec, save for those to do with 7.1 surround sound for which no specification is given.*/
 
 //this is the registry. The matrices are below.
 MixingMatrixInfo mixing_matrix_list[] = {
@@ -43,25 +44,27 @@ float mixing_matrix_1_2[] = {
 };
 
 //fl, fr, fc, lfe, bl, br
+//Send mono to center channel only.
 float mixing_matrix_1_6[] = {
+0.0,
+0.0,
 1.0,
-1.0,
-1.0,
-0.0, //no lfe
-1.0,
-1.0,
+0.0,
+0.0,
+0.0,
 };
 
 //fl, fr, fc, lfe, bl, br, sl, sr
+//Mono goes to center only.
 float mixing_matrix_1_8[] = {
+0.0f,
+0.0f,
 1.0f,
-1.0f,
-1.0f,
-0.0f, //no lfe
-1.0f,
-1.0f,
-1.0f,
-1.0f,
+0.0f,
+0.0f,
+0.0f,
+0.0f,
+0.0f,
 };
 
 float mixing_matrix_2_1[] = {
@@ -74,8 +77,8 @@ float mixing_matrix_2_6[] = {
 0.0f, 1.0f, //right to front right
 0.0f, 0.0f, //don't use FC. FC needs filters of one sort or another to work right.
 0.0f, 0.0f, //don't use lfe.
-1.0f, 0.0f, //left to back left.
-0.0f, 1.0f, //right to back right.
+0.0f, 0.0f, //No back left.
+0.0f, 0.0f, //No back right.
 };
 
 float mixing_matrix_2_8[] = {
@@ -83,20 +86,25 @@ float mixing_matrix_2_8[] = {
 0.0f, 1.0f, //right to fr.
 0.0f, 0.0f, //dont' use fc.
 0.0f, 0.0f, //don't use LFE.
-1.0f, 0.0f, //left to bl.
-0.0f, 1.0f, //right to br.
-1.0f, 0.0f, //left to sl.
-0.0f, 1.0f, //right to sr.
+0.0f, 0.0f, //No back left.
+0.0f, 0.0f, //No back right.
+0.0f, 0.0f,
+0.0f, 0.0f,
 };
 
+//These numbers taken from webaudio spec.
+//output = 0.7071 * (input.L + input.R) + input.C + 0.5 * (input.SL + input.SR)
 float mixing_matrix_6_1[] = {
-1/6.0f, 1/6.0f, 1/6.0f, 1/6.0f, 1/6.0f, 1/6.0f,
+0.707, 0.707, 1.0, 0.0, 0.5, 0.5,
 };
 
+/*Again, from webaudio:
+output.L = L + 0.7071 * (input.C + input.SL)
+output.R = R + 0.7071 * (input.C + input.SR)
+*/
 float mixing_matrix_6_2[] = {
-//send bl, fl to left, bl, fr to right, fc to left and right, lfe to left and right.
-0.3f, 0.0f, 0.3f, 0.1f, 0.3f, 0.0f,
-0.0f, 0.3f, 0.3f, 0.1f, 0.0f, 0.3f,
+1.0, 0.0, 0.7071, 0.0, 0.7071, 0.0,
+0.0, 1.0, 0.7071, 0.0, 0.0, 0.7071,
 };
 
 float mixing_matrix_6_8[] = {
@@ -113,16 +121,15 @@ float mixing_matrix_6_8[] = {
 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f, //sr.
 };
 
+//Based off 6_1, but assuming that the sl and bl contribute equally.
 float mixing_matrix_8_1[] = {
-1/8.0f, 1/8.0f, 1/8.0f, 1/8.0f, 1/8.0f, 1/8.0f, 1/8.0f, 1/8.0f,
+0.7071, 0.7071, 1.0, 0.0, 0.25, 0.25, 0.25, 0.25,
 };
 
+//Based off 6_2 in the same wasy as 8_1 is based off 6_1.
 float mixing_matrix_8_2[] = {
-//copy fl, sl, bl to left, fr, sr, br to rright, fc to both, lfe to both.
-//0.2*3 = 0.6, 0.2*2=0.4, 0.6+0.4=1.
-//Unlike 5.1, we're less friendly towards balancing right.
-0.2f, 0.0f, 0.2f, 0.2f, 0.2f, 0.0f, 0.2f, 0.0f,
-0.0f, 0.2f, 0.2f, 0.2f, 0.0f, 0.2f, 0.0f, 0.2f,
+1.0, 0.0, 0.7071, 0.0, 0.7071/2, 0.0, 0.7071/2, 0.0,
+0.0, 1.0, 0.7071, 0.0, 0.0, 0.7071/2, 0.0, 0.7071/2,
 };
 
 float mixing_matrix_8_6[] = {
