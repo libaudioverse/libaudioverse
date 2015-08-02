@@ -40,11 +40,14 @@ class Buffer: public ExternalObject {
 	//This can't be undone.
 	void normalize();
 	private:
+	void ensureRemixingWorkspace(int length);
 	int channels = 0;
 	int frames = 0;
 	int sr = 0;
 	float* data = nullptr, *data_end = nullptr;
 	std::shared_ptr<Simulation> simulation;
+	float* remixing_workspace = nullptr;
+	int remixing_workspace_length = 0;
 };
 
 std::shared_ptr<Buffer> createBuffer(std::shared_ptr<Simulation>simulation);

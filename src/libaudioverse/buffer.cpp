@@ -24,6 +24,7 @@ std::shared_ptr<Buffer> createBuffer(std::shared_ptr<Simulation>simulation) {
 
 Buffer::~Buffer() {
 	if(data) freeArray(data);
+	if(remixing_workspace) freeArray(remixing_workspace);
 }
 
 std::shared_ptr<Simulation> Buffer::getSimulation() {
@@ -51,35 +52,18 @@ void Buffer::loadFromArray(int sr, int channels, int frames, float* inputData) {
 }
 
 int Buffer::writeData(int startFrame, int channels, int frames, float** outputs) {
-	//we know that writeChannel always returns the same value for all channels and the same startFrame and frames.
-	int count = 0;
-	for(int i=0; i < channels; i++) {
-		count = writeChannel(startFrame, i, channels, frames, outputs[i]);
-		if(count == 0) break;
-	}
-	return count;
-}
-
-int Buffer::writeChannel(int startFrame, int channel, int maxChannels, int frames, float* dest) {
-	if(channel >=maxChannels) return 0; //bad, very bad.
-	const float* matrix= simulation->getMixingMatrix(this->channels, maxChannels);
-	float* readFrom =data+startFrame*this->channels;
-	int willWrite = this->frames-startFrame;
-	if(willWrite <= 0) return 0;
-	if(willWrite > frames) willWrite = frames;
-	if(channel>= this->channels && matrix== nullptr) return willWrite; //we wrote according to the drop channels rule and our destination is supposed to be zeroed.
-	else if(matrix) {
-		for(int i=0; i < willWrite; i++) {
-			for(int j = 0; j < this->channels; j++) {
-				dest[i] += readFrom[i*this->channels+j]*matrix[channel*this->channels+j];
-			}
+	//Figure out how much we can write.
+	int canWrite = std::max(startFrame-this->frames, 0);
+	int willWrite = std::min(canWrite, frames);
+	if(willWrite == 0) return 0;
+	ensureRemixingWorkspace(channels*willWrite);
+	audio_io::remixAudioInterleaved(willWrite, this->channels, data+this->channels*startFrame, channels, remixing_workspace);
+	for(int i = 0; i < willWrite; i++) {
+		for(int chan = 0; chan < channels; chan++) {
+			outputs[chan][i] = remixing_workspace[chan*channels+i];
 		}
-		return willWrite;
 	}
-	else {
-		for(int i=0; i < willWrite; i++) dest[i] = readFrom[i*this->channels+channel];
-		return willWrite;
-	}
+	return willWrite;
 }
 
 float Buffer::getSample(int frame, int channel) {
@@ -87,22 +71,29 @@ float Buffer::getSample(int frame, int channel) {
 }
 
 float Buffer::getSampleWithMixingMatrix(int frame, int channel, int maxChannels) {
-	auto mat =simulation->getMixingMatrix(channels, maxChannels);
-	if(mat) {
-		float res= 0.0;
-		for(int i=0; i < channels; i++) res += data[frame*channels+i]*mat[channels*channel+i];
-		return res;
-	}
-	else if(channel < channels) return data[frame*channels+channel];
-	else return 0.0;
+	if(frame > this->frames) return 0.0f;
+	ensureRemixingWorkspace(maxChannels);
+	audio_io::remixAudioInterleaved(1, this->channels, data+frame*this->channels, maxChannels, remixing_workspace);
+	return remixing_workspace[channel];
 }
 
 void Buffer::normalize() {
 	float min = *std::min_element(data, data+channels*frames);
 	float max = *std::max_element(data, data+channels*frames);
 	float normfactor = std::max(abs(min), abs(max));
-	normfactor = 1.0/normfactor;
+	normfactor = 1.0f/normfactor;
 	scalarMultiplicationKernel(channels*frames, normfactor, data, data);
+}
+
+void Buffer::ensureRemixingWorkspace(int length) {
+	if(remixing_workspace_length >= length) return;
+	else {
+		if(remixing_workspace) {
+			freeArray(remixing_workspace);
+			remixing_workspace = nullptr;
+		}
+		remixing_workspace = allocArray<float>(length);
+	}
 }
 
 //begin public api
