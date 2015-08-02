@@ -43,7 +43,8 @@ HrtfData::~HrtfData() {
 	if(temporary_buffer2) freeArray(temporary_buffer2);
 	if(hrirs == nullptr) return; //we never loaded one.
 	for(int i = 0; i < elev_count; i++) {
-		for(int j = 0; j < azimuth_counts[i]; j++) freeArray(hrirs[i][j]);
+		//The staticResamplerKernel allocates with new[], not allocArray.
+		for(int j = 0; j < azimuth_counts[i]; j++) delete[] hrirs[i][j];
 		delete[] hrirs[i];
 	}
 	delete[] hrirs;
