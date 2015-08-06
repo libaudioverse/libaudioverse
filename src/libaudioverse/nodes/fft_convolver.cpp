@@ -84,7 +84,7 @@ void FftConvolverNode::setResponseFromFile(std::string path, int fileChannel, in
 	//Finally, set the specified convolver.
 	setResponse(convolverChannel, resampledTmpLength, resampledTmp);
 	freeArray(tmp);
-	freeArray(resampledTmp);
+	delete[] resampledTmp;
 }
 
 //begin public api
