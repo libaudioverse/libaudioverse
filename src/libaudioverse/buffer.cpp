@@ -23,7 +23,7 @@ std::shared_ptr<Buffer> createBuffer(std::shared_ptr<Simulation>simulation) {
 }
 
 Buffer::~Buffer() {
-	if(data) freeArray(data);
+	if(data) delete[] data;
 	if(remixing_workspace) freeArray(remixing_workspace);
 }
 
