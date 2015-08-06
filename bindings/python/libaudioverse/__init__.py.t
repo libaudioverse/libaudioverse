@@ -168,7 +168,7 @@ class _CallbackWrapper(object):
 class DeviceInfo(object):
 	"""Represents info on a audio device.
 	
-	Channels is the number of channels for the device.  Name is a human-readable name.  Index should be passed to Simulation.__init__ as the device index.
+	Channels is the number of channels for the device.  Name is a unicode string containing a human-readable name.  Index should be used with Simulation.set_output_device.
 	
 	The caveat from the Libaudioverse manual should be  summarized here:
 	channels is not reliable, and your application should default to stereo while providing the user the option to change it."""
@@ -185,7 +185,7 @@ def enumerate_devices():
 	for i in xrange(max_index):
 		info = DeviceInfo(index = i,
 		channels = _lav.device_get_channels(i),
-		name = _lav.device_get_name(i))
+		name = unicode(_lav.device_get_name(i), 'UTF8'))
 		infos.append(info)
 	return infos
 
