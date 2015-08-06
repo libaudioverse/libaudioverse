@@ -144,6 +144,8 @@ functions:
     category: devices
     doc_description: |
       Returns a human-readable name for the specified audio device.
+      
+      The string that this function outputs is encoded in UTF8.
     params:
       index: The index of the audio device.
       destination: Contains a pointer to  a string allocated by Libaudioverse containing the name. Use {{"Lav_free"|function}} on this string when done with it.
