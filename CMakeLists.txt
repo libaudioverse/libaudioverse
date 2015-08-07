@@ -2,7 +2,6 @@ cmake_MINIMUM_REQUIRED(VERSION 2.8)
 
 project(Libaudioverse)
 include_directories("${CMAKE_SOURCE_DIR}/include")
-include_directories("${CMAKE_SOURCE_DIR}/powercores/include")
 
 #Which CPU extensions to enable?
 option(LIBAUDIOVERSE_USE_SSE2 "Use SSE2" ON)
@@ -21,12 +20,13 @@ include("vendoring/glm.txt")
 include("vendoring/kissfft.txt")
 
 #mine. Order matters because of include directories.
+include("vendoring/powercores.txt")
 include("vendoring/speex_resampler_cpp.txt")
 include("vendoring/audio_io.txt")
 
 
 #All the libraries we need to link with:
-SET(libaudioverse_required_libraries ${libsndfile_name} kissfft audio_io speex_resampler_cpp)
+SET(libaudioverse_required_libraries ${libsndfile_name} kissfft audio_io speex_resampler_cpp powercores)
 add_subdirectory(src)
 
 #this makes the bindings generation step always run after a Libaudioverse build.

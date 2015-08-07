@@ -1,0 +1,2 @@
+add_subdirectory(powercores)
+include_directories("${CMAKE_SOURCE_DIR}/powercores/include")
