@@ -36,11 +36,11 @@ Simulation::Simulation(unsigned int sr, unsigned int blockSize, unsigned int mix
 	//Get thread count.
 	int defaultThreadCount = std::thread::hardware_concurrency();
 	if(defaultThreadCount == 0) {
-		log(Lav_LOG_LEVEL_INFO, "Simulation: threading implementation does not support querying hardware concurrency.");
+		logInfo("Simulation: threading implementation does not support querying hardware concurrency.");
 		defaultThreadCount = 1;
 	}
-	if(defaultThreadCount > 1) log(Lav_LOG_LEVEL_INFO, "Simulation: enabling concurrency with %i threads.", defaultThreadCount);
-	else log(Lav_LOG_LEVEL_INFO, "Simulation: not enabling concurrency.  CPU only supports one thread.");
+	if(defaultThreadCount > 1) logInfo("Simulation: enabling concurrency with %i threads.", defaultThreadCount);
+	else logInfo("Simulation: not enabling concurrency.  CPU only supports one thread.");
 	setThreads(defaultThreadCount);
 	start();
 }

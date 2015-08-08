@@ -21,6 +21,7 @@ typedef void (*initfunc_t)();
 //Errors will be returned as appropriate.
 //Initialization stops at the first failed function and does not continue.
 initfunc_t initializers[] = {
+	//Logging is implicit.
 	initializeErrorModule,
 	initializeMemoryModule,
 	initializeFunctionTables,

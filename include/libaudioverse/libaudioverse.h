@@ -128,10 +128,10 @@ enum Lav_NODE_STATES {
 
 /**Logging levels.*/
 enum Lav_LOGGING_LEVELS {
-	Lav_LOG_LEVEL_OFF = 0,
-	Lav_LOG_LEVEL_CRITICAL = 1,
-	Lav_LOG_LEVEL_INFO = 2,
-	Lav_LOG_LEVEL_DEBUG = 3,
+	Lav_LOGGING_LEVEL_OFF = 0,
+	Lav_LOGGING_LEVEL_CRITICAL = 1,
+	Lav_LOGGING_LEVEL_INFO = 2,
+	Lav_LOGGING_LEVEL_DEBUG = 3,
 };
 
 /**Initialize Libaudioverse.*/

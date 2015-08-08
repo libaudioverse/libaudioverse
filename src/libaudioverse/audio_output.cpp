@@ -24,12 +24,12 @@ namespace libaudioverse_implementation {
 std::shared_ptr<audio_io::OutputDeviceFactory> *audio_output_factory;
 
 void initializeDeviceFactory() {
-	log(Lav_LOG_LEVEL_INFO, "Initializing audio backend.");
+	logInfo("Initializing audio backend.");
 	audio_output_factory = new std::shared_ptr<audio_io::OutputDeviceFactory>();
 	auto possible=audio_io::getOutputDeviceFactory();
 	if(possible != nullptr) {
 		*audio_output_factory = possible;
-		log(Lav_LOG_LEVEL_INFO, "Chosen backend is %s", (*audio_output_factory)->getName().c_str());
+		logInfo("Chosen backend is %s", (*audio_output_factory)->getName().c_str());
 		return;
 	}
 	else {

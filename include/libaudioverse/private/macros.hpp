@@ -7,6 +7,9 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "../libaudioverse.h"
 #include "error.hpp" //needed by the standard catchblock macro, below.
 
+/**These are the most common macros.
+Also see logging.hpp, which has more.*/
+
 //use __LINE__ for a quick unique variable.
 #define LOCK(object) std::lock_guard<decltype((object))> lock_##__LINE__((object))
 
