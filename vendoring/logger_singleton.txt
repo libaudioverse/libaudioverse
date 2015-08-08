@@ -1,0 +1,2 @@
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/logger_singleton/include")
+add_subdirectory(logger_singleton)

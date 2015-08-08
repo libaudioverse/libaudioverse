@@ -20,13 +20,14 @@ include("vendoring/glm.txt")
 include("vendoring/kissfft.txt")
 
 #mine. Order matters because of include directories.
+include("vendoring/logger_singleton.txt")
 include("vendoring/powercores.txt")
 include("vendoring/speex_resampler_cpp.txt")
 include("vendoring/audio_io.txt")
 
 
 #All the libraries we need to link with:
-SET(libaudioverse_required_libraries ${libsndfile_name} kissfft audio_io speex_resampler_cpp powercores)
+SET(libaudioverse_required_libraries ${libsndfile_name} kissfft audio_io logger_singleton speex_resampler_cpp powercores)
 add_subdirectory(src)
 
 #this makes the bindings generation step always run after a Libaudioverse build.
