@@ -44,6 +44,9 @@ functions:
       In order to free such memory, be sure to use this function rather than the normal system free:
       on some platforms, the Libaudioverse DLL may not be using the same C runtime,
       and the memory passed to you may be allocated from internal caches.
+      
+      This function is no-op after shutdown, but should not be used before initialization.
+      This behavior simplifies writing garbage-collected bindings to Libaudioverse, and should not be relied on directly.
     params:
       ptr: The pointer to free.
   Lav_handleIncRef:
@@ -69,6 +72,9 @@ functions:
       Furthermore, in the case of objects like buffers, various internal Libaudioverse properties could conceivably need to hold onto the object.
       Internally, Libaudioverse uses shared pointers to make sure this cannot happen,
       but at the cost of not being able to guarantee instant resource freeing.
+      
+      This function is no-op after shutdown, but should not be used before initialization.
+      This behavior simplifies writing garbage-collected bindings to Libaudioverse, and should not be relied on directly.
     params:
       handle: The handle whose reference count we are decrementing.
   Lav_handleGetAndClearFirstAccess:

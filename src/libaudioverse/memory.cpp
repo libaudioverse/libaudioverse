@@ -24,6 +24,8 @@ std::recursive_mutex *memory_lock = nullptr;
 std::map<int, std::shared_ptr<ExternalObject>> *external_handles = nullptr;
 std::atomic<int> *max_handle = nullptr;
 LavHandleDestroyedCallback handle_destroyed_callback = nullptr;
+bool memory_initialized = false;
+
 
 void initializeMemoryModule() {
 	memory_lock=new std::recursive_mutex();
@@ -31,13 +33,21 @@ void initializeMemoryModule() {
 	max_handle->store(1);
 	external_ptrs= new std::map<void*, std::shared_ptr<void>>();
 	external_handles=new std::map<int, std::shared_ptr<ExternalObject>>();
+	memory_initialized = true;
 }
 
 void shutdownMemoryModule() {
+	std::lock_guard<std::recursive_mutex> l(*memory_lock);
 	delete external_handles;
+	external_handles = nullptr;
 	delete external_ptrs;
+	external_ptrs = nullptr;
 	delete max_handle;
-	delete memory_lock;
+	max_handle = nullptr;
+	//We intensionally leak the memory lock.
+	//This has to stay around so that the public API can be made safe after library shutdown.
+	//User code won't call us, but garbage collected languages might.
+	memory_initialized = false;
 }
 
 ExternalObject::ExternalObject(int type) {
@@ -74,6 +84,7 @@ bool isAligned(const void* ptr) {
 	return (i & mask) == 0;
 	#endif
 }
+
 std::function<void(ExternalObject*)> ObjectDeleter(std::shared_ptr<Simulation> simulation) {
 	return [=](ExternalObject* obj) {
 		//We have to make sure to call the callback outside the lock.
@@ -95,6 +106,7 @@ std::function<void(ExternalObject*)> ObjectDeleter(std::shared_ptr<Simulation> s
 Lav_PUBLIC_FUNCTION LavError Lav_free(void* ptr) {
 	PUB_BEGIN
 	std::lock_guard<std::recursive_mutex> guard(*memory_lock);
+	if(memory_initialized == false) return Lav_ERROR_NONE; //If we're shut down, everything is already freed.
 	if(external_ptrs->count(ptr)) external_ptrs->erase(ptr);
 	else ERROR(Lav_ERROR_INVALID_HANDLE);
 	PUB_END
@@ -109,11 +121,12 @@ Lav_PUBLIC_FUNCTION LavError Lav_handleIncRef(LavHandle handle) {
 
 Lav_PUBLIC_FUNCTION LavError Lav_handleDecRef(LavHandle handle) {
 	PUB_BEGIN
+	std::lock_guard<std::recursive_mutex> guard(*memory_lock);
+	if(memory_initialized == false) return Lav_ERROR_NONE;
 	auto e = incomingObject<ExternalObject>(handle);
 	auto rc = e->refcount.fetch_add(-1);
 	rc-=1;
 	if(rc == 0) {
-		std::lock_guard<std::recursive_mutex> guard(*memory_lock);
 		external_handles->erase(e->externalObjectHandle);
 	}
 	PUB_END
