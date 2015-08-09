@@ -11,6 +11,7 @@ import ctypes
 import enum
 import functools
 import threading
+import logging
 
 def find_datafiles():
 	import glob
@@ -89,31 +90,18 @@ _lav.bindings_register_exception(_libaudioverse.{{error_name}}, {{friendly_name}
 {%endfor%}
 
 #logging infrastructure
-_logging_callback = None
-_logging_callback_ctypes = None
+def _logging_callback(level, message, is_last):
+	l=logging.getLogger("libaudioverse")
+	if level == LoggingLevels.critical:
+		l.critical(message)
+	elif level == LoggingLevels.info:
+		l.info(message)
+	elif level == LoggingLevels.debug:
+		l.debug(message)
 
-def set_logging_callback(callback):
-	"""Callback must be a function taking 3 arguments: level, message, and is_last.  is_last is set to 1 on the last logging message to be seen, typically found at Libaudioverse shutdown.
-
-use None to clear."""
-	global _logging_callback, _logging_callback_ctypes
-	callback_c = _libaudioverse.LavLoggingCallback(callback)
-	_lav.set_logging_callback(callback_c)
-	_logging_callback = callback
-	_logging_callback_ctypes = callback_c
-
-def get_logging_callback():
-	"""Returns the logging callback."""
-
-	return _logging_callback
-
-def set_logging_level(level):
-	"""Set the logging level.  This should be a value from the LoggingLevels enum."""
-	_lav.set_logging_level(level)
-
-def get_logging_level():
-	"""Get the logging level."""
-	return LoggingLevels(_lav.get_logging_level())
+_logging_callback_ctypes = _libaudioverse.LavLoggingCallback(_logging_callback)
+_lav.set_logging_callback(_logging_callback_ctypes)
+_lav.set_logging_level(LoggingLevels.debug)
 
 #library initialization and termination.
 
