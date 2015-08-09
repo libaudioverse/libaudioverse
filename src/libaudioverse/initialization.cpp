@@ -37,9 +37,10 @@ typedef void (*shutdownfunc_t)();
 //Termination never fails.
 //logging must always be last.
 shutdownfunc_t shutdown_funcs[] = {
-shutdownDeviceFactory,
 shutdownMemoryModule,
 shutdownErrorModule,
+//Device factory needs to go near the end because it tries to log.
+shutdownDeviceFactory,
 shutdownLogging,
 };
 

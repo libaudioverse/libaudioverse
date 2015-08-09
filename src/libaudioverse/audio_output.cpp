@@ -25,6 +25,7 @@ std::shared_ptr<audio_io::OutputDeviceFactory> *audio_output_factory;
 
 void initializeDeviceFactory() {
 	logInfo("Initializing audio backend.");
+	audio_io::initialize();
 	audio_output_factory = new std::shared_ptr<audio_io::OutputDeviceFactory>();
 	auto possible=audio_io::getOutputDeviceFactory();
 	if(possible != nullptr) {
@@ -39,6 +40,7 @@ void initializeDeviceFactory() {
 
 void shutdownDeviceFactory() {
 	if(audio_output_factory) delete audio_output_factory;
+	audio_io::shutdown();
 }
 
 std::shared_ptr<audio_io::OutputDeviceFactory> getOutputDeviceFactory() {
