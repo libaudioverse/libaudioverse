@@ -101,7 +101,7 @@ def _logging_callback(level, message, is_last):
 
 _logging_callback_ctypes = _libaudioverse.LavLoggingCallback(_logging_callback)
 _lav.set_logging_callback(_logging_callback_ctypes)
-_lav.set_logging_level(LoggingLevels.debug)
+_lav.set_logging_level(int(LoggingLevels.debug))
 
 #library initialization and termination.
 
