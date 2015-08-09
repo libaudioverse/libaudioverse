@@ -270,6 +270,11 @@ void Node::disconnect(int which) {
 	simulation->invalidatePlan();
 }
 
+void Node::isolate() {
+	int oc = getOutputConnectionCount();
+	for(int i = 0; i < oc; i++) disconnect(i);
+}
+
 std::shared_ptr<Simulation> Node::getSimulation() {
 	return simulation;
 }
