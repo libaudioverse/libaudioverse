@@ -24,17 +24,23 @@ namespace libaudioverse_implementation {
 std::shared_ptr<audio_io::OutputDeviceFactory> *audio_output_factory;
 
 void initializeDeviceFactory() {
-	logInfo("Initializing audio backend.");
-	audio_io::initialize();
-	audio_output_factory = new std::shared_ptr<audio_io::OutputDeviceFactory>();
-	auto possible=audio_io::getOutputDeviceFactory();
-	if(possible != nullptr) {
-		*audio_output_factory = possible;
-		logInfo("Chosen backend is %s", (*audio_output_factory)->getName().c_str());
-		return;
+	try {
+		logInfo("Initializing audio backend.");
+		audio_io::initialize();
+		audio_output_factory = new std::shared_ptr<audio_io::OutputDeviceFactory>();
+		auto possible=audio_io::getOutputDeviceFactory();
+		if(possible != nullptr) {
+			*audio_output_factory = possible;
+			logInfo("Chosen backend is %s", (*audio_output_factory)->getName().c_str());
+			return;
+		}
+		else {
+			ERROR(Lav_ERROR_CANNOT_INIT_AUDIO, "Not able to initialize an audio backend.");
+		}
 	}
-	else {
-		ERROR(Lav_ERROR_CANNOT_INIT_AUDIO, "Not able to initialize an audio backend.");
+	catch(std::exception &e) {
+		//We should catch specific audio_io exceptions here, but they all inherrit from std::exception and audio_io does not differentiate as of yet.
+		ERROR(Lav_ERROR_CANNOT_INIT_AUDIO, e.what());
 	}
 }
 

@@ -118,8 +118,14 @@ void Simulation::setOutputDevice(int index, int channels, int mixahead) {
 			strong->getBlock(buffer, channels);
 		}
 	};
-	auto dev =factory->createDevice(cb, index, channels, getSr(), getBlockSize(), mixahead);
-	if(dev == nullptr) ERROR(Lav_ERROR_CANNOT_INIT_AUDIO, "Device could not be created.");
+	std::shared_ptr<audio_io::OutputDevice> dev;
+	try {
+		dev =factory->createDevice(cb, index, channels, getSr(), getBlockSize(), mixahead);
+		if(dev == nullptr) ERROR(Lav_ERROR_CANNOT_INIT_AUDIO, "Device could not be created.");
+	}
+	catch(std::exception &e) {
+		ERROR(Lav_ERROR_CANNOT_INIT_AUDIO, e.what());
+	}
 	output_device=dev;
 }
 
