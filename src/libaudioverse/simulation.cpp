@@ -103,7 +103,7 @@ void Simulation::doMaintenance() {
 	}
 }
 
-void Simulation::setOutputDevice(int index, int channels, int mixahead) {
+void Simulation::setOutputDevice(int index, int channels, float minLatency, float startLatency, float maxLatency) {
 	if(index < -1) ERROR(Lav_ERROR_RANGE, "Index -1 is default; all other negative numbers are invalid.");
 	auto factory = getOutputDeviceFactory();
 	if(factory == nullptr) ERROR(Lav_ERROR_CANNOT_INIT_AUDIO, "Failed to get output device factory.");
@@ -120,7 +120,7 @@ void Simulation::setOutputDevice(int index, int channels, int mixahead) {
 	};
 	std::shared_ptr<audio_io::OutputDevice> dev;
 	try {
-		dev =factory->createDevice(cb, index, channels, getSr(), getBlockSize(), mixahead);
+		dev =factory->createDevice(cb, index, channels, getSr(), getBlockSize(), minLatency, startLatency, maxLatency);
 		if(dev == nullptr) ERROR(Lav_ERROR_CANNOT_INIT_AUDIO, "Device could not be created.");
 	}
 	catch(std::exception &e) {
@@ -251,11 +251,11 @@ Lav_PUBLIC_FUNCTION LavError Lav_simulationGetSr(LavHandle simulationHandle, int
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_simulationSetOutputDevice(LavHandle simulationHandle, int index, int channels, int mixahead) {
+Lav_PUBLIC_FUNCTION LavError Lav_simulationSetOutputDevice(LavHandle simulationHandle, int index, int channels, float minLatency, float startLatency, float maxLatency) {
 	PUB_BEGIN
 	auto sim = incomingObject<Simulation>(simulationHandle);
 	LOCK(*sim);
-	sim->setOutputDevice(index, channels, mixahead);
+	sim->setOutputDevice(index, channels, minLatency, startLatency, maxLatency);
 	PUB_END
 }
 

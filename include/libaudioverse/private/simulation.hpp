@@ -51,7 +51,7 @@ class Simulation: public ExternalObject, public Job {
 	void unlock() {mutex.unlock();}
 
 	//associate with the specified device index.
-	void setOutputDevice(int index, int channels, int mixahead);
+	void setOutputDevice(int index, int channels, float minLatency, float startLatency, float maxLatency);
 	void clearOutputDevice();
 
 	//Tasks that need to run in the background.

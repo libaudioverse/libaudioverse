@@ -217,11 +217,11 @@ For full details of this class, see the Libaudioverse manual."""
 			self.handle = handle
 			self._lock = self._state['lock']
 
-	def set_output_device(self, index, channels=2, mixahead=2):
+	def set_output_device(self, index, channels=2, min_latency = 0.0, start_latency = 0.1, max_latency = 0.2):
 		"""Sets the output device.
 		Use -1 for default system audio. 0 and greater are specific audio devices.
 		To enumerate output devices, use enumerate_output_devices."""
-		_lav.simulation_set_output_device(self, index, channels, mixahead)
+		_lav.simulation_set_output_device(self, index, channels, min_latency, start_latency, max_latency)
 
 	def clear_output_device(self):
 		"""Clears the output device, stopping audio and allowing use of get_block again."""

@@ -209,7 +209,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlock(LavHandle simulationHandle, 
 Lav_PUBLIC_FUNCTION LavError Lav_simulationGetSr(LavHandle simulationHandle, int* destination);
 
 /**Set or clear the output device.*/
-Lav_PUBLIC_FUNCTION LavError Lav_simulationSetOutputDevice(LavHandle simulationHandle, int index, int channels, int mixahead);
+Lav_PUBLIC_FUNCTION LavError Lav_simulationSetOutputDevice(LavHandle simulationHandle, int index, int channels, float minLatency, float startLatency, float maxLatency);
 Lav_PUBLIC_FUNCTION LavError Lav_simulationClearOutputDevice(LavHandle simulationHandle);
 
 /**Lock/unlock the simulation.*/
