@@ -123,7 +123,7 @@ functions:
     category: core
     doc_description: |
       Set the logging level.
-      You will receive messages via the logging callback for all levels less than or equal to the logging level.
+      You will receive messages via the logging callback for all levels  greater than the logging level.
     params:
       level: The new logging level.
   Lav_getLoggingLevel:
