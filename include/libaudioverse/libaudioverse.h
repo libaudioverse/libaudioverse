@@ -112,8 +112,6 @@ enum Lav_OBJECT_TYPES {
 	Lav_OBJTYPE_RECORDER_NODE,
 	Lav_OBJTYPE_CONVOLVER_NODE,
 	Lav_OBJTYPE_FFT_CONVOLVER_NODE,
-	
-	Lav_OBJTYPE_LATE_REFLECTIONS_NODE,
 	Lav_OBJTYPE_THREE_BAND_EQ_NODE,
 	Lav_OBJTYPE_FILTERED_DELAY_NODE,
 	Lav_OBJTYPE_PANNER_BANK_NODE,
@@ -407,8 +405,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createConvolverNode(LavHandle simulationHandle,
 Lav_PUBLIC_FUNCTION LavError Lav_createFftConvolverNode(LavHandle simulationHandle, int channels, LavHandle* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_fftConvolverNodeSetResponse(LavHandle nodeHandle, int channel, int length, float* response);
 Lav_PUBLIC_FUNCTION LavError Lav_fftConvolverNodeSetResponseFromFile(LavHandle nodeHandle, const char* path, int fileChannel, int convolverChannel);
-
-Lav_PUBLIC_FUNCTION LavError Lav_createLateReflectionsNode(LavHandle simulationHandle, LavHandle* destination);
 
 Lav_PUBLIC_FUNCTION LavError Lav_createThreeBandEqNode(LavHandle simulationHandle, int channels, LavHandle* destination);
 
