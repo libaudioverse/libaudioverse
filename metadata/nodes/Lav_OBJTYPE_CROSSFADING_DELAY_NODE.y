@@ -7,6 +7,20 @@ properties:
     doc_description: |
       The delay of the delay line in seconds.
       The range of this property depends on the maxDelay parameter to the constructor.
+      
+      Note that values less than 1 sample still introduce delay.
+  Lav_DELAY_DELAY_SAMPLES:
+    name: delay_samples
+    type: double
+    range: dynamic
+    default: 0.0
+    doc_description: |
+      The delay of the delay line in samples.
+      
+      This property's range depends on the maximum delay.  Values of 0 will introduce delay of 1 sample.
+      
+      This property is a double  so that it can accurately reflect the delay property.
+      Setting it to a fractional value will make it arbitrarily pick one of the adjacent samples.
   Lav_DELAY_FEEDBACK:
     name: feedback
     type: float

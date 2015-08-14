@@ -27,6 +27,18 @@ void DoppleringDelayLine::setDelay(float d) {
 	else velocity = 0.0;
 }
 
+void DoppleringDelayLine::setDelayInSamples(int newDelay) {
+	if(counter) {
+		delay = new_delay;
+		counter = 0;
+	}
+	new_delay = std::min(newDelay, max_delay);
+	counter = interpolation_time*sr;
+	if(counter == 0) counter=1;
+	if(sr*interpolation_time !=0.0) velocity = (new_delay-delay)/(sr*interpolation_time);
+	else velocity = 0.0;
+}
+
 void DoppleringDelayLine::setInterpolationTime(float t) {
 	interpolation_time = t;
 }

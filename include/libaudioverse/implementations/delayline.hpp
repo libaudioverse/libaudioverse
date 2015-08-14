@@ -31,6 +31,7 @@ class CrossfadingDelayLine {
 	public:
 	CrossfadingDelayLine(float maxDelay, float sr);
 	void setDelay(float delay);
+	void setDelayInSamples(int newDelay);
 	//convenience function: combination compute and advance.
 	float tick(float sample);
 	//feedback has to use the slow path, but this one is optimized.
@@ -44,7 +45,7 @@ class CrossfadingDelayLine {
 	void setInterpolationTime(float t);
 	private:
 	DelayRingbuffer line;
-	unsigned int line_length = 0, delay = 0, new_delay = 0;
+	unsigned int max_delay = 0, delay = 0, new_delay = 0;
 	int counter;
 	float interpolation_delta = 1.0f, interpolation_time=0.0f;
 	float sr = 0.0f, weight1=1.0f, weight2=0.0f;
@@ -56,6 +57,7 @@ class DoppleringDelayLine {
 	public:
 	DoppleringDelayLine(float maxDelay, float sr);
 	void setDelay(float d);
+	void setDelayInSamples(int newDelay);
 	void setInterpolationTime(float t);
 	float tick(float sample);
 	float computeSample();
@@ -75,6 +77,7 @@ class InterpolatedDelayLine {
 	public:
 	InterpolatedDelayLine(float maxDelay, float sr);
 	void setDelay(float d);
+	void setDelayInSamples(int samples);
 	float tick(float sample);
 	float computeSample();
 	void advance(float sample);

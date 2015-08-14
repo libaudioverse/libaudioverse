@@ -11,11 +11,16 @@ namespace libaudioverse_implementation {
 
 CrossfadingDelayLine::CrossfadingDelayLine(float maxDelay, float sr): line((int)(sr*maxDelay)+1) {
 	this->sr = sr;
+	max_delay = line.getLength();
 }
 
 void CrossfadingDelayLine::setDelay(float delay) {
 	int newDelay = (unsigned int)(delay*sr);
-	if(newDelay >= line.getLength()) newDelay = line.getLength()-1;
+	setDelayInSamples(newDelay);
+}
+
+void CrossfadingDelayLine::setDelayInSamples(int newDelay) {
+	if(newDelay >= max_delay) newDelay = max_delay-1;
 	delay = new_delay;
 	new_delay = newDelay;
 	weight1 = 1.0f;

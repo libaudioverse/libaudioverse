@@ -26,6 +26,14 @@ class DoppleringDelayNode: public Node {
 	protected:
 	void delayChanged();
 	void recomputeDelta();
+	//Callbacks for when delay_samples and delay get changed.
+	void updateDelay();
+	void updateDelaySamples();
+	//This flag prevents the above two callbacks from ping-ponging.
+	bool is_syncing_properties = false;
+	//Set to either Lav_DELAY_DELAY or Lav_DELAY_DELAY_SAMPLES if the property changed. Otherwise 0.
+	int last_updated_delay_property = 0;
+	//Standard stuff for delay lines.
 	unsigned int delay_line_length = 0;
 	DoppleringDelayLine **lines;
 	int line_count;
@@ -37,8 +45,14 @@ DoppleringDelayNode::DoppleringDelayNode(std::shared_ptr<Simulation> simulation,
 	lines = new DoppleringDelayLine*[lineCount]();
 	for(unsigned int i = 0; i < lineCount; i++) lines[i] = new DoppleringDelayLine(maxDelay, simulation->getSr());
 	getProperty(Lav_DELAY_DELAY).setFloatRange(0.0f, maxDelay);
+	getProperty(Lav_DELAY_DELAY_SAMPLES).setDoubleRange(0.0, maxDelay*(double)simulation->getSr());
+	//These callbacks link these properties to each other.
+	getProperty(Lav_DELAY_DELAY).setPostChangedCallback([&] () {updateDelaySamples();});
+	getProperty(Lav_DELAY_DELAY_SAMPLES).setPostChangedCallback([&] () {updateDelay();});
 	//finally, set the read-only max delay.
 	getProperty(Lav_DELAY_DELAY_MAX).setFloatValue(maxDelay);
+	//Set us up as though delay just changed.
+	last_updated_delay_property = Lav_DELAY_DELAY;
 	appendInputConnection(0, lineCount);
 	appendOutputConnection(0, lineCount);
 }
@@ -60,12 +74,37 @@ void DoppleringDelayNode::recomputeDelta() {
 }
 
 void DoppleringDelayNode::delayChanged() {
-	float newDelay = getProperty(Lav_DELAY_DELAY).getFloatValue();
-	for(int i = 0; i < line_count; i++) lines[i]->setDelay(newDelay);
+	if(last_updated_delay_property == Lav_DELAY_DELAY) {
+		float newDelay = getProperty(Lav_DELAY_DELAY).getFloatValue();
+		for(int i = 0; i < line_count; i++) lines[i]->setDelay(newDelay);
+	}
+	else {
+		int delayInSamples = (int)getProperty(Lav_DELAY_DELAY_SAMPLES).getDoubleValue();
+		for(int i = 0; i < line_count; i++) lines[i]->setDelayInSamples(delayInSamples);
+	}
+	last_updated_delay_property = 0;
+}
+
+void DoppleringDelayNode::updateDelaySamples() {
+	if(is_syncing_properties) return; //The other callback is why we were called.
+	double newValue = getProperty(Lav_DELAY_DELAY).getFloatValue()*(double)simulation->getSr();
+	is_syncing_properties = true;
+	getProperty(Lav_DELAY_DELAY_SAMPLES).setDoubleValue(newValue);
+	is_syncing_properties = false;
+	last_updated_delay_property = Lav_DELAY_DELAY;
+}
+
+void DoppleringDelayNode::updateDelay() {
+	if(is_syncing_properties) return; //The other callback is why we were called.
+	double newValue = getProperty(Lav_DELAY_DELAY_SAMPLES).getDoubleValue()/simulation->getSr();
+	is_syncing_properties = true;
+	getProperty(Lav_DELAY_DELAY).setFloatValue(newValue);
+	is_syncing_properties = false;
+	last_updated_delay_property = Lav_DELAY_DELAY_SAMPLES;
 }
 
 void DoppleringDelayNode::process() {
-	if(werePropertiesModified(this, Lav_DELAY_DELAY)) delayChanged();
+	if(last_updated_delay_property != 0) delayChanged();
 	if(werePropertiesModified(this, Lav_DELAY_INTERPOLATION_TIME)) recomputeDelta();
 	for(int output = 0; output < num_output_buffers; output++) {
 		auto &line = *lines[output];

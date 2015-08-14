@@ -18,6 +18,10 @@ void InterpolatedDelayLine::setDelay(float d) {
 	delay = d*sr;
 }
 
+void InterpolatedDelayLine::setDelayInSamples(int samples) {
+	delay = std::min(samples, max_delay);
+}
+
 float InterpolatedDelayLine::tick(float sample) {
 	float retval = computeSample();
 	advance(sample);
