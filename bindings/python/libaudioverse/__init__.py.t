@@ -186,7 +186,7 @@ class _HandleComparer(object):
 
 	def __lt__(self, other):
 		#Things that aren't subclasses are less than us.
-		if not isinstance(other, _HandleComparer): returnTrue
+		if not isinstance(other, _HandleComparer): return True
 		return self.handle < other.handle
 
 	def __hash__(self):
@@ -318,7 +318,7 @@ Use load_from_file to read a file or load_from_array to load an iterable."""
 		Wraps Lav_bufferLoadFromFile."""
 		_lav.buffer_load_from_file(self, path)
 
-	def load_from_array(sr, channels, frames, data):
+	def load_from_array(self, sr, channels, frames, data):
 		"""Load from an array of interleaved floats.
 		
 		Wraps Lav_bufferLoadFromArray."""
@@ -407,7 +407,7 @@ class IntProperty(LibaudioverseProperty):
 	def value(self, val):
 		if isinstance(val, enum.IntEnum):
 			if not isinstance(val, self.enum):
-				raise valueError('Attemptn to use wrong enum to set property. Expected instance of {}'.format(self.enum.__class__))
+				raise ValueError('Attemptn to use wrong enum to set property. Expected instance of {}'.format(self.enum.__class__))
 			val = val.value
 		_lav.node_set_int_property(self._node, self._slot, val)
 
@@ -597,23 +597,6 @@ class GenericNode(_HandleComparer):
 		"""Get the names of all properties on this node."""
 		return self._state['properties'].keys()
 
-	def get_property_info(self, name):
-		"""Return info for the property named name."""
-		with self._lock:
-			if name not in self._state['properties']:
-				raise ValueError(name + " is not a property on this instance.")
-			index = self._state['properties'][name]
-			type = PropertyTypes(_lav.node_get_property_type(self.handle, index))
-			range = None
-			has_dynamic_range = bool(_lav.node_get_property_has_dynamic_range(self.handle, index))
-			if type == PropertyTypes.int:
-				range = _lav.node_get_int_property_range(self.handle, index)
-			elif type == PropertyTypes.float:
-				range = _lav.node_get_float_property_range(self.handle, index)
-			elif type == PropertyTypes.double:
-				range = _lav.node_get_double_property_range(self.handle, index)
-			return PropertyInfo(name = name, type = type, range = range, has_dynamic_range = has_dynamic_range)
-
 	def connect(self, output, node, input):
 		"""Connect the specified output of this node to the specified input of another node.
 		
@@ -745,7 +728,7 @@ class {{friendly_name}}Node(GenericNode):
 			if callback is None:
 				#delete the key, clear the callback with Libaudioverse.
 				{{libaudioverse_function_name}}(self.handle, None, None)
-				del self._state['callbacks'][{{callback_name}}]
+				del self._state['callbacks']['{{callback_name}}']
 				return
 			if additional_args is None:
 				additionnal_args = ()
