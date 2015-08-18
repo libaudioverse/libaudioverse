@@ -42,10 +42,17 @@ return v;\
 }\
 )
 
+LavError createCrossfader(LavHandle& sim, LavHandle& h) {
+	ERRCHECK(Lav_createCrossfaderNode(sim, 2, 2, &h));
+	ERRCHECK(Lav_crossfaderNodeCrossfade(h, 2.0, 1));
+	return Lav_ERROR_NONE;
+}
+
 std::tuple<std::string, int, std::function<std::vector<LavHandle>(LavHandle, int)>> to_profile[] = {
 ENTRY("sine", 1000, Lav_createSineNode(sim, &h)),
 ENTRY("crossfading delay line", 1000, Lav_createCrossfadingDelayNode(sim, 0.1, 1, &h)),
 ENTRY("biquad", 1000, Lav_createBiquadNode(sim, 1, &h)),
+ENTRY("2-channel 2-input crossfader", 500, createCrossfader(sim, h)),
 ENTRY("amplitude panner", 1000, Lav_createAmplitudePannerNode(sim, &h)),
 ENTRY("HRTF panner", 30, Lav_createHrtfNode(sim, "default", &h)),
 ENTRY("hard limiter", 1000, Lav_createHardLimiterNode(sim, 2, &h)),
