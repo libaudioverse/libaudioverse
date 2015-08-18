@@ -34,13 +34,14 @@ void Property::associateSimulation(std::shared_ptr<Simulation> simulation) {
 	this->simulation = simulation;
 }
 
-void Property::reset() {
+void Property::reset(bool avoidCallbacks) {
 	value = default_value;
 	string_value = default_string_value;
 	farray_value = default_farray_value;
 	iarray_value = default_iarray_value;
 	buffer_value=nullptr;
 	automators.clear();
+	if(avoidCallbacks == false) firePostChangedCallback();
 }
 
 int Property::getType() {
@@ -159,11 +160,11 @@ int Property::getIntValue() {
 	return value.ival;
 }
 
-void Property::setIntValue(int v) {
+void Property::setIntValue(int v, bool avoidCallbacks) {
 	RC(v, ival);
 	value.ival = v;
 	last_modified=simulation->getTickCount();
-	firePostChangedCallback();
+	if(avoidCallbacks == false) firePostChangedCallback();
 }	
 
 int Property::getIntDefault() {
@@ -193,12 +194,12 @@ float Property::getFloatValue(int i) {
 	else return value.fval;
 }
 
-void Property::setFloatValue(float v) {
+void Property::setFloatValue(float v, bool avoidCallbacks) {
 	RC(v, fval);
 	automators.clear();
 	value.fval = v;
 	last_modified=simulation->getTickCount();
-	firePostChangedCallback();
+	if(avoidCallbacks == false) firePostChangedCallback();
 }
 
 float Property::getFloatDefault() {
@@ -227,12 +228,12 @@ double Property::getDoubleValue(int i) {
 	else return value.dval;
 }
 
-void Property::setDoubleValue(double v) {
+void Property::setDoubleValue(double v, bool avoidCallbacks) {
 	RC(v, dval);
 	automators.clear();
 	value.dval = v;
 	last_modified =simulation->getTickCount();
-	firePostChangedCallback();
+	if(avoidCallbacks == false) firePostChangedCallback();
 }
 
 double Property::getDoubleMin() {
@@ -260,18 +261,18 @@ const float* Property::getFloat3Default() {
 	return default_value.f3val;
 }
 
-void Property::setFloat3Value(const float* const v) {
+void Property::setFloat3Value(const float* const v, bool avoidCallbacks) {
 	memcpy(value.f3val, v, sizeof(float)*3);
 	last_modified = simulation->getTickCount();
-	firePostChangedCallback();
+	if(avoidCallbacks == false) firePostChangedCallback();
 }
 
-void Property::setFloat3Value(float v1, float v2, float v3) {
+void Property::setFloat3Value(float v1, float v2, float v3, bool avoidCallbacks) {
 	value.f3val[0] = v1;
 	value.f3val[1] = v2;
 	value.f3val[2] = v3;
 	last_modified=simulation->getTickCount();
-	firePostChangedCallback();
+	if(avoidCallbacks == false) firePostChangedCallback();
 }
 
 void Property::setFloat3Default(const float* const v) {
@@ -292,13 +293,13 @@ const float* Property::getFloat6Default() {
 	return default_value.f6val;
 }
 
-void Property::setFloat6Value(const float* const v) {
+void Property::setFloat6Value(const float* const v, bool avoidCallbacks) {
 	memcpy(&value.f6val, v, sizeof(float)*6);
 	last_modified = simulation->getTickCount();
-	firePostChangedCallback();
+	if(avoidCallbacks == false) firePostChangedCallback();
 }
 
-void Property::setFloat6Value(float v1, float v2, float v3, float v4, float v5, float v6) {
+void Property::setFloat6Value(float v1, float v2, float v3, float v4, float v5, float v6, bool avoidCallbacks) {
 	value.f6val[0] = v1;
 	value.f6val[1] = v2;
 	value.f6val[2] = v3;
@@ -306,7 +307,7 @@ void Property::setFloat6Value(float v1, float v2, float v3, float v4, float v5, 
 	value.f6val[4] = v5;
 	value.f6val[5] = v6;
 	last_modified =simulation->getTickCount();
-	firePostChangedCallback();
+	if(avoidCallbacks == false) firePostChangedCallback();
 }
 
 void Property::setFloat6Default(const float* const v) {
@@ -337,7 +338,7 @@ float Property::readFloatArray(unsigned int index) {
 	return farray_value[index];
 }
 
-void Property::writeFloatArray(unsigned int start, unsigned int stop, float* values) {
+void Property::writeFloatArray(unsigned int start, unsigned int stop, float* values, bool avoidCallbacks) {
 	if(start >= farray_value.size() || stop > farray_value.size()) ERROR(Lav_ERROR_RANGE, "Attempt to write outside bounds of array.");
 	for(int i=start; i < stop; i++) {
 		RC(values[i], fval);
@@ -346,10 +347,10 @@ void Property::writeFloatArray(unsigned int start, unsigned int stop, float* val
 		farray_value[i] = values[i];
 	}
 	last_modified=simulation->getTickCount();
-	firePostChangedCallback();
+	if(avoidCallbacks == false) firePostChangedCallback();
 }
 
-void Property::replaceFloatArray(unsigned int length, float* values) {
+void Property::replaceFloatArray(unsigned int length, float* values, bool avoidCallbacks) {
 	if(read_only == false) {
 		if(length < min_array_length ) ERROR(Lav_ERROR_RANGE, "New array is too short.");
 		if(length > max_array_length) ERROR(Lav_ERROR_RANGE, "New array is too long.");
@@ -360,7 +361,7 @@ void Property::replaceFloatArray(unsigned int length, float* values) {
 	farray_value.resize(length);
 	std::copy(values, values+length, farray_value.begin());
 	last_modified=simulation->getTickCount();
-	firePostChangedCallback();
+	if(avoidCallbacks == false) firePostChangedCallback();
 }
 
 float* Property::getFloatArrayPtr() {
@@ -385,7 +386,7 @@ int Property::readIntArray(unsigned int index) {
 	return iarray_value[index];
 }
 
-void Property::writeIntArray(unsigned int start, unsigned int stop, int* values) {
+void Property::writeIntArray(unsigned int start, unsigned int stop, int* values, bool avoidCallbacks) {
 	if(start >= iarray_value.size() || stop > iarray_value.size()) ERROR(Lav_ERROR_RANGE, "Attempt to write past end of array.");
 	for(int i =start; i < stop; i++) {
 		RC(values[i], ival);
@@ -394,10 +395,10 @@ void Property::writeIntArray(unsigned int start, unsigned int stop, int* values)
 		iarray_value[i] = values[i];
 	}
 	last_modified = simulation->getTickCount();
-	firePostChangedCallback();
+	if(avoidCallbacks == false) firePostChangedCallback();
 }
 
-void Property::replaceIntArray(unsigned int length, int* values) {
+void Property::replaceIntArray(unsigned int length, int* values, bool avoidCallbacks) {
 	if(read_only == false) {
 		if(length < min_array_length) ERROR(Lav_ERROR_RANGE, "New array is too short.");
 		if(length > max_array_length) ERROR(Lav_ERROR_RANGE, "New array is too long.");
@@ -408,7 +409,7 @@ void Property::replaceIntArray(unsigned int length, int* values) {
 	iarray_value.resize(length);
 	std::copy(values, values+length, iarray_value.begin());
 	last_modified=simulation->getTickCount();
-	firePostChangedCallback();
+	if(avoidCallbacks == false) firePostChangedCallback();
 }
 
 int* Property::getIntArrayPtr() {
@@ -432,10 +433,10 @@ const char* Property::getStringValue() {
 	return string_value.c_str();
 }
 
-void Property::setStringValue(const char* s) {
+void Property::setStringValue(const char* s, bool avoidCallbacks) {
 	string_value = s;
 	last_modified=simulation->getTickCount();
-	firePostChangedCallback();
+	if(avoidCallbacks == false) firePostChangedCallback();
 }
 
 const char* Property::getStringDefault() {
@@ -450,10 +451,10 @@ std::shared_ptr<Buffer> Property::getBufferValue() {
 	return buffer_value;
 }
 
-void Property::setBufferValue(std::shared_ptr<Buffer> b) {
+void Property::setBufferValue(std::shared_ptr<Buffer> b, bool avoidCallbacks) {
 	buffer_value=b;
 	last_modified = simulation->getTickCount();
-	firePostChangedCallback();
+	if(avoidCallbacks == false) firePostChangedCallback();
 }
 
 bool Property::needsARate() {

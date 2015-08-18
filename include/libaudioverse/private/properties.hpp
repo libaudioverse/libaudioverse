@@ -42,7 +42,7 @@ class Property {
 	void associateNode(Node* node);
 	void associateSimulation(std::shared_ptr<Simulation> simulation);
 
-	void reset();
+	void reset(bool avoidCallbacks = false);
 	int getType();
 	void setType(int t);
 	int isType(int t);
@@ -64,7 +64,7 @@ class Property {
 	void cancelAutomators(double time);
 	//yes, really. This is as uggly as it looks.
 	int getIntValue();
-	void setIntValue(int v);
+	void setIntValue(int v, bool avoidCallbacks = false);
 	int getIntDefault();
 	void setIntDefault(int d);
 	int getIntMin();
@@ -76,7 +76,7 @@ class Property {
 	//The index of r1 must be strictly less than or equal to the index of r2.
 	//This condition may be lifted in future.
 	float getFloatValue(int i = 0);
-	void setFloatValue(float v);
+	void setFloatValue(float v, bool avoidCallbacks = false);
 	float getFloatDefault();
 	void setFloatDefault(float v);
 	float getFloatMin();
@@ -88,7 +88,7 @@ class Property {
 	//The index of r1 must be strictly less than or equal to the index of r2.
 	//This condition may be lifted in future.
 	double getDoubleValue(int i = 0);
-	void setDoubleValue(double v);
+	void setDoubleValue(double v, bool avoidCallbacks = false);
 	double getDoubleMin();
 	double getDoubleMax();
 	void setDoubleRange(double a, double b);
@@ -97,16 +97,16 @@ class Property {
 	//float3 vectors.
 	const float* getFloat3Value();
 	const float* getFloat3Default();
-	void setFloat3Value(const float* const v);
-	void setFloat3Value(float v1, float v2, float v3);
+	void setFloat3Value(const float* const v, bool avoidCallbacks = false);
+	void setFloat3Value(float v1, float v2, float v3, bool avoidCallbacks = false);
 	void setFloat3Default(const float* const v);
 	void setFloat3Default(float v1, float v2, float v3);
 
 	//float6 vectors.
 	const float* getFloat6Value();
 	const float* getFloat6Default();
-	void setFloat6Value(const float* const v);
-	void setFloat6Value(float v1, float v2, float v3, float v4, float v5, float v6);
+	void setFloat6Value(const float* const v, bool avoidCallbacks);
+	void setFloat6Value(float v1, float v2, float v3, float v4, float v5, float v6, bool avoidCallbacks = false);
 	void setFloat6Default(const float* const v);
 	void setFloat6Default(float v1, float v2, float v3, float v4, float v5, float v6);
 
@@ -117,8 +117,8 @@ class Property {
 
 	//the float arrays.
 	float readFloatArray(unsigned int index);
-	void writeFloatArray(unsigned int start, unsigned int stop, float* values);
-	void replaceFloatArray(unsigned int length, float* values);
+	void writeFloatArray(unsigned int start, unsigned int stop, float* values, bool avoidCallbacks = false);
+	void replaceFloatArray(unsigned int length, float* values, bool avoidCallbacks = false);
 	unsigned int getFloatArrayLength();
 	float* getFloatArrayPtr();
 	std::vector<float> getFloatArrayDefault();
@@ -126,8 +126,8 @@ class Property {
 	
 	//the int arrays.
 	int readIntArray(unsigned int index);
-	void writeIntArray(unsigned int start, unsigned int stop, int* values);
-	void replaceIntArray(unsigned int length, int* values);
+	void writeIntArray(unsigned int start, unsigned int stop, int* values, bool avoidCallbacks = false);
+	void replaceIntArray(unsigned int length, int* values, bool avoidCallbacks = false);
 	unsigned int getIntArrayLength();
 	int* getIntArrayPtr();
 	std::vector<int> getIntArrayDefault();
@@ -135,13 +135,13 @@ class Property {
 
 	//strings:
 	const char* getStringValue();
-	void setStringValue(const char* s);
+	void setStringValue(const char* s, bool avoidCallbacks= false);
 	const char* getStringDefault();
 	void setStringDefault(const char* s);
 
 	//Buffer properties.
 	std::shared_ptr<Buffer> getBufferValue();
-	void setBufferValue(std::shared_ptr<Buffer> b);
+	void setBufferValue(std::shared_ptr<Buffer> b, bool avoidCallbacks = false);
 
 	//Can we assume that the value for i=0 in the get* functions is the value for the whole block?
 	//In other words, can we optimize the application by not computing the same thing over and over?
