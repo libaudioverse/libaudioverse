@@ -171,7 +171,7 @@ class Property {
 	unsigned int min_array_length = 0, max_array_length = std::numeric_limits<unsigned int>::max();
 	bool read_only = false;
 	bool has_dynamic_range = false;
-	Node* node;
+	Node* node = nullptr;
 	std::shared_ptr<Simulation> simulation;
 
 	//These are for automation and node connections:

@@ -531,6 +531,7 @@ void Property::setPostChangedCallback(std::function<void(void)> cb) {
 }
 
 void Property::firePostChangedCallback() {
+	if(node == nullptr) return; //Not associated with a node yet.
 	if(post_changed_callback) post_changed_callback();
 	node->visitPropertyBackrefs(tag, [](Property& p) {
 		if(p.post_changed_callback) p.post_changed_callback();
