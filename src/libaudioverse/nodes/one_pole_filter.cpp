@@ -52,9 +52,20 @@ void OnePoleFilterNode::reconfigureFilters() {
 
 void OnePoleFilterNode::process() {
 	if(werePropertiesModified(this, Lav_ONE_POLE_FILTER_IS_HIGHPASS, Lav_ONE_POLE_FILTER_FREQUENCY)) reconfigureFilters();
+	auto &freqProp = getProperty(Lav_ONE_POLE_FILTER_FREQUENCY);
+	bool isHighpass = getProperty(Lav_ONE_POLE_FILTER_IS_HIGHPASS).getIntValue() == 1;
 	for(int i = 0; i < channels; i++) {
 		auto &filt = *filters[i];
-		for(int j = 0; j < block_size; j++) output_buffers[i][j] = filt.tick(input_buffers[i][j]);
+		if(freqProp.needsARate() == false) {
+			for(int j = 0; j < block_size; j++) output_buffers[i][j] = filt.tick(input_buffers[i][j]);
+		}
+		else {
+			for(int j = 0; j < block_size; j++) {
+				float freq = freqProp.getFloatValue(j);
+				filt.setPoleFromFrequency(freq, isHighpass);
+				output_buffers[i][j] = filt.tick(input_buffers[i][j]);
+			}
+		}
 	}
 }
 

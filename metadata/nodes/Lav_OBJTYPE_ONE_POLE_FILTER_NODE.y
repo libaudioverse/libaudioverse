@@ -4,7 +4,7 @@ properties:
     type: float
     range: dynamic
     default: 500.0
-    is_arate: true
+    rate: a
     doc_description: |
       The -3 DB frequency of the filter.
       
