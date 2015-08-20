@@ -109,6 +109,8 @@ nodes/three_band_eq.cpp
 nodes/filtered_delay.cpp
 nodes/panner_bank.cpp
 nodes/crossfader.cpp
+nodes/one_pole_filter.cpp
+
 
 #automators
 automators/automators.cpp
