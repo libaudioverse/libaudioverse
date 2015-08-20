@@ -26,7 +26,6 @@ std::atomic<int> *max_handle = nullptr;
 LavHandleDestroyedCallback handle_destroyed_callback = nullptr;
 bool memory_initialized = false;
 
-
 void initializeMemoryModule() {
 	memory_lock=new std::recursive_mutex();
 	max_handle = new std::atomic<int>();
@@ -146,7 +145,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_handleDecRef(LavHandle handle) {
 			node->unlock();
 			l.lock();
 			//This can in theory happen.
-			if(memory_initialized) return Lav_ERROR_NONE;
+			if(memory_initialized == false) return Lav_ERROR_NONE;
 		}
 		external_handles->erase(e->externalObjectHandle);
 	}

@@ -50,10 +50,12 @@ void Simulation::completeInitialization() {
 }
 
 Simulation::~Simulation() {
+	printf("Deleting simulation...\n");
 	//enqueue a task which will stop the background thread.
 	enqueueTask([]() {throw ThreadTerminationException();});
 	backgroundTaskThread.join();
 	delete planner;
+	printf("Simulation deleted.\n");
 }
 
 //Yes, this uses goto. Yes, goto is evil. We need a single point of exit.
