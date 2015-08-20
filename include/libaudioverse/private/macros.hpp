@@ -18,10 +18,10 @@ Such functions should indicate errors by throwing ErrorException, not returning.
 under no circumstances will an exception leave the public api and propagate into user code, ever.  This is necessary because we wish to bind to many languages, and very few actually support marshalling exceptions across the boundary.*/
 #define PUB_BEGIN try {
 
-#define PUB_END } catch(ErrorException e) {\
+#define PUB_END } catch(ErrorException &e) {\
 recordError(e);\
 return e.error; \
-} catch(std::bad_alloc e) {\
+} catch(std::bad_alloc &e) {\
 recordError(ErrorException(Lav_ERROR_MEMORY, "Memory allocation error." __FILE__, __LINE__));\
 return Lav_ERROR_MEMORY;\
 } catch(...) {\
