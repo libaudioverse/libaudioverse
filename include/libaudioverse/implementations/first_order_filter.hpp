@@ -13,8 +13,13 @@ class FirstOrderFilter {
 	float tick(float input);
 	//Set the pole's position on the  real axis.
 	void setPolePosition(float pos);
+	float getPolePosition();
 	//Set the zero's position on the real axis.
 	void setZeroPosition(float pos);
+	float getZeroPosition();
+	//Configure as butterworth lowpass and highpass. Specify the 3 DB frequency.
+	void configureLowpass(float frequency);
+	void configureHighpass(float frequency);
 	private:
 	double sr = 0.0;
 	float b0 = 1.0, b1 = 0.0, a1 = 0.0;
@@ -33,9 +38,29 @@ inline void FirstOrderFilter::setPolePosition(float pos) {
 	a1 = -pos;
 }
 
+float FirstOrderFilter::getPolePosition() {
+	return -a1;
+}
+
 inline void FirstOrderFilter::setZeroPosition(float pos) {
 	b0 = 1.0f;
 	b1 = -pos;
+}
+
+inline float FirstOrderFilter::getZeroPosition() {
+	return -b1/b0;
+}
+
+inline void FirstOrderFilter::configureLowpass(float frequency) {
+	b1 = 0.0;
+	a1 = -exp(-2*PI*frequency/sr);
+	b0 = 1.0+a1;
+}
+
+inline void FirstOrderFilter::configureHighpass(float frequency) {
+	b1 = 0.0;
+	a1 = exp(-2.0*PI*frequency/sr);
+	b0 = 1-a1;
 }
 
 }
