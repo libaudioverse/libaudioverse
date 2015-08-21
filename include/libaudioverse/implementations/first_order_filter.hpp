@@ -20,9 +20,9 @@ class FirstOrderFilter {
 	//Configure as butterworth lowpass and highpass. Specify the 3 DB frequency.
 	void configureLowpass(float frequency);
 	void configureHighpass(float frequency);
+	float b0 = 1.0, b1 = 0.0, a1 = 0.0;
 	private:
 	double sr = 0.0;
-	float b0 = 1.0, b1 = 0.0, a1 = 0.0;
 	//the history.
 	float lastOutput = 0.0, lastInput = 0.0;
 };

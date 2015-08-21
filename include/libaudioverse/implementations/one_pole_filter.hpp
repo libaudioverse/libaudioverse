@@ -15,9 +15,9 @@ class OnePoleFilter {
 	void setPolePosition(float pos, bool normalize = true);
 	//Set the filter up. Specify highpass or lowpass and the -3 db frequency.
 	void setPoleFromFrequency(float fc, bool isHighpass = false);
+	float b0 = 1.0, a1 = 0.0;
 	private:
 	double sr = 0.0;
-	float b0 = 1.0, a1 = 0.0;
 	//the history.
 	float last = 0.0;
 };
