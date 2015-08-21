@@ -110,7 +110,7 @@ nodes/filtered_delay.cpp
 nodes/panner_bank.cpp
 nodes/crossfader.cpp
 nodes/one_pole_filter.cpp
-
+nodes/first_order_filter.cpp
 
 #automators
 automators/automators.cpp

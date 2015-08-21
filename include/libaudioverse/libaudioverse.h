@@ -117,6 +117,7 @@ enum Lav_OBJECT_TYPES {
 	Lav_OBJTYPE_PANNER_BANK_NODE,
 	Lav_OBJTYPE_CROSSFADER_NODE,
 	Lav_OBJTYPE_ONE_POLE_FILTER_NODE,
+	Lav_OBJTYPE_FIRST_ORDER_FILTER_NODE,
 };
 
 /**Node states.*/
@@ -418,6 +419,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_createCrossfaderNode(LavHandle simulationHandle
 Lav_PUBLIC_FUNCTION LavError Lav_crossfaderNodeCrossfade(LavHandle nodeHandle, float duration, int input);
 
 Lav_PUBLIC_FUNCTION LavError Lav_createOnePoleFilterNode(LavHandle simulationHandle, int channels, LavHandle* destination);
+
+Lav_PUBLIC_FUNCTION LavError Lav_createFirstOrderFilterNode(LavHandle simulationHandle, int channels, LavHandle* destination);
 
 #ifdef __cplusplus
 }
