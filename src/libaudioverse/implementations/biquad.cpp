@@ -15,22 +15,17 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 namespace libaudioverse_implementation {
 
 void BiquadFilter::configure(int type, double frequency, double dbGain, double q) {
-	double a0, b0;
-	//rest are from the class.
+	double a0;
 	//This function takes references.
 	biquadConfigurationImplementation(sr, type, frequency, dbGain, q, b0, b1, b2, a0, a1, a2);
-	//we have (b0+b1^z^-1+b2*z^-2)/(a0+a1^z^-1+a2*z^-2)
-	//We want (1+b1^z^-1+b2*z^-2)/(1+a1*z^-1+a2*z^-2)
-	//Consequently, we multiply by (1/b0)/(1/a0)=(a0/b0)
-	//But this means that we need to add back in (b0/a0).
-	gain = b0/a0;
-	//We also have to divide the coefficients:
-	b1 /= b0;
-	b2 /= b0;
+	//We want a0 to be 1.  We can do this by multiplying by 1/(1/a0).
+	//Unfortunately, this changes the filter gain.  But suppose we multiply by (1/a0)/(1/a0) = 1:
+	b0 /= a0;
+	b1 /= a0;
+	b2 /= a0;
 	a1 /= a0;
 	a2 /= a0;
 }
-
 
 void BiquadFilter::clearHistories() {
 	h1=0.0f;
