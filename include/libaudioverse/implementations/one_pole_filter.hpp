@@ -25,7 +25,7 @@ class OnePoleFilter {
 inline float OnePoleFilter::tick(float input) {
 	float out = b0*input-a1*last;
 	last = out;
-	return last;
+	return out;
 }
 
 inline void OnePoleFilter::setPolePosition(float pos, bool normalize) {
