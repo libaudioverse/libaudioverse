@@ -20,6 +20,8 @@ class FirstOrderFilter {
 	//Configure as butterworth lowpass and highpass. Specify the 3 DB frequency.
 	void configureLowpass(float frequency);
 	void configureHighpass(float frequency);
+	//Configure as a first-order allpass.  Phase of pi at DC, 0 at Nyquist, specify the pi/2 frequency.
+	void configureAllpass(float frequency);
 	float b0 = 1.0, b1 = 0.0, a1 = 0.0;
 	private:
 	double sr = 0.0;
@@ -61,6 +63,17 @@ inline void FirstOrderFilter::configureHighpass(float frequency) {
 	b1 = 0.0;
 	a1 = exp(-2.0*PI*frequency/sr);
 	b0 = 1-a1;
+}
+
+inline void FirstOrderFilter::configureAllpass(float frequency) {
+	float omegaB = frequency*2*PI; //Not normalized because we're doing the bilinear transform.
+	float omegaBT = omegaB/sr; //omegaB times the sampling interval.
+	//Formulas from Physical Audio Processing by JOS. See section on analog phasing: https://ccrma.stanford.edu/~jos/pasp/Virtual_Analog_Example_Phasing.html
+	//The above link derives the positionn of the pole and 0 from the bilinear transform, giving the following formulas.
+	float pole = (1.0-tan(omegaBT/2.0))/(1+tan(omegaBT/2.0));
+	b0 = pole;
+	b1 = 1.0;
+	a1 = pole;
 }
 
 }
