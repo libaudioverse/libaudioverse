@@ -22,6 +22,10 @@ class FirstOrderFilterNode: public Node {
 	public:
 	FirstOrderFilterNode(std::shared_ptr<Simulation> sim, int channels);
 	void process() override;
+	void configureLowpass(float freq);
+	void configureHighpass(float freq);
+	void configureAllpass(float freq);
+	void recomputePoleAndZero();
 	FirstOrderFilter** filters;
 	int channels;
 };
@@ -85,6 +89,26 @@ void FirstOrderFilterNode::process() {
 	}
 }
 
+void FirstOrderFilterNode::configureLowpass(float freq) {
+	for(int i = 0; i < channels; i++) filters[i]->configureLowpass(freq);
+	recomputePoleAndZero();
+}
+
+void FirstOrderFilterNode::configureHighpass(float freq) {
+	for(int i = 0; i < channels; i++) filters[i]->configureHighpass(freq);
+	recomputePoleAndZero();
+}
+
+void FirstOrderFilterNode::configureAllpass(float freq) {
+	for(int i = 0; i < channels; i++) filters[i]->configureAllpass(freq);
+	recomputePoleAndZero();
+}
+
+void FirstOrderFilterNode::recomputePoleAndZero() {
+	getProperty(Lav_FIRST_ORDER_FILTER_POLE).setFloatValue(filters[0]->getPolePosition());
+	getProperty(Lav_FIRST_ORDER_FILTER_ZERO).setFloatValue(filters[0]->getZeroPosition());
+}
+
 //begin public api.
 
 Lav_PUBLIC_FUNCTION LavError Lav_createFirstOrderFilterNode(LavHandle simulationHandle, int channels, LavHandle* destination) {
@@ -95,5 +119,19 @@ Lav_PUBLIC_FUNCTION LavError Lav_createFirstOrderFilterNode(LavHandle simulation
 	*destination =outgoingObject<Node>(retval);
 	PUB_END
 }
+
+//I'm not typing this 3 times.
+#define conf(which) \
+Lav_PUBLIC_FUNCTION LavError Lav_firstOrderFilterNodeConfigure##which(LavHandle nodeHandle, float frequency) {\
+	PUB_BEGIN\
+	auto n = incomingObject<FirstOrderFilterNode>(nodeHandle);\
+	LOCK(*n);\
+	n->configure##which(frequency);\
+	PUB_END\
+}
+
+conf(Lowpass)
+conf(Highpass)
+conf(Allpass)
 
 }

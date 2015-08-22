@@ -421,6 +421,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_crossfaderNodeCrossfade(LavHandle nodeHandle, f
 Lav_PUBLIC_FUNCTION LavError Lav_createOnePoleFilterNode(LavHandle simulationHandle, int channels, LavHandle* destination);
 
 Lav_PUBLIC_FUNCTION LavError Lav_createFirstOrderFilterNode(LavHandle simulationHandle, int channels, LavHandle* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_firstOrderFilterNodeConfigureLowpass(LavHandle nodeHandle, float frequency);
+Lav_PUBLIC_FUNCTION LavError Lav_firstOrderFilterNodeConfigureHighpass(LavHandle nodeHandle, float frequency);
+Lav_PUBLIC_FUNCTION LavError Lav_firstOrderFilterNodeConfigureAllpass(LavHandle nodeHandle, float freequency);
 
 #ifdef __cplusplus
 }
