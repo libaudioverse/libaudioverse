@@ -53,8 +53,9 @@ void FirstOrderFilterNode::process() {
 		for(int i = 0; i < channels; i++) {
 			auto &filt = *filters[i];
 			for(int j = 0; j < block_size; j++) {
-				filt.setZeroPosition(zeroProp.getFloatValue(j));
-				filt.setPolePosition(poleProp.getFloatValue(j));
+				filt.setZeroPosition(zeroProp.getFloatValue(j), false);
+				filt.setPolePosition(poleProp.getFloatValue(j), false);
+				filt.normalize();
 				output_buffers[i][j] = filt.tick(input_buffers[i][j]);
 			}
 		}
@@ -80,8 +81,9 @@ void FirstOrderFilterNode::process() {
 	else {
 		for(int i = 0; i < channels; i++) {
 			auto &filt = *filters[i];
-			filt.setPolePosition(poleProp.getFloatValue());
-			filt.setZeroPosition(zeroProp.getFloatValue());
+			filt.setPolePosition(poleProp.getFloatValue(), false);
+			filt.setZeroPosition(zeroProp.getFloatValue(), false);
+			filt.normalize();
 			for(int j = 0; j < block_size; j++) {
 				output_buffers[i][j] = filt.tick(input_buffers[i][j]);
 			}
