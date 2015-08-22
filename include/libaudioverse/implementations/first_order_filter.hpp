@@ -83,7 +83,8 @@ inline void FirstOrderFilter::configureLowpass(float frequency) {
 
 inline void FirstOrderFilter::configureHighpass(float frequency) {
 	b1 = 0.0;
-	a1 = exp(-PI*frequency/sr);
+	float bandwidth = sr/2.0-frequency;
+	a1 = exp(-PI*bandwidth/sr);
 	b0 = 1-a1;
 }
 
