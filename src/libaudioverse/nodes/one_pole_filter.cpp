@@ -10,6 +10,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/kernels.hpp>
+#include <libaudioverse/private/multichannel_filter_bank.hpp>
 #include <limits>
 #include <memory>
 #include <algorithm>
@@ -23,16 +24,14 @@ class OnePoleFilterNode: public Node {
 	OnePoleFilterNode(std::shared_ptr<Simulation> sim, int channels);
 	void process() override;
 	void reconfigureFilters();
-	OnePoleFilter** filters;
-	int channels;
+	MultichannelFilterBank<OnePoleFilter> bank;
 };
 
-OnePoleFilterNode::OnePoleFilterNode(std::shared_ptr<Simulation> sim, int channels): Node(Lav_OBJTYPE_ONE_POLE_FILTER_NODE, sim, channels, channels) {
+OnePoleFilterNode::OnePoleFilterNode(std::shared_ptr<Simulation> sim, int channels): Node(Lav_OBJTYPE_ONE_POLE_FILTER_NODE, sim, channels, channels),
+bank(simulation->getSr()) {
 	if(channels < 1) ERROR(Lav_ERROR_RANGE, "Cannot filter 0 or fewer channels.");
-	filters = new OnePoleFilter*[channels];
-	for(int i = 0; i < channels; i++) filters[i] = new OnePoleFilter(simulation->getSr());
+	bank.setChannelCount(channels);
 	getProperty(Lav_ONE_POLE_FILTER_FREQUENCY).setFloatRange(0, simulation->getSr()/2.0);
-	this->channels = channels;
 	reconfigureFilters();
 	appendInputConnection(0, channels);
 	appendOutputConnection(0, channels);
@@ -47,26 +46,17 @@ std::shared_ptr<Node> createOnePoleFilterNode(std::shared_ptr<Simulation> simula
 void OnePoleFilterNode::reconfigureFilters() {
 	float freq = getProperty(Lav_ONE_POLE_FILTER_FREQUENCY).getFloatValue();
 	bool isHighpass = getProperty(Lav_ONE_POLE_FILTER_IS_HIGHPASS).getIntValue() == 1; //==1 prevents a performance warning from VC++.
-	for(int i = 0; i < channels; i++) filters[i]->setPoleFromFrequency(freq, isHighpass);
+	bank->setPoleFromFrequency(freq, isHighpass);
 }
 
 void OnePoleFilterNode::process() {
 	if(werePropertiesModified(this, Lav_ONE_POLE_FILTER_IS_HIGHPASS, Lav_ONE_POLE_FILTER_FREQUENCY)) reconfigureFilters();
 	auto &freqProp = getProperty(Lav_ONE_POLE_FILTER_FREQUENCY);
 	bool isHighpass = getProperty(Lav_ONE_POLE_FILTER_IS_HIGHPASS).getIntValue() == 1;
-	for(int i = 0; i < channels; i++) {
-		auto &filt = *filters[i];
-		if(freqProp.needsARate() == false) {
-			for(int j = 0; j < block_size; j++) output_buffers[i][j] = filt.tick(input_buffers[i][j]);
-		}
-		else {
-			for(int j = 0; j < block_size; j++) {
-				float freq = freqProp.getFloatValue(j);
-				filt.setPoleFromFrequency(freq, isHighpass);
-				output_buffers[i][j] = filt.tick(input_buffers[i][j]);
-			}
-		}
-	}
+	if(freqProp.needsARate()) bank.process(block_size, &input_buffers[0], &output_buffers[0], [&] (OnePoleFilter& filter, int index) {
+		filter.setPoleFromFrequency(freqProp.getFloatValue(index), isHighpass);
+	});
+	else bank.process(block_size, &input_buffers[0], &output_buffers[0]);
 }
 
 //begin public api.

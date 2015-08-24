@@ -16,7 +16,7 @@ class BiquadFilter {
 	float tick(float input);
 
 	void configure(int type, double frequency, double dbGain, double q);
-	void clearHistories();
+	void reset();
 	void setCoefficients(double b0, double b1, double b2, double a1, double a2);
 	
 	double qFromBw(double frequency, double bw);

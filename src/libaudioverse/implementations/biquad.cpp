@@ -28,10 +28,10 @@ void BiquadFilter::configure(int type, double frequency, double dbGain, double q
 	setCoefficients(b0, b1, b2, a1, a2);
 }
 
-void BiquadFilter::clearHistories() {
+void BiquadFilter::reset() {
 	h1=0.0f;
 	h2=0.0f;
-	if(slave) slave->clearHistories();
+	if(slave) slave->reset();
 }
 
 void BiquadFilter::setCoefficients(double b0, double b1, double b2, double a1, double a2) {

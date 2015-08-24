@@ -10,32 +10,28 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/kernels.hpp>
 #include <libaudioverse/implementations/biquad.hpp>
-#include <limits>
+#include <libaudioverse/private/multichannel_filter_bank.hpp>
 #include <memory>
 #include <algorithm>
 #include <utility>
-#include <vector>
-
 
 namespace libaudioverse_implementation {
 
 class BiquadNode: public Node {
 	public:
 	BiquadNode(std::shared_ptr<Simulation> sim, unsigned int channels);
-	~BiquadNode();
 	void process();
 	void reconfigure();
 	void reset() override;
 	private:
-	BiquadFilter** biquads;
-	int channels;
+	MultichannelFilterBank<BiquadFilter> bank;
 	int prev_type;
 };
 
-BiquadNode::BiquadNode(std::shared_ptr<Simulation> sim, unsigned int channels): Node(Lav_OBJTYPE_BIQUAD_NODE, sim, channels, channels) {
-	this->channels=channels;
-	biquads = new BiquadFilter*[channels]();
-	for(int i= 0; i < channels; i++) biquads[i] = new BiquadFilter(simulation->getSr());
+BiquadNode::BiquadNode(std::shared_ptr<Simulation> sim, unsigned int channels): Node(Lav_OBJTYPE_BIQUAD_NODE, sim, channels, channels),
+bank(simulation->getSr()) {
+	if(channels < 1) ERROR(Lav_ERROR_RANGE, "Cannot filter 0 or fewer channels.");
+	bank.setChannelCount(channels);
 	prev_type = getProperty(Lav_BIQUAD_FILTER_TYPE).getIntValue();
 	appendInputConnection(0, channels);
 	appendOutputConnection(0, channels);
@@ -47,38 +43,24 @@ std::shared_ptr<Node> createBiquadNode(std::shared_ptr<Simulation> simulation, u
 	return retval;
 }
 
-BiquadNode::~BiquadNode() {
-	for(int i=0; i < channels; i++) delete biquads[i];
-	delete[] biquads;
-}
-
 void BiquadNode::reconfigure() {
 	int type = getProperty(Lav_BIQUAD_FILTER_TYPE).getIntValue();
 	float sr = simulation->getSr();
 	float frequency = getProperty(Lav_BIQUAD_FREQUENCY).getFloatValue();
 	float q = getProperty(Lav_BIQUAD_Q).getFloatValue();
 	float dbgain= getProperty(Lav_BIQUAD_DBGAIN).getFloatValue();
-	for(int i=0; i < channels; i++) {
-		biquads[i]->configure(type, frequency, dbgain, q);
-		if(type != prev_type) biquads[i]->clearHistories();
-	}
+	bank->configure(type, frequency, dbgain, q);
+	if(type != prev_type) bank.reset();
 	prev_type = type;
 }
 
 void BiquadNode::process() {
-	reconfigure(); //always reconfigure the biquad, so that properties are k-rate.
-	//doing this this way may make the algorithm morecache- friendly on some compilers/systems.
-	//It also avoids a large number of extraneous lookups in the vctor.
-	for(int j = 0; j < channels; j++) {
-		BiquadFilter &bq = *biquads[j];
-		for(unsigned int i = 0; i < block_size; i++) {
-			output_buffers[j][i] = bq.tick(input_buffers[j][i]);
-		}
-	}
+	if(werePropertiesModified(this, Lav_BIQUAD_FILTER_TYPE, Lav_BIQUAD_DBGAIN, Lav_BIQUAD_FREQUENCY, Lav_BIQUAD_Q)) reconfigure();
+	bank.process(block_size, &input_buffers[0], &output_buffers[0]);
 }
 
 void BiquadNode::reset() {
-	for(int i= 0; i < channels; i++) biquads[i]->clearHistories();
+	bank.reset();
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_createBiquadNode(LavHandle simulationHandle, unsigned int channels, LavHandle* destination) {

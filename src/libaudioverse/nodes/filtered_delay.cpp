@@ -85,7 +85,7 @@ void FilteredDelayNode::reconfigureBiquads() {
 	float dbgain= getProperty(Lav_FILTERED_DELAY_DBGAIN).getFloatValue();
 	for(int i=0; i < channels; i++) {
 		biquads[i]->configure(type, frequency, dbgain, q);
-		if(type != prev_type) biquads[i]->clearHistories();
+		if(type != prev_type) biquads[i]->reset();
 	}
 	prev_type = type;
 }
@@ -120,7 +120,7 @@ void FilteredDelayNode::process() {
 
 void FilteredDelayNode::reset() {
 	for(int i = 0; i < channels; i++) {
-		biquads[i]->clearHistories();
+		biquads[i]->reset();
 		lines[i]->reset();
 	}
 }

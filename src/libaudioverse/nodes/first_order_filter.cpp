@@ -10,6 +10,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/kernels.hpp>
+#include <libaudioverse/private/multichannel_filter_bank.hpp>
 #include <limits>
 #include <memory>
 #include <algorithm>
@@ -26,15 +27,13 @@ class FirstOrderFilterNode: public Node {
 	void configureHighpass(float freq);
 	void configureAllpass(float freq);
 	void recomputePoleAndZero();
-	FirstOrderFilter** filters;
-	int channels;
+	MultichannelFilterBank<FirstOrderFilter> bank;
 };
 
-FirstOrderFilterNode::FirstOrderFilterNode(std::shared_ptr<Simulation> sim, int channels): Node(Lav_OBJTYPE_FIRST_ORDER_FILTER_NODE, sim, channels, channels) {
+FirstOrderFilterNode::FirstOrderFilterNode(std::shared_ptr<Simulation> sim, int channels): Node(Lav_OBJTYPE_FIRST_ORDER_FILTER_NODE, sim, channels, channels),
+bank(simulation->getSr()) {
 	if(channels < 1) ERROR(Lav_ERROR_RANGE, "Cannot filter 0 or fewer channels.");
-	filters = new FirstOrderFilter*[channels];
-	for(int i = 0; i < channels; i++) filters[i] = new FirstOrderFilter(simulation->getSr());
-	this->channels = channels;
+	bank.setChannelCount(channels);
 	appendInputConnection(0, channels);
 	appendOutputConnection(0, channels);
 }
@@ -48,67 +47,53 @@ std::shared_ptr<Node> createFirstOrderFilterNode(std::shared_ptr<Simulation> sim
 void FirstOrderFilterNode::process() {
 	auto &poleProp = getProperty(Lav_FIRST_ORDER_FILTER_POLE);
 	auto &zeroProp = getProperty(Lav_FIRST_ORDER_FILTER_ZERO);
-	//Four cases: none is a-rate, pole is a-rate, zero is a-rate, botha re a-rate.
+	//Four cases: none is a-rate, pole is a-rate, zero is a-rate, both are a-rate.
 	if(zeroProp.needsARate() && poleProp.needsARate()) {
-		for(int i = 0; i < channels; i++) {
-			auto &filt = *filters[i];
-			for(int j = 0; j < block_size; j++) {
-				filt.setZeroPosition(zeroProp.getFloatValue(j), false);
-				filt.setPolePosition(poleProp.getFloatValue(j), false);
-				filt.normalize();
-				output_buffers[i][j] = filt.tick(input_buffers[i][j]);
-			}
-		}
+		bank.process(block_size, &input_buffers[0], &output_buffers[0], [&] (FirstOrderFilter& filt, int index) {
+			filt.setZeroPosition(zeroProp.getFloatValue(index), false);
+			filt.setPolePosition(poleProp.getFloatValue(index), false);
+			filt.normalize();
+		});
 	}
 	else if(zeroProp.needsARate()) {
-		for(int i = 0; i < channels; i++) {
-			auto &filt = *filters[i];
-			for(int j = 0; j < block_size; j++) {
-				filt.setZeroPosition(zeroProp.getFloatValue(j));
-				output_buffers[i][j] = filt.tick(input_buffers[i][j]);
-			}
-		}
+		bank.process(block_size, &input_buffers[0], &output_buffers[0], [&] (FirstOrderFilter& filt, int index) {
+			filt.setZeroPosition(zeroProp.getFloatValue(index), false);
+			filt.normalize();
+		});
 	}
 	else if(poleProp.needsARate()) {
-		for(int i = 0; i < channels; i++) {
-			auto &filt = *filters[i];
-			for(int j = 0; j < block_size; j++) {
-				filt.setPolePosition(poleProp.getFloatValue(j));
-				output_buffers[i][j] = filt.tick(input_buffers[i][j]);
-			}
-		}
+		bank.process(block_size, &input_buffers[0], &output_buffers[0], [&] (FirstOrderFilter& filt, int index) {
+			filt.setPolePosition(poleProp.getFloatValue(index), false);
+			filt.normalize();
+		});
 	}
 	else {
-		for(int i = 0; i < channels; i++) {
-			auto &filt = *filters[i];
-			filt.setPolePosition(poleProp.getFloatValue(), false);
-			filt.setZeroPosition(zeroProp.getFloatValue(), false);
-			filt.normalize();
-			for(int j = 0; j < block_size; j++) {
-				output_buffers[i][j] = filt.tick(input_buffers[i][j]);
-			}
-		}
+		bank->setZeroPosition(zeroProp.getFloatValue(), false);
+		bank->setPolePosition(poleProp.getFloatValue(), false);
+		bank->normalize();
+		bank.process(block_size, &input_buffers[0], &output_buffers[0]);
 	}
 }
 
 void FirstOrderFilterNode::configureLowpass(float freq) {
-	for(int i = 0; i < channels; i++) filters[i]->configureLowpass(freq);
+	bank->configureLowpass(freq);
 	recomputePoleAndZero();
 }
 
 void FirstOrderFilterNode::configureHighpass(float freq) {
-	for(int i = 0; i < channels; i++) filters[i]->configureHighpass(freq);
+	bank->configureHighpass(freq);
 	recomputePoleAndZero();
 }
 
 void FirstOrderFilterNode::configureAllpass(float freq) {
-	for(int i = 0; i < channels; i++) filters[i]->configureAllpass(freq);
+	bank->configureAllpass(freq);
 	recomputePoleAndZero();
 }
 
 void FirstOrderFilterNode::recomputePoleAndZero() {
-	getProperty(Lav_FIRST_ORDER_FILTER_POLE).setFloatValue(filters[0]->getPolePosition());
-	getProperty(Lav_FIRST_ORDER_FILTER_ZERO).setFloatValue(filters[0]->getZeroPosition());
+	auto& filt = *bank;
+	getProperty(Lav_FIRST_ORDER_FILTER_POLE).setFloatValue(filt.getPolePosition());
+	getProperty(Lav_FIRST_ORDER_FILTER_ZERO).setFloatValue(filt.getZeroPosition());
 }
 
 //begin public api.

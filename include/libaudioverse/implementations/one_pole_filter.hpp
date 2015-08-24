@@ -16,6 +16,8 @@ class OnePoleFilter {
 	//Set the filter up. Specify highpass or lowpass and the -3 db frequency.
 	void setPoleFromFrequency(float fc, bool isHighpass = false);
 	void setCoefficients(float b0, float a1);
+	void reset();
+	
 	float b0 = 1.0, a1 = 0.0;
 	OnePoleFilter* slave = nullptr;
 	private:
@@ -61,6 +63,11 @@ void OnePoleFilter::setCoefficients(float b0, float a1) {
 	this->b0 = b0;
 	this->a1 = a1;
 	if(slave) slave->setCoefficients(b0, a1);
+}
+
+void OnePoleFilter::reset() {
+	last = 0.0;
+	if(slave) slave->reset();
 }
 
 }
