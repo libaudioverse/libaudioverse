@@ -17,11 +17,15 @@ class BiquadFilter {
 
 	void configure(int type, double frequency, double dbGain, double q);
 	void clearHistories();
+	void setCoefficients(double b0, double b1, double b2, double a1, double a2);
+	
 	double qFromBw(double frequency, double bw);
 	double qFromS(double dbgain, double s);
 	
 	double b0 = 1.0, b1 = 0.0, b2 = 0.0;
 	double a1 = 0.0, a2 = 0.0;
+	//If set, all functions but tick with side effects forward onto the slave.
+	BiquadFilter* slave = nullptr;
 	private:
 	float sr;
 	//The history.

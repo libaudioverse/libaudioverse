@@ -20,13 +20,18 @@ class FirstOrderFilter {
 	void setZeroPosition(float pos, bool shouldNormalize = true);
 	float getZeroPosition();
 	//Make the peak gain of this filter 1.
-	void normalize();
+	//_useSlave is for internal use only.
+	void normalize(bool _useSlave = false);
 	//Configure as butterworth lowpass and highpass. Specify the 3 DB frequency.
 	void configureLowpass(float frequency);
 	void configureHighpass(float frequency);
 	//Configure as a first-order allpass.  Phase of pi at DC, 0 at Nyquist, specify the pi/2 frequency.
 	void configureAllpass(float frequency);
+	void setCoefficients(float b0, float b1, float a1);
+	
 	float b0 = 1.0, b1 = 0.0, a1 = 0.0;
+	//All calls with side effects save tick forward to the slave, if set.
+	FirstOrderFilter* slave = nullptr;
 	private:
 	double sr = 0.0;
 	//the history.
@@ -42,7 +47,8 @@ inline float FirstOrderFilter::tick(float input) {
 
 inline void FirstOrderFilter::setPolePosition(float pos, bool shouldNormalize) {
 	a1 = -pos;
-	if(shouldNormalize) normalize();
+	if(shouldNormalize) normalize(false);
+	if(slave) slave->setPolePosition(pos, shouldNormalize);
 }
 
 float FirstOrderFilter::getPolePosition() {
@@ -52,14 +58,15 @@ float FirstOrderFilter::getPolePosition() {
 inline void FirstOrderFilter::setZeroPosition(float pos, bool shouldNormalize) {
 	b0 = 1.0f;
 	b1 = -pos;
-	if(shouldNormalize) normalize();
+	if(shouldNormalize) normalize(false);
+	if(slave) slave->setZeroPosition(pos, shouldNormalize);
 }
 
 inline float FirstOrderFilter::getZeroPosition() {
 	return -b1/b0;
 }
 
-inline void FirstOrderFilter::normalize() {
+inline void FirstOrderFilter::normalize(bool _useSlave) {
 	/**This filter can only have real poles and zeros.
 	Consequently, peak gain is either at 0 or nyquist.
 	We evaluate it as |(b_0+b_1g)/(1+a_1g)|
@@ -73,22 +80,28 @@ inline void FirstOrderFilter::normalize() {
 	//This can't affect bandpass filters, as bandpass has peak gain of 1. We do it by folding into b0.
 	b0 /= g;
 	b1 /= g;
+	if(slave && _useSlave) slave->normalize();
 }
 
 inline void FirstOrderFilter::configureLowpass(float frequency) {
+	float b0, b1, a1;
 	b1 = 0.0;
 	a1 = -exp(-PI*frequency/sr);
 	b0 = 1.0+a1;
+	setCoefficients(b0, b1, a1);
 }
 
 inline void FirstOrderFilter::configureHighpass(float frequency) {
+	float b0, b1, a1;
 	b1 = 0.0;
 	float bandwidth = sr/2.0-frequency;
 	a1 = exp(-PI*bandwidth/sr);
 	b0 = 1-a1;
+	setCoefficients(b0, b1, a1);
 }
 
 inline void FirstOrderFilter::configureAllpass(float frequency) {
+	float b0, b1, a1;
 	float omegaB = frequency*2*PI; //Not normalized because we're doing the bilinear transform.
 	float omegaBT = omegaB/sr; //omegaB times the sampling interval.
 	//Formulas from Physical Audio Processing by JOS. See section on analog phasing: https://ccrma.stanford.edu/~jos/pasp/Virtual_Analog_Example_Phasing.html
@@ -97,6 +110,14 @@ inline void FirstOrderFilter::configureAllpass(float frequency) {
 	b0 = pole;
 	b1 = 1.0;
 	a1 = pole;
+	setCoefficients(b0, b1, a1);
+}
+
+void FirstOrderFilter::setCoefficients(float b0, float b1, float a1) {
+	this->b0 = b0;
+	this->b1 = b1;
+	this->a1 = a1;
+	if(slave) slave->setCoefficients(b0, b1, a1);
 }
 
 }

@@ -15,7 +15,9 @@ class OnePoleFilter {
 	void setPolePosition(float pos, bool normalize = true);
 	//Set the filter up. Specify highpass or lowpass and the -3 db frequency.
 	void setPoleFromFrequency(float fc, bool isHighpass = false);
+	void setCoefficients(float b0, float a1);
 	float b0 = 1.0, a1 = 0.0;
+	OnePoleFilter* slave = nullptr;
 	private:
 	double sr = 0.0;
 	//the history.
@@ -29,6 +31,7 @@ inline float OnePoleFilter::tick(float input) {
 }
 
 inline void OnePoleFilter::setPolePosition(float pos, bool normalize) {
+	float b0, a1;
 	a1 = -pos;
 	b0 = 1.0f;
 	/**Reasoning time:
@@ -40,6 +43,7 @@ inline void OnePoleFilter::setPolePosition(float pos, bool normalize) {
 	b0 = 1-|a1|.
 	*/
 	if(normalize) b0 = 1.0-abs(a1);
+	setCoefficients(b0, a1);
 }
 
 inline void OnePoleFilter::setPoleFromFrequency(float fc, bool isHighpass) {
@@ -51,6 +55,12 @@ inline void OnePoleFilter::setPoleFromFrequency(float fc, bool isHighpass) {
 	//If this is a lowpass, the pole is in the right half of the z-plane. Otherwise it's in the left half.
 	if(isHighpass) rad = -rad;
 	setPolePosition(rad);
+}
+
+void OnePoleFilter::setCoefficients(float b0, float a1) {
+	this->b0 = b0;
+	this->a1 = a1;
+	if(slave) slave->setCoefficients(b0, a1);
 }
 
 }

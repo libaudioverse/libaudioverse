@@ -15,7 +15,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 namespace libaudioverse_implementation {
 
 void BiquadFilter::configure(int type, double frequency, double dbGain, double q) {
-	double a0;
+	double a0, a1, a2, b0, b1, b2;
 	//This function takes references.
 	biquadConfigurationImplementation(sr, type, frequency, dbGain, q, b0, b1, b2, a0, a1, a2);
 	//We want a0 to be 1.  We can do this by multiplying by 1/(1/a0).
@@ -25,11 +25,22 @@ void BiquadFilter::configure(int type, double frequency, double dbGain, double q
 	b2 /= a0;
 	a1 /= a0;
 	a2 /= a0;
+	setCoefficients(b0, b1, b2, a1, a2);
 }
 
 void BiquadFilter::clearHistories() {
 	h1=0.0f;
 	h2=0.0f;
+	if(slave) slave->clearHistories();
+}
+
+void BiquadFilter::setCoefficients(double b0, double b1, double b2, double a1, double a2) {
+	this->b0 = b0;
+	this->b1 = b1;
+	this->b2 = b2;
+	this->a1 = a1;
+	this->a2 = a2;
+	if(slave) slave->setCoefficients(b0, b1, b2, a1, a2);
 }
 
 double BiquadFilter::qFromBw(double frequency, double bw) {
