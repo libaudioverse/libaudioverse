@@ -9,7 +9,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/simulation.hpp>
 #include <libaudioverse/private/properties.hpp>
-#include <libaudioverse/private/functiontables.hpp>
 #include <libaudioverse/private/dspmath.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/memory.hpp>

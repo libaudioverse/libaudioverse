@@ -36,7 +36,6 @@ connections.cpp
 node.cpp
 buffer.cpp
 properties.cpp
-functiontables.cpp
 initialization.cpp
 memory.cpp
 events.cpp
@@ -81,36 +80,36 @@ implementations/biquad.cpp
 implementations/interpolated_delay_line.cpp
 
 #specific node types.
-nodes/sine.cpp
-nodes/hard_limiter.cpp
-nodes/hrtf.cpp
-nodes/crossfading_delay.cpp
-nodes/dopplering_delay.cpp
 nodes/amplitude_panner.cpp
-nodes/push.cpp
 nodes/biquad.cpp
-nodes/pull.cpp
-nodes/graph_listener.cpp
-nodes/custom.cpp
-nodes/ringmod.cpp
-nodes/multipanner.cpp
-nodes/feedback_delay_network.cpp
-nodes/square.cpp
-nodes/noise.cpp
-nodes/iir.cpp
-nodes/gain.cpp
-nodes/split_merge.cpp #contains two nodes under the same class.
 nodes/buffer.cpp
 nodes/buffer_timeline.cpp
-nodes/recorder.cpp
 nodes/convolver.cpp
-nodes/fft_convolver.cpp
-nodes/three_band_eq.cpp
-nodes/filtered_delay.cpp
-nodes/panner_bank.cpp
 nodes/crossfader.cpp
-nodes/one_pole_filter.cpp
+nodes/crossfading_delay.cpp
+nodes/custom.cpp
+nodes/dopplering_delay.cpp
+nodes/feedback_delay_network.cpp
+nodes/fft_convolver.cpp
+nodes/filtered_delay.cpp
 nodes/first_order_filter.cpp
+nodes/gain.cpp
+nodes/graph_listener.cpp
+nodes/hard_limiter.cpp
+nodes/hrtf.cpp
+nodes/iir.cpp
+nodes/multipanner.cpp
+nodes/noise.cpp
+nodes/one_pole_filter.cpp
+nodes/panner_bank.cpp
+nodes/pull.cpp
+nodes/push.cpp
+nodes/recorder.cpp
+nodes/ringmod.cpp
+nodes/sine.cpp
+nodes/split_merge.cpp #contains two nodes under the same class.
+nodes/square.cpp
+nodes/three_band_eq.cpp
 
 #automators
 automators/automators.cpp

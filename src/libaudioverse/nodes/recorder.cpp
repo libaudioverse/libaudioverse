@@ -15,7 +15,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <powercores/threadsafe_queue.hpp>
 #include <powercores/exceptions.hpp>
 #include <powercores/utilities.hpp>
-#include <limits>
 #include <thread>
 #include <mutex>
 #include <atomic>

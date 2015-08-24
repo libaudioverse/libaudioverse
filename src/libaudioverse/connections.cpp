@@ -11,13 +11,10 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/simulation.hpp>
 #include <libaudioverse/private/macros.hpp>
-#include <libaudioverse/private/metadata.hpp>
 #include <libaudioverse/private/kernels.hpp>
 #include <audio_io/audio_io.hpp>
 #include <algorithm>
 #include <memory>
-#include <stdlib.h>
-#include <string.h>
 #include <vector>
 
 namespace libaudioverse_implementation {

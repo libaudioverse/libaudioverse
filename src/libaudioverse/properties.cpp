@@ -6,6 +6,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/automators.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/connections.hpp>
 #include <stdlib.h>
 #include <string.h>
 #include <algorithm>

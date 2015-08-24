@@ -3,10 +3,10 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #pragma once
 #include "memory.hpp"
-#include "simulation.hpp"
 #include <memory>
 
 namespace libaudioverse_implementation {
+class Simulation;
 
 class Buffer: public ExternalObject {
 	public:
@@ -33,8 +33,8 @@ class Buffer: public ExternalObject {
 	float getSampleWithMixingMatrix(int frame, int channel, int maxChannels);
 
 	//meet lockable concept:
-	void lock() {simulation->lock();}
-	void unlock() {simulation->unlock();}
+	void lock();
+	void unlock();
 
 	//Normalize the buffer: divide by the sample furthest from zero.
 	//This can't be undone.

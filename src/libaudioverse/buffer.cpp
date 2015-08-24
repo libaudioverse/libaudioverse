@@ -96,6 +96,14 @@ void Buffer::ensureRemixingWorkspace(int length) {
 	}
 }
 
+void Buffer::lock() {
+	simulation->lock();
+}
+
+void Buffer::unlock() {
+	simulation->unlock();
+}
+
 //begin public api
 
 Lav_PUBLIC_FUNCTION LavError Lav_createBuffer(LavHandle simulationHandle, LavHandle* destination) {

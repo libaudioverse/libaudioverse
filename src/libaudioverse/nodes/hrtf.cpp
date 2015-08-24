@@ -13,8 +13,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/kernels.hpp>
 #include <libaudioverse/private/constants.hpp>
 #include <libaudioverse/implementations/convolvers.hpp>
-#include <limits>
-#include <functional>
 #include <algorithm>
 #include <memory>
 #include <math.h>

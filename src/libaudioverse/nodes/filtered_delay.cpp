@@ -8,14 +8,10 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/memory.hpp>
-#include <libaudioverse/private/dspmath.hpp>
 #include <libaudioverse/implementations/delayline.hpp>
 #include <libaudioverse/implementations/biquad.hpp>
-#include <vector>
-#include <limits>
 #include <memory>
 #include <algorithm>
-#include <math.h>
 
 namespace libaudioverse_implementation {
 

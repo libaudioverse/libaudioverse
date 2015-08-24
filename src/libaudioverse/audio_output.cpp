@@ -2,7 +2,6 @@
 This file is part of Libaudioverse, a library for 3D and environmental audio simulation, and is released under the terms of the Gnu General Public License Version 3 or (at your option) any later version.
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
-
 #include <libaudioverse/private/simulation.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/memory.hpp>
@@ -11,12 +10,9 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <string>
 #include <vector>
 #include <memory>
-#include <utility>
 #include <mutex>
-#include <string.h>
 #include <algorithm>
 #include <thread>
-#include <chrono>
 #include <libaudioverse/private/logging.hpp>
 
 namespace libaudioverse_implementation {

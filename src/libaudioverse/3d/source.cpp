@@ -17,7 +17,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <math.h>
 #include <stdlib.h>
 #include <glm/glm.hpp>
-#include <limits>
 #include <memory>
 #include <set>
 

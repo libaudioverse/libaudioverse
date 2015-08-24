@@ -8,13 +8,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/memory.hpp>
-#include <libaudioverse/private/kernels.hpp>
 #include <libaudioverse/nodes/crossfader.hpp>
-#include <limits>
 #include <memory>
-#include <algorithm>
-#include <utility>
-#include <vector>
 
 namespace libaudioverse_implementation {
 

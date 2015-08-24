@@ -5,8 +5,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "../libaudioverse.h"
 #include "properties.hpp"
 #include "events.hpp"
-#include "connections.hpp"
 #include "memory.hpp"
+#include "connections.hpp"
 #include <map>
 #include <memory>
 #include <vector>
@@ -17,6 +17,9 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 namespace libaudioverse_implementation {
 
 class Property;
+class InputConnection;
+class OutputConnection;
+
 //Needed to make comparing property backrefs sane.
 class PropertyBackrefComparer {
 	public:

@@ -12,11 +12,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/constants.hpp>
 #include <libaudioverse/private/creators.hpp>
 #include <libaudioverse/private/hrtf.hpp>
-#include <limits>
 #include <memory>
-#include <algorithm>
-#include <utility>
-#include <vector>
+
 
 namespace libaudioverse_implementation {
 

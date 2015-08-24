@@ -10,13 +10,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/implementations/panner.hpp>
 #include <libaudioverse/nodes/panner.hpp>
-#include <libaudioverse/private/constants.hpp>
 #include <libaudioverse/private/kernels.hpp>
-#include <limits>
 #include <memory>
-#include <algorithm>
-#include <utility>
-#include <vector>
 
 namespace libaudioverse_implementation {
 

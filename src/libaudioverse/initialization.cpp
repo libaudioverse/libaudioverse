@@ -4,7 +4,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 /**Initialize libaudioverse.*/
 #include <libaudioverse/libaudioverse.h>
-#include <libaudioverse/private/functiontables.hpp>
 #include <libaudioverse/private/simulation.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/metadata.hpp>
@@ -24,7 +23,6 @@ initfunc_t initializers[] = {
 	//Logging is implicit.
 	initializeErrorModule,
 	initializeMemoryModule,
-	initializeFunctionTables,
 	initializeDeviceFactory,
 	initializeMetadata,
 };

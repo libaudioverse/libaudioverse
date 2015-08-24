@@ -8,12 +8,10 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/memory.hpp>
-#include <libaudioverse/private/kernels.hpp>
 #include <libaudioverse/implementations/biquad.hpp>
 #include <libaudioverse/private/multichannel_filter_bank.hpp>
 #include <memory>
-#include <algorithm>
-#include <utility>
+
 
 namespace libaudioverse_implementation {
 
