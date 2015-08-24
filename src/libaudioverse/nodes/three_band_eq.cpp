@@ -6,12 +6,13 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/simulation.hpp>
 #include <libaudioverse/private/properties.hpp>
-#include <libaudioverse/private/iir.hpp>
+#include <libaudioverse/implementations/biquad.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/memory.hpp>
+#include <libaudioverse/private/kernels.hpp>
 #include <libaudioverse/private/dspmath.hpp>
+#include <libaudioverse/private/multichannel_filter_bank.hpp>
 #include <algorithm>
-
 
 namespace libaudioverse_implementation {
 
@@ -19,27 +20,21 @@ namespace libaudioverse_implementation {
 class ThreeBandEqNode: public Node {
 	public:
 	ThreeBandEqNode(std::shared_ptr<Simulation> simulation, int channels);
-	~ThreeBandEqNode();
 	void recompute();
 	virtual void process() override;
 	virtual void reset() override;
 	float lowband_gain;
-	IIRFilter** midband_peaks= nullptr;
-	IIRFilter** highband_shelves = nullptr;
-	int channels;
+	MultichannelFilterBank<BiquadFilter> midband_peaks, highband_shelves;
 };
 
-ThreeBandEqNode::ThreeBandEqNode(std::shared_ptr<Simulation> simulation, int channels): Node(Lav_OBJTYPE_THREE_BAND_EQ_NODE, simulation, channels, channels) {
+ThreeBandEqNode::ThreeBandEqNode(std::shared_ptr<Simulation> simulation, int channels): Node(Lav_OBJTYPE_THREE_BAND_EQ_NODE, simulation, channels, channels),
+midband_peaks(simulation->getSr()),
+highband_shelves(simulation->getSr()) {
 	if(channels <= 0) ERROR(Lav_ERROR_RANGE, "Channels must be greater 0.");
 	appendInputConnection(0, channels);
 	appendOutputConnection(0, channels);
-	this->channels=channels;
-	midband_peaks = new IIRFilter*[channels];
-	highband_shelves= new IIRFilter*[channels];
-	for(int i = 0; i < channels; i++) {
-		midband_peaks[i] = new IIRFilter(simulation->getSr());
-		highband_shelves[i] = new IIRFilter(simulation->getSr());
-	}
+	midband_peaks.setChannelCount(channels);
+	highband_shelves.setChannelCount(channels);
 	//Set ranges of the nyqiuist properties.
 	getProperty(Lav_THREE_BAND_EQ_HIGHBAND_FREQUENCY).setFloatRange(0.0, simulation->getSr()/2.0);
 	getProperty(Lav_THREE_BAND_EQ_LOWBAND_FREQUENCY).setFloatRange(0.0, simulation->getSr()/2.0);
@@ -50,15 +45,6 @@ std::shared_ptr<Node> createThreeBandEqNode(std::shared_ptr<Simulation> simulati
 	std::shared_ptr<ThreeBandEqNode> retval = std::shared_ptr<ThreeBandEqNode>(new ThreeBandEqNode(simulation, channels), ObjectDeleter(simulation));
 	simulation->associateNode(retval);
 	return retval;
-}
-
-ThreeBandEqNode::~ThreeBandEqNode() {
-	for(int i = 0; i < channels; i++) {
-		delete midband_peaks[i];
-		delete highband_shelves[i];
-	}
-	delete[] midband_peaks;
-	delete[] highband_shelves;
 }
 
 void ThreeBandEqNode::recompute() {
@@ -74,14 +60,12 @@ void ThreeBandEqNode::recompute() {
 	double peakingDbgain =midbandDb-lowbandDb;
 	//And the highband needs to go from the middle band to the high.
 	double highshelfDbgain=highbandDb-midbandDb;
-	//Compute q from bw and s, using an arbetrary IIR filter.
-	//The iir filters only care about sr, so we can just pick one.
-	double peakingQ=midband_peaks[0]->qFromBw(midbandFreq, (highbandFreq-midbandFreq)*2);
-	double highshelfQ = highband_shelves[0]->qFromS(highbandFreq, 1.0);
-	for(int i = 0; i < channels; i++) {
-		midband_peaks[i]->configureBiquad(Lav_BIQUAD_TYPE_PEAKING, midbandFreq, peakingDbgain, peakingQ);
-		highband_shelves[i]->configureBiquad(Lav_BIQUAD_TYPE_HIGHSHELF, highbandFreq, highshelfDbgain, highshelfQ);
-	}
+	//Compute q from bw and s, using an arbetrary biquad filter.
+	//The biquad filters only care about sr, so we can just pick one.
+	double peakingQ = midband_peaks->qFromBw(midbandFreq, (highbandFreq-midbandFreq)*2);
+	double highshelfQ = highband_shelves->qFromS(highbandFreq, 1.0);
+	midband_peaks->configure(Lav_BIQUAD_TYPE_PEAKING, midbandFreq, peakingDbgain, peakingQ);
+	highband_shelves->configure(Lav_BIQUAD_TYPE_HIGHSHELF, highbandFreq, highshelfDbgain, highshelfQ);
 }
 
 void ThreeBandEqNode::process() {
@@ -92,20 +76,14 @@ void ThreeBandEqNode::process() {
 	Lav_THREE_BAND_EQ_HIGHBAND_DBGAIN,
 	Lav_THREE_BAND_EQ_HIGHBAND_FREQUENCY
 	)) recompute();
-	for(int channel=0; channel < channels; channel++) {
-		auto &peak= *midband_peaks[channel];
-		auto &shelf = *highband_shelves[channel];
-		for(int i= 0; i < block_size; i++) {
-			output_buffers[channel][i] = lowband_gain*peak.tick(shelf.tick(input_buffers[channel][i]));
-		}
-	}
+	for(int channel=0; channel < midband_peaks.getChannelCount(); channel++) scalarMultiplicationKernel(block_size, lowband_gain, input_buffers[channel], output_buffers[channel]);
+	midband_peaks.process(block_size, &output_buffers[0], &output_buffers[0]);
+	highband_shelves.process(block_size, &output_buffers[0], &output_buffers[0]);
 }
 
 void ThreeBandEqNode::reset() {
-	for(int i = 0; i < channels; i++) {
-		midband_peaks[i]->clearHistories();
-		highband_shelves[i]->clearHistories();
-	}
+	midband_peaks.reset();
+	highband_shelves.reset();
 }
 
 //begin public api
