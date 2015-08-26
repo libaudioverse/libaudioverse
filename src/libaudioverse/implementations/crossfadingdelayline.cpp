@@ -16,10 +16,13 @@ CrossfadingDelayLine::CrossfadingDelayLine(float maxDelay, float sr): line((int)
 
 void CrossfadingDelayLine::setDelay(float delay) {
 	int newDelay = (unsigned int)(delay*sr);
+	//Call to the slave is handled by setDelayInSamples.
 	setDelayInSamples(newDelay);
 }
 
 void CrossfadingDelayLine::setDelayInSamples(int newDelay) {
+	//we change newDelay, so call the slave first.
+	if(slave) slave->setDelayInSamples(newDelay);
 	if(newDelay >= max_delay) newDelay = max_delay-1;
 	delay = new_delay;
 	new_delay = newDelay;
@@ -33,6 +36,7 @@ void CrossfadingDelayLine::setDelayInSamples(int newDelay) {
 
 void CrossfadingDelayLine::setInterpolationTime(float t) {
 	interpolation_time = t;
+	if(slave) slave->setInterpolationTime(t);
 }
 
 float CrossfadingDelayLine::tick(float sample) {
@@ -100,6 +104,15 @@ void CrossfadingDelayLine::reset() {
 	weight2 = 0.0f;
 	counter=0;
 	line.reset();
+	if(slave) slave->reset();
+}
+
+CrossfadingDelayLine* CrossfadingDelayLine::getSlave() {
+	return slave;
+}
+
+void CrossfadingDelayLine::setSlave(CrossfadingDelayLine* s) {
+	slave = s;
 }
 
 }

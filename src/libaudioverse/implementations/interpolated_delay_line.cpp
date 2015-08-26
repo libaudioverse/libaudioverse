@@ -16,10 +16,12 @@ InterpolatedDelayLine::InterpolatedDelayLine(float maxDelay, float sr): line((in
 
 void InterpolatedDelayLine::setDelay(float d) {
 	delay = d*sr;
+	if(slave) slave->setDelay(d);
 }
 
 void InterpolatedDelayLine::setDelayInSamples(int samples) {
 	delay = std::min(samples, max_delay);
+	if(slave) slave->setDelayInSamples(samples);
 }
 
 float InterpolatedDelayLine::tick(float sample) {
@@ -45,6 +47,14 @@ void InterpolatedDelayLine::advance(float sample) {
 
 void InterpolatedDelayLine::reset() {
 	line.reset();
+}
+
+InterpolatedDelayLine* InterpolatedDelayLine::getSlave() {
+	return slave;
+}
+
+void InterpolatedDelayLine::setSlave(InterpolatedDelayLine* s) {
+	slave = s;
 }
 
 }

@@ -43,12 +43,15 @@ class CrossfadingDelayLine {
 	void add(float delay, float value);
 	void reset();
 	void setInterpolationTime(float t);
+	CrossfadingDelayLine* getSlave();
+	void setSlave(CrossfadingDelayLine* s);
 	private:
 	DelayRingbuffer line;
 	unsigned int max_delay = 0, delay = 0, new_delay = 0;
 	int counter;
 	float interpolation_delta = 1.0f, interpolation_time=0.0f;
 	float sr = 0.0f, weight1=1.0f, weight2=0.0f;
+	CrossfadingDelayLine* slave = nullptr;
 };
 
 //This is nearly the same as the crossfading delay line except:
@@ -63,6 +66,8 @@ class DoppleringDelayLine {
 	float computeSample();
 	void advance(float sample);
 	void reset();
+	DoppleringDelayLine* getSlave();
+	void setSlave(DoppleringDelayLine* s);
 	private:
 	int max_delay = 0, interpolating_direction = 0;
 	double delay = 0.0, new_delay = 0.0;
@@ -71,6 +76,7 @@ class DoppleringDelayLine {
 	float interpolation_time =0.1f;
 	float sr = 0;
 	DelayRingbuffer line;
+	DoppleringDelayLine* slave = nullptr;
 };
 
 class InterpolatedDelayLine {
@@ -82,11 +88,14 @@ class InterpolatedDelayLine {
 	float computeSample();
 	void advance(float sample);
 	void reset();
+	InterpolatedDelayLine* getSlave();
+	void setSlave(InterpolatedDelayLine* s);
 	private:
 	int max_delay = 0;
 	double delay = 0.0;
 	float sr = 0;
 	DelayRingbuffer line;
+	InterpolatedDelayLine* slave = nullptr;
 };
 
 }

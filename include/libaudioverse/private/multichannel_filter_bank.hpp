@@ -75,7 +75,7 @@ void MultichannelFilterBank<filter_type>::setChannelCount(int newCount) {
 	}
 	else {
 		auto last = first;
-		while(last && last->slave) last = last->getSlave();
+		while(last && last->getSlave()) last = last->getSlave();
 		int add = newCount-channel_count;
 		while(add) {
 			last->setSlave(filter_creator());
@@ -134,7 +134,7 @@ void MultichannelFilterBank<filter_type>::process(int blockSize, float** inputs,
 	int i = 0;
 	while(f) {
 		//We temporarily unhook the slave.
-		auto slave = f->getSlave;
+		auto slave = f->getSlave();
 		f->setSlave(nullptr);
 		for(int j = 0; j < blockSize; j++) {
 			callable(*f, j, args...);

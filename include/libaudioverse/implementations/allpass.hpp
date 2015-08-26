@@ -22,8 +22,12 @@ class AllpassFilter {
 	//These are for nesting.  Call the first one, feed it through the nested filter, call the second one.
 	float beginNestedTick();
 	float endNestedTick(float input, float lineValue);
+	AllpassFilter<delay_type>* getSlave();
+	void setSlave(AllpassFilter<delay_type>* slave);
 	float coefficient = 1.0;
 	delay_type line;
+	private:
+	AllpassFilter<delay_type> *slave = nullptr;
 };
 
 template<typename delay_type>
@@ -49,6 +53,19 @@ float AllpassFilter<delay_type>::endNestedTick(float input, float lineValue) {
 	float out = coefficient*input+lineValue;
 	line.advance(rec);
 	return out;
+}
+
+template<typename delay_type>
+AllpassFilter<delay_type>* AllpassFilter<delay_type>::getSlave() {
+	return slave;
+}
+
+template<typename delay_type>
+void AllpassFilter<delay_type>::setSlave(AllpassFilter<delay_type>* s) {
+	slave = s;
+	//Hook up the line, too.
+	if(s) line.setSlave(s->line);
+	else line.setSlave(nullptr);
 }
 
 }
