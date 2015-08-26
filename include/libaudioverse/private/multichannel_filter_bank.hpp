@@ -52,7 +52,7 @@ template<typename filter_type>
 MultichannelFilterBank<filter_type>::~MultichannelFilterBank() {
 	while(first) {
 		auto t = first;
-		first = first->slave;
+		first = first->getSlave();
 		delete t;
 	}
 }
@@ -69,17 +69,17 @@ void MultichannelFilterBank<filter_type>::setChannelCount(int newCount) {
 		int drop = channel_count-newCount;
 		while(drop) {
 			auto t = first;
-			first = first->slave;
+			first = first->getSlave();
 			delete t;
 		}
 	}
 	else {
 		auto last = first;
-		while(last && last->slave) last = last->slave;
+		while(last && last->slave) last = last->getSlave();
 		int add = newCount-channel_count;
 		while(add) {
-			last->slave = filter_creator();
-			last = last->slave;
+			last->setSlave(filter_creator());
+			last = last->getSlave();
 			add--;
 		}
 	}
@@ -91,7 +91,7 @@ void MultichannelFilterBank<filter_type>::reset() {
 	auto f = first;
 	while(f) {
 		f->reset();
-		f = f->slave;
+		f = f->getSlave();
 	}
 }
 
@@ -112,7 +112,7 @@ void MultichannelFilterBank<filter_type>::tick(float* inputFrame, float* outputF
 	while(t) {
 		outputFrame[i] = t->tick(inputFrame[i]);
 		i++;
-		t = t->slave;
+		t = t->getSlave();
 	}
 }
 
@@ -122,7 +122,7 @@ void MultichannelFilterBank<filter_type>::process(int blockSize, float** inputs,
 	int i = 0;
 	while(f) {
 		for(int j = 0; j < blockSize; j++) outputs[i][j] = f->tick(inputs[i][j]);
-		f = f->slave;
+		f = f->getSlave();
 		i++;
 	}
 }
@@ -134,16 +134,16 @@ void MultichannelFilterBank<filter_type>::process(int blockSize, float** inputs,
 	int i = 0;
 	while(f) {
 		//We temporarily unhook the slave.
-		auto slave = f->slave;
-		f->slave = nullptr;
+		auto slave = f->getSlave;
+		f->setSlave(nullptr);
 		for(int j = 0; j < blockSize; j++) {
 			callable(*f, j, args...);
 			outputs[i][j] = f->tick(inputs[i][j]);
 		}
 		i++;
 		//Put the slave back and advance.
-		f->slave = slave;
-		f = f->slave;
+		f->setSlave(slave);
+		f = f->getSlave();
 	}
 }
 

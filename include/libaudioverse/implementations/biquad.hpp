@@ -20,15 +20,18 @@ class BiquadFilter {
 	
 	double qFromBw(double frequency, double bw);
 	double qFromS(double dbgain, double s);
+
+	BiquadFilter* getSlave();
+	void setSlave(BiquadFilter* s);	
 	
 	double b0 = 1.0, b1 = 0.0, b2 = 0.0;
 	double a1 = 0.0, a2 = 0.0;
-	//If set, all functions but tick with side effects forward onto the slave.
-	BiquadFilter* slave = nullptr;
 	private:
 	float sr;
 	//The history.
 	double h1=0.0f, h2=0.0f;
+	//If set, all functions but tick with side effects forward onto the slave.
+	BiquadFilter* slave = nullptr;
 };
 
 //separate so it can be used by both this and the IIR filter.

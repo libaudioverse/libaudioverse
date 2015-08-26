@@ -29,13 +29,16 @@ class FirstOrderFilter {
 	void configureAllpass(float frequency);
 	void setCoefficients(float b0, float b1, float a1);
 	void reset();	
+	FirstOrderFilter* getSlave();
+	void setSlave(FirstOrderFilter* s);
+	
 	float b0 = 1.0, b1 = 0.0, a1 = 0.0;
-	//All calls with side effects save tick forward to the slave, if set.
-	FirstOrderFilter* slave = nullptr;
 	private:
 	double sr = 0.0;
 	//the history.
 	float lastOutput = 0.0, lastInput = 0.0;
+	//All calls with side effects save tick forward to the slave, if set.
+	FirstOrderFilter* slave = nullptr;
 };
 
 inline float FirstOrderFilter::tick(float input) {
@@ -113,17 +116,25 @@ inline void FirstOrderFilter::configureAllpass(float frequency) {
 	setCoefficients(b0, b1, a1);
 }
 
-void FirstOrderFilter::setCoefficients(float b0, float b1, float a1) {
+inline void FirstOrderFilter::setCoefficients(float b0, float b1, float a1) {
 	this->b0 = b0;
 	this->b1 = b1;
 	this->a1 = a1;
 	if(slave) slave->setCoefficients(b0, b1, a1);
 }
 
-void FirstOrderFilter::reset() {
+inline void FirstOrderFilter::reset() {
 	lastOutput = 0.0;
 	lastInput = 0.0;
 	if(slave) slave->reset();
+}
+
+inline FirstOrderFilter* FirstOrderFilter::getSlave() {
+	return slave;
+}
+
+inline void FirstOrderFilter::setSlave(FirstOrderFilter* s) {
+	slave = s;
 }
 
 }

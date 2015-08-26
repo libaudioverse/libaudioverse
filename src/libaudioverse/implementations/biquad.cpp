@@ -52,6 +52,14 @@ double BiquadFilter::qFromS(double dbgain, double s) {
 	return sqrt((a+1/a)*(1/s-1) + 2);
 }
 
+BiquadFilter* BiquadFilter::getSlave() {
+	return slave;
+}
+
+void BiquadFilter::setSlave(BiquadFilter* s) {
+	slave = s;
+}
+
 void biquadConfigurationImplementation(double sr, int type, double frequency, double dbGain, double q, double &b0, double &b1, double &b2, double &a0, double &a1, double &a2) {
 	//this entire function is a straightforward implementation of the Audio EQ cookbook, included with this repository.
 	//alias our parameters to match the Audio EQ cookbook.
