@@ -80,6 +80,7 @@ implementations/biquad.cpp
 implementations/interpolated_delay_line.cpp
 
 #specific node types.
+nodes/allpass.cpp
 nodes/amplitude_panner.cpp
 nodes/biquad.cpp
 nodes/buffer.cpp

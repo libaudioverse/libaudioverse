@@ -118,6 +118,7 @@ enum Lav_OBJECT_TYPES {
 	Lav_OBJTYPE_CROSSFADER_NODE,
 	Lav_OBJTYPE_ONE_POLE_FILTER_NODE,
 	Lav_OBJTYPE_FIRST_ORDER_FILTER_NODE,
+	Lav_OBJTYPE_ALLPASS_NODE,
 };
 
 /**Node states.*/
@@ -424,6 +425,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_createFirstOrderFilterNode(LavHandle simulation
 Lav_PUBLIC_FUNCTION LavError Lav_firstOrderFilterNodeConfigureLowpass(LavHandle nodeHandle, float frequency);
 Lav_PUBLIC_FUNCTION LavError Lav_firstOrderFilterNodeConfigureHighpass(LavHandle nodeHandle, float frequency);
 Lav_PUBLIC_FUNCTION LavError Lav_firstOrderFilterNodeConfigureAllpass(LavHandle nodeHandle, float freequency);
+
+Lav_PUBLIC_FUNCTION LavError Lav_createAllpassNode(LavHandle simulationHandle, int channels, int maxDelay, LavHandle* destination);
 
 #ifdef __cplusplus
 }
