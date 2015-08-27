@@ -37,7 +37,7 @@ void initializeMemoryModule() {
 
 void shutdownMemoryModule() {
 	std::lock_guard<std::recursive_mutex> l(*memory_lock);
-	//We need to teat nodes as a special case, isolating them.
+	//We need to treat nodes as a special case, isolating them.
 	//This is an unfortunate consequence of the fact that the memory module needs to shut down before the device module.
 	//See the comments in Lav_handleDecRef for the rationale.
 	for(auto &i: *external_handles) {

@@ -46,7 +46,7 @@ inline void OnePoleFilter::setPolePosition(float pos, bool normalize) {
 	By the rules of fractions:
 	b0 = 1-|a1|.
 	*/
-	if(normalize) b0 = 1.0-abs(a1);
+	if(normalize) b0 = (float)(1.0-abs(a1));
 	setCoefficients(b0, a1);
 }
 

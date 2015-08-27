@@ -39,9 +39,9 @@ void biquadConfigurationImplementation(double sr, int type, double frequency, do
 
 inline float BiquadFilter::tick(float input)  {
 	//Direct form 2: apply the  recursive  filter first.
-	float recursive = input-a1*h1-a2*h2;
+	double recursive = input-a1*h1-a2*h2;
 	//Apply the numerator, a simple convolution:
-	float output = b0*recursive+b1*h1+b2*h2;
+	float output = (float)(b0*recursive+b1*h1+b2*h2);
 	h2=h1;
 	h1=recursive;
 	return output;

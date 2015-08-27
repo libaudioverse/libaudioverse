@@ -119,6 +119,7 @@ enum Lav_OBJECT_TYPES {
 	Lav_OBJTYPE_ONE_POLE_FILTER_NODE,
 	Lav_OBJTYPE_FIRST_ORDER_FILTER_NODE,
 	Lav_OBJTYPE_ALLPASS_NODE,
+	Lav_OBJTYPE_NESTED_ALLPASS_NETWORK_NODE,
 };
 
 /**Node states.*/
@@ -427,6 +428,15 @@ Lav_PUBLIC_FUNCTION LavError Lav_firstOrderFilterNodeConfigureHighpass(LavHandle
 Lav_PUBLIC_FUNCTION LavError Lav_firstOrderFilterNodeConfigureAllpass(LavHandle nodeHandle, float freequency);
 
 Lav_PUBLIC_FUNCTION LavError Lav_createAllpassNode(LavHandle simulationHandle, int channels, int maxDelay, LavHandle* destination);
+
+Lav_PUBLIC_FUNCTION LavError Lav_createNestedAllpassNetworkNode(LavHandle simulationHandle, int channels, LavHandle* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_nestedAllpassNetworkNodeBeginNesting(LavHandle nodeHandle, int delay, float coefficient);
+Lav_PUBLIC_FUNCTION LavError Lav_nestedAllpassNetworkNodeEndNesting(LavHandle nodeHandle);
+Lav_PUBLIC_FUNCTION LavError Lav_nestedAllpassNetworkNodeAppendAllpass(LavHandle nodeHandle, int delay, float coefficient);
+Lav_PUBLIC_FUNCTION LavError Lav_nestedAllpassNetworkNodeAppendOnePole(LavHandle nodeHandle, float frequency, int isHighpass);
+Lav_PUBLIC_FUNCTION LavError Lav_nestedAllpassNetworkNodeAppendBiquad(LavHandle nodeHandle, int type, double frequency, double dbGain, double q);
+Lav_PUBLIC_FUNCTION LavError Lav_nestedAllpassNetworkNodeAppendReader(LavHandle nodeHandle);
+Lav_PUBLIC_FUNCTION LavError Lav_nestedAllpassNetworkNodeCompile(LavHandle nodeHandle);
 
 #ifdef __cplusplus
 }

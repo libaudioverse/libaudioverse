@@ -78,6 +78,7 @@ implementations/block_convolver.cpp
 implementations/fft_convolver.cpp
 implementations/biquad.cpp
 implementations/interpolated_delay_line.cpp
+implementations/nested_allpass_network.cpp
 
 #specific node types.
 nodes/allpass.cpp
@@ -100,6 +101,7 @@ nodes/hard_limiter.cpp
 nodes/hrtf.cpp
 nodes/iir.cpp
 nodes/multipanner.cpp
+nodes/nested_allpass_network.cpp
 nodes/noise.cpp
 nodes/one_pole_filter.cpp
 nodes/panner_bank.cpp

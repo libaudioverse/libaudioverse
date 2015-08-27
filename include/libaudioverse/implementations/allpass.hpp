@@ -20,6 +20,7 @@ class AllpassFilter {
 	void setCoefficient(float c);
 	float tick(float input);
 	//These are for nesting.  Call the first one, feed it through the nested filter, call the second one.
+	//This returns the internal line value.
 	float beginNestedTick();
 	float endNestedTick(float input, float lineValue);
 	void reset();
