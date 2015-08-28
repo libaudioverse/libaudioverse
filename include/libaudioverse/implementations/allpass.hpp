@@ -40,7 +40,6 @@ void AllpassFilter<delay_type>::setCoefficient(float c) {
 
 template<typename delay_type>
 float AllpassFilter<delay_type>::tick(float input) {
-	float lineValue = line.computeSample();
 	//No nesting.
 	return endNestedTick(input, beginNestedTick());
 }
