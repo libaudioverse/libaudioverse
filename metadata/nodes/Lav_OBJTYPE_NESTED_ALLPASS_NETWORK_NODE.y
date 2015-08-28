@@ -36,6 +36,9 @@ extra_functions:
     doc_description: |
       The output will include audio from wherever this is appended.
       You need to call this function at least once, or your configured filter will be silent.
+    params:
+      mul: The volume of the reader.
+      mul: The volume of the reader.
   Lav_nestedAllpassNetworkNodeCompile:
     doc_description: |
       Compile the current set of commands, replace the currently running filter with the new one, and clear the current set of commands.

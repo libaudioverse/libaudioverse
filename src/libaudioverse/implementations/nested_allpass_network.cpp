@@ -45,7 +45,7 @@ float NestedAllpassNetworkASTNode::tick(float input) {
 	} 
 	//Read the output and add it.
 	else if(type == NestedAllpassNetworkASTTypes::READER) {
-		source->contribute(input);
+		source->contribute(input*reader_mul);
 		return input;
 	}
 	return 0.0f;
@@ -132,10 +132,11 @@ void NestedAllpassNetwork::appendBiquad(int type, double frequency, double dbGai
 	if(slave) slave->appendBiquad(type, frequency, dbGain, q);
 }	
 
-void NestedAllpassNetwork::appendReader() {
+void NestedAllpassNetwork::appendReader(float mul) {
 	auto n = new NestedAllpassNetworkASTNode(this, NestedAllpassNetworkASTTypes::READER, nullptr);
+	n->reader_mul = mul;
 	hookupAST(n);
-	if(slave) slave->appendReader();
+	if(slave) slave->appendReader(mul);
 }
 
 void NestedAllpassNetwork::compile() {

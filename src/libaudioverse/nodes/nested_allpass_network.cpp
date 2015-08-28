@@ -24,7 +24,7 @@ class NestedAllpassNetworkNode: public Node {
 	void appendAllpass(int delay, float coefficient);
 	void appendOnePole(float frequency, bool isHighpass = false);
 	void appendBiquad(int type, double frequency, double dbGain, double q);
-	void appendReader();
+	void appendReader(float mul);
 	void compile();
 	MultichannelFilterBank<NestedAllpassNetwork> bank;
 };
@@ -71,8 +71,8 @@ void NestedAllpassNetworkNode::appendBiquad(int type, double frequency, double d
 	bank->appendBiquad(type, frequency, dbGain, q);
 }
 
-void NestedAllpassNetworkNode::appendReader() {
-	bank->appendReader();
+void NestedAllpassNetworkNode::appendReader(float mul) {
+	bank->appendReader(mul);
 }
 
 void NestedAllpassNetworkNode::compile() {
@@ -126,9 +126,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_nestedAllpassNetworkNodeAppendBiquad(LavHandle 
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nestedAllpassNetworkNodeAppendReader(LavHandle nodeHandle) {
+Lav_PUBLIC_FUNCTION LavError Lav_nestedAllpassNetworkNodeAppendReader(LavHandle nodeHandle, float mul) {
 	PRE
-	n->appendReader();
+	n->appendReader(mul);
 	PUB_END
 }
 

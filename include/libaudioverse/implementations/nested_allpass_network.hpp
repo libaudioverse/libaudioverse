@@ -30,6 +30,8 @@ class NestedAllpassNetworkASTNode {
 	void* filter = nullptr; //Depends on the type.
 	//Nested is the one that's nested inside, next is the next one on this level.
 	NestedAllpassNetworkASTNode *nested = nullptr, *next = nullptr;
+	//Used for the reader.
+	float reader_mul = 1.0f;
 };
 
 /**This class builds networks of nested allpasses and lowpasses, most commonly used in Schroeder reverb designs.
@@ -56,7 +58,7 @@ class NestedAllpassNetwork {
 	//Append a reader.
 	//Readers sum the output of whatever is before/above them into the final output.
 	//If there are no readers, the output is silent.
-	void appendReader();
+	void appendReader(float mul);
 	//Compile the network and begin a new one.
 	void compile();
 	//Standard filter stuff.
