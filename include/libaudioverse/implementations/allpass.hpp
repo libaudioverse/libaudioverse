@@ -52,7 +52,7 @@ float AllpassFilter<delay_type>::beginNestedTick() {
 template<typename delay_type>
 float AllpassFilter<delay_type>::endNestedTick(float input, float lineValue) {
 	float rec = input-coefficient*lineValue;
-	float out = coefficient*input+lineValue;
+	float out = coefficient*rec+lineValue;
 	line.advance(rec);
 	return out;
 }
