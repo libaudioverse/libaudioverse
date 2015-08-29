@@ -56,12 +56,22 @@ def reverse_handle(handle):
 {%macro autopointerize(arglist)%}
 {%for arg in arglist%}
 {%if arg.type.base == 'LavHandle'%}
-	{{arg.name}} = getattr({{arg.name}}.handle, 'handle', {{arg.name}}.handle)
+	#Drill down up to twice, otherwise assume we passed in something safe.
+	{{arg.name}} = getattr({{arg.name}}, 'handle', {{arg.name}})
+	{{arg.name}} = getattr({{arg.name}}, 'handle', {{arg.name}})
 {%endif%}
 {%if arg.type.indirection == 1 and not arg.type.base == 'char'%}
 	if isinstance({{arg.name}}, collections.Sized):
 		if not isinstance({{arg.name}}, basestring):
-			{{arg.name}} = ({{arg.type|ctypes_string(1)}}*len({{arg.name}}))(*{{arg.name}})
+			{{arg.name}}_t = {{arg.type|ctypes_string(1)}}*len({{arg.name}})
+			#Try to use the buffer interfaces, if we can.
+			try:
+				{{arg.name}} = {{arg.name}}_t.from_buffer({{arg.name}})
+			except TypeError:
+				{{arg.name}}_new = {{arg.name}}_t()
+				for i, j in enumerate({{arg.name}}):
+					{{arg.name}}_new[i] = j
+				{{arg.name}} = {{arg.name}}_new
 		else:
 			{{arg.name}} = ctypes.cast(ctypes.create_string_buffer({{arg.name}}, len({{arg.name}})), {{arg.type|ctypes_string}})
 {%endif%}

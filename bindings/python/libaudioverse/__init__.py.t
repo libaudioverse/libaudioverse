@@ -479,7 +479,7 @@ class BufferProperty(LibaudioverseProperty):
 	@value.setter
 	def value(self, val):
 		if val is None or isinstance(val, Buffer):
-			_lav.node_set_buffer_property(self._node, self._slot, val)
+			_lav.node_set_buffer_property(self._node, self._slot, val if val is not None else 0)
 		else:
 			raise ValueError("Expected a Buffer or None.")
 
