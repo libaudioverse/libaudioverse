@@ -92,6 +92,15 @@ for propkey, propid, propinfo in joined_properties:
 			continue #it's either MIN_INT, MAX_INT, INFINITY, -INFINITY, or another special identifier.  Pass through unchanged.
 		#we're not worried about float3 or float6 logic, because those aren't allowed to have traditional ranges at the moment-so this is it:
 		propinfo['range'][i] = string_from_number(j, propinfo['type'])
+	#Some array properties (see the feedback delay network) are controlled completely by their constructor.
+	#If this is the case, we need to give it some defaults so that the generated cpp file doesn't explode.
+	#The constructor later updates this information.
+	if propinfo.get('dynamic_array', False):
+		propinfo['min_length'] = 1
+		propinfo['max_length'] = 1
+		#This string is handled later; we need to be careful aboput the type here.
+		#No need to duplicate code we have to do in a minute anyway.
+		propinfo['default'] = 'zeros'
 	#Default handling logic.  If we don't have one and are int, float, or double we make it 0.
 	if propinfo['type'] in {'int', 'float', 'double'}:
 		propinfo['default'] = string_from_number(propinfo.get('default', 0), propinfo['type'])
@@ -100,6 +109,12 @@ for propkey, propid, propinfo in joined_properties:
 		for i, j in enumerate(list(propinfo.get('default', [0, 0, 0] if propinfo['type'] == 'float3' else [0, 0, 0, 0, 0, 0]))):
 			propinfo['default'][i] = string_from_number(j, propinfo['type'])
 	elif propinfo['type'] in {'int_array', 'float_array'}:
+		#As a special case, we allow the default heere to be the string "zeros".
+		if propinfo.get('default', None) == "zeros":
+			length = int(propinfo['min_length'])
+			propinfo['default'] = [0.0]*length
+			if propinfo['type'] == 'float_array':
+				propinfo['default'] = [int(i) for i in propinfo['default']]
 		for i, j in enumerate(list(propinfo.get('default', []))):
 			propinfo['default'][i] = string_from_number(j, propinfo['type'])
 	propinfo['normalized'] = True
