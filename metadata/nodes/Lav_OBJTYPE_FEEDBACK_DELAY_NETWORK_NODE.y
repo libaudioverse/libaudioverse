@@ -1,4 +1,32 @@
 properties:
+  Lav_FDN_OUTPUT_GAINS:
+    name: output_gains
+    type: float_array
+    dynamic_array: true
+    doc_description: |
+      Allows control of the individual gains of the output.
+      These gains do not apply to the feedback path and are only for controlling relative output levels.
+      The array for this property allows any floating point values, and must be exactly `channels` long.
+  Lav_FDN_DELAYS:
+    name: delays
+    type: float_array
+    dynamic_array: true
+    doc_description: |
+      The lengths of the delay lines in seconds.
+      This array must be {{"channels"|codelit}} long.
+      All values must be positive and no more than the maximum delay specified to the constructor.
+  Lav_FDN_MATRIX:
+    name: matrix
+    type: float_array
+    dynamic_array: true
+    doc_description: |
+      The feedback matrix.
+      
+      A column vector is formed by reading all delay lines.
+      This vector is multiplied by this matrix, and then fed back into the delay lines.
+      
+      The matrix is stored in column-major order.
+      The supplied array must have a length equal to the square of the channels specified to the constructor.
   Lav_FDN_INTERPOLATION_TIME:
     name: interpolation_time
     type: float

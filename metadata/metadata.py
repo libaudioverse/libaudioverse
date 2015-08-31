@@ -95,12 +95,13 @@ for propkey, propid, propinfo in joined_properties:
 	#Some array properties (see the feedback delay network) are controlled completely by their constructor.
 	#If this is the case, we need to give it some defaults so that the generated cpp file doesn't explode.
 	#The constructor later updates this information.
-	if propinfo.get('dynamic_array', False):
+	if propinfo['type'] in {'int_array', 'float_array'} and propinfo.get('dynamic_array', False):
 		propinfo['min_length'] = 1
 		propinfo['max_length'] = 1
 		#This string is handled later; we need to be careful aboput the type here.
 		#No need to duplicate code we have to do in a minute anyway.
 		propinfo['default'] = 'zeros'
+		propinfo['range'] = ['MIN_INT', 'MAX_INT'] if propinfo['type'] == 'int_array' else ['-INFINITY', 'INFINITY']
 	#Default handling logic.  If we don't have one and are int, float, or double we make it 0.
 	if propinfo['type'] in {'int', 'float', 'double'}:
 		propinfo['default'] = string_from_number(propinfo.get('default', 0), propinfo['type'])
