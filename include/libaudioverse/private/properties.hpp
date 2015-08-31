@@ -114,6 +114,8 @@ class Property {
 	//note that in the below, we again disable all range checks for properties which are read_only.
 	void setArrayLengthRange(unsigned int lower, unsigned int upper);
 	void getArraylengthRange(unsigned int* min, unsigned int* max);
+	//also to both:
+	void zeroArray(int length);
 
 	//the float arrays.
 	float readFloatArray(unsigned int index);

@@ -378,10 +378,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createRingmodNode(LavHandle simulationHandle, L
 
 //these are for feedback delay networks.
 //Warning: this is one of if not the single most complex nodes in Libaudioverse.
-Lav_PUBLIC_FUNCTION LavError Lav_createFeedbackDelayNetworkNode(LavHandle simulationHandle, float maxDelay, int lines, LavHandle* destination);
-Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetMatrix(LavHandle nodeHandle, int count, float* values);
-Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetOutputGains(LavHandle nodeHandle, int count, float* values);
-Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetDelays(LavHandle nodeHandle , int count, float* values);
+Lav_PUBLIC_FUNCTION LavError Lav_createFeedbackDelayNetworkNode(LavHandle simulationHandle, float maxDelay, int channels, LavHandle* destination);
 
 //implements iir filters.
 Lav_PUBLIC_FUNCTION LavError Lav_createIirNode(LavHandle simulationHandle, int channels, LavHandle* destination);

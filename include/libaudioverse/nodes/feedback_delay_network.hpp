@@ -4,22 +4,25 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include "../private/node.hpp"
 #include "../implementations/feedback_delay_network.hpp"
+#include "../implementations/delayline.hpp"
 #include <memory>
 
 namespace libaudioverse_implementation {
 
+//This node can be controlled both through properties and the methods herein.
+//Internal code should use the methods, which do not keep the properties updated but avoid lots of overhead.
 class FeedbackDelayNetworkNode: public Node {
 	public:
 	FeedbackDelayNetworkNode(std::shared_ptr<Simulation> simulation, float maxDelay, int lines);
 	~FeedbackDelayNetworkNode();
 	void process();
-	void setMatrix(int length, float* values);
-	void setOutputGains(int count, float* values);
-	void setDelays(int length, float* values);
+	void setMatrix(float* values);
+	void setOutputGains(float* values);
+	void setDelays(float* values);
 	private:
-	FeedbackDelayNetwork<>*network = nullptr;
+	FeedbackDelayNetwork<InterpolatedDelayLine>*network = nullptr;
 	float max_delay = 0.0f;
-	int line_count = 0;
+	int channels = 0;
 	float*last_output = nullptr, *next_input=nullptr;
 	float* gains = nullptr;
 };

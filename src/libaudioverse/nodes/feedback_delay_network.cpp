@@ -13,23 +13,47 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/nodes/feedback_delay_network.hpp>
 #include <memory>
 #include <algorithm>
+#include <limits>
 
 namespace libaudioverse_implementation {
 
-FeedbackDelayNetworkNode::FeedbackDelayNetworkNode(std::shared_ptr<Simulation> simulation, float maxDelay, int lines):
-Node(Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK_NODE, simulation, lines, lines) {
+FeedbackDelayNetworkNode::FeedbackDelayNetworkNode(std::shared_ptr<Simulation> simulation, float maxDelay, int channels):
+Node(Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK_NODE, simulation, channels, channels) {
 	max_delay = maxDelay;
-	line_count = lines;
-	network = new FeedbackDelayNetwork<>(lines, maxDelay, simulation->getSr());
-	last_output = allocArray<float>(lines);
-	next_input=allocArray<float>(lines);
-	gains = allocArray<float>(lines);
-	for(int i = 0; i < lines; i++) gains[i] = 1.0f;
+	this->channels = channels;
+	network = new FeedbackDelayNetwork<InterpolatedDelayLine>(channels, maxDelay, simulation->getSr());
+	last_output = allocArray<float>(channels);
+	next_input=allocArray<float>(channels);
+	gains = allocArray<float>(channels);
+	for(int i = 0; i < channels; i++) gains[i] = 1.0f;
 	getProperty(Lav_FDN_MAX_DELAY).setFloatValue(maxDelay);
-	for(int i= 0; i < lines; i++) {
+	for(int i= 0; i < channels; i++) {
 		appendInputConnection(i, 1);
 		appendOutputConnection(i, 1);
 	}
+
+	std::vector<float> default(channels, 0.0f);
+	//Set up the properties.
+	getProperty(Lav_FDN_DELAYS).setArrayLengthRange(channels, channels);
+	getProperty(Lav_FDN_DELAYS).setFloatRange(0.0, maxDelay);
+	getProperty(Lav_FDN_DELAYS).replaceFloatArray(channels, &default[0]);	
+	getProperty(Lav_FDN_DELAYS).setFloatArrayDefault(default);
+	
+	getProperty(Lav_FDN_OUTPUT_GAINS).setArrayLengthRange(channels, channels);
+	getProperty(Lav_FDN_OUTPUT_GAINS).setFloatRange(-std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity());
+	default.clear();
+	default.resize(channels, 1.0f);
+	getProperty(Lav_FDN_OUTPUT_GAINS).replaceFloatArray(channels, &default[0]);
+	getProperty(Lav_FDN_OUTPUT_GAINS).setFloatArrayDefault(default);
+	//Identity matrix.
+	default.clear();
+	default.resize(channels*channels, 0.0f);
+	//Build an identity matrix.
+	for(int i = 0; i < channels; i++) default[i*channels+i] = 0.0f;
+	getProperty(Lav_FDN_MATRIX).setArrayLengthRange(channels*channels, channels*channels);
+	getProperty(Lav_FDN_MATRIX).setFloatRange(-std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity());
+	getProperty(Lav_FDN_MATRIX).replaceFloatArray(channels*channels, &default[0]);
+	getProperty(Lav_FDN_MATRIX).setFloatArrayDefault(default);
 }
 
 FeedbackDelayNetworkNode::~FeedbackDelayNetworkNode() {
@@ -39,13 +63,24 @@ FeedbackDelayNetworkNode::~FeedbackDelayNetworkNode() {
 	freeArray(gains);
 }
 
-std::shared_ptr<Node> createFeedbackDelayNetworkNode(std::shared_ptr<Simulation> simulation, float maxDelay, int lines) {
-	auto retval = std::shared_ptr<FeedbackDelayNetworkNode>(new FeedbackDelayNetworkNode(simulation, maxDelay, lines), ObjectDeleter(simulation));
+std::shared_ptr<Node> createFeedbackDelayNetworkNode(std::shared_ptr<Simulation> simulation, float maxDelay, int channels) {
+	auto retval = std::shared_ptr<FeedbackDelayNetworkNode>(new FeedbackDelayNetworkNode(simulation, maxDelay, channels), ObjectDeleter(simulation));
 	simulation->associateNode(retval);
 	return retval;
 }
 
 void FeedbackDelayNetworkNode::process() {
+	//First, check an d set properties.
+	//We just do this inline because it's trivial.
+	if(werePropertiesModified(this, Lav_FDN_DELAYS)) {
+		setDelays(getProperty(Lav_FDN_DELAYS).getFloatArrayPtr());
+	}
+	if(werePropertiesModified(this, Lav_FDN_MATRIX)) {
+		setMatrix(getProperty(Lav_FDN_MATRIX).getFloatArrayPtr());
+	}
+	if(werePropertiesModified(this, Lav_FDN_OUTPUT_GAINS)) {
+		setOutputGains(getProperty(Lav_FDN_OUTPUT_GAINS).getFloatArrayPtr());
+	}
 	for(int i = 0; i < block_size; i++) {
 		network->computeFrame(last_output);
 		for(int j = 0; j < num_output_buffers; j++) {
@@ -56,66 +91,26 @@ void FeedbackDelayNetworkNode::process() {
 	}
 }
 
-void FeedbackDelayNetworkNode::setMatrix(int length, float* values) {
-	if(length != line_count*line_count) ERROR(Lav_ERROR_RANGE, "Matrix size mismatch.");
+void FeedbackDelayNetworkNode::setMatrix(float* values) {
 	network->setMatrix(values);
 }
 
-void FeedbackDelayNetworkNode::setOutputGains(int count, float* values) {
-	if(count < line_count) ERROR(Lav_ERROR_RANGE, "Not enough gains.");
-	if(count > line_count) ERROR(Lav_ERROR_RANGE, "Too many gains.");
-	std::copy(values, values+count, gains);
+void FeedbackDelayNetworkNode::setOutputGains(float* values) {
+	std::copy(values, values+channels, gains);
 }
 
-void FeedbackDelayNetworkNode::setDelays(int length, float* values) {
-	if(length < line_count) ERROR(Lav_ERROR_RANGE, "Too few delays.");
-	if(length > line_count) ERROR(Lav_ERROR_RANGE, "Too many delays.");
-	for(int i=0; i < line_count; i++) {
-		if(values[i] > max_delay) ERROR(Lav_ERROR_RANGE, "Delay too long.");
-	}
+void FeedbackDelayNetworkNode::setDelays(float* values) {
 	network->setDelays(values);
 }
 
 //begin public api.
 
-Lav_PUBLIC_FUNCTION LavError Lav_createFeedbackDelayNetworkNode(LavHandle simulationHandle, float maxDelay, int lines, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createFeedbackDelayNetworkNode(LavHandle simulationHandle, float maxDelay, int channels, LavHandle* destination) {
 	PUB_BEGIN
 	auto simulation =incomingObject<Simulation>(simulationHandle);
 	LOCK(*simulation);
 	*destination = outgoingObject<Node>(createFeedbackDelayNetworkNode(
-	simulation, maxDelay, lines));
-	PUB_END
-}
-
-#define FDN_OR_ERROR if(node->getType() != Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK_NODE) ERROR(Lav_ERROR_TYPE_MISMATCH, "Expected a feedback delay network node.");
-
-Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetMatrix(LavHandle nodeHandle, int count, float* values) {
-	PUB_BEGIN
-	auto node=incomingObject<Node>(nodeHandle);
-	LOCK(*node);
-	FDN_OR_ERROR
-	auto fdn=std::static_pointer_cast<FeedbackDelayNetworkNode>(node);
-	fdn->setMatrix(count, values);
-	PUB_END
-}
-
-Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetOutputGains(LavHandle nodeHandle, int count, float* values) {
-	PUB_BEGIN
-	auto node=incomingObject<Node>(nodeHandle);
-	LOCK(*node);
-	FDN_OR_ERROR
-	auto fdn = std::static_pointer_cast<FeedbackDelayNetworkNode>(node);
-	fdn->setOutputGains(count, values);
-	PUB_END
-}
-
-Lav_PUBLIC_FUNCTION LavError Lav_feedbackDelayNetworkNodeSetDelays(LavHandle nodeHandle, int count, float* values) {
-	PUB_BEGIN
-	auto node= incomingObject<Node>(nodeHandle);
-	LOCK(*node);
-	FDN_OR_ERROR
-	auto fdn=std::static_pointer_cast<FeedbackDelayNetworkNode>(node);
-	fdn->setDelays(count, values);
+	simulation, maxDelay, channels));
 	PUB_END
 }
 

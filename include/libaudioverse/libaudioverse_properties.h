@@ -130,10 +130,9 @@ enum Lav_BIQUAD_TYPES {
 //this is for feedback delay networks. We shorten because otherwise it would be insane to actually use these.
 enum Lav_FEEDBACK_DELAY_NETWORK_PROPERTIES {
 	Lav_FDN_MAX_DELAY = -1,
-	Lav_FDN_INTERPOLATION_TIME = -2,
-	Lav_FDN_OUTPUT_GAINS = -3,
-	Lav_FDN_DELAYS = -4,
-	Lav_FDN_MATRIX = -5,
+	Lav_FDN_OUTPUT_GAINS = -2,
+	Lav_FDN_DELAYS = -3,
+	Lav_FDN_MATRIX = -4,
 };
 
 enum Lav_BUFFER_PROPERTIES {

@@ -334,6 +334,19 @@ void Property::getArraylengthRange(unsigned int* min, unsigned int* max) {
 	*max = max_array_length;
 }
 
+void Property::zeroArray(int length) {
+	if(length < min_array_length) ERROR(Lav_ERROR_RANGE, "Array too short.");
+	else if(length > max_array_length) ERROR(Lav_ERROR_RANGE, "Array too large.");
+	if(type == Lav_PROPERTYTYPE_FLOAT_ARRAY) {
+		farray_value.resize(length);
+		for(int i = 0; i < length; i++) farray_value[i] = 0.0f;
+	}
+	else {
+		iarray_value.resize(length);
+		for(int i = 0; i < length; i++) iarray_value[i] = 0;
+	}
+}
+
 float Property::readFloatArray(unsigned int index) {
 	if(index >= farray_value.size()) ERROR(Lav_ERROR_RANGE, "Index out of bounds.");
 	return farray_value[index];
