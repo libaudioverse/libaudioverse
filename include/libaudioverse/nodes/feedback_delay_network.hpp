@@ -9,6 +9,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 namespace libaudioverse_implementation {
 
+class OnePoleFilter;
+
 //This node can be controlled both through properties and the methods herein.
 //Internal code should use the methods, which do not keep the properties updated but avoid lots of overhead.
 class FeedbackDelayNetworkNode: public Node {
@@ -19,12 +21,15 @@ class FeedbackDelayNetworkNode: public Node {
 	void setMatrix(float* values);
 	void setOutputGains(float* values);
 	void setDelays(float* values);
+	void configureFilters(int* types, float* frequencies);	
 	private:
 	FeedbackDelayNetwork<InterpolatedDelayLine>*network = nullptr;
 	float max_delay = 0.0f;
 	int channels = 0;
 	float*last_output = nullptr, *next_input=nullptr;
 	float* gains = nullptr;
+	//Filters to be inserted into the feedback path.
+	OnePoleFilter** filters = nullptr;
 };
 
 }

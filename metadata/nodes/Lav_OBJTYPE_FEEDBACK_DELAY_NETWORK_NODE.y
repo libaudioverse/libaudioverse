@@ -27,6 +27,21 @@ properties:
       
       The matrix is stored in column-major order.
       The supplied array must have a length equal to the square of the channels specified to the constructor.
+  Lav_FDN_FILTER_TYPES:
+    name: filter_types
+    type: int_array
+    dynamic_array: true
+    value_enum: Lav_FDN_FILTER_TYPES
+    doc_description: |
+      Allows insertion of filters in the feedback paths.
+      These filters can be individually enabled and disabled; the default is disabled.
+  Lav_FDN_FILTER_FREQUENCIES:
+    name: filter_frequencies
+    type: float_array
+    dynamic_array: true
+    doc_description: |
+      The frequencies of the filters.
+      The range of this property is 0 to Nyquist, or half the sampling rate.
   Lav_FDN_MAX_DELAY:
     name: delay_max
     type: float

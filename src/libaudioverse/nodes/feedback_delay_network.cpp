@@ -10,10 +10,11 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/implementations/delayline.hpp>
 #include <libaudioverse/implementations/feedback_delay_network.hpp>
+#include <libaudioverse/implementations/one_pole_filter.hpp>
 #include <libaudioverse/nodes/feedback_delay_network.hpp>
 #include <memory>
 #include <algorithm>
-#include <limits>
+#include <limits> //FDN uses infinity and -infinity in the constructor.
 
 namespace libaudioverse_implementation {
 
@@ -32,6 +33,11 @@ Node(Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK_NODE, simulation, channels, channels) {
 		appendOutputConnection(i, 1);
 	}
 
+	//Allocate and configure the filters.
+	filters = new OnePoleFilter*[channels];
+	for(int i = 0; i < channels; i++) filters[i] = new OnePoleFilter(simulation->getSr());
+	
+	
 	std::vector<float> default(channels, 0.0f);
 	//Set up the properties.
 	getProperty(Lav_FDN_DELAYS).setArrayLengthRange(channels, channels);
@@ -54,6 +60,12 @@ Node(Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK_NODE, simulation, channels, channels) {
 	getProperty(Lav_FDN_MATRIX).setFloatRange(-std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity());
 	getProperty(Lav_FDN_MATRIX).replaceFloatArray(channels*channels, &default[0]);
 	getProperty(Lav_FDN_MATRIX).setFloatArrayDefault(default);
+	
+	//The filters.
+	getProperty(Lav_FDN_FILTER_TYPES).setArrayLengthRange(channels, channels);
+	getProperty(Lav_FDN_FILTER_TYPES).zeroArray(channels);
+	getProperty(Lav_FDN_FILTER_FREQUENCIES).setArrayLengthRange(channels, channels);
+	getProperty(Lav_FDN_FILTER_FREQUENCIES).zeroArray(channels);
 }
 
 FeedbackDelayNetworkNode::~FeedbackDelayNetworkNode() {
@@ -81,11 +93,18 @@ void FeedbackDelayNetworkNode::process() {
 	if(werePropertiesModified(this, Lav_FDN_OUTPUT_GAINS)) {
 		setOutputGains(getProperty(Lav_FDN_OUTPUT_GAINS).getFloatArrayPtr());
 	}
-	for(int i = 0; i < block_size; i++) {
+	if(werePropertiesModified(this, Lav_FDN_FILTER_TYPES, Lav_FDN_FILTER_FREQUENCIES)) {
+		configureFilters(
+		getProperty(Lav_FDN_FILTER_TYPES).getIntArrayPtr(),
+		getProperty(Lav_FDN_FILTER_FREQUENCIES).getFloatArrayPtr());
+	}
+	for(int i = 0	; i < block_size; i++) {
 		network->computeFrame(last_output);
-		for(int j = 0; j < num_output_buffers; j++) {
+		for(int j = 0; j < num_output_buffers; j++) { 	
 			output_buffers[j][i] = last_output[j]*gains[j];
 			next_input[j] = input_buffers[j][i];
+			//Apply the filter.
+			last_output[j] = filters[j]->tick(last_output[j]);
 		}
 		network->advance(next_input, last_output);
 	}
@@ -101,6 +120,18 @@ void FeedbackDelayNetworkNode::setOutputGains(float* values) {
 
 void FeedbackDelayNetworkNode::setDelays(float* values) {
 	network->setDelays(values);
+}
+
+void FeedbackDelayNetworkNode::configureFilters(int* types, float* frequencies) {
+	for(int i = 0; i < channels; i++) {
+		if(types[i] == Lav_FDN_FILTER_TYPE_DISABLED) {
+			//Configure a passthrough filter.
+			filters[i]->setCoefficients(1.0, 0.0);
+		}
+		else {
+			filters[i]->setPoleFromFrequency(frequencies[i], types[i] == Lav_FDN_FILTER_TYPE_HIGHPASS);
+		}
+	}
 }
 
 //begin public api.

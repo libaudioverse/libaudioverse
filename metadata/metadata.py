@@ -77,7 +77,8 @@ for propkey, propid, propinfo in joined_properties:
 		propinfo['range'] = [0.0, 0.0]
 	if propinfo['type'] == 'double' and propinfo.get('read_only', False):
 		propinfo['range'] = [0.0, 0.0]
-	if propinfo['type'] == 'int' and not propinfo.get('read_only', False) and 'value_enum' in propinfo:
+	#Some int arrays are arrays of enums, i.e. FDN filter types.
+	if propinfo['type'] in {'int', 'int_array'} and not propinfo.get('read_only', False) and 'value_enum' in propinfo:
 		e = all_info['constants_by_enum'][propinfo['value_enum']]
 		r1 = min(e.values())
 		r2 = max(e.values())
@@ -96,12 +97,12 @@ for propkey, propid, propinfo in joined_properties:
 	#If this is the case, we need to give it some defaults so that the generated cpp file doesn't explode.
 	#The constructor later updates this information.
 	if propinfo['type'] in {'int_array', 'float_array'} and propinfo.get('dynamic_array', False):
-		propinfo['min_length'] = 1
-		propinfo['max_length'] = 1
-		#This string is handled later; we need to be careful aboput the type here.
+		propinfo['min_length'] = propinfo.get('min_length', 1)
+		propinfo['max_length'] = propinfo.get('max_length', 1)
+		#This string is handled later; we need to be careful about the type here.
 		#No need to duplicate code we have to do in a minute anyway.
-		propinfo['default'] = 'zeros'
-		propinfo['range'] = ['MIN_INT', 'MAX_INT'] if propinfo['type'] == 'int_array' else ['-INFINITY', 'INFINITY']
+		propinfo['default'] = propinfo.get('default', 'zeros')
+		propinfo['range'] = propinfo.get('range', ['MIN_INT', 'MAX_INT'] if propinfo['type'] == 'int_array' else ['-INFINITY', 'INFINITY'])
 	#Default handling logic.  If we don't have one and are int, float, or double we make it 0.
 	if propinfo['type'] in {'int', 'float', 'double'}:
 		propinfo['default'] = string_from_number(propinfo.get('default', 0), propinfo['type'])
