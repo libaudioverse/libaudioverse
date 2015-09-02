@@ -91,6 +91,7 @@ nodes/crossfader.cpp
 nodes/crossfading_delay.cpp
 nodes/custom.cpp
 nodes/dopplering_delay.cpp
+nodes/fdn_reverb.cpp
 nodes/feedback_delay_network.cpp
 nodes/fft_convolver.cpp
 nodes/filtered_delay.cpp

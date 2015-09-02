@@ -216,6 +216,11 @@ enum Lav_ALLPASS_OPROPERTIES {
 	Lav_ALLPASS_COEFFICIENT = -4,
 };
 
+enum Lav_FDN_REVERB_PROPERTIES {
+	Lav_FDN_REVERB_T60 = -1,
+	Lav_FDN_REVERB_CUTOFF_FREQUENCY = -2 
+};
+
 #ifdef __cplusplus
 }
 #endif
