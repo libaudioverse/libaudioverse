@@ -36,30 +36,34 @@ properties:
       The angles of the speakers in the order in which they are to be mapped to channels.
       The first speaker will be mapped to the first channel, the second to the second, etc.
       These channels are then combined and produced as the single output of the panner.
-      
-      Note that, in the case wherein this property is set to have more than 2 speakers, we assume that channel
-      3 is the center and channel 4 is the LFE.
-      By default, these are set to 0.
-      If you are using this panner for a nontraditional purpose, i.e. panning across a set of delay lines,
-      then set skip_lfe and skip_center to 0, to disable this functionality.
   Lav_PANNER_SKIP_LFE:
     name: skip_lfe
     type: boolean
     default: 1
     doc_description: |
-      If more than 2 speakers are provided, this panner assumes that it is dealing with a surround sound layout.
-      In order to make this work, the third and later speakers are shifted in order to leave silent channels for the center and LFE speakers.
       This property controls whether or not the LFE channel is reserved, i.e. skipped.
       You  almost always want this on.
+  Lav_PANNER_HAS_LFE:
+    name: has_lfe
+    type: boolean
+    default: 0
+    doc_description: |
+      Whether the current channel map has an LFE channel or not.
+      If it does, this is assumed to be channel 4.
   Lav_PANNER_SKIP_CENTER:
     name: skip_center
     type: boolean
     default: 1
     doc_description: |
-      If more than 2 speakers are provided, this panner assumes that it is dealing with a surround sound layout.
-      In order to make this work, the third and later speakers are shifted in order to leave silent channels for the center and LFE speakers.
       This property controls whether or not the center channel is reserved, i.e. skipped.
       You  almost always want this on.
+  Lav_PANNER_HAS_CENTER:
+    name: has_center
+    type: boolean
+    default: 0
+    doc_description: |
+      Whether the currently specified channel map has a center channel.
+      if it does, this is assumed to be channel 3.
   Lav_PANNER_PASSTHROUGH:
     name: passthrough
     type: float
