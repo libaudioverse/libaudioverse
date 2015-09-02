@@ -16,6 +16,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 namespace libaudioverse_implementation {
 
 float standard_map_stereo[] = {-90.0f, 90.0f};
+float standard_map_40[] = {-45.0, 45.0, -135.0, 135.0};
 float standard_map_51[] = {-22.5f, 22.5f, -110.0f, 110.0f};
 float standard_map_71[] = {-22.5f, 22.5f, -150.0f, 150.0f, -110.0f, 110.0f};
 
@@ -81,6 +82,8 @@ void AmplitudePannerNode::configureStandardChannelMap(unsigned int channels) {
 		case 2:
 		getProperty(Lav_PANNER_CHANNEL_MAP).replaceFloatArray(2, standard_map_stereo);
 		break;
+		case 4:
+		getProperty(Lav_PANNER_CHANNEL_MAP).replaceFloatArray(4, standard_map_40);
 		case 6:
 		getProperty(Lav_PANNER_CHANNEL_MAP).replaceFloatArray(4, standard_map_51);
 		break;
