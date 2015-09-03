@@ -40,6 +40,9 @@ class FdnReverbNode: public Node {
 	float feedback_gains[8];
 	OnePoleFilter** lowpass_filters = nullptr;
 	InterpolatedDelayLine** delay_lines = nullptr;
+	//We keep a record of these for debugging and other purposes.
+	//These are the delays based off the current density.
+	float current_delays[8];
 };
 
 FdnReverbNode::FdnReverbNode(std::shared_ptr<Simulation> sim): Node(Lav_OBJTYPE_FDN_REVERB_NODE, sim, 4, 4) {
@@ -72,7 +75,9 @@ FdnReverbNode::~FdnReverbNode() {
 }
 
 void FdnReverbNode::process() {
-	if(werePropertiesModified(this, Lav_FDN_REVERB_T60, Lav_FDN_REVERB_CUTOFF_FREQUENCY)) reconfigureModel();
+	if(werePropertiesModified(this, Lav_FDN_REVERB_T60, Lav_FDN_REVERB_CUTOFF_FREQUENCY,
+	Lav_FDN_REVERB_DENSITY
+	)) reconfigureModel();
 	float lineValues[8];
 	float feedbacks[8];
 	for(int sample = 0; sample < block_size; sample++) {
@@ -111,12 +116,15 @@ void FdnReverbNode::process() {
 void FdnReverbNode::reconfigureModel() {
 	float t60 = getProperty(Lav_FDN_REVERB_T60).getFloatValue();
 	float cutoff = getProperty(Lav_FDN_REVERB_CUTOFF_FREQUENCY).getFloatValue();
+	float density = getProperty(Lav_FDN_REVERB_DENSITY).getFloatValue();
 	float dbPerSec = -60.0f/t60;
+	float delayMultiplier = 0.3+1.4*(1.0-density);
 	for(int i = 0; i < 8; i++) {
-		float dbPerDelay = delays[i]*dbPerSec;
+		current_delays[i] = delayMultiplier*delays[i];
+		float dbPerDelay = current_delays[i]*dbPerSec;
 		float gain = dbToScalar(dbPerDelay, 1.0);
 		feedback_gains[i] = gain;
-		delay_lines[i]->setDelay(delays[i]);
+		delay_lines[i]->setDelay(current_delays[i]);
 		lowpass_filters[i]->setPoleFromFrequency(cutoff);
 	}
 }
