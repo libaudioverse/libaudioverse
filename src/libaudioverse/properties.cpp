@@ -132,6 +132,9 @@ void Property::scheduleAutomator(Automator* automator) {
 		prevValue = a->getFinalValue();
 		prevTime = a->getScheduledTime()+a->getDuration();
 	}
+	//The automator index can now be wrong.
+	//If we just set it to zero, the updateAutomatorIndex function will then fix it on the next tick.
+	automator_index = 0;
 }
 
 void Property::cancelAutomators(double time) {
@@ -147,6 +150,9 @@ void Property::cancelAutomators(double time) {
 	if(b != automators.end()) automators.erase(b, automators.end());
 	//If the automators vector is empty, we need to use the cached value.
 	if(automators.empty()) type==Lav_PROPERTYTYPE_FLOAT ? value.fval = currentValue : value.dval = currentValue;
+	//The automator index may now be wrong.
+	//If we just set it to zero, the updateAutomatorIndex calls will fix it.
+	automator_index = 0;
 }
 
 bool Property::isReadOnly() {
