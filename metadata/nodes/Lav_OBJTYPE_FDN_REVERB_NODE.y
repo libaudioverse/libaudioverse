@@ -22,6 +22,22 @@ properties:
     doc_description: |
       Controls the density of the reverb.
       Extremely low values sound "grainy"; extremely high values tend to resonate.
+  Lav_FDN_REVERB_DELAY_MODULATION_FREQUENCY:
+    name: delay_modulation_frequency
+    type: float
+    default: 10.0
+    range: [0.0, 500.0]
+    doc_description: |
+      Controls how fast the internal delay lines modulate.
+  Lav_FDN_REVERB_DELAY_MODULATION_DEPTH:
+    name: delay_modulation_depth
+    type: float
+    default: 0.0
+    range: [0.0, 1.0]
+    doc_description: |
+      Controls how deep the modulation of the delay lines is.
+      Increasing this property slightly makes the late reverb sound less metallic, while extremely high values add chorus-like effects.
+      This property acts as a multiplier, and the correspondance between it and physical units is intentionally left unspecified.
 inputs:
   - [4, "The signal to apply reverb to."]
 outputs:

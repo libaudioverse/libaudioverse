@@ -11,7 +11,9 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/dspmath.hpp>
 #include <libaudioverse/implementations/delayline.hpp>
 #include <libaudioverse/implementations/one_pole_filter.hpp>
+#include <libaudioverse/implementations/interpolated_random_generator.hpp>
 #include <algorithm>
+#include <random> //we need the random sequence.
 
 namespace libaudioverse_implementation {
 
@@ -31,27 +33,46 @@ const float delays[8] = {
 	4127.0/44100.0,
 };
 
+//Controls density to delay multiplier conversion as:
+//min_delay_multiplier+delay_multiplier_variation(1-density).
+const float min_delay_multiplier = 0.3, delay_multiplier_variation = 1.4;
+//Controls the maximum modulation.
+//Must be less than the smallest possible delay line, or 0.3*delays[0].
+//This value was determined through experimentation, such that the modulationn depth property maps to something reasonable at 1 with the default modulation frequency.
+float modulation_duration = 0.01f;
+
+
 class FdnReverbNode: public Node {
 	public:
 	FdnReverbNode(std::shared_ptr<Simulation> sim);
 	~FdnReverbNode();
 	void process();
+	void modulateLines();
 	void reconfigureModel();
 	float feedback_gains[8];
 	OnePoleFilter** lowpass_filters = nullptr;
 	InterpolatedDelayLine** delay_lines = nullptr;
+	InterpolatedRandomGenerator **delay_line_modulators;
 	//We keep a record of these for debugging and other purposes.
 	//These are the delays based off the current density.
 	float current_delays[8];
+	//Modulation state.
+	bool needs_modulation = false;
+	float modulation_depth = 0.0f; //equal to the property times the modulation duration from above.
 };
 
 FdnReverbNode::FdnReverbNode(std::shared_ptr<Simulation> sim): Node(Lav_OBJTYPE_FDN_REVERB_NODE, sim, 4, 4) {
 	std::fill(feedback_gains, feedback_gains+8, 0.0f);
 	delay_lines = new InterpolatedDelayLine*[8];
+	delay_line_modulators = new InterpolatedRandomGenerator*[8];
 	lowpass_filters = new OnePoleFilter*[8]();
 	double sr = simulation->getSr();
+	int seeds[8];
+	std::seed_seq seq{1, 2, 3, 4, 5, 6, 7, 8};
+	seq.generate(seeds, seeds+8);
 	for(int  i = 0; i < 8; i++) {
 		delay_lines[i] = new InterpolatedDelayLine(1.0, sr);
+		delay_line_modulators[i] = new InterpolatedRandomGenerator(sr, seeds[i]);
 		lowpass_filters[i] = new OnePoleFilter(sr);
 	}
 	appendInputConnection(0, 4);
@@ -74,9 +95,17 @@ FdnReverbNode::~FdnReverbNode() {
 	delete[] lowpass_filters;
 }
 
+void FdnReverbNode::modulateLines() {
+	if(needs_modulation == false) return;
+	for(int i = 0; i < 8; i++) {
+		delay_lines[i]->setDelay(current_delays[i]+modulation_depth*delay_line_modulators[i]->tick());
+	}
+}
+
 void FdnReverbNode::process() {
 	if(werePropertiesModified(this, Lav_FDN_REVERB_T60, Lav_FDN_REVERB_CUTOFF_FREQUENCY,
-	Lav_FDN_REVERB_DENSITY
+	Lav_FDN_REVERB_DENSITY,
+	Lav_FDN_REVERB_DELAY_MODULATION_FREQUENCY, Lav_FDN_REVERB_DELAY_MODULATION_DEPTH
 	)) reconfigureModel();
 	float lineValues[8];
 	float feedbacks[8];
@@ -108,8 +137,9 @@ void FdnReverbNode::process() {
 		}
 		//Bring the inputs in to the first four lines.
 		for(int i = 0; i < 8; i++) feedbacks[i] += input_buffers[i%4][sample];
-		//And finally we write.
+		//Write outputs.
 		for(int i = 0; i < 8; i++) delay_lines[i]->advance(feedbacks[i]);
+		modulateLines();
 	}
 }
 
@@ -118,7 +148,7 @@ void FdnReverbNode::reconfigureModel() {
 	float cutoff = getProperty(Lav_FDN_REVERB_CUTOFF_FREQUENCY).getFloatValue();
 	float density = getProperty(Lav_FDN_REVERB_DENSITY).getFloatValue();
 	float dbPerSec = -60.0f/t60;
-	float delayMultiplier = 0.3+1.4*(1.0-density);
+	float delayMultiplier = min_delay_multiplier+delay_multiplier_variation*(1.0-density);
 	for(int i = 0; i < 8; i++) {
 		current_delays[i] = delayMultiplier*delays[i];
 		float dbPerDelay = current_delays[i]*dbPerSec;
@@ -126,6 +156,17 @@ void FdnReverbNode::reconfigureModel() {
 		feedback_gains[i] = gain;
 		delay_lines[i]->setDelay(current_delays[i]);
 		lowpass_filters[i]->setPoleFromFrequency(cutoff);
+	}
+	//Do we need to modulate.
+	float modDepth = getProperty(Lav_FDN_REVERB_DELAY_MODULATION_DEPTH).getFloatValue();
+	float modFreq = getProperty(Lav_FDN_REVERB_DELAY_MODULATION_FREQUENCY).getFloatValue();
+	if(modDepth == 0.0 || modFreq == 0.0) {
+		needs_modulation = false;
+	}
+	else {
+		needs_modulation = true;
+		modulation_depth = modDepth*modulation_duration;
+		for(int i = 0; i < 8; i++)  delay_line_modulators[i]->setFrequency(modFreq);
 	}
 }
 
