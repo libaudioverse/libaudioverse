@@ -120,6 +120,7 @@ enum Lav_OBJECT_TYPES {
 	Lav_OBJTYPE_FIRST_ORDER_FILTER_NODE,
 	Lav_OBJTYPE_ALLPASS_NODE,
 	Lav_OBJTYPE_NESTED_ALLPASS_NETWORK_NODE,
+	Lav_OBJTYPE_FDN_REVERB_NODE,
 };
 
 /**Node states.*/
@@ -434,6 +435,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_nestedAllpassNetworkNodeAppendOnePole(LavHandle
 Lav_PUBLIC_FUNCTION LavError Lav_nestedAllpassNetworkNodeAppendBiquad(LavHandle nodeHandle, int type, double frequency, double dbGain, double q);
 Lav_PUBLIC_FUNCTION LavError Lav_nestedAllpassNetworkNodeAppendReader(LavHandle nodeHandle, float mul);
 Lav_PUBLIC_FUNCTION LavError Lav_nestedAllpassNetworkNodeCompile(LavHandle nodeHandle);
+
+Lav_PUBLIC_FUNCTION LavError Lav_createFdnReverbNode(LavHandle simulationHandle, LavHandle* destination);
 
 #ifdef __cplusplus
 }

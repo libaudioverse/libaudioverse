@@ -16,6 +16,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 namespace libaudioverse_implementation {
 
 float standard_map_stereo[] = {-90.0f, 90.0f};
+float standard_map_40[] = {-45.0, 45.0, -135.0, 135.0};
 float standard_map_51[] = {-22.5f, 22.5f, -110.0f, 110.0f};
 float standard_map_71[] = {-22.5f, 22.5f, -150.0f, 150.0f, -110.0f, 110.0f};
 
@@ -41,8 +42,8 @@ void AmplitudePannerNode::recomputeChannelMap() {
 	bool skipCenter = getProperty(Lav_PANNER_SKIP_CENTER).getIntValue() == 1;
 	Property& channelMap = getProperty(Lav_PANNER_CHANNEL_MAP);
 	unsigned int max = channelMap.getFloatArrayLength();
-	if(skipLfe && channelMap.getFloatArrayLength() > 2) max++;
-	if(skipCenter && channelMap.getFloatArrayLength() > 2) max++;
+	if(skipLfe && has_lfe) max++;
+	if(skipCenter && has_center) max++;
 	resize(1, max);
 	getOutputConnection(0)->reconfigure(0, max);
 	unsigned int index = 0;
@@ -60,10 +61,14 @@ void AmplitudePannerNode::willProcessParents() {
 }
 
 void AmplitudePannerNode::process() {
+	if(werePropertiesModified(this, Lav_PANNER_HAS_CENTER, Lav_PANNER_HAS_LFE)) {
+		has_center = getProperty(Lav_PANNER_HAS_CENTER).getIntValue() == 1;
+		has_lfe = getProperty(Lav_PANNER_HAS_LFE).getIntValue() == 1;
+	}
 	float azimuth = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
 	float passthrough =getProperty(Lav_PANNER_PASSTHROUGH).getFloatValue();
-	bool skipCenter=getProperty(Lav_PANNER_SKIP_CENTER).getIntValue() == 1;
-	bool skipLfe=getProperty(Lav_PANNER_SKIP_LFE).getIntValue() == 1;
+	bool skipCenter=getProperty(Lav_PANNER_SKIP_CENTER).getIntValue() == 1 && has_center;
+	bool skipLfe=getProperty(Lav_PANNER_SKIP_LFE).getIntValue() == 1 && has_lfe;
 	panner.pan(azimuth, block_size, input_buffers[0], num_output_buffers, &output_buffers[0]);
 	if(passthrough != 0.0f) {
 		scalarMultiplicationKernel(block_size, passthrough, input_buffers[0], input_buffers[0]);
@@ -80,16 +85,29 @@ void AmplitudePannerNode::configureStandardChannelMap(unsigned int channels) {
 	switch(channels) {
 		case 2:
 		getProperty(Lav_PANNER_CHANNEL_MAP).replaceFloatArray(2, standard_map_stereo);
+		has_center = false;
+		has_lfe = false;
+		break;
+		case 4:
+		getProperty(Lav_PANNER_CHANNEL_MAP).replaceFloatArray(4, standard_map_40);
+		has_center = false;
+		has_lfe = false;
 		break;
 		case 6:
 		getProperty(Lav_PANNER_CHANNEL_MAP).replaceFloatArray(4, standard_map_51);
+		has_center = true;
+		has_lfe = true;
 		break;
 		case 8:
 		getProperty(Lav_PANNER_CHANNEL_MAP).replaceFloatArray(6, standard_map_71);
+		has_center = true;
+		has_lfe = true;
 		break;
 	};
 	getProperty(Lav_PANNER_SKIP_LFE).setIntValue(1);
 	getProperty(Lav_PANNER_SKIP_CENTER).setIntValue(1);
+	getProperty(Lav_PANNER_HAS_LFE).setIntValue(has_lfe);
+	getProperty(Lav_PANNER_HAS_CENTER).setIntValue(has_center);
 }
 
 //begin public api

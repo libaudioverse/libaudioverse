@@ -14,7 +14,7 @@ class AmplitudePannerNode: public Node {
 	virtual void process() override;
 	void recomputeChannelMap();
 	void configureStandardChannelMap(unsigned int channels);
-	bool map_changed = true;
+	bool map_changed = true, has_center = false, has_lfe = false;
 	PannerImplementation panner;
 };
 

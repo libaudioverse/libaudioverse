@@ -80,6 +80,11 @@ void MultipannerNode::strategyChanged() {
 		std::dynamic_pointer_cast<AmplitudePannerNode>(amplitude_panner)->configureStandardChannelMap(2);
 		hookAmplitude = true;
 		break;
+		case Lav_PANNING_STRATEGY_SURROUND40:
+		std::dynamic_pointer_cast<AmplitudePannerNode>(amplitude_panner)->configureStandardChannelMap(4);
+		hookAmplitude = true;
+		newOutputSize = 4;
+		break;
 		case Lav_PANNING_STRATEGY_SURROUND51:
 		std::dynamic_pointer_cast<AmplitudePannerNode>(amplitude_panner)->configureStandardChannelMap(6);
 		hookAmplitude = true;
