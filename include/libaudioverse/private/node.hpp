@@ -59,7 +59,8 @@ class Node: public ExternalObject, public Job {
 	//Connects an output to a property.
 	virtual void connectProperty(int output, std::shared_ptr<Node> node, int slot);
 	//called on an output, this function terminates all connections for which it is involved.
-	virtual void disconnect(int which);
+	//If node is null, clear everything.
+	virtual void disconnect(int output, std::shared_ptr<Node> node = nullptr, int input = 0);
 	//Completely isolate this node.
 	//This will be exposed publicly in future, but exists primarily for object deletion: input and output connections must die immediately.
 	//If they don't, the planner can see things that are no longer true.

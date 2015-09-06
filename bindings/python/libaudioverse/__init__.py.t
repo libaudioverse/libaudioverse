@@ -628,25 +628,35 @@ class GenericNode(_HandleComparer):
 			self._state['outputs_properties'][output].add((slot, weakref.ref(other)))
 			other._state['inputs_properties'][slot].add((output, self))
 
-	def disconnect(self, output):
-		"""Clears all connections made with a specific output."""
+	def disconnect(self, output, node = None, input = 0):
+		"""Disconnect from other nodes.
+		
+		If node is None, all connections involving output are cleared.
+		
+		if node is not None, then we are disconnecting from a specific node and input combination."""
+		if node is None:
+			node = 0 #Force this translation.
 		with self._lock:
-			_lav.node_disconnect(self, output)
+			_lav.node_disconnect(self, output, node, input)
 			for i in self._state['outputs'][output]:
-				input, weak =i
+				connected_input, weak =i
 				other = weak()
 				if not other:
 					continue
-				other_input = other._state['inputs'][input]
+				if connected_input != input and node != 0:
+					continue
+				other_input = other._state['inputs'][connected_input]
 				if (output, self) in other_input:
 					other_input.remove((output, self))
-			for i in self._state['outputs_properties'][output]:
-				slot, weak = i
-				obj = weak()
-				if obj is not None and (output, self) in obj._state['inputs_properties']:
-					obj._state['inputs_properties'].remove((output, self))
-			if (output, self) in self._state['simulation']._state['inputs']:
-				self._state['simulation']._state['inputs'].remove((output, self))
+			#These next can only apply if we are disconnecting from a specific node.
+			if node == 0:
+				for i in self._state['outputs_properties'][output]:
+					slot, weak = i
+					obj = weak()
+					if obj is not None and (output, self) in obj._state['inputs_properties']:
+						obj._state['inputs_properties'].remove((output, self))
+				if (output, self) in self._state['simulation']._state['inputs']:
+					self._state['simulation']._state['inputs'].remove((output, self))
 
 {%for enumerant, prop in metadata['nodes']['Lav_OBJTYPE_GENERIC_NODE']['properties'].iteritems()%}
 {{macros.implement_property(enumerant, prop)}}

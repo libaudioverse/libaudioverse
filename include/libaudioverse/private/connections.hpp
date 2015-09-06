@@ -32,6 +32,7 @@ class OutputConnection {
 	void reconfigure(int newStart, int newCount);
 	void clear();
 	void connectHalf(std::shared_ptr<InputConnection> inputConnection);
+	void disconnectHalf(std::shared_ptr<InputConnection> connection);
 	int getStart() {return start;}
 	int getCount() {return count;}
 	Node* getNode();
@@ -52,6 +53,7 @@ class InputConnection {
 	void addNodeless(float** inputs, bool shouldApplyMixingMatrix);
 	void reconfigure(int start, int count);
 	void connectHalf(std::shared_ptr<OutputConnection>outputConnection);
+	void disconnectHalf(std::shared_ptr<OutputConnection> connection);
 	void forgetConnection(OutputConnection* which);
 	int getStart() {return start;}
 	int getCount() {return count;}
@@ -66,5 +68,7 @@ class InputConnection {
 };
 
 void makeConnection(std::shared_ptr<OutputConnection> output, std::shared_ptr<InputConnection> input);
+void breakConnection(std::shared_ptr<OutputConnection> output, std::shared_ptr<InputConnection> input);
+
 
 }

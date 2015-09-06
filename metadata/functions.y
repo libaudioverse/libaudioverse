@@ -368,9 +368,15 @@ functions:
   Lav_nodeDisconnect:
     category: nodes
     doc_description: |
-      Disconnect the output of the specified node from all inputs to which it is connected.
+      Disconnect the output of the specified node.
+      
+      If {{"otherHandle"|param}} is 0, disconnect from all inputs.
+      
+      If {{"otherHandle"|param}} is nonzero, disconnect from the specific node and input combination.
     params:
       output: The output to disconnect.
+      otherHandle: The node from which to disconnect.
+      input: The input of the other node from which to disconnect.
   Lav_nodeGetInputConnectionCount:
     category: nodes
     doc_description: |

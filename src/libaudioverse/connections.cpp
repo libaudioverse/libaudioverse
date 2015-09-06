@@ -59,6 +59,12 @@ void OutputConnection::connectHalf(std::shared_ptr<InputConnection> inputConnect
 	connected_to.insert(inputConnection);
 }
 
+void OutputConnection::disconnectHalf(std::shared_ptr<InputConnection> connection) {
+	if(connected_to.count(connection)) {
+		connected_to.erase(connection);
+	}
+}
+
 Node* OutputConnection::getNode() {
 	return node;
 }
@@ -103,6 +109,12 @@ void InputConnection::connectHalf(std::shared_ptr<OutputConnection> outputConnec
 	connected_to.insert(outputConnection);
 }
 
+void InputConnection::disconnectHalf(std::shared_ptr<OutputConnection> connection) {
+	if(connected_to.count(connection)) {
+		connected_to.erase(connection);
+	}
+}
+
 void InputConnection::forgetConnection(OutputConnection* which) {
 	decltype(connected_to) removing;
 	for(auto &i: connected_to) {
@@ -137,6 +149,11 @@ int InputConnection::getConnectedNodeCount() {
 void makeConnection(std::shared_ptr<OutputConnection> output, std::shared_ptr<InputConnection> input) {
 	output->connectHalf(input);
 	input->connectHalf(output);
+}
+
+void breakConnection(std::shared_ptr<OutputConnection> output, std::shared_ptr<InputConnection> input) {
+	input->disconnectHalf(output);
+	output->disconnectHalf(input);
 }
 
 }

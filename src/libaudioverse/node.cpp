@@ -264,9 +264,13 @@ void Node::connectProperty(int output, std::shared_ptr<Node> node, int slot) {
 	simulation->invalidatePlan();
 }
 
-void Node::disconnect(int which) {
-	auto o =getOutputConnection(which);
-	o->clear();
+void Node::disconnect(int output, std::shared_ptr<Node> node, int input) {
+	auto o =getOutputConnection(output);
+	if(node == nullptr) o->clear();
+	else {
+		auto other = node->getInputConnection(input);
+		breakConnection(o, other);
+	}
 	simulation->invalidatePlan();
 }
 
@@ -499,11 +503,12 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeConnectProperty(LavHandle nodeHandle, int o
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeDisconnect(LavHandle nodeHandle, int output) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeDisconnect(LavHandle nodeHandle, int output, LavHandle otherHandle, int input) {
 	PUB_BEGIN
 	auto node = incomingObject<Node>(nodeHandle);
+	auto other = incomingObject<Node>(otherHandle);
 	LOCK(*node);
-	node->disconnect(output);
+	node->disconnect(output, other, input);
 	PUB_END
 }
 
