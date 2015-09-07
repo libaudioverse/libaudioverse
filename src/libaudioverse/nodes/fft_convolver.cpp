@@ -40,9 +40,7 @@ FftConvolverNode::FftConvolverNode(std::shared_ptr<Simulation> simulation, int c
 }
 
 std::shared_ptr<Node> createFftConvolverNode(std::shared_ptr<Simulation> simulation, int channels) {
-	std::shared_ptr<FftConvolverNode> retval = std::shared_ptr<FftConvolverNode>(new FftConvolverNode(simulation, channels), ObjectDeleter(simulation));
-	simulation->associateNode(retval);
-	return retval;
+	return standardNodeCreation<FftConvolverNode>(simulation, channels);
 }
 
 FftConvolverNode::~FftConvolverNode() {

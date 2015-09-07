@@ -26,9 +26,7 @@ RingmodNode::RingmodNode(std::shared_ptr<Simulation> sim): Node(Lav_OBJTYPE_RING
 }
 
 std::shared_ptr<Node> createRingmodNode(std::shared_ptr<Simulation> simulation) {
-	auto retval = std::shared_ptr<RingmodNode>(new RingmodNode(simulation), ObjectDeleter(simulation));
-	simulation->associateNode(retval);
-	return retval;
+	return standardNodeCreation<RingmodNode>(simulation);
 }
 
 void RingmodNode::process() {

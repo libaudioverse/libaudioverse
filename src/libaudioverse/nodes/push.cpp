@@ -41,9 +41,7 @@ PushNode::PushNode(std::shared_ptr<Simulation> sim, unsigned int inputSr, unsign
 }
 
 std::shared_ptr<Node> createPushNode(std::shared_ptr<Simulation> simulation, unsigned int inputSr, unsigned int channels) {
-	auto retval = std::shared_ptr<PushNode>(new PushNode(simulation, inputSr, channels), ObjectDeleter(simulation));
-	simulation->associateNode(retval);
-	return retval;
+	return standardNodeCreation<PushNode>(simulation, inputSr, channels);
 }
 
 PushNode::~PushNode() {

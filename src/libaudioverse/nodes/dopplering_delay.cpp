@@ -53,9 +53,7 @@ DoppleringDelayNode::DoppleringDelayNode(std::shared_ptr<Simulation> simulation,
 }
 
 std::shared_ptr<Node> createDoppleringDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, unsigned int lineCount) {
-	auto tmp = std::shared_ptr<DoppleringDelayNode>(new DoppleringDelayNode(simulation, maxDelay, lineCount), ObjectDeleter(simulation));
-	simulation->associateNode(tmp);
-	return tmp;
+	return standardNodeCreation<DoppleringDelayNode>(simulation, maxDelay, lineCount);
 }
 
 DoppleringDelayNode::~DoppleringDelayNode() {

@@ -29,8 +29,7 @@ AmplitudePannerNode::AmplitudePannerNode(std::shared_ptr<Simulation> simulation)
 }
 
 std::shared_ptr<Node>createAmplitudePannerNode(std::shared_ptr<Simulation> simulation) {
-	auto retval = std::shared_ptr<AmplitudePannerNode>(new AmplitudePannerNode(simulation), ObjectDeleter(simulation));
-	simulation->associateNode(retval);
+	auto retval = standardNodeCreation<AmplitudePannerNode>(simulation);
 	//needed because the inputs/outputs logic needs shared_from_this to be working.
 	retval->recomputeChannelMap();
 	return retval;

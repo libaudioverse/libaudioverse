@@ -51,9 +51,7 @@ RecorderNode::RecorderNode(std::shared_ptr<Simulation> simulation, int channels)
 }
 
 std::shared_ptr<Node> createRecorderNode(std::shared_ptr<Simulation> simulation, int channels) {
-	std::shared_ptr<RecorderNode> retval = std::shared_ptr<RecorderNode>(new RecorderNode(simulation, channels), ObjectDeleter(simulation));
-	simulation->associateNode(retval);
-	return retval;
+	return standardNodeCreation<RecorderNode>(simulation, channels);
 }
 
 RecorderNode::~RecorderNode() {

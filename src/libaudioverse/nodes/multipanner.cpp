@@ -40,8 +40,7 @@ MultipannerNode::MultipannerNode(std::shared_ptr<Simulation> sim, std::shared_pt
 }
 
 std::shared_ptr<Node> createMultipannerNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf) {
-	auto retval = std::shared_ptr<MultipannerNode>(new MultipannerNode(simulation, hrtf), ObjectDeleter(simulation));
-	simulation->associateNode(retval);
+	auto retval = standardNodeCreation<MultipannerNode>(simulation, hrtf);
 	//this call must be here because it involves shared_from_this.
 	retval->configureForwardedProperties();
 	retval->strategyChanged();

@@ -97,9 +97,7 @@ HrtfNode::~HrtfNode() {
 }
 
 std::shared_ptr<Node>createHrtfNode(std::shared_ptr<Simulation>simulation, std::shared_ptr<HrtfData> hrtf) {
-	auto retval = std::shared_ptr<HrtfNode>(new HrtfNode(simulation, hrtf), ObjectDeleter(simulation));
-	simulation->associateNode(retval);
-	return retval;
+	return standardNodeCreation<HrtfNode>(simulation, hrtf);
 }
 
 void HrtfNode::process() {

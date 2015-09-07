@@ -42,9 +42,7 @@ highband_shelves(simulation->getSr()) {
 }
 
 std::shared_ptr<Node> createThreeBandEqNode(std::shared_ptr<Simulation> simulation, int channels) {
-	std::shared_ptr<ThreeBandEqNode> retval = std::shared_ptr<ThreeBandEqNode>(new ThreeBandEqNode(simulation, channels), ObjectDeleter(simulation));
-	simulation->associateNode(retval);
-	return retval;
+	return standardNodeCreation<ThreeBandEqNode>(simulation, channels);
 }
 
 void ThreeBandEqNode::recompute() {

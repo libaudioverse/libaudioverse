@@ -29,9 +29,7 @@ CrossfaderNode::CrossfaderNode(std::shared_ptr<Simulation> sim, int channels, in
 }
 
 std::shared_ptr<Node> createCrossfaderNode(std::shared_ptr<Simulation> simulation, int channels, int inputs) {
-	auto retval = std::shared_ptr<CrossfaderNode>(new CrossfaderNode(simulation, channels, inputs), ObjectDeleter(simulation));
-	simulation->associateNode(retval);
-	return retval;
+	return standardNodeCreation<CrossfaderNode>(simulation, channels, inputs);
 }
 
 void CrossfaderNode::crossfade(float duration, int input) {

@@ -38,9 +38,7 @@ ConvolverNode::ConvolverNode(std::shared_ptr<Simulation> simulation, int channel
 }
 
 std::shared_ptr<Node> createConvolverNode(std::shared_ptr<Simulation> simulation, int channels) {
-	std::shared_ptr<ConvolverNode> retval = std::shared_ptr<ConvolverNode>(new ConvolverNode(simulation, channels), ObjectDeleter(simulation));
-	simulation->associateNode(retval);
-	return retval;
+	return standardNodeCreation<ConvolverNode>(simulation, channels);
 }
 
 ConvolverNode::~ConvolverNode() {

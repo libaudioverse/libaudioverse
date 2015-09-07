@@ -53,9 +53,7 @@ CrossfadingDelayNode::CrossfadingDelayNode(std::shared_ptr<Simulation> simulatio
 }
 
 std::shared_ptr<Node> createCrossfadingDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, unsigned int lineCount) {
-	auto tmp = std::shared_ptr<CrossfadingDelayNode>(new CrossfadingDelayNode(simulation, maxDelay, lineCount), ObjectDeleter(simulation));
-	simulation->associateNode(tmp);
-	return tmp;
+	return standardNodeCreation<CrossfadingDelayNode>(simulation, maxDelay, lineCount);
 }
 
 CrossfadingDelayNode::~CrossfadingDelayNode() {

@@ -27,9 +27,7 @@ CustomNode::CustomNode(std::shared_ptr<Simulation> sim, unsigned int inputs, uns
 }
 
 std::shared_ptr<Node> createCustomNode(std::shared_ptr<Simulation> simulation, unsigned int inputs, unsigned int channelsPerInput, unsigned int outputs,  unsigned int channelsPerOutput) {
-	auto retval = std::shared_ptr<CustomNode>(new CustomNode(simulation, inputs, channelsPerInput, outputs, channelsPerOutput), ObjectDeleter(simulation));
-	simulation->associateNode(retval);
-	return retval;
+	return standardNodeCreation<CustomNode>(simulation, inputs, channelsPerInput, outputs, channelsPerOutput);
 }
 
 void CustomNode::process() {

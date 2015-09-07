@@ -27,9 +27,7 @@ SineNode::SineNode(std::shared_ptr<Simulation> simulation): Node(Lav_OBJTYPE_SIN
 }
 
 std::shared_ptr<Node> createSineNode(std::shared_ptr<Simulation> simulation) {
-	std::shared_ptr<SineNode> retval = std::shared_ptr<SineNode>(new SineNode(simulation), ObjectDeleter(simulation));
-	simulation->associateNode(retval);
-	return retval;
+	return standardNodeCreation<SineNode>(simulation);
 }
 
 void SineNode::process() {

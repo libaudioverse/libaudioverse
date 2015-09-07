@@ -33,9 +33,7 @@ bank(simulation->getSr()) {
 }
 
 std::shared_ptr<Node> createOnePoleFilterNode(std::shared_ptr<Simulation> simulation, int channels) {
-	auto retval = std::shared_ptr<OnePoleFilterNode>(new OnePoleFilterNode(simulation, channels), ObjectDeleter(simulation));
-	simulation->associateNode(retval);
-	return retval;
+	return standardNodeCreation<OnePoleFilterNode>(simulation, channels);
 }
 
 void OnePoleFilterNode::reconfigureFilters() {

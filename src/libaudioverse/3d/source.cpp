@@ -43,10 +43,9 @@ void SourceNode::forwardProperties() {
 }
 
 std::shared_ptr<Node> createSourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentNode> environment) {
-	auto temp = std::shared_ptr<SourceNode>(new SourceNode(simulation, environment), ObjectDeleter(simulation));
+	auto temp = standardNodeCreation<SourceNode>(simulation, environment);
 	temp->forwardProperties();
 	environment->registerSourceForUpdates(temp);
-	simulation->associateNode(temp);
 	return temp;
 }
 

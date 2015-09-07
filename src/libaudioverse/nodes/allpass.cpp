@@ -39,9 +39,7 @@ bank((maxDelay+1)/simulation->getSr(), simulation->getSr()) {
 }
 
 std::shared_ptr<Node> createAllpassNode(std::shared_ptr<Simulation> simulation, int channels, int maxDelay) {
-	auto retval = std::shared_ptr<AllpassNode>(new AllpassNode(simulation, channels, maxDelay), ObjectDeleter(simulation));
-	simulation->associateNode(retval);
-	return retval;
+	return standardNodeCreation<AllpassNode>(simulation, channels, maxDelay);
 }
 
 void AllpassNode::reconfigureCoefficient() {

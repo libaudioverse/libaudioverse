@@ -25,8 +25,7 @@ SplitMergeNode::SplitMergeNode(std::shared_ptr<Simulation> simulation, int type)
 }
 
 std::shared_ptr<Node> createSplitMergeNode(std::shared_ptr<Simulation> simulation, int type) {
-	auto retval = std::shared_ptr<SplitMergeNode>(new SplitMergeNode(simulation, type), ObjectDeleter(simulation));
-	return retval;
+	return standardNodeCreation<SplitMergeNode>(simulation, type);
 }
 
 std::shared_ptr<Node> createChannelSplitterNode(std::shared_ptr<Simulation> simulation, int channels) {

@@ -55,9 +55,7 @@ This was originally taken from Spectral Audio processing by JOS.*/
 }
 
 std::shared_ptr<Node> createNoiseNode(std::shared_ptr<Simulation> simulation) {
-	std::shared_ptr<NoiseNode> retval = std::shared_ptr<NoiseNode>(new NoiseNode(simulation), ObjectDeleter(simulation));
-	simulation->associateNode(retval);
-	return retval;
+	return standardNodeCreation<NoiseNode>(simulation);
 }
 
 void NoiseNode::white() {

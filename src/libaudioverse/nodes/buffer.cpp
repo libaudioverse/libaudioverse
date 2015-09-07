@@ -39,9 +39,7 @@ BufferNode::BufferNode(std::shared_ptr<Simulation> simulation): Node(Lav_OBJTYPE
 }
 
 std::shared_ptr<Node> createBufferNode(std::shared_ptr<Simulation> simulation) {
-	std::shared_ptr<BufferNode> retval = std::shared_ptr<BufferNode>(new BufferNode(simulation), ObjectDeleter(simulation));
-	simulation->associateNode(retval);
-	return retval;
+	return standardNodeCreation<BufferNode>(simulation);
 }
 
 void BufferNode::bufferChanged() {

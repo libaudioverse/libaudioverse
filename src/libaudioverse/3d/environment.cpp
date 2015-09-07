@@ -38,9 +38,7 @@ EnvironmentNode::EnvironmentNode(std::shared_ptr<Simulation> simulation, std::sh
 }
 
 std::shared_ptr<EnvironmentNode> createEnvironmentNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf) {
-	auto retval = std::shared_ptr<EnvironmentNode>(new EnvironmentNode(simulation, hrtf), ObjectDeleter(simulation));
-	simulation->associateNode(retval);
-	return retval;
+	return standardNodeCreation<EnvironmentNode>(simulation, hrtf);
 }
 
 void EnvironmentNode::willProcessParents() {

@@ -181,4 +181,13 @@ class SubgraphNode: public Node {
 	std::shared_ptr<Node> subgraph_input, subgraph_output;
 };
 
+/**This is the creation template for a node.
+Every createXXX function uses this template.*/
+template<typename NodeT, typename... ArgsT>
+std::shared_ptr<NodeT> standardNodeCreation(std::shared_ptr<Simulation> simulation, ArgsT... args) {
+	std::shared_ptr<NodeT> ret(new NodeT(simulation, std::forward<ArgsT>(args)...), ObjectDeleter(simulation));
+	simulation->associateNode(ret);
+	return ret;
+}
+
 }

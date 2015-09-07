@@ -33,9 +33,7 @@ GraphListenerNode::GraphListenerNode(std::shared_ptr<Simulation> sim, unsigned i
 }
 
 std::shared_ptr<Node> createGraphListenerNode(std::shared_ptr<Simulation> simulation, unsigned int channels) {
-	auto retval = std::shared_ptr<GraphListenerNode>(new GraphListenerNode(simulation, channels), ObjectDeleter(simulation));
-	simulation->associateNode(retval);
-	return retval;
+	return standardNodeCreation<GraphListenerNode>(simulation, channels);
 }
 
 GraphListenerNode::~GraphListenerNode() {

@@ -36,9 +36,7 @@ bank(simulation->getSr()) {
 }
 
 std::shared_ptr<Node> createBiquadNode(std::shared_ptr<Simulation> simulation, unsigned int channels) {
-	auto retval = std::shared_ptr<BiquadNode>(new BiquadNode(simulation, channels), ObjectDeleter(simulation));
-	simulation->associateNode(retval);
-	return retval;
+	return standardNodeCreation<BiquadNode>(simulation, channels);
 }
 
 void BiquadNode::reconfigure() {

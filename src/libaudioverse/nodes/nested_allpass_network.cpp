@@ -38,9 +38,7 @@ bank(simulation->getSr()) {
 }
 
 std::shared_ptr<Node> createNestedAllpassNetworkNode(std::shared_ptr<Simulation> simulation, int channels) {
-	auto retval = std::shared_ptr<NestedAllpassNetworkNode>(new NestedAllpassNetworkNode(simulation, channels), ObjectDeleter(simulation));
-	simulation->associateNode(retval);
-	return retval;
+	return standardNodeCreation<NestedAllpassNetworkNode>(simulation, channels);
 }
 
 void NestedAllpassNetworkNode::process() {

@@ -36,9 +36,7 @@ PullNode::PullNode(std::shared_ptr<Simulation> sim, unsigned int inputSr, unsign
 }
 
 std::shared_ptr<Node> createPullNode(std::shared_ptr<Simulation> simulation, unsigned int inputSr, unsigned int channels) {
-	auto retval = std::shared_ptr<PullNode>(new PullNode(simulation, inputSr, channels), ObjectDeleter(simulation));
-	simulation->associateNode(retval);
-	return retval;
+	return standardNodeCreation<PullNode>(simulation, inputSr, channels);
 }
 
 PullNode::~PullNode() {

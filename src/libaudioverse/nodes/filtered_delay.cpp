@@ -49,9 +49,7 @@ FilteredDelayNode::FilteredDelayNode(std::shared_ptr<Simulation> simulation, flo
 }
 
 std::shared_ptr<Node> createFilteredDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, unsigned int channels) {
-	auto tmp = std::shared_ptr<FilteredDelayNode>(new FilteredDelayNode(simulation, maxDelay, channels), ObjectDeleter(simulation));
-	simulation->associateNode(tmp);
-	return tmp;
+	return standardNodeCreation<FilteredDelayNode>(simulation, maxDelay, channels);
 }
 
 FilteredDelayNode::~FilteredDelayNode() {

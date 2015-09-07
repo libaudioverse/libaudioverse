@@ -81,9 +81,7 @@ FdnReverbNode::FdnReverbNode(std::shared_ptr<Simulation> sim): Node(Lav_OBJTYPE_
 }
 
 std::shared_ptr<Node> createFdnReverbNode(std::shared_ptr<Simulation> simulation) {
-	auto retval = std::shared_ptr<FdnReverbNode>(new FdnReverbNode(simulation), ObjectDeleter(simulation));
-	simulation->associateNode(retval);
-	return retval;
+	return standardNodeCreation<FdnReverbNode>(simulation);
 }
 
 FdnReverbNode::~FdnReverbNode() {

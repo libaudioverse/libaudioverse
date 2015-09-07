@@ -36,9 +36,7 @@ IirNode::IirNode(std::shared_ptr<Simulation> simulation, int channels): Node(Lav
 }
 
 std::shared_ptr<Node> createIirNode(std::shared_ptr<Simulation> simulation, int channels) {
-	std::shared_ptr<IirNode> retval = std::shared_ptr<IirNode>(new IirNode(simulation, channels), ObjectDeleter(simulation));
-	simulation->associateNode(retval);
-	return retval;
+	return standardNodeCreation<IirNode>(simulation, channels);
 }
 
 IirNode::~IirNode() {

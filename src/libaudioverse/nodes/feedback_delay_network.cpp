@@ -76,9 +76,7 @@ FeedbackDelayNetworkNode::~FeedbackDelayNetworkNode() {
 }
 
 std::shared_ptr<Node> createFeedbackDelayNetworkNode(std::shared_ptr<Simulation> simulation, float maxDelay, int channels) {
-	auto retval = std::shared_ptr<FeedbackDelayNetworkNode>(new FeedbackDelayNetworkNode(simulation, maxDelay, channels), ObjectDeleter(simulation));
-	simulation->associateNode(retval);
-	return retval;
+	return standardNodeCreation<FeedbackDelayNetworkNode>(simulation, maxDelay, channels);
 }
 
 void FeedbackDelayNetworkNode::process() {

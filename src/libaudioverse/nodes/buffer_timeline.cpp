@@ -89,9 +89,7 @@ BufferTimelineNode::BufferTimelineNode(std::shared_ptr<Simulation> simulation, i
 }
 
 std::shared_ptr<Node> createBufferTimelineNode(std::shared_ptr<Simulation> simulation, int channels) {
-	std::shared_ptr<BufferTimelineNode> retval = std::shared_ptr<BufferTimelineNode>(new BufferTimelineNode(simulation, channels), ObjectDeleter(simulation));
-	simulation->associateNode(retval);
-	return retval;
+	return standardNodeCreation<BufferTimelineNode>(simulation, channels);
 }
 
 void BufferTimelineNode::process() {

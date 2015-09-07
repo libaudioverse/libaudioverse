@@ -23,9 +23,7 @@ GainNode::GainNode(std::shared_ptr<Simulation> sim): Node(Lav_OBJTYPE_GAIN_NODE,
 }
 
 std::shared_ptr<Node> createGainNode(std::shared_ptr<Simulation> simulation) {
-	auto retval = std::shared_ptr<GainNode>(new GainNode(simulation), ObjectDeleter(simulation));
-	simulation->associateNode(retval);
-	return retval;
+	return standardNodeCreation<GainNode>(simulation);
 }
 
 void GainNode::process() {

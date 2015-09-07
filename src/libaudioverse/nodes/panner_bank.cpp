@@ -51,8 +51,7 @@ PannerBankNode::PannerBankNode(std::shared_ptr<Simulation> sim, int pannerCount,
 }
 
 std::shared_ptr<Node> createPannerBankNode(std::shared_ptr<Simulation> simulation, int pannerCount, std::shared_ptr<HrtfData> hrtf) {
-	auto retval = std::shared_ptr<PannerBankNode>(new PannerBankNode(simulation, pannerCount, hrtf), ObjectDeleter(simulation));
-	simulation->associateNode(retval);
+	auto retval = standardNodeCreation<PannerBankNode>(simulation, pannerCount, hrtf);
 	//this call must be here because it involves shared_from_this.
 	retval->configureForwardedProperties();
 	return retval;

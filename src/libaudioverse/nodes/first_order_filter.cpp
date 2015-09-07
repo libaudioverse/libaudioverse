@@ -34,9 +34,7 @@ bank(simulation->getSr()) {
 }
 
 std::shared_ptr<Node> createFirstOrderFilterNode(std::shared_ptr<Simulation> simulation, int channels) {
-	auto retval = std::shared_ptr<FirstOrderFilterNode>(new FirstOrderFilterNode(simulation, channels), ObjectDeleter(simulation));
-	simulation->associateNode(retval);
-	return retval;
+	return standardNodeCreation<FirstOrderFilterNode>(simulation, channels);
 }
 
 void FirstOrderFilterNode::process() {

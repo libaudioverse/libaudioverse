@@ -28,9 +28,7 @@ SquareNode::SquareNode(std::shared_ptr<Simulation> simulation): Node(Lav_OBJTYPE
 }
 
 std::shared_ptr<Node> createSquareNode(std::shared_ptr<Simulation> simulation) {
-	std::shared_ptr<SquareNode> retval = std::shared_ptr<SquareNode>(new SquareNode(simulation), ObjectDeleter(simulation));
-	simulation->associateNode(retval);
-	return retval;
+	return standardNodeCreation<SquareNode>(simulation);
 }
 
 void SquareNode::recompute() {
