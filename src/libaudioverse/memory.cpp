@@ -37,13 +37,6 @@ void initializeMemoryModule() {
 
 void shutdownMemoryModule() {
 	std::lock_guard<std::recursive_mutex> l(*memory_lock);
-	//We need to treat nodes as a special case, isolating them.
-	//This is an unfortunate consequence of the fact that the memory module needs to shut down before the device module.
-	//See the comments in Lav_handleDecRef for the rationale.
-	for(auto &i: *external_handles) {
-		auto n = std::dynamic_pointer_cast<Node>(i.second);
-		if(n) n->isolate();
-	}
 	delete external_handles;
 	external_handles = nullptr;
 	delete external_ptrs;
@@ -133,20 +126,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_handleDecRef(LavHandle handle) {
 	auto rc = e->refcount.fetch_add(-1);
 	rc-=1;
 	if(rc == 0) {
-		/*Special case for nodes: if we delete one we need to isolate it.
-		This is because, by the time the shared pointer's deleter gets called, the shared pointer is invalid.
-		Connection logic needs shared_from_this, and the following line can break shared_from_this.*/
-		auto node = std::dynamic_pointer_cast<Node>(e);
-		if(node) {
-			//We need to make sure the memory module is reentrant, thus this little dance.
-			l.unlock();
-			node->lock();
-			node->isolate();
-			node->unlock();
-			l.lock();
-			//This can in theory happen.
-			if(memory_initialized == false) return Lav_ERROR_NONE;
-		}
 		external_handles->erase(e->externalObjectHandle);
 	}
 	PUB_END

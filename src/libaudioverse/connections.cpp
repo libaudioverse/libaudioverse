@@ -108,8 +108,8 @@ void InputConnection::connectHalf(std::shared_ptr<OutputConnection> outputConnec
 	auto n = std::static_pointer_cast<Node>(outputConnection->getNode()->shared_from_this());
 	connected_to[outputConnection] = n;
 }
-
 void InputConnection::disconnectHalf(std::shared_ptr<OutputConnection> connection) {
+
 	if(connected_to.count(connection)) {
 		connected_to.erase(connection);
 	}
@@ -148,8 +148,8 @@ void makeConnection(std::shared_ptr<OutputConnection> output, std::shared_ptr<In
 }
 
 void breakConnection(std::shared_ptr<OutputConnection> output, std::shared_ptr<InputConnection> input) {
-	input->disconnectHalf(output);
 	output->disconnectHalf(input);
+	input->disconnectHalf(output);
 }
 
 }
