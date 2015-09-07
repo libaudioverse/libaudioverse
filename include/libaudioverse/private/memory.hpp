@@ -27,6 +27,7 @@ class Simulation;
 
 extern std::map<void*, std::shared_ptr<void>> *external_ptrs;
 extern std::map<int, std::shared_ptr<ExternalObject>> *external_handles;
+extern std::map<int, std::weak_ptr<ExternalObject>> *weak_external_handles;
 extern std::recursive_mutex *memory_lock;
 //max handle we've used for an outgoing object. Ensures no duplication.
 extern std::atomic<int> *max_handle;
@@ -69,8 +70,9 @@ int outgoingObject(std::shared_ptr<t> what) {
 		what->is_external_object =true;
 		what->is_first_external_access = true;
 		what->has_external_mapping = true;
-		what->refcount.fetch_add(1);
+		what->refcount.store(1);
 		(*external_handles)[what->external_object_handle] = what;
+		(*weak_external_handles)[what->external_object_handle] = what;
 	}
 	return what->external_object_handle;
 }
@@ -84,7 +86,17 @@ std::shared_ptr<t> incomingObject(int handle, bool allowNull =false) {
 		if(res == nullptr) ERROR(Lav_ERROR_TYPE_MISMATCH, "Incoming pointer did not match requested type.");
 		return res;
 	}
-	else ERROR(Lav_ERROR_INVALID_HANDLE, "Handle did not originate from Libaudioverse or was deleted.");
+	else if(weak_external_handles->count(handle)) {
+		auto weak_res = weak_external_handles->at(handle);
+		auto strong_res = weak_res.lock();
+		auto res = std::dynamic_pointer_cast<t>(strong_res);
+		if(res ) return res;
+		//The dynamic cast failing means we have a strong_res.
+		//Not having a handle means no strong_res.
+		else if(res == nullptr && strong_res != nullptr) ERROR(Lav_ERROR_TYPE_MISMATCH, "Incoming pointer did not match requested type.");
+		else weak_external_handles->erase(handle);
+	}
+	ERROR(Lav_ERROR_INVALID_HANDLE, "Handle did not originate from Libaudioverse or was deleted.");
 	//we can't get here, but some compilers probably complain anyway:
 	return nullptr;
 }

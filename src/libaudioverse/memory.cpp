@@ -21,7 +21,11 @@ namespace libaudioverse_implementation {
 
 std::map<void*, std::shared_ptr<void>> *external_ptrs = nullptr;
 std::recursive_mutex *memory_lock = nullptr;
+//The handles we keep alive because the external world has a copy.
 std::map<int, std::shared_ptr<ExternalObject>> *external_handles = nullptr;
+//Sometimes, the external world has handed in all its references.  But we need to be able to look it up anyway, in case we havne't deleted it.
+//This dict holds a weak reference to every handle passed to the extrernal world until the end of the program.
+std::map<int, std::weak_ptr<ExternalObject>> *weak_external_handles = nullptr;
 std::atomic<int> *max_handle = nullptr;
 LavHandleDestroyedCallback handle_destroyed_callback = nullptr;
 bool memory_initialized = false;
@@ -32,6 +36,7 @@ void initializeMemoryModule() {
 	max_handle->store(1);
 	external_ptrs= new std::map<void*, std::shared_ptr<void>>();
 	external_handles=new std::map<int, std::shared_ptr<ExternalObject>>();
+	weak_external_handles = new std::map<int, std::weak_ptr<ExternalObject>>();
 	memory_initialized = true;
 }
 
@@ -39,6 +44,8 @@ void shutdownMemoryModule() {
 	std::lock_guard<std::recursive_mutex> l(*memory_lock);
 	delete external_handles;
 	external_handles = nullptr;
+	delete weak_external_handles;
+	weak_external_handles = nullptr;
 	delete external_ptrs;
 	external_ptrs = nullptr;
 	delete max_handle;
