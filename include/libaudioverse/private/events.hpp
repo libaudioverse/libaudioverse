@@ -18,7 +18,7 @@ class Event {
 	Event();
 	Event(const Event& other);
 	Event& operator=(const Event other);
-	void setHandler(std::function<void(Node*, void*)> cb);
+	void setHandler(std::function<void(std::shared_ptr<Node>, void*)> cb);
 	//these two are for when using externally. Allows us to make a query of what the handler is for c api.
 	void setExternalHandler(LavEventCallback cb);
 	LavEventCallback getExternalHandler();
@@ -45,7 +45,7 @@ class Event {
 	private:
 	std::shared_ptr<Simulation> associated_simulation = nullptr;
 	LavEventCallback external_handler = nullptr;
-	std::function<void(Node*, void*)> handler;
+	std::function<void(std::shared_ptr<Node>, void*)> handler;
 	std::string name;
 	Node* associated_node = nullptr;
 	void* user_data = nullptr;

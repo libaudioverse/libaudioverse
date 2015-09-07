@@ -34,7 +34,7 @@ LavEventCallback Event::getExternalHandler() {
 	return external_handler;
 }
 
-void Event::setHandler(std::function<void(Node*, void*)> handler) {
+void Event::setHandler(std::function<void(std::shared_ptr<Node>, void*)> handler) {
 	this->handler = handler;
 }
 
@@ -50,7 +50,7 @@ void Event::fire() {
 		auto shared_node= node.lock();
 		if(shared_node== nullptr) return;	
 		//callbacks die with nodes; if we get this far, this is still a valid pointer.
-		handler(shared_node.get(), userdata);
+		handler(shared_node, userdata);
 		this->is_firing.store(0);
 	});
 }

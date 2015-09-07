@@ -32,7 +32,7 @@ std::shared_ptr<Node> createCustomNode(std::shared_ptr<Simulation> simulation, u
 
 void CustomNode::process() {
 	if(callback != nullptr) {
-		callback(externalObjectHandle, block_size, num_input_buffers, getInputBufferArray(), num_output_buffers, getOutputBufferArray(), callback_userdata);
+		callback(outgoingObject(this->shared_from_this()), block_size, num_input_buffers, getInputBufferArray(), num_output_buffers, getOutputBufferArray(), callback_userdata);
 	}
 	else {
 		for(int i= 0; i < num_output_buffers; i++) std::copy(input_buffers[i], input_buffers[i]+block_size, output_buffers[i]);

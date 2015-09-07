@@ -871,11 +871,11 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeSetEvent(LavHandle nodeHandle, int event, L
 	LOCK(*ptr);
 	auto &ev = ptr->getEvent(event);
 	if(handler) {
-		ev.setHandler([=](Node* o, void* d) { handler(o->externalObjectHandle, d);});
+		ev.setHandler([=](std::shared_ptr<Node> o, void* d) { handler(outgoingObject(o), d);});
 		ev.setExternalHandler(handler);
 		ev.setUserData(userData);
 	} else {
-		ev.setHandler(std::function<void(Node*, void*)>());
+		ev.setHandler(std::function<void(std::shared_ptr<Node>, void*)>());
 		ev.setExternalHandler(nullptr);
 	}
 	PUB_END

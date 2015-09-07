@@ -51,7 +51,7 @@ void PullNode::process() {
 		got += resampler->write(resampled_buffer, block_size-got);
 		if(got >= block_size) break; //we may have done it on this iteration.
 		if(callback) {
-			callback(externalObjectHandle, block_size, channels, incoming_buffer, callback_userdata);
+			callback(outgoingObject(this->shared_from_this()), block_size, channels, incoming_buffer, callback_userdata);
 		} else {
 			memset(incoming_buffer, 0, block_size*sizeof(float)*channels);
 		}

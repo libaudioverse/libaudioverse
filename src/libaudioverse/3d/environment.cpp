@@ -128,7 +128,7 @@ void EnvironmentNode::playAsync(std::shared_ptr<Buffer> buffer, float x, float y
 	//When the event fires, we null the pointers we captured, and then everything schedules for deletion.
 	//We need the simulation shared pointer.
 	auto simulation = this->simulation;
-	b->getEvent(Lav_BUFFER_END_EVENT).setHandler([b, e, s, simulation] (Node* unused1, void* unused2) mutable {
+	b->getEvent(Lav_BUFFER_END_EVENT).setHandler([b, e, s, simulation] (std::shared_ptr<Node> unused1, void* unused2) mutable {
 		//Recall that events do not hold locks when fired.
 		//If we lock anything we delete here, it will not unlock properly.
 		//So lock the simulation.

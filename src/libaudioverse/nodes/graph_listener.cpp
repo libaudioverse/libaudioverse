@@ -47,7 +47,7 @@ void GraphListenerNode::process() {
 				outgoing_buffer[i*channels+j] = input_buffers[j][i];
 			}
 		}
-		callback(this->externalObjectHandle, block_size, channels, outgoing_buffer, callback_userdata);
+		callback(outgoingObject(this->shared_from_this()), block_size, channels, outgoing_buffer, callback_userdata);
 	}
 	for(int i= 0; i < num_output_buffers; i++) std::copy(input_buffers[i], input_buffers[i]+block_size, output_buffers[i]);
 }
