@@ -27,7 +27,7 @@ class _HandleBox(object):
 
 	def __init__(self, handle):
 		self.handle= int(handle)
-		first_access= _libaudioverse.c_int()
+		first_access= ctypes.c_int()
 		_libaudioverse.Lav_handleGetAndClearFirstAccess(handle, ctypes.byref(first_access))
 		if not first_access:
 			_libaudioverse.Lav_handleIncRef(handle)

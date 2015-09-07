@@ -64,6 +64,7 @@ def _handle_destroyed(handle):
 			#We block until they finish.
 			#If they do anything that needs the lock we're holding, lock inversion.
 			#This variable holds the dict until after the function ends.
+			#Note that this is an integer, not a _HandleBox
 			ensure_gc_later = _object_states[handle]
 			del _object_states[handle]
 
@@ -583,7 +584,7 @@ class GenericNode(_HandleComparer):
 				self._state['properties']["{{prop['name']}}"] = _libaudioverse.{{enumerant}}
 {%endfor%}
 			else:
-				self._state=_object_states[handle]
+				self._state=_object_states[handle.handle]
 			self._lock = self._state['lock']
 
 	def get_property_names(self):
