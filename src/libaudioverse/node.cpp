@@ -506,7 +506,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeConnectProperty(LavHandle nodeHandle, int o
 Lav_PUBLIC_FUNCTION LavError Lav_nodeDisconnect(LavHandle nodeHandle, int output, LavHandle otherHandle, int input) {
 	PUB_BEGIN
 	auto node = incomingObject<Node>(nodeHandle);
-	auto other = incomingObject<Node>(otherHandle);
+	//We have to allow null for this one.
+	auto other = incomingObject<Node>(otherHandle, true);
 	LOCK(*node);
 	node->disconnect(output, other, input);
 	PUB_END
