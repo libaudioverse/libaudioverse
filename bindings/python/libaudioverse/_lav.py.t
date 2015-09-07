@@ -27,7 +27,7 @@ class _HandleBox(object):
 
 	def __init__(self, handle):
 		self.handle= int(handle)
-		first_access= _libaudioverse.LavHandle()
+		first_access= _libaudioverse.c_int()
 		_libaudioverse.Lav_handleGetAndClearFirstAccess(handle, ctypes.byref(first_access))
 		if not first_access:
 			_libaudioverse.Lav_handleIncRef(handle)
@@ -46,7 +46,6 @@ class _HandleBox(object):
 	def __del__(self):
 		#Guard against interpreter shutdown.
 		if self.handle is None or _libaudioverse is None: return
-
 		_libaudioverse.Lav_handleDecRef(self.handle)
 		self.handle = None
 
