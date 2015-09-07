@@ -342,10 +342,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_createNoiseNode(LavHandle simulationHandle, Lav
 Lav_PUBLIC_FUNCTION LavError Lav_createHrtfNode(LavHandle simulationHandle, const char* hrtfPath, LavHandle* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterNode(LavHandle simulationHandle, int channels, LavHandle *destination);
 
-Lav_PUBLIC_FUNCTION LavError Lav_createCrossfadingDelayNode(LavHandle simulationHandle, float maxDelay, unsigned int lineCount, LavHandle* destination);
-Lav_PUBLIC_FUNCTION LavError Lav_createDoppleringDelayNode(LavHandle simulationHandle, float maxDelay, unsigned int lineCount, LavHandle* destination);
-
-Lav_PUBLIC_FUNCTION LavError Lav_createDoppleringDelayNode(LavHandle simulationHandle, float maxDelay, unsigned int lineCount, LavHandle* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createCrossfadingDelayNode(LavHandle simulationHandle, float maxDelay, int channels, LavHandle* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createDoppleringDelayNode(LavHandle simulationHandle, float maxDelay, int channels, LavHandle* destination);
 
 Lav_PUBLIC_FUNCTION LavError Lav_createAmplitudePannerNode(LavHandle simulationHandle, LavHandle* destination);
 //can set the standard channel map for 2, 6, and 8 channels. Other values cause Lav_ERROR_RANGE.

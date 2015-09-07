@@ -15,7 +15,7 @@ namespace libaudioverse_implementation {
 
 class CrossfadingDelayNode: public Node {
 	public:
-	CrossfadingDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, unsigned int lineCount);
+	CrossfadingDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, int channels);
 	~CrossfadingDelayNode();
 	void process();
 	protected:
@@ -31,14 +31,14 @@ class CrossfadingDelayNode: public Node {
 	int last_updated_delay_property = 0;
 	unsigned int delay_line_length = 0;
 	CrossfadingDelayLine **lines;
-	int line_count;
+	int channels;
 };
 
-CrossfadingDelayNode::CrossfadingDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, unsigned int lineCount): Node(Lav_OBJTYPE_CROSSFADING_DELAY_NODE, simulation, lineCount, lineCount) {
-	if(lineCount <= 0) ERROR(Lav_ERROR_RANGE, "lineCount must be greater than 0.");
-	line_count = lineCount;
-	lines = new CrossfadingDelayLine*[lineCount];
-	for(unsigned int i = 0; i < lineCount; i++) lines[i] = new CrossfadingDelayLine(maxDelay, simulation->getSr());
+CrossfadingDelayNode::CrossfadingDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, int channels): Node(Lav_OBJTYPE_CROSSFADING_DELAY_NODE, simulation, channels, channels) {
+	if(channels <= 0) ERROR(Lav_ERROR_RANGE, "lineCount must be greater than 0.");
+	this->channels = channels;
+	lines = new CrossfadingDelayLine*[channels];
+	for(unsigned int i = 0; i < channels; i++) lines[i] = new CrossfadingDelayLine(maxDelay, simulation->getSr());
 	getProperty(Lav_DELAY_DELAY).setFloatRange(0.0f, maxDelay);
 	getProperty(Lav_DELAY_DELAY_SAMPLES).setDoubleRange(0.0, maxDelay*(double)simulation->getSr());
 	//These callbacks make these two properties be linked, such that updating one updates the other.
@@ -48,32 +48,32 @@ CrossfadingDelayNode::CrossfadingDelayNode(std::shared_ptr<Simulation> simulatio
 	getProperty(Lav_DELAY_DELAY_MAX).setFloatValue(maxDelay);
 	//Setup as though we just changed delay.
 	last_updated_delay_property = Lav_DELAY_DELAY;
-	appendInputConnection(0, lineCount);
-	appendOutputConnection(0, lineCount);
+	appendInputConnection(0, channels);
+	appendOutputConnection(0, channels);
 }
 
-std::shared_ptr<Node> createCrossfadingDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, unsigned int lineCount) {
-	return standardNodeCreation<CrossfadingDelayNode>(simulation, maxDelay, lineCount);
+std::shared_ptr<Node> createCrossfadingDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, unsigned int channels) {
+	return standardNodeCreation<CrossfadingDelayNode>(simulation, maxDelay, channels);
 }
 
 CrossfadingDelayNode::~CrossfadingDelayNode() {
-	for(int i=0; i < line_count; i++) delete lines[i];
+	for(int i=0; i < channels; i++) delete lines[i];
 	delete[] lines;
 }
 
 void CrossfadingDelayNode::recomputeDelta() {
 	float time = getProperty(Lav_DELAY_INTERPOLATION_TIME).getFloatValue();
-	for(int i = 0; i < line_count; i++) lines[i]->setInterpolationTime(time);
+	for(int i = 0; i < channels; i++) lines[i]->setInterpolationTime(time);
 }
 
 void CrossfadingDelayNode::delayChanged() {
 	if(last_updated_delay_property == Lav_DELAY_DELAY) {
 		float newDelay = getProperty(Lav_DELAY_DELAY).getFloatValue();
-		for(int i = 0; i < line_count; i++) lines[i]->setDelay(newDelay);
+		for(int i = 0; i < channels; i++) lines[i]->setDelay(newDelay);
 	}
 	else {
 		int delayInSamples = (int)getProperty(Lav_DELAY_DELAY_SAMPLES).getDoubleValue();
-		for(int i = 0; i < line_count; i++) lines[i]->setDelayInSamples(delayInSamples);
+		for(int i = 0; i < channels; i++) lines[i]->setDelayInSamples(delayInSamples);
 	}
 	last_updated_delay_property = 0;
 }
@@ -120,11 +120,11 @@ void CrossfadingDelayNode::process() {
 }
 
 //begin public api
-Lav_PUBLIC_FUNCTION LavError Lav_createCrossfadingDelayNode(LavHandle simulationHandle, float maxDelay, unsigned int lineCount, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createCrossfadingDelayNode(LavHandle simulationHandle, float maxDelay, int channels, LavHandle* destination) {
 	PUB_BEGIN
 	auto simulation =incomingObject<Simulation>(simulationHandle);
 	LOCK(*simulation);
-	auto d = createCrossfadingDelayNode(simulation, maxDelay, lineCount);
+	auto d = createCrossfadingDelayNode(simulation, maxDelay, channels);
 	*destination = outgoingObject(d);
 	PUB_END
 }
