@@ -211,7 +211,6 @@ For full details of this class, see the Libaudioverse manual."""
 			if handle.handle not in _object_states:
 				_object_states[handle.handle] = dict()
 				_object_states[handle.handle]['lock'] = threading.Lock()
-				_object_states[handle.handle]['inputs'] = set()
 				_object_states[handle.handle]['block_callback'] = None
 			self._state = _object_states[handle.handle]
 			self.handle = handle
@@ -578,12 +577,6 @@ class GenericNode(_HandleComparer):
 				self._state['callbacks'] = dict()
 				self._state['input_connection_count'] =_lav.node_get_input_connection_count(self)
 				self._state['output_connection_count'] = _lav.node_get_output_connection_count(self)
-				self._state['inputs'] =collections.defaultdict(set)
-				self._state['outputs'] = collections.defaultdict(set)
-				#Holds (slot, other) tuples for disconnection logic with properties.
-				self._state['outputs_properties'] = collections.defaultdict(set)
-				#Holds (output, other) for property connections. Keys are property slot values.
-				self._state['inputs_properties'] = collections.defaultdict(set)
 				self._state['lock'] = threading.Lock()
 				self._state['properties'] = dict()
 {%for enumerant, prop in metadata['nodes']['Lav_OBJTYPE_GENERIC_NODE']['properties'].iteritems()%}
@@ -602,18 +595,13 @@ class GenericNode(_HandleComparer):
 		
 		As a feature of the Python bindings, nodes are kept alive if another node's input is connected to one of their outputs.
 		So long as some node which this node is connected to is alive, this node will also be alive."""
-		with self._lock:
-			_lav.node_connect(self, output, node, input)
-			self._state['outputs'][output].add((input, weakref.ref(node)))
-			node._state['inputs'][input].add((output, self))
+		_lav.node_connect(self, output, node, input)
 
 	def connect_simulation(self, output):
 		"""Connect the specified output of this node to  this node's simulation.
 		
 		Nodes which are connected to the simulation are kept alive as long as they are connected to the simulation."""
-		with self._lock:
-			_lav.node_connect_simulation(self, output)
-			self._state['simulation']._state['inputs'].add((output, self))
+		_lav.node_connect_simulation(self, output)
 
 	def connect_property(self, output, property):
 		"""Connect an output of this node to an automatable property.
@@ -623,10 +611,7 @@ class GenericNode(_HandleComparer):
 		As usual, this connection keeps this node alive as long as the destination is also alive."""
 		other = property._node
 		slot = property._slot
-		with self._lock:
-			_lav.node_connect_property(self, output, other, slot)
-			self._state['outputs_properties'][output].add((slot, weakref.ref(other)))
-			other._state['inputs_properties'][slot].add((output, self))
+		_lav.node_connect_property(self, output, other, slot)
 
 	def disconnect(self, output, node = None, input = 0):
 		"""Disconnect from other nodes.
@@ -636,27 +621,7 @@ class GenericNode(_HandleComparer):
 		if node is not None, then we are disconnecting from a specific node and input combination."""
 		if node is None:
 			node = 0 #Force this translation.
-		with self._lock:
-			_lav.node_disconnect(self, output, node, input)
-			for i in self._state['outputs'][output]:
-				connected_input, weak =i
-				other = weak()
-				if not other:
-					continue
-				if connected_input != input and node != 0:
-					continue
-				other_input = other._state['inputs'][connected_input]
-				if (output, self) in other_input:
-					other_input.remove((output, self))
-			#These next can only apply if we are disconnecting from a specific node.
-			if node == 0:
-				for i in self._state['outputs_properties'][output]:
-					slot, weak = i
-					obj = weak()
-					if obj is not None and (output, self) in obj._state['inputs_properties']:
-						obj._state['inputs_properties'].remove((output, self))
-				if (output, self) in self._state['simulation']._state['inputs']:
-					self._state['simulation']._state['inputs'].remove((output, self))
+		_lav.node_disconnect(self, output, node, input)
 
 {%for enumerant, prop in metadata['nodes']['Lav_OBJTYPE_GENERIC_NODE']['properties'].iteritems()%}
 {{macros.implement_property(enumerant, prop)}}
