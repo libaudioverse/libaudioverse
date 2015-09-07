@@ -50,7 +50,7 @@ void shutdownMemoryModule() {
 }
 
 ExternalObject::ExternalObject(int type) {
-	externalObjectHandle = max_handle->fetch_add(1);
+	external_object_handle = max_handle->fetch_add(1);
 	this->type=type;
 	refcount.store(0);
 }
@@ -91,8 +91,8 @@ std::function<void(ExternalObject*)> ObjectDeleter(std::shared_ptr<Simulation> s
 		bool isExternal;
 		int handle;
 		LOCK(*simulation);
-		isExternal = obj->isExternalObject;
-		handle = obj->externalObjectHandle;
+		isExternal = obj->is_external_object;
+		handle = obj->external_object_handle;
 		//WARNING: this line can call this deleter recursively, if obj contains the final shared pointer to another ExternalObject.
 		delete obj;
 		//Because of the recursion, shell out to the simulation's task thread.
@@ -126,7 +126,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_handleDecRef(LavHandle handle) {
 	auto rc = e->refcount.fetch_add(-1);
 	rc-=1;
 	if(rc == 0) {
-		external_handles->erase(e->externalObjectHandle);
+		external_handles->erase(e->external_object_handle);
+		//We need to be readded to the dict if we're passed out again.
+		e->has_external_mapping = false;
 	}
 	PUB_END
 }
@@ -134,8 +136,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_handleDecRef(LavHandle handle) {
 Lav_PUBLIC_FUNCTION LavError Lav_handleGetAndClearFirstAccess(LavHandle handle, int* destination) {
 	PUB_BEGIN
 	auto e = incomingObject<ExternalObject>(handle);
-	*destination = e->isFirstExternalAccess;
-	e->isFirstExternalAccess = false;
+	*destination = e->is_first_external_access;
+	e->is_first_external_access = false;
 	PUB_END
 }
 

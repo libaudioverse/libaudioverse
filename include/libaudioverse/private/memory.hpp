@@ -36,8 +36,10 @@ class ExternalObject: public std::enable_shared_from_this<ExternalObject>  {
 	ExternalObject(int type);
 	virtual ~ExternalObject();
 	int getType();
-	bool isExternalObject = false, isFirstExternalAccess = false;
-	int externalObjectHandle, type;
+	bool is_external_object = false, is_first_external_access = false;
+	int external_object_handle, type;
+	//Have we been put in the dict yet?
+	bool has_external_mapping = false;
 	std::atomic<int> refcount;
 };
 
@@ -62,14 +64,15 @@ template<class t>
 int outgoingObject(std::shared_ptr<t> what) {
 	//null is a special case for which we pass out 0.
 	if(what == nullptr) return 0;
-	if(what->isExternalObject == false) {
+	if(what->has_external_mapping == false) {
 		std::lock_guard<std::recursive_mutex> guard(*memory_lock);
-		what->isExternalObject =true;
-		what->isFirstExternalAccess = true;
+		what->is_external_object =true;
+		what->is_first_external_access = true;
+		what->has_external_mapping = true;
 		what->refcount.fetch_add(1);
-		(*external_handles)[what->externalObjectHandle] = what;
+		(*external_handles)[what->external_object_handle] = what;
 	}
-	return what->externalObjectHandle;
+	return what->external_object_handle;
 }
 
 template<class t>
