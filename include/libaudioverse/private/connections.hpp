@@ -11,15 +11,6 @@ namespace libaudioverse_implementation {
 class Node;
 class Simulation;
 
-/**Overview:
-
-These two classes implement the connection logic for Libaudioverse: the ability to pass more than one channel of audio around, upmixing and dowmixing in all common cases.
-
-Nodes have any number of input connections and any number of output connections; these are exposed publicly as simply inputs and outputs.  When nodes die, connections automatically break.
-
-Shared pointers geta bit funny here: the shared pointer that has to be used must come from and share ownership with a Node shared pointer.
-To that end, connection logic is contained in a function that favours neither class, and some functions (specifically those intended to be called on the other class and mostly/completely private to this module) use raw pointers to indicate which object they're talking about.*/
-
 //we need weak pointers to this in OutputConnection.
 class InputConnection;
 
@@ -45,7 +36,9 @@ class OutputConnection {
 };
 
 /**Unlike output connections, input connections may have a null node, so long as the nodeless functions are used.
-this is to prevent needing to make special case code for simulations.*/
+this is to prevent needing to make special case code for simulations.
+
+Input connections keep nodes alive.*/
 class InputConnection {
 	public:
 	InputConnection(std::shared_ptr<Simulation> simulation, Node* node, int start, int count);
@@ -63,7 +56,7 @@ class InputConnection {
 	private:
 	Node* node;
 	int start, count;
-	std::set<std::weak_ptr<OutputConnection>, std::owner_less<std::weak_ptr<OutputConnection>>> connected_to;
+	std::map<std::shared_ptr<OutputConnection>, std::shared_ptr<Node>> connected_to;
 	std::shared_ptr<Simulation> simulation;
 };
 

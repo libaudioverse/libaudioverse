@@ -17,6 +17,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <memory>
 #include <vector>
 
+
 namespace libaudioverse_implementation {
 
 OutputConnection::OutputConnection(std::shared_ptr<Simulation> simulation, Node* node, int start, int count) {
@@ -94,9 +95,7 @@ void InputConnection::add(bool shouldApplyMixingMatrix) {
 
 void InputConnection::addNodeless(float** inputs, bool shouldApplyMixingMatrix) {
 	for(auto &i: connected_to) {
-		auto i_s = i.lock();
-		if(i_s == nullptr) continue;
-		i_s->add(count, inputs+start, shouldApplyMixingMatrix);
+		i.first->add(count, inputs+start, shouldApplyMixingMatrix);
 	}
 }
 
@@ -106,7 +105,8 @@ void InputConnection::reconfigure(int newStart, int newCount) {
 }
 
 void InputConnection::connectHalf(std::shared_ptr<OutputConnection> outputConnection) {
-	connected_to.insert(outputConnection);
+	auto n = std::static_pointer_cast<Node>(outputConnection->getNode()->shared_from_this());
+	connected_to[outputConnection] = n;
 }
 
 void InputConnection::disconnectHalf(std::shared_ptr<OutputConnection> connection) {
@@ -116,11 +116,9 @@ void InputConnection::disconnectHalf(std::shared_ptr<OutputConnection> connectio
 }
 
 void InputConnection::forgetConnection(OutputConnection* which) {
-	decltype(connected_to) removing;
+	std::set<std::shared_ptr<OutputConnection>> removing;
 	for(auto &i: connected_to) {
-		auto i_s=i.lock();
-		//we might as well take this opportunity to clean up dead weak pointers since we're already creating the temporary set.
-		if(i_s == nullptr || i_s.get() == which) removing.insert(i);
+		if(i.first.get() == which) removing.insert(i.first);
 	}
 	for(auto &i: removing) {
 		connected_to.erase(i);
@@ -134,9 +132,7 @@ Node* InputConnection::getNode() {
 std::vector<Node*> InputConnection::getConnectedNodes() {
 	std::vector<Node*> retval;
 	for(auto &i: connected_to) {
-		auto i_s= i.lock();
-		if(i_s == nullptr) continue;
-		auto n= i_s->getNode();
+		auto n= i.first->getNode();
 		retval.push_back(n);
 	}
 	return retval;
