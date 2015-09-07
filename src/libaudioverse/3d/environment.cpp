@@ -90,6 +90,10 @@ std::shared_ptr<Node> EnvironmentNode::createPannerNode() {
 	return pan;
 }
 
+void EnvironmentNode::destroyPannerNode(std::shared_ptr<Node> panner) {
+	panner->isolate();
+}
+
 void EnvironmentNode::registerSourceForUpdates(std::shared_ptr<SourceNode> source) {
 	sources.insert(source);
 	simulation->invalidatePlan();

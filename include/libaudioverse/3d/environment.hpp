@@ -31,6 +31,7 @@ class EnvironmentNode: public SubgraphNode {
 	//call update on all sources.
 	virtual void willProcessParents();
 	std::shared_ptr<Node> createPannerNode();
+	void destroyPannerNode(std::shared_ptr<Node> panner);
 	void visitDependenciesUnconditional(std::function<void(std::shared_ptr<Job>&)> &pred) override;
 	//Play buffer asynchronously at specified position, destroying the source when done.
 	void playAsync(std::shared_ptr<Buffer> buffer, float x, float y, float z);

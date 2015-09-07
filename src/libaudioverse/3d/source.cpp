@@ -49,6 +49,11 @@ std::shared_ptr<Node> createSourceNode(std::shared_ptr<Simulation> simulation, s
 	return temp;
 }
 
+SourceNode::~SourceNode() {
+	//Since connections are currently strong, return our panner to the environment
+	environment->destroyPannerNode(panner_node);
+}
+
 //helper function: calculates gains given distance models.
 float calculateGainForDistanceModel(int model, float distance, float maxDistance, float referenceDistance) {
 	float retval = 1.0f;

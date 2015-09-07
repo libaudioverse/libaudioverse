@@ -16,6 +16,7 @@ class Node;
 class SourceNode: public SubgraphNode {
 	public:
 	SourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentNode> environment);
+	~SourceNode();
 	void update(EnvironmentInfo &env);
 	//involves shared pointers.
 	void forwardProperties();
