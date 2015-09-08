@@ -84,14 +84,8 @@ void EnvironmentNode::willProcessParents() {
 	for(auto i: needsRemoval) sources.erase(i);
 }
 
-std::shared_ptr<Node> EnvironmentNode::createPannerNode() {
-	auto pan = createMultipannerNode(simulation, hrtf);
-	pan->connect(0, output, 0);
-	return pan;
-}
-
-void EnvironmentNode::destroyPannerNode(std::shared_ptr<Node> panner) {
-	panner->isolate();
+std::shared_ptr<HrtfData> EnvironmentNode::getHrtf() {
+	return hrtf;
 }
 
 void EnvironmentNode::registerSourceForUpdates(std::shared_ptr<SourceNode> source) {

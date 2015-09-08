@@ -27,7 +27,7 @@ SourceNode::SourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<E
 	input->resize(1, 1);
 	input->appendInputConnection(0, 1);
 	input->appendOutputConnection(0, 1);
-	panner_node = environment->createPannerNode();
+	panner_node = createMultipannerNode(simulation, environment->getHrtf());
 	this->environment = environment;
 	//we have to read off these defaults manually, and it must always be the last thing in the constructor.
 	getProperty(Lav_SOURCE_DISTANCE_MODEL).setIntValue(environment->getProperty(Lav_ENVIRONMENT_DEFAULT_DISTANCE_MODEL).getIntValue());
@@ -50,8 +50,8 @@ std::shared_ptr<Node> createSourceNode(std::shared_ptr<Simulation> simulation, s
 }
 
 SourceNode::~SourceNode() {
-	//Since connections are currently strong, return our panner to the environment
-	environment->destroyPannerNode(panner_node);
+	//Since connections are currently strong, break them.
+	panner_node->isolate();
 }
 
 void SourceNode::feedEffect(int which) {
