@@ -42,6 +42,14 @@ void initializeMemoryModule() {
 
 void shutdownMemoryModule() {
 	std::lock_guard<std::recursive_mutex> l(*memory_lock);
+	//We're about to shut down, but sometimes there are cycles.
+	//The most notable case of this is nodes connected to the simulation: the simulation holds them and they hold the simulation.
+	//In order to help prevent bugs, we therefore isolate all nodes that we can reach.
+	for(auto &i: *weak_external_handles) {
+		auto s = i.second.lock();
+		auto n = std::dynamic_pointer_cast<Node>(s);
+		if(n) n->isolate();
+	}
 	delete external_handles;
 	external_handles = nullptr;
 	delete weak_external_handles;
