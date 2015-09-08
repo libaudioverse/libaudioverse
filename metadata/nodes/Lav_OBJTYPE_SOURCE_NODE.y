@@ -57,6 +57,18 @@ properties:
       Sources which are head relative interpret their positions in the default coordinate system, relative to the listener.
       Positive x is right, positive y is up, and positive z is behind the listener.
       The orientation and position properties of an environment do not affect head relative sources, making them ideal for such things as footsteps and/or HUD effects that should be panned.
+  Lav_SOURCE_REVERB_DISTANCE:
+    name: reverb_distance
+    type: float
+    range: [0.0, INFINITY]
+    default: 30.0
+    doc_description: |
+      The distance at which the source will only be heard through the reverb effect sends.
+      
+      If this source is not feeding any effect sends configured as reverbs, this property has no effect.
+      
+      For values greater than {{"Lav_SOURCE_MAX_DISTANCE"|property}}, the source will always be heard at least somewhat in the dry path.
+      {{"Lav_SOURCE_DISTANCE_MODEL"|property}} controls how this crossfading takes place.
 extra_functions:
   Lav_sourceNodeFeedEffect:
     doc_description: |

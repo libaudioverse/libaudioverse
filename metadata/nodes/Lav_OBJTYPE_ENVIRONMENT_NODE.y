@@ -68,6 +68,15 @@ properties:
       or where the app changes the panning strategies of sources after creation.
       
       Values besides 2, 4, 6, or 8 do not usually have much meaning.
+  Lav_ENVIRONMENT_DEFAULT_REVERB_DISTANCE:
+    name: default_reverb_distance
+    type: float
+    range: [0.0, INFINITY]
+    default: 30.0
+    doc_description: |
+      The default distance at which a source will be heard only in the reverb.
+      
+      See documentation on the {{"Lav_OBJTYPE_SOURCE_NODE"|node}} node.
 extra_functions:
   Lav_environmentNodePlayAsync:
     doc_description: |
