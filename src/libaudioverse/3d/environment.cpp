@@ -42,7 +42,13 @@ std::shared_ptr<EnvironmentNode> createEnvironmentNode(std::shared_ptr<Simulatio
 	return standardNodeCreation<EnvironmentNode>(simulation, hrtf);
 }
 
-void EnvironmentNode::willProcessParents() {
+void EnvironmentNode::willTick() {
+	if(werePropertiesModified(this, Lav_ENVIRONMENT_OUTPUT_CHANNELS)) {
+		int channels = getProperty(Lav_ENVIRONMENT_OUTPUT_CHANNELS).getIntValue();
+		getOutputConnection(0)->reconfigure(0, channels);
+		output->getOutputConnection(0)->reconfigure(0, channels);
+		output->getInputConnection(0)->reconfigure(0, channels);
+	}
 	if(werePropertiesModified(this, Lav_3D_POSITION, Lav_3D_ORIENTATION)) {
 		//update the matrix.
 		//Important: look at the glsl constructors. Glm copies them, and there is nonintuitive stuff here.
@@ -98,15 +104,6 @@ void EnvironmentNode::registerSourceForUpdates(std::shared_ptr<SourceNode> sourc
 	}
 	//Sources count as dependencies, so we need to invalidate.
 	simulation->invalidatePlan();
-}
-
-void EnvironmentNode::willTick() {
-	if(werePropertiesModified(this, Lav_ENVIRONMENT_OUTPUT_CHANNELS)) {
-		int channels = getProperty(Lav_ENVIRONMENT_OUTPUT_CHANNELS).getIntValue();
-		getOutputConnection(0)->reconfigure(0, channels);
-		output->getOutputConnection(0)->reconfigure(0, channels);
-		output->getInputConnection(0)->reconfigure(0, channels);
-	}
 }
 
 void EnvironmentNode::visitDependenciesUnconditional(std::function<void(std::shared_ptr<Job>&)> &pred) {

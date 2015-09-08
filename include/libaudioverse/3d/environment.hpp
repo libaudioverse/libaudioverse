@@ -35,9 +35,8 @@ class EnvironmentNode: public SubgraphNode {
 	EnvironmentNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf);
 	void registerSourceForUpdates(std::shared_ptr<SourceNode> source, bool useEffectSends = true);
 	//Maybe change our output channels.
+	//Also update sources, which might reconfigure themselves.
 	virtual void willTick() override;
-	//call update on all sources.
-	virtual void willProcessParents();
 	std::shared_ptr<HrtfData> getHrtf();
 	void visitDependenciesUnconditional(std::function<void(std::shared_ptr<Job>&)> &pred) override;
 	//Play buffer asynchronously at specified position, destroying the source when done.
