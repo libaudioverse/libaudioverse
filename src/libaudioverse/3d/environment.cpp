@@ -91,6 +91,10 @@ std::shared_ptr<HrtfData> EnvironmentNode::getHrtf() {
 
 void EnvironmentNode::registerSourceForUpdates(std::shared_ptr<SourceNode> source) {
 	sources.insert(source);
+	for(int i = 0; i < effect_sends.size(); i++) {
+		if(effect_sends[i].connect_by_default) source->feedEffect(i);
+	}
+	//Sources count as dependencies, so we need to invalidate.
 	simulation->invalidatePlan();
 }
 

@@ -55,6 +55,8 @@ SourceNode::SourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<E
 	p = std::static_pointer_cast<AmplitudePannerNode>(createAmplitudePannerNode(simulation));
 	p->configureStandardChannelMap(8);
 	effect_panners.push_back(p);
+	//Actually connect the input to them.
+	for(auto &i: effect_panners) input->connect(0, i, 0);
 }
 
 void SourceNode::forwardProperties() {
