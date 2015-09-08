@@ -188,11 +188,12 @@ void SourceNode::update(EnvironmentInfo &env) {
 	for(auto &i: outgoing_effects_reverb) {
 		i.second->getProperty(Lav_NODE_MUL).setFloatValue(reverbGain);
 	}
-	handleCulling(distance >= maxDistance);
+	//The condition is whether or not we should cull.
+	handleStateUpdates(distance >= maxDistance);
 }
 
-void SourceNode::handleCulling(bool shouldCull) {
-	int newState = 0;
+void SourceNode::handleStateUpdates(bool shouldCull) {
+	int newState = Lav_NODESTATE_PLAYING;
 	if(culled == false && shouldCull) {
 		newState = Lav_NODESTATE_PAUSED;
 		input->getProperty(Lav_NODE_STATE).setIntValue(Lav_NODESTATE_ALWAYS_PLAYING);
@@ -200,10 +201,24 @@ void SourceNode::handleCulling(bool shouldCull) {
 	}
 	else if(culled && shouldCull == false) {
 		culled = false;
-		input->getProperty(Lav_NODE_STATE).setIntValue(Lav_NODESTATE_PLAYING);
+		//The state is the state property's value.
+		//This makes pausing sources work.
 		newState = Lav_NODESTATE_PLAYING;
+		input->getProperty(Lav_NODE_STATE).setIntValue(newState);
 	}
-	else return; //nothing to do.
+	//We always change the states, in order that we can look at this special case.
+	//it's either paused (in which case we pause everything)
+	//Or always playing (in which case it doesn't matter, as long as at least the input has it).
+	if(getState() != Lav_NODESTATE_PLAYING) {
+		newState = getState();
+		input->setState(newState);
+	}
+	//We might be unculled and need to set everything to playing because the user paused:
+	else if(culled == false) {
+		newState = Lav_NODESTATE_PLAYING;
+		input->setState(newState);
+	}
+	//Otherwise, the above code has the input always playing, and the following suspends everything else.
 	//We iterate over everything and change the state.
 	panner_node->setState(newState);
 	for(auto &i: effect_panners) i->setState(newState);

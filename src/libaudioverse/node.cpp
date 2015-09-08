@@ -84,8 +84,10 @@ Node::Node(int type, std::shared_ptr<Simulation> simulation, unsigned int numInp
 	block_size = simulation->getBlockSize();
 	
 	//We must invalidate the plan when people touch the state property.
-	getProperty(Lav_NODE_STATE).setPostChangedCallback([simulation] () {
-		simulation->invalidatePlan();
+	getProperty(Lav_NODE_STATE).setPostChangedCallback([&] () {
+		//The qualification is important.
+		if(getState() != prev_state) this->simulation->invalidatePlan();
+		prev_state = getState();
 	});
 }
 
