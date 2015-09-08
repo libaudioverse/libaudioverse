@@ -170,6 +170,10 @@ void SourceNode::update(EnvironmentInfo &env) {
 		//And also make sure that we distribute it equally among them.
 		reverbGain /= outgoing_effects_reverb.size();
 	}
+	//Bring in mul.
+	float mul = getProperty(Lav_NODE_MUL).getFloatValue();
+	dryGain*=mul;
+	reverbGain*=mul;
 	//Set the output panner, a multipanner.
 	panner_node->getProperty(Lav_PANNER_AZIMUTH).setFloatValue(azimuth);
 	panner_node->getProperty(Lav_PANNER_ELEVATION).setFloatValue(elevation);
