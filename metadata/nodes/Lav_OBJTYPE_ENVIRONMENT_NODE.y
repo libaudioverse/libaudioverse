@@ -88,6 +88,7 @@ extra_functions:
       x: The x-component of the  position.
       y: The y-component of the position.
       z: The z-component of the position.
+      isDry: If true, we avoid sending to the effect sends configured as defaults.
   Lav_environmentNodeAddEffectSend:
     doc_description: |
       Add an effect send.

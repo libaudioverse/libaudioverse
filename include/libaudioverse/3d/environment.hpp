@@ -33,7 +33,7 @@ class EnvironmentInfo {
 class EnvironmentNode: public SubgraphNode {
 	public:
 	EnvironmentNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf);
-	void registerSourceForUpdates(std::shared_ptr<SourceNode> source);
+	void registerSourceForUpdates(std::shared_ptr<SourceNode> source, bool useEffectSends = true);
 	//Maybe change our output channels.
 	virtual void willTick() override;
 	//call update on all sources.
@@ -41,7 +41,7 @@ class EnvironmentNode: public SubgraphNode {
 	std::shared_ptr<HrtfData> getHrtf();
 	void visitDependenciesUnconditional(std::function<void(std::shared_ptr<Job>&)> &pred) override;
 	//Play buffer asynchronously at specified position, destroying the source when done.
-	void playAsync(std::shared_ptr<Buffer> buffer, float x, float y, float z);
+	void playAsync(std::shared_ptr<Buffer> buffer, float x, float y, float z, bool isDry = false);
 	//Get the output.
 	//This is needed for effect sends, which must jump directly to it.
 	std::shared_ptr<Node> getOutputNode();

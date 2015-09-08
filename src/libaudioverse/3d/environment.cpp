@@ -89,10 +89,12 @@ std::shared_ptr<HrtfData> EnvironmentNode::getHrtf() {
 	return hrtf;
 }
 
-void EnvironmentNode::registerSourceForUpdates(std::shared_ptr<SourceNode> source) {
+void EnvironmentNode::registerSourceForUpdates(std::shared_ptr<SourceNode> source, bool useEffectSends) {
 	sources.insert(source);
-	for(int i = 0; i < effect_sends.size(); i++) {
-		if(effect_sends[i].connect_by_default) source->feedEffect(i);
+	if(useEffectSends) {
+		for(int i = 0; i < effect_sends.size(); i++) {
+			if(effect_sends[i].connect_by_default) source->feedEffect(i);
+		}
 	}
 	//Sources count as dependencies, so we need to invalidate.
 	simulation->invalidatePlan();
@@ -119,13 +121,18 @@ void EnvironmentNode::visitDependenciesUnconditional(std::function<void(std::sha
 	}
 }
 
-void EnvironmentNode::playAsync(std::shared_ptr<Buffer> buffer, float x, float y, float z) {
+void EnvironmentNode::playAsync(std::shared_ptr<Buffer> buffer, float x, float y, float z, bool isDry) {
 	auto e = std::static_pointer_cast<EnvironmentNode>(shared_from_this());
 	auto s = createSourceNode(simulation, e);
 	auto b = createBufferNode(simulation);
 	b->getProperty(Lav_BUFFER_BUFFER).setBufferValue(buffer);
 	b->connect(0, s, 0);
 	s->getProperty(Lav_3D_POSITION).setFloat3Value(x, y, z);
+	if(isDry) {
+		for(int i = 0; i < effect_sends.size(); i++) {
+			std::static_pointer_cast<SourceNode>(s)->stopFeedingEffect(i);
+		}
+	}
 	//The key here is that we capture the shared pointers, holding them until the event fires.
 	//When the event fires, we null the pointers we captured, and then everything schedules for deletion.
 	//We need the simulation shared pointer.
@@ -194,12 +201,13 @@ Lav_PUBLIC_FUNCTION LavError Lav_createEnvironmentNode(LavHandle simulationHandl
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_environmentNodePlayAsync(LavHandle nodeHandle, LavHandle bufferHandle, float x, float y, float z) {
+Lav_PUBLIC_FUNCTION LavError Lav_environmentNodePlayAsync(LavHandle nodeHandle, LavHandle bufferHandle, float x, float y, float z, int isDry) {
 	PUB_BEGIN
 	auto e = incomingObject<EnvironmentNode>(nodeHandle);
 	auto b = incomingObject<Buffer>(bufferHandle);
 	LOCK(*e);
-	e->playAsync(b, x, y, z);
+	//==1 gets rid of a VC++ warning.
+	e->playAsync(b, x, y, z, isDry == 1);
 	PUB_END
 }
 
