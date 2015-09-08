@@ -26,7 +26,8 @@ EnvironmentNode::EnvironmentNode(std::shared_ptr<Simulation> simulation, std::sh
 	this->hrtf = hrtf;
 	int channels = getProperty(Lav_ENVIRONMENT_OUTPUT_CHANNELS).getIntValue();
 	output = createGainNode(simulation);
-	output->resize(channels, channels);
+	//We alwyas have 8 buffers, and alias them with the connections.
+	output->resize(8, 8);
 	output->appendInputConnection(0, channels);
 	output->appendOutputConnection(0, channels);
 	appendOutputConnection(0, channels);
@@ -96,7 +97,6 @@ void EnvironmentNode::registerSourceForUpdates(std::shared_ptr<SourceNode> sourc
 void EnvironmentNode::willTick() {
 	if(werePropertiesModified(this, Lav_ENVIRONMENT_OUTPUT_CHANNELS)) {
 		int channels = getProperty(Lav_ENVIRONMENT_OUTPUT_CHANNELS).getIntValue();
-		output->resize(channels, channels);
 		getOutputConnection(0)->reconfigure(0, channels);
 		output->getOutputConnection(0)->reconfigure(0, channels);
 		output->getInputConnection(0)->reconfigure(0, channels);
@@ -138,6 +138,10 @@ void EnvironmentNode::playAsync(std::shared_ptr<Buffer> buffer, float x, float y
 	});
 }
 
+std::shared_ptr<Node> EnvironmentNode::getOutputNode() {
+	return output;
+}
+
 int EnvironmentNode::addEffectSend(int channels, bool isReverb, bool connectByDefault) {
 	if(channels != 1 && channels != 2 && channels != 4 && channels != 6 && channels != 8)
 	ERROR(Lav_ERROR_RANGE, "Channel count for an effect send needs to be 1, 2, 4, 6, or 8.");
@@ -147,6 +151,13 @@ int EnvironmentNode::addEffectSend(int channels, bool isReverb, bool connectByDe
 	send.channels = channels;
 	send.is_reverb = isReverb;
 	send.connect_by_default = connectByDefault;
+	//Resize the output gain node to have room, and append new connections.
+	int oldSize = output->getOutputBufferCount();
+	int newSize = oldSize+send.channels;
+	output->resize(newSize, newSize);
+	output->appendInputConnection(oldSize, send.channels);
+	output->appendOutputConnection(oldSize, send.channels);
+	appendOutputConnection(oldSize, send.channels);
 	int index = effect_sends.size();
 	effect_sends.push_back(send);
 	for(auto &i: sources) {
@@ -155,6 +166,12 @@ int EnvironmentNode::addEffectSend(int channels, bool isReverb, bool connectByDe
 	}
 	return index;
 }
+
+EffectSendConfiguration& EnvironmentNode::getEffectSend(int which) {
+	if(which < 0 || which > effect_sends.size()) ERROR(Lav_ERROR_RANGE, "Invalid effect send.");
+	return effect_sends[which];
+}
+
 
 //begin public api
 

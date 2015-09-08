@@ -42,7 +42,8 @@ class Node: public ExternalObject, public Job {
 
 	//equivalent to reading lav_NODE_STATE.
 	int getState();
-
+	void setState(int newState);
+	
 	//public view of connections.
 	virtual int getInputConnectionCount();
 	virtual int getOutputConnectionCount();

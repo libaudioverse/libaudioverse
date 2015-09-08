@@ -42,9 +42,13 @@ class EnvironmentNode: public SubgraphNode {
 	void visitDependenciesUnconditional(std::function<void(std::shared_ptr<Job>&)> &pred) override;
 	//Play buffer asynchronously at specified position, destroying the source when done.
 	void playAsync(std::shared_ptr<Buffer> buffer, float x, float y, float z);
+	//Get the output.
+	//This is needed for effect sends, which must jump directly to it.
+	std::shared_ptr<Node> getOutputNode();
 	//Manage effect sends.
 	//Returns the integer identifier of the send.
 	int addEffectSend(int channels, bool isReverb, bool connecctByDefault);
+	EffectSendConfiguration& getEffectSend(int which);
 	private:
 	//while these may be parents (through virtue of the panners we give out), they also have to hold a reference to us-and that reference must be strong.
 	//the world is more capable of handling a source that dies than a source a world that dies.

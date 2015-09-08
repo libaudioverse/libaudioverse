@@ -5,6 +5,9 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "../private/node.hpp"
 #include <memory>
 #include <set>
+#include <vector>
+#include <map>
+
 
 
 namespace libaudioverse_implementation {
@@ -17,9 +20,12 @@ class SourceNode: public SubgraphNode {
 	public:
 	SourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentNode> environment);
 	~SourceNode();
+	//For the case of 1 channels, returns the input gain node as-is.
+	std::shared_ptr<Node> getPannerForEffectChannels(int channels);
 	void feedEffect(int which);
 	void stopFeedingEffect(int which);
 	void update(EnvironmentInfo &env);
+	void handleCulling(bool shouldCull);
 	//involves shared pointers.
 	void forwardProperties();
 	void visitDependenciesUnconditional(std::function<void(std::shared_ptr<Job>&)> &pred) override;
@@ -27,6 +33,10 @@ class SourceNode: public SubgraphNode {
 	bool culled = false;
 	std::shared_ptr<Node> panner_node, input;
 	std::shared_ptr<EnvironmentNode> environment;
+	std::vector<std::shared_ptr<Node>> effect_panners;
+	//It is unlikely that we are going to have more effect sends than possible gain nodes.
+	//We are either sending to a regular or a reverb effect.
+	std::map<int, std::shared_ptr<Node>> outgoing_effects, outgoing_effects_reverb;
 };
 
 }

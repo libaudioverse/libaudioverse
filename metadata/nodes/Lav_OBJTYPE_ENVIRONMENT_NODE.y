@@ -59,13 +59,15 @@ properties:
   Lav_ENVIRONMENT_OUTPUT_CHANNELS:
     name: output_channels
     type: int
-    range: [0, MAX_INT]
+    range: [0, 8]
     default: 2
     doc_description: |
       Environments are not smart enough to determine the number of channels their output needs to have.
       If you are using something greater than stereo, i.e. 5.1, you need to change this property.
       The specific issue solved by this property is the case in which one source is set to something different than all others,
       or where the app changes the panning strategies of sources after creation.
+      
+      Values besides 2, 4, 6, or 8 do not usually have much meaning.
 extra_functions:
   Lav_environmentNodePlayAsync:
     doc_description: |
