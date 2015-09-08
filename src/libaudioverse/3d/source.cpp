@@ -157,15 +157,22 @@ void SourceNode::update(EnvironmentInfo &env) {
 	int distanceModel = getProperty(Lav_SOURCE_DISTANCE_MODEL).getIntValue();
 	float maxDistance = getProperty(Lav_SOURCE_MAX_DISTANCE).getFloatValue();
 	float referenceDistance = getProperty(Lav_SOURCE_SIZE).getFloatValue();
-	float distanceModelGain = calculateGainForDistanceModel(distanceModel, distance, maxDistance, referenceDistance);
-	//Add in our mul.
-	float gain  = distanceModelGain*getProperty(Lav_NODE_MUL).getFloatValue();
-
+	float reverbDistance = getProperty(Lav_SOURCE_REVERB_DISTANCE).getFloatValue();
+	float dryGain = calculateGainForDistanceModel(distanceModel, distance, maxDistance, referenceDistance);
+	float unscaledReverbMultiplier = 1.0f-calculateGainForDistanceModel(distanceModel, distance, reverbDistance, 0.0f);
+	float scaledReverbMultiplier = 0.1+0.9*unscaledReverbMultiplier;
+	float reverbGain = dryGain*scaledReverbMultiplier;
+	//Question: are we going to actually send to a reverb? If so, make room in the dry gain for it.
+	if(outgoing_effects_reverb.size()) {
+		dryGain *= 1.0f-scaledReverbMultiplier;
+		//And also make sure that we distribute it equally among them.
+		reverbGain /= outgoing_effects_reverb.size();
+	}
 	//Set the output panner, a multipanner.
 	panner_node->getProperty(Lav_PANNER_AZIMUTH).setFloatValue(azimuth);
 	panner_node->getProperty(Lav_PANNER_ELEVATION).setFloatValue(elevation);
 	panner_node->getProperty(Lav_PANNER_DISTANCE).setFloatValue(distance);
-	panner_node ->getProperty(Lav_NODE_MUL).setFloatValue(gain);
+	panner_node ->getProperty(Lav_NODE_MUL).setFloatValue(dryGain);
 	//Set the panners for effect sends; note that these are not multipanners and only have azimuth and elevation.
 	for(auto &i: effect_panners) {
 		i->getProperty(Lav_PANNER_AZIMUTH).setFloatValue(azimuth);
@@ -173,7 +180,11 @@ void SourceNode::update(EnvironmentInfo &env) {
 	}
 	//Set the gains for non-reverb sends.
 	for(auto &i: outgoing_effects) {
-		i.second->getProperty(Lav_NODE_MUL).setFloatValue(gain);
+		i.second->getProperty(Lav_NODE_MUL).setFloatValue(dryGain);
+	}
+	//And reverb sends.
+	for(auto &i: outgoing_effects_reverb) {
+		i.second->getProperty(Lav_NODE_MUL).setFloatValue(reverbGain);
 	}
 	handleCulling(distance >= maxDistance);
 }
