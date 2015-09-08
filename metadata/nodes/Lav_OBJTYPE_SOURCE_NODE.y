@@ -57,6 +57,49 @@ properties:
       Sources which are head relative interpret their positions in the default coordinate system, relative to the listener.
       Positive x is right, positive y is up, and positive z is behind the listener.
       The orientation and position properties of an environment do not affect head relative sources, making them ideal for such things as footsteps and/or HUD effects that should be panned.
+  Lav_SOURCE_REVERB_DISTANCE:
+    name: reverb_distance
+    type: float
+    range: [0.0, INFINITY]
+    default: 30.0
+    doc_description: |
+      The distance at which the source will only be heard through the reverb effect sends.
+      
+      If this source is not feeding any effect sends configured as reverbs, this property has no effect.
+      
+      For values greater than {{"Lav_SOURCE_MAX_DISTANCE"|property}}, the source will always be heard at least somewhat in the dry path.
+      {{"Lav_SOURCE_DISTANCE_MODEL"|property}} controls how this crossfading takes place.
+  Lav_SOURCE_MIN_REVERB_LEVEL:
+    name: min_reverb_level
+    type: float
+    range: [0.0, 1.0]
+    default: 0.1
+    doc_description: |
+      The minimum reverb level allowed.
+      
+      if a send is configured to be a reverb send, this is the minimum amount of audio that will be diverted to it.
+      
+      Behavior is undefined if this property is ever greater than the value you give to {{"Lav_SOURCE_MAX_REVERB_LEVEL"|property}}.
+  Lav_SOURCE_MAX_REVERB_LEVEL:
+    name: max_reverb_level
+    type: float
+    range: [0.0, 1.0]
+    default: 1.0
+    doc_description: |
+      The maximum amount of audio to be diverted to reverb sends, if any.
+      
+      Behavior is undefined if this property is ever less than {{"Lav_SOURCE_MIN_REVERB_LEVEL"|property}}.
+extra_functions:
+  Lav_sourceNodeFeedEffect:
+    doc_description: |
+      Begin feeding the specified effect send.
+    params:
+      effect: The index of the effect send to feed.
+  Lav_sourceNodeStopFeedingEffect:
+    doc_description: |
+      Stop feeding an effect send.
+    params:
+      effect: The send to stop feeding.
 inputs:
   - [1, "The audio to enter the 3D environment."]
 outputs: null

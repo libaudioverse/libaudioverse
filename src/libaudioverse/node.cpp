@@ -194,6 +194,10 @@ int Node::getState() {
 	return getProperty(Lav_NODE_STATE).getIntValue();
 }
 
+void Node::setState(int newState) {
+	getProperty(Lav_NODE_STATE).setIntValue(newState);
+}
+
 int Node::getOutputBufferCount() {
 	return output_buffers.size();
 }

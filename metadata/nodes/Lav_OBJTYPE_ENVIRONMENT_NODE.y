@@ -59,13 +59,24 @@ properties:
   Lav_ENVIRONMENT_OUTPUT_CHANNELS:
     name: output_channels
     type: int
-    range: [0, MAX_INT]
+    range: [0, 8]
     default: 2
     doc_description: |
       Environments are not smart enough to determine the number of channels their output needs to have.
       If you are using something greater than stereo, i.e. 5.1, you need to change this property.
       The specific issue solved by this property is the case in which one source is set to something different than all others,
       or where the app changes the panning strategies of sources after creation.
+      
+      Values besides 2, 4, 6, or 8 do not usually have much meaning.
+  Lav_ENVIRONMENT_DEFAULT_REVERB_DISTANCE:
+    name: default_reverb_distance
+    type: float
+    range: [0.0, INFINITY]
+    default: 30.0
+    doc_description: |
+      The default distance at which a source will be heard only in the reverb.
+      
+      See documentation on the {{"Lav_OBJTYPE_SOURCE_NODE"|node}} node.
 extra_functions:
   Lav_environmentNodePlayAsync:
     doc_description: |
@@ -77,6 +88,30 @@ extra_functions:
       x: The x-component of the  position.
       y: The y-component of the position.
       z: The z-component of the position.
+  Lav_environmentNodeAddEffectSend:
+    doc_description: |
+      Add an effect send.
+      
+      Effect sends are aggregates of all sources configured to make use of them.
+      This function's return value is the index of the newly created effecct send.
+      
+      The world gains an additional output for every added effect send.
+      This output aggregates all audio of sources configured to send to it, including the panning effects on those sources.
+      The returned index is the number of the newly created output.
+      
+      Two special cases are worth noting.
+      
+      First, a mono effect send includes all sources with only attenuation applied.
+      
+      Second, if the effect send has 4 channels, it may be configured to be a reverb effect send with the {{"isReverb"|param}} parameter.
+      Reverb effect sends are treated differently in terms of attenuation:
+      as sources move away from the listener, their dry path becomes less but the audio sent to the reverb effect send becomes greater.
+      
+      No effect send can include occlusion effects.
+    params:
+      channels: The number of channels the effect send is to have. Must be 1, 2, 4, 6, or 8.
+      isReverb: nonzero if this is a reverb effect send.
+      connectByDefault: If nonzero, all existing and newly created sources will send to this effect send unless disabled.
 inputs: null
 outputs:
   - [dynamic, "Depends on the output_channels property.", "The output of the 3D environment."]

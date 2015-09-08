@@ -26,7 +26,8 @@ EnvironmentNode::EnvironmentNode(std::shared_ptr<Simulation> simulation, std::sh
 	this->hrtf = hrtf;
 	int channels = getProperty(Lav_ENVIRONMENT_OUTPUT_CHANNELS).getIntValue();
 	output = createGainNode(simulation);
-	output->resize(channels, channels);
+	//We alwyas have 8 buffers, and alias them with the connections.
+	output->resize(8, 8);
 	output->appendInputConnection(0, channels);
 	output->appendOutputConnection(0, channels);
 	appendOutputConnection(0, channels);
@@ -84,25 +85,22 @@ void EnvironmentNode::willProcessParents() {
 	for(auto i: needsRemoval) sources.erase(i);
 }
 
-std::shared_ptr<Node> EnvironmentNode::createPannerNode() {
-	auto pan = createMultipannerNode(simulation, hrtf);
-	pan->connect(0, output, 0);
-	return pan;
-}
-
-void EnvironmentNode::destroyPannerNode(std::shared_ptr<Node> panner) {
-	panner->isolate();
+std::shared_ptr<HrtfData> EnvironmentNode::getHrtf() {
+	return hrtf;
 }
 
 void EnvironmentNode::registerSourceForUpdates(std::shared_ptr<SourceNode> source) {
 	sources.insert(source);
+	for(int i = 0; i < effect_sends.size(); i++) {
+		if(effect_sends[i].connect_by_default) source->feedEffect(i);
+	}
+	//Sources count as dependencies, so we need to invalidate.
 	simulation->invalidatePlan();
 }
 
 void EnvironmentNode::willTick() {
 	if(werePropertiesModified(this, Lav_ENVIRONMENT_OUTPUT_CHANNELS)) {
 		int channels = getProperty(Lav_ENVIRONMENT_OUTPUT_CHANNELS).getIntValue();
-		output->resize(channels, channels);
 		getOutputConnection(0)->reconfigure(0, channels);
 		output->getOutputConnection(0)->reconfigure(0, channels);
 		output->getInputConnection(0)->reconfigure(0, channels);
@@ -144,6 +142,41 @@ void EnvironmentNode::playAsync(std::shared_ptr<Buffer> buffer, float x, float y
 	});
 }
 
+std::shared_ptr<Node> EnvironmentNode::getOutputNode() {
+	return output;
+}
+
+int EnvironmentNode::addEffectSend(int channels, bool isReverb, bool connectByDefault) {
+	if(channels != 1 && channels != 2 && channels != 4 && channels != 6 && channels != 8)
+	ERROR(Lav_ERROR_RANGE, "Channel count for an effect send needs to be 1, 2, 4, 6, or 8.");
+	if(channels != 4 && isReverb)
+	ERROR(Lav_ERROR_RANGE, "Reverb effects sends must have 4 channels.");
+	EffectSendConfiguration send;
+	send.channels = channels;
+	send.is_reverb = isReverb;
+	send.connect_by_default = connectByDefault;
+	//Resize the output gain node to have room, and append new connections.
+	int oldSize = output->getOutputBufferCount();
+	int newSize = oldSize+send.channels;
+	output->resize(newSize, newSize);
+	output->appendInputConnection(oldSize, send.channels);
+	output->appendOutputConnection(oldSize, send.channels);
+	appendOutputConnection(oldSize, send.channels);
+	int index = effect_sends.size();
+	effect_sends.push_back(send);
+	for(auto &i: sources) {
+		auto s = i.lock();
+		if(s) s->feedEffect(index);
+	}
+	return index;
+}
+
+EffectSendConfiguration& EnvironmentNode::getEffectSend(int which) {
+	if(which < 0 || which > effect_sends.size()) ERROR(Lav_ERROR_RANGE, "Invalid effect send.");
+	return effect_sends[which];
+}
+
+
 //begin public api
 
 Lav_PUBLIC_FUNCTION LavError Lav_createEnvironmentNode(LavHandle simulationHandle, const char*hrtfPath, LavHandle* destination) {
@@ -167,6 +200,17 @@ Lav_PUBLIC_FUNCTION LavError Lav_environmentNodePlayAsync(LavHandle nodeHandle, 
 	auto b = incomingObject<Buffer>(bufferHandle);
 	LOCK(*e);
 	e->playAsync(b, x, y, z);
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_environmentNodeAddEffectSend(LavHandle nodeHandle, int channels, int isReverb, int connectByDefault, int* destination) {
+	PUB_BEGIN
+	auto e = incomingObject<EnvironmentNode>(nodeHandle);
+	LOCK(*e);
+	//The == 1 gets rid of a VC++ performance warning.
+	//We add 1 here because the external world needs to deal in indexes that are the same as the outputs to use.
+	//The internal world uses 0-based indexes because it rarely deals with the environment's outputs.
+	*destination = e->addEffectSend(channels, isReverb == 1, connectByDefault == 1)+1;
 	PUB_END
 }
 

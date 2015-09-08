@@ -10,6 +10,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/simulation.hpp>
 #include <libaudioverse/private/creators.hpp>
 #include <libaudioverse/private/memory.hpp>
+#include <libaudioverse/nodes/panner.hpp>
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/libaudioverse3d.h>
@@ -19,6 +20,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <glm/glm.hpp>
 #include <memory>
 #include <set>
+#include <vector>
+#include <map>
 
 namespace libaudioverse_implementation {
 
@@ -27,15 +30,34 @@ SourceNode::SourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<E
 	input->resize(1, 1);
 	input->appendInputConnection(0, 1);
 	input->appendOutputConnection(0, 1);
-	panner_node = environment->createPannerNode();
+	panner_node = createMultipannerNode(simulation, environment->getHrtf());
+	panner_node->connect(0, environment->getOutputNode(), 0);
 	this->environment = environment;
 	//we have to read off these defaults manually, and it must always be the last thing in the constructor.
 	getProperty(Lav_SOURCE_DISTANCE_MODEL).setIntValue(environment->getProperty(Lav_ENVIRONMENT_DEFAULT_DISTANCE_MODEL).getIntValue());
 	getProperty(Lav_SOURCE_MAX_DISTANCE).setFloatValue(environment->getProperty(Lav_ENVIRONMENT_DEFAULT_MAX_DISTANCE).getFloatValue());
 	getProperty(Lav_SOURCE_PANNER_STRATEGY).setIntValue(environment->getProperty(Lav_ENVIRONMENT_DEFAULT_PANNER_STRATEGY).getIntValue());
 	getProperty(Lav_SOURCE_SIZE).setFloatValue(environment->getProperty(Lav_ENVIRONMENT_DEFAULT_SIZE).getFloatValue());
+	getProperty(Lav_SOURCE_REVERB_DISTANCE).setFloatValue(environment->getProperty(Lav_ENVIRONMENT_DEFAULT_REVERB_DISTANCE).getFloatValue());
 	input->connect(0, panner_node, 0);
 	setInputNode(input);
+	
+	//Configure tyhe effect send panners.
+	std::shared_ptr<AmplitudePannerNode> p;
+	p = std::static_pointer_cast<AmplitudePannerNode>(createAmplitudePannerNode(simulation));
+	p->configureStandardChannelMap(2);
+	effect_panners.push_back(p);
+	p = std::static_pointer_cast<AmplitudePannerNode>(createAmplitudePannerNode(simulation));
+	p->configureStandardChannelMap(4);
+	effect_panners.push_back(p);
+	p = std::static_pointer_cast<AmplitudePannerNode>(createAmplitudePannerNode(simulation));
+	p->configureStandardChannelMap(6);
+	effect_panners.push_back(p);
+	p = std::static_pointer_cast<AmplitudePannerNode>(createAmplitudePannerNode(simulation));
+	p->configureStandardChannelMap(8);
+	effect_panners.push_back(p);
+	//Actually connect the input to them.
+	for(auto &i: effect_panners) input->connect(0, i, 0);
 }
 
 void SourceNode::forwardProperties() {
@@ -50,8 +72,51 @@ std::shared_ptr<Node> createSourceNode(std::shared_ptr<Simulation> simulation, s
 }
 
 SourceNode::~SourceNode() {
-	//Since connections are currently strong, return our panner to the environment
-	environment->destroyPannerNode(panner_node);
+	//Since connections are currently strong, break them.
+	panner_node->isolate();
+	//Also isolate all of the panners in the effect sends.
+	for(auto &i: effect_panners) i->isolate();
+	for(auto &i: outgoing_effects) i.second->isolate();
+	for(auto &i: outgoing_effects_reverb) i.second->isolate();
+}
+
+void SourceNode::feedEffect(int which) {
+	if(outgoing_effects.count(which) || outgoing_effects_reverb.count(which)) return; //already feeding, so no-op.
+	auto &info = environment->getEffectSend(which);
+	auto gain = createGainNode(simulation);
+	gain->resize(info.channels, info.channels);
+	gain->appendInputConnection(0, info.channels);
+	gain->appendOutputConnection(0, info.channels);
+	if(info.is_reverb) outgoing_effects_reverb[which] = gain;
+	else outgoing_effects[which] = gain;
+	auto pan = getPannerForEffectChannels(info.channels);
+	pan->connect(0, gain, 0);
+	auto out = environment->getOutputNode();
+	gain->connect(0, out, which+1);
+}
+
+void SourceNode::stopFeedingEffect(int which) {
+	std::shared_ptr<Node> isolating = nullptr;
+	if(outgoing_effects.count(which)) {
+		isolating = outgoing_effects[which];
+		outgoing_effects.erase(which);
+	}
+	else if(outgoing_effects_reverb.count(which)) {
+		isolating = outgoing_effects_reverb[which];
+		outgoing_effects_reverb.erase(which);
+	}
+	if(isolating) isolating->isolate();
+}
+
+std::shared_ptr<Node> SourceNode::getPannerForEffectChannels(int channels) {
+	switch(channels) {
+		case 1: return input;
+		case 2: return effect_panners[0];
+		case 4: return effect_panners[1];
+		case 6: return effect_panners[2];
+		case 8: return effect_panners[3];
+		default: return nullptr;
+	}
 }
 
 //helper function: calculates gains given distance models.
@@ -92,27 +157,58 @@ void SourceNode::update(EnvironmentInfo &env) {
 	int distanceModel = getProperty(Lav_SOURCE_DISTANCE_MODEL).getIntValue();
 	float maxDistance = getProperty(Lav_SOURCE_MAX_DISTANCE).getFloatValue();
 	float referenceDistance = getProperty(Lav_SOURCE_SIZE).getFloatValue();
-	float gain = calculateGainForDistanceModel(distanceModel, distance, maxDistance, referenceDistance);
-	//Add in our mul.
-	gain *= getProperty(Lav_NODE_MUL).getFloatValue();
-
-	//set the panner.
+	float reverbDistance = getProperty(Lav_SOURCE_REVERB_DISTANCE).getFloatValue();
+	float dryGain = calculateGainForDistanceModel(distanceModel, distance, maxDistance, referenceDistance);
+	float unscaledReverbMultiplier = 1.0f-calculateGainForDistanceModel(distanceModel, distance, reverbDistance, 0.0f);
+	float minReverbLevel = getProperty(Lav_SOURCE_MIN_REVERB_LEVEL).getFloatValue();
+	float maxReverbLevel = getProperty(Lav_SOURCE_MAX_REVERB_LEVEL).getFloatValue();
+	float scaledReverbMultiplier = minReverbLevel+(maxReverbLevel-minReverbLevel)*unscaledReverbMultiplier;
+	float reverbGain = dryGain*scaledReverbMultiplier;
+	//Question: are we going to actually send to a reverb? If so, make room in the dry gain for it.
+	if(outgoing_effects_reverb.size()) {
+		dryGain *= 1.0f-scaledReverbMultiplier;
+		//And also make sure that we distribute it equally among them.
+		reverbGain /= outgoing_effects_reverb.size();
+	}
+	//Set the output panner, a multipanner.
 	panner_node->getProperty(Lav_PANNER_AZIMUTH).setFloatValue(azimuth);
 	panner_node->getProperty(Lav_PANNER_ELEVATION).setFloatValue(elevation);
 	panner_node->getProperty(Lav_PANNER_DISTANCE).setFloatValue(distance);
-	panner_node ->getProperty(Lav_NODE_MUL).setFloatValue(gain);
-	
-	//If we're beyond the max distance and not culled:
-	if(culled == false && distance >= maxDistance) {
-		panner_node->getProperty(Lav_NODE_STATE).setIntValue(Lav_NODESTATE_PAUSED);
+	panner_node ->getProperty(Lav_NODE_MUL).setFloatValue(dryGain);
+	//Set the panners for effect sends; note that these are not multipanners and only have azimuth and elevation.
+	for(auto &i: effect_panners) {
+		i->getProperty(Lav_PANNER_AZIMUTH).setFloatValue(azimuth);
+		i->getProperty(Lav_PANNER_ELEVATION).setFloatValue(elevation);
+	}
+	//Set the gains for non-reverb sends.
+	for(auto &i: outgoing_effects) {
+		i.second->getProperty(Lav_NODE_MUL).setFloatValue(dryGain);
+	}
+	//And reverb sends.
+	for(auto &i: outgoing_effects_reverb) {
+		i.second->getProperty(Lav_NODE_MUL).setFloatValue(reverbGain);
+	}
+	handleCulling(distance >= maxDistance);
+}
+
+void SourceNode::handleCulling(bool shouldCull) {
+	int newState = 0;
+	if(culled == false && shouldCull) {
+		newState = Lav_NODESTATE_PAUSED;
 		input->getProperty(Lav_NODE_STATE).setIntValue(Lav_NODESTATE_ALWAYS_PLAYING);
 		culled = true;
 	}
-	else if(distance < maxDistance && culled) {
+	else if(culled && shouldCull == false) {
 		culled = false;
 		input->getProperty(Lav_NODE_STATE).setIntValue(Lav_NODESTATE_PLAYING);
-		panner_node->getProperty(Lav_NODE_STATE).setIntValue(Lav_NODESTATE_PLAYING);
+		newState = Lav_NODESTATE_PLAYING;
 	}
+	else return; //nothing to do.
+	//We iterate over everything and change the state.
+	panner_node->setState(newState);
+	for(auto &i: effect_panners) i->setState(newState);
+	for(auto &i: outgoing_effects) i.second->setState(newState);
+	for(auto &i: outgoing_effects_reverb) i.second->setState(newState);
 }
 
 void SourceNode::visitDependenciesUnconditional(std::function<void(std::shared_ptr<Job>&)> &pred) {
@@ -127,6 +223,24 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSourceNode(LavHandle simulationHandle, La
 	LOCK(*simulation);
 	auto retval = createSourceNode(simulation, incomingObject<EnvironmentNode>(environmentHandle));
 	*destination = outgoingObject<Node>(retval);
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_sourceNodeFeedEffect(LavHandle nodeHandle, int effect) {
+	PUB_BEGIN
+	auto s = incomingObject<SourceNode>(nodeHandle);
+	LOCK(*s);
+	//Note that external indexes are 1-based.
+	s->feedEffect(effect-1);
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_sourceNodeStopFeedingEffect(LavHandle nodeHandle, int effect) {
+	PUB_BEGIN
+	auto s = incomingObject<SourceNode>(nodeHandle);
+	LOCK(*s);
+	//Note that external indexes are 1-based.
+	s->stopFeedingEffect(effect-1);
 	PUB_END
 }
 

@@ -11,8 +11,11 @@ extern "C" {
 
 Lav_PUBLIC_FUNCTION LavError Lav_createEnvironmentNode(LavHandle simulationHandle, const char*hrtfPath, LavHandle* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_environmentNodePlayAsync(LavHandle nodeHandle, LavHandle bufferHandle, float x, float y, float z);
+Lav_PUBLIC_FUNCTION LavError Lav_environmentNodeAddEffectSend(LavHandle nodeHandle, int channels, int isReverb, int connectByDefault, int* destination);
 
 Lav_PUBLIC_FUNCTION LavError Lav_createSourceNode(LavHandle simulationHandle, LavHandle environmentHandle, LavHandle* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_sourceNodeFeedEffect(LavHandle nodeHandle, int effect);
+Lav_PUBLIC_FUNCTION LavError Lav_sourceNodeStopFeedingEffect(LavHandle nodeHandle, int effect);
 
 //A few properties common to most objects in the 3d simulation including all environments.
 enum Lav_3D_PROPERTIES {
@@ -27,14 +30,18 @@ enum lav_STANDARD_ENVIRONMENT_PROPERTIES {
 	Lav_ENVIRONMENT_DEFAULT_MAX_DISTANCE = -12,
 	Lav_ENVIRONMENT_DEFAULT_SIZE = -13,
 	Lav_ENVIRONMENT_OUTPUT_CHANNELS = -14,
+	Lav_ENVIRONMENT_DEFAULT_REVERB_DISTANCE = -15,
 };
 
 enum Lav_SOURCE_PROPERTIES {
 	Lav_SOURCE_MAX_DISTANCE = -3,
 	Lav_SOURCE_DISTANCE_MODEL = -4,
 	Lav_SOURCE_SIZE = -5,
+	Lav_SOURCE_REVERB_DISTANCE = -6,
 	Lav_SOURCE_PANNER_STRATEGY = -8,
 	Lav_SOURCE_HEAD_RELATIVE = -9,
+	Lav_SOURCE_MIN_REVERB_LEVEL = -10,
+	Lav_SOURCE_MAX_REVERB_LEVEL = -11,
 };
 
 enum Lav_DISTANCE_MODELS {
