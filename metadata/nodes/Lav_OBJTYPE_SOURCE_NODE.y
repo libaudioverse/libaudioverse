@@ -57,6 +57,17 @@ properties:
       Sources which are head relative interpret their positions in the default coordinate system, relative to the listener.
       Positive x is right, positive y is up, and positive z is behind the listener.
       The orientation and position properties of an environment do not affect head relative sources, making them ideal for such things as footsteps and/or HUD effects that should be panned.
+extra_functions:
+  Lav_sourceNodeFeedEffect:
+    doc_description: |
+      Begin feeding the specified effect send.
+    params:
+      effect: The index of the effect send to feed.
+  Lav_sourceNodeStopFeedingEffect:
+    doc_description: |
+      Stop feeding an effect send.
+    params:
+      effect: The send to stop feeding.
 inputs:
   - [1, "The audio to enter the 3D environment."]
 outputs: null

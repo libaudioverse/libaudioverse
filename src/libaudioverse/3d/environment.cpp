@@ -144,6 +144,24 @@ void EnvironmentNode::playAsync(std::shared_ptr<Buffer> buffer, float x, float y
 	});
 }
 
+int EnvironmentNode::addEffectSend(int channels, bool isReverb, bool connectByDefault) {
+	if(channels != 1 && channels != 2 && channels != 4 && channels != 6 && channels != 8)
+	ERROR(Lav_ERROR_RANGE, "Channel count for an effect send needs to be 1, 2, 4, 6, or 8.");
+	if(channels != 4 && isReverb)
+	ERROR(Lav_ERROR_RANGE, "Reverb effects sends must have 4 channels.");
+	EffectSendConfiguration send;
+	send.channels = channels;
+	send.is_reverb = isReverb;
+	send.connect_by_default = connectByDefault;
+	int index = effect_sends.size();
+	effect_sends.push_back(send);
+	for(auto &i: sources) {
+		auto s = i.lock();
+		if(s) s->feedEffect(index);
+	}
+	return index;
+}
+
 //begin public api
 
 Lav_PUBLIC_FUNCTION LavError Lav_createEnvironmentNode(LavHandle simulationHandle, const char*hrtfPath, LavHandle* destination) {
@@ -167,6 +185,15 @@ Lav_PUBLIC_FUNCTION LavError Lav_environmentNodePlayAsync(LavHandle nodeHandle, 
 	auto b = incomingObject<Buffer>(bufferHandle);
 	LOCK(*e);
 	e->playAsync(b, x, y, z);
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_environmentNodeAddEffectSend(LavHandle nodeHandle, int channels, int isReverb, int connectByDefault, int* destination) {
+	PUB_BEGIN
+	auto e = incomingObject<EnvironmentNode>(nodeHandle);
+	LOCK(*e);
+	//The == 1 gets rid of a VC++ performance warning.
+	*destination = e->addEffectSend(channels, isReverb == 1, connectByDefault == 1);
 	PUB_END
 }
 

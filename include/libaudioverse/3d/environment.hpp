@@ -15,6 +15,14 @@ class HrtfData;
 class Simulation;
 class Buffer;
 
+/**Configuration of an effect send.*/
+class EffectSendConfiguration {
+	public:
+	int channels = 0; //1, 2, 4, 6, or 8.
+	bool is_reverb = false; //For 4-channel effect sends, if we should use reverb-type panning.
+	bool connect_by_default = false; //If sources should be connected to this send by default.
+};
+
 /**This holds info on listener positions, defaults, etc.
 Anything a source needs for updating, basically.*/
 class EnvironmentInfo {
@@ -35,6 +43,9 @@ class EnvironmentNode: public SubgraphNode {
 	void visitDependenciesUnconditional(std::function<void(std::shared_ptr<Job>&)> &pred) override;
 	//Play buffer asynchronously at specified position, destroying the source when done.
 	void playAsync(std::shared_ptr<Buffer> buffer, float x, float y, float z);
+	//Manage effect sends.
+	//Returns the integer identifier of the send.
+	int addEffectSend(int channels, bool isReverb, bool connecctByDefault);
 	private:
 	//while these may be parents (through virtue of the panners we give out), they also have to hold a reference to us-and that reference must be strong.
 	//the world is more capable of handling a source that dies than a source a world that dies.
@@ -42,6 +53,7 @@ class EnvironmentNode: public SubgraphNode {
 	std::shared_ptr<HrtfData > hrtf;
 	std::shared_ptr<Node> output=nullptr;
 	EnvironmentInfo environment_info;
+	std::vector<EffectSendConfiguration> effect_sends;
 };
 
 }

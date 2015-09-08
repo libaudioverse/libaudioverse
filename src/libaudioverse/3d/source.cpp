@@ -54,6 +54,14 @@ SourceNode::~SourceNode() {
 	environment->destroyPannerNode(panner_node);
 }
 
+void SourceNode::feedEffect(int which) {
+	//Todo: implement.
+}
+
+void SourceNode::stopFeedingEffect(int which) {
+	//Todo: implement.
+}
+
 //helper function: calculates gains given distance models.
 float calculateGainForDistanceModel(int model, float distance, float maxDistance, float referenceDistance) {
 	float retval = 1.0f;
@@ -127,6 +135,22 @@ Lav_PUBLIC_FUNCTION LavError Lav_createSourceNode(LavHandle simulationHandle, La
 	LOCK(*simulation);
 	auto retval = createSourceNode(simulation, incomingObject<EnvironmentNode>(environmentHandle));
 	*destination = outgoingObject<Node>(retval);
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_sourceNodeFeedEffect(LavHandle nodeHandle, int effect) {
+	PUB_BEGIN
+	auto s = incomingObject<SourceNode>(nodeHandle);
+	LOCK(*s);
+	s->feedEffect(effect);
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_sourceNodeStopFeedingEffect(LavHandle nodeHandle, int effect) {
+	PUB_BEGIN
+	auto s = incomingObject<SourceNode>(nodeHandle);
+	LOCK(*s);
+	s->stopFeedingEffect(effect);
 	PUB_END
 }
 

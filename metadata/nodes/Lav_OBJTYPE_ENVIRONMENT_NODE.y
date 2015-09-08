@@ -77,6 +77,30 @@ extra_functions:
       x: The x-component of the  position.
       y: The y-component of the position.
       z: The z-component of the position.
+  Lav_environmentNodeAddEffectSend:
+    doc_description: |
+      Add an effect send.
+      
+      Effect sends are aggregates of all sources configured to make use of them.
+      This function's return value is the index of the newly created effecct send.
+      
+      The world gains an additional output for every added effect send.
+      This output aggregates all audio of sources configured to send to it, including the panning effects on those sources.
+      The returned index is the number of the newly created output.
+      
+      Two special cases are worth noting.
+      
+      First, a mono effect send includes all sources with only attenuation applied.
+      
+      Second, if the effect send has 4 channels, it may be configured to be a reverb effect send with the {{"isReverb"|param}} parameter.
+      Reverb effect sends are treated differently in terms of attenuation:
+      as sources move away from the listener, their dry path becomes less but the audio sent to the reverb effect send becomes greater.
+      
+      No effect send can include occlusion effects.
+    params:
+      channels: The number of channels the effect send is to have. Must be 1, 2, 4, 6, or 8.
+      isReverb: nonzero if this is a reverb effect send.
+      connectByDefault: If nonzero, all existing and newly created sources will send to this effect send unless disabled.
 inputs: null
 outputs:
   - [dynamic, "Depends on the output_channels property.", "The output of the 3D environment."]
