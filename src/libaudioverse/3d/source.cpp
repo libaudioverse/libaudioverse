@@ -160,7 +160,9 @@ void SourceNode::update(EnvironmentInfo &env) {
 	float reverbDistance = getProperty(Lav_SOURCE_REVERB_DISTANCE).getFloatValue();
 	float dryGain = calculateGainForDistanceModel(distanceModel, distance, maxDistance, referenceDistance);
 	float unscaledReverbMultiplier = 1.0f-calculateGainForDistanceModel(distanceModel, distance, reverbDistance, 0.0f);
-	float scaledReverbMultiplier = 0.1+0.9*unscaledReverbMultiplier;
+	float minReverbLevel = getProperty(Lav_SOURCE_MIN_REVERB_LEVEL).getFloatValue();
+	float maxReverbLevel = getProperty(Lav_SOURCE_MAX_REVERB_LEVEL).getFloatValue();
+	float scaledReverbMultiplier = minReverbLevel+(maxReverbLevel-minReverbLevel)*unscaledReverbMultiplier;
 	float reverbGain = dryGain*scaledReverbMultiplier;
 	//Question: are we going to actually send to a reverb? If so, make room in the dry gain for it.
 	if(outgoing_effects_reverb.size()) {

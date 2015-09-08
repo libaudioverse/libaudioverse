@@ -69,6 +69,26 @@ properties:
       
       For values greater than {{"Lav_SOURCE_MAX_DISTANCE"|property}}, the source will always be heard at least somewhat in the dry path.
       {{"Lav_SOURCE_DISTANCE_MODEL"|property}} controls how this crossfading takes place.
+  Lav_SOURCE_MIN_REVERB_LEVEL:
+    name: min_reverb_level
+    type: float
+    range: [0.0, 1.0]
+    default: 0.1
+    doc_description: |
+      The minimum reverb level allowed.
+      
+      if a send is configured to be a reverb send, this is the minimum amount of audio that will be diverted to it.
+      
+      Behavior is undefined if this property is ever greater than the value you give to {{"Lav_SOURCE_MAX_REVERB_LEVEL"|property}}.
+  Lav_SOURCE_MAX_REVERB_LEVEL:
+    name: max_reverb_level
+    type: float
+    range: [0.0, 1.0]
+    default: 1.0
+    doc_description: |
+      The maximum amount of audio to be diverted to reverb sends, if any.
+      
+      Behavior is undefined if this property is ever less than {{"Lav_SOURCE_MIN_REVERB_LEVEL"|property}}.
 extra_functions:
   Lav_sourceNodeFeedEffect:
     doc_description: |
