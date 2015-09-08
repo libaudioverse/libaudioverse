@@ -10,6 +10,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/simulation.hpp>
 #include <libaudioverse/private/creators.hpp>
 #include <libaudioverse/private/memory.hpp>
+#include <libaudioverse/nodes/panner.hpp>
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/libaudioverse3d.h>
@@ -39,6 +40,21 @@ SourceNode::SourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<E
 	getProperty(Lav_SOURCE_SIZE).setFloatValue(environment->getProperty(Lav_ENVIRONMENT_DEFAULT_SIZE).getFloatValue());
 	input->connect(0, panner_node, 0);
 	setInputNode(input);
+	
+	//Configure tyhe effect send panners.
+	std::shared_ptr<AmplitudePannerNode> p;
+	p = std::static_pointer_cast<AmplitudePannerNode>(createAmplitudePannerNode(simulation));
+	p->configureStandardChannelMap(2);
+	effect_panners.push_back(p);
+	p = std::static_pointer_cast<AmplitudePannerNode>(createAmplitudePannerNode(simulation));
+	p->configureStandardChannelMap(4);
+	effect_panners.push_back(p);
+	p = std::static_pointer_cast<AmplitudePannerNode>(createAmplitudePannerNode(simulation));
+	p->configureStandardChannelMap(6);
+	effect_panners.push_back(p);
+	p = std::static_pointer_cast<AmplitudePannerNode>(createAmplitudePannerNode(simulation));
+	p->configureStandardChannelMap(8);
+	effect_panners.push_back(p);
 }
 
 void SourceNode::forwardProperties() {
