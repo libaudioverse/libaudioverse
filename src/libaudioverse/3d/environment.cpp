@@ -193,7 +193,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_environmentNodeAddEffectSend(LavHandle nodeHand
 	auto e = incomingObject<EnvironmentNode>(nodeHandle);
 	LOCK(*e);
 	//The == 1 gets rid of a VC++ performance warning.
-	*destination = e->addEffectSend(channels, isReverb == 1, connectByDefault == 1);
+	//We add 1 here because the external world needs to deal in indexes that are the same as the outputs to use.
+	//The internal world uses 0-based indexes because it rarely deals with the environment's outputs.
+	*destination = e->addEffectSend(channels, isReverb == 1, connectByDefault == 1)+1;
 	PUB_END
 }
 
