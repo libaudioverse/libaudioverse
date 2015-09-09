@@ -61,6 +61,10 @@ Lav_PUBLIC_FUNCTION LavError Lav_initialize() {
 		return Lav_ERROR_NONE;
 	}
 	logDebug("Beginning initialization of Libaudioverse, revision %s", getGitRevision());
+	logDebug("Build type: %s", getBuildType());
+	logDebug("C compiler flags: %s", getCompilerCFlags());
+	logDebug("C++ flags: %s", getCompilerCxxFlags());
+	logDebug("Linker flags: %s", getLinkerFlags());
 	for(int i = 0; i < sizeof(initializers)/sizeof(initializers[0]); i++) {
 		logDebug("Initializing %s.", initializers[i].name);
 		initializers[i].func();

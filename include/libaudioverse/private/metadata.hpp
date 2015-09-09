@@ -12,5 +12,9 @@ void initializeMetadata();
 std::map<int, Property> makePropertyTable(int objtype);
 std::map<int, Event> makeEventTable(int objtyp);
 const char* getGitRevision();
+const char* getCompilerCFlags();
+const char* getCompilerCxxFlags();
+const char* getBuildType();
+const char* getLinkerFlags();
 
 }

@@ -9,6 +9,10 @@ constants_by_enum:Same as constants, but grouped by the enumeration and placed i
 important_enums: The enums which metadata marks as important in some way.
 metadata: The parsed yaml document itself as a dict.
 git_revision: The SHA of the git commit we're building with, if we can get it.
+compiler_c_flags: Flags used with .c files
+compiler_cxx_flags: Flags used with C++ files.
+linker_flags: Flags for the linker.
+build_type: The build type.
 """
 
 from pycparser import *
@@ -65,6 +69,17 @@ def get_git_revision():
 		#The most notablwe is that the user might not have git.
 		revision = "could not be determined"
 	return revision
+
+def get_flags():
+	lines = []
+	with file(os.path.join(get_root_directory(), "build", "compiler_flags.txt")) as f:
+		lines = [i for i in f]
+	return {
+		"build_type": lines[0].strip(),
+		"compiler_c_flags": lines[1].strip(),
+		"compiler_cxx_flags": lines[2].strip(),
+		"linker_flags": lines[3].strip(),
+	}
 
 def make_ast():
 	#compute the input file.
@@ -206,5 +221,6 @@ def get_all_info():
 
 	all_info['important_enums'] = important_enums
 	all_info['git_revision'] = get_git_revision()
+	all_info.update(get_flags()) #get the compiler and linker flags, etc.
 	all_info_cache =all_info
 	return copy.deepcopy(all_info)

@@ -118,4 +118,20 @@ const char* getGitRevision() {
 	return "<%git_revision%>";
 }
 
+const char* getCompilerCFlags() {
+	return "<%compiler_c_flags%>";
+}
+
+const char* getCompilerCxxFlags() {
+	return "<%compiler_cxx_flags%>";
+}
+
+const char* getBuildType() {
+	return "<%build_type%>";
+}
+
+const char* getLinkerFlags() {
+	return "<%linker_flags%>";
+}
+
 }
