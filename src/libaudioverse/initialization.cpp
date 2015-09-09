@@ -15,44 +15,55 @@ namespace libaudioverse_implementation {
 
 typedef void (*initfunc_t)();
 
+
+struct InitInfo {
+	char* name;
+	initfunc_t func;
+};
+
 //These run in the order specified in this array with no parallelism.
 //If adding new functionality here, simply add it and follow the above typedef.
 //Errors will be returned as appropriate.
 //Initialization stops at the first failed function and does not continue.
-initfunc_t initializers[] = {
+InitInfo initializers[] = {
 	//Logging is implicit.
-	initializeErrorModule,
-	initializeMemoryModule,
-	initializeDeviceFactory,
-	initializeMetadata,
+	{"Error handling", initializeErrorModule},
+	{"Memory subsystem", initializeMemoryModule},
+	{"Audio backend", initializeDeviceFactory},
+	{"Metadata tables", initializeMetadata},
 };
 
 typedef void (*shutdownfunc_t)();
+
+struct ShutdownInfo{
+	char* name;
+	shutdownfunc_t func;
+};
 
 //These run in the order specified in this array with no parallelism.
 //If adding new functionality here, simply add it and follow the above typedef.
 //Errors will be returned as appropriate.
 //Termination never fails.
 //logging must always be last.
-shutdownfunc_t shutdown_funcs[] = {
-shutdownErrorModule,
-shutdownMemoryModule,
-//Device factory needs to go near the end because it tries to log.
-shutdownDeviceFactory,
-shutdownLogging,
+ShutdownInfo shutdown_funcs[] = {
+	{"Error handling subsystem", shutdownErrorModule},
+	{"memory module", shutdownMemoryModule},
+	//Device factory needs to go near the end because it tries to log.
+	{"audio backend", shutdownDeviceFactory},
+	{"logging", shutdownLogging},
 };
 
 unsigned int isInitialized = 0;
 
-
 Lav_PUBLIC_FUNCTION LavError Lav_initialize() {
-	using namespace libaudioverse_implementation;
 	PUB_BEGIN
 	if(isInitialized == 1) {
 		return Lav_ERROR_NONE;
 	}
+	logDebug("Beginning initialization.");
 	for(int i = 0; i < sizeof(initializers)/sizeof(initializers[0]); i++) {
-		initializers[i]();
+		logDebug("Initializing %s.", initializers[i].name);
+		initializers[i].func();
 	}
 	isInitialized = 1;
 	PUB_END
@@ -61,8 +72,10 @@ Lav_PUBLIC_FUNCTION LavError Lav_initialize() {
 Lav_PUBLIC_FUNCTION LavError Lav_shutdown() {
 	using namespace libaudioverse_implementation;
 	PUB_BEGIN
+	logDebug("Beginning shutdown.");
 	for(int i = 0; i < sizeof(shutdown_funcs)/sizeof(shutdown_funcs[0]); i++) {
-		shutdown_funcs[i]();
+		logDebug("Shutting down %s.", shutdown_funcs[i].name);
+		shutdown_funcs[i].func();
 	}
 	isInitialized = 0;
 	PUB_END
