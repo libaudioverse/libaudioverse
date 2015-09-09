@@ -11,5 +11,6 @@ namespace libaudioverse_implementation {
 void initializeMetadata();
 std::map<int, Property> makePropertyTable(int objtype);
 std::map<int, Event> makeEventTable(int objtyp);
+const char* getGitRevision();
 
 }

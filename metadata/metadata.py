@@ -126,6 +126,7 @@ context = {
 'joined_properties': joined_properties,
 'joined_events': joined_events,
 }
+context.update(all_info)
 
 template = environment.get_template('metadata.t')
 result = template.render(context)

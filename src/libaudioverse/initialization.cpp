@@ -60,7 +60,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_initialize() {
 	if(isInitialized == 1) {
 		return Lav_ERROR_NONE;
 	}
-	logDebug("Beginning initialization.");
+	logDebug("Beginning initialization of Libaudioverse, revision %s", getGitRevision());
 	for(int i = 0; i < sizeof(initializers)/sizeof(initializers[0]); i++) {
 		logDebug("Initializing %s.", initializers[i].name);
 		initializers[i].func();

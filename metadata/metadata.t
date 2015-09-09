@@ -114,4 +114,8 @@ std::map<int, Event> makeEventTable(int nodetype) {
 	return retval;
 }
 
+const char* getGitRevision() {
+	return "<%git_revision%>";
+}
+
 }

@@ -8,6 +8,7 @@ constants: An extracted list of all constants.  This is a flat representation co
 constants_by_enum:Same as constants, but grouped by the enumeration and placed in dictionaries; keys are enumeration names.
 important_enums: The enums which metadata marks as important in some way.
 metadata: The parsed yaml document itself as a dict.
+git_revision: The SHA of the git commit we're building with, if we can get it.
 """
 
 from pycparser import *
@@ -50,6 +51,20 @@ class ParameterInfo(object):
 
 def get_root_directory():
 	return os.path.split(os.path.split(os.path.abspath(__file__))[0])[0]
+
+def get_git_revision():
+	try:
+		revision_query = subprocess.Popen(args = ['git', 'rev-parse', 'HEAD'], shell = True, stdout = subprocess.PIPE)
+		revision = ""
+		for i in revision_query.stdout:
+			if len(i):
+				revision = i[:-1]
+				break
+	except:
+		#Too many possibilities when working with subprocess.
+		#The most notablwe is that the user might not have git.
+		revision = "could not be determined"
+	return revision
 
 def make_ast():
 	#compute the input file.
@@ -190,5 +205,6 @@ def get_all_info():
 		important_enums.append(i)
 
 	all_info['important_enums'] = important_enums
+	all_info['git_revision'] = get_git_revision()
 	all_info_cache =all_info
 	return copy.deepcopy(all_info)
