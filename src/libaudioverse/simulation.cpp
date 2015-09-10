@@ -13,6 +13,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/file.hpp>
 #include <libaudioverse/private/planner.hpp>
 #include <libaudioverse/private/logging.hpp>
+#include <libaudioverse/private/helper_templates.hpp>
 #include <powercores/utilities.hpp>
 #include <audio_io/audio_io.hpp>
 #include <stdlib.h>
@@ -96,13 +97,8 @@ void Simulation::getBlock(float* out, unsigned int channels, bool mayApplyMixing
 }
 
 void Simulation::doMaintenance() {
-	decltype(nodes) to_remove;
-	for(auto &n: nodes) {
-		if(n.lock() == nullptr) to_remove.insert(n);
-	}
-	for(auto &n: to_remove) {
-		nodes.erase(n);
-	}
+	killDeadWeakPointers(nodes);
+	killDeadWeakPointers(will_tick_nodes);
 }
 
 void Simulation::setOutputDevice(int index, int channels, float minLatency, float startLatency, float maxLatency) {

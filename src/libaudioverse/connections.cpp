@@ -12,6 +12,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/simulation.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/kernels.hpp>
+#include <libaudioverse/private/helper_templates.hpp>
 #include <audio_io/audio_io.hpp>
 #include <algorithm>
 #include <memory>
@@ -72,13 +73,11 @@ Node* OutputConnection::getNode() {
 
 std::vector<Node*> OutputConnection::getConnectedNodes() {
 	std::vector<Node*> retval;
-	for(auto &i: connected_to) {
-		auto i_s= i.lock();
-		if(i_s==nullptr) continue;
-		auto n = i_s->getNode();
-		//the simulation uses an input connection without a node via the nodeless functions.
+	filterWeakPointers(connected_to, [&](std::shared_ptr<InputConnection> conn) {
+		auto n = conn->getNode();
+		//The simulation uses an input connection without a node, so we need to protect against this case.
 		if(n) retval.push_back(n);
-	}
+	});
 	return retval;
 }
 
@@ -108,21 +107,17 @@ void InputConnection::connectHalf(std::shared_ptr<OutputConnection> outputConnec
 	auto n = std::static_pointer_cast<Node>(outputConnection->getNode()->shared_from_this());
 	connected_to[outputConnection] = n;
 }
-void InputConnection::disconnectHalf(std::shared_ptr<OutputConnection> connection) {
 
+void InputConnection::disconnectHalf(std::shared_ptr<OutputConnection> connection) {
 	if(connected_to.count(connection)) {
 		connected_to.erase(connection);
 	}
 }
 
 void InputConnection::forgetConnection(OutputConnection* which) {
-	std::set<std::shared_ptr<OutputConnection>> removing;
-	for(auto &i: connected_to) {
-		if(i.first.get() == which) removing.insert(i.first);
-	}
-	for(auto &i: removing) {
-		connected_to.erase(i);
-	}
+	filter(connected_to, [](decltype(connected_to)::value_type &k, OutputConnection* t)->bool {
+		return k.first.get() == t;
+	}, which);
 }
 
 Node* InputConnection::getNode() {
