@@ -11,6 +11,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/hrtf.hpp>
 #include <libaudioverse/private/buffer.hpp>
+#include <libaudioverse/private/helper_templates.hpp>
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/libaudioverse3d.h>
@@ -80,17 +81,9 @@ void EnvironmentNode::willTick() {
 	}
 	//give the new environment to the sources.
 	//this is a set of weak pointers.
-	decltype(sources) needsRemoval; //for source cleanup below.
-	for(auto i: sources) {
-		auto tmp = i.lock();
-		if(tmp == nullptr) {
-			needsRemoval.insert(i);
-			continue;
-		}
-		tmp->update(environment_info);
-	}
-	//do cleanup of dead sources.
-	for(auto i: needsRemoval) sources.erase(i);
+	filterWeakPointers(sources, [&](std::shared_ptr<SourceNode> &s) {
+		s->update(environment_info);
+	});
 }
 
 std::shared_ptr<HrtfData> EnvironmentNode::getHrtf() {
