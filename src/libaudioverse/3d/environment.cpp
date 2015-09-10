@@ -39,7 +39,9 @@ EnvironmentNode::EnvironmentNode(std::shared_ptr<Simulation> simulation, std::sh
 }
 
 std::shared_ptr<EnvironmentNode> createEnvironmentNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf) {
-	return standardNodeCreation<EnvironmentNode>(simulation, hrtf);
+	auto ret = standardNodeCreation<EnvironmentNode>(simulation, hrtf);
+	simulation->registerNodeForWillTick(ret);
+	return ret;
 }
 
 void EnvironmentNode::willTick() {

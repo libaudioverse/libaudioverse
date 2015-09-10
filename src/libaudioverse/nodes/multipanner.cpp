@@ -44,6 +44,7 @@ std::shared_ptr<Node> createMultipannerNode(std::shared_ptr<Simulation> simulati
 	//this call must be here because it involves shared_from_this.
 	retval->configureForwardedProperties();
 	retval->strategyChanged();
+	simulation->registerNodeForWillTick(retval);
 	return retval;
 }
 

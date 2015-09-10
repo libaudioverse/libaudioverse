@@ -42,6 +42,8 @@ class Simulation: public ExternalObject, public Job {
 	LavError start();
 	LavError stop();
 	LavError associateNode(std::shared_ptr<Node> node);
+	//Indicates that a node should have willTick called on it.
+	void registerNodeForWillTick(std::shared_ptr<Node> node);
 
 	float getSr() { return sr;}
 	int getTickCount() {return tick_count;}
@@ -80,6 +82,8 @@ class Simulation: public ExternalObject, public Job {
 	float sr = 0.0f;
 	//if nodes die, they automatically need to be removed.  We can do said removal on next process.
 	std::set<std::weak_ptr<Node>, std::owner_less<std::weak_ptr<Node>>> nodes;
+	std::set<std::weak_ptr<Node>, std::owner_less<std::weak_ptr<Node>>> will_tick_nodes; //Nodes to call willTick on.
+	
 	std::recursive_mutex mutex;
 
 	powercores::ThreadsafeQueue<std::function<void(void)>>  tasks;

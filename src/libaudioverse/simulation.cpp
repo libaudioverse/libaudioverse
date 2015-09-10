@@ -70,7 +70,7 @@ void Simulation::getBlock(float* out, unsigned int channels, bool mayApplyMixing
 	//zero the outputs we need.
 	for(unsigned int i= 0; i < channels; i++) memset(final_outputs[i], 0, sizeof(float)*block_size);
 	//Inform nodes that we are going to tick.
-	for(auto &i: nodes) {
+	for(auto &i: will_tick_nodes) {
 		auto n = i.lock();
 		if(n) n->willTick();
 	}
@@ -152,6 +152,10 @@ LavError Simulation::stop() {
 LavError Simulation::associateNode(std::shared_ptr<Node> node) {
 	nodes.insert(std::weak_ptr<Node>(node));
 	return Lav_ERROR_NONE;
+}
+
+void Simulation::registerNodeForWillTick(std::shared_ptr<Node> node) {
+	will_tick_nodes.insert(node);
 }
 
 void Simulation::enqueueTask(std::function<void(void)> cb) {
