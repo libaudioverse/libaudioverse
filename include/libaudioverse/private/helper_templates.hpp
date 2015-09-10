@@ -41,7 +41,7 @@ void killDeadWeakPointers(ContainerT &&container) {
 	auto cur = container.begin();
 	while(cur != container.end()) {
 		if(cur->lock()) cur++;
-		else container.erase(cur);
+		else cur = container.erase(cur);
 	}
 }
 
