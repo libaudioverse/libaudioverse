@@ -1,18 +1,6 @@
 [submodule "glm"]
 	path = glm
 	url = https://github.com/g-truc/glm.git
-[submodule "powercores"]
-	path = powercores
-	url = http://github.com/camlorn/powercores.git
 [submodule "OpenAL-Soft"]
 	path = OpenAL-Soft
 	url = http://github.com/camlorn/OpenAL-Soft.git
-[submodule "audio_io"]
-	path = audio_io
-	url = http://github.com/camlorn/audio_io.git
-[submodule "speex_resampler_cpp"]
-	path = speex_resampler_cpp
-	url = https://github.com/camlorn/speex_resampler_cpp.git
-[submodule "logger_singleton"]
-	path = logger_singleton
-	url = http://github.com/camlorn/logger_singleton.git
