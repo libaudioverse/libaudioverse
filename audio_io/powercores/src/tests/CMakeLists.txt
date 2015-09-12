@@ -1,0 +1,7 @@
+macro(test name)
+add_executable(${name} ${name}.cpp)
+SET_PROPERTY(TARGET ${name} PROPERTY RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_BINARY_DIR}/tests")
+target_link_libraries(${name} powercores)
+endmacro()
+test(test_queue)
+test(test_thread_pool)
