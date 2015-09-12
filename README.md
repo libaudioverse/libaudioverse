@@ -1,6 +1,5 @@
 Libaudioverse
 ==============
-Note: this is a work in progress.
 
 ##What is Libaudioverse?##
 
