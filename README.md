@@ -30,6 +30,9 @@ The 3D simulation supports HRTF via the HRTF panner as well as all common speake
 
 - Any number of effects.  An environment may be configured to have "effect sends".  An effect send is an aggregate of all sources connected to it.  Sources may be configured to be connected to specific effect sends, and you get as many effect sends as you want.  These expose themselves as additional outputs on the environment which may be routed through such things as environmental reverbs.
 
+The only currently implemented effect is an environmental reverb, though other effects are still pending.  The envvironmental reverb can be controlled through room density, the time it takes the reverb to decay by 60 decibals, and a few other parameters.
+Any node can effectively be used as an effect, and Libaudioverse is flexible enough to let you build your own (just configure a network of nodes and connect an output from the environment to the right place).
+
 ###Fast###
 
 Here is some output from Libaudioverse's profiler that speaks for itself.  This output was taken on a Macbook Pro with an Intel I7-3520M at 2.9 GHZ using a Libaudioverse built with VC++ 2013:
