@@ -22,40 +22,57 @@ This renders Libaudioverse capable of representing any system that can run in co
 
 ###The 3D Simulation###
 
-The 3D simulation supports HRTF via the HRTF panner as well as all common speaker layouts.  It works very similarly to OpenAL or OpenGL.  It consists of two components:
+The 3D simulation supports HRTF via the HRTF panner as well as all common speaker layouts.  It works very similarly to OpenAL or OpenGL.  It consists of a few components:
 
-- The environment node specifies information about the environment and the listener.  At the moment, only a "simple" environment without reverb has been implemented, but more are coming.  The environment node outputs audio for all sources which are using it.  It is not possible to change a source's environment, and it is expected that most apps will only ever use one.
+- The environment node specifies information about the environment and the listener.  The environment node outputs audio for all sources which are using it.  It is not possible to change a source's environment, and it is expected that most apps will only ever use one.
 
-- The source node is an input to the environment.  Source nodes have positions in world coordinates and are automatically panned as appropriate.  Unlike other systems, a source node does not work with buffers; instead, you may connect any Libaudioverse node to it.
+- The source node is an input to the environment.  Source nodes have positions in world coordinates and are automatically panned as appropriate.  Unlike some alternatives to Libaudioverse, a source node does not work with buffers; instead, you may connect any Libaudioverse node to it.
 
-The two missing features are Doppler and reverb.  These will be implemented before the 1.0 version of this library.
+- Any number of effects.  An environment may be configured to have "effect sends".  An effect send is an aggregate of all sources connected to it.  Sources may be configured to be connected to specific effect sends, and you get as many effect sends as you want.  These expose themselves as additional outputs on the environment which may be routed through such things as environmental reverbs.
 
 ###Fast###
 
-Here is some output from the profiling test for the 3D audio simulation that speaks for itself.  This was taken on my MacBook Pro with an Intel I7 at 2.9 GHZ.  This test is using the built-in HRTF; this means 2 128-point convolutions per source at 44100 KHZ.
+Here is some output from Libaudioverse's profiler that speaks for itself.  This output was taken on a Macbook Pro with an Intel I7-3520M at 2.9 GHZ using a Libaudioverse built with VC++ 2013:
 
 ~~~
-Running 50 times with 250 sources
-Took 0.959000 seconds
-Estimate: 303.125854 sources maximum
+Running profile tests on 2 threads
+Estimate for sine nodes: 6344.249512
+Estimate for crossfading delay line nodes: 4517.500977
+Estimate for biquad nodes: 3594.419922
+Estimate for One-pole filter nodes: 4499.990723
+Estimate for 2-channel 2-input crossfader nodes: 2502.150391
+Estimate for amplitude panner nodes: 4758.187012
+Estimate for HRTF panner nodes: 657.168518
+Estimate for hard limiter nodes: 4364.653320
+Estimate for channel splitter nodes: 4758.187012
+Estimate for channel merger nodes: 4003.439941
+Estimate for noise nodes: 879.543762
+Estimate for square nodes: 2379.093506
+Estimate for ringmod nodes: 8862.577148
+Estimate for 16x16 FDN nodes: 45.529320
+Estimate for 32x32 FDN nodes: 21.302710
 ~~~
 
-Note that Libaudioverse does not yet use multiple cores, though it does use SSE2 if compiled with that option.
+And the following is profiling of the 3D simulation components.  This test estimates the maximum number of sources you can possibly run in realtime:
 
-The above number is the absolute maximum this test thinks it can play in realtime.  For actual realtime playback, expect to top out around 20 sources lower.  For a game or interactive application, halve this number: Libaudioverse can output this many sources, but must hold a lock that prevents changing properties on Libaudioverse objects while it is in the middle of synthesizing the next chunk of audio to be sent to the sound card.  This essentially means that you should be able to get 100 sources on a comparable computer.  If we switch from HRTF panning to normal panning, the test becomes meaningless--if you could max out Libaudioverse on a desktop in such a configuration, you'd have an order of magnitude too many for the player to be able to appreciate.
+~~~
+Running 50 times with 250 sources on 2 threads
+Took 0.848000 seconds
+Estimate: 342.803833 sources maximum
+~~~
 
-Optimization is still ongoing, so expect the final version to be faster yet.
+As implied by the output of the above tests, Libaudioverse is capable of using multiple cores to a noticeable advantage.  In addition, Libaudioverse uses SSE2 by default (this can be disabled with a CMake option).
 
 ##Building##
 
-Currently Libaudioverse only builds on Windows.  This is  a restriction that I intend to lift by the end of May.  Libaudioverse itself will build fine on other platforms, but the build scripts don't know how to handle it and Libaudioverse is currently missing audio backends.  If you are on Linux or Mac, watch this space.
+Currently Libaudioverse only builds on Windows.  Libaudioverse itself will build with minor changes on other platforms, but the build scripts don't know how to handle it and Libaudioverse is currently missing audio backends.  If you are on Linux or Mac, watch this space; it will build on your platform before 1.0 is released.
 
 You need the following:
 
 - Python 2.7
 - CMake 3.0 or later.
-- The python packages Jinja2, pycparser, enum34
-- A C++11 capable compiler.  For Windows, this must be Visual Studio 2013.
+- The python packages Jinja2, pycparser, enum34, numpy, and scipy.
+- A C++11 capable compiler.  For Windows, this must be Visual Studio 2013 or later.  Building with Visual Studio 2015 gives a decent performance boost.
 
 The build process is the normal build process for CMake, with one small note.  You must build the library as an out-of-source build in a directory called build.  All CMake generators should work.  As an example, here is my build process:
 
