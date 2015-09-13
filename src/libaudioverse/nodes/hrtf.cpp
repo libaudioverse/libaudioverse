@@ -112,7 +112,7 @@ void HrtfNode::process() {
 	bool allowCrossfade = getProperty(Lav_PANNER_SHOULD_CROSSFADE).getIntValue();
 	float currentAzimuth = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
 	float currentElevation = getProperty(Lav_PANNER_ELEVATION).getFloatValue();
-	if(fabs(currentElevation-prev_elevation) > 0.5f || fabs(currentAzimuth-prev_azimuth) > 0.5f) {
+	if(allowCrossfade && (fabs(currentElevation-prev_elevation) > 0.5f || fabs(currentAzimuth-prev_azimuth) > 0.5f)) {
 		hrtf->computeCoefficientsStereo(currentElevation, currentAzimuth, left_response, right_response, linearPhase);
 		if(allowCrossfade) {
 			new_left_convolver->setResponse(response_length, left_response);
