@@ -80,7 +80,7 @@ float Buffer::getSampleWithMixingMatrix(int frame, int channel, int maxChannels)
 void Buffer::normalize() {
 	float min = *std::min_element(data, data+channels*frames);
 	float max = *std::max_element(data, data+channels*frames);
-	float normfactor = std::max(abs(min), abs(max));
+	float normfactor = std::max(fabs(min), fabs(max));
 	normfactor = 1.0f/normfactor;
 	scalarMultiplicationKernel(channels*frames, normfactor, data, data);
 }
