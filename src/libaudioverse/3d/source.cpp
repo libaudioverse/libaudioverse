@@ -60,8 +60,13 @@ SourceNode::SourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<E
 	for(auto &i: effect_panners) input->connect(0, i, 0);
 }
 
+void SourceNode::forwardProperties() {
+	panner_node->forwardProperty(Lav_PANNER_STRATEGY, std::static_pointer_cast<Node>(shared_from_this()), Lav_SOURCE_PANNER_STRATEGY);
+}
+
 std::shared_ptr<Node> createSourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentNode> environment) {
 	auto temp = standardNodeCreation<SourceNode>(simulation, environment);
+	temp->forwardProperties();
 	environment->registerSourceForUpdates(temp);
 	return temp;
 }
@@ -88,6 +93,8 @@ void SourceNode::feedEffect(int which) {
 	pan->connect(0, gain, 0);
 	auto out = environment->getOutputNode();
 	gain->connect(0, out, which+1);
+	//By forwarding this to the panner, we can control only one object. This prevents a great deal of iteration.
+	gain->forwardProperty(Lav_NODE_STATE, panner_node, Lav_NODE_STATE);
 }
 
 void SourceNode::stopFeedingEffect(int which) {
@@ -143,6 +150,10 @@ void SourceNode::update(EnvironmentInfo &env) {
 	else npos = env.world_to_listener_transform*glm::vec4(pos[0], pos[1], pos[2], 1.0f);
 	//npos is now easy to work with.
 	float distance = glm::length(npos);
+	float maxDistance = getProperty(Lav_SOURCE_MAX_DISTANCE).getFloatValue();
+	//We get maxDistance early so we can do the state update; if this says cull, we bail out now.
+	handleStateUpdates(distance > maxDistance);
+	if(culled) return;
 	float xz = sqrtf(npos.x*npos.x+npos.z*npos.z);
 	//elevation and azimuth, in degrees.
 	float elevation = atan2f(npos.y, xz)/PI*180.0f;
@@ -150,7 +161,6 @@ void SourceNode::update(EnvironmentInfo &env) {
 	if(elevation > 90.0f) elevation = 90.0f;
 	if(elevation < -90.0f) elevation = -90.0f;
 	int distanceModel = getProperty(Lav_SOURCE_DISTANCE_MODEL).getIntValue();
-	float maxDistance = getProperty(Lav_SOURCE_MAX_DISTANCE).getFloatValue();
 	float referenceDistance = getProperty(Lav_SOURCE_SIZE).getFloatValue();
 	float reverbDistance = getProperty(Lav_SOURCE_REVERB_DISTANCE).getFloatValue();
 	float dryGain = calculateGainForDistanceModel(distanceModel, distance, maxDistance, referenceDistance);
@@ -187,42 +197,29 @@ void SourceNode::update(EnvironmentInfo &env) {
 	for(auto &i: outgoing_effects_reverb) {
 		i.second->getProperty(Lav_NODE_MUL).setFloatValue(reverbGain);
 	}
-	//The condition is whether or not we should cull.
-	handleStateUpdates(distance >= maxDistance);
 }
 
 void SourceNode::handleStateUpdates(bool shouldCull) {
-	int newState = Lav_NODESTATE_PLAYING;
-	if(culled == false && shouldCull) {
-		newState = Lav_NODESTATE_PAUSED;
-		input->getProperty(Lav_NODE_STATE).setIntValue(Lav_NODESTATE_ALWAYS_PLAYING);
-		culled = true;
+	//This has four cases.
+	//If we are culled and need to be culled, we need to set our input's state.
+	if(culled && shouldCull) {
+		if(getState() != Lav_NODESTATE_PAUSED) input->setState(Lav_NODESTATE_ALWAYS_PLAYING);
+		else input->setState(Lav_NODESTATE_PAUSED);
 	}
+	//If we are culled and don't need to be culled, input goes to playing and panner goes to whatever we are.
 	else if(culled && shouldCull == false) {
-		culled = false;
-		//The state is the state property's value.
-		//This makes pausing sources work.
-		newState = Lav_NODESTATE_PLAYING;
-		input->getProperty(Lav_NODE_STATE).setIntValue(newState);
+		input->setState(Lav_NODESTATE_PLAYING);
+		panner_node->setState(getState());
 	}
-	//We always change the states, in order that we can look at this special case.
-	//it's either paused (in which case we pause everything)
-	//Or always playing (in which case it doesn't matter, as long as at least the input has it).
-	if(getState() != Lav_NODESTATE_PLAYING) {
-		newState = getState();
-		input->setState(newState);
+	//If we aren't culled but need to be, then cull us.
+	if(culled == false && shouldCull) {
+		//Input goes to either paused or always playing, panner goes to paused.
+		panner_node->setState(Lav_NODESTATE_PAUSED);
+		if(getState() != Lav_NODESTATE_PAUSED) input->setState(Lav_NODESTATE_ALWAYS_PLAYING);
+		else input->setState(Lav_NODESTATE_PAUSED);
 	}
-	//We might be unculled and need to set everything to playing because the user paused:
-	else if(culled == false) {
-		newState = Lav_NODESTATE_PLAYING;
-		input->setState(newState);
-	}
-	//Otherwise, the above code has the input always playing, and the following suspends everything else.
-	//We iterate over everything and change the state.
-	panner_node->setState(newState);
-	for(auto &i: effect_panners) i->setState(newState);
-	for(auto &i: outgoing_effects) i.second->setState(newState);
-	for(auto &i: outgoing_effects_reverb) i.second->setState(newState);
+	//Otherwise, the panner reflects our state.
+	else panner_node->setState(getState());
 }
 
 void SourceNode::visitDependenciesUnconditional(std::function<void(std::shared_ptr<Job>&)> &pred) {

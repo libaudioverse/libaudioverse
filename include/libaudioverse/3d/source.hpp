@@ -9,7 +9,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <map>
 
 
-
 namespace libaudioverse_implementation {
 
 class EnvironmentNode;
@@ -20,6 +19,7 @@ class SourceNode: public SubgraphNode {
 	public:
 	SourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentNode> environment);
 	~SourceNode();
+	void forwardProperties(); //involves shared_from_this.
 	//For the case of 1 channels, returns the input gain node as-is.
 	std::shared_ptr<Node> getPannerForEffectChannels(int channels);
 	void feedEffect(int which);
