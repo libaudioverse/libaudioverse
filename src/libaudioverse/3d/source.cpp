@@ -60,13 +60,8 @@ SourceNode::SourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<E
 	for(auto &i: effect_panners) input->connect(0, i, 0);
 }
 
-void SourceNode::forwardProperties() {
-	panner_node->forwardProperty(Lav_PANNER_STRATEGY, std::static_pointer_cast<Node>(this->shared_from_this()), Lav_SOURCE_PANNER_STRATEGY);
-}
-
 std::shared_ptr<Node> createSourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentNode> environment) {
 	auto temp = standardNodeCreation<SourceNode>(simulation, environment);
-	temp->forwardProperties();
 	environment->registerSourceForUpdates(temp);
 	return temp;
 }

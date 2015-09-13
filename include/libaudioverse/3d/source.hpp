@@ -26,8 +26,6 @@ class SourceNode: public SubgraphNode {
 	void stopFeedingEffect(int which);
 	void update(EnvironmentInfo &env);
 	void handleStateUpdates(bool shouldCull);
-	//involves shared pointers.
-	void forwardProperties();
 	void visitDependenciesUnconditional(std::function<void(std::shared_ptr<Job>&)> &pred) override;
 	private:
 	bool culled = false;
