@@ -1,69 +1,29 @@
 Libaudioverse
 ==============
 
-##What is Libaudioverse?##
+##Introduction##
 
-Libaudioverse is three things:
+Libaudioverse is a highly flexible realtime audio synthesis library.
+Potential applications include games, realtime music synthesis, voice chat, implementations of WebAudio, and more.
+libaudioverse supports the best possible backends it can for each platform, and uses both SSE2 and threads for increased performance.
 
-- A library for building realtime audio synthesis applications.
+At the core of Libaudioverse is the concept of a node,  a piece of meaningful audio architecture.
+They can be connected in any acyclic configuration, allowing the creation of much more complex effects.
+It is possible to schedule property changes and envelopes with sample-perfect accuracy;.
+For more complex effects, nodes can be connected directly to the properties of other nodes.
 
-- An implementation of 3D and environmental audio built on top of lower level Libaudioverse components.
+here is an overview of the offered nodes:
 
-- Fast.
+- The environment and source nodes come together to act as a fully functional 3D audio environment, including support for HRTF, surround sound, and reverb.
+- The FDN reverberator is an environmental reverb capable of representing everything from a bathroom to a cathedral.
+- If you want to play with Schroeder Allpass sections, try the nested Allpass Network node.
+- A variety of lower-level filters are available: Biquad, first-order, one-pole, and convolution.
+- It is possible to implement any IIR filter, either by cascading lower level filters or by using the IIR filter node directly.
+- Oscillator options include sine and square, as well as a configurable noise generator.
+- there are several delay line types.  Most delay lines offer support for feedback, and the filtered delay line allows filtering this feedback.
+- You can record audio with the recorder, or intercept audio anywhere in the graph of nodes with the graph listener.
+- Finally, if none of these meet your needs, it is possible to create your own node via the custom node.  This is done by supplying a callback.
 
-###Realtime Audio Synthesis###
-
-Libaudioverse's key concept is the node: an audio processor that has some number of inputs, some number of outputs, and some number of properties.  The outputs of a node can be connected to the inputs of any other node, so long as this does not form a cycle in the graph.  The relationship between inputs and outputs is many to many: you may connect 1 output to as many inputs as you wish, and each input may have as many outputs connected to it as you wish.  Examples of nodes include the sine wave, a lowpass filter, an implementation of HRTF panning, and a ring modulator.  The full list of useful nodes is only growing as time passes, rendering this list far from exhaustive.
-
-To provide a more helpful analogy, it is possible to view Libaudioverse nodes as black boxes with knobs, input jacks, and output wires.  The knobs take the place of properties, changing something about the audio.  The input jacks are the audio to be changed.  The output wires send your transformed audio onward.  Some nodes don't have inputs, instead performing functions like reading files.
-
-This renders Libaudioverse capable of representing any system that can run in constant memory and which does not change the rate of audio.  This includes at least causal linear systems and waveshaping.  If Libaudioverse does not provide a node you need, it is possible to implement it yourself; alternatively, report an issue here or e-mail me and I will see what I can do about adding it to the core library.
-
-###The 3D Simulation###
-
-The 3D simulation supports HRTF via the HRTF panner as well as all common speaker layouts.  It works very similarly to OpenAL or OpenGL.  It consists of a few components:
-
-- The environment node specifies information about the environment and the listener.  The environment node outputs audio for all sources which are using it.  It is not possible to change a source's environment, and it is expected that most apps will only ever use one.
-
-- The source node is an input to the environment.  Source nodes have positions in world coordinates and are automatically panned as appropriate.  Unlike some alternatives to Libaudioverse, a source node does not work with buffers; instead, you may connect any Libaudioverse node to it.
-
-- Any number of effects.  An environment may be configured to have "effect sends".  An effect send is an aggregate of all sources connected to it.  Sources may be configured to be connected to specific effect sends, and you get as many effect sends as you want.  These expose themselves as additional outputs on the environment which may be routed through such things as environmental reverbs.
-
-The only currently implemented effect is an environmental reverb, though other effects are still pending.  The envvironmental reverb can be controlled through room density, the time it takes the reverb to decay by 60 decibals, and a few other parameters.
-Any node can effectively be used as an effect, and Libaudioverse is flexible enough to let you build your own (just configure a network of nodes and connect an output from the environment to the right place).
-
-###Fast###
-
-Here is some output from Libaudioverse's profiler that speaks for itself.  This output was taken on a Macbook Pro with an Intel I7-3520M at 2.9 GHZ using a Libaudioverse built with VC++ 2013:
-
-~~~
-Running profile tests on 2 threads
-Estimate for sine nodes: 6344.249512
-Estimate for crossfading delay line nodes: 4517.500977
-Estimate for biquad nodes: 3594.419922
-Estimate for One-pole filter nodes: 4499.990723
-Estimate for 2-channel 2-input crossfader nodes: 2502.150391
-Estimate for amplitude panner nodes: 4758.187012
-Estimate for HRTF panner nodes: 657.168518
-Estimate for hard limiter nodes: 4364.653320
-Estimate for channel splitter nodes: 4758.187012
-Estimate for channel merger nodes: 4003.439941
-Estimate for noise nodes: 879.543762
-Estimate for square nodes: 2379.093506
-Estimate for ringmod nodes: 8862.577148
-Estimate for 16x16 FDN nodes: 45.529320
-Estimate for 32x32 FDN nodes: 21.302710
-~~~
-
-And the following is profiling of the 3D simulation components.  This test estimates the maximum number of sources you can possibly run in realtime:
-
-~~~
-Running 50 times with 250 sources on 2 threads
-Took 0.848000 seconds
-Estimate: 342.803833 sources maximum
-~~~
-
-As implied by the output of the above tests, Libaudioverse is capable of using multiple cores to a noticeable advantage.  In addition, Libaudioverse uses SSE2 by default (this can be disabled with a CMake option).
 
 ##Building##
 
