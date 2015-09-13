@@ -1,10 +1,11 @@
 {%-import 'macros.t' as macros with context-%}
 #implements lifting the raw ctypes-basedd api into something markedly pallatable.
 #among other things, the implementation heree enables calling functions with keyword arguments and raises exceptions on error, rather than dealing with ctypes directly.
+from __future__ import absolute_import
 import ctypes
 import collections
 import functools
-import _libaudioverse
+from . import _libaudioverse
 
 #These are not from libaudioverse.
 #Implement a method by which the public libaudioverse module may register its exception classes for error code translation.

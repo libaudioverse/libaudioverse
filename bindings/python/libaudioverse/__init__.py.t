@@ -2,9 +2,9 @@
 """Implements all of the Libaudioverse API.
 
 This is the only module that should be used.  All other modules are private."""
-
-import _lav
-import _libaudioverse
+from __future__ import absolute_import
+from . import _lav
+from . import _libaudioverse
 import weakref
 import collections
 import ctypes
