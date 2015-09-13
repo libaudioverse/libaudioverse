@@ -5,7 +5,7 @@ Libaudioverse
 
 Libaudioverse is a highly flexible realtime audio synthesis library.
 Potential applications include games, realtime music synthesis, voice chat, implementations of WebAudio, and more.
-libaudioverse supports the best possible backends it can for each platform, and uses both SSE2 and threads for increased performance.
+Libaudioverse supports the best possible backends it can for each platform, and uses both SSE2 and threads for increased performance.
 
 At the core of Libaudioverse is the concept of a node,  a piece of meaningful audio architecture.
 They can be connected in any acyclic configuration, allowing the creation of much more complex effects.
@@ -22,7 +22,7 @@ here is an overview of the offered nodes:
 - Oscillator options include sine and square, as well as a configurable noise generator.
 - there are several delay line types.  Most delay lines offer support for feedback, and the filtered delay line allows filtering this feedback.
 - You can record audio with the recorder, or intercept audio anywhere in the graph of nodes with the graph listener.
-- Finally, if none of these meet your needs, it is possible to create your own node via the custom node.  This is done by supplying a callback.
+- Finally, if none of these meet your needs, it is possible to create your own node via the custom node.
 
 
 ##Building##
