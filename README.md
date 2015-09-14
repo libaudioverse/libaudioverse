@@ -34,7 +34,7 @@ You need the following:
 - Python 2.7
 - CMake 3.0 or later.
 - The python packages Jinja2, pycparser, enum34, numpy, and scipy.
-- A C++11 capable compiler.  For Windows, this must be Visual Studio 2013 or later.  Building with Visual Studio 2015 gives a decent performance boost.
+- A C++11 capable compiler.  For Windows, this must be Visual Studio 2015 or later.
 
 The build process is the normal build process for CMake, with one small note.  You must build the library as an out-of-source build in a directory called build.  All CMake generators should work.  As an example, here is my build process:
 
