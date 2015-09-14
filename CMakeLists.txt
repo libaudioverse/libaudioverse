@@ -1,4 +1,4 @@
-cmake_MINIMUM_REQUIRED(VERSION 2.8)
+cmake_MINIMUM_REQUIRED(VERSION 3.3.0)
 
 project(Libaudioverse)
 include_directories("${CMAKE_SOURCE_DIR}/include")
