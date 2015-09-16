@@ -121,8 +121,9 @@ class Node: public ExternalObject, public Job {
 
 	//Conform to Job.
 	virtual void visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) override;
-	virtual void willExecuteDependencies();
-	virtual void execute();
+	virtual void willExecuteDependencies() override;
+	virtual void execute() override;
+	virtual bool canCull() override;
 
 	//This is the actual implementation of visitDependencies.
 	//visitDependencies will only call this function if the state is unpaused.

@@ -393,6 +393,10 @@ void Node::execute() {
 	tick();
 }
 
+bool Node::canCull() {
+	return getState() == Lav_NODESTATE_PAUSED;
+}
+
 void Node::visitDependenciesUnconditional(std::function<void(std::shared_ptr<Job>&)> &pred) {
 	for(int i = 0; i < getInputConnectionCount(); i++) {
 		auto conn = getInputConnection(i)->getConnectedNodes();
