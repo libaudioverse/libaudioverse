@@ -29,9 +29,6 @@ class  Job {
 	//Override points for executing.
 	virtual void willExecuteDependencies() {}
 	virtual void execute() {}
-	//Return true if we can skip this job's willExecute and execute.
-	//This is used to completely remove paused  nodes from the plan.
-	virtual bool canCull() {return false;}
 	private:
 	int job_sort_tag = 0;
 	bool job_recorded = false;

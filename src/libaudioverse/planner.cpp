@@ -94,10 +94,7 @@ void tagger(std::shared_ptr<Job> job, int tag, std::vector<std::shared_ptr<Job>>
 	bool skipRecursion = (job->job_sort_tag == tag && job->job_recorded);
 	job->job_sort_tag = tag;
 	if(job->job_recorded == false) {
-		//We only caer to actually add it to the plan if it can't be culled.
-		//This is true for paused nodes, avoiding a bunch of overhead in the multithreaded case.
-		//Particularly important for culled sources.
-		if(job->canCull() == false) destination.push_back(job);
+		destination.push_back(job);
 		job->job_recorded = true;
 	}
 	if(skipRecursion == false) {
