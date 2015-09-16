@@ -44,7 +44,10 @@ class Simulation: public ExternalObject, public Job {
 	LavError associateNode(std::shared_ptr<Node> node);
 	//Indicates that a node should have willTick called on it.
 	void registerNodeForWillTick(std::shared_ptr<Node> node);
-
+	//used to register and unregister for always playing status.
+	void registerNodeForAlwaysPlaying(std::shared_ptr<Node> which);
+	void unregisterNodeForAlwaysPlaying(std::shared_ptr<Node> which);
+	
 	float getSr() { return sr;}
 	int getTickCount() {return tick_count;}
 	void doMaintenance(); //cleans up dead weak pointers, etc.
@@ -83,6 +86,7 @@ class Simulation: public ExternalObject, public Job {
 	//if nodes die, they automatically need to be removed.  We can do said removal on next process.
 	std::set<std::weak_ptr<Node>, std::owner_less<std::weak_ptr<Node>>> nodes;
 	std::set<std::weak_ptr<Node>, std::owner_less<std::weak_ptr<Node>>> will_tick_nodes; //Nodes to call willTick on.
+	std::set<std::weak_ptr<Node>, std::owner_less<std::weak_ptr<Node>>> always_playing_nodes; //Nodes that are currently always playing.
 	
 	std::recursive_mutex mutex;
 

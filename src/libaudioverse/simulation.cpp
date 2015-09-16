@@ -154,6 +154,14 @@ void Simulation::registerNodeForWillTick(std::shared_ptr<Node> node) {
 	will_tick_nodes.insert(node);
 }
 
+void Simulation::registerNodeForAlwaysPlaying(std::shared_ptr<Node> which) {
+	always_playing_nodes.insert(which);
+}
+
+void Simulation::unregisterNodeForAlwaysPlaying(std::shared_ptr<Node> which) {
+	always_playing_nodes.erase(which);
+}
+
 void Simulation::enqueueTask(std::function<void(void)> cb) {
 	tasks.enqueue(cb);
 }
@@ -206,13 +214,10 @@ void Simulation::visitDependencies(std::function<void(std::shared_ptr<Job>&)> &p
 		auto n = std::dynamic_pointer_cast<Job>(i->shared_from_this());
 		if(n) pred(n);
 	}
-	for(auto i: nodes) {
-		auto n = i.lock();
-		if(n && n->getState() == Lav_NODESTATE_ALWAYS_PLAYING) {
-			auto j = std::static_pointer_cast<Job>(n);
-			pred(j);
-		}
-	}
+	filterWeakPointers(always_playing_nodes, [&pred](std::shared_ptr<Node> n) {
+		auto j = std::static_pointer_cast<Job>(n);
+		pred(j);
+	});
 }
 
 void Simulation::invalidatePlan() {

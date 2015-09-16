@@ -85,9 +85,12 @@ Node::Node(int type, std::shared_ptr<Simulation> simulation, unsigned int numInp
 	
 	//We must invalidate the plan when people touch the state property.
 	getProperty(Lav_NODE_STATE).setPostChangedCallback([&] () {
-		//The qualification is important.
-		if(getState() != prev_state) this->simulation->invalidatePlan();
+		if(getState() == prev_state) return;
+		//Warning: two simulations in scope.
+		this->simulation->invalidatePlan();
+		if(prev_state == Lav_NODESTATE_ALWAYS_PLAYING) this->simulation->unregisterNodeForAlwaysPlaying(std::static_pointer_cast<Node>(shared_from_this()));
 		prev_state = getState();
+		if(prev_state == Lav_NODESTATE_ALWAYS_PLAYING) this->simulation->registerNodeForAlwaysPlaying(std::static_pointer_cast<Node>(shared_from_this()));
 	});
 }
 
