@@ -30,6 +30,8 @@ OutputConnection::OutputConnection(std::shared_ptr<Simulation> simulation, Node*
 
 void OutputConnection::add(int inputBufferCount, float** inputBuffers, bool shouldApplyMixingMatrix) {
 	//Ticking is now handled by the planner, see planner.cpp.
+	//If the node is paused, we are going to output zeros, so skip.
+	if(node->getState() == Lav_NODESTATE_PAUSED) return;
 	//get the array of outputs from our node.
 	float** outputArray=node->getOutputBufferArray();
 	//it is the responsibility of our node to keep us configured, so we assume what info we have is accurate. If it is not, that is the fault of our node.

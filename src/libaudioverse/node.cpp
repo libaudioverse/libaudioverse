@@ -105,8 +105,9 @@ void Node::tickProperties() {
 
 void Node::tick() {
 	last_processed = simulation->getTickCount();
-	zeroOutputBuffers(); //we always do this because sometimes we're not going to actually do anything else.
 	if(getState() == Lav_NODESTATE_PAUSED) return; //nothing to do, for we are paused.
+	//If we're paused, then our output connections short-circuit and add zero.
+	zeroOutputBuffers();
 	tickProperties();
 	//willProcessParents is handled by the planner.
 	zeroInputBuffers();
