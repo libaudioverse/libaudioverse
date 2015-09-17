@@ -84,7 +84,7 @@ void Simulation::getBlock(float* out, unsigned int channels, bool mayApplyMixing
 	block_callback_time +=block_size/sr;
 	end:
 	int maintenance_count=maintenance_start;
-	filterWeakPointers(maintenance_nodes, [&](std::shared_ptr<Node> i_s) {
+	filterWeakPointers(maintenance_nodes, [&](std::shared_ptr<Node> &i_s) {
 		if(maintenance_count % maintenance_rate== 0) i_s->doMaintenance();
 		maintenance_count++;
 	});
@@ -216,7 +216,7 @@ void Simulation::visitDependencies(std::function<void(std::shared_ptr<Job>&)> &p
 		auto n = std::dynamic_pointer_cast<Job>(i->shared_from_this());
 		if(n) pred(n);
 	}
-	filterWeakPointers(always_playing_nodes, [&pred](std::shared_ptr<Node> n) {
+	filterWeakPointers(always_playing_nodes, [&pred](std::shared_ptr<Node> &n) {
 		auto j = std::static_pointer_cast<Job>(n);
 		pred(j);
 	});

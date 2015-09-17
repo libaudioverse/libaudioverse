@@ -64,7 +64,7 @@ void Planner::runJobsAsync() {
 	while(i != end) {
 		while(i != end && (*	i)->job_sort_tag == prev_tag) { //While jobs are guaranteed to not depend on each other.
 			thread_pool.submitJob([i] () {
-				auto jobPtr = *i;
+				auto &jobPtr = *i;
 				jobPtr->execute();
 				jobPtr->job_recorded = false;
 			});

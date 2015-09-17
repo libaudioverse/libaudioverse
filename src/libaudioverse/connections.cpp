@@ -75,7 +75,7 @@ Node* OutputConnection::getNode() {
 
 std::vector<Node*> OutputConnection::getConnectedNodes() {
 	std::vector<Node*> retval;
-	filterWeakPointers(connected_to, [&](std::shared_ptr<InputConnection> conn) {
+	filterWeakPointers(connected_to, [&](std::shared_ptr<InputConnection> &conn) {
 		auto n = conn->getNode();
 		//The simulation uses an input connection without a node, so we need to protect against this case.
 		if(n) retval.push_back(n);
