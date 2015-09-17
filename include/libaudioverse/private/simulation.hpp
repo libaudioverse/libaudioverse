@@ -47,6 +47,8 @@ class Simulation: public ExternalObject, public Job {
 	//used to register and unregister for always playing status.
 	void registerNodeForAlwaysPlaying(std::shared_ptr<Node> which);
 	void unregisterNodeForAlwaysPlaying(std::shared_ptr<Node> which);
+	//If we need maintenance.
+	void registerNodeForMaintenance(std::shared_ptr<Node> which);
 	
 	float getSr() { return sr;}
 	int getTickCount() {return tick_count;}
@@ -87,6 +89,7 @@ class Simulation: public ExternalObject, public Job {
 	std::set<std::weak_ptr<Node>, std::owner_less<std::weak_ptr<Node>>> nodes;
 	std::set<std::weak_ptr<Node>, std::owner_less<std::weak_ptr<Node>>> will_tick_nodes; //Nodes to call willTick on.
 	std::set<std::weak_ptr<Node>, std::owner_less<std::weak_ptr<Node>>> always_playing_nodes; //Nodes that are currently always playing.
+	std::set<std::weak_ptr<Node>, std::owner_less<std::weak_ptr<Node>>> maintenance_nodes; //Nodes that need doMaintenance.
 	
 	std::recursive_mutex mutex;
 

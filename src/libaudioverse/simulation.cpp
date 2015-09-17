@@ -84,12 +84,10 @@ void Simulation::getBlock(float* out, unsigned int channels, bool mayApplyMixing
 	block_callback_time +=block_size/sr;
 	end:
 	int maintenance_count=maintenance_start;
-	for(auto &i: nodes) {
-		auto i_s=i.lock();
-		if(i_s == nullptr) continue;
+	filterWeakPointers(maintenance_nodes, [&](std::shared_ptr<Node> i_s) {
 		if(maintenance_count % maintenance_rate== 0) i_s->doMaintenance();
 		maintenance_count++;
-	}
+	});
 	maintenance_start++;
 	//and ourselves.
 	if(maintenance_start%maintenance_rate == 0) doMaintenance();
@@ -160,6 +158,10 @@ void Simulation::registerNodeForAlwaysPlaying(std::shared_ptr<Node> which) {
 
 void Simulation::unregisterNodeForAlwaysPlaying(std::shared_ptr<Node> which) {
 	always_playing_nodes.erase(which);
+}
+
+void Simulation::registerNodeForMaintenance(std::shared_ptr<Node> which) {
+	maintenance_nodes.insert(which);
 }
 
 void Simulation::enqueueTask(std::function<void(void)> cb) {
