@@ -73,7 +73,7 @@ properties:
     name: min_reverb_level
     type: float
     range: [0.0, 1.0]
-    default: 0.1
+    default: 0.15
     doc_description: |
       The minimum reverb level allowed.
       
@@ -84,7 +84,7 @@ properties:
     name: max_reverb_level
     type: float
     range: [0.0, 1.0]
-    default: 1.0
+    default: 0.6
     doc_description: |
       The maximum amount of audio to be diverted to reverb sends, if any.
       
