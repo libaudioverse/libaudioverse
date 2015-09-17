@@ -89,8 +89,8 @@ Node::Node(int type, std::shared_ptr<Simulation> simulation, unsigned int numInp
 		//Warning: two simulations in scope.
 		this->simulation->invalidatePlan();
 		if(prev_state == Lav_NODESTATE_ALWAYS_PLAYING) this->simulation->unregisterNodeForAlwaysPlaying(std::static_pointer_cast<Node>(shared_from_this()));
-		prev_state = getState();
-		if(prev_state == Lav_NODESTATE_ALWAYS_PLAYING) this->simulation->registerNodeForAlwaysPlaying(std::static_pointer_cast<Node>(shared_from_this()));
+		state = prev_state = getProperty(Lav_NODE_STATE).getIntValue();
+		if(state == Lav_NODESTATE_ALWAYS_PLAYING) this->simulation->registerNodeForAlwaysPlaying(std::static_pointer_cast<Node>(shared_from_this()));
 	});
 }
 
@@ -196,7 +196,7 @@ void Node::willTick() {
 }
 
 int Node::getState() {
-	return getProperty(Lav_NODE_STATE).getIntValue();
+	return state;
 }
 
 void Node::setState(int newState) {
