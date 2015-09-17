@@ -147,7 +147,7 @@ class Node: public ExternalObject, public Job {
 	bool is_processing = false, is_suspended = false;
 	int num_input_buffers = 0, num_output_buffers = 0, block_size = 0;
 	//used to make no-op state changes free.
-	int state = Lav_NODESTATE_PLAYING, prev_state = Lav_NODESTATE_PLAYING;
+	int prev_state = Lav_NODESTATE_PLAYING;
 	int last_processed = -1; //-1 so that it's not equal to the simulation's tick counter, which starts at 0.
 
 	//we are never allowed to copy.

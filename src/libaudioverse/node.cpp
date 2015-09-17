@@ -189,7 +189,7 @@ void Node::willTick() {
 }
 
 int Node::getState() {
-	return state;
+	return getProperty(Lav_NODE_STATE).getIntValue();
 }
 
 void Node::setState(int newState) {
@@ -200,8 +200,8 @@ void Node::stateChanged() {
 	if(getState() == prev_state) return;
 	simulation->invalidatePlan();
 	if(prev_state == Lav_NODESTATE_ALWAYS_PLAYING) simulation->unregisterNodeForAlwaysPlaying(std::static_pointer_cast<Node>(shared_from_this()));
-	state = prev_state = getProperty(Lav_NODE_STATE).getIntValue();
-	if(state == Lav_NODESTATE_ALWAYS_PLAYING) simulation->registerNodeForAlwaysPlaying(std::static_pointer_cast<Node>(shared_from_this()));
+	prev_state = getProperty(Lav_NODE_STATE).getIntValue();
+	if(prev_state == Lav_NODESTATE_ALWAYS_PLAYING) simulation->registerNodeForAlwaysPlaying(std::static_pointer_cast<Node>(shared_from_this()));
 }
 
 int Node::getOutputBufferCount() {
