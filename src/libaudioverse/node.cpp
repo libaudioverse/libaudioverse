@@ -84,14 +84,7 @@ Node::Node(int type, std::shared_ptr<Simulation> simulation, unsigned int numInp
 	block_size = simulation->getBlockSize();
 	
 	//We must invalidate the plan when people touch the state property.
-	getProperty(Lav_NODE_STATE).setPostChangedCallback([&] () {
-		if(getState() == prev_state) return;
-		//Warning: two simulations in scope.
-		this->simulation->invalidatePlan();
-		if(prev_state == Lav_NODESTATE_ALWAYS_PLAYING) this->simulation->unregisterNodeForAlwaysPlaying(std::static_pointer_cast<Node>(shared_from_this()));
-		state = prev_state = getProperty(Lav_NODE_STATE).getIntValue();
-		if(state == Lav_NODESTATE_ALWAYS_PLAYING) this->simulation->registerNodeForAlwaysPlaying(std::static_pointer_cast<Node>(shared_from_this()));
-	});
+	getProperty(Lav_NODE_STATE).setPostChangedCallback([&] () {stateChanged();});
 }
 
 Node::~Node() {
@@ -201,6 +194,14 @@ int Node::getState() {
 
 void Node::setState(int newState) {
 	getProperty(Lav_NODE_STATE).setIntValue(newState);
+}
+
+void Node::stateChanged() {
+	if(getState() == prev_state) return;
+	simulation->invalidatePlan();
+	if(prev_state == Lav_NODESTATE_ALWAYS_PLAYING) simulation->unregisterNodeForAlwaysPlaying(std::static_pointer_cast<Node>(shared_from_this()));
+	state = prev_state = getProperty(Lav_NODE_STATE).getIntValue();
+	if(state == Lav_NODESTATE_ALWAYS_PLAYING) simulation->registerNodeForAlwaysPlaying(std::static_pointer_cast<Node>(shared_from_this()));
 }
 
 int Node::getOutputBufferCount() {
