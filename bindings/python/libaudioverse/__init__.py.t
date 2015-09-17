@@ -469,7 +469,7 @@ class BufferProperty(LibaudioverseProperty):
     
     def __init__(self, handle, slot):
         #no getter and setter. This is custom.
-        self._handle = node
+        self._handle = handle
         self._slot = slot
 
     @property
@@ -583,11 +583,14 @@ class GenericNode(_HandleComparer):
                 self._state['property_instances'] = dict()
 {%for enumerant, prop in metadata['nodes']['Lav_OBJTYPE_GENERIC_NODE']['properties'].iteritems()%}
                 self._state['properties']["{{prop['name']}}"] = _libaudioverse.{{enumerant}}
-{{macros.make_property_instance(enumerant, prop)|indent(16, True)}}
 {%endfor%}
             else:
                 self._state=_object_states[handle.handle]
             self._lock = self._state['lock']
+            self._property_instances = dict()
+{%for enumerant, prop in metadata['nodes']['Lav_OBJTYPE_GENERIC_NODE']['properties'].iteritems()%}
+{{macros.make_property_instance(enumerant, prop)|indent(12, True)}}
+{%endfor%}
 
     def get_property_names(self):
         """Get the names of all properties on this node."""
@@ -652,16 +655,18 @@ class {{friendly_name}}Node(GenericNode):
     def __init__(self{%if constructor_arg_names|length > 0%}, {%endif%}{{constructor_arg_names|join(', ')}}):
         super({{friendly_name}}Node, self).__init__(_lav.{{constructor_name|without_lav|camelcase_to_underscores}}({{constructor_arg_names|join(', ')}}))
 
-{%if property_dict | length > 0%}
     def init_with_handle(self, handle):
         with _object_states_lock:
             #our super implementation adds us, so remember if we weren't there.
             should_add_properties = handle.handle not in _object_states
             super({{friendly_name}}Node, self).init_with_handle(handle)
+{%if property_dict|length%}
             if should_add_properties:
 {%for enumerant, prop in property_dict.iteritems()%}
                 self._state['properties']["{{prop['name']}}"] = _libaudioverse.{{enumerant}}
-{{macros.make_property_instance(enumerant, prop)|indent(16,  True)}}
+{%endfor%}
+{%for enumerant, prop in property_dict.iteritems()%}
+{{macros.make_property_instance(enumerant, prop)|indent(12,  True)}}
 {%endfor%}
 {%endif%}
 
@@ -720,5 +725,6 @@ class {{friendly_name}}Node(GenericNode):
             #As this is just for GC and the getter, we don't deal with the overhead of an object, and just use tuples.
             self._state['callbacks']["{{callback_name}}"] = (callback, wrapper, ctypes_callback)
 {%endfor%}
+
 _types_to_classes[ObjectTypes.{{friendly_name | camelcase_to_underscores}}_node] = {{friendly_name}}Node
 {%endfor%}
