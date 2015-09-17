@@ -98,16 +98,13 @@ def {{friendly_name}}({{input_arg_names|join(', ')}}):
 		{%for i in output_arg_names%}ctypes.byref({{i}}){%if not loop.last%}, {%endif%}{%endfor%})
 	if err != _libaudioverse.Lav_ERROR_NONE:
 		raise make_error_from_code(err)
-	retval = []
-{%for i in func_info.output_args%}
-{%if i.type.base=='LavHandle' and i.type.indirection == 1%}
-	handle = {{i.name}}.value
-	retval.append(reverse_handle(handle))
-{%else%}
-	retval.append(getattr({{i.name}}, 'value', {{i.name}}))
-{%endif%}
-{%endfor%}
-	return tuple(retval) if len(retval) > 1 else retval[0]
+	return {%for i in func_info.output_args -%}
+{%- if i.type.base=='LavHandle' and i.type.indirection == 1 -%}
+	reverse_handle({{i.name}}.value){%if not loop.last%}, {%endif%}
+{%- else -%}
+	getattr({{i.name}}, 'value', {{i.name}}){%if not loop.last%}, {%endif%}
+{%-endif-%}
+{%-endfor-%}
 {%endif%}
 
 {%endfor%}

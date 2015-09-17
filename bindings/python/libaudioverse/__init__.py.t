@@ -352,26 +352,27 @@ class LibaudioverseProperty(object):
 	
 	All properties support resetting and type query."""
 
-	def __init__(self, node, slot, getter, setter):
-		self._node = node
+	def __init__(self, handle, slot, getter, setter):
+		self._handle = handle
 		self._slot = slot
 		self._getter=getter
 		self._setter = setter
 
 	@property
 	def value(self):
-		return self._getter(self._node, self._slot)
+		return self._getter(self._handle, self._slot)
 
 	@value.setter
 	def value(self, val):
-		return self._setter(self._node, self._slot, val)
+		return self._setter(self._handle, self._slot, val)
+
 	def reset(self):
-		_lav.node_reset_property(self._node, self._slot)
+		_lav.node_reset_property(self._handle, self._slot)
 
 	@property
 	def type(self):
 		"""The property's type."""
-		return PropertyTypes(_lav.node_get_property_type(self._node, self._slot))
+		return PropertyTypes(_lav.node_get_property_type(self._handle, self._slot))
 
 	def __repr__(self):
 		return "<{} {}>".format(self.__class__.__name__, self.value)
@@ -382,23 +383,23 @@ class BooleanProperty(LibaudioverseProperty):
 	Note that boolean properties show up as int properties when their type is queried.
 	This class adds extra marshalling to make sure that boolean properties show up as booleans on the Python side, as the C API does not distinguish between boolean properties and int properties with range [0, 1]."""
 	
-	def __init__(self, node, slot):
-		super(BooleanProperty, self).__init__(node = node, slot = slot, getter =_lav.node_get_int_property, setter = _lav.node_set_int_property)
+	def __init__(self, handle, slot):
+		super(BooleanProperty, self).__init__(handle = handle, slot = slot, getter =_lav.node_get_int_property, setter = _lav.node_set_int_property)
 
 	@LibaudioverseProperty.value.getter
 	def value(self):
-		return bool(self._getter(self._node, self._slot))
+		return bool(self._getter(self._handle, self._slot))
 
 class IntProperty(LibaudioverseProperty):
 	"""Proxy to an integer or enumeration property."""
 
-	def __init__(self, node, slot, enum = None):
-		super(IntProperty, self).__init__(node = node, slot = slot, getter = None, setter = None)
+	def __init__(self, handle, slot, enum = None):
+		super(IntProperty, self).__init__(handle = handle, slot = slot, getter = None, setter = None)
 		self.enum = enum
 
 	@property
 	def value(self):
-		v = _lav.node_get_int_property(self._node, self._slot)
+		v = _lav.node_get_int_property(self._handle, self._slot)
 		if self.enum:
 			v = self.enum(v)
 		return v
@@ -409,7 +410,7 @@ class IntProperty(LibaudioverseProperty):
 			if not isinstance(val, self.enum):
 				raise ValueError('Attemptn to use wrong enum to set property. Expected instance of {}'.format(self.enum.__class__))
 			val = val.value
-		_lav.node_set_int_property(self._node, self._slot, val)
+		_lav.node_set_int_property(self._handle, self._slot, val)
 
 class AutomatedProperty(LibaudioverseProperty):
 	"""A property that supports automation and node connection."""
@@ -420,7 +421,7 @@ class AutomatedProperty(LibaudioverseProperty):
 		The property's value will change to the specified value by the specified time, starting at the end of the previous automator
 		
 		This function wraps Lav_automationLinearRampToValue."""
-		_lav.automation_linear_ramp_to_value(self._node, self._slot, time, value)
+		_lav.automation_linear_ramp_to_value(self._handle, self._slot, time, value)
 
 	def envelope(self, time, duration, values):
 		"""Run an envelope.
@@ -429,57 +430,56 @@ class AutomatedProperty(LibaudioverseProperty):
 		
 		This function wraps Lav_automationEnvelope."""
 		values_length = len(values)
-		_lav.automation_envelope(self._node, self._slot, time, duration, values_length, values)
+		_lav.automation_envelope(self._handle, self._slot, time, duration, values_length, values)
 
 	def set(self, time, value):
 		"""Sets the property's value to a specific value at a specific time.
 		
 		Wraps Lav_automationSet."""
-		_lav.automation_set(self._node, self._slot, time, value)
-
+		_lav.automation_set(self._handle, self._slot, time, value)
 
 	def cancel_automators(self, time):
 		"""Cancel all automators scheduled to start after time.
 		
 		Wraps Lav_automationCancelAutomators."""
-		_lav.automation_cancel_automators(self._node, self._slot, time)
+		_lav.automation_cancel_automators(self._handle, self._slot, time)
 
 class FloatProperty(AutomatedProperty):
 	"""Proxy to a float property."""
 
-	def __init__(self, node, slot):
-		super(FloatProperty, self).__init__(node = node, slot = slot, getter = _lav.node_get_float_property, setter = _lav.node_set_float_property)
+	def __init__(self, handle, slot):
+		super(FloatProperty, self).__init__(handle = handle, slot = slot, getter = _lav.node_get_float_property, setter = _lav.node_set_float_property)
 
 class DoubleProperty(LibaudioverseProperty):
 	"""Proxy to a double property."""
 
-	def __init__(self, node, slot):
-		super(DoubleProperty, self).__init__(node = node, slot = slot, getter = _lav.node_get_double_property, setter = _lav.node_set_double_property)
+	def __init__(self, handle, slot):
+		super(DoubleProperty, self).__init__(handle = handle, slot = slot, getter = _lav.node_get_double_property, setter = _lav.node_set_double_property)
 
 class StringProperty(LibaudioverseProperty):
 	"""Proxy to a string property."""
 
-	def __init__(self, node, slot):
-		super(StringProperty, self).__init__(node = node, slot = slot, getter = _lav.node_get_string_property, setter = _lav.node_set_string_property)
+	def __init__(self, handle, slot):
+		super(StringProperty, self).__init__(handle = handle, slot = slot, getter = _lav.node_get_string_property, setter = _lav.node_set_string_property)
 
 class BufferProperty(LibaudioverseProperty):
 	"""Proxy to a buffer property.
 	
 	It is safe to set this property to None."""
 	
-	def __init__(self, node, slot):
+	def __init__(self, handle, slot):
 		#no getter and setter. This is custom.
-		self._node = node
+		self._handle = node
 		self._slot = slot
 
 	@property
 	def value(self):
-		return _resurrect(_lav.node_get_buffer_property(self._node, self._slot))
+		return _resurrect(_lav.node_get_buffer_property(self._handle, self._slot))
 
 	@value.setter
 	def value(self, val):
 		if val is None or isinstance(val, Buffer):
-			_lav.node_set_buffer_property(self._node, self._slot, val if val is not None else 0)
+			_lav.node_set_buffer_property(self._handle, self._slot, val if val is not None else 0)
 		else:
 			raise ValueError("Expected a Buffer or None.")
 
@@ -488,8 +488,8 @@ class VectorProperty(LibaudioverseProperty):
 	
 	This class knows how to marshal anything that is a collections.sized and will error if length constraints are not met."""
 
-	def __init__(self, node, slot, getter, setter, length):
-		super(VectorProperty, self).__init__(node = node, slot = slot, getter = getter, setter =setter)
+	def __init__(self, handle, slot, getter, setter, length):
+		super(VectorProperty, self).__init__(handle = handle, slot = slot, getter = getter, setter =setter)
 		self._length = length
 
 	#Override setter:
@@ -499,62 +499,62 @@ class VectorProperty(LibaudioverseProperty):
 			raise ValueError("Expected a collections.sized subclass")
 		if len(val) != self._length:
 			raise ValueError("Expected a {}-element list".format(self._length))
-		self._setter(self._node, self._slot, *val)
+		self._setter(self._handle, self._slot, *val)
 
 class Float3Property(VectorProperty):
 	"""Represents a float3 property."""
 	
-	def __init__(self, node, slot):
-		super(Float3Property, self).__init__(node, slot, getter =_lav.node_get_float3_property, setter = _lav.node_set_float3_property, length = 3)
+	def __init__(self, handle, slot):
+		super(Float3Property, self).__init__(handle = handle, slot = slot, getter =_lav.node_get_float3_property, setter = _lav.node_set_float3_property, length = 3)
 
 class Float6Property(VectorProperty):
 	"""Represents a float6 property."""
 	
-	def __init__(self, node, slot):
-		super(Float6Property, self).__init__(node = node, slot = slot, getter =_lav.node_get_float6_property, setter =_lav.node_set_float6_property, length = 6)
+	def __init__(self, handle, slot):
+		super(Float6Property, self).__init__(handle = handle, slot = slot, getter =_lav.node_get_float6_property, setter =_lav.node_set_float6_property, length = 6)
 
 #Array properties.
 #This is a base class because we have 2, but they have to lock their parent node.
 class ArrayProperty(LibaudioverseProperty):
 	"""Base class for all array properties."""
 
-	def __init__(self, node, slot, reader, replacer, length):
-		self._node = node
+	def __init__(self, handle, slot, reader, replacer, length, lock):
+		self._handle = handle
 		self._slot = slot
 		self._reader=reader
 		self._replacer=replacer
 		self._length = length
+		self._lock = lock
 
 	@property
 	def value(self):
 		"""The array, as a tuple."""
-		with self._node._lock:
-			length = self._length(self._node, self._slot)
+		with self._lock:
+			length = self._length(self._handle, self._slot)
 			accum = [None]*length
 			for i in xrange(length):
-				accum[i] = self._reader(self._node, self._slot, i)
+				accum[i] = self._reader(self._handle, self._slot, i)
 		return tuple(accum)
 
 	@value.setter
 	def value(self, val):
-		self._replacer(self._node, self._slot, len(val), val)
+		self._replacer(self._handle, self._slot, len(val), val)
 
 class IntArrayProperty(ArrayProperty):
 	"""Represents an int array property."""
-	def __init__(self, node, slot):
-		super(IntArrayProperty, self).__init__(node = node, slot = slot, reader = _lav.node_read_int_array_property,
+	def __init__(self, handle, slot, lock):
+		super(IntArrayProperty, self).__init__(handle = handle, slot = slot, lock = lock, reader = _lav.node_read_int_array_property,
 			replacer =_lav.node_replace_int_array_property, length = _lav.node_get_int_array_property_length)
 
 class FloatArrayProperty(ArrayProperty):
 	"""Represents a float array property."""
 
-	def __init__(self, node, slot):
-		super(FloatArrayProperty, self).__init__(node = node, slot = slot,
+	def __init__(self, handle, slot, lock):
+		super(FloatArrayProperty, self).__init__(handle = handle, slot = slot, lock = lock,
 			reader =_lav.node_read_float_array_property,
 			replacer = _lav.node_replace_float_array_property,
 			length = _lav.node_get_float_array_property_length
 		)
-
 
 #This is the class hierarchy.
 #GenericNode is at the bottom, and we should never see one; and GenericObject should hold most implementation.

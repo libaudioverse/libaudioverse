@@ -5,12 +5,12 @@
 		"""{{prop.get('doc_description', "")}}"""
 {%if prop['type'] == 'int'%}
 {%if 'value_enum' in prop%}
-		return IntProperty(node = self, slot = _libaudioverse.{{enumerant}}, enum = {{prop['value_enum']|without_lav|underscores_to_camelcase(True)}})
+		return IntProperty(handle = self.handle, slot = _libaudioverse.{{enumerant}}, enum = {{prop['value_enum']|without_lav|underscores_to_camelcase(True)}})
 {%else%}
-		return IntProperty(node = self, slot = _libaudioverse.{{enumerant}})
+		return IntProperty(handle = self.handle, slot = _libaudioverse.{{enumerant}})
 {%endif%}
 {%elif prop['type'] in ['int_array','float_array']%}
-		return {{prop['type']|underscores_to_camelcase(True)}}Property(self, slot=_libaudioverse.{{enumerant}})
+		return {{prop['type']|underscores_to_camelcase(True)}}Property(self, slot=_libaudioverse.{{enumerant}}, lock = self._lock)
 {%else%}
 		return {{prop['type']|underscores_to_camelcase(True)}}Property(node=self, slot = _libaudioverse.{{enumerant}})
 {%endif%}
