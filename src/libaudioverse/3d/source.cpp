@@ -61,7 +61,10 @@ SourceNode::SourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<E
 }
 
 void SourceNode::forwardProperties() {
-	panner_node->forwardProperty(Lav_PANNER_STRATEGY, std::static_pointer_cast<Node>(shared_from_this()), Lav_SOURCE_PANNER_STRATEGY);
+	auto strong = std::static_pointer_cast<Node>(shared_from_this());
+	panner_node->forwardProperty(Lav_PANNER_STRATEGY, strong, Lav_SOURCE_PANNER_STRATEGY);
+	panner_node->forwardProperty(Lav_NODE_STATE, strong, Lav_NODE_STATE);
+	//All the other exit points can be handled by forwarding states of the effect gains.
 }
 
 std::shared_ptr<Node> createSourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentNode> environment) {
@@ -93,8 +96,7 @@ void SourceNode::feedEffect(int which) {
 	pan->connect(0, gain, 0);
 	auto out = environment->getOutputNode();
 	gain->connect(0, out, which+1);
-	//By forwarding this to the panner, we can control only one object. This prevents a great deal of iteration.
-	gain->forwardProperty(Lav_NODE_STATE, panner_node, Lav_NODE_STATE);
+	gain->forwardProperty(Lav_NODE_STATE, std::static_pointer_cast<Node>(shared_from_this()), Lav_NODE_STATE);
 }
 
 void SourceNode::stopFeedingEffect(int which) {
@@ -200,32 +202,33 @@ void SourceNode::update(EnvironmentInfo &env) {
 }
 
 void SourceNode::handleStateUpdates(bool shouldCull) {
-	//This has four cases.
-	//If we are culled and need to be culled, we need to set our input's state.
-	if(culled && shouldCull) {
-		if(getState() != Lav_NODESTATE_PAUSED) input->setState(Lav_NODESTATE_ALWAYS_PLAYING);
-		else input->setState(Lav_NODESTATE_PAUSED);
-	}
-	//If we are culled and don't need to be culled, input goes to playing and panner goes to whatever we are.
-	else if(culled && shouldCull == false) {
-		input->setState(Lav_NODESTATE_PLAYING);
-		panner_node->setState(getState());
+	//If we are culled and don't need to be culled, reform connections.
+	if(culled && shouldCull == false) {
+		auto out = environment->getOutputNode();
+		panner_node->connect(0, out, 0);
+		for(auto &i: outgoing_effects) {
+			i.second->connect(0, out, i.first+1);
+		}
+		for(auto &i: outgoing_effects_reverb) {
+			i.second->connect(0, out, i.first+1);
+		}
 	}
 	//If we aren't culled but need to be, then cull us.
-	if(culled == false && shouldCull) {
-		//Input goes to either paused or always playing, panner goes to paused.
-		panner_node->setState(Lav_NODESTATE_PAUSED);
-		if(getState() != Lav_NODESTATE_PAUSED) input->setState(Lav_NODESTATE_ALWAYS_PLAYING);
-		else input->setState(Lav_NODESTATE_PAUSED);
+	else if(culled == false && shouldCull) {
+		panner_node->disconnect(0);
+		for(auto &i: outgoing_effects) {
+			i.second->disconnect(0);
+		}
+		for(auto &i: outgoing_effects_reverb) {
+			i.second->disconnect(0);
+		}
 	}
-	//Otherwise, the panner reflects our state.
-	else panner_node->setState(getState());
+	culled = shouldCull;
 }
 
-void SourceNode::visitDependenciesUnconditional(std::function<void(std::shared_ptr<Job>&)> &pred) {
-	SubgraphNode::visitDependenciesUnconditional(pred);
-	auto j = std::static_pointer_cast<Job>(panner_node);
-	pred(j);
+void SourceNode::visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) {
+	if(getState() != Lav_NODESTATE_PAUSED && culled) input->visitDependenciesUnconditional(pred);
+	//The rest is handled via the environment, which goes through the panner itself.
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_createSourceNode(LavHandle simulationHandle, LavHandle environmentHandle, LavHandle* destination) {
