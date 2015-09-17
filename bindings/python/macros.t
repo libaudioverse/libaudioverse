@@ -1,19 +1,23 @@
+{%macro make_property_instance(enumerant, prop)%}
+{%if prop['type'] == 'int'%}
+{%if 'value_enum' in prop%}
+self._state['property_instances'][_libaudioverse.{{enumerant}}] = IntProperty(handle = self.handle, slot = _libaudioverse.{{enumerant}}, enum = {{prop['value_enum']|without_lav|underscores_to_camelcase(True)}})
+{%else%}
+self._state['property_instances'][_libaudioverse.{{enumerant}}] = IntProperty(handle = self.handle, slot = _libaudioverse.{{enumerant}})
+{%endif%}
+{%elif prop['type'] in ['int_array','float_array']%}
+self._state['property_instances'][_libaudioverse.{{enumerant}}] = {{prop['type']|underscores_to_camelcase(True)}}Property(handle = self.handle, slot=_libaudioverse.{{enumerant}}, lock = self._lock)
+{%else%}
+self._state['property_instances'][_libaudioverse.{{enumerant}}] = {{prop['type']|underscores_to_camelcase(True)}}Property(handle = self.handle, slot = _libaudioverse.{{enumerant}})
+{%endif%}
+{%endmacro%}
+
 {%macro implement_property(enumerant, prop)%}
 
     @property
     def {{prop['name']}}(self):   
         """{{prop.get('doc_description', "")}}"""
-{%if prop['type'] == 'int'%}
-{%if 'value_enum' in prop%}
-        return IntProperty(handle = self.handle, slot = _libaudioverse.{{enumerant}}, enum = {{prop['value_enum']|without_lav|underscores_to_camelcase(True)}})
-{%else%}
-        return IntProperty(handle = self.handle, slot = _libaudioverse.{{enumerant}})
-{%endif%}
-{%elif prop['type'] in ['int_array','float_array']%}
-        return {{prop['type']|underscores_to_camelcase(True)}}Property(self, slot=_libaudioverse.{{enumerant}}, lock = self._lock)
-{%else%}
-        return {{prop['type']|underscores_to_camelcase(True)}}Property(node=self, slot = _libaudioverse.{{enumerant}})
-{%endif%}
+        return self._state['property_instances'][_libaudioverse.{{enumerant}}]
 
 {%if not prop['read_only']%}
     @{{prop['name']}}.setter

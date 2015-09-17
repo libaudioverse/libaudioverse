@@ -580,8 +580,10 @@ class GenericNode(_HandleComparer):
                 self._state['output_connection_count'] = _lav.node_get_output_connection_count(self)
                 self._state['lock'] = threading.Lock()
                 self._state['properties'] = dict()
+                self._state['property_instances'] = dict()
 {%for enumerant, prop in metadata['nodes']['Lav_OBJTYPE_GENERIC_NODE']['properties'].iteritems()%}
                 self._state['properties']["{{prop['name']}}"] = _libaudioverse.{{enumerant}}
+{{macros.make_property_instance(enumerant, prop)|indent(16, True)}}
 {%endfor%}
             else:
                 self._state=_object_states[handle.handle]
@@ -659,6 +661,7 @@ class {{friendly_name}}Node(GenericNode):
             if should_add_properties:
 {%for enumerant, prop in property_dict.iteritems()%}
                 self._state['properties']["{{prop['name']}}"] = _libaudioverse.{{enumerant}}
+{{macros.make_property_instance(enumerant, prop)|indent(16,  True)}}
 {%endfor%}
 {%endif%}
 
