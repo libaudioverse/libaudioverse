@@ -23,16 +23,16 @@ fader.connect_simulation(0)
 crossfade_sem = threading.Semaphore(value = 0)
 
 def done(*args):
-	crossfade_sem.release()
+    crossfade_sem.release()
 
 fader.finished_event = done
 
 for i in xrange(5):
-	fader.crossfade(duration = 0.5, input = 1)
-	crossfade_sem.acquire()
-	fader.crossfade(duration = 0.5, input = 2)
-	crossfade_sem.acquire()
-	fader.crossfade(duration = 0.5, input = 1)
-	crossfade_sem.acquire()
-	fader.crossfade(duration = 0.5, input = 0)
-	crossfade_sem.acquire()
+    fader.crossfade(duration = 0.5, input = 1)
+    crossfade_sem.acquire()
+    fader.crossfade(duration = 0.5, input = 2)
+    crossfade_sem.acquire()
+    fader.crossfade(duration = 0.5, input = 1)
+    crossfade_sem.acquire()
+    fader.crossfade(duration = 0.5, input = 0)
+    crossfade_sem.acquire()

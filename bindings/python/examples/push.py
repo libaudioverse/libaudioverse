@@ -13,10 +13,10 @@ sim.set_output_device(-1)
 p = libaudioverse.PushNode(sim, 48000, 2)
 
 def audio_callback(obj):
-	p.feed(len(stereo), stereo)
+    p.feed(len(stereo), stereo)
 
 def out_callback(obj):
-	p.feed(len(stereo), stereo)
+    p.feed(len(stereo), stereo)
 
 p.threshold.value = 0.1
 p.audio_event = audio_callback

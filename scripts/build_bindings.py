@@ -6,5 +6,5 @@ import bindings.make_bindings
 
 
 if __name__ == '__main__':
-	print "Building bindings..."
-	bindings.make_bindings.make_bindings()
+    print "Building bindings..."
+    bindings.make_bindings.make_bindings()

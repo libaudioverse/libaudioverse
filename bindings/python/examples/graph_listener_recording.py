@@ -26,8 +26,8 @@ w2.frequency.value = 305
 #the queue and callback for recording.
 audio_queue = Queue.Queue()
 def callback(obj, frames, channels, buffer):
-	#Copying is not optional. The memory belongs to libaudioverse.
-	audio_queue.put([buffer[i] for i in xrange(channels*frames)])
+    #Copying is not optional. The memory belongs to libaudioverse.
+    audio_queue.put([buffer[i] for i in xrange(channels*frames)])
 
 listener.set_listening_callback(callback)
 
@@ -42,12 +42,12 @@ f.setnchannels(2)
 f.setframerate(44100)
 f.setsampwidth(2)
 try:
-	while True:
-		frame = audio_queue.get(block = False)
-		frame = [int(i*32767) for i in frame] #python wants integer samples, Libaudioverse gives float.
-		frame_string = struct.pack(str(len(frame))+"h", *frame)
-		f.writeframes(frame_string)
+    while True:
+        frame = audio_queue.get(block = False)
+        frame = [int(i*32767) for i in frame] #python wants integer samples, Libaudioverse gives float.
+        frame_string = struct.pack(str(len(frame))+"h", *frame)
+        f.writeframes(frame_string)
 except Queue.Empty:
-		pass
+        pass
 f.close()
 

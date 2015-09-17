@@ -28,11 +28,11 @@ elev_delta = max_elev-min_elev
 world.orientation.value = (0, 1, 0, 0, 0, 1)
 
 def block_callback(simulation, time):
-	height = min_elev+(time/duration)*elev_delta
-	radians = 2*math.pi*circles*time/duration
-	x = distance*math.sin(radians)
-	y = distance*math.cos(radians)
-	source.position.value = (x, y, height)
+    height = min_elev+(time/duration)*elev_delta
+    radians = 2*math.pi*circles*time/duration
+    x = distance*math.sin(radians)
+    y = distance*math.cos(radians)
+    source.position.value = (x, y, height)
 
 world.connect_simulation(0)
 s.set_block_callback(block_callback)

@@ -29,8 +29,8 @@ panner_bank = PannerBankNode(s, panner_count = order+1, hrtf_path = "default")
 late = LateReflectionsNode(s)
 
 for i in xrange(order):
-	splitter.connect(i, late, i)
-	late.connect(i, panner_bank, i)
+    splitter.connect(i, late, i)
+    late.connect(i, panner_bank, i)
 
 panner_bank.connect_simulation(0)
 panner_bank.distance=30

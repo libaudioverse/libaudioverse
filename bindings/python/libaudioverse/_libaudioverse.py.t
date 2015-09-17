@@ -9,16 +9,16 @@ import sys
 #If it fails, we fall back to the system.
 #this latter point is what makes NVDA add-ons work right: they use the preloading a dll trick on Windows.
 if hasattr(sys, 'frozen'):
-	try:
-		path = os.path.join(os.path.abspath(os.path.dirname(sys.executable)), 'libaudioverse')
-		libsndfile_module = ctypes.cdll.LoadLibrary(os.path.join(path, 'libsndfile-1.dll'))
-		libaudioverse_module = ctypes.cdll.LoadLibrary(os.path.join(path, 'libaudioverse.dll'))
-	except:
-		libsndfile_module = ctypes.cdll.LoadLibrary(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'libsndfile-1.dll'))
-		libaudioverse_module = ctypes.cdll.LoadLibrary(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'libaudioverse.dll'))
+    try:
+        path = os.path.join(os.path.abspath(os.path.dirname(sys.executable)), 'libaudioverse')
+        libsndfile_module = ctypes.cdll.LoadLibrary(os.path.join(path, 'libsndfile-1.dll'))
+        libaudioverse_module = ctypes.cdll.LoadLibrary(os.path.join(path, 'libaudioverse.dll'))
+    except:
+        libsndfile_module = ctypes.cdll.LoadLibrary(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'libsndfile-1.dll'))
+        libaudioverse_module = ctypes.cdll.LoadLibrary(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'libaudioverse.dll'))
 else:
-	libsndfile_module = ctypes.cdll.LoadLibrary(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'libsndfile-1.dll'))
-	libaudioverse_module = ctypes.cdll.LoadLibrary(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'libaudioverse.dll'))
+    libsndfile_module = ctypes.cdll.LoadLibrary(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'libsndfile-1.dll'))
+    libaudioverse_module = ctypes.cdll.LoadLibrary(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'libaudioverse.dll'))
 
 {%for name, val in constants.iteritems() -%}
 {{name}} = {{val}}

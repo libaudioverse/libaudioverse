@@ -16,7 +16,7 @@ filenode.buffer = buffer
 
 #callback for when the file finishes.
 def finished(obj):
-	print "Finished playing."
+    print "Finished playing."
 
 filenode.end_event = finished
 
@@ -33,22 +33,22 @@ quit
 print commands
 
 while True:
-	try:
-		command = raw_input().split(" ")
-		if command[0] == 'quit':
-			break
-		elif command[0] == 'play':
-			filenode.state.value = libaudioverse.NodeStates.playing
-		elif command[0] == 'pause':
-			filenode.state.value = libaudioverse.NodeStates.paused
-		elif command[0] == 'seek':
-			to = float(command[1])
-			filenode.position.value = to
-		elif command[0] == 'pitch_bend':
-			to = float(command[1])
-			filenode.pitch_bend.value = to
-	except Exception as e:
-		print "Libaudioverse error.  Unrecognized command, or invalid syntax."
-		print commands
+    try:
+        command = raw_input().split(" ")
+        if command[0] == 'quit':
+            break
+        elif command[0] == 'play':
+            filenode.state.value = libaudioverse.NodeStates.playing
+        elif command[0] == 'pause':
+            filenode.state.value = libaudioverse.NodeStates.paused
+        elif command[0] == 'seek':
+            to = float(command[1])
+            filenode.position.value = to
+        elif command[0] == 'pitch_bend':
+            to = float(command[1])
+            filenode.pitch_bend.value = to
+    except Exception as e:
+        print "Libaudioverse error.  Unrecognized command, or invalid syntax."
+        print commands
 
 libaudioverse.shutdown()

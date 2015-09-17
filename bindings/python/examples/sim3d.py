@@ -23,13 +23,13 @@ print """Enter python expressions that evaluate to 3-tuples (x, y, z).
 Positive x is to your right, positive y is above you, and positive z is behind you.
 Enter quit to quit."""
 while True:
-	command = raw_input()
-	if command == 'quit':
-		break
-	vect = eval(command)
-	if not isinstance(vect, collections.Sized) or len(vect) != 3:
-		print "Must evaluate to a 3-tuple.  Try again"
-		continue
-	source.position.value = vect
+    command = raw_input()
+    if command == 'quit':
+        break
+    vect = eval(command)
+    if not isinstance(vect, collections.Sized) or len(vect) != 3:
+        print "Must evaluate to a 3-tuple.  Try again"
+        continue
+    source.position.value = vect
 
 libaudioverse.shutdown()
