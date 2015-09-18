@@ -35,6 +35,7 @@ class  Job {
 	friend void tagger(std::shared_ptr<Job> job, int tag, std::vector<std::shared_ptr<Job>> &destination);
 	friend bool jobComparer(const std::shared_ptr<Job> &a, const std::shared_ptr<Job> &b);
 	friend class Planner;
+	friend void jobExecutor(std::shared_ptr<Job> &j); //Used by the planner to run jobs.
 };
 
 }

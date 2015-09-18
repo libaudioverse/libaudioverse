@@ -49,10 +49,14 @@ void Planner::execute(std::shared_ptr<Job> start, int threads) {
 	last_start = start;
 }
 
+void jobExecutor(std::shared_ptr<Job> &j) {
+	j->execute();
+	j->job_recorded = false;
+}
+
 void Planner::runJobsSync() {
 	for(auto i = plan.begin(); i != plan.end(); i++) {
-		(*i)->execute();
-		(*i)->job_recorded = false; //clear for the next time we plan.
+		jobExecutor(*i);
 	}
 }
 
@@ -63,14 +67,10 @@ void Planner::runJobsAsync() {
 	auto end = plan.end();
 	//Run through it, enqueueing jobs and barriers.
 	while(i != end) {
-		while(i != end && (*	i)->job_sort_tag == prev_tag) { //While jobs are guaranteed to not depend on each other.
-			thread_pool.submitJob([i] () {
-				auto &jobPtr = *i;
-				jobPtr->execute();
-				jobPtr->job_recorded = false;
-			});
-			i++;
-		}
+		auto j = i;
+		while(j != end && (*	j)->job_sort_tag == prev_tag) j++; //Find the end of the current range of nondependent jobs.
+		thread_pool.map(jobExecutor, i, j);
+		i = j;
 		//Make sure everything finishes before we start the next ones.
 		thread_pool.submitBarrier();
 		if(i != end) prev_tag = (*i)->job_sort_tag;
