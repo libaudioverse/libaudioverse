@@ -36,7 +36,8 @@ void OutputConnection::add(int inputBufferCount, float** inputBuffers, bool shou
 	//get the array of outputs from our node.
 	float** outputArray=node->getOutputBufferArray();
 	//it is the responsibility of our node to keep us configured, so we assume what info we have is accurate. If it is not, that is the fault of our node.
-	if(shouldApplyMixingMatrix) {
+	///if they're the same, we fall through because we can do better with our sse kernels than audio_io.
+	if(shouldApplyMixingMatrix && inputBufferCount != count ) {
 		//Remix, but don't zero first.
 		audio_io::remixAudioUninterleaved(block_size, count, outputArray+start, inputBufferCount, inputBuffers, false);
 	}
