@@ -123,7 +123,9 @@ class Node: public ExternalObject, public Job {
 	//visitDependencies will only call this function if the state is unpaused.
 	//This exists for cycle detection.
 	virtual void visitDependenciesUnconditional(std::function<void(std::shared_ptr<Job>&)> &pred);
-	
+
+	//True if we're paused.
+	bool canCull() override;
 	protected:
 	std::shared_ptr<Simulation> simulation = nullptr;
 	std::map<int, Property> properties;

@@ -410,6 +410,10 @@ void Node::visitDependenciesUnconditional(std::function<void(std::shared_ptr<Job
 	}	
 }
 
+bool Node::canCull() {
+	return getState() == Lav_NODESTATE_PAUSED;
+}
+
 //LavSubgraphNode
 
 SubgraphNode::SubgraphNode(int type, std::shared_ptr<Simulation> simulation): Node(type, simulation, 0, 0) {
