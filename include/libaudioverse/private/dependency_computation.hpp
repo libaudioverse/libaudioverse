@@ -19,10 +19,10 @@ To create a node that overrides its dependency management, add a template here a
 Be sure to order the final template from most to least specific.*/
 
 template<typename CallableT, typename... ArgsT>
-void simulationVisitDependencies(std::shared_ptr<Simulation> start, CallableT&& callable, ArgsT&&... args) {
+void simulationVisitDependencies(std::shared_ptr<Simulation> &start, CallableT&& callable, ArgsT&&... args) {
 	for(auto &i: start->final_output_connection->getConnectedNodes()) {
-		auto n = std::dynamic_pointer_cast<Job>(i->shared_from_this());
-		if(n) callable(n, args...);
+		//This cannot fail.
+		callable(std::dynamic_pointer_cast<Job>(i->shared_from_this()), args...);
 	}
 	filterWeakPointers(start->always_playing_nodes, [](std::shared_ptr<Node> &n, CallableT &callable, ArgsT&&... args2) {
 		auto j = std::static_pointer_cast<Job>(n);
@@ -35,8 +35,8 @@ void nodeVisitDependencies(std::shared_ptr<Node> start, CallableT&& callable, Ar
 	for(int i = 0; i < start->getInputConnectionCount(); i++) {
 		auto conn = start->getInputConnection(i)->getConnectedNodes();
 		for(auto &p: conn) {
-			auto j = std::dynamic_pointer_cast<Job>(p->shared_from_this());
-			callable(j, args...);
+			//This one can't fail either.
+			callable(std::dynamic_pointer_cast<Job>(p->shared_from_this()), args...);
 		}
 	}
 	for(auto &p: start->properties) {
@@ -44,8 +44,7 @@ void nodeVisitDependencies(std::shared_ptr<Node> start, CallableT&& callable, Ar
 		auto conn = prop.getInputConnection();
 		if(conn) {
 			for(auto n: conn->getConnectedNodes()) {
-				auto j = std::dynamic_pointer_cast<Job>(n->shared_from_this());
-				callable(j, args...);
+				callable(std::dynamic_pointer_cast<Job>(n->shared_from_this()), args...);
 			}
 		}
 	}	
@@ -77,8 +76,8 @@ void sourceVisitDependencies(std::shared_ptr<SourceNode> start, CallableT&& call
 
 #define TRY(type, name)  auto casted##type = std::dynamic_pointer_cast<type>(start); if(casted##type) {name(casted##type, callable, args...);return;}
 
-template<typename CallableT, typename... ArgsT>
-void visitDependencies(std::shared_ptr<Job> start, CallableT&& callable, ArgsT&&... args) {
+template<typename JobT, typename CallableT, typename... ArgsT>
+void visitDependencies(JobT &&start, CallableT&& callable, ArgsT&&... args) {
 	TRY(Simulation, simulationVisitDependencies)
 	TRY(EnvironmentNode, environmentVisitDependencies)
 	TRY(SourceNode, sourceVisitDependencies)
