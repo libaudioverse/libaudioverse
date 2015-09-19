@@ -16,7 +16,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 #define BLOCK_SIZE 1024
 #define SR 44100
-#define ITERATIONS 50
+#define ITERATIONS 200
 float storage[BLOCK_SIZE*2] = {0};
 //This is a big block of data so we can profile buffers.
 #define BUFFER_SIZE 32768

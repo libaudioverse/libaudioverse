@@ -15,7 +15,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 #define BLOCK_SIZE 1024
 #define NUM_SOURCES 250
-#define NUM_TIMES 50
+#define NUM_TIMES 200
 float storage[BLOCK_SIZE*2] = {0};
 
 #define ERRCHECK(x) do {\
