@@ -3,6 +3,7 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
+#include <libaudioverse/nodes/biquad.hpp>
 #include <libaudioverse/private/simulation.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/properties.hpp>
@@ -14,17 +15,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 
 namespace libaudioverse_implementation {
-
-class BiquadNode: public Node {
-	public:
-	BiquadNode(std::shared_ptr<Simulation> sim, unsigned int channels);
-	void process();
-	void reconfigure();
-	void reset() override;
-	private:
-	MultichannelFilterBank<BiquadFilter> bank;
-	int prev_type;
-};
 
 BiquadNode::BiquadNode(std::shared_ptr<Simulation> sim, unsigned int channels): Node(Lav_OBJTYPE_BIQUAD_NODE, sim, channels, channels),
 bank(simulation->getSr()) {

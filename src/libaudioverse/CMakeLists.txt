@@ -50,7 +50,6 @@ file_io/file_writer.cpp
 
 #classes and functionality for DSp that are stateful, and miscellaneous DSP-related math functions.
 dsp/ringmod.cpp
-dsp/iir.cpp
 dsp/db.cpp
 dsp/euclid.cpp
 dsp/hadamard_matrix.cpp
@@ -70,6 +69,7 @@ kernels/multiplying.cpp
 kernels/dot.cpp
 
 #Like kernels, but stateful.
+implementations/iir.cpp
 implementations/panner.cpp
 implementations/delayringbuffer.cpp
 implementations/crossfadingdelayline.cpp

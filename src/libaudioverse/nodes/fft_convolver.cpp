@@ -1,11 +1,11 @@
 /**Copyright (C) Austin Hicks, 2014
 This file is part of Libaudioverse, a library for 3D and environmental audio simulation, and is released under the terms of the Gnu General Public License Version 3 or (at your option) any later version.
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
-
 #include <math.h>
 #include <stdlib.h>
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
+#include <libaudioverse/nodes/fft_convolver.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/simulation.hpp>
 #include <libaudioverse/private/properties.hpp>
@@ -18,17 +18,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <string>
 
 namespace libaudioverse_implementation {
-
-class FftConvolverNode: public Node {
-	public:
-	FftConvolverNode(std::shared_ptr<Simulation> simulation, int channels);
-	~FftConvolverNode();
-	virtual void process();
-	void setResponse(int channel, int length, float* response);
-	void setResponseFromFile(std::string path, int fileChannel, int convolverChannel);
-	int channels;
-	FftConvolver **convolvers;
-};
 
 FftConvolverNode::FftConvolverNode(std::shared_ptr<Simulation> simulation, int channels): Node(Lav_OBJTYPE_FFT_CONVOLVER_NODE, simulation, channels, channels) {
 	if(channels < 1) ERROR(Lav_ERROR_RANGE, "Channels must be greater than 0.");

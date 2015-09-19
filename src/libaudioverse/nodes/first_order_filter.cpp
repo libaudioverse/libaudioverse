@@ -3,6 +3,7 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
+#include <libaudioverse/nodes/first_order_filter.hpp>
 #include <libaudioverse/implementations/first_order_filter.hpp>
 #include <libaudioverse/private/simulation.hpp>
 #include <libaudioverse/private/node.hpp>
@@ -13,17 +14,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <memory>
 
 namespace libaudioverse_implementation {
-
-class FirstOrderFilterNode: public Node {
-	public:
-	FirstOrderFilterNode(std::shared_ptr<Simulation> sim, int channels);
-	void process() override;
-	void configureLowpass(float freq);
-	void configureHighpass(float freq);
-	void configureAllpass(float freq);
-	void recomputePoleAndZero();
-	MultichannelFilterBank<FirstOrderFilter> bank;
-};
 
 FirstOrderFilterNode::FirstOrderFilterNode(std::shared_ptr<Simulation> sim, int channels): Node(Lav_OBJTYPE_FIRST_ORDER_FILTER_NODE, sim, channels, channels),
 bank(simulation->getSr()) {

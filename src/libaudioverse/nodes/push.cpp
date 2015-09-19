@@ -3,6 +3,7 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
+#include <libaudioverse/nodes/push.hpp>
 #include <libaudioverse/private/simulation.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/properties.hpp>
@@ -12,23 +13,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <memory>
 
 namespace libaudioverse_implementation {
-
-class PushNode: public Node {
-	public:
-	PushNode(std::shared_ptr<Simulation> sim, unsigned int inputSr, unsigned int channels);
-	~PushNode();
-	void process();
-	void feed(unsigned int length, float* buffer);
-	unsigned int input_sr = 0;
-	std::shared_ptr<speex_resampler_cpp::Resampler> resampler = nullptr;
-	float* workspace = nullptr;
-	//the push_* variables are for the public api to feed us.
-	float* push_buffer = nullptr;
-	unsigned int push_channels = 0;
-	unsigned int push_frames = 1024;
-	unsigned int push_offset = 0;
-	bool fired_out_callback = false;
-};
 
 PushNode::PushNode(std::shared_ptr<Simulation> sim, unsigned int inputSr, unsigned int channels): Node(Lav_OBJTYPE_PUSH_NODE, sim, 0, channels) {
 	if(channels == 0) ERROR(Lav_ERROR_RANGE, "Channels must be greater than 0.");

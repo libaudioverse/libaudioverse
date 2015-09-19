@@ -5,6 +5,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <stdlib.h>
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
+#include <libaudioverse/nodes/buffer_timeline.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/simulation.hpp>
 #include <libaudioverse/private/properties.hpp>
@@ -18,18 +19,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <vector>
 
 namespace libaudioverse_implementation {
-
-class ScheduledBuffer {
-	public:
-	ScheduledBuffer(std::shared_ptr<Buffer> buffer, double time, float delta, int outputChannels);
-	bool add(float* destination, int maxFrames, int channel); //returns true when there is no more to write.
-	std::shared_ptr<Buffer> buffer;
-	int length = 0, output_channels = 0, buffer_channels = 0;
-	std::vector<int> position;
-	float offset = 0.0f;
-	double time;
-	float delta = 1.0;
-};
 
 ScheduledBuffer::ScheduledBuffer(std::shared_ptr<Buffer> buffer, double time, float delta, int outputChannels) {
 	this->buffer=buffer;
@@ -68,19 +57,6 @@ bool ScheduledBuffer::add(float* destination, int maxFrames, int channel) {
 bool operator<(const ScheduledBuffer &a, const ScheduledBuffer &b) {
 	return a.time < b.time;
 }
-
-class BufferTimelineNode: public Node {
-	public:
-	BufferTimelineNode(std::shared_ptr<Simulation> simulation, int channels);
-	void process() override;
-	void scheduleBuffer(double time, float delta, std::shared_ptr<Buffer> buffer);
-	void reset() override;
-	private:
-	std::vector<ScheduledBuffer> scheduled_buffers;
-	std::vector<ScheduledBuffer> active_buffers;
-	double time = 0.0;
-	int output_channels = 0;
-};
 
 BufferTimelineNode::BufferTimelineNode(std::shared_ptr<Simulation> simulation, int channels): Node(Lav_OBJTYPE_BUFFER_TIMELINE_NODE, simulation, 0, channels) {
 	if(channels <= 0) ERROR(Lav_ERROR_RANGE, "Channels must be greater than 0.");

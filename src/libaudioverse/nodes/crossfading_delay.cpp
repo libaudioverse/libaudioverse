@@ -3,6 +3,7 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
+#include <libaudioverse/nodes/crossfading_delay.hpp>
 #include <libaudioverse/private/simulation.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/properties.hpp>
@@ -12,27 +13,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <memory>
 
 namespace libaudioverse_implementation {
-
-class CrossfadingDelayNode: public Node {
-	public:
-	CrossfadingDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, int channels);
-	~CrossfadingDelayNode();
-	void process();
-	protected:
-	void delayChanged();
-	void recomputeDelta();
-	//These do not touch the line. They keep properties in sync.
-	//updateDelayInSamples is called when delay changes; updateDelay when delay_samples changes.
-	void updateDelaySamples();
-	void updateDelay();
-	//Flag to prevent "ping-pong" in the above callbacks.
-	bool is_syncing_properties = false;
-	//Either 0, Lav_DELAY_DELAY, or Lav_DELAY_DELAY_SAMPLES.
-	int last_updated_delay_property = 0;
-	unsigned int delay_line_length = 0;
-	CrossfadingDelayLine **lines;
-	int channels;
-};
 
 CrossfadingDelayNode::CrossfadingDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, int channels): Node(Lav_OBJTYPE_CROSSFADING_DELAY_NODE, simulation, channels, channels) {
 	if(channels <= 0) ERROR(Lav_ERROR_RANGE, "lineCount must be greater than 0.");

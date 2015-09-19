@@ -3,12 +3,13 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
+#include <libaudioverse/nodes/multipanner.hpp>
 #include <libaudioverse/private/simulation.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/memory.hpp>
-#include <libaudioverse/nodes/panner.hpp>
+#include <libaudioverse/nodes/amplitude_panner.hpp>
 #include <libaudioverse/private/constants.hpp>
 #include <libaudioverse/private/creators.hpp>
 #include <libaudioverse/private/hrtf.hpp>
@@ -16,15 +17,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 
 namespace libaudioverse_implementation {
-
-class MultipannerNode: public SubgraphNode {
-	public:
-	MultipannerNode(std::shared_ptr<Simulation> sim, std::shared_ptr<HrtfData> hrtf);
-	std::shared_ptr<Node> hrtf_panner = nullptr, amplitude_panner = nullptr, input= nullptr, current_panner = nullptr;
-	void configureForwardedProperties();
-	void strategyChanged();
-	void willTick() override;
-};
 
 MultipannerNode::MultipannerNode(std::shared_ptr<Simulation> sim, std::shared_ptr<HrtfData> hrtf): SubgraphNode(Lav_OBJTYPE_MULTIPANNER_NODE, sim)  {
 	hrtf_panner = createHrtfNode(sim, hrtf);

@@ -10,7 +10,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/simulation.hpp>
 #include <libaudioverse/private/creators.hpp>
 #include <libaudioverse/private/memory.hpp>
-#include <libaudioverse/nodes/panner.hpp>
+#include <libaudioverse/nodes/amplitude_panner.hpp>
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/libaudioverse3d.h>

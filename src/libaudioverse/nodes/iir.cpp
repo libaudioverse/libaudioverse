@@ -4,24 +4,15 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
+#include <libaudioverse/nodes/iir.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/simulation.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/memory.hpp>
-#include <libaudioverse/private/iir.hpp>
+#include <libaudioverse/implementations/iir.hpp>
 
 namespace libaudioverse_implementation {
-
-class IirNode: public Node {
-	public:
-	IirNode(std::shared_ptr<Simulation> simulation, int channels);
-	~IirNode();
-	virtual void process();
-	void setCoefficients(int numeratorLength, double* numerator, int denominatorLength, double* denominator, int shouldClearHistory);
-	IIRFilter** filters;
-	int channels;
-};
 
 IirNode::IirNode(std::shared_ptr<Simulation> simulation, int channels): Node(Lav_OBJTYPE_IIR_NODE, simulation, channels, channels) {
 	if(channels <= 0) ERROR(Lav_ERROR_RANGE, "Channels must be greater than 0.");

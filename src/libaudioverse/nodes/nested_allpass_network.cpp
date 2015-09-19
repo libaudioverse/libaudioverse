@@ -3,6 +3,7 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
+#include <libaudioverse/nodes/nested_allpass_network.hpp>
 #include <libaudioverse/private/simulation.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/properties.hpp>
@@ -13,21 +14,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <algorithm>
 
 namespace libaudioverse_implementation {
-
-class NestedAllpassNetworkNode: public Node {
-	public:
-	NestedAllpassNetworkNode(std::shared_ptr<Simulation> sim, int channels);
-	void process() override;
-	void reset() override;
-	void beginNesting(int delay, float coefficient);
-	void endNesting();
-	void appendAllpass(int delay, float coefficient);
-	void appendOnePole(float frequency, bool isHighpass = false);
-	void appendBiquad(int type, double frequency, double dbGain, double q);
-	void appendReader(float mul);
-	void compile();
-	MultichannelFilterBank<NestedAllpassNetwork> bank;
-};
 
 NestedAllpassNetworkNode::NestedAllpassNetworkNode(std::shared_ptr<Simulation> sim, int channels): Node(Lav_OBJTYPE_NESTED_ALLPASS_NETWORK_NODE, sim, channels, channels),
 bank(simulation->getSr()) {

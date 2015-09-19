@@ -32,4 +32,5 @@ class FeedbackDelayNetworkNode: public Node {
 	OnePoleFilter** filters = nullptr;
 };
 
+std::shared_ptr<Node> createFeedbackDelayNetworkNode(std::shared_ptr<Simulation> simulation, float maxDelay, int channels);
 }

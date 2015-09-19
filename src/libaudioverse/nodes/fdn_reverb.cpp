@@ -3,6 +3,7 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
+#include <libaudioverse/nodes/fdn_reverb.hpp>
 #include <libaudioverse/private/simulation.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/properties.hpp>
@@ -40,26 +41,6 @@ const float min_delay_multiplier = 0.3, delay_multiplier_variation = 1.4;
 //Must be less than the smallest possible delay line, or 0.3*delays[0].
 //This value was determined through experimentation, such that the modulationn depth property maps to something reasonable at 1 with the default modulation frequency.
 float modulation_duration = 0.01f;
-
-
-class FdnReverbNode: public Node {
-	public:
-	FdnReverbNode(std::shared_ptr<Simulation> sim);
-	~FdnReverbNode();
-	void process();
-	void modulateLines();
-	void reconfigureModel();
-	float feedback_gains[8];
-	OnePoleFilter** lowpass_filters = nullptr;
-	InterpolatedDelayLine** delay_lines = nullptr;
-	InterpolatedRandomGenerator **delay_line_modulators;
-	//We keep a record of these for debugging and other purposes.
-	//These are the delays based off the current density.
-	float current_delays[8];
-	//Modulation state.
-	bool needs_modulation = false;
-	float modulation_depth = 0.0f; //equal to the property times the modulation duration from above.
-};
 
 FdnReverbNode::FdnReverbNode(std::shared_ptr<Simulation> sim): Node(Lav_OBJTYPE_FDN_REVERB_NODE, sim, 4, 4) {
 	std::fill(feedback_gains, feedback_gains+8, 0.0f);

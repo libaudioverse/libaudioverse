@@ -23,4 +23,6 @@ class CrossfaderNode: public Node {
 	bool crossfading = false;
 };
 
+std::shared_ptr<Node> createCrossfaderNode(std::shared_ptr<Simulation> simulation, int channels, int inputs);
+
 }

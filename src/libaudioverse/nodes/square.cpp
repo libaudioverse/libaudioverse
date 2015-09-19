@@ -1,9 +1,9 @@
 /**Copyright (C) Austin Hicks, 2014
 This file is part of Libaudioverse, a library for 3D and environmental audio simulation, and is released under the terms of the Gnu General Public License Version 3 or (at your option) any later version.
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
-
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
+#include <libaudioverse/nodes/square.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/simulation.hpp>
 #include <libaudioverse/private/properties.hpp>
@@ -13,15 +13,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 
 namespace libaudioverse_implementation {
-
-/**Note.  We can't use floats. There's some instability with the accumulator model that was here before that shows up as audible artifacts.*/
-class SquareNode: public Node {
-	public:
-	SquareNode(std::shared_ptr<Simulation> simulation);
-	void recompute();
-	virtual void process();
-	float phase = 0.0f, phase_increment=0.0f, on_for = 0.0f, prev_integral=0.0f;
-};
 
 SquareNode::SquareNode(std::shared_ptr<Simulation> simulation): Node(Lav_OBJTYPE_SQUARE_NODE, simulation, 0, 1) {
 	appendOutputConnection(0, 1);

@@ -4,6 +4,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
+#include <libaudioverse/nodes/recorder.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/simulation.hpp>
 #include <libaudioverse/private/properties.hpp>
@@ -20,26 +21,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <atomic>
 
 namespace libaudioverse_implementation {
-
-class RecorderNode: public Node {
-	public:
-	RecorderNode(std::shared_ptr<Simulation> simulation, int channels);
-	~RecorderNode();
-	void recordingThreadFunction();
-	virtual void process() override;
-	virtual void doMaintenance() override;
-	void startRecording(std::string path);
-	void stopRecording();
-	std::thread recording_thread;
-	powercores::ThreadsafeQueue<float*> available_buffers;
-	powercores::ThreadsafeQueue<float*> unwritten_buffers;
-	int buffer_size = 0;
-	int buffer_freeing_threshold =20; //If we ever get this far ahead, we free some buffers.
-	std::atomic_flag should_keep_recording;
-	FileWriter recording_to;
-	int channels = 0;
-	bool recording = false;
-};
 
 RecorderNode::RecorderNode(std::shared_ptr<Simulation> simulation, int channels): Node(Lav_OBJTYPE_RECORDER_NODE, simulation, channels, channels) {
 	appendInputConnection(0, channels);

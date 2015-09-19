@@ -3,6 +3,7 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
+#include <libaudioverse/nodes/dopplering_delay.hpp>
 #include <libaudioverse/private/simulation.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/properties.hpp>
@@ -12,27 +13,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <memory>
 
 namespace libaudioverse_implementation {
-
-class DoppleringDelayNode: public Node {
-	public:
-	DoppleringDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, int channels);
-	~DoppleringDelayNode();
-	void process();
-	protected:
-	void delayChanged();
-	void recomputeDelta();
-	//Callbacks for when delay_samples and delay get changed.
-	void updateDelay();
-	void updateDelaySamples();
-	//This flag prevents the above two callbacks from ping-ponging.
-	bool is_syncing_properties = false;
-	//Set to either Lav_DELAY_DELAY or Lav_DELAY_DELAY_SAMPLES if the property changed. Otherwise 0.
-	int last_updated_delay_property = 0;
-	//Standard stuff for delay lines.
-	unsigned int delay_line_length = 0;
-	DoppleringDelayLine **lines;
-	int channels;
-};
 
 DoppleringDelayNode::DoppleringDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, int channels): Node(Lav_OBJTYPE_DOPPLERING_DELAY_NODE, simulation, channels, channels) {
 	if(channels <= 0) ERROR(Lav_ERROR_RANGE, "lineCOunt must be greater than 0.");

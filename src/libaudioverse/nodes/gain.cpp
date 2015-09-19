@@ -3,6 +3,7 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
+#include <libaudioverse/nodes/gain.hpp>
 #include <libaudioverse/private/simulation.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/properties.hpp>
@@ -12,12 +13,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <algorithm>
 
 namespace libaudioverse_implementation {
-
-class GainNode: public Node {
-	public:
-	GainNode(std::shared_ptr<Simulation> sim);
-	void process();
-};
 
 GainNode::GainNode(std::shared_ptr<Simulation> sim): Node(Lav_OBJTYPE_GAIN_NODE, sim, 0, 0) {
 }
