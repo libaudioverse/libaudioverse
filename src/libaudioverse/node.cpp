@@ -44,6 +44,7 @@ bool doesEdgePreserveAcyclicity(std::shared_ptr<Job> start, std::shared_ptr<Job>
 	};
 	//And then we pass it to itself.
 	visitDependencies(start, helper, helper);
+	return cycled == false;
 }
 
 //For property backrefs.

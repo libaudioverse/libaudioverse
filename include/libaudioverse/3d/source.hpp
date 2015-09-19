@@ -36,8 +36,8 @@ class SourceNode: public SubgraphNode {
 	//We are either sending to a regular or a reverb effect.
 	std::map<int, std::shared_ptr<Node>> outgoing_effects, outgoing_effects_reverb;
 	
-	template<typename CallableT, typename... ArgsT>
-	friend void sourceVisitDependencies(std::shared_ptr<SourceNode> start, CallableT &&callable, ArgsT&&... args);
+	template<typename JobT, typename CallableT, typename... ArgsT>
+	friend void sourceVisitDependencies(JobT&& start, CallableT &&callable, ArgsT&&... args);
 };
 
 std::shared_ptr<Node> createSourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentNode> environment);

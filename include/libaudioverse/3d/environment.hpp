@@ -57,8 +57,8 @@ class EnvironmentNode: public SubgraphNode {
 	EnvironmentInfo environment_info;
 	std::vector<EffectSendConfiguration> effect_sends;
 	
-	template<typename CallableT, typename... ArgsT>
-	friend void environmentVisitDependencies(std::shared_ptr<EnvironmentNode> start, CallableT &&callable, ArgsT&&... args);
+	template<typename JobT, typename CallableT, typename... ArgsT>
+	friend void environmentVisitDependencies(JobT&& start, CallableT &&callable, ArgsT&&... args);
 };
 
 std::shared_ptr<EnvironmentNode> createEnvironmentNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf);

@@ -18,8 +18,8 @@ Instead, everything was moved here.
 To create a node that overrides its dependency management, add a template here and then insert a case in the final template in this file.
 Be sure to order the final template from most to least specific.*/
 
-template<typename CallableT, typename... ArgsT>
-void simulationVisitDependencies(std::shared_ptr<Simulation> &start, CallableT&& callable, ArgsT&&... args) {
+template<typename  JobT, typename CallableT, typename... ArgsT>
+void simulationVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&... args) {
 	for(auto &i: start->final_output_connection->getConnectedNodes()) {
 		//This cannot fail.
 		callable(std::dynamic_pointer_cast<Job>(i->shared_from_this()), args...);
@@ -30,8 +30,8 @@ void simulationVisitDependencies(std::shared_ptr<Simulation> &start, CallableT&&
 	}, callable, args...);
 }
 
-template<typename CallableT, typename... ArgsT>
-void nodeVisitDependencies(std::shared_ptr<Node> start, CallableT&& callable, ArgsT&&... args) {
+template<typename JobT, typename CallableT, typename... ArgsT>
+void nodeVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&... args) {
 	for(int i = 0; i < start->getInputConnectionCount(); i++) {
 		auto conn = start->getInputConnection(i)->getConnectedNodes();
 		for(auto &p: conn) {
@@ -50,14 +50,14 @@ void nodeVisitDependencies(std::shared_ptr<Node> start, CallableT&& callable, Ar
 	}	
 }
 
-template<typename CallableT, typename... ArgsT>
-void subgraphNodeVisitDependencies(std::shared_ptr<SubgraphNode> start, CallableT&& callable, ArgsT&&... args) {
+template<typename JobT, typename CallableT, typename... ArgsT>
+void subgraphNodeVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&... args) {
 	auto j = std::static_pointer_cast<Job>(start->subgraph_output);
 	if(j) callable(j, args...);
 }
 
-template<typename CallableT, typename... ArgsT>
-void environmentVisitDependencies(std::shared_ptr<EnvironmentNode> start, CallableT&& callable, ArgsT&&... args) {
+template<typename JobT, typename CallableT, typename... ArgsT>
+void environmentVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&... args) {
 	subgraphNodeVisitDependencies(std::static_pointer_cast<SubgraphNode>(start), callable, args...);
 	//Other dependencies: all our sources.
 	for(auto w: start->sources) {
@@ -69,8 +69,8 @@ void environmentVisitDependencies(std::shared_ptr<EnvironmentNode> start, Callab
 	}
 }
 
-template<typename CallableT, typename... ArgsT>
-void sourceVisitDependencies(std::shared_ptr<SourceNode> start, CallableT&& callable, ArgsT&&... args) {
+template<typename JobT, typename CallableT, typename... ArgsT>
+void sourceVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&... args) {
 	if(start->getState() != Lav_NODESTATE_PAUSED && start->culled) visitDependencies(start->input, callable, args...);
 }
 

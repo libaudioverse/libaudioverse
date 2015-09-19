@@ -61,7 +61,6 @@ Simulation::~Simulation() {
 
 //Yes, this uses goto. Yes, goto is evil. We need a single point of exit.
 void Simulation::getBlock(float* out, unsigned int channels, bool mayApplyMixingMatrix) {
-//	invalidatePlan();
 	if(out == nullptr || channels == 0) goto end; //nothing to do.
 	if(block_callback) block_callback(outgoingObject(this->shared_from_this()), block_callback_time, block_callback_userdata);
 	//configure our connection to the number of channels requested.

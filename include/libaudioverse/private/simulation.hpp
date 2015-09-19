@@ -112,8 +112,8 @@ class Simulation: public ExternalObject, public Job {
 	Planner* planner = nullptr;
 	int threads = 1;
 	
-	template<typename CallableT, typename... ArgsT>
-	friend void simulationVisitDependencies(std::shared_ptr<Simulation> &start, CallableT&& callable, ArgsT&&... args);
+	template<typename JobT, typename CallableT, typename... ArgsT>
+	friend void simulationVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&... args);
 };
 
 }
