@@ -18,6 +18,9 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #define SR 44100
 #define ITERATIONS 50
 float storage[BLOCK_SIZE*2] = {0};
+//This is a big block of data so we can profile buffers.
+#define BUFFER_SIZE 32768
+float buffer[BUFFER_SIZE] = {0.0f};
 
 #define ERRCHECK(x) do {\
 if((x) != Lav_ERROR_NONE) {\
@@ -48,8 +51,18 @@ LavError createCrossfader(LavHandle& sim, LavHandle& h) {
 	return Lav_ERROR_NONE;
 }
 
+LavError createBuffer(LavHandle sim, LavHandle& h) {
+	ERRCHECK(Lav_createBufferNode(sim, &h));
+	LavHandle b;
+	ERRCHECK(Lav_createBuffer(sim, &b));
+	ERRCHECK(Lav_bufferLoadFromArray(b, 44100, 4, BUFFER_SIZE/4, buffer));
+	ERRCHECK(Lav_nodeSetBufferProperty(h, Lav_BUFFER_BUFFER, b));
+	return Lav_ERROR_NONE;
+}
+
 std::tuple<std::string, int, std::function<std::vector<LavHandle>(LavHandle, int)>> to_profile[] = {
 ENTRY("sine", 1000, Lav_createSineNode(sim, &h)),
+ENTRY("4-channel buffer", 100, createBuffer(sim, h)),
 ENTRY("crossfading delay line", 1000, Lav_createCrossfadingDelayNode(sim, 0.1, 1, &h)),
 ENTRY("biquad", 1000, Lav_createBiquadNode(sim, 1, &h)),
 ENTRY("One-pole filter", 1000, Lav_createOnePoleFilterNode(sim, 1, &h)),
