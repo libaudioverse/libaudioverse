@@ -109,7 +109,6 @@ void Node::tick() {
 	//If we're paused, then our output connections short-circuit and add zero.
 	zeroOutputBuffers();
 	tickProperties();
-	//willProcessParents is handled by the planner.
 	zeroInputBuffers();
 	//Collect parent outputs onto ours.
 	//by using the getInputConnection and getInputConnectionCount functions, we allow subgraphs to override effectively.
@@ -181,9 +180,6 @@ void Node::zeroInputBuffers() {
 	for(int i = 0; i < inputBufferCount; i++) {
 		memset(inputBuffers[i], 0, sizeof(float)*simulation->getBlockSize());
 	}
-}
-
-void Node::willProcessParents() {
 }
 
 void Node::willTick() {
@@ -388,10 +384,6 @@ void Node::resize(int newInputCount, int newOutputCount) {
 
 void Node::visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) {
 	if(getState() != Lav_NODESTATE_PAUSED) visitDependenciesUnconditional(pred);
-}
-
-void Node::willExecuteDependencies() {
-	willProcessParents();
 }
 
 void Node::execute() {

@@ -26,6 +26,12 @@ float standard_map_71[] = {-22.5f, 22.5f, -150.0f, 150.0f, -110.0f, 110.0f};
 AmplitudePannerNode::AmplitudePannerNode(std::shared_ptr<Simulation> simulation): Node(Lav_OBJTYPE_AMPLITUDE_PANNER_NODE, simulation, 1, 0) {
 	appendInputConnection(0, 1);
 	appendOutputConnection(0, 0);
+	auto cb = [&](){recomputeChannelMap();};
+	getProperty(Lav_PANNER_CHANNEL_MAP).setPostChangedCallback(cb);
+	getProperty(Lav_PANNER_SKIP_CENTER).setPostChangedCallback(cb);
+	getProperty(Lav_PANNER_SKIP_LFE).setPostChangedCallback(cb);
+	getProperty(Lav_PANNER_HAS_LFE).setPostChangedCallback(cb);
+	getProperty(Lav_PANNER_HAS_CENTER).setPostChangedCallback(cb);
 }
 
 std::shared_ptr<Node>createAmplitudePannerNode(std::shared_ptr<Simulation> simulation) {
@@ -37,43 +43,35 @@ std::shared_ptr<Node>createAmplitudePannerNode(std::shared_ptr<Simulation> simul
 
 void AmplitudePannerNode::recomputeChannelMap() {
 	panner.reset();
-	bool skipLfe = getProperty(Lav_PANNER_SKIP_LFE).getIntValue() == 1;
-	bool skipCenter = getProperty(Lav_PANNER_SKIP_CENTER).getIntValue() == 1;
+	skip_lfe = getProperty(Lav_PANNER_SKIP_LFE).getIntValue() == 1;
+	skip_center = getProperty(Lav_PANNER_SKIP_CENTER).getIntValue() == 1;
+	has_lfe = getProperty(Lav_PANNER_HAS_LFE).getIntValue() == 1;
+	has_center = getProperty(Lav_PANNER_HAS_CENTER).getIntValue() == 1;
 	Property& channelMap = getProperty(Lav_PANNER_CHANNEL_MAP);
 	unsigned int max = channelMap.getFloatArrayLength();
-	if(skipLfe && has_lfe) max++;
-	if(skipCenter && has_center) max++;
+	if(skip_lfe && has_lfe) max++;
+	if(skip_center && has_center) max++;
 	resize(1, max);
 	getOutputConnection(0)->reconfigure(0, max);
 	unsigned int index = 0;
 	for(unsigned int i = 0; i < max; i++) {
-		if(i == 2 && skipCenter) continue;
-		if(i == 3 && skipLfe) continue;
+		if(i == 2 && skip_center) continue;
+		if(i == 3 && skip_lfe) continue;
 		float angle = channelMap.readFloatArray(index);
 		panner.addEntry(angle, i);
 		index++;
 	}
 }
 
-void AmplitudePannerNode::willProcessParents() {
-	if(werePropertiesModified(this, Lav_PANNER_CHANNEL_MAP, Lav_PANNER_SKIP_CENTER, Lav_PANNER_SKIP_LFE)) recomputeChannelMap();
-}
-
 void AmplitudePannerNode::process() {
-	if(werePropertiesModified(this, Lav_PANNER_HAS_CENTER, Lav_PANNER_HAS_LFE)) {
-		has_center = getProperty(Lav_PANNER_HAS_CENTER).getIntValue() == 1;
-		has_lfe = getProperty(Lav_PANNER_HAS_LFE).getIntValue() == 1;
-	}
 	float azimuth = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
 	float passthrough =getProperty(Lav_PANNER_PASSTHROUGH).getFloatValue();
-	bool skipCenter=getProperty(Lav_PANNER_SKIP_CENTER).getIntValue() == 1 && has_center;
-	bool skipLfe=getProperty(Lav_PANNER_SKIP_LFE).getIntValue() == 1 && has_lfe;
 	panner.pan(azimuth, block_size, input_buffers[0], num_output_buffers, &output_buffers[0]);
 	if(passthrough != 0.0f) {
 		scalarMultiplicationKernel(block_size, passthrough, input_buffers[0], input_buffers[0]);
 		for(int i = 0; i < num_output_buffers; i++) {
-			if(i ==2 && skipCenter) continue;
-			if(i==3 && skipLfe) continue;
+			if(i ==2 && skip_center) continue;
+			if(i==3 && skip_lfe) continue;
 			scalarMultiplicationKernel(block_size, 1.0f-passthrough, output_buffers[i], output_buffers[i]);
 			additionKernel(block_size, input_buffers[0], output_buffers[i], output_buffers[i]);
 		}

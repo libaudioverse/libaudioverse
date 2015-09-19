@@ -85,13 +85,7 @@ class Node: public ExternalObject, public Job {
 	//Does some cleanup and the like.
 	//This is also an override point for subclasses that may need to do cleanup periodically in order to remain performant; in that case, they *must* call the base. Or else.
 	virtual void doMaintenance();
-	//this is called at some point in the processing logic which is guaranteed to be before this node's parents are processed and after the device is locked.
-	//additionally, a parent will have its willProcessParents called after this node.
-	//that is, nothing else will touch this node but the mixer thread, and the next thing to be called (at some point in future) is willProcess.
-	//the default does nothing.
-	//Do not change connections.
-	virtual void willProcessParents();
-	//Called after the simulation is locked but before ticking, in some arbetrary order.
+	//Called after the simulation is locked but before ticking, in some arbetrary order. We must be registered for this.
 	//It is safe to change connections here.
 	virtual void willTick();
 	
@@ -123,7 +117,6 @@ class Node: public ExternalObject, public Job {
 
 	//Conform to Job.
 	virtual void visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) override;
-	virtual void willExecuteDependencies();
 	virtual void execute();
 
 	//This is the actual implementation of visitDependencies.

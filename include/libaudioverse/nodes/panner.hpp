@@ -10,11 +10,10 @@ namespace libaudioverse_implementation {
 class AmplitudePannerNode: public Node {
 	public:
 	AmplitudePannerNode(std::shared_ptr<Simulation> simulation);
-	void willProcessParents() override;
 	virtual void process() override;
 	void recomputeChannelMap();
 	void configureStandardChannelMap(unsigned int channels);
-	bool map_changed = true, has_center = false, has_lfe = false;
+	bool map_changed = true, has_center = false, has_lfe = false, skip_center = false, skip_lfe = false;
 	PannerImplementation panner;
 };
 

@@ -27,9 +27,6 @@ void Planner::execute(std::shared_ptr<Job> start, int threads) {
 			execute(start, threads);
 		}
 	}
-	for(auto i = plan.rbegin(); i != plan.rend(); i++) {
-		(*i)->willExecuteDependencies();
-	}
 	if(threads == 1) {
 		runJobsSync();
 	}

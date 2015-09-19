@@ -26,8 +26,6 @@ class  Job {
 	//Call pred on all dependent jobs.
 	//It's okay to visit a dependency twice, the planners protect against this.
 	virtual void visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) = 0;
-	//Override points for executing.
-	virtual void willExecuteDependencies() {}
 	virtual void execute() {}
 	private:
 	int job_sort_tag = 0;
