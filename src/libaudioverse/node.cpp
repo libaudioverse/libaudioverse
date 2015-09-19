@@ -14,6 +14,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/metadata.hpp>
 #include <libaudioverse/private/kernels.hpp>
 #include <libaudioverse/private/buffer.hpp>
+#include <libaudioverse/private/dependency_computation.hpp>
 #include <algorithm>
 #include <memory>
 #include <stdlib.h>
@@ -22,6 +23,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <vector>
 
 namespace libaudioverse_implementation {
+
 
 /**Given two nodes, determine if connecting an output of start to an input of end causes a cycle.*/
 bool doesEdgePreserveAcyclicity(std::shared_ptr<Job> start, std::shared_ptr<Job> end) {
@@ -33,18 +35,15 @@ bool doesEdgePreserveAcyclicity(std::shared_ptr<Job> start, std::shared_ptr<Job>
 	//connecting start to end connects everything "behind" start to end,
 	//so there's a cycle if end is already behind start.
 	//We check by walking all dependencies of start looking for end.
-	//This is slow, in that it visits extra nodes on a cycle; but if there is no cycle, we visit everything anyway.
-	//We go via visitDependenciesUnconditional to avoid the state check;
-	//this unfortunately involves casting.
-	std::function<void(std::shared_ptr<Job>&)> f ;
 	bool cycled = false;
-	f = [&] (std::shared_ptr<Job> &j) {
-		auto n = std::dynamic_pointer_cast<Node>(j);
-		if(j == end) cycled = true;
-		else if(cycled == false && n) n->visitDependenciesUnconditional(f);
+	auto helper = [&](std::shared_ptr<Job> current, auto callable) {
+		cycled = current == end;
+		if(cycled) return;
+		//We're passing ourself to ourself to avoid std::functions all the way down.
+		else visitDependencies(current, callable, callable);
 	};
-	std::dynamic_pointer_cast<Node>(start)->visitDependencies(f);
-	return cycled == false;
+	//And then we pass it to itself.
+	visitDependencies(start, helper, helper);
 }
 
 //For property backrefs.
