@@ -109,7 +109,7 @@ bool jobComparer(const std::shared_ptr<Job> &a, const std::shared_ptr<Job> &b) {
 }
 
 void Planner::replan(std::shared_ptr<Job> start) {
-	logDebug("Rerplanning.");
+	logDebug("Replanning.");
 	//Fill the vector with the jobs.
 	tagger(start, 0, plan);
 	//In the common case, the vector is sorted by a reverse.
