@@ -4,6 +4,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include "node.hpp"
 #include "simulation.hpp"
+#include "helper_templates.hpp"
 #include "../3d/environment.hpp"
 #include "../3d/source.hpp"
 #include <memory>
@@ -16,6 +17,18 @@ Instead, everything was moved here.
 
 To create a node that overrides its dependency management, add a template here and then insert a case in the final template in this file.
 Be sure to order the final template from most to least specific.*/
+
+template<typename CallableT, typename... ArgsT>
+void simulationVisitDependencies(std::shared_ptr<Simulation> start, CallableT&& callable, ArgsT&&... args) {
+	for(auto &i: start->final_output_connection->getConnectedNodes()) {
+		auto n = std::dynamic_pointer_cast<Job>(i->shared_from_this());
+		if(n) callable(n, args...);
+	}
+	filterWeakPointers(start->always_playing_nodes, [](std::shared_ptr<Node> &n, CallableT &callable, ArgsT&&... args2) {
+		auto j = std::static_pointer_cast<Job>(n);
+		callable(j, args2...);
+	}, callable, args...);
+}
 
 template<typename CallableT, typename... ArgsT>
 void nodeVisitDependencies(std::shared_ptr<Node> start, CallableT&& callable, ArgsT&&... args) {
@@ -45,8 +58,8 @@ void subgraphNodeVisitDependencies(std::shared_ptr<SubgraphNode> start, Callable
 }
 
 template<typename CallableT, typename... ArgsT>
-void environmentVisitDependencies(std::shared_ptr<Node> start, CallableT&& callable, ArgsT&&... args) {
-	subgraphVisitDependencies(std::static_pointer_cast<SubgraphNode>(start), callable, args...);
+void environmentVisitDependencies(std::shared_ptr<EnvironmentNode> start, CallableT&& callable, ArgsT&&... args) {
+	subgraphNodeVisitDependencies(std::static_pointer_cast<SubgraphNode>(start), callable, args...);
 	//Other dependencies: all our sources.
 	for(auto w: start->sources) {
 		auto n = w.lock();
@@ -57,20 +70,20 @@ void environmentVisitDependencies(std::shared_ptr<Node> start, CallableT&& calla
 	}
 }
 
-template<typename CallableT, typename ArgsT...>
-void sourceVisitDependencies(std::shared_ptr<Node> start, CallableT&& callable, ArgsT&&... args) {
+template<typename CallableT, typename... ArgsT>
+void sourceVisitDependencies(std::shared_ptr<SourceNode> start, CallableT&& callable, ArgsT&&... args) {
 	if(start->getState() != Lav_NODESTATE_PAUSED && start->culled) visitDependencies(start->input, callable, args...);
 }
 
-#define TRY(type, name)  if(std::dynamic_pointer_cast<type>(start)) {name(std::static_pointer_cast<type>(start), callable, args...);return}
+#define TRY(type, name)  auto casted##type = std::dynamic_pointer_cast<type>(start); if(casted##type) {name(casted##type, callable, args...);return;}
 
-template<typename JobT, typename CallableT, typename... ArgsT>
-void visitDependencies(JobT start, callableT&& callable, ArgsT&&... args) {
-	TRY(Simulation, simulationVisitDependencies
+template<typename CallableT, typename... ArgsT>
+void visitDependencies(std::shared_ptr<Job> start, CallableT&& callable, ArgsT&&... args) {
+	TRY(Simulation, simulationVisitDependencies)
 	TRY(EnvironmentNode, environmentVisitDependencies)
-	TRY(SoruceNode, sourceVisitDependencies)
-	TRY(SubgraphNode, subgraphVisitDependencies)
-	TRY(node, nodeVisitDependencies)
+	TRY(SourceNode, sourceVisitDependencies)
+	TRY(SubgraphNode, subgraphNodeVisitDependencies)
+	TRY(Node, nodeVisitDependencies)
 }
 
 }

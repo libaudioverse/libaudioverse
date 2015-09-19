@@ -27,6 +27,7 @@ class  Job {
 	//It's okay to visit a dependency twice, the planners protect against this.
 	virtual void visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) = 0;
 	virtual void execute() {}
+	bool canCull() {return false;}
 	private:
 	int job_sort_tag = 0;
 	bool job_recorded = false;

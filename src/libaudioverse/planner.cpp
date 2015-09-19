@@ -4,6 +4,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/planner.hpp>
 #include <libaudioverse/private/audio_thread.hpp>
 #include <libaudioverse/private/logging.hpp>
+#include <libaudioverse/private/dependency_computation.hpp>
 #include <vector>
 #include <memory>
 #include <algorithm>
@@ -103,6 +104,8 @@ void Planner::invalidatePlan() {
 //Actually do the planning below here:
 //Small helper  function, which needn't know about the class (thus avoiding capture requirements).
 void tagger(std::shared_ptr<Job> job, int tag, std::vector<std::shared_ptr<Job>> &destination) {
+	//If we can cull the job, drop out now.
+	if(job->canCull()) return;
 	tag = std::min(tag, job->job_sort_tag);
 	//If we are not changing the tag and this job was seen, we can abort the recursion early;
 	//In such a case, we will not change anything.
@@ -113,8 +116,7 @@ void tagger(std::shared_ptr<Job> job, int tag, std::vector<std::shared_ptr<Job>>
 		job->job_recorded = true;
 	}
 	if(skipRecursion == false) {
-		std::function<void(std::shared_ptr<Job>&)> f = [&](std::shared_ptr<Job> &j) {tagger(j, tag-1, destination);};
-		job->visitDependencies(f);
+		visitDependencies(job, tagger, tag-1, destination);
 	}
 }
 
