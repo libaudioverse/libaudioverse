@@ -146,6 +146,9 @@ class Node: public ExternalObject, public Job {
 	//we are never allowed to copy.
 	Node(const Node&) = delete;
 	Node& operator=(const Node&) = delete;
+	
+	template<typename CallableT, typename... ArgsT>
+	friend void nodeVisitDependencies(std::shared_ptr<Node> start, CallableT&& callable, ArgsT&&... args);
 };
 
 /*needed for things that wish to encapsulate and manage nodes that the public API isn't supposed to see.
@@ -175,6 +178,9 @@ class SubgraphNode: public Node {
 	
 	protected:
 	std::shared_ptr<Node> subgraph_input, subgraph_output;
+	
+	template<typename CallableT, typename... ArgsT>
+	friend void subgraphNodeVisitDependencies(std::shared_ptr<SubgraphNode> start, CallableT &&callable, ArgsT&&... args);
 };
 
 /**This is the creation template for a node.
