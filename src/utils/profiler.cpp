@@ -102,7 +102,7 @@ void main(int argc, char** args) {
 		if(times < threads) times = threads;
 		auto handles=std::get<2>(info)(sim, times);
 		for(auto h: handles) {
-			ERRCHECK(Lav_nodeSetIntProperty(h, Lav_NODE_STATE, Lav_NODESTATE_ALWAYS_PLAYING));
+			ERRCHECK(Lav_nodeConnectSimulation(h, 0));
 		}
 		float dur=timeit([&] () {
 			ERRCHECK(Lav_simulationGetBlock(sim, 2, 1, storage));
@@ -111,6 +111,7 @@ void main(int argc, char** args) {
 		float estimate = (BLOCK_SIZE/(float)SR)/dur*times;
 		printf("%f\n", estimate);
 		for(auto h: handles) {
+			ERRCHECK(Lav_nodeDisconnect(h, 0, 0, 0));
 			ERRCHECK(Lav_handleDecRef(h));
 		}
 		ERRCHECK(Lav_handleDecRef(sim));
