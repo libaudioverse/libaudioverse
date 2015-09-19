@@ -30,7 +30,7 @@ class OutputConnection {
 	std::vector<Node*> getConnectedNodes();
 	private:
 	Node* node = nullptr;
-	int start, count;
+	int start, count, block_size;
 	std::set<std::weak_ptr<InputConnection>, std::owner_less<std::weak_ptr<InputConnection>>> connected_to;
 	std::shared_ptr<Simulation> simulation;
 };
@@ -55,7 +55,7 @@ class InputConnection {
 	int getConnectedNodeCount();
 	private:
 	Node* node;
-	int start, count;
+	int start, count, block_size;
 	std::map<std::shared_ptr<OutputConnection>, std::shared_ptr<Node>> connected_to;
 	std::shared_ptr<Simulation> simulation;
 };

@@ -26,6 +26,7 @@ OutputConnection::OutputConnection(std::shared_ptr<Simulation> simulation, Node*
 	this->node= node;
 	this->start =start;
 	this->count = count;
+	this->block_size = simulation->getBlockSize();
 }
 
 void OutputConnection::add(int inputBufferCount, float** inputBuffers, bool shouldApplyMixingMatrix) {
@@ -37,11 +38,11 @@ void OutputConnection::add(int inputBufferCount, float** inputBuffers, bool shou
 	//it is the responsibility of our node to keep us configured, so we assume what info we have is accurate. If it is not, that is the fault of our node.
 	if(shouldApplyMixingMatrix) {
 		//Remix, but don't zero first.
-		audio_io::remixAudioUninterleaved(simulation->getBlockSize(), count, outputArray+start, inputBufferCount, inputBuffers, false);
+		audio_io::remixAudioUninterleaved(block_size, count, outputArray+start, inputBufferCount, inputBuffers, false);
 	}
 	else { //copy and drop.
 		int channelsToAdd =std::min(count, inputBufferCount);
-		for(int i=0; i < channelsToAdd; i++) additionKernel(simulation->getBlockSize(), outputArray[i+start], inputBuffers[i], inputBuffers[i]);
+		for(int i=0; i < channelsToAdd; i++) additionKernel(block_size, outputArray[i+start], inputBuffers[i], inputBuffers[i]);
 	}
 }
 
@@ -88,6 +89,7 @@ InputConnection::InputConnection(std::shared_ptr<Simulation> simulation, Node* n
 	this->node= node;
 	this->start=start;
 	this->count = count;
+	this->block_size = simulation->getBlockSize();
 }
 
 void InputConnection::add(bool shouldApplyMixingMatrix) {
