@@ -26,8 +26,8 @@ include("vendoring/speex_resampler_cpp.txt")
 include("vendoring/audio_io.txt")
 
 
-#All the libraries we need to link with:
-SET(libaudioverse_required_libraries ${libsndfile_name} kissfft audio_io logger_singleton speex_resampler_cpp powercores)
+#All the libraries we need to link with. Platform-specific libraries are set in the include file for compiler flags.
+SET(libaudioverse_required_libraries ${libaudioverse_required_libraries} ${libsndfile_name} kissfft audio_io logger_singleton speex_resampler_cpp powercores)
 add_subdirectory(src)
 
 #this makes the bindings generation step always run after a Libaudioverse build.

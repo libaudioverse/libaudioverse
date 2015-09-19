@@ -38,6 +38,15 @@ class ThreadPool {
 		job_queue_pointer = (job_queue_pointer+1)%thread_count;
 	}
 
+	/**Submit a job, possibly with arguments, to all threads.*/
+	template<typename CallableT, typename... ArgsT>
+	void submitJobToAllThreads(CallableT &&callable, ArgsT&&... args) {
+		auto job = [callable, args...]() mutable {
+			callable(args...);
+		};
+		for(auto &i: job_queues) i->enqueue(job);
+	}
+	
 	/**Submit a job represented by a function with arguments and a return value, obtaining a future which will later contain the result of the job.*/
 	template<class FuncT, class... ArgsT>
 	std::future<typename std::result_of<FuncT(ArgsT...)>::type> submitJobWithResult(FuncT &&callable, ArgsT&&... args) {

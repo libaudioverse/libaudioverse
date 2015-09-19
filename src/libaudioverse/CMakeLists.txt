@@ -123,6 +123,7 @@ automators/set.cpp
 
 #audio output using audio_io:
 audio_output.cpp
+audio_thread.cpp
 
 #the 3D abstraction on top of libaudioverse.
 3d/environment.cpp

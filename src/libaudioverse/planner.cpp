@@ -2,6 +2,7 @@
 This file is part of Libaudioverse, a library for 3D and environmental audio simulation, and is released under the terms of the Gnu General Public License Version 3 or (at your option) any later version.
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/private/planner.hpp>
+#include <libaudioverse/private/audio_thread.hpp>
 #include <libaudioverse/private/logging.hpp>
 #include <vector>
 #include <memory>
@@ -28,16 +29,32 @@ void Planner::execute(std::shared_ptr<Job> start, int threads) {
 		}
 	}
 	if(threads == 1) {
+		becomeAudioThread();
 		runJobsSync();
 	}
 	else {
-		if(last_thread_count != threads) {
-			thread_pool.setThreadCount(threads);
-			last_thread_count = threads;
-		}
+		//We are maybe currently an audio thread. We don't want to be.
+		unbecomeAudioThread();
 		if(started_thread_pool == false) {
+			thread_pool.setThreadCount(threads);
 			thread_pool.start();
+			thread_pool.submitJobToAllThreads(becomeAudioThread);
+			thread_pool.submitBarrier();
+			auto fut = thread_pool.submitJobWithResult([] () {});
+			fut.wait();
 			started_thread_pool = true;
+		}
+		if(last_thread_count != threads) {
+			thread_pool.submitJobToAllThreads(unbecomeAudioThread);
+			thread_pool.submitBarrier();
+			auto fut = thread_pool.submitJobWithResult([] () {});
+			fut.wait();
+			thread_pool.setThreadCount(threads);
+			thread_pool.submitJobToAllThreads(becomeAudioThread);
+			thread_pool.submitBarrier();
+			fut = thread_pool.submitJobWithResult([] () {});
+			fut.wait();
+			last_thread_count = threads;
 		}
 		runJobsAsync();
 	}

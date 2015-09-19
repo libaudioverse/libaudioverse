@@ -14,3 +14,9 @@ add_definitions(-DLIBAUDIOVERSE_MALLOC_ALIGNMENT=${LIBAUDIOVERSE_MALLOC_ALIGNMEN
 if(${LIBAUDIOVERSE_USE_SSE2})
 add_definitions(-DLIBAUDIOVERSE_USE_SSE2)
 endif()
+
+if(${WIN32})
+add_definitions(-DLIBAUDIOVERSE_IS_WINDOWS)
+#For multimedia class scheduler service.
+set(libaudioverse_required_libraries ${libaudioverse_required_libraries} avrt)
+endif()
