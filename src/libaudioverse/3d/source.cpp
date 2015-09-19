@@ -4,13 +4,14 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 #include <libaudioverse/3d/source.hpp>
 #include <libaudioverse/3d/environment.hpp>
+#include <libaudioverse/nodes/amplitude_panner.hpp>
+#include <libaudioverse/nodes/multipanner.hpp>
+#include <libaudioverse/nodes/gain.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/constants.hpp>
 #include <libaudioverse/private/simulation.hpp>
-#include <libaudioverse/private/creators.hpp>
 #include <libaudioverse/private/memory.hpp>
-#include <libaudioverse/nodes/amplitude_panner.hpp>
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/libaudioverse3d.h>

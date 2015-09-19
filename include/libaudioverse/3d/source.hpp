@@ -37,4 +37,5 @@ class SourceNode: public SubgraphNode {
 	std::map<int, std::shared_ptr<Node>> outgoing_effects, outgoing_effects_reverb;
 };
 
+std::shared_ptr<Node> createSourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentNode> environment);
 }

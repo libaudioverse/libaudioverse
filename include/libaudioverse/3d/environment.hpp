@@ -58,4 +58,5 @@ class EnvironmentNode: public SubgraphNode {
 	std::vector<EffectSendConfiguration> effect_sends;
 };
 
+std::shared_ptr<EnvironmentNode> createEnvironmentNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf);
 }
