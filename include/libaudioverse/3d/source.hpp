@@ -26,9 +26,11 @@ class SourceNode: public SubgraphNode {
 	void stopFeedingEffect(int which);
 	void update(EnvironmentInfo &env);
 	void handleStateUpdates(bool shouldCull);
+	void setForcedCull(bool c);
 	void visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) override;
 	private:
-	bool culled = false;
+	//Forced_cull is used by playAsync to avoid invalidation of the plan.
+	bool culled = false, forced_cull = false;
 	std::shared_ptr<Node> panner_node, input;
 	std::shared_ptr<EnvironmentNode> environment;
 	std::vector<std::shared_ptr<Node>> effect_panners;
