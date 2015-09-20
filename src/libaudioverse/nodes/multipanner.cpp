@@ -105,6 +105,12 @@ void MultipannerNode::willTick() {
 	if(werePropertiesModified(this, Lav_PANNER_STRATEGY)) strategyChanged();
 }
 
+void MultipannerNode::reset() {
+	hrtf_panner->reset();
+	amplitude_panner->reset();
+	input->reset();
+}
+
 //begin public api
 
 Lav_PUBLIC_FUNCTION LavError Lav_createMultipannerNode(LavHandle simulationHandle, char* hrtfPath, LavHandle* destination) {
