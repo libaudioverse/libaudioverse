@@ -14,7 +14,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <vector>
 
 #define BLOCK_SIZE 1024
-#define NUM_SOURCES 50
+#define NUM_SOURCES 150
 #define NUM_TIMES 200
 float storage[BLOCK_SIZE*2] = {0};
 
