@@ -168,6 +168,8 @@ void HrtfNode::applyIdtChanged() {
 }
 
 void HrtfNode::reset() {
+	prev_azimuth = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
+	prev_elevation = getProperty(Lav_PANNER_ELEVATION).getFloatValue();
 }
 
 //begin public api
