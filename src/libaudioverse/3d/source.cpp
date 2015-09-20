@@ -156,8 +156,8 @@ void SourceNode::update(EnvironmentInfo &env) {
 	float distance = glm::length(npos);
 	float maxDistance = getProperty(Lav_SOURCE_MAX_DISTANCE).getFloatValue();
 	//We get maxDistance early so we can do the state update; if this says cull, we bail out now.
-	//Cull if we're too far away to be audible or if we have no input connections or if it's forced by someone else.
-	handleStateUpdates(forced_cull || distance > maxDistance || getInputConnection(0)->getConnectedNodeCount() == 0);
+	//Cull if we're too far away to be audible or if we have no input connections.
+	handleStateUpdates(distance > maxDistance || getInputConnection(0)->getConnectedNodeCount() == 0);
 	if(culled) return;
 	float xz = sqrtf(npos.x*npos.x+npos.z*npos.z);
 	//elevation and azimuth, in degrees.
@@ -227,10 +227,6 @@ void SourceNode::handleStateUpdates(bool shouldCull) {
 		}
 	}
 	culled = shouldCull;
-}
-
-void SourceNode::setForcedCull(bool c) {
-	forced_cull = c;
 }
 
 void SourceNode::visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) {
