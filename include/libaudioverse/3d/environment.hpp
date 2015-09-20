@@ -59,7 +59,7 @@ class EnvironmentNode: public SubgraphNode {
 	std::vector<EffectSendConfiguration> effect_sends;
 	
 	//This is used to make play_async not invalidate the plan.
-	std::set<std::tuple<std::shared_ptr<Node>, std::shared_ptr<SourceNode>>> play_async_source_cache;
+	std::vector<std::tuple<std::shared_ptr<Node>, std::shared_ptr<SourceNode>>> play_async_source_cache;
 	int play_async_source_cache_limit = 30; //How many we're willing to cache.
 };
 

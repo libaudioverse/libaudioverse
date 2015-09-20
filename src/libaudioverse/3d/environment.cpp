@@ -126,8 +126,8 @@ void EnvironmentNode::playAsync(std::shared_ptr<Buffer> buffer, float x, float y
 		b = createBufferNode(simulation);
 	}
 	else {
-		std::tie(b, s) = *play_async_source_cache.begin();
-		play_async_source_cache.erase(play_async_source_cache.begin());
+		std::tie(b, s) = play_async_source_cache.back();
+		play_async_source_cache.pop_back();
 		fromCache = true;
 	}
 	b->getProperty(Lav_BUFFER_BUFFER).setBufferValue(buffer);
@@ -159,7 +159,7 @@ void EnvironmentNode::playAsync(std::shared_ptr<Buffer> buffer, float x, float y
 			//Sleep the source, clear the buffer.
 			s->setState(Lav_NODESTATE_PAUSED);
 			b->getProperty(Lav_BUFFER_BUFFER).setBufferValue(nullptr);
-			e->play_async_source_cache.insert(make_tuple(b, s));
+			e->play_async_source_cache.emplace_back(b, s);
 		}
 		else {
 			//Otherwise, let go.
