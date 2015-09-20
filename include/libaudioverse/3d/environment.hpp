@@ -60,7 +60,7 @@ class EnvironmentNode: public SubgraphNode {
 	
 	//This is used to make play_async not invalidate the plan.
 	std::set<std::tuple<std::shared_ptr<Node>, std::shared_ptr<SourceNode>>> play_async_source_cache;
-	int play_async_source_cache_limit = 10; //How many we're willing to cache.
+	int play_async_source_cache_limit = 30; //How many we're willing to cache.
 };
 
 std::shared_ptr<EnvironmentNode> createEnvironmentNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf);
