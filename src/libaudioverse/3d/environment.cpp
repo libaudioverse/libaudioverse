@@ -134,7 +134,7 @@ void EnvironmentNode::playAsync(std::shared_ptr<Buffer> buffer, float x, float y
 	if(fromCache == false) b->connect(0, s, 0);
 	b->getProperty(Lav_BUFFER_POSITION).setDoubleValue(0.0);
 	s->getProperty(Lav_3D_POSITION).setFloat3Value(x, y, z);
-	if(isDry) {
+		if(isDry) {
 		for(int i = 0; i < effect_sends.size(); i++) {
 			s->stopFeedingEffect(i);
 		}
@@ -147,6 +147,10 @@ void EnvironmentNode::playAsync(std::shared_ptr<Buffer> buffer, float x, float y
 	}
 	if(fromCache) s->setState(Lav_NODESTATE_PLAYING);
 	auto simulation = this->simulation;
+	//We've just done a bunch of stuff that invalidates the plan, so maybe we can squeeze in a bit more.
+	//If we update the source, it might cull.  We can then reset it to avoid HRTF crossfading.
+	s->update(environment_info);
+	s->reset(); //Avoid crossfading the hrtf.	
 	b->getEvent(Lav_BUFFER_END_EVENT).setHandler([b, e, s, simulation] (std::shared_ptr<Node> unused1, void* unused2) mutable {
 		//Recall that events do not hold locks when fired.
 		//So lock the simulation.
