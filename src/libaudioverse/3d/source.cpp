@@ -124,6 +124,14 @@ std::shared_ptr<Node> SourceNode::getPannerForEffectChannels(int channels) {
 	}
 }
 
+void SourceNode::reset() {
+	panner_node->reset();
+	input->reset();
+	for(auto &i: outgoing_effects) i.second->reset();
+	for(auto &i: outgoing_effects_reverb) i.second->reset();
+	for(auto &i: effect_panners) i->reset();
+}
+
 //helper function: calculates gains given distance models.
 float calculateGainForDistanceModel(int model, float distance, float maxDistance, float referenceDistance) {
 	float retval = 1.0f;
