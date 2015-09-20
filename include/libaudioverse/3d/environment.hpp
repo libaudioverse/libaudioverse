@@ -6,6 +6,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <vector>
 #include <set>
 #include <memory>
+#include <tuple>
 #include <glm/glm.hpp>
 
 namespace libaudioverse_implementation {
@@ -56,6 +57,10 @@ class EnvironmentNode: public SubgraphNode {
 	std::shared_ptr<Node> output=nullptr;
 	EnvironmentInfo environment_info;
 	std::vector<EffectSendConfiguration> effect_sends;
+	
+	//This is used to make play_async not invalidate the plan.
+	std::set<std::tuple<std::shared_ptr<Node>, std::shared_ptr<SourceNode>>> play_async_source_cache;
+	int play_async_source_cache_limit = 10; //How many we're willing to cache.
 };
 
 std::shared_ptr<EnvironmentNode> createEnvironmentNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf);
