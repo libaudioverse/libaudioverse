@@ -20,6 +20,7 @@ class SourceNode: public SubgraphNode {
 	SourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentNode> environment);
 	~SourceNode();
 	void forwardProperties(); //involves shared_from_this.
+	void reset() override;
 	//For the case of 1 channels, returns the input gain node as-is.
 	std::shared_ptr<Node> getPannerForEffectChannels(int channels);
 	void feedEffect(int which);

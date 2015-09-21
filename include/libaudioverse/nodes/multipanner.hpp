@@ -17,6 +17,7 @@ class MultipannerNode: public SubgraphNode {
 	void configureForwardedProperties();
 	void strategyChanged();
 	void willTick() override;
+	void reset() override;
 };
 
 std::shared_ptr<Node> createMultipannerNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf);

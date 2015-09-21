@@ -1,7 +1,6 @@
 /**Copyright (C) Austin Hicks, 2014
 This file is part of Libaudioverse, a library for 3D and environmental audio simulation, and is released under the terms of the Gnu General Public License Version 3 or (at your option) any later version.
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
-
 #include <libaudioverse/3d/source.hpp>
 #include <libaudioverse/3d/environment.hpp>
 #include <libaudioverse/nodes/gain.hpp>
@@ -21,6 +20,9 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <glm/gtx/transform.hpp>
 #include <algorithm>
 #include <vector>
+#include <set>
+#include <tuple>
+#include <memory>
 
 namespace libaudioverse_implementation {
 
@@ -116,26 +118,56 @@ void EnvironmentNode::visitDependenciesUnconditional(std::function<void(std::sha
 
 void EnvironmentNode::playAsync(std::shared_ptr<Buffer> buffer, float x, float y, float z, bool isDry) {
 	auto e = std::static_pointer_cast<EnvironmentNode>(shared_from_this());
-	auto s = createSourceNode(simulation, e);
-	auto b = createBufferNode(simulation);
+	std::shared_ptr<Node> b;
+	std::shared_ptr<SourceNode> s;
+	bool fromCache = false;
+	if(play_async_source_cache.empty()) {
+		s = std::static_pointer_cast<SourceNode>(createSourceNode(simulation, e));
+		b = createBufferNode(simulation);
+	}
+	else {
+		std::tie(b, s) = play_async_source_cache.back();
+		play_async_source_cache.pop_back();
+		fromCache = true;
+	}
 	b->getProperty(Lav_BUFFER_BUFFER).setBufferValue(buffer);
-	b->connect(0, s, 0);
+	if(fromCache == false) b->connect(0, s, 0);
+	b->getProperty(Lav_BUFFER_POSITION).setDoubleValue(0.0);
 	s->getProperty(Lav_3D_POSITION).setFloat3Value(x, y, z);
-	if(isDry) {
+		if(isDry) {
 		for(int i = 0; i < effect_sends.size(); i++) {
-			std::static_pointer_cast<SourceNode>(s)->stopFeedingEffect(i);
+			s->stopFeedingEffect(i);
 		}
 	}
-	//The key here is that we capture the shared pointers, holding them until the event fires.
-	//When the event fires, we null the pointers we captured, and then everything schedules for deletion.
-	//We need the simulation shared pointer.
+	else {
+		//This might be from the cache and previously used as dry.
+		for(int i = 0; i < effect_sends.size(); i++) {
+			s->feedEffect(i);
+		}
+	}
+	if(fromCache) s->setState(Lav_NODESTATE_PLAYING);
 	auto simulation = this->simulation;
+	//We've just done a bunch of stuff that invalidates the plan, so maybe we can squeeze in a bit more.
+	//If we update the source, it might cull.  We can then reset it to avoid HRTF crossfading.
+	s->update(environment_info);
+	s->reset(); //Avoid crossfading the hrtf.	
 	b->getEvent(Lav_BUFFER_END_EVENT).setHandler([b, e, s, simulation] (std::shared_ptr<Node> unused1, void* unused2) mutable {
 		//Recall that events do not hold locks when fired.
-		//If we lock anything we delete here, it will not unlock properly.
 		//So lock the simulation.
 		LOCK(*simulation);
-		if(b) b->disconnect(0);
+		if(e->play_async_source_cache.size() < e->play_async_source_cache_limit) {
+			//Sleep the source, clear the buffer.
+			s->setState(Lav_NODESTATE_PAUSED);
+			b->getProperty(Lav_BUFFER_BUFFER).setBufferValue(nullptr);
+			e->play_async_source_cache.emplace_back(b, s);
+		}
+		else {
+			//Otherwise, let go.
+			s->isolate();
+			b->isolate();
+		}
+		//We let go of them so that they can delete if they want to.
+		//We don't want to extend lifetime guarantees into the event firing, as this event may remain set for a time.
 		b.reset();
 		s.reset();
 		e.reset();
