@@ -72,9 +72,7 @@ class Simulation: public Job {
 	//Thread support.
 	void setThreads(int n);
 	int getThreads();
-	
-	//Conform to job.
-	virtual void visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) override;
+
 	//called when connections are formed or lost, or when a node is deleted.
 	void invalidatePlan();
 	protected:

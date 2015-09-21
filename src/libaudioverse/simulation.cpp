@@ -210,18 +210,6 @@ int Simulation::getThreads() {
 	return threads;
 }
 
-//Conform to job:
-void Simulation::visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) {
-	for(auto &i: final_output_connection->getConnectedNodes()) {
-		auto n = std::dynamic_pointer_cast<Job>(i->shared_from_this());
-		if(n) pred(n);
-	}
-	filterWeakPointers(always_playing_nodes, [&pred](std::shared_ptr<Node> &n) {
-		auto j = std::static_pointer_cast<Job>(n);
-		pred(j);
-	});
-}
-
 void Simulation::invalidatePlan() {
 	planner->invalidatePlan();
 }

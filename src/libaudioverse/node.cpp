@@ -382,32 +382,8 @@ void Node::resize(int newInputCount, int newOutputCount) {
 	}
 }
 
-void Node::visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) {
-	if(getState() != Lav_NODESTATE_PAUSED) visitDependenciesUnconditional(pred);
-}
-
 void Node::execute() {
 	tick();
-}
-
-void Node::visitDependenciesUnconditional(std::function<void(std::shared_ptr<Job>&)> &pred) {
-	for(int i = 0; i < getInputConnectionCount(); i++) {
-		auto conn = getInputConnection(i)->getConnectedNodes();
-		for(auto &p: conn) {
-			auto j = std::dynamic_pointer_cast<Job>(p->shared_from_this());
-			pred(j);
-		}
-	}
-	for(auto &p: properties) {
-		auto &prop = p.second;
-		auto conn = prop.getInputConnection();
-		if(conn) {
-			for(auto n: conn->getConnectedNodes()) {
-				auto j = std::dynamic_pointer_cast<Job>(n->shared_from_this());
-				pred(j);
-			}
-		}
-	}	
 }
 
 bool Node::canCull() {
@@ -447,12 +423,6 @@ int SubgraphNode::getOutputBufferCount() {
 float** SubgraphNode::getOutputBufferArray() {
 	if(subgraph_output) return subgraph_output->getOutputBufferArray();
 	return nullptr;
-}
-
-//Our only dependency is our output node, if set.
-void SubgraphNode::visitDependenciesUnconditional(std::function<void(std::shared_ptr<Job>&)> &pred) {
-	auto j = std::static_pointer_cast<Job>(subgraph_output);
-	if(j) pred(j);
 }
 
 //This override is needed because nodes try to add their inputs, but we override where input connections come from.

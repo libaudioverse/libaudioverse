@@ -104,18 +104,6 @@ void EnvironmentNode::registerSourceForUpdates(std::shared_ptr<SourceNode> sourc
 	simulation->invalidatePlan();
 }
 
-void EnvironmentNode::visitDependenciesUnconditional(std::function<void(std::shared_ptr<Job>&)> &pred) {
-	SubgraphNode::visitDependenciesUnconditional(pred);
-	//Other dependencies: all our sources.
-	for(auto w: sources) {
-		auto n = w.lock();
-		if(n) {
-			auto j = std::static_pointer_cast<Job>(n);
-			pred(j);
-		}
-	}
-}
-
 void EnvironmentNode::playAsync(std::shared_ptr<Buffer> buffer, float x, float y, float z, bool isDry) {
 	auto e = std::static_pointer_cast<EnvironmentNode>(shared_from_this());
 	std::shared_ptr<Node> b;

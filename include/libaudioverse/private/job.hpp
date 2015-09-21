@@ -3,7 +3,6 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include "memory.hpp"
 #pragma once
-#include <functional>
 #include <set>
 #include <vector>
 #include <map>
@@ -26,9 +25,6 @@ class  Job: public ExternalObject {
 	public:
 	Job(int type): ExternalObject(type) {}
 	virtual ~Job() {}
-	//Call pred on all dependent jobs.
-	//It's okay to visit a dependency twice, the planners protect against this.
-	virtual void visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) = 0;
 	virtual void execute() {}
 	virtual bool canCull() {return false;}
 	private:

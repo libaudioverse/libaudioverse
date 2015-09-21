@@ -116,13 +116,7 @@ class Node: public Job {
 	virtual void resize(int newInputCount, int newOutputCount);
 
 	//Conform to Job.
-	virtual void visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) override;
 	virtual void execute();
-
-	//This is the actual implementation of visitDependencies.
-	//visitDependencies will only call this function if the state is unpaused.
-	//This exists for cycle detection.
-	virtual void visitDependenciesUnconditional(std::function<void(std::shared_ptr<Job>&)> &pred);
 
 	//True if we're paused.
 	bool canCull() override;
@@ -170,9 +164,6 @@ class SubgraphNode: public Node {
 	//these forward onto the output node, making connections to the subgraph magically work.
 	int getOutputBufferCount() override;
 	float** getOutputBufferArray() override;
-
-	//Our dependency is our single output node.
-	void visitDependenciesUnconditional(std::function<void(std::shared_ptr<Job>&)> &pred) override;
 
 	//Override tick because we can't try to use connections.
 	//We don't have proper input buffers, default tick will override who knows what.
