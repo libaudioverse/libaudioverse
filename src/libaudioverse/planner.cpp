@@ -5,6 +5,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/audio_thread.hpp>
 #include <libaudioverse/private/logging.hpp>
 #include <libaudioverse/private/dependency_computation.hpp>
+#include <libaudioverse/private/helper_templates.hpp>
 #include <vector>
 #include <memory>
 #include <algorithm>
@@ -18,17 +19,11 @@ Planner::~Planner() {
 }
 
 void Planner::execute(std::shared_ptr<Job> start, int threads) {
-	if(is_valid == false || last_start.lock() != start) replan(start);
-	plan.assign(weak_plan.begin(), weak_plan.end());
-	//Check it for nulls.  This is theoretically possible.
-	for(auto &p: plan) {
-		if(p == nullptr) {
-			invalidatePlan();
-			plan.clear();
-			//recurse into ourselves and try to plan again.
-			execute(start, threads);
-		}
-	}
+	if(last_start.lock() != start) invalidatePlan();
+	if(is_valid == false) replan(start);
+	else initializeStrongPlan(); //Try to get it from the cache.
+	//We might invalidate because of a dead weak pointer, but this can only happen once.
+	if(is_valid == false) replan(start);
 	if(threads == 1) {
 		becomeAudioThread();
 		runJobsSync();
@@ -59,8 +54,7 @@ void Planner::execute(std::shared_ptr<Job> start, int threads) {
 		}
 		runJobsAsync();
 	}
-	//Kill the shared pointers.
-	plan.clear();
+	clearStrongPlan();
 	last_start = start;
 }
 
@@ -70,25 +64,17 @@ void jobExecutor(std::shared_ptr<Job> &j) {
 }
 
 void Planner::runJobsSync() {
-	for(auto i = plan.begin(); i != plan.end(); i++) {
-		jobExecutor(*i);
+	for(auto &bin: plan) {
+		for(auto &j: bin.second) {
+			jobExecutor(j);
+		}
 	}
 }
 
 void Planner::runJobsAsync() {
-	if(plan.size() == 0) return; //nothing to do.
-	int prev_tag = plan[0]->job_sort_tag;
-	auto i = plan.begin();
-	auto end = plan.end();
-	//Run through it, enqueueing jobs and barriers.
-	while(i != end) {
-		auto j = i;
-		while(j != end && (*	j)->job_sort_tag == prev_tag) j++; //Find the end of the current range of nondependent jobs.
-		thread_pool.map(jobExecutor, i, j);
-		i = j;
-		//Make sure everything finishes before we start the next ones.
+	for(auto &bin: plan) {
+		thread_pool.map(jobExecutor, bin.second.begin(), bin.second.end());
 		thread_pool.submitBarrier();
-		if(i != end) prev_tag = (*i)->job_sort_tag;
 	}
 	//At this point, submit a meaningless job that does nothing.
 	//This lets us synchronize with the end of this batch.
@@ -103,40 +89,48 @@ void Planner::invalidatePlan() {
 
 //Actually do the planning below here:
 //Small helper  function, which needn't know about the class (thus avoiding capture requirements).
-void tagger(std::shared_ptr<Job> job, int tag, std::vector<std::shared_ptr<Job>> &destination) {
-	//If we can cull the job, drop out now.
-	if(job->canCull()) return;
-	tag = std::min(tag, job->job_sort_tag);
-	//If we are not changing the tag and this job was seen, we can abort the recursion early;
-	//In such a case, we will not change anything.
-	bool skipRecursion = (job->job_sort_tag == tag && job->job_recorded);
-	job->job_sort_tag = tag;
-	if(job->job_recorded == false) {
-		destination.push_back(job);
-		job->job_recorded = true;
-	}
-	if(skipRecursion == false) {
-		visitDependencies(job, tagger, tag-1, destination);
-	}
-}
-
-bool jobComparer(const std::shared_ptr<Job> &a, const std::shared_ptr<Job> &b) {
-	return a->job_sort_tag < b->job_sort_tag;
+void tagger(std::shared_ptr<Job> job, int tag, std::map<int, std::vector<std::shared_ptr<Job>>> &destination) {
+	//if the job is recorded or cullable, we can skip out.
+	if(job->job_recorded || job->canCull()) return;
+	//Visit our dependencies first.  We want this to make sure we're in the lowest bin we have to be in.
+	//Consider a graph, a->b, a->c->b.
+	//If we're called on b as a's dependency and record, then it won't happen before c.
+	visitDependencies(job, tagger, tag-1, destination);
+	//The job may have just been recorded.  if it was, we can abort.
+	if(job->job_recorded) return;
+	//We know it can't be culled because this never changes. So put it in.
+	destination[tag].emplace_back(job);
+	job->job_recorded = true;
 }
 
 void Planner::replan(std::shared_ptr<Job> start) {
 	logDebug("Replanning.");
 	//Fill the vector with the jobs.
 	tagger(start, 0, plan);
-	//In the common case, the vector is sorted by a reverse.
-	std::reverse(plan.begin(), plan.end());
-	//sort the vector.
-	//Since the deepest jobs are negative, this works.
-	std::sort(plan.begin(), plan.end(), jobComparer);
 	is_valid = true;
 	//Put in weak_plan, the cache.
-	weak_plan.assign(plan.begin(), plan.end());
-	plan.clear();
+	//We do two loops because we really don't want to keep deleting and recreating the vectors.
+	//First loop: kill bins in the weak plan that have no correspondance anymore.
+	filter(weak_plan, [](decltype(weak_plan)::value_type &i, decltype(plan) &plan)->bool {
+		return plan.count(i.first);
+	}, plan);
+	for(auto &bin: plan) {
+		weak_plan[bin.first].assign(bin.second.begin(), bin.second.end());
+	}
+}
+
+void Planner::clearStrongPlan() {
+	for(auto &bin: plan) bin.second.clear();
+}
+
+void Planner::initializeStrongPlan() {
+	for(auto &bin: weak_plan) {
+		plan[bin.first].assign(bin.second.begin(), bin.second.end());
+		for(auto &j: plan[bin.first]) if(j == nullptr) {
+			invalidatePlan();
+			return;
+		}
+	}
 }
 
 }

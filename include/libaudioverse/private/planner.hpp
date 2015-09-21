@@ -26,8 +26,13 @@ class Planner {
 	void invalidatePlan();
 	private:
 	void replan(std::shared_ptr<Job> start);
-	std::vector<std::shared_ptr<Job>> plan;
-	std::vector<std::weak_ptr<Job>> weak_plan;
+	//After every tick, kill the shared pointers so that we can let things die.
+	void clearStrongPlan();
+	//Initialize the strong version of the plan from the weak pointers.
+	//This can invalidate the plan.
+	void initializeStrongPlan();
+	std::map<int, std::vector<std::shared_ptr<Job>>> plan;
+	std::map<int, std::vector<std::weak_ptr<Job>>> weak_plan;
 	bool is_valid = false;
 	std::weak_ptr<Job> last_start;
 	//For threads:

@@ -6,6 +6,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <functional>
 #include <set>
 #include <vector>
+#include <map>
 #include <memory>
 
 /**See planner.hpp.
@@ -16,7 +17,7 @@ namespace libaudioverse_implementation {
 class Job;
 
 /**Tags jobs with a number indicating when theya re to run.*/
-void tagger(std::shared_ptr<Job> job, int tag, std::vector<std::shared_ptr<Job>> &destination);
+void tagger(std::shared_ptr<Job> job, int tag, std::map<int, std::vector<std::shared_ptr<Job>>> &destination);
 /**Compares smart pointers to jobs: terue if job a comes-before job b.
 bool jobComparer(const std::shared_ptr<Job> &a, const std::shared_ptr<Job> &b);
 
@@ -33,7 +34,7 @@ class  Job: public ExternalObject {
 	private:
 	int job_sort_tag = 0;
 	bool job_recorded = false;
-	friend void tagger(std::shared_ptr<Job> job, int tag, std::vector<std::shared_ptr<Job>> &destination);
+	friend void tagger(std::shared_ptr<Job> job, int tag, std::map<int, std::vector<std::shared_ptr<Job>>> &destination);
 	friend bool jobComparer(const std::shared_ptr<Job> &a, const std::shared_ptr<Job> &b);
 	friend class Planner;
 	friend void jobExecutor(std::shared_ptr<Job> &j); //Used by the planner to run jobs.
