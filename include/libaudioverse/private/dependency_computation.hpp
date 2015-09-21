@@ -19,7 +19,7 @@ To create a node that overrides its dependency management, add a template here a
 Be sure to order the final template from most to least specific.*/
 
 template<typename  JobT, typename CallableT, typename... ArgsT>
-void simulationVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&... args) {
+inline void simulationVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&... args) {
 	start->final_output_connection->visitInputs(callable, args...);
 	filterWeakPointers(start->always_playing_nodes, [](std::shared_ptr<Node> &n, CallableT &callable, ArgsT&&... args2) {
 		auto j = std::static_pointer_cast<Job>(n);
@@ -28,33 +28,25 @@ void simulationVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&... 
 }
 
 template<typename JobT, typename CallableT, typename... ArgsT>
-void nodeVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&... args) {
+inline void nodeVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&... args) {
 	for(int i = 0; i < start->getInputConnectionCount(); i++) {
-		auto conn = start->getInputConnection(i)->getConnectedNodes();
-		for(auto &p: conn) {
-			//This one can't fail either.
-			callable(std::static_pointer_cast<Job>(p->shared_from_this()), args...);
-		}
+		start->getInputConnection(i)->visitInputs(callable, args...);
 	}
 	for(auto &p: start->properties) {
 		auto &prop = p.second;
 		auto conn = prop.getInputConnection();
-		if(conn) {
-			for(auto n: conn->getConnectedNodes()) {
-				callable(std::static_pointer_cast<Job>(n->shared_from_this()), args...);
-			}
-		}
+		if(conn) conn->visitInputs(callable, args...);
 	}	
 }
 
 template<typename JobT, typename CallableT, typename... ArgsT>
-void subgraphNodeVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&... args) {
+inline void subgraphNodeVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&... args) {
 	auto j = std::static_pointer_cast<Job>(start->subgraph_output);
 	if(j) callable(j, args...);
 }
 
 template<typename JobT, typename CallableT, typename... ArgsT>
-void environmentVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&... args) {
+inline void environmentVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&... args) {
 	subgraphNodeVisitDependencies(std::static_pointer_cast<SubgraphNode>(start), callable, args...);
 	//Other dependencies: all our sources.
 	for(auto w: start->sources) {
@@ -67,14 +59,14 @@ void environmentVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&...
 }
 
 template<typename JobT, typename CallableT, typename... ArgsT>
-void sourceVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&... args) {
+inline void sourceVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&... args) {
 	if(start->getState() != Lav_NODESTATE_PAUSED && start->culled) visitDependencies(start->input, callable, args...);
 }
 
 #define TRY(type, name)  auto casted##type = std::dynamic_pointer_cast<type>(start); if(casted##type) {name(casted##type, callable, args...);return;}
 
 template<typename JobT, typename CallableT, typename... ArgsT>
-void visitDependencies(JobT &&start, CallableT&& callable, ArgsT&&... args) {
+inline void visitDependencies(JobT &&start, CallableT&& callable, ArgsT&&... args) {
 	TRY(Simulation, simulationVisitDependencies)
 	TRY(EnvironmentNode, environmentVisitDependencies)
 	TRY(SourceNode, sourceVisitDependencies)
