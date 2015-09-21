@@ -32,10 +32,8 @@ class  Job: public ExternalObject {
 	virtual void execute() {}
 	virtual bool canCull() {return false;}
 	private:
-	int job_sort_tag = 0;
 	bool job_recorded = false;
 	friend void tagger(std::shared_ptr<Job> job, int tag, std::map<int, std::vector<std::shared_ptr<Job>>> &destination);
-	friend bool jobComparer(const std::shared_ptr<Job> &a, const std::shared_ptr<Job> &b);
 	friend class Planner;
 	friend void jobExecutor(std::shared_ptr<Job> &j); //Used by the planner to run jobs.
 };
