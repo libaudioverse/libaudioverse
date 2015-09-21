@@ -27,7 +27,6 @@ class SourceNode: public SubgraphNode {
 	void stopFeedingEffect(int which);
 	void update(EnvironmentInfo &env);
 	void handleStateUpdates(bool shouldCull);
-	void visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) override;
 	private:
 	bool culled = false;
 	std::shared_ptr<Node> panner_node, input;
@@ -36,6 +35,9 @@ class SourceNode: public SubgraphNode {
 	//It is unlikely that we are going to have more effect sends than possible gain nodes.
 	//We are either sending to a regular or a reverb effect.
 	std::map<int, std::shared_ptr<Node>> outgoing_effects, outgoing_effects_reverb;
+	
+	template<typename JobT, typename CallableT, typename... ArgsT>
+	friend void sourceVisitDependencies(JobT&& start, CallableT &&callable, ArgsT&&... args);
 };
 
 std::shared_ptr<Node> createSourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentNode> environment);

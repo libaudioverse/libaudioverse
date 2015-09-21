@@ -26,7 +26,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 namespace libaudioverse_implementation {
 
-Simulation::Simulation(unsigned int sr, unsigned int blockSize, unsigned int mixahead): ExternalObject(Lav_OBJTYPE_SIMULATION) {
+Simulation::Simulation(unsigned int sr, unsigned int blockSize, unsigned int mixahead): Job(Lav_OBJTYPE_SIMULATION) {
 	if(blockSize%4 || blockSize== 0) ERROR(Lav_ERROR_RANGE, "Block size must be a nonzero multiple of 4."); //only afe to have this be a multiple of four.
 	this->sr = (float)sr;
 	this->block_size = blockSize;
@@ -208,18 +208,6 @@ void Simulation::setThreads(int n) {
 
 int Simulation::getThreads() {
 	return threads;
-}
-
-//Conform to job:
-void Simulation::visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) {
-	for(auto &i: final_output_connection->getConnectedNodes()) {
-		auto n = std::dynamic_pointer_cast<Job>(i->shared_from_this());
-		if(n) pred(n);
-	}
-	filterWeakPointers(always_playing_nodes, [&pred](std::shared_ptr<Node> &n) {
-		auto j = std::static_pointer_cast<Job>(n);
-		pred(j);
-	});
 }
 
 void Simulation::invalidatePlan() {

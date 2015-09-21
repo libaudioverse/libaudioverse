@@ -28,7 +28,7 @@ class Planner;
 class ThreadTerminationException {
 };
 
-class Simulation: public ExternalObject, public Job {
+class Simulation: public Job {
 	public:
 	Simulation(unsigned int sr, unsigned int blockSize, unsigned int mixahead);
 	//needed because the InputConnection needs us to use shared_from_this.
@@ -72,9 +72,7 @@ class Simulation: public ExternalObject, public Job {
 	//Thread support.
 	void setThreads(int n);
 	int getThreads();
-	
-	//Conform to job.
-	virtual void visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) override;
+
 	//called when connections are formed or lost, or when a node is deleted.
 	void invalidatePlan();
 	protected:
@@ -111,6 +109,9 @@ class Simulation: public ExternalObject, public Job {
 	
 	Planner* planner = nullptr;
 	int threads = 1;
+	
+	template<typename JobT, typename CallableT, typename... ArgsT>
+	friend void simulationVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&... args);
 };
 
 }

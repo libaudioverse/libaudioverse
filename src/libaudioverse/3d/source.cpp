@@ -237,10 +237,8 @@ void SourceNode::handleStateUpdates(bool shouldCull) {
 	culled = shouldCull;
 }
 
-void SourceNode::visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) {
-	if(getState() != Lav_NODESTATE_PAUSED && culled) input->visitDependenciesUnconditional(pred);
-	//The rest is handled via the environment, which goes through the panner itself.
-}
+
+//Begin public API.
 
 Lav_PUBLIC_FUNCTION LavError Lav_createSourceNode(LavHandle simulationHandle, LavHandle environmentHandle, LavHandle* destination) {
 	PUB_BEGIN

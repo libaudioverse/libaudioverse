@@ -28,7 +28,7 @@ class PropertyBackrefComparer {
 
 
 /**Things all Libaudioverse nodes have.*/
-class Node: public ExternalObject, public Job {
+class Node: public Job {
 	public:
 	Node(int type, std::shared_ptr<Simulation> simulation, unsigned int numInputBuffers, unsigned int numOutputBuffers);
 	virtual ~Node();
@@ -116,14 +116,10 @@ class Node: public ExternalObject, public Job {
 	virtual void resize(int newInputCount, int newOutputCount);
 
 	//Conform to Job.
-	virtual void visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) override;
 	virtual void execute();
 
-	//This is the actual implementation of visitDependencies.
-	//visitDependencies will only call this function if the state is unpaused.
-	//This exists for cycle detection.
-	virtual void visitDependenciesUnconditional(std::function<void(std::shared_ptr<Job>&)> &pred);
-	
+	//True if we're paused.
+	bool canCull() override;
 	protected:
 	std::shared_ptr<Simulation> simulation = nullptr;
 	std::map<int, Property> properties;
@@ -146,6 +142,9 @@ class Node: public ExternalObject, public Job {
 	//we are never allowed to copy.
 	Node(const Node&) = delete;
 	Node& operator=(const Node&) = delete;
+	
+	template<typename JobT, typename CallableT, typename... ArgsT>
+	friend void nodeVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&... args);
 };
 
 /*needed for things that wish to encapsulate and manage nodes that the public API isn't supposed to see.
@@ -166,15 +165,15 @@ class SubgraphNode: public Node {
 	int getOutputBufferCount() override;
 	float** getOutputBufferArray() override;
 
-	//Our dependency is our single output node.
-	void visitDependenciesUnconditional(std::function<void(std::shared_ptr<Job>&)> &pred) override;
-
 	//Override tick because we can't try to use connections.
 	//We don't have proper input buffers, default tick will override who knows what.
 	void tick() override;
 	
 	protected:
 	std::shared_ptr<Node> subgraph_input, subgraph_output;
+	
+	template<typename JobT, typename CallableT, typename... ArgsT>
+	friend void subgraphNodeVisitDependencies(JobT&& start, CallableT &&callable, ArgsT&&... args);
 };
 
 /**This is the creation template for a node.

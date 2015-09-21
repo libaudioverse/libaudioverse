@@ -14,6 +14,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/metadata.hpp>
 #include <libaudioverse/private/kernels.hpp>
 #include <libaudioverse/private/buffer.hpp>
+#include <libaudioverse/private/dependency_computation.hpp>
 #include <algorithm>
 #include <memory>
 #include <stdlib.h>
@@ -22,6 +23,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <vector>
 
 namespace libaudioverse_implementation {
+
 
 /**Given two nodes, determine if connecting an output of start to an input of end causes a cycle.*/
 bool doesEdgePreserveAcyclicity(std::shared_ptr<Job> start, std::shared_ptr<Job> end) {
@@ -33,17 +35,15 @@ bool doesEdgePreserveAcyclicity(std::shared_ptr<Job> start, std::shared_ptr<Job>
 	//connecting start to end connects everything "behind" start to end,
 	//so there's a cycle if end is already behind start.
 	//We check by walking all dependencies of start looking for end.
-	//This is slow, in that it visits extra nodes on a cycle; but if there is no cycle, we visit everything anyway.
-	//We go via visitDependenciesUnconditional to avoid the state check;
-	//this unfortunately involves casting.
-	std::function<void(std::shared_ptr<Job>&)> f ;
 	bool cycled = false;
-	f = [&] (std::shared_ptr<Job> &j) {
-		auto n = std::dynamic_pointer_cast<Node>(j);
-		if(j == end) cycled = true;
-		else if(cycled == false && n) n->visitDependenciesUnconditional(f);
+	auto helper = [&](std::shared_ptr<Job> current, auto callable) {
+		cycled = current == end;
+		if(cycled) return;
+		//We're passing ourself to ourself to avoid std::functions all the way down.
+		else visitDependencies(current, callable, callable);
 	};
-	std::dynamic_pointer_cast<Node>(start)->visitDependencies(f);
+	//And then we pass it to itself.
+	visitDependencies(start, helper, helper);
 	return cycled == false;
 }
 
@@ -56,7 +56,7 @@ bool PropertyBackrefComparer::operator() (const std::tuple<std::weak_ptr<Node>, 
 	else return std::get<1>(a) < std::get<1>(b);
 }
 
-Node::Node(int type, std::shared_ptr<Simulation> simulation, unsigned int numInputBuffers, unsigned int numOutputBuffers): ExternalObject(type) {
+Node::Node(int type, std::shared_ptr<Simulation> simulation, unsigned int numInputBuffers, unsigned int numOutputBuffers): Job(type) {
 	this->simulation= simulation;
 	//request properties from the metadata module.
 	properties = makePropertyTable(type);
@@ -382,32 +382,12 @@ void Node::resize(int newInputCount, int newOutputCount) {
 	}
 }
 
-void Node::visitDependencies(std::function<void(std::shared_ptr<Job>&)> &pred) {
-	if(getState() != Lav_NODESTATE_PAUSED) visitDependenciesUnconditional(pred);
-}
-
 void Node::execute() {
 	tick();
 }
 
-void Node::visitDependenciesUnconditional(std::function<void(std::shared_ptr<Job>&)> &pred) {
-	for(int i = 0; i < getInputConnectionCount(); i++) {
-		auto conn = getInputConnection(i)->getConnectedNodes();
-		for(auto &p: conn) {
-			auto j = std::dynamic_pointer_cast<Job>(p->shared_from_this());
-			pred(j);
-		}
-	}
-	for(auto &p: properties) {
-		auto &prop = p.second;
-		auto conn = prop.getInputConnection();
-		if(conn) {
-			for(auto n: conn->getConnectedNodes()) {
-				auto j = std::dynamic_pointer_cast<Job>(n->shared_from_this());
-				pred(j);
-			}
-		}
-	}	
+bool Node::canCull() {
+	return getState() == Lav_NODESTATE_PAUSED;
 }
 
 //LavSubgraphNode
@@ -443,12 +423,6 @@ int SubgraphNode::getOutputBufferCount() {
 float** SubgraphNode::getOutputBufferArray() {
 	if(subgraph_output) return subgraph_output->getOutputBufferArray();
 	return nullptr;
-}
-
-//Our only dependency is our output node, if set.
-void SubgraphNode::visitDependenciesUnconditional(std::function<void(std::shared_ptr<Job>&)> &pred) {
-	auto j = std::static_pointer_cast<Job>(subgraph_output);
-	if(j) pred(j);
 }
 
 //This override is needed because nodes try to add their inputs, but we override where input connections come from.

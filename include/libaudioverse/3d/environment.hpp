@@ -39,7 +39,6 @@ class EnvironmentNode: public SubgraphNode {
 	//Also update sources, which might reconfigure themselves.
 	virtual void willTick() override;
 	std::shared_ptr<HrtfData> getHrtf();
-	void visitDependenciesUnconditional(std::function<void(std::shared_ptr<Job>&)> &pred) override;
 	//Play buffer asynchronously at specified position, destroying the source when done.
 	void playAsync(std::shared_ptr<Buffer> buffer, float x, float y, float z, bool isDry = false);
 	//Get the output.
@@ -58,6 +57,8 @@ class EnvironmentNode: public SubgraphNode {
 	EnvironmentInfo environment_info;
 	std::vector<EffectSendConfiguration> effect_sends;
 	
+	template<typename JobT, typename CallableT, typename... ArgsT>
+	friend void environmentVisitDependencies(JobT&& start, CallableT &&callable, ArgsT&&... args);
 	//This is used to make play_async not invalidate the plan.
 	std::vector<std::tuple<std::shared_ptr<Node>, std::shared_ptr<SourceNode>>> play_async_source_cache;
 	int play_async_source_cache_limit = 30; //How many we're willing to cache.

@@ -28,7 +28,7 @@ void filterWeakPointers(ContainerT &&container, CallableT &&callable, ArgsT&&...
 	while(cur != container.end()) {
 		auto strong = cur->lock();
 		if(strong) {
-			callable(strong);
+			callable(strong, args...);
 			cur++;
 		}
 		else cur = container.erase(cur);
