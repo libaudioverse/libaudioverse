@@ -22,7 +22,7 @@ template<typename  JobT, typename CallableT, typename... ArgsT>
 void simulationVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&... args) {
 	for(auto &i: start->final_output_connection->getConnectedNodes()) {
 		//This cannot fail.
-		callable(std::dynamic_pointer_cast<Job>(i->shared_from_this()), args...);
+		callable(std::static_pointer_cast<Job>(i->shared_from_this()), args...);
 	}
 	filterWeakPointers(start->always_playing_nodes, [](std::shared_ptr<Node> &n, CallableT &callable, ArgsT&&... args2) {
 		auto j = std::static_pointer_cast<Job>(n);
@@ -36,7 +36,7 @@ void nodeVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&... args) 
 		auto conn = start->getInputConnection(i)->getConnectedNodes();
 		for(auto &p: conn) {
 			//This one can't fail either.
-			callable(std::dynamic_pointer_cast<Job>(p->shared_from_this()), args...);
+			callable(std::static_pointer_cast<Job>(p->shared_from_this()), args...);
 		}
 	}
 	for(auto &p: start->properties) {
@@ -44,7 +44,7 @@ void nodeVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&... args) 
 		auto conn = prop.getInputConnection();
 		if(conn) {
 			for(auto n: conn->getConnectedNodes()) {
-				callable(std::dynamic_pointer_cast<Job>(n->shared_from_this()), args...);
+				callable(std::static_pointer_cast<Job>(n->shared_from_this()), args...);
 			}
 		}
 	}	
