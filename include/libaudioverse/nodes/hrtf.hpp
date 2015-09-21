@@ -27,8 +27,8 @@ class HrtfNode: public Node {
 	std::shared_ptr<HrtfData> hrtf = nullptr;
 	//for determining when we should and shouldn't crossfade.
 	float prev_azimuth = 0.0f, prev_elevation = 0.0f;
-	//Force a recompute of the HRIR.  Used when resetting.
-	bool force_recompute = true;
+	//We just reset, and need to avoid crossfading.
+	bool just_reset = true;
 	//buffers and length for the convolvers.
 	float* left_response, *right_response;
 	int response_length;

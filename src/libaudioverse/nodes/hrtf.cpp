@@ -78,10 +78,10 @@ void HrtfNode::process() {
 	kiss_fftr(fft, fft_workspace, input_fft);
 	//calculating the hrir is expensive, do it only if needed.
 	bool didRecompute = false;
-	bool allowCrossfade = getProperty(Lav_PANNER_SHOULD_CROSSFADE).getIntValue();
+	bool allowCrossfade = getProperty(Lav_PANNER_SHOULD_CROSSFADE).getIntValue() && just_reset == false;
 	float currentAzimuth = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
 	float currentElevation = getProperty(Lav_PANNER_ELEVATION).getFloatValue();
-	if(force_recompute | fabs(currentElevation-prev_elevation) > 0.5f || fabs(currentAzimuth-prev_azimuth) > 0.5f) {
+	if(just_reset || fabs(currentElevation-prev_elevation) > 0.5f || fabs(currentAzimuth-prev_azimuth) > 0.5f) {
 		hrtf->computeCoefficientsStereo(currentElevation, currentAzimuth, left_response, right_response, linearPhase);
 		if(allowCrossfade) {
 			new_left_convolver->setResponse(response_length, left_response);
@@ -92,6 +92,7 @@ void HrtfNode::process() {
 			right_convolver->setResponse(response_length, right_response);
 		}
 		didRecompute=true;
+		just_reset = false;
 		//note: putting these anywhere in the didnt-recompute path causes things to never move.
 		prev_elevation = currentElevation;
 		prev_azimuth = currentAzimuth;
@@ -170,7 +171,7 @@ void HrtfNode::applyIdtChanged() {
 void HrtfNode::reset() {
 	prev_azimuth = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
 	prev_elevation = getProperty(Lav_PANNER_ELEVATION).getFloatValue();
-	force_recompute = true;
+	just_reset = true;
 }
 
 //begin public api
