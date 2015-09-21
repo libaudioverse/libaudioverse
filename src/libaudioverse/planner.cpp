@@ -25,31 +25,17 @@ void Planner::execute(std::shared_ptr<Job> start, int threads) {
 	//We might invalidate because of a dead weak pointer, but this can only happen once.
 	if(is_valid == false) replan(start);
 	if(threads == 1) {
-		becomeAudioThread();
 		runJobsSync();
 	}
 	else {
-		//We are maybe currently an audio thread. We don't want to be.
-		unbecomeAudioThread();
 		if(started_thread_pool == false) {
 			thread_pool.setThreadCount(threads);
 			thread_pool.start();
-			thread_pool.submitJobToAllThreads(becomeAudioThread);
-			thread_pool.submitBarrier();
-			auto fut = thread_pool.submitJobWithResult([] () {});
-			fut.wait();
 			started_thread_pool = true;
+			last_thread_count = threads;
 		}
 		if(last_thread_count != threads) {
-			thread_pool.submitJobToAllThreads(unbecomeAudioThread);
-			thread_pool.submitBarrier();
-			auto fut = thread_pool.submitJobWithResult([] () {});
-			fut.wait();
 			thread_pool.setThreadCount(threads);
-			thread_pool.submitJobToAllThreads(becomeAudioThread);
-			thread_pool.submitBarrier();
-			fut = thread_pool.submitJobWithResult([] () {});
-			fut.wait();
 			last_thread_count = threads;
 		}
 		runJobsAsync();
@@ -64,14 +50,20 @@ void jobExecutor(std::shared_ptr<Job> &j) {
 }
 
 void Planner::runJobsSync() {
+	becomeAudioThread();
 	for(auto &bin: plan) {
 		for(auto &j: bin.second) {
 			jobExecutor(j);
 		}
 	}
+	//We are potentially sharing this thread with someone else. It is important that we don't accidentally give them high priority too.
+	unbecomeAudioThread();
 }
 
 void Planner::runJobsAsync() {
+	//becomeAudioThread is no-op if called multiple times.
+	//Putting it here greatly simplifies thread pool startup logic.
+	thread_pool.submitJobToAllThreads(becomeAudioThread);
 	for(auto &bin: plan) {
 		thread_pool.map(jobExecutor, bin.second.begin(), bin.second.end());
 		thread_pool.submitBarrier();
