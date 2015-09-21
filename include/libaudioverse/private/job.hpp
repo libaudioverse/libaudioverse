@@ -16,8 +16,8 @@ namespace libaudioverse_implementation {
 
 class Job;
 
-/**Tags jobs with a number indicating when theya re to run.*/
-void tagger(std::shared_ptr<Job> job, int tag, std::map<int, std::vector<std::shared_ptr<Job>>> &destination);
+//Places jobs into their bins.
+void binner(std::shared_ptr<Job> job, int tag, std::map<int, std::vector<std::shared_ptr<Job>>> &destination);
 /**Compares smart pointers to jobs: terue if job a comes-before job b.
 bool jobComparer(const std::shared_ptr<Job> &a, const std::shared_ptr<Job> &b);
 
@@ -33,7 +33,7 @@ class  Job: public ExternalObject {
 	virtual bool canCull() {return false;}
 	private:
 	bool job_recorded = false;
-	friend void tagger(std::shared_ptr<Job> job, int tag, std::map<int, std::vector<std::shared_ptr<Job>>> &destination);
+	friend void binner(std::shared_ptr<Job> job, int tag, std::map<int, std::vector<std::shared_ptr<Job>>> &destination);
 	friend class Planner;
 	friend void jobExecutor(std::shared_ptr<Job> &j); //Used by the planner to run jobs.
 };

@@ -81,13 +81,13 @@ void Planner::invalidatePlan() {
 
 //Actually do the planning below here:
 //Small helper  function, which needn't know about the class (thus avoiding capture requirements).
-void tagger(std::shared_ptr<Job> job, int tag, std::map<int, std::vector<std::shared_ptr<Job>>> &destination) {
+inline void binner(std::shared_ptr<Job> job, int tag, std::map<int, std::vector<std::shared_ptr<Job>>> &destination) {
 	//if the job is recorded or cullable, we can skip out.
 	if(job->job_recorded || job->canCull()) return;
 	//Visit our dependencies first.  We want this to make sure we're in the lowest bin we have to be in.
 	//Consider a graph, a->b, a->c->b.
 	//If we're called on b as a's dependency and record, then it won't happen before c.
-	visitDependencies(job, tagger, tag-1, destination);
+	visitDependencies(job, binner, tag-1, destination);
 	//The job may have just been recorded.  if it was, we can abort.
 	if(job->job_recorded) return;
 	//We know it can't be culled because this never changes. So put it in.
@@ -98,7 +98,7 @@ void tagger(std::shared_ptr<Job> job, int tag, std::map<int, std::vector<std::sh
 void Planner::replan(std::shared_ptr<Job> start) {
 	logDebug("Replanning.");
 	//Fill the vector with the jobs.
-	tagger(start, 0, plan);
+	binner(start, 0, plan);
 	is_valid = true;
 	//Put in weak_plan, the cache.
 	//We do two loops because we really don't want to keep deleting and recreating the vectors.
