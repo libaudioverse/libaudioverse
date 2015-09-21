@@ -53,6 +53,11 @@ class InputConnection {
 	Node* getNode();
 	std::vector<Node*> getConnectedNodes();
 	int getConnectedNodeCount();
+	
+	template<typename CallableT, typename... ArgsT>
+	void visitInputs(CallableT&& callable, ArgsT&&... args) {
+		for(auto &i: connected_to) callable(std::static_pointer_cast<Node>(i.first->getNode()->shared_from_this()), args...);
+	}
 	private:
 	Node* node;
 	int start, count, block_size;
