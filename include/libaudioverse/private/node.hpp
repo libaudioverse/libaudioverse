@@ -28,7 +28,7 @@ class PropertyBackrefComparer {
 
 
 /**Things all Libaudioverse nodes have.*/
-class Node: public ExternalObject, public Job {
+class Node: public Job {
 	public:
 	Node(int type, std::shared_ptr<Simulation> simulation, unsigned int numInputBuffers, unsigned int numOutputBuffers);
 	virtual ~Node();

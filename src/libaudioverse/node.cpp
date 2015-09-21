@@ -56,7 +56,7 @@ bool PropertyBackrefComparer::operator() (const std::tuple<std::weak_ptr<Node>, 
 	else return std::get<1>(a) < std::get<1>(b);
 }
 
-Node::Node(int type, std::shared_ptr<Simulation> simulation, unsigned int numInputBuffers, unsigned int numOutputBuffers): ExternalObject(type) {
+Node::Node(int type, std::shared_ptr<Simulation> simulation, unsigned int numInputBuffers, unsigned int numOutputBuffers): Job(type) {
 	this->simulation= simulation;
 	//request properties from the metadata module.
 	properties = makePropertyTable(type);

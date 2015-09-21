@@ -28,7 +28,7 @@ class Planner;
 class ThreadTerminationException {
 };
 
-class Simulation: public ExternalObject, public Job {
+class Simulation: public Job {
 	public:
 	Simulation(unsigned int sr, unsigned int blockSize, unsigned int mixahead);
 	//needed because the InputConnection needs us to use shared_from_this.
