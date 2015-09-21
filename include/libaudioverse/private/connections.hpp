@@ -56,7 +56,7 @@ class InputConnection {
 	
 	template<typename CallableT, typename... ArgsT>
 	void visitInputs(CallableT&& callable, ArgsT&&... args) {
-		for(auto &i: connected_to) callable(std::static_pointer_cast<Node>(i.first->getNode()->shared_from_this()), args...);
+		for(auto &i: connected_to) callable(i.second, args...);
 	}
 	private:
 	Node* node;
