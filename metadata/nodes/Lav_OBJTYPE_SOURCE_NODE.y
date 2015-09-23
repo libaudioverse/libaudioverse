@@ -89,6 +89,20 @@ properties:
       The maximum amount of audio to be diverted to reverb sends, if any.
       
       Behavior is undefined if this property is ever less than {{"Lav_SOURCE_MIN_REVERB_LEVEL"|property}}.
+  Lav_SOURCE_OCCLUSION:
+    type: float
+    name: occlusion
+    range: [0.0, 1.0]
+    default: 0.0
+    doc_description: |
+      A scalar representing how occluded this source is.
+      
+      This property controls internal filters of the source that make occluded objects sound muffled.
+      A value of 1.0 is a fully occluded source, which will be all but silent; a value of 0.0 has no effect.
+      
+      It is extremely difficult to map occlusion to a physical quantity.
+      In the real world, occlusion depends on mass, density, molecular structure, and a huge number of other factors.
+      Libaudioverse therefore chooses to use this scalar quantity and to attempt to "do the right thing."
 extra_functions:
   Lav_sourceNodeFeedEffect:
     doc_description: |

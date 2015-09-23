@@ -7,6 +7,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/nodes/amplitude_panner.hpp>
 #include <libaudioverse/nodes/multipanner.hpp>
 #include <libaudioverse/nodes/gain.hpp>
+#include <libaudioverse/nodes/biquad.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/constants.hpp>
