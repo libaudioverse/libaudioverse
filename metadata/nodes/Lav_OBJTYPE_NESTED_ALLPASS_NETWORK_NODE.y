@@ -21,7 +21,7 @@ extra_functions:
     doc_description: |
       Appenda  one-pole filter.
     params:
-      frequerncy: The {{"-3 DB"|codelit}} frequency.
+      frequency: The {{"-3 DB"|codelit}} frequency.
       isHighpass: 0 for lowpass, 1 for highpass.
   Lav_nestedAllpassNetworkNodeAppendBiquad:
     doc-description: |

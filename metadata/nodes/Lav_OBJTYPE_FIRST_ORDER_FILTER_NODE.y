@@ -22,17 +22,17 @@ extra_functions:
   Lav_firstOrderFilterNodeConfigureLowpass:
     doc_description: |
       Configure the filter as a first-order Butterworth lowpass.
-      This is equivalent to the {{"Lav_OBJTYPE_ONE_POLE_FILTER"|node}} lowpass configuration.
+      This is equivalent to the {{"Lav_OBJTYPE_ONE_POLE_FILTER_NODE"|node}} lowpass configuration.
     params:
       frequency: The {{"-3 DB"|codelit}} frequency. Must be between 0 and nyquist.
   Lav_firstOrderFilterNodeConfigureHighpass:
     doc_description: |
       Configure the filter as a highpass with a roll-off of {{"6 DB"|codelit}} per octave.
-      This is identical to the {{"Lav_OBJTYPE_ONE_POLE_NODE"|node}} highpass configuration.
+      This is identical to the {{"Lav_OBJTYPE_ONE_POLE_FILTER_NODE"|node}} highpass configuration.
     params:
       frequency: The {{"-3 DB"|codelit}} frequency. Must be between 0 and Nyquist.
   Lav_firstOrderFilterNodeConfigureAllpass:
-    doc_descrpition: |
+    doc_description: |
       Configure this node as an allpass.
       You specify the {{"\frac{\pi}{2}"|latex}} frequency.
       You get a filter with a phase of {{"\pi"|latex}} at DC and 0 at Nyquist.
