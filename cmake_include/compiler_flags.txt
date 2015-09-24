@@ -2,6 +2,16 @@ if(${MSVC})
 #turn off the secure crt warnings, because we're not allowed to use microsoft specific functions.
 #Also turn off unsafe stl warnings.  This library likes the unsafe stl.
 add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
+
+if(${LIBAUDIOVERSE_MSVC_FORCE_STATIC_RUNTIME})
+#Force the static runtime.
+#We leave minimum sized releases alone.
+foreach(flag_var
+CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_RELWITHDEBINFO
+CMAKE_C_FLAGS_RELEASE CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELWITHDEBINFO)
+string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
+endforeach()
+endif()
 endif()
 
 #For linux and mac, we must append -std=c99 and -std=c++99

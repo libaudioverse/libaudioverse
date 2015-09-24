@@ -1,6 +1,7 @@
 cmake_MINIMUM_REQUIRED(VERSION 3.3.0)
 
 project(Libaudioverse)
+
 include_directories("${CMAKE_SOURCE_DIR}/include")
 
 #Which CPU extensions to enable?
@@ -12,6 +13,9 @@ SET(LIBAUDIOVERSE_MALLOC_ALIGNMENT 16)
 ENDIF()
 
 #sets up compiler flags for things: sse, vc++ silencing, etc.
+#This needs to be first to force MSVC static runtime.
+#We declare its options here so that trhey are advertised.
+option(LIBAUDIOVERSE_MSVC_FORCE_STATIC_RUNTIME "Force VC++ to statically link the runtime" ON)
 include("cmake_include/compiler_flags.txt")
 
 #Libraries we vendor.
