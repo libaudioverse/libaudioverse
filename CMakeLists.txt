@@ -1,5 +1,12 @@
 cmake_MINIMUM_REQUIRED(VERSION 3.3.0)
 
+#Force release as our default, if the user hasn't overridden.
+#Libaudioverse is almost completely useless in debug.
+#The project command sets this, if we haven't.
+if(NOT CMAKE_BUILD_TYPE)
+SET(CMAKE_BUILD_TYPE "Release" CACHE STRING "The build type. Either Debug, Release, RelWithDebInfo, or MinSizeRel." FORCE)
+endif()
+
 project(Libaudioverse)
 
 include_directories("${CMAKE_SOURCE_DIR}/include")
