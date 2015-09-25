@@ -5,6 +5,7 @@ import jinja2
 import sys
 sys.path = [os.path.join(os.path.dirname(__file__), '..')] + sys.path
 import bindings.get_info
+from bindings.maybe_write import maybe_write
 import re
 
 if len(sys.argv) != 2:
@@ -134,5 +135,4 @@ result = template.render(context)
 if not os.path.exists(os.path.split(os.path.abspath(sys.argv[1]))[0]):
     os.makedirs(os.path.split(os.path.abspath(sys.argv[1]))[0])
 
-with file(sys.argv[1], 'w') as f:
-    f.write(result)
+maybe_write(sys.argv[1], result)
