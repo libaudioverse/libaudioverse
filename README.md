@@ -33,10 +33,25 @@ You need the following:
 
 - Python 2.7
 - CMake 3.0 or later.
-- The python packages Jinja2, pycparser, enum34, numpy, and scipy.
+- The python packages PyYAML, Jinja2, pycparser, enum34, numpy, and scipy.
 - A C++11 capable compiler.  For Windows, this must be Visual Studio 2015 or later.
 
-The build process is the normal build process for CMake, with one small note.  You must build the library as an out-of-source build in a directory called build.  All CMake generators should work.  As an example, here is my build process:
+NOTE: Visual Studio 2015 does not include the C++ components by default.
+You need to be sure to do a custom install and get at least the C/C++ compiler and all of the Windows headers.
+
+The build process is the normal build process for CMake.
+You must build the library as an out-of-source build in a directory called build.
+All CMake generators should work.
+
+For generators without multiple build types, the default configuration of a newly created build directory is Release.
+On Windows, I suggest using `nmake` from a Visual Studio 2015 developer command prompt; if you choose to use Visual Studio project files, make sure to change your build configuration to release.
+
+If you are not using binaries provided by me and need to build Libaudioverse frequently, my generator of choice is `NMake Makefiles JOMM`.
+Jom is a parallel version of NMake and may be obtained from [here](https://wiki.qt.io/Jom).
+Unlike MSBuild, Jom is much less verbose.
+
+Here is an example set of commands, assuming you have all components and Jom.
+If you are using a different generator, you will need to change the last one.
 
 ~~~
 mkdir build
@@ -44,6 +59,11 @@ cd build
 CMake -G "NMake Makefiles JOM" ..
 jom
 ~~~
+
+To generate the manual, you will additionally need asciidoc or asccidoctor.
+Either will work, but Asciidoctor is much, much faster.
+Execute the documentation target to generate `build/documentation/libaudioverse_manual.html`, which contains what currently exists of the manual.
+This is a work in progress.
 
 ##Bindings##
 
