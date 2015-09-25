@@ -32,7 +32,7 @@ Currently Libaudioverse only builds on Windows.  Libaudioverse itself will build
 You need the following:
 
 - Python 2.7
-- CMake 3.0 or later.
+- CMake 3.3 or later.
 - The python packages PyYAML, Jinja2, pycparser, enum34, numpy, and scipy.
 - A C++11 capable compiler.  For Windows, this must be Visual Studio 2015 or later.
 
