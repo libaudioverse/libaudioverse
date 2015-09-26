@@ -47,7 +47,6 @@ COMMAND python "\"${CMAKE_CURRENT_SOURCE_DIR}/scripts/build_bindings.py\""
 DEPENDS libaudioverse
 )
 
-#This makes documentation run, but only when requested.
-ADD_CUSTOM_TARGET(libaudioverse_docs
-COMMAND python "\"${CMAKE_CURRENT_SOURCE_DIR}/scripts/build_docs.py\""
-)
+#Bring  in cpack.
+set(CPACK_GENERATOR ZIP)
+include(CPack)

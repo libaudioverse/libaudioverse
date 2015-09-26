@@ -158,3 +158,20 @@ file(WRITE "${CMAKE_BINARY_DIR}/compiler_flags.txt" "${CMAKE_BUILD_TYPE}\n")
 FILE(APPEND "${CMAKE_BINARY_DIR}/compiler_flags.txt" "${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_${UPPER_BUILD_TYPE}}\n")
 file(APPEND "${CMAKE_BINARY_DIR}/compiler_flags.txt" "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${UPPER_BUILD_TYPE}}\n")
 file(APPEND "${CMAKE_BINARY_DIR}/compiler_flags.txt" "${CMAKE_SHARED_LINKER_FLAGS} ${CMAKE_SHARED_LINKER_FLAGS_${UPPER_BUILD_TYPE}}")
+
+#Docs.
+ADD_CUSTOM_TARGET(libaudioverse_docs ALL
+COMMAND python "\"${CMAKE_SOURCE_DIR}/scripts/build_docs.py\""
+)
+
+#Everything below here is installation related.
+
+set(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}/libaudioverse")
+
+#Install libaudioverse.
+install(TARGETS libaudioverse
+DESTINATION .)
+
+#Copy the manual.
+install(FILES "${CMAKE_BINARY_DIR}/documentation/libaudioverse_manual.html"
+DESTINATION .)
