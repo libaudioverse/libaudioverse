@@ -51,3 +51,5 @@ DEPENDS libaudioverse
 ADD_CUSTOM_TARGET(libaudioverse_docs
 COMMAND python "\"${CMAKE_CURRENT_SOURCE_DIR}/scripts/build_docs.py\""
 )
+
+include(cmake_include/install_logic.txt)
