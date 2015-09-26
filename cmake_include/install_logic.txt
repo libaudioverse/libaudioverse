@@ -1,4 +1,0 @@
-#This is included last and sets up all of the install destinations, etc.
-
-set(CPACK_GENERATOR ZIP)
-include(CPack)
