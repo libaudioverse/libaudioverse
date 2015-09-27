@@ -1,0 +1,7 @@
+This is a Libaudioverse nightly.  This file is regenerated every evening at midnight EST.
+
+Libaudioverse is a work in progress.  Things may break horribly for you.  Or not, who knows.  The API is stable, and major compatibility problems should not be expected at this time (but this is not a promise, should issues come up).
+
+To use Libaudioverse in Python, install the provided wheel.  For other programming languages, you must include libaudioverse.dll and libsndfile-1.dll with your app.  C/C++ headers are in the include directory, and libaudioverse_manual.html provides what currently exists of the documentation.
+
+For more information, see the Github page: http://github.com/camlorn/libaudioverse

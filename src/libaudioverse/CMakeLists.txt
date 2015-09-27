@@ -172,6 +172,19 @@ set(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}/libaudioverse")
 install(TARGETS libaudioverse
 DESTINATION .)
 
+#Nightly readme.
+install(FILES "${CMAKE_SOURCE_DIR}/nightly_instructions.txt"
+DESTINATION .
+RENAME readme.txt)
+
+#Grab the headers and put them in the include directory.
+install(FILES
+"${CMAKE_SOURCE_DIR}/include/libaudioverse/libaudioverse.h"
+"${CMAKE_SOURCE_DIR}/include/libaudioverse/libaudioverse_properties.h"
+"${CMAKE_SOURCE_DIR}/include/libaudioverse/libaudioverse3d.h"
+DESTINATION "include/libaudioverse")
+
+
 #Copy the manual.
 install(FILES "${CMAKE_BINARY_DIR}/documentation/libaudioverse_manual.html"
 DESTINATION .)
