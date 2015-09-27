@@ -175,3 +175,12 @@ DESTINATION .)
 #Copy the manual.
 install(FILES "${CMAKE_BINARY_DIR}/documentation/libaudioverse_manual.html"
 DESTINATION .)
+
+#Grab a copy of Libsndfile.
+#Note: this only applies to Windows, and only until we figure out how to statically link Libsndfile.
+install(FILES "${LIBSNDFILE_BINARY_DIR}/libsndfile-1.dll"
+DESTINATION .)
+
+#Python installation.  Grab the wheel.
+install(DIRECTORY "${CMAKE_BINARY_DIR}/bindings/python/dist/"
+DESTINATION .)

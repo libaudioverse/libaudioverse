@@ -4,6 +4,7 @@ import re
 from .. import transformers, get_info, doc_helper
 from . import doc_filters
 import os.path
+import subprocess
 
 ctypes_map = {
 'int' : 'ctypes.c_int',
@@ -41,6 +42,10 @@ def ctypes_function_helper(func, typedef_prefix):
     argstr = ", ".join([retstr] + [ctypes_string(i.type, 0, typedef_prefix) for i in func.args])
     return "ctypes.CFUNCTYPE(" + argstr + ")"
 
+def post_generate(dir):
+    """Make a wheel, later installed via cmake."""
+    subprocess.call(["python", "setup.py", "bdist_wheel"], shell=True)
+
 def make_python(info):
     #get our directory.
     source_dir = os.path.split(__file__)[0]
@@ -68,5 +73,6 @@ def make_python(info):
         'additional_directories': [
             'examples',
             'docs',
-        ]
+        ],
+        'post_generate': post_generate,
     }

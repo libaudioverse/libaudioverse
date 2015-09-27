@@ -15,7 +15,7 @@ generators = {
 }
 
 def write_files(files, source_dir, dest_dir):
-    special_keys = ['dll_location', 'additional_directories', 'libsndfile_location']
+    special_keys = {'dll_location', 'additional_directories', 'libsndfile_location', 'post_generate'}
     if os.path.exists(dest_dir):
         shutil.rmtree(dest_dir)
     for name, contents in files.iteritems():
@@ -48,4 +48,10 @@ def make_bindings():
     for name, func in generators.iteritems():
         #we copy so that the generators can modify data as they need.
         files = func(copy.deepcopy(all_info))
-        write_files(files, os.path.join(get_info.get_root_directory(), 'bindings', name), os.path.join(get_info.get_root_directory(), 'build', 'bindings', name))
+        source_dir = os.path.join(get_info.get_root_directory(), 'bindings', name)
+        dest_dir = os.path.join(get_info.get_root_directory(), 'build', 'bindings', name)
+        write_files(files, source_dir, dest_dir)
+        #Call the post_generate hook, if any.
+        #This is always called from the directory the bindings were put in.
+        os.chdir(dest_dir)
+        files.get('post_generate', lambda x: None)(dest_dir)
