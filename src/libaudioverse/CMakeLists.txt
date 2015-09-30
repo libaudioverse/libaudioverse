@@ -177,6 +177,10 @@ install(FILES "${CMAKE_SOURCE_DIR}/nightly_instructions.txt"
 DESTINATION .
 RENAME readme.txt)
 
+install(FILES "${CMAKE_SOURCE_DIR}/license"
+DESTINATION .
+RENAME license.txt)
+
 #Grab the headers and put them in the include directory.
 install(FILES
 "${CMAKE_SOURCE_DIR}/include/libaudioverse/libaudioverse.h"
