@@ -11,6 +11,8 @@ project(Libaudioverse)
 
 include_directories("${CMAKE_SOURCE_DIR}/include")
 
+option(LIBAUDIOVERSE_DEVMODE "Whether this is being built for official release. Makes some targets (documentation) optional" ON)
+
 #Which CPU extensions to enable?
 option(LIBAUDIOVERSE_USE_SSE2 "Use SSE2" ON)
 #this is the required alignment for allocation, a default which is configured in case sse/other processor extensions are disabled.
@@ -21,7 +23,7 @@ ENDIF()
 
 #sets up compiler flags for things: sse, vc++ silencing, etc.
 #This needs to be first to force MSVC static runtime.
-#We declare its options here so that trhey are advertised.
+#We declare its options here so that they are advertised to readers of this file.
 option(LIBAUDIOVERSE_MSVC_FORCE_STATIC_RUNTIME "Force VC++ to statically link the runtime" ON)
 include("cmake_include/compiler_flags.txt")
 
