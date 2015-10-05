@@ -59,7 +59,8 @@ build_script:
   - cd build
   #Turn off devmode to make docs be part of all.
   - 'cmake .. -DLIBAUDIOVERSE_DEVMODE:BOOL=OFF -DLIBSNDFILE_LOCATION:STRING="c:/projects/libaudioverse/tmp"'
-  - cmake --build . --config Release --target package
+  #-m is parallel build.
+  - cmake --build . --config Release --target package -- /m
 
 after_build:
   - echo Uploading Windows build to camlorn.net.
