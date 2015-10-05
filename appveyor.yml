@@ -9,7 +9,7 @@ os: Windows Server 2012
 init:
   - git config --global core.autocrlf true
 
-clone_folder c:\projects\libaudioverse
+clone_folder: c:\projects\libaudioverse
 shallow_clone: true
 clone_depth: 5
 
