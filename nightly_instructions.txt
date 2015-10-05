@@ -7,6 +7,6 @@ To use Libaudioverse in Python, install the provided wheel.  For all programming
 Visual studio users may link directly to the provided import library; this library was built with Visual Studio 2015, but should work with earlier versions.  MinGW users can pass the DLL directly to the linker, which should link it fine.
 
 For more information, see the Github page: http://github.com/camlorn/libaudioverse
-This repository does not include examples.  For examples, you will need to clone or download the Github repository.
+This archive does not include examples.  For examples, you will need to clone or download the Github repository.
 
 If you find any issues, please report them against the Github issue tracker.  A mailing list is pending.
