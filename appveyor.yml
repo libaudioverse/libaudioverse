@@ -69,4 +69,4 @@ after_build:
   - python appveyor_upload.py
 
 artifacts:
-  - path: 'c:\projects\libaudioverse\build\libaudioverse_master.zip'
+  - path: 'build\libaudioverse_master.zip'
