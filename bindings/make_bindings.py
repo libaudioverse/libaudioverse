@@ -6,7 +6,8 @@ import shutil
 import copy
 
 if os.name == 'nt':
-    libsndfile_path = r"C:\Program Files (x86)\Mega-Nerd\libsndfile\bin"
+    libsndfile_prefix = os.getenv("LIBSNDFILE_LOCATION", r"C:\Program Files (x86)\Mega-Nerd\libsndfile")
+    libsndfile_path = os.path.join(libsndfile_prefix, "bin")
 else:
     libsndfile_path = None
 

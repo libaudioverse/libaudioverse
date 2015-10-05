@@ -35,11 +35,25 @@ install:
   - mkdir tmp
   - cd tmp
   - echo Downloading Libsndfile.
+  - mkdir bin
+  - cd bin
   - appveyor DownloadFile http://camlorn.net/appveyor/libsndfile32/libsndfile-1.dll
+  - cd ..
+  - mkdir include
+  - cd include
+  - appveyor DownloadFile http://camlorn.net/appveyor/libsndfile32/sndfile.h
+  - cd ..
+  - mkdir lib
+  - cd lib
   - appveyor DownloadFile http://camlorn.net/appveyor/libsndfile32/libsndfile-1.lib
-
+  - cd ..
+  - "set LIBSNDFILE_LOCATION=C:\\projects\\libaudioverse\\tmp"
 
 build_script:
-  - echo Built!
+  - mkdir build
+  - cd build
+  #Turn off devmode to make docs be part of all.
+  - cmake .. -DLIBAUDIOVERSE_DEVMODE:BOOL=OFF
+  - cmake --build . --config Release --target package
 
 deploy: off
