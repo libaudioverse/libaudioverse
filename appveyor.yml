@@ -61,6 +61,8 @@ build_script:
   - 'cmake .. -DLIBAUDIOVERSE_DEVMODE:BOOL=OFF -DLIBSNDFILE_LOCATION:STRING="c:/projects/libaudioverse/tmp"'
   #-m is parallel build.
   - cmake --build . --config Release --target package -- /m
+  #Go back, so that after_build works.
+  - cd ..
 
 after_build:
   - echo Uploading Windows build to camlorn.net.
