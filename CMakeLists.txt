@@ -1,4 +1,4 @@
-cmake_MINIMUM_REQUIRED(VERSION 3.3.0)
+cmake_MINIMUM_REQUIRED(VERSION 3.0.0)
 
 #Force release as our default, if the user hasn't overridden.
 #Libaudioverse is almost completely useless in debug.
