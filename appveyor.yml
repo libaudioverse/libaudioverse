@@ -35,9 +35,9 @@ install:
   - mkdir tmp
   - cd tmp
   - echo Downloading Libsndfile.
-  - appveyor DownloadFile http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.25-w32-setup.exe -FileName libsndfile.exe
-  - echo Installing Libsndfile
-  - libsndfile.exe /s
+  - appveyor DownloadFile http://camlorn.net/appveyor/libsndfile32/libsndfile-1.dll
+  - appveyor DownloadFile http://camlorn.net/appveyor/libsndfile32/libsndfile-1.lib
+
 
 build_script:
   - echo Built!
