@@ -57,4 +57,5 @@ build_script:
   - 'cmake .. -DLIBAUDIOVERSE_DEVMODE:BOOL=OFF -DLIBSNDFILE_LOCATION:STRING="c:/projects/libaudioverse/tmp"'
   - cmake --build . --config Release --target package
 
-deploy: off
+artifacts:
+  - path: 'c:\projects\libaudioverse\build\libaudioverse_master.zip'

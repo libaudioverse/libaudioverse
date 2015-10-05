@@ -51,5 +51,5 @@ DEPENDS libaudioverse
 
 #Bring  in cpack.
 set(CPACK_GENERATOR ZIP)
-set(CPACK_PACKAGE_FILE_NAME libaudioverse_nightly)
+set(CPACK_PACKAGE_FILE_NAME libaudioverse_master)
 include(CPack)
