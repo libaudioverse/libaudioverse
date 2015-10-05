@@ -46,7 +46,7 @@ install:
   - mkdir lib
   - cd lib
   - appveyor DownloadFile http://camlorn.net/appveyor/libsndfile32/libsndfile-1.lib
-  - cd ..
+  - cd ../..
   - "set LIBSNDFILE_LOCATION=C:\\projects\\libaudioverse\\tmp"
 
 build_script:
