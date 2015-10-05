@@ -1,0 +1,45 @@
+version: 0.8pre-{build}
+
+branches:
+  only:
+    - master
+
+os: Windows Server 2012
+
+init:
+  - git config --global core.autocrlf true
+
+clone_folder c:\projects\libaudioverse
+shallow_clone: true
+clone_depth: 5
+
+platform:
+  - x86
+configuration:
+  - Release
+
+
+install:
+  #First, we need to get ourselves into a miniconda environment.
+  - "set PATH=C:\\Miniconda;C:\\Miniconda\\Scripts;%PATH%"
+  #Alwways confirm and don't change the prompt.
+  - conda config --set always_yes yes --set changeps1 no
+  #Bring in latest conda packages.
+  - conda update -q conda
+  - conda info -a
+  - "conda create -q -n lav-environment python=2.7 numpy scipy"
+  - activate lav-environment
+  #Bring in jinja2, pycparser, etc.
+  - "pip install jinja2 pycparser pyyaml enum34"
+  #This next one gets a bit interesting: we need to download and silently install libsndfile.
+  - mkdir tmp
+  - cd tmp
+  - echo Downloading Libsndfile.
+  - appveyor DownloadFile http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.25-w32-setup.exe -FileName libsndfile.exe
+  - echo Installing Libsndfile
+  - libsndfile.exe /s
+
+build_script:
+  - echo Built!
+
+deploy: off
