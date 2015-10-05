@@ -60,10 +60,8 @@ CMake -G "NMake Makefiles JOM" ..
 jom
 ~~~
 
-To generate the manual, you will additionally need asciidoc or asccidoctor.
-Either will work, but Asciidoctor is much, much faster.
+To generate the manual, you will additionally need  asccidoctor.
 Execute the documentation target to generate `build/documentation/libaudioverse_manual.html`, which contains what currently exists of the manual.
-This is a work in progress.
 
 ##Bindings##
 

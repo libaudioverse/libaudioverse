@@ -30,4 +30,4 @@ if __name__ == '__main__':
     with file(os.path.join(dest_dir, 'enumerations.asciidoc'), 'w') as f:
         f.write(enum_docs)
 
-    print subprocess.check_output(["asciidoc", os.path.join(dest_dir, 'libaudioverse_manual.asciidoc')], stderr= subprocess.STDOUT, shell = True)
+    print subprocess.check_output(["asciidoctor", os.path.join(dest_dir, 'libaudioverse_manual.asciidoc')], stderr= subprocess.STDOUT, shell = True)
