@@ -4,7 +4,8 @@ branches:
   only:
     - master
 
-
+environment:
+  LIBSNDFILE_LOCATION: 'c:\projects\libaudioverse\tmp'
 init:
   - git config --global core.autocrlf true
 
@@ -46,6 +47,7 @@ install:
   - cd lib
   - appveyor DownloadFile http://camlorn.net/appveyor/libsndfile32/libsndfile-1.lib
   - cd ../..
+  - gem install asciidoctor
 
 
 build_script:
