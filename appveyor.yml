@@ -6,6 +6,10 @@ branches:
 
 environment:
   LIBSNDFILE_LOCATION: 'c:\projects\libaudioverse\tmp'
+  DEPLOYMENT_HOST: camlorn.net
+  DEPLOYMENT_USERNAME: camlorn
+  DEPLOYMENT_PASSWORD:
+    secure: N+y3x+7kivMfuMDkYVN7CQ==
 init:
   - git config --global core.autocrlf true
 
@@ -30,7 +34,7 @@ install:
   - "conda create -q -n lav-environment python=2.7 numpy scipy"
   - activate lav-environment
   #Bring in jinja2, pycparser, etc.
-  - "pip install jinja2 pycparser pyyaml enum34"
+  - "pip install jinja2 pycparser pyyaml enum34 paramiko"
   #This next one gets a bit interesting: we need to download and silently install libsndfile.
   - mkdir tmp
   - cd tmp
@@ -56,6 +60,10 @@ build_script:
   #Turn off devmode to make docs be part of all.
   - 'cmake .. -DLIBAUDIOVERSE_DEVMODE:BOOL=OFF -DLIBSNDFILE_LOCATION:STRING="c:/projects/libaudioverse/tmp"'
   - cmake --build . --config Release --target package
+
+after_build:
+  - echo Uploading Windows build to camlorn.net.
+  - python appveyor_upload.py
 
 artifacts:
   - path: 'c:\projects\libaudioverse\build\libaudioverse_master.zip'
