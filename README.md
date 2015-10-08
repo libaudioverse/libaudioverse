@@ -1,6 +1,8 @@
 Libaudioverse
 ==============
 
+[![Windows Build status](https://ci.appveyor.com/api/projects/status/wmoa6isbe8fdmg2c?svg=true)](https://ci.appveyor.com/project/camlorn/libaudioverse)
+
 ##Introduction##
 
 Libaudioverse is a highly flexible realtime audio synthesis library.
