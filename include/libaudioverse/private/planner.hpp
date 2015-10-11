@@ -39,9 +39,6 @@ class Planner {
 	bool started_thread_pool = false;
 	int last_thread_count = 0;
 	powercores::ThreadPool thread_pool{0};
-	//This is used to maintain the needed_tag on jobs.
-	//It is important that this start at 1, not zero, as the default needed_tag is 0.
-	int current_needed_tag = 1;
 };
 
 }

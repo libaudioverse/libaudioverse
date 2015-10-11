@@ -27,13 +27,8 @@ class  Job: public ExternalObject {
 	virtual ~Job() {}
 	virtual void execute() {}
 	virtual bool canCull() {return false;}
-	//Each replanning sets the needed tag on all jobs that will execute.
-	//Specifically, this is set to the index of the current plan.
-	//This lets jobs look ahead and do adding, instead of pulling in from their parents, and otherwise increase parallelism significantly.
-	int getNeededTag() {return needed_tag;}
 	private:
 	bool job_recorded = false;
-	int needed_tag = 0;
 	friend void binner(std::shared_ptr<Job> job, int tag, std::map<int, std::vector<std::shared_ptr<Job>>> &destination);
 	friend class Planner;
 	friend void jobExecutor(std::shared_ptr<Job> &j); //Used by the planner to run jobs.
