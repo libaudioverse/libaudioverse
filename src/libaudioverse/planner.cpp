@@ -88,7 +88,7 @@ inline void binner(std::shared_ptr<Job> job, int tag, std::map<int, std::vector<
 	//Consider a graph, a->b, a->c->b.
 	//If we're called on b as a's dependency and record, then it won't happen before c.
 	visitDependencies(job, binner, tag-1, destination);
-	//The job may have just been recorded.  if it was, we can abort.
+	//The job may have just been recorded.  If it was, we can abort.
 	if(job->job_recorded) return;
 	//We know it can't be culled because this never changes. So put it in.
 	destination[tag].emplace_back(job);
@@ -100,6 +100,13 @@ void Planner::replan(std::shared_ptr<Job> start) {
 	//Fill the vector with the jobs.
 	binner(start, 0, plan);
 	is_valid = true;
+	//Set the needed tags.
+	for(auto &bin: plan) {
+		for(auto &j: bin.second) {
+			j->needed_tag = current_needed_tag;
+		}
+	}
+	current_needed_tag += 1;
 	//Put in weak_plan, the cache.
 	//We do two loops because we really don't want to keep deleting and recreating the vectors.
 	//First loop: kill bins in the weak plan that have no correspondance anymore.
