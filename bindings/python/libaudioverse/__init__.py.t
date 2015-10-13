@@ -91,7 +91,7 @@ _lav.bindings_register_exception(_libaudioverse.{{error_name}}, {{friendly_name}
 {%endfor%}
 
 #logging infrastructure
-def _logging_callback(level, message, is_last):
+def _logging_callback(level, message):
     l=logging.getLogger("libaudioverse")
     if level == LoggingLevels.critical:
         l.critical(message)

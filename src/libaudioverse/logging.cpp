@@ -50,7 +50,7 @@ int loggingLevelToInt(logger_singleton::LoggingLevel level) {
 
 void logCallbackTranslator(logger_singleton::LogMessage &msg, LavLoggingCallback cb) {
 	std::string outgoing = msg.topic+": "+msg.message;
-	cb(loggingLevelToInt(msg.level), outgoing.c_str(), msg.is_final);
+	cb(loggingLevelToInt(msg.level), outgoing.c_str());
 }
 
 //begin public api.

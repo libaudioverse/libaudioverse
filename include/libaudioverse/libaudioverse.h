@@ -169,7 +169,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_handleGetType(LavHandle handle, int* destinatio
 /**Configure and query logging.
 
 These functions may be used before library initialization, the intent being that you can get initialization logs.  These functions, like all other functions, cannot be used after library termination.*/
-typedef void (*LavLoggingCallback)(int level, const char* message, int is_final);
+typedef void (*LavLoggingCallback)(int level, const char* message);
 Lav_PUBLIC_FUNCTION LavError Lav_setLoggingCallback(LavLoggingCallback cb);
 Lav_PUBLIC_FUNCTION LavError Lav_getLoggingCallback(LavLoggingCallback* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_setLoggingLevel(int level);
