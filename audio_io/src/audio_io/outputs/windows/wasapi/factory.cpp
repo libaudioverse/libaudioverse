@@ -3,7 +3,7 @@
 #include "wasapi.hpp"
 #include <audio_io/private/audio_outputs.hpp>
 #include <audio_io/private/com.hpp>
-#include <logger_singleton.hpp>
+#include <audio_io/private/logging.hpp>
 #include <windows.h>
 #include <audioclient.h>
 #include <mmdeviceapi.h>
@@ -16,7 +16,7 @@ WasapiOutputDeviceFactory::WasapiOutputDeviceFactory() {
 	IMMDeviceEnumerator* enumerator_raw = nullptr;
 	auto res = APARTMENTCALL(CoCreateInstance, CLSID_MMDeviceEnumerator, nullptr, CLSCTX_ALL, IID_IMMDeviceEnumerator, (void**)&enumerator_raw);
 	if(IS_ERROR(res)) {
-		logger_singleton::getLogger()->logCritical("audio_io", "Could not create device enumerator in factory constructor. Error %i\n", res);
+		logCritical("Could not create device enumerator in factory constructor. Error %i\n", res);
 		throw AudioIOError("Could not create Wasapi device enumerator");
 	}
 	enumerator = wrapComPointer(enumerator_raw);
@@ -41,7 +41,7 @@ std::shared_ptr<OutputDevice> WasapiOutputDeviceFactory::createDevice(std::funct
 	if(index == -1) res = APARTMENTCALL(enumerator->GetDefaultAudioEndpoint, eRender, eMultimedia, &dev);
 	else res = APARTMENTCALL(enumerator->GetDevice, ids_to_id_strings[index].c_str(), &dev);
 	if(IS_ERROR(res)) {
-		logger_singleton::getLogger()->logCritical("audio_io", "Could not create IMMDevice instance.  COM error %i", res);
+		logCritical("Could not create IMMDevice instance.  COM error %i", res);
 		throw AudioIOError("Could not create IMMDeviceInstance");
 	}
 	auto ret = std::make_shared<WasapiOutputDevice>(callback, wrapComPointer(dev), blockSize, channels, sr, minLatency, startLatency, maxLatency);
@@ -64,14 +64,14 @@ void WasapiOutputDeviceFactory::rescan() {
 	IMMDeviceCollection *collection_raw = nullptr;
 	auto res = enumerator->EnumAudioEndpoints(eRender, DEVICE_STATE_ACTIVE, &collection_raw);
 	if(IS_ERROR(res)) {
-		logger_singleton::getLogger()->logCritical("audio_io", "Failed to get IMMDeviceCollection.  COM error %i", res);
+		logCritical("Failed to get IMMDeviceCollection.  COM error %i", res);
 		throw AudioIOError("Could not create IMMDeviceCollection.");
 	}
 	auto collection = wrapComPointer(collection_raw);
 	UINT count;
 	res = collection->GetCount(&count);
 	if(IS_ERROR(res)) {
-		logger_singleton::getLogger()->logCritical("audio_io", "Failure to retrieve device count. Error %i", res);
+		logCritical("Failure to retrieve device count. Error %i", res);
 		throw AudioIOError("Could not determine device count.");
 	}
 	for(UINT i = 0; i < count; i++) {
@@ -80,7 +80,7 @@ void WasapiOutputDeviceFactory::rescan() {
 		IMMDevice *device_raw = nullptr;
 		res = collection->Item(i, &device_raw);
 		if(IS_ERROR(res)) {
-			logger_singleton::getLogger()->logCritical("audio_io", "Couldn't obtain device info for device %i.  Error %i", i, res);
+			logCritical("Couldn't obtain device info for device %i.  Error %i", i, res);
 			throw AudioIOError("Failure to retrieve device information.");
 		}
 		auto device = wrapComPointer(device_raw);
@@ -88,14 +88,14 @@ void WasapiOutputDeviceFactory::rescan() {
 		IPropertyStore *properties_raw = nullptr;
 		res = device->OpenPropertyStore(STGM_READ, &properties_raw);
 		if(IS_ERROR(res)) {
-			logger_singleton::getLogger()->logCritical("audio_io", "Couldn't open property store for device %i. Error %i", i, res);
+			logCritical("Couldn't open property store for device %i. Error %i", i, res);
 			throw AudioIOError("Cannot open property store.");
 		}
 		auto properties = wrapComPointer(properties_raw);
 		PROPVARIANT prop;
 		res = properties->GetValue(PKEY_AudioEngine_DeviceFormat, &prop);
 		if(IS_ERROR(res)) {
-			logger_singleton::getLogger()->logCritical("audio_io", "Could not obtain device format for device %i. Error: %i", i, res);
+			logCritical("Could not obtain device format for device %i. Error: %i", i, res);
 			throw AudioIOError("Couldn't get device format.");
 		}
 		WAVEFORMATEX *format = (WAVEFORMATEX*)prop.blob.pBlobData;
@@ -104,14 +104,14 @@ void WasapiOutputDeviceFactory::rescan() {
 		LPWSTR identifier = nullptr;
 		res = device->GetId(&identifier);
 		if(IS_ERROR(res)) {
-			logger_singleton::getLogger()->logCritical("audio_io", "Could not retreive identifier for device %i. Error %i", i, res);
+			logCritical("Could not retreive identifier for device %i. Error %i", i, res);
 			throw AudioIOError("Failure to retrieve device identifier");
 		}
 		identifierString = std::wstring(identifier);
 		CoTaskMemFree(identifier);
 		res = properties->GetValue(PKEY_DeviceInterface_FriendlyName, &prop);
 		if(IS_ERROR(res)) {
-			logger_singleton::getLogger()->logCritical("audio_io", "Failure to obtain friendly name for device %i.  Error %i", i, res);
+			logCritical("Failure to obtain friendly name for device %i.  Error %i", i, res);
 			throw AudioIOError("Couldn't get friendly name");
 		}
 		LPWSTR rawname = prop.pwszVal;
@@ -140,20 +140,20 @@ OutputDeviceFactory* createWasapiOutputDeviceFactory() {
 			IAudioClient* client_raw = nullptr;
 			auto res = sta.callInApartment(CoCreateInstance, CLSID_MMDeviceEnumerator, nullptr, CLSCTX_ALL, IID_IMMDeviceEnumerator, (void**)&enumerator_raw);
 			if(IS_ERROR(res)) {
-				logger_singleton::getLogger()->logDebug("audio_io", "Couldn't create IMMDeviceEnumerator.  COM error %i", (int)res);
+				logDebug("Couldn't create IMMDeviceEnumerator.  COM error %i", (int)res);
 				return nullptr;
 			}
 			auto enumerator = wrapComPointer(enumerator_raw);
 			//Attempt to get the default device.
 			res = APARTMENTCALL(enumerator->GetDefaultAudioEndpoint, eRender, eMultimedia, &default_device_raw);
 			if(IS_ERROR(res)) {
-				logger_singleton::getLogger()->logDebug("audio_io", "Couldn't initialize IMMDevice for the default audio device.  COM error %i", (int)res);
+				logDebug("Couldn't initialize IMMDevice for the default audio device.  COM error %i", (int)res);
 				return nullptr;
 			}
 			auto default_device = wrapComPointer(default_device_raw);
 			res = APARTMENTCALL(default_device->Activate, IID_IAudioClient, CLSCTX_ALL, NULL, (void**)&client_raw);
 			if(IS_ERROR(res)) {
-				logger_singleton::getLogger()->logDebug("audio_io", "Couldn't activate default Wasapi audio device. COM error %i", (int)res);
+				logDebug("Couldn't activate default Wasapi audio device. COM error %i", (int)res);
 				return nullptr;
 			}
 			auto client = wrapComPointer(client_raw);
@@ -161,20 +161,20 @@ OutputDeviceFactory* createWasapiOutputDeviceFactory() {
 			WAVEFORMATEX *format = nullptr;
 			res = APARTMENTCALL(client->GetMixFormat, &format);
 			if(IS_ERROR(res)) {
-				logger_singleton::getLogger()->logDebug("audio_io", "Couldn't get mix format for default device.  COM error %i", (int)res);
+				logDebug("Couldn't get mix format for default device.  COM error %i", (int)res);
 				return nullptr;
 			}
 			//We don't request a specific buffer length, we just want to know if we can open and otherwise don't care.
 			res = APARTMENTCALL(client->Initialize, AUDCLNT_SHAREMODE_SHARED, 0, 0, 0, format, NULL);
 			if(IS_ERROR(res)) {
-				logger_singleton::getLogger()->logDebug("audio_io", "Couldn't initialize default audio device. COM error %i", (int)res);
+				logDebug("Couldn't initialize default audio device. COM error %i", (int)res);
 				return nullptr;
 			}
 		} //End the test scope.
 		return new WasapiOutputDeviceFactory();
 	}
 	catch(...) {
-		logger_singleton::getLogger()->logDebug("audio_io", "Attempt to initialize Wasapi failed. Falling back to next preferred factory.");
+		logDebug("Attempt to initialize Wasapi failed. Falling back to next preferred factory.");
 		return nullptr;
 	}
 	return nullptr;

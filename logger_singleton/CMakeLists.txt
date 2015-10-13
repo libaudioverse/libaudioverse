@@ -8,3 +8,7 @@ add_library(logger_singleton STATIC
 src/logger_singleton/logger_singleton.cpp
 )
 
+
+add_executable(test_logger
+src/tests/test_logger.cpp)
+target_link_libraries(test_logger logger_singleton)

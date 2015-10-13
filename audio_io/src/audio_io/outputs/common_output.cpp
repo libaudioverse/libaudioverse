@@ -1,7 +1,7 @@
 #include <audio_io/audio_io.hpp>
 #include <audio_io/private/audio_outputs.hpp>
 #include <audio_io/private/sample_format_converter.hpp>
-#include <logger_singleton.hpp>
+#include <audio_io/private/logging.hpp>
 #include <string>
 #include <vector>
 #include <functional>
@@ -23,7 +23,7 @@ void OutputDeviceImplementation::init(std::function<void(float*, int)> callback,
 	sample_format_converter = std::make_shared<SampleFormatConverter>(callback, inputFrames, inputChannels, inputSr, outputChannels, outputSr);
 	//Estimate: outputSr/inputSr is in output samples/input samples, the conversion factor by dimensional analysis.
 	output_frames = input_frames*output_sr/input_sr;
-	logger_singleton::getLogger()->logDebug("audio_io", "DeviceFactoryImplementation initialized. "
+	logDebug("DeviceFactoryImplementation initialized. "
 	"input_frames = %i, input_sr = %i, input_channels = %i, output_frames = %i, output_sr = %i, output_channels = %i.",
 	input_frames, input_sr, input_channels, output_frames, output_sr, output_channels);
 }
@@ -35,7 +35,7 @@ void OutputDeviceImplementation::stop() {
 }
 
 OutputDeviceFactoryImplementation::~OutputDeviceFactoryImplementation() {
-	logger_singleton::getLogger()->logInfo("audio_io", "Output device factory is dying.  Terminating all devices.");
+	logInfo("Output device factory is dying.  Terminating all devices.");
 	for(auto p: created_devices) {
 		auto strong = p.lock();
 		if(strong) strong->stop();

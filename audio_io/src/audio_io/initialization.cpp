@@ -1,14 +1,14 @@
 #include <audio_io/audio_io.hpp>
-#include <logger_singleton.hpp>
+#include <audio_io/private/logging.hpp>
 
 namespace audio_io {
 
 void initialize() {
-	logger_singleton::initialize();
+	//Logging uses once_flag.
 }
 
 void shutdown() {
-	logger_singleton::shutdown();
+	implementation::shutdownLogger();
 }
 
 }

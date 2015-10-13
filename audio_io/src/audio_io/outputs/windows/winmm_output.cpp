@@ -4,7 +4,7 @@
 #include <audio_io/private/audio_outputs.hpp>
 #include <audio_io/private/sample_format_converter.hpp>
 #include <audio_io/private/latency_predictor.hpp>
-#include <logger_singleton.hpp>
+#include <audio_io/private/logging.hpp>
 #include <functional>
 #include <string>
 #include <sstream>
@@ -126,7 +126,7 @@ WinmmOutputDevice::~WinmmOutputDevice() {
 }
 
 void WinmmOutputDevice::stop() {
-	logger_singleton::getLogger()->logInfo("audio_io", "Winmm device shutting down.");
+	logInfo("Winmm device shutting down.");
 	//Shut down the thread.
 	if(winmm_mixing_thread.joinable()) {
 		winmm_mixing_flag.clear();
@@ -158,7 +158,7 @@ std::tuple<WAVEHDR*, short*> WinmmOutputDevice::getWinmmBuffer() {
 
 void WinmmOutputDevice::winmm_mixer() {
 	float* workspace = new float[winmm_buffer_frames*output_channels];
-	logger_singleton::getLogger()->logDebug("audio_io", "Winmm mixing thread started.");
+	logDebug("Winmm mixing thread started.");
 	while(winmm_mixing_flag.test_and_set()) {
 		int targetLatency = latency_predictor.predictLatencyInBlocks(winmm_buffer_frames, output_sr);
 		short* nextBuffer = nullptr;
@@ -220,7 +220,7 @@ void WinmmOutputDevice::winmm_mixer() {
 }
 	waveOutClose(winmm_handle);
 	winmm_handle=nullptr;
-	logger_singleton::getLogger()->logDebug("audio_io", "Winmm mixing thread exiting normally.");
+	logDebug("Winmm mixing thread exiting normally.");
 }
 
 class WinmmOutputDeviceFactory: public OutputDeviceFactoryImplementation {

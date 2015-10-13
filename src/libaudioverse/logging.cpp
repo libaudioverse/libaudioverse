@@ -5,7 +5,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/logging.hpp>
-#include <logger_singleton.hpp>
+#include <logger_singleton/logger_singleton.hpp>
+#include <logger_singleton/logger_singleton.hpp>
 #include <atomic>
 #include <mutex>
 #include <string>
@@ -15,17 +16,21 @@ namespace libaudioverse_implementation {
 std::once_flag logging_init_flag;
 bool initialized_logging = false;
 std::atomic<LavLoggingCallback> saved_logging_callback;
+std::shared_ptr<logger_singleton::Logger> *logger = nullptr;
 
 void implicitInitLogging() {
 	std::call_once(logging_init_flag, [] () {
-		logger_singleton::initialize();
+		logger = new std::shared_ptr<logger_singleton::Logger>();
+		*logger = logger_singleton::createLogger();
 		initialized_logging = true;
 		saved_logging_callback.store(nullptr);
 	});
 }
 
 void shutdownLogging() {
-	if(initialized_logging) logger_singleton::shutdown();
+	if(initialized_logging) {
+		delete logger;
+	}
 }
 
 logger_singleton::LoggingLevel intToLoggingLevel(int level) {
@@ -53,11 +58,16 @@ void logCallbackTranslator(logger_singleton::LogMessage &msg, LavLoggingCallback
 	cb(loggingLevelToInt(msg.level), outgoing.c_str());
 }
 
+std::shared_ptr<logger_singleton::Logger> getLogger() {
+	implicitInitLogging();
+	return *logger;
+}
+
 //begin public api.
 Lav_PUBLIC_FUNCTION LavError Lav_setLoggingCallback(LavLoggingCallback cb) {
 	PUB_BEGIN
 	implicitInitLogging();
-	logger_singleton::getLogger()->setLoggingCallback([=] (logger_singleton::LogMessage &msg) {logCallbackTranslator(msg, cb);});
+	getLogger()->setLoggingCallback([=] (logger_singleton::LogMessage &msg) {logCallbackTranslator(msg, cb);});
 	saved_logging_callback.store(cb);
 	PUB_END
 }
@@ -72,14 +82,14 @@ Lav_PUBLIC_FUNCTION LavError Lav_getLoggingCallback(LavLoggingCallback* destinat
 Lav_PUBLIC_FUNCTION LavError Lav_setLoggingLevel(int level) {
 	PUB_BEGIN
 	implicitInitLogging();
-	logger_singleton::getLogger()->setLoggingLevel(intToLoggingLevel(level));
+	getLogger()->setLoggingLevel(intToLoggingLevel(level));
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_getLoggingLevel(int* destination) {
 	PUB_BEGIN
 	implicitInitLogging();
-	*destination = loggingLevelToInt(logger_singleton::getLogger()->getLoggingLevel());
+	*destination = loggingLevelToInt(getLogger()->getLoggingLevel());
 	PUB_END
 }
 

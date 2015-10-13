@@ -1,9 +1,9 @@
 #pragma once
+#include <logger_singleton/logger_singleton.hpp>
 #include <vector>
 #include <memory>
 #include <functional>
 #include <exception>
-
 
 namespace audio_io {
 
@@ -17,6 +17,11 @@ Be sure that you delete all objects that you got from this library before callin
 
 void initialize();
 void shutdown();
+
+/**Retrieve the logger_singleton logger.
+
+You can use this before initialization.*/
+std::shared_ptr<logger_singleton::Logger> getLogger();
 
 /**Exceptions.*/
 

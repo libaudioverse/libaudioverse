@@ -1,4 +1,4 @@
-#include <logger_singleton.hpp>
+#include <logger_singleton/logger_singleton.hpp>
 #include <functional>
 #include <queue>
 #include <thread>
@@ -29,9 +29,9 @@ Logger::Logger() {
 
 Logger::~Logger() {
 	std::unique_lock<std::mutex> l(mutex);
-	message_queue.push(LogMessage(LoggingLevel::INFO, "logger_singleton", "Logger shutting down", true));
+	running = false;
 	l.unlock();
-	enqueued_message.notify_one();
+	check_cond.notify_one();
 	logging_thread.join();
 }
 
@@ -40,7 +40,7 @@ void Logger::submitMessage(LoggingLevel level, std::string topic, std::string me
 	std::unique_lock<std::mutex> l(mutex);
 	message_queue.push(msg);
 	l.unlock();
-	enqueued_message.notify_one();
+	check_cond.notify_one();
 }
 
 void Logger::setLoggingLevel(LoggingLevel level) {
@@ -62,16 +62,25 @@ void Logger::setLoggingCallback(std::function<void(LogMessage&)> cb) {
 	mutex.unlock();
 }
 
+void Logger::setAsForwarder(std::shared_ptr<Logger> to) {
+	setLoggingCallback([=](LogMessage& m) {
+		to->submitMessage(m.level, m.topic, m.message);
+	});
+}
+
 void Logger::loggingThreadFunction() {
-	bool shouldContinue = true;
-	while(shouldContinue) {
+	while(true) { //Infinite because we need to check running inside the mutex.
 		std::unique_lock<std::mutex> l(mutex);
-		if(message_queue.empty()) { //sleep till we get a message.
-			enqueued_message.wait(l, [&]() {return message_queue.empty() == false;});
+		//We need to be absolutely sure to log everything, so don't allow us to exit if there's something on the queue still.
+		if(running == false && message_queue.empty()) break;
+		if(message_queue.empty()) { //sleep till we get a message or running changes.
+			check_cond.wait(l);
+			//We need to duplicate the check here, as we don't know why we woke, and it might be spureous.
+			//If it's because running changed, then we get it on the next iteration.
+			if(message_queue.empty()) continue;
 		}
 		auto msg = message_queue.front();
 		message_queue.pop();
-		if(msg.is_final) shouldContinue = false;
 		bool needsCallback = callback && msg.level >= level;
 		auto cb = callback;
 		//Execute callback outside the lock.  This prevents incoming messages from blocking.
@@ -80,26 +89,8 @@ void Logger::loggingThreadFunction() {
 	}
 }
 
-std::shared_ptr<Logger> *singleton = nullptr;
-int initcount = 0;
-
-void initialize() {
-	if(initcount == 0) {
-		//This works because we're friends with Logger.
-		singleton = new std::shared_ptr<Logger>(new Logger());
-	}
-	initcount++;
-}
-
-void shutdown() {
-	if(initcount == 1) {
-		delete singleton;
-	}
-	initcount --;
-}
-
-std::shared_ptr<Logger> getLogger() {
-	return *singleton;
+std::shared_ptr<Logger> createLogger() {
+	return std::shared_ptr<Logger>(new Logger());
 }
 
 }

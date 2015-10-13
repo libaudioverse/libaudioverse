@@ -4,7 +4,7 @@
 #include <audio_io/private/audio_outputs.hpp>
 #include <audio_io/private/sample_format_converter.hpp>
 #include <audio_io/private/latency_predictor.hpp>
-#include <logger_singleton.hpp>
+#include <audio_io/private/logging.hpp>
 #include <thread>
 #include <atomic>
 #include <chrono>
@@ -20,18 +20,18 @@ const int wasapi_chunk_length = 512;
 
 WasapiOutputDevice::WasapiOutputDevice(std::function<void(float*, int)> callback, std::shared_ptr<IMMDevice> device, int inputFrames, int inputChannels, int inputSr, double minLatency, double startLatency, double maxLatency)  {
 	this->device = device;
-	logger_singleton::getLogger()->logDebug("audio_io", "Attempting to initialize a Wasapi device.");
+	logDebug("Attempting to initialize a Wasapi device.");
 	IAudioClient* client_raw = nullptr;
 	auto res = APARTMENTCALL(device->Activate, IID_IAudioClient, CLSCTX_ALL, NULL, (void**)&client_raw);
 	if(IS_ERROR(res)) {
-		logger_singleton::getLogger()->logCritical("audio_io", "Could not activate device.  Error code %i.", (int)res);
+		logDebug("Could not activate device.  Error code %i.", (int)res);
 		throw AudioIOError("Wasapi: could not activate device.");
 	}
 	client = wrapComPointer(client_raw);
 	WAVEFORMATEX *format = nullptr;
 	res = APARTMENTCALL(client->GetMixFormat, &format);
 	if(IS_ERROR(res)) {
-		logger_singleton::getLogger()->logCritical("audio_io", "Wasapi: could not get mix format. Error: %i", (int)res);
+		logDebug("Wasapi: could not get mix format. Error: %i", (int)res);
 		throw AudioIOError("Wasapi: unable to retrieve mix format.");
 	}
 	if(format->wFormatTag == WAVE_FORMAT_EXTENSIBLE) this->format = *(WAVEFORMATEXTENSIBLE*)format;
@@ -61,21 +61,21 @@ WasapiOutputDevice::WasapiOutputDevice(std::function<void(float*, int)> callback
 	}
 	res = APARTMENTCALL(client->IsFormatSupported, AUDCLNT_SHAREMODE_SHARED, (WAVEFORMATEX*)&(this->format), &format);
 	if(IS_ERROR(res)) {
-		logger_singleton::getLogger()->logCritical("audio_io", "Requested mix format is not supported.  Attempt to use IEEE float failed. Error: %i", (int)res);
+		logDebug("Requested mix format is not supported.  Attempt to use IEEE float failed. Error: %i", (int)res);
 		throw AudioIOError("Wasapi: could not initialize with float audio..");
 	}
 	//We ask for 100 MS of latency to play with.
 	REFERENCE_TIME latencyNanoseconds = 100000000;
 	res = APARTMENTCALL(client->Initialize, AUDCLNT_SHAREMODE_SHARED, 0, latencyNanoseconds/100, 0, (WAVEFORMATEX*)&(this->format), NULL);
 	if(res != S_OK) {
-		logger_singleton::getLogger()->logCritical("audio_io", "Call to IAudioClient::initialize failed. COM error %i.", (int)res);
+		logDebug("Call to IAudioClient::initialize failed. COM error %i.", (int)res);
 		throw AudioIOError("Wasapi: call to IAudioClient::initialize failed.");
 	}
 	//Get the buffer size and use it to make the predictor.
 	UINT32 bufferSize;
 	res = APARTMENTCALL(client->GetBufferSize, &bufferSize);
 	if(IS_ERROR(res)) {
-		logger_singleton::getLogger()->logCritical("audio_io", "Attempt to get buffer size failed with error %i", (int)res);
+		logDebug("Attempt to get buffer size failed with error %i", (int)res);
 		throw AudioIOError("Couldn't get Wasapi buffer size.");
 	}
 	int outputSr = this->format.Format.nSamplesPerSec;
@@ -83,13 +83,13 @@ WasapiOutputDevice::WasapiOutputDevice(std::function<void(float*, int)> callback
 	if(maxLatency > bufferSize/(float)outputSr) maxLatency = bufferSize/(float)outputSr;
 	//Clamp starting latency.
 	startLatency = std::min(std::max(startLatency, minLatency), maxLatency);
-	logger_singleton::getLogger()->logDebug("audio_io", "minLatency=%f, startLatency=%f, maxLatency=%f, bufferSize=%i, output_sr=%i", minLatency, startLatency, maxLatency, (int)bufferSize, outputSr);
+	logDebug("minLatency=%f, startLatency=%f, maxLatency=%f, bufferSize=%i, output_sr=%i", minLatency, startLatency, maxLatency, (int)bufferSize, outputSr);
 	latency_predictor = new LatencyPredictor(30, minLatency, startLatency, maxLatency);
 	init(callback, inputFrames, inputChannels, inputSr, this->format.Format.nChannels, outputSr);
 	//At this point, we no longer need to go via the STA for the client interface.
 	should_continue.test_and_set();
 	wasapi_mixing_thread = std::thread(&WasapiOutputDevice::wasapiMixingThreadFunction, this);
-	logger_singleton::getLogger()->logDebug("audio_io", "Initialized Wasapi device.");
+	logDebug("Initialized Wasapi device.");
 }
 
 WasapiOutputDevice::~WasapiOutputDevice() {
@@ -98,8 +98,8 @@ WasapiOutputDevice::~WasapiOutputDevice() {
 }
 
 void WasapiOutputDevice::stop() {
-	logger_singleton::getLogger()->logInfo("audio_io", "Wasapi device shutting down.");
-	logger_singleton::getLogger()->logDebug("audio_io", "Stopping a Wasapi device.");
+	logInfo("Wasapi device shutting down.");
+	logDebug("Stopping a Wasapi device.");
 	should_continue.clear();
 	wasapi_mixing_thread.join();
 }
@@ -108,7 +108,7 @@ void WasapiOutputDevice::wasapiMixingThreadFunction() {
 	//Stuff here can run outside the apartment.
 	auto res = CoInitializeEx(NULL, COINIT_MULTITHREADED);
 	if(IS_ERROR(res)) {
-		logger_singleton::getLogger()->logDebug("audio_io", "Wassapi device mixing thread: could not initialize COM. Error %i", (int)res);
+		logDebug("Wassapi device mixing thread: could not initialize COM. Error %i", (int)res);
 		return; //We really can't recover from this.
 	}
 	IAudioRenderClient *renderClient_raw = nullptr;
@@ -127,7 +127,7 @@ void WasapiOutputDevice::wasapiMixingThreadFunction() {
 	renderClient->ReleaseBuffer(bufferSize-padding, 0);
 	//The buffer is filled, so we begin processing.
 	client->Start();
-	logger_singleton::getLogger()->logDebug("audio_io", "Wasapi mixing thread: audio client is started.  Mixing audio.");
+	logDebug("Wasapi mixing thread: audio client is started.  Mixing audio.");
 	//From here, it's thankfully much simpler.  Every time we have at least output_frames worth of empty buffer, we fill it.
 	bool workspaceContainsChunk = false;
 	while(should_continue.test_and_set()) {
@@ -160,7 +160,7 @@ void WasapiOutputDevice::wasapiMixingThreadFunction() {
 	client->Reset();
 	delete[] workspace;
 	CoUninitialize();
-	logger_singleton::getLogger()->logDebug("audio_io", "Wasapi mixing thread: exiting.");
+	logDebug("Wasapi mixing thread: exiting.");
 }
 
 }

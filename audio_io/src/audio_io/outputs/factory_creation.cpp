@@ -1,6 +1,6 @@
 #include <audio_io/audio_io.hpp>
 #include <audio_io/private/audio_outputs.hpp>
-#include <logger_singleton.hpp>
+#include <audio_io/private/logging.hpp>
 #include <memory>
 #include <utility>
 
@@ -17,12 +17,12 @@ const std::pair<const char*, const implementation::OutputDeviceFactoryCreationFu
 std::shared_ptr<OutputDeviceFactory> getOutputDeviceFactory() {
 	OutputDeviceFactory* fact=nullptr;
 	for(int i=0; i < sizeof(outputDeviceFactoryCreators)/sizeof(outputDeviceFactoryCreators[0]); i++) {
-		logger_singleton::getLogger()->logInfo("audio_io", "Attempting to use device factory %s.", outputDeviceFactoryCreators[i].first);
+		implementation::logInfo("Attempting to use device factory %s.", outputDeviceFactoryCreators[i].first);
 		fact = outputDeviceFactoryCreators[i].second();
 		if(fact) break;
 	}
 	if(fact == nullptr) {
-		logger_singleton::getLogger()->logCritical("audio_io", "Failed to create a device factory.  Audio output is unavailable on this system.");
+		implementation::logCritical("Failed to create a device factory.  Audio output is unavailable on this system.");
 		throw NoBackendError();
 	}
 	return std::shared_ptr<OutputDeviceFactory>(fact);

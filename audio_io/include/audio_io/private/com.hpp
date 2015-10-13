@@ -6,7 +6,7 @@
 #include <functional>
 #include <memory>
 #include <windows.h>
-#include <logger_singleton.hpp>
+#include "logging.hpp"
 
 namespace audio_io {
 namespace implementation {
@@ -62,7 +62,7 @@ class SingleThreadedApartment {
 template<typename T>
 typename std::shared_ptr<typename T> wrapComPointer(T* what) {
 	if(what == nullptr) {
-		logger_singleton::getLogger()->logDebug("audio_io", "Attempt to wrap null COM pointer.");
+		logDebug("audio_io", "Attempt to wrap null COM pointer.");
 		return nullptr;
 	}
 	return std::shared_ptr<typename T>(what, [](T* p) {

@@ -24,6 +24,7 @@ SET(AUDIO_IO_NEEDED_LIBRARIES ${AUDIO_IO_NEEDED_LIBRARIES} speex_resampler_cpp p
 
 SET(AUDIO_IO_FILES
 src/audio_io/initialization.cpp
+src/audio_io/logging.cpp
 src/audio_io/outputs/common_output.cpp
 src/audio_io/outputs/factory_creation.cpp
 src/audio_io/outputs/latency_predictor.cpp

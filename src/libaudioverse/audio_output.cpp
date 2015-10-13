@@ -6,14 +6,16 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/error.hpp>
+#include <libaudioverse/private/logging.hpp>
 #include <audio_io/audio_io.hpp>
+#include <logger_singleton/logger_singleton.hpp>
 #include <string>
 #include <vector>
 #include <memory>
 #include <mutex>
 #include <algorithm>
 #include <thread>
-#include <libaudioverse/private/logging.hpp>
+
 
 namespace libaudioverse_implementation {
 
@@ -22,6 +24,8 @@ std::shared_ptr<audio_io::OutputDeviceFactory> *audio_output_factory;
 void initializeDeviceFactory() {
 	try {
 		logInfo("Initializing audio backend.");
+		//Hook audio_io's logger to our logger.
+		audio_io::getLogger()->setAsForwarder(getLogger());
 		audio_io::initialize();
 		audio_output_factory = new std::shared_ptr<audio_io::OutputDeviceFactory>();
 		auto possible=audio_io::getOutputDeviceFactory();
