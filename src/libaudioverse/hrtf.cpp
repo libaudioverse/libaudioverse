@@ -100,20 +100,20 @@ void HrtfData::loadFromDefault(unsigned int forSr) {
 #define convf(b) safeConvertMemory<float>*(b)
 
 void HrtfData::loadFromBuffer(unsigned int length, char* buffer, unsigned int forSr) {
-	//we now handle endianness.
-	int32_t endianness_marker =convi(buffer);
-	if(endianness_marker != 1) reverse_endianness(buffer, length, 4);
-	//read it again; if it is still not 1, something has gone badly wrong.
-	endianness_marker = convi(buffer);
-	if(endianness_marker != 1) ERROR(Lav_ERROR_HRTF_INVALID, "Could not correct endianness for this architecture.");
-
 	char* iterator = buffer;
 	const unsigned int window_size = 4;
-
-	//read the header information.
-	iterator += window_size;//skip the endianness marker, which is handled above.
+	//Skip the uuid. We will use this in future.
+	iterator+=16;
+	//we now handle endianness.
+	int32_t endianness_marker =convi(iterator);
+	if(endianness_marker != 1) reverse_endianness(iterator, length-16, 4); //-16 because of uuid.
+	//read it again; if it is still not 1, something has gone badly wrong.
+	endianness_marker = convi(iterator);
+	if(endianness_marker != 1) ERROR(Lav_ERROR_HRTF_INVALID, "Could not correct endianness for this architecture.");
+	iterator += window_size;
+	
+	//Get the header info.
 	samplerate = convi(iterator);
-
 	iterator += window_size;
 	hrir_count = convi(iterator);
 	iterator += window_size;

@@ -5,6 +5,8 @@ import numpy.fft as fft
 import struct
 import enum
 import itertools
+import uuid
+
 
 EndiannessTypes=enum.Enum("EndiannessTypes", "big little")
 
@@ -12,8 +14,9 @@ class HrtfWriter(object):
     endianness_marker = 1
     #The odd syntax here lets us put comments in.
     format_template="".join([
-    "{}", #endianness and size indicator. This is platform-dependent.
-    "2i", #Endianness marker, samplerate.
+    "{}", #endianness and size indicator. This is platform-dependent and doesn't add anything to the string.
+    "16c", #The uuid.
+    "2i", #Endianness check marker, samplerate.
     "4i", #Response count, number of elevations, min elevation, max elevation.
     "{}", #Hole for the azimuth counts.
     "i", #Length of each response in samples.
@@ -68,6 +71,7 @@ class HrtfWriter(object):
     def pack_data(self):
         self.make_format_string()
         iter = itertools.chain(
+        uuid.uuid4().bytes, #Generate a 16-byte uuid.
         [self.endianness_marker, self.samplerate, self.response_count,
         self.elevation_count, self.min_elevation, self.max_elevation],
         self.azimuth_counts,

@@ -4,7 +4,9 @@ A file specifying an HRTF definition shall consist of the following, specified i
 
 Assume an integer is 4 bytes and a float is 4 bytes.
 
-- First, the integer 1 represented as 4 bytes.  This allows us to tell if the file was written on an endianness other than ours through a simple compare.  If it, when compared, is not equal to 1, then iterate over the file with a window size of 4 and swap appropriately.
+- A unique string of 16 bytes.  How these are generated doesn't matter; the scripts included with this repository use Python's uuid module.  If two files have the same string of 16 bytes, they are considered to be the same HRTF for caching purposes.
+
+- The integer 1 represented as 4 bytes.  This allows us to tell if the file was written on an endianness other than ours through a simple compare.  If it, when compared, is not equal to 1, then iterate over the file with a window size of 4 and swap appropriately.
 
 - The sample rate of the responses in this file in hertz as a 4-byte integer.
 
