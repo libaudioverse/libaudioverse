@@ -115,12 +115,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createPannerBankNode(LavHandle simulationHandle
 	PUB_BEGIN
 	auto simulation = incomingObject<Simulation>(simulationHandle);
 	LOCK(*simulation);
-	std::shared_ptr<HrtfData> hrtf = std::make_shared<HrtfData>();
-	if(std::string(hrtfPath) == "default") {
-		hrtf->loadFromDefault(simulation->getSr());
-	} else {
-		hrtf->loadFromFile(hrtfPath, simulation->getSr());
-	}
+	auto hrtf = createHrtfFromString(hrtfPath, simulation->getSr());
 	*destination = outgoingObject<Node>(createPannerBankNode(simulation, pannerCount, hrtf));
 	PUB_END
 }

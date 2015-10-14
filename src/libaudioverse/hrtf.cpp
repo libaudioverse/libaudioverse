@@ -16,9 +16,11 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/data.hpp>
 #include <libaudioverse/private/memory.hpp>
 #include <math.h>
+#include <kiss_fftr.h>
 #include <memory>
 #include <algorithm>
-#include <kiss_fftr.h>
+#include <map>
+#include <thread>
 
 namespace libaudioverse_implementation {
 
@@ -258,6 +260,19 @@ void HrtfData::computeCoefficientsStereo(float elevation, float azimuth, float *
 	//the left ear is found at an azimuth which is reflectred about 0 degrees.
 	azimuth = ringmodf(360-azimuth, 360.0f);
 	computeCoefficientsMono(elevation, azimuth, left, linphase);
+}
+
+std::shared_ptr<HrtfData> createHrtfFromString(std::string path, int forSr) {
+	if(path == "default") {
+		auto h = std::make_shared<HrtfData>();
+		h->loadFromDefault(forSr);
+		return h;
+	}
+	else {
+		auto h = std::make_shared<HrtfData>();
+		h->loadFromFile(path, forSr);
+		return h;
+	}
 }
 
 }

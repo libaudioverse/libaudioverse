@@ -43,4 +43,7 @@ class HrtfData {
 	float* fft_time_data = nullptr; //needed as a temporary buffer, because technically this is circular convolution.
 };
 
+//This is threadsafe in and of itself, and will return hrtfs from a cache if it can.
+//Either load from a file or our internal default.
+std::shared_ptr<HrtfData> createHrtfFromString(std::string path, int forSr);
 }

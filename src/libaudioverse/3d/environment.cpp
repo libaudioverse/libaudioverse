@@ -203,12 +203,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createEnvironmentNode(LavHandle simulationHandl
 	PUB_BEGIN
 	auto simulation = incomingObject<Simulation>(simulationHandle);
 	LOCK(*simulation);
-	auto hrtf = std::make_shared<HrtfData>();
-	if(std::string(hrtfPath) != "default") {
-		hrtf->loadFromFile(hrtfPath, simulation->getSr());
-	} else {
-		hrtf->loadFromDefault(simulation->getSr());
-	}
+	auto hrtf = createHrtfFromString(hrtfPath, simulation->getSr());
 	auto retval = createEnvironmentNode(simulation, hrtf);
 	*destination = outgoingObject<Node>(retval);
 	PUB_END
