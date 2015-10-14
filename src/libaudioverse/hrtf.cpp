@@ -21,6 +21,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <algorithm>
 #include <map>
 #include <thread>
+#include <tuple>
 
 namespace libaudioverse_implementation {
 
@@ -261,23 +262,53 @@ void HrtfData::computeCoefficientsStereo(float elevation, float azimuth, float *
 	azimuth = ringmodf(360-azimuth, 360.0f);
 	computeCoefficientsMono(elevation, azimuth, left, linphase);
 }
+
+/**This helper class loads a UUID from the specified file handle.
+The first 16 bytes of every HRTF file are effectively unique, so we can use them to compare for caching.
+This only accounts for the file itself.  See below for the caching.*/
+class HrtfId {
+	public:
+	HrtfId(FILE* fp);
+	char identity[16];
+};
+
+HrtfId::HrtfId(FILE* fp) {
+	int got = fread(identity, 1, 16, fp);
+	if(got != 16) ERROR(Lav_ERROR_HRTF_INVALID, "File does not contain enough bytes for UUID.");
+}
+
+bool operator==(const HrtfId& a, const HrtfId& b) {
+	return memcmp(a.identity, b.identity, 16) == 0;
+}
+
+bool operator<(const HrtfId &a, const HrtfId& b) {
+	return memcmp(a.identity, b.identity, 16) == -1;
+}
+
+bool operator>(const HrtfId& a, const HrtfId& b) {
+	return memcmp(a.identity, b.identity, 16) == 1;
+}
+
 std::map<int, std::shared_ptr<HrtfData>> *default_hrtf_cache;
+//Tuple of (forSr, HrtfId).
+std::map<std::tuple<int, HrtfId>, std::shared_ptr<HrtfData>> *file_hrtf_cache;
 std::mutex *hrtf_cache_mutex;
 
 void initializeHrtfCaches() {
 	default_hrtf_cache = new std::map<int, std::shared_ptr<HrtfData>>();
+	file_hrtf_cache = new std::map<std::tuple<int, HrtfId>, std::shared_ptr<HrtfData>>();
 	hrtf_cache_mutex = new std::mutex();
 }
 
 void shutdownHrtfCaches() {
 	delete hrtf_cache_mutex;
 	delete default_hrtf_cache;
+	delete file_hrtf_cache;
 }
 
-
 std::shared_ptr<HrtfData> createHrtfFromString(std::string path, int forSr) {
-	std::lock_guard<std::mutex> guard(*hrtf_cache_mutex);
 	if(path == "default") {
+		std::lock_guard<std::mutex> guard(*hrtf_cache_mutex);
 		if(default_hrtf_cache->count(forSr)) return default_hrtf_cache->at(forSr);
 		auto h = std::make_shared<HrtfData>();
 		h->loadFromDefault(forSr);
@@ -285,8 +316,15 @@ std::shared_ptr<HrtfData> createHrtfFromString(std::string path, int forSr) {
 		return h;
 	}
 	else {
+		FILE *fp = fopen(path.c_str(), "rb");
+		if(fp == nullptr) ERROR(Lav_ERROR_FILE, std::string("Could not find HRTF file ")+path);
+		auto identity = HrtfId(fp);
+		fclose(fp);
+		std::lock_guard<std::mutex> guard(*hrtf_cache_mutex);
+		if(file_hrtf_cache->count(std::make_tuple(forSr, identity))) return file_hrtf_cache->at(std::make_tuple(forSr, identity));
 		auto h = std::make_shared<HrtfData>();
 		h->loadFromFile(path, forSr);
+		(*file_hrtf_cache)[std::make_tuple(forSr, identity)] = h;
 		return h;
 	}
 }
