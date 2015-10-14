@@ -261,11 +261,27 @@ void HrtfData::computeCoefficientsStereo(float elevation, float azimuth, float *
 	azimuth = ringmodf(360-azimuth, 360.0f);
 	computeCoefficientsMono(elevation, azimuth, left, linphase);
 }
+std::map<int, std::shared_ptr<HrtfData>> *default_hrtf_cache;
+std::mutex *hrtf_cache_mutex;
+
+void initializeHrtfCaches() {
+	default_hrtf_cache = new std::map<int, std::shared_ptr<HrtfData>>();
+	hrtf_cache_mutex = new std::mutex();
+}
+
+void shutdownHrtfCaches() {
+	delete hrtf_cache_mutex;
+	delete default_hrtf_cache;
+}
+
 
 std::shared_ptr<HrtfData> createHrtfFromString(std::string path, int forSr) {
+	std::lock_guard<std::mutex> guard(*hrtf_cache_mutex);
 	if(path == "default") {
+		if(default_hrtf_cache->count(forSr)) return default_hrtf_cache->at(forSr);
 		auto h = std::make_shared<HrtfData>();
 		h->loadFromDefault(forSr);
+		(*default_hrtf_cache)[forSr] = h;
 		return h;
 	}
 	else {

@@ -10,6 +10,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/audio_devices.hpp>
 #include <libaudioverse/private/logging.hpp>
+#include <libaudioverse/private/hrtf.hpp>
 
 namespace libaudioverse_implementation {
 
@@ -31,6 +32,7 @@ InitInfo initializers[] = {
 	{"Memory subsystem", initializeMemoryModule},
 	{"Audio backend", initializeDeviceFactory},
 	{"Metadata tables", initializeMetadata},
+	{"HRTF caches", initializeHrtfCaches},
 };
 
 typedef void (*shutdownfunc_t)();
@@ -50,6 +52,7 @@ ShutdownInfo shutdown_funcs[] = {
 	{"memory module", shutdownMemoryModule},
 	//Device factory needs to go near the end because it tries to log.
 	{"audio backend", shutdownDeviceFactory},
+	{"HRTF caches", shutdownHrtfCaches},
 	{"logging", shutdownLogging},
 };
 
