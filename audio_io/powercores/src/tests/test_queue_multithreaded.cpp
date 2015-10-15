@@ -6,31 +6,14 @@ See LICENSE in the root of the powercores repository for details.*/
 #include <atomic>
 #include <stdio.h>
 
-bool basic_test() {
-	printf("Testing queue for single-thread access...\n");
-	powercores::ThreadsafeQueue<unsigned int> q;
-	unsigned int length = 100;
-	for(unsigned int i = 0; i < length; i++) {
-		q.enqueue(i);
-	}
-	for(unsigned int i = 0; i < length; i++) {
-		if(i != q.dequeue()) {
-			printf("single-thread access failed.\n");
-			return false;
-		}
-	}
-	printf("single-thread access thest passed.\n");
-	return true;
-}
-
-bool multithreaded_test() {
+int main() {
 	printf("Testing queue for thread safety\n");
 	powercores::ThreadsafeQueue<int> q1, q2;
 	std::vector<std::thread> thread_array;
 	unsigned int total = 50000;
 	unsigned int threads = 10;
 	unsigned int expectedResult = total*threads;
-	std::atomic<int> accumulator;
+	std::atomic<int> accumulator{0};
 	auto stage1 = [&]() {
 		for(unsigned int i = 0; i < total; i++) q2.enqueue(q1.dequeue());
 	};
@@ -52,14 +35,8 @@ bool multithreaded_test() {
 	}
 	if(accumulator.load() == expectedResult) {
 		printf("Thread safety test passed.\n");
-		return true;
+		return 0;
 	}
 	printf("Thread safety test failed.\n");
-	return false;
-}
-
-#define TEST(t) if(t() == false) return;
-void main() {
-	TEST(basic_test);
-	TEST(multithreaded_test);
+	return 1;
 }

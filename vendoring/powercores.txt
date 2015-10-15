@@ -1,2 +1,3 @@
+set(POWERCORES_BUILD_TESTS OFF CACHE BOOL "Don't build powercores tests, as we don't need them in Libaudioverse.")
 add_subdirectory(powercores)
 include_directories("${CMAKE_SOURCE_DIR}/powercores/include")

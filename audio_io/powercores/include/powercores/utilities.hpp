@@ -4,6 +4,7 @@ See LICENSE in the root of the powercores repository for details.*/
 #include <thread>
 #include <system_error>
 #include <utility>
+#include <functional>
 
 namespace powercores {
 
@@ -27,6 +28,21 @@ std::thread  safeStartThread(ParamsT&&... params) {
 		}
 	} while(retry);
 	return retval;
+}
+
+/**Get a unique identifier for a thread.
+This is guaranteed to be unique for up to the size limit of long long threads, and does not reuse identifiers.
+std::thread::id does reuse identifiers, which causes problems for some applications.*/
+long long getThreadId();
+
+//Internal helper for the following function, do not use.
+void atThreadExitImpl(std::function<void(void)> what);
+
+/**Run a callable at thread exit.
+This has all of the restrictions of a destructor.  Arguments and the callable object are copied.  Order of calls is not guaranteed.*/
+template<typename CallableT, typename... ArgsT>
+void atThreadExit(CallableT&& callable, ArgsT&&... args) {
+	atThreadExitImpl([callable, args...]() {callable(args...);});
 }
 
 }

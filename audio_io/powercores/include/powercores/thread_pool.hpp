@@ -29,15 +29,30 @@ class ThreadPool {
 	void stop() ;
 	void setThreadCount(int n) ;
 	
-	/**Submit a job, which will be called in the future.*/
-	void submitJob(const std::function<void(void)> &job);
+	/**Submit a job, which will be called in the future.
+	This is a template so that we can sometimes avoid copying internally.*/
+	template<typename CallableT>
+	void submitJob(CallableT&& job) {
+		auto &job_queue = job_queues[job_queue_pointer];
+		job_queue->enqueue(job);
+		job_queue_pointer = (job_queue_pointer+1)%thread_count;
+	}
 
+	/**Submit a job, possibly with arguments, to all threads.*/
+	template<typename CallableT, typename... ArgsT>
+	void submitJobToAllThreads(CallableT &&callable, ArgsT&&... args) {
+		auto job = [callable, args...]() mutable {
+			callable(args...);
+		};
+		for(auto &i: job_queues) i->enqueue(job);
+	}
+	
 	/**Submit a job represented by a function with arguments and a return value, obtaining a future which will later contain the result of the job.*/
 	template<class FuncT, class... ArgsT>
-	std::future<typename std::result_of<FuncT(ArgsT...)>::type> submitJobWithResult(const FuncT &callable, ArgsT... args) {
+	std::future<typename std::result_of<FuncT(ArgsT...)>::type> submitJobWithResult(FuncT &&callable, ArgsT&&... args) {
 		//The task is not copyable, so we keep a pointer and delete it after we execute it.
 		auto task = new std::packaged_task<typename std::result_of<FuncT(ArgsT...)>::type(ArgsT...)>(callable);
-		auto job = [task, args...] () {
+		auto job = [task, args...] () mutable {
 			(*task)(args...);
 			delete task;
 		};
@@ -46,7 +61,7 @@ class ThreadPool {
 		return retval;
 	}
 	
-	/**Submit a range of jobs.*/
+	/**Submit a range of jobs which will be started in order as threads become available from begin to end.*/
 	template<class IterT>
 	void submitJobRange(IterT begin, IterT end) {
 		for(; begin != end; begin++) submitJob(*begin);
@@ -69,6 +84,22 @@ class ThreadPool {
 		}
 		//Submit the rest normally.
 		submitJobRange(begin, end);
+	}
+	
+	/**Map a function over a range specified by two iterators.
+	The function receives the result of dereferencing the iterator and any additional arguments, and will run in some unspecified order.  The iterators must be random access.*/
+	template<typename CallableT, typename IterT, typename... ArgsT>
+	void map(CallableT &&callable, IterT begin, IterT end, ArgsT&&... args) {
+		auto executor = [callable, args...](IterT subrangeBegin, IterT subrangeEnd) {
+			for(; subrangeBegin != subrangeEnd; subrangeBegin++) callable(*subrangeBegin, args...);
+		};
+		int amount = end-begin;
+		int amountPerThread = amount/thread_count;
+		for(int i = 0; i < thread_count; i++) {
+			submitJobWithResult(executor, begin, begin+amountPerThread);
+			begin += amountPerThread;
+		}
+		if(begin != end) submitJobWithResult(executor, begin, end);
 	}
 	
 	/**Submit a barrier.	

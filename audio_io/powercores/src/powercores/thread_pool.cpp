@@ -51,12 +51,6 @@ void ThreadPool::setThreadCount(int n) {
 	if(wasRunning) start();
 }
 
-void ThreadPool::submitJob(const std::function<void(void)> &job) {
-	auto &job_queue = job_queues[job_queue_pointer];
-	job_queue->enqueue(job);
-	job_queue_pointer = (job_queue_pointer+1)%thread_count;
-}
-
 void ThreadPool::submitBarrier() {
 	//Promises are not copyable, so we save a pointer and delete it later, after the barrier.
 	auto promise = new std::promise<void>();
