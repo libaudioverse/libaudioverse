@@ -62,7 +62,7 @@ build_script:
 
 after_build:
   - echo Uploading Windows build to camlorn.net.
-  - python appveyor_upload.py
+  - py -3 appveyor_upload.py
 
 artifacts:
   - path: 'build\libaudioverse_master.zip'
