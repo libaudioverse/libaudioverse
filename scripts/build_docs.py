@@ -10,7 +10,7 @@ import docgen
 import bindings.get_info
 
 if __name__ == '__main__':
-    print "Building documentation..."
+    print("Building documentation...")
     info=bindings.get_info.get_all_info()
     docgen.prepare_docs(info)
     dest_dir = os.path.join(repository_root, 'build', 'documentation')
@@ -23,11 +23,11 @@ if __name__ == '__main__':
 
     shutil.copytree(os.path.join(repository_root, 'documentation'), dest_dir)
 
-    with file(os.path.join(dest_dir, 'node_reference.asciidoc'), 'wb') as f:
+    with open(os.path.join(dest_dir, 'node_reference.asciidoc'), 'w') as f:
         f.write(node_reference)
-    with file(os.path.join(dest_dir, 'c_api.asciidoc'), 'wb') as f:
+    with open(os.path.join(dest_dir, 'c_api.asciidoc'), 'w') as f:
         f.write(c_api_docs)
-    with file(os.path.join(dest_dir, 'enumerations.asciidoc'), 'w') as f:
+    with open(os.path.join(dest_dir, 'enumerations.asciidoc'), 'w') as f:
         f.write(enum_docs)
 
-    print subprocess.check_output(["asciidoctor", os.path.join(dest_dir, 'libaudioverse_manual.asciidoc')], stderr= subprocess.STDOUT, shell = True)
+    print(subprocess.check_output(["asciidoctor", os.path.join(dest_dir, 'libaudioverse_manual.asciidoc')], stderr= subprocess.STDOUT, shell = True))

@@ -10,9 +10,9 @@ def euclid(a, b):
     return a
 
 if len(sys.argv) != 3:
-    print "Usage: coprimes.py <start> <count>"
+    print("Usage: coprimes.py <start> <count>")
 
-print "Generating sequence"
+print("Generating sequence")
 start= int(sys.argv[1])
 count=int(sys.argv[2])
 coprimes=set([start])
@@ -24,4 +24,4 @@ while len(coprimes) < count:
     coprimes.add(j)
 result=sorted(coprimes)
 
-print ", ".join((str(i) for i in result))
+print(", ".join((str(i) for i in result)))

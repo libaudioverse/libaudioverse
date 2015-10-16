@@ -85,13 +85,13 @@ def cleanup_node(all_info, name, node):
     if 'callbacks' not in node:
         node['has_callbacks'] = False
         node['callbacks'] = dict()
-    for i in node['properties'].itervalues():
+    for i in node['properties'].values():
         cleanup_property(i)
-    for i in node['events'].itervalues():
+    for i in node['events'].values():
         cleanup_event(i)
-    for n, i in node['callbacks'].iteritems():
+    for n, i in node['callbacks'].items():
         cleanup_callback(all_info, n, i, name)
-    for n, d in node['extra_functions'].iteritems():
+    for n, d in node['extra_functions'].items():
         cleanup_extra_function(all_info, n, d, name)
     node['doc_description'] = node.get('doc_description', 'No description available.')
     node['doc_name'] = node.get('doc_name', 'No document name available')
@@ -103,7 +103,7 @@ def cleanup_node(all_info, name, node):
     node['constructor'] = constructor
 
 def load_node(all_info, path):
-    with file(path) as f:
+    with open(path) as f:
         node_info = yaml.load(f)
     name =os.path.split(path)[1][:-len(".y")]
     cleanup_node(all_info, name, node_info)
@@ -118,7 +118,7 @@ def make_metadata(all_info):
     ))
 
     #First, build the base dict. This is metada.yaml:
-    with file(os.path.join(metadata_dir, "metadata.y")) as f:
+    with open(os.path.join(metadata_dir, "metadata.y")) as f:
         metadata = yaml.load(f)
 
     #Next, we add all the files in the nodes subdirectory:
@@ -130,15 +130,15 @@ def make_metadata(all_info):
         node_info = load_node(all_info, i)
         metadata['nodes'][node_info[0]] = node_info[1]
     #Grab function categories and function documentation:
-    with file(os.path.join(metadata_dir, 'function_categories.y')) as f:
+    with open(os.path.join(metadata_dir, 'function_categories.y')) as f:
         metadata.update(yaml.load(f))
-    with file(os.path.join(metadata_dir, 'functions.y')) as f:
+    with open(os.path.join(metadata_dir, 'functions.y')) as f:
         metadata.update(yaml.load(f))
-    with file(os.path.join(metadata_dir, 'enumerations.y')) as f:
+    with open(os.path.join(metadata_dir, 'enumerations.y')) as f:
         metadata.update(yaml.load(f))
 
     #run over all the functions, cleaning them up:
-    for name, func in metadata['functions'].iteritems():
+    for name, func in metadata['functions'].items():
         cleanup_function(all_info, name, func)
 
     return metadata

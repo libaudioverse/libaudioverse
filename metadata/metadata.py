@@ -9,10 +9,10 @@ from bindings.maybe_write import maybe_write
 import re
 
 if len(sys.argv) != 2:
-    print"Invalid usage: do not have destination"
+    print("Invalid usage: do not have destination")
     sys.exit(1)
 
-print "Generating", sys.argv[1]
+print("Generating", sys.argv[1])
 
 directory = os.path.split(os.path.abspath(__file__))[0]
 all_info = bindings.get_info.get_all_info()
@@ -28,24 +28,24 @@ extensions = ['jinja2.ext.loopcontrols'])
 #the map we have here is actually very verbose, and can be flattened into something easily iterable.
 #we can then take advantage of either std::pair or std::tuple as the keys.
 joined_properties = []
-for nodekey, nodeinfo in [(i, metadata['nodes'].get(i, dict())) for i in all_info['constants'].iterkeys() if re.match("Lav_OBJTYPE_(\w+_*)+_NODE", i)]:
+for nodekey, nodeinfo in [(i, metadata['nodes'].get(i, dict())) for i in all_info['constants'].keys() if re.match("Lav_OBJTYPE_(\w+_*)+_NODE", i)]:
     #add everything from the object itself.
-    for propkey, propinfo in nodeinfo.get('properties', dict()).iteritems():
+    for propkey, propinfo in nodeinfo.get('properties', dict()).items():
         joined_properties.append((nodekey, propkey, propinfo))
     #if we're not suppressing inheritence, we follow this up with everything from lav_OBJTYPE_GENERIC.
     if not nodeinfo.get('suppress_implied_inherit', False):
-        for propkey, propinfo in metadata['nodes']['Lav_OBJTYPE_GENERIC_NODE']['properties'].iteritems():
+        for propkey, propinfo in metadata['nodes']['Lav_OBJTYPE_GENERIC_NODE']['properties'].items():
             joined_properties.append((nodekey, propkey, propinfo))
 
 #this is the same logic, but for events.
 joined_events = []
-for nodekey, nodeinfo in [(i, metadata['nodes'].get(i, dict())) for i in all_info['constants'].iterkeys() if re.match("Lav_OBJTYPE_(\w+_*)+_NODE", i)]:
+for nodekey, nodeinfo in [(i, metadata['nodes'].get(i, dict())) for i in all_info['constants'].keys() if re.match("Lav_OBJTYPE_(\w+_*)+_NODE", i)]:
     #add everything from the object itself.
-    for eventkey, eventinfo in nodeinfo.get('events', dict()).iteritems():
+    for eventkey, eventinfo in nodeinfo.get('events', dict()).items():
         joined_events.append((nodekey, eventkey, eventinfo))
     #if we're not suppressing inheritence, we follow this up with everything from lav_OBJTYPE_GENERIC.
     if not nodeinfo.get('suppress_implied_inherit', False):
-        for eventkey, eventinfo in metadata['nodes']['Lav_OBJTYPE_GENERIC_NODE'].get('events', dict()).iteritems():
+        for eventkey, eventinfo in metadata['nodes']['Lav_OBJTYPE_GENERIC_NODE'].get('events', dict()).items():
             joined_events.append((nodekey, eventkey, eventinfo))
 
 #the template will convert the types into enums via judicious use of if statements-we use it like augmented c, and prefer to do refactoring only there when possible.
@@ -59,8 +59,8 @@ def string_from_number(val, type):
     elif type in {'int', 'int_array', 'boolean'}:
         return str(int(val))    
     else:
-        print "Warning: Unrecognized type or value with type", type, "and value", val
-        print "Returning val unchanged."
+        print("Warning: Unrecognized type or value with type", type, "and value", val)
+        print("Returning val unchanged.")
         return val
 
 #note that there is a very interesting little hack heere.
@@ -90,7 +90,7 @@ for propkey, propid, propinfo in joined_properties:
         propinfo['range'] = [0, 0]
         propinfo['is_dynamic'] = True
     for i, j in enumerate(list(propinfo.get('range', []))): #if we don't have a range, this will do nothing.
-        if isinstance(j, basestring):
+        if isinstance(j, str):
             continue #it's either MIN_INT, MAX_INT, INFINITY, -INFINITY, or another special identifier.  Pass through unchanged.
         #we're not worried about float3 or float6 logic, because those aren't allowed to have traditional ranges at the moment-so this is it:
         propinfo['range'][i] = string_from_number(j, propinfo['type'])
@@ -135,4 +135,4 @@ result = template.render(context)
 if not os.path.exists(os.path.split(os.path.abspath(sys.argv[1]))[0]):
     os.makedirs(os.path.split(os.path.abspath(sys.argv[1]))[0])
 
-maybe_write(sys.argv[1], result)
+maybe_write(sys.argv[1], result.encode('utf8'))

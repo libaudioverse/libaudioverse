@@ -11,34 +11,34 @@ import hrtf_writer
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:
-        print "Usage: mit_hrtf.py <directory> <output_file>"
+        print("Usage: mit_hrtf.py <directory> <output_file>")
         exit()
 
     root_path = sys.argv[1]
     output_file = sys.argv[2]
     all_wavefiles = glob(root_path + '/*/*.wav')
-    print "Enumerated wave files:", len(all_wavefiles), "found."
+    print("Enumerated wave files:", len(all_wavefiles), "found.")
     read_wavefiles = dict()
 
-    print "Reading files."
+    print("Reading files.")
     for i in all_wavefiles:
         name = os.path.split(i)[1]
         read_wavefiles[name] = wavfile.read(i)
 
-    print "Separating channels."
+    print("Separating channels.")
 
     #we can discard samplerates at this point.
-    for i, j in dict(read_wavefiles).iteritems():
+    for i, j in dict(read_wavefiles).items():
         arr = j[1]
         #Note: this is numpy slicing syntax.
         read_wavefiles[i] = (arr[:, 0], arr[:, 1])
 
-    print "Extracting angles."
+    print("Extracting angles.")
 
     hrirs = dict()
     pattern = re.compile(r"H(-{0,1}\d+)e(\d+)a\.wav")
 
-    for i, j in read_wavefiles.iteritems():
+    for i, j in read_wavefiles.items():
         extracted = pattern.match(i)
         elevation = extracted.group(1)
         azimuth = extracted.group(2)
@@ -46,8 +46,8 @@ if __name__ == '__main__':
         azimuth = int(azimuth)
         hrirs[(elevation, azimuth)] = j
 
-    print "Expanding 180-degree stereo responses to 360-degree mono responses."
-    for i, j in dict(hrirs).iteritems():
+    print("Expanding 180-degree stereo responses to 360-degree mono responses.")
+    for i, j in dict(hrirs).items():
         #0 and 180 are special: we average these instead.
         if i[1] in set([0, 180]):
             #The int16 is important here, as HrtfWriter tries to convert data for us.
@@ -59,9 +59,9 @@ if __name__ == '__main__':
         hrirs[i] = j[1] #first of the pair.
         hrirs[(i[0], 360-i[1])] = j[0] #the second response.
 
-    print "Computing data needed by HrtfWriter."
+    print("Computing data needed by HrtfWriter.")
     #compute the number of elevations:
-    elev_list = list(set([i[0] for i in hrirs.iterkeys()]))
+    elev_list = list(set([i[0] for i in hrirs.keys()]))
     number_of_elevations = len(elev_list)
     elev_list.sort() #from least to greatest, per the hrir datafile format.
 
@@ -74,7 +74,7 @@ if __name__ == '__main__':
     for elev in elev_list:
         azimuth_list.append(len([key for key in hrirs if key[0] == elev]))
 
-    print "Preparing list of responses..."
+    print("Preparing list of responses...")
     responses = []
     for ind, elev in enumerate(elev_list):
         new_elev = []

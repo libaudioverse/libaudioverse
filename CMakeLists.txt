@@ -9,6 +9,14 @@ endif()
 
 project(Libaudioverse)
 
+#Decide on our Python command.
+#For all platforms but Windows, it's Python.  But Windows has the launcher, so we request Python 3.
+if(${WIN32})
+set(PYTHON_COMMAND py -3)
+else()
+set(PYTHON_COMMAND python)
+endif()
+
 include_directories("${CMAKE_SOURCE_DIR}/include")
 
 option(LIBAUDIOVERSE_DEVMODE "Whether this is being built for official release. Makes some targets (documentation) optional" ON)
@@ -45,7 +53,7 @@ add_subdirectory(src)
 
 #this makes the bindings generation step always run after a Libaudioverse build.
 ADD_CUSTOM_TARGET(libaudioverse_bindings ALL
-COMMAND python "\"${CMAKE_CURRENT_SOURCE_DIR}/scripts/build_bindings.py\""
+COMMAND ${PYTHON_COMMAND} "\"${CMAKE_CURRENT_SOURCE_DIR}/scripts/build_bindings.py\""
 DEPENDS libaudioverse
 )
 

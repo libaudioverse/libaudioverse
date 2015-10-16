@@ -33,7 +33,7 @@ Currently Libaudioverse only builds on Windows.  Libaudioverse itself will build
 
 You need the following:
 
-- Python 2.7
+- Python 3.5. If you are on Windows, the launcher must be working.
 - CMake 3.3 or later.
 - The python packages PyYAML, Jinja2, pycparser, enum34, numpy, and scipy.
 - A C++11 capable compiler.  For Windows, this must be Visual Studio 2015 or later.
@@ -62,7 +62,7 @@ CMake -G "NMake Makefiles JOM" ..
 jom
 ~~~
 
-To generate the manual, you will additionally need  asccidoctor.
+To generate the manual, you will additionally need  asciidoctor.
 Execute the documentation target to generate `build/documentation/libaudioverse_manual.html`, which contains what currently exists of the manual.
 
 ##Bindings##

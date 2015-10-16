@@ -85,7 +85,7 @@ The outputs of this node are described below.
 ==== Properties
 
 
-{%for propinfo in nodes[node_name]['properties'].iteritems()%}
+{%for propinfo in nodes[node_name]['properties'].items()%}
 
 ===== {{propinfo[1]['name']}}
 
@@ -112,7 +112,7 @@ Default Value: {{propinfo[1].get('default', 'See Description')}}
 {%if nodes[node_name]['has_events']%}
 ==== Events
 
-{%for callinfo in nodes[node_name]['events'].iteritems()%}
+{%for callinfo in nodes[node_name]['events'].items()%}
 
 ===== {{callinfo[1]['name']}}
 C Enumeration Value: {{callinfo[0]}}
@@ -126,7 +126,7 @@ C Enumeration Value: {{callinfo[0]}}
 {%if node['has_callbacks']%}
 ==== Callbacks
 
-{%for name, info in node['callbacks'].iteritems()%}
+{%for name, info in node['callbacks'].items()%}
 ===== {{name}}
 Setter: {{functions[info['setter_name']]|function_to_string}}
 
@@ -141,7 +141,7 @@ Callback Prototype: {{info['callback_func']|function_to_string}}
 {%if node['has_extra_functions']%}
 ==== Extra Functions
 
-{%for c_name, info in node['extra_functions'].iteritems()%}
+{%for c_name, info in node['extra_functions'].items()%}
 {{macros.render_function(c_name, info)}}
 
 {%endfor%}

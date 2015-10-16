@@ -78,7 +78,7 @@ def reverse_handle(handle):
 {%endfor%}
 {%endmacro%}
 
-{%for func_name, func_info in functions.iteritems()%}
+{%for func_name, func_info in functions.items()%}
 {%set friendly_name = func_name|without_lav|camelcase_to_underscores%}
 {%set input_arg_names = func_info.input_args|map(attribute='name')|list%}
 {%set output_arg_names = func_info.output_args|map(attribute='name')|list%}

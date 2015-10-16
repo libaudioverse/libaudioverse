@@ -20,15 +20,15 @@ else:
     libsndfile_module = ctypes.cdll.LoadLibrary(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'libsndfile-1.dll'))
     libaudioverse_module = ctypes.cdll.LoadLibrary(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'libaudioverse.dll'))
 
-{%for name, val in constants.iteritems() -%}
+{%for name, val in constants.items() -%}
 {{name}} = {{val}}
 {%endfor%}
 
-{%for n, t in typedefs.iteritems()%}
+{%for n, t in typedefs.items()%}
 {{n}} = {{t|ctypes_string}}
 {%endfor%}
 
-{%for name, info in functions.iteritems()-%}
+{%for name, info in functions.items()-%}
 {{name}} = ctypes.CFUNCTYPE({{info.return_type|ctypes_string}}
 {%-if info.args|length > 0%}, {%endif%}{#some functions don't have arguments; if it doesn't, we must avoid the first comma#}
 {%-for arg in info.args-%}

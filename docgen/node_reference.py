@@ -8,7 +8,7 @@ def make_node_reference(all_info):
     context = dict()
     context.update(all_info)
     template = env.get_template("node_reference.t")
-    sorted_nodes= context['metadata']['nodes'].items()
+    sorted_nodes= list(context['metadata']['nodes'].items())
     sorted_nodes.sort(key = lambda x: x[1]['doc_name'].lower())
     sorted_nodes= [i[0] for i in sorted_nodes]
     sorted_nodes.remove('Lav_OBJTYPE_GENERIC_NODE')

@@ -32,22 +32,22 @@ The second is the string to transform."""
     def prepare_function(func):
         func['doc_description'] = render(func.get('doc_description', no_doc_description))
         if 'params' in func: #some functions don't have params
-            for n, p in func['params'].iteritems():
+            for n, p in func['params'].items():
                 func['params'][n] = render(p)
 
-    for name, func in all_info['metadata']['functions'].iteritems():
+    for name, func in all_info['metadata']['functions'].items():
         prepare_function(func)
 
-    for name, d in all_info['metadata']['nodes'].iteritems():
+    for name, d in all_info['metadata']['nodes'].items():
         d['doc_description'] = render(d.get('doc_description', no_doc_description))
-        for name, func in d.get('extra_functions', dict()).iteritems():
+        for name, func in d.get('extra_functions', dict()).items():
             prepare_function(func)
         #callbacks are function-like enough:
-        for name, cb in d.get('callbacks', dict()).iteritems():
+        for name, cb in d.get('callbacks', dict()).items():
             prepare_function(cb)
     #Run over the enums and render them:
-    for enum in all_info['metadata']['enumerations'].itervalues():
+    for enum in all_info['metadata']['enumerations'].values():
         enum['doc_description']=render(enum['doc_description'])
-        for k, v in enum['members'].iteritems():
+        for k, v in enum['members'].items():
             enum['members'][k] = render(v)
     #no return, we modify in place.

@@ -5,7 +5,7 @@
 The following section lists some of Libaudioverse's enumerations.
 This section concerns itself only with those enumerations that are important by themselves.
 
-{%for name, info in metadata['enumerations'].iteritems()%}
+{%for name, info in metadata['enumerations'].items()%}
 
 === {{name}}
 

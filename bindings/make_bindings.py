@@ -19,14 +19,14 @@ def write_files(files, source_dir, dest_dir):
     special_keys = {'dll_location', 'additional_directories', 'libsndfile_location', 'post_generate'}
     if os.path.exists(dest_dir):
         shutil.rmtree(dest_dir)
-    for name, contents in files.iteritems():
+    for name, contents in files.items():
         if name in special_keys:
             continue
         fullpath = os.path.join(dest_dir, name)
         dir = os.path.split(fullpath)[0]
         if not os.path.exists(dir):
             os.makedirs(dir)
-        with file(fullpath, 'w') as f:
+        with open(fullpath, 'w') as f:
             f.write(contents)
     #handle the dll's copying.
     dll_target = files.get('dll_location', '')
@@ -46,7 +46,7 @@ def write_files(files, source_dir, dest_dir):
 
 def make_bindings():
     all_info = get_info.get_all_info()
-    for name, func in generators.iteritems():
+    for name, func in generators.items():
         #we copy so that the generators can modify data as they need.
         files = func(copy.deepcopy(all_info))
         source_dir = os.path.join(get_info.get_root_directory(), 'bindings', name)

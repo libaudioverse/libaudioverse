@@ -5,7 +5,7 @@ import os.path
 
 if __name__ == '__main__':
     if len(sys.argv) != 5:
-        print "Syntax: python convert_to_cpp_file.py <namespace> <array_name> <file_name> <outputfile>"
+        print("Syntax: python convert_to_cpp_file.py <namespace> <array_name> <file_name> <outputfile>")
         sys.exit(1)
 
     namespace_name = sys.argv[1]
@@ -28,13 +28,12 @@ unsigned int {{array_name}}_size = {{chars|length}}*sizeof(char);
 {{"}"}}
 """
 
-    with file(input_file_name, "rb") as f:
+    with open(input_file_name, "rb") as f:
         input_data = f.read()
 
     chars = []
     for i, j in enumerate(input_data):
-        char_value = ord(j)
-        escape_string = "\\"+hex(char_value)[1:]
+        escape_string = "\\"+hex(j)[1:]
         chars.append(escape_string)
 
 
@@ -48,6 +47,6 @@ unsigned int {{array_name}}_size = {{chars|length}}*sizeof(char);
         os.makedirs(needed_directory)
 
 
-    with file(output_file_name, "wb") as f:
-        f.write(result)
-    print "Wrote", output_file_name
+    with open(output_file_name, "wb") as f:
+        f.write(result.encode('utf8'))
+    print("Wrote", output_file_name)
