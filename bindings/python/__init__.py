@@ -44,7 +44,7 @@ def ctypes_function_helper(func, typedef_prefix):
 
 def post_generate(dir):
     """Make a wheel, later installed via cmake."""
-    subprocess.call(["python", "setup.py", "bdist_wheel"], shell=True)
+    subprocess.call(["python", "setup.py", "bdist_wheel", "--universal"], shell=True)
 
 def make_python(info):
     #get our directory.
