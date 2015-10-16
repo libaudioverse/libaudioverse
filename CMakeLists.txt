@@ -8,14 +8,9 @@ SET(CMAKE_BUILD_TYPE "Release" CACHE STRING "The build type. Either Debug, Relea
 endif()
 
 project(Libaudioverse)
-option(LIBAUDIOVERSE_IN_CI "Are we in CI?" OFF)
 
-
-#Decide on our Python command.
-#For all platforms but Windows, it's Python.  But Windows has the launcher, so we request Python 3.
-if(${LIBAUDIOVERSE_IN_CI})
-set(PYTHON_COMMAND python)
-elseif(${WIN32})
+#Are we using the Windows Python launcher?
+if(${WIN32})
 set(PYTHON_COMMAND py -3)
 else()
 set(PYTHON_COMMAND python)
