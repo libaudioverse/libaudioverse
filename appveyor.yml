@@ -25,7 +25,7 @@ configuration:
 
 install:
   #Bring in jinja2, pycparser, etc.
-  - "py -3 -m pip install jinja2 pycparser pyyaml paramiko"
+  - "py -3 -m pip install jinja2 pycparser pyyaml paramiko wheel"
   #Numpy and scipy, from my server.
   - "py -3 -m pip install http://camlorn.net/appveyor/numpy-1.10.1+mkl-cp35-none-win_amd64.whl"
   - "py -3 -m pip install http://camlorn.net/appveyor/scipy-0.16.0-cp35-none-win_amd64.whl"
