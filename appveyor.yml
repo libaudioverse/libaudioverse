@@ -60,7 +60,7 @@ build_script:
   - mkdir build
   - cd build
   #Turn off devmode to make docs be part of all.
-  - 'cmake .. -DLIBAUDIOVERSE_DEVMODE:BOOL=OFF -DLIBSNDFILE_LOCATION:STRING="c:/projects/libaudioverse/tmp"'
+  - 'cmake .. -DLIBAUDIOVERSE_DEVMODE:BOOL=OFF -DLIBSNDFILE_LOCATION:STRING="c:/projects/libaudioverse/tmp" -DLIBAUDIOVERSE_IN_CI:BOOL=ON'
   #-m is parallel build.
   - cmake --build . --config Release --target package -- /m
   #Go back, so that after_build works.
