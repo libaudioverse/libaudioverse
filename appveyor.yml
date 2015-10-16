@@ -31,10 +31,12 @@ install:
   #Bring in latest conda packages.
   - conda update -q conda
   - conda info -a
-  - "conda create -q -n lav-environment python=2.7 numpy scipy"
+  - "conda create -q -n lav-environment python=3.5 numpy scipy"
   - activate lav-environment
   #Bring in jinja2, pycparser, etc.
   - "pip install jinja2 pycparser pyyaml enum34 paramiko"
+  #Override pycrypto. 2.6.1 is broken on Python 3 due to an absolute import, so grab the beta:
+  - "pip install https://ftp.dlitz.net/pub/dlitz/crypto/pycrypto/pycrypto-2.7a1.tar.gz"
   #This next one gets a bit interesting: we need to download and silently install libsndfile.
   - mkdir tmp
   - cd tmp

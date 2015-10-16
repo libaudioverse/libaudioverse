@@ -8,14 +8,14 @@ host = os.getenv("DEPLOYMENT_HOST")
 port = 22
 
 if host is None:
-    print "Host?"
-    host = raw_input()
+    print("Host?")
+    host = input()
 if username is None:
-    print "Username?"
-    username = raw_input()
+    print("Username?")
+    username = input()
 if password is None:
-    print "Password?"
-    password = raw_input()
+    print("Password?")
+    password = input()
 
 transport=paramiko.Transport(host, 22)
 transport.connect(username = username, password = password)
