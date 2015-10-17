@@ -19,5 +19,8 @@ setup(
         'License :: OSI Approved :: GPL',
         'Topic :: Software Development :: Libraries'
     ],
-    zip_safe = False
+    zip_safe = False,
+    extras_require = {
+        ':python_version <= "3.4"': ['enum34'],
+    }
 )
