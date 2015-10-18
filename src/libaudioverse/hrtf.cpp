@@ -15,6 +15,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/kernels.hpp>
 #include <libaudioverse/private/data.hpp>
 #include <libaudioverse/private/memory.hpp>
+#include <powercores/thread_local_variable.hpp>
 #include <math.h>
 #include <kiss_fftr.h>
 #include <memory>
@@ -40,9 +41,66 @@ void reverse_endianness(char* buffer, unsigned int count, unsigned int window) {
 //this makes sure that we aren't about to do something silently dangerous and tels us at compile time.
 static_assert(sizeof(float) == 4, "Sizeof float is not 4; cannot safely work with hrtfs");
 
+HrtfData::HrtfData():
+//We have to give the thread-local variables constructors and destructors.
+temporary_buffer1([&]() {
+	float** p = new float*;
+	*p = createTemporaryBuffer();
+	return p;
+},
+[&](float** p) {
+	freeTemporaryBuffer(*p);
+	delete p;
+}),
+temporary_buffer2([&] () {
+	float** p = new float*;
+	*p = createTemporaryBuffer();
+	return p;
+},
+[&](float** p) {
+	freeTemporaryBuffer(*p);
+	delete p;
+}),
+fft([&]() {
+	kiss_fftr_cfg* p = new kiss_fftr_cfg;
+	*p = createFft();
+	return p;
+},
+[&](kiss_fftr_cfg* p) {
+	freeFft(*p);
+	delete p;
+}),
+ifft([&]() {
+	kiss_fftr_cfg* p = new kiss_fftr_cfg;
+	*p = createIfft();
+	return p;
+},
+[&](kiss_fftr_cfg* p) {
+	freeIfft(*p);
+	delete p;
+}),
+fft_data([&]() {
+	auto p = new kiss_fft_cpx*;
+	*p = createFftData();
+	return p;
+},
+[&](kiss_fft_cpx** p) {
+	freeFftData(*p);
+	delete p;
+}),
+fft_time_data([&]() {
+	auto p = new float*;
+	*p = createFftTimeData();
+	return p;
+},
+[&](float** p) {
+	freeFftTimeData(*p);
+	delete p;
+})
+{
+}
+
 HrtfData::~HrtfData() {
-	if(temporary_buffer1) freeArray(temporary_buffer1);
-	if(temporary_buffer2) freeArray(temporary_buffer2);
 	if(hrirs == nullptr) return; //we never loaded one.
 	for(int i = 0; i < elev_count; i++) {
 		//The staticResamplerKernel allocates with new[], not allocArray.
@@ -51,24 +109,23 @@ HrtfData::~HrtfData() {
 	}
 	delete[] hrirs;
 	delete[] azimuth_counts;
-	freeArray(fft_time_data);
-	freeArray(fft_data);
-	kiss_fftr_free(fft);
-	kiss_fftr_free(ifft);
 }
 
 void HrtfData::linearPhase(float* buffer) {
+	//Read the thread locals.
+	float* fft_time_data = *(this->fft_time_data);
+	kiss_fft_cpx* fft_data = *(this->fft_data);
 	//Note that this is in effect circular convolution with a truncation.
 	std::copy(buffer, buffer+hrir_length, fft_time_data);
 	std::fill(fft_time_data+hrir_length, fft_time_data+hrir_length*2, 0.0f);
-	kiss_fftr(fft, fft_time_data, fft_data);
+	kiss_fftr(*fft, fft_time_data, fft_data);
 	for(int i = 0; i < hrir_length+1; i++) {
 		fft_data[i].r = cabs(fft_data[i].r, fft_data[i].i);
 		fft_data[i].i = 0.0f;
 	}
-	kiss_fftri(ifft, fft_data, fft_time_data);
+	kiss_fftri(*ifft, fft_data, fft_time_data);
 	//Apply the downscaling that kissfft requires, otherwise this is too loud.
-	//Also accomplish copying back to the starting piont.
+	//Also accomplish copying back to the starting point.
 	scalarMultiplicationKernel(hrir_length, 1.0f/(2*hrir_length), fft_time_data, buffer);
 }
 
@@ -169,17 +226,6 @@ void HrtfData::loadFromBuffer(unsigned int length, char* buffer, unsigned int fo
 	hrir_length = final_hrir_length;
 	samplerate = forSr;
 	freeArray(tempBuffer);
-
-	if(temporary_buffer1) freeArray(temporary_buffer1);
-	if(temporary_buffer2) freeArray(temporary_buffer2);
-	temporary_buffer1 = allocArray<float>(hrir_length);
-	temporary_buffer2 = allocArray<float>(hrir_length);
-	
-	//stuff for linear phase filters.
-	fft_time_data = allocArray<float>(hrir_length*2);
-	fft_data = allocArray<kiss_fft_cpx>(hrir_length+1); //half the bins, plus dc.
-	fft = kiss_fftr_alloc(hrir_length*2, 0, nullptr, nullptr);
-	ifft = kiss_fftr_alloc(hrir_length*2, 1, nullptr, nullptr);
 }
 
 //a complete HRTF for stereo is two calls to this function.
@@ -242,6 +288,9 @@ void HrtfData::computeCoefficientsMono(float elevation, float azimuth, float* ou
 		}
 		//otherwise, the slower version; this involves copies and the fft.
 		else {
+			//Read the thread locals.
+			float *temporary_buffer1 = *(this->temporary_buffer1);
+			float* temporary_buffer2 = *(this->temporary_buffer2);
 			std::copy(azimuths[azimuthIndex1], azimuths[azimuthIndex1]+hrir_length, temporary_buffer1);
 			std::copy(azimuths[azimuthIndex2], azimuths[azimuthIndex2]+hrir_length, temporary_buffer2);
 			linearPhase(temporary_buffer1);
@@ -261,6 +310,49 @@ void HrtfData::computeCoefficientsStereo(float elevation, float azimuth, float *
 	//the left ear is found at an azimuth which is reflectred about 0 degrees.
 	azimuth = ringmodf(360-azimuth, 360.0f);
 	computeCoefficientsMono(elevation, azimuth, left, linphase);
+}
+
+//Create and free buffers.
+//These are used by the thread locals.
+
+float* HrtfData::createTemporaryBuffer() {
+	return allocArray<float>(hrir_length);
+}
+
+void HrtfData::freeTemporaryBuffer(float* b) {
+	freeArray(b);
+}
+
+kiss_fftr_cfg HrtfData::createFft() {
+	return kiss_fftr_alloc(hrir_length*2, 0, nullptr, nullptr);
+}
+
+kiss_fftr_cfg HrtfData::createIfft() {
+	return kiss_fftr_alloc(hrir_length*2, 1, nullptr, nullptr);
+}
+
+void HrtfData::freeFft(kiss_fftr_cfg& d) {
+	kiss_fftr_free(d);
+}
+
+void HrtfData::freeIfft(kiss_fftr_cfg& d) {
+	kiss_fftr_free(d);
+}
+
+kiss_fft_cpx* HrtfData::createFftData() {
+	return allocArray<kiss_fft_cpx>(hrir_length+1);
+}
+
+void HrtfData::freeFftData(kiss_fft_cpx* d) {
+	freeArray(d);
+}
+
+float* HrtfData::createFftTimeData() {
+	return allocArray<float>(hrir_length*2);
+}
+
+void HrtfData::freeFftTimeData(float* b) {
+	freeArray(b);
 }
 
 /**This helper class loads a UUID from the specified file handle.
