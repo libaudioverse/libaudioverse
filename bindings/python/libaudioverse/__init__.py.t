@@ -615,7 +615,7 @@ class GenericNode(_HandleComparer):
         Example: n.connect_property(0, mySineNode.frequency).
         
         As usual, this connection keeps this node alive as long as the destination is also alive."""
-        other = property._node
+        other = property._handle
         slot = property._slot
         _lav.node_connect_property(self, output, other, slot)
 
