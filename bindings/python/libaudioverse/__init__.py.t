@@ -12,6 +12,8 @@ import enum
 import functools
 import threading
 import logging
+import six.moves
+
 
 def find_datafiles():
     import glob
@@ -171,7 +173,7 @@ def enumerate_devices():
     """Returns a list of DeviceInfo representing the devices on the system."""
     max_index = _lav.device_get_count()
     infos = []
-    for i in xrange(max_index):
+    for i in six.moves.range(max_index):
         info = DeviceInfo(index = i,
         channels = _lav.device_get_channels(i),
         name = unicode(_lav.device_get_name(i), 'UTF8'))
@@ -532,7 +534,7 @@ class ArrayProperty(LibaudioverseProperty):
         with self._lock:
             length = self._length(self._handle, self._slot)
             accum = [None]*length
-            for i in xrange(length):
+            for i in six.moves.range(length):
                 accum[i] = self._reader(self._handle, self._slot, i)
         return tuple(accum)
 

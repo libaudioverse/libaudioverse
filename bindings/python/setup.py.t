@@ -20,6 +20,7 @@ setup(
         'Topic :: Software Development :: Libraries'
     ],
     zip_safe = False,
+    install_requires = ['six'],
     extras_require = { #This comes from wheel docs, but by the PEP explaining environment markers shouldn't work. But it does.
         ':python_version <= "3.4"': ['enum34'],
     }
