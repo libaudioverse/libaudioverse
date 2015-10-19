@@ -176,7 +176,7 @@ def enumerate_devices():
     for i in six.moves.range(max_index):
         info = DeviceInfo(index = i,
         channels = _lav.device_get_channels(i),
-        name = unicode(_lav.device_get_name(i), 'UTF8'))
+        name = _lav.device_get_name(i))
         infos.append(info)
     return infos
 
