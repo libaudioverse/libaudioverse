@@ -84,7 +84,7 @@ def block_callback(simulation, time):
 
 simulation.set_block_callback(block_callback)
 
-print "Writing 30 seconds of audio to out.ogg..."
+print("Writing 30 seconds of audio to out.ogg...")
 simulation.write_file(path="out.ogg", channels=2, duration =30.0)
 #simulation.set_output_device(-1, mixahead=20)
 #raw_input()

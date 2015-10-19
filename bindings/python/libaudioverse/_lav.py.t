@@ -59,8 +59,9 @@ def reverse_handle(handle):
     #Drill down up to twice, otherwise assume we passed in something safe.
     {{arg.name}} = getattr({{arg.name}}, 'handle', {{arg.name}})
     {{arg.name}} = getattr({{arg.name}}, 'handle', {{arg.name}})
-{%endif%}
-{%if arg.type.indirection == 1 and not arg.type.base == 'char'%}
+{%elif arg.type.indirection == 1 and arg.type.base == 'char'%}
+    {{arg.name}} = {{arg.name}}.encode('utf8') #All strings are contractually UTF8 when entering Libaudioverse.
+{%elif arg.type.indirection == 1%}
     if isinstance({{arg.name}}, collections.Sized):
         if not isinstance({{arg.name}}, basestring):
             {{arg.name}}_t = {{arg.type|ctypes_string(1)}}*len({{arg.name}})
@@ -100,10 +101,13 @@ def {{friendly_name}}({{input_arg_names|join(', ')}}):
         raise make_error_from_code(err)
     return {%for i in func_info.output_args -%}
 {%- if i.type.base=='LavHandle' and i.type.indirection == 1 -%}
-    reverse_handle({{i.name}}.value){%if not loop.last%}, {%endif%}
+    reverse_handle({{i.name}}.value)
+{%-elif i.type.base == 'char' and i.type.indirection == 1-%}
+    {{i.name}}.decode('utf8') #All strings are contractually UTF8 when returned to us.
 {%- else -%}
-    getattr({{i.name}}, 'value', {{i.name}}){%if not loop.last%}, {%endif%}
+    getattr({{i.name}}, 'value', {{i.name}})
 {%-endif-%}
+{%-if not loop.last%}, {%endif-%}
 {%-endfor-%}
 {%endif%}
 
