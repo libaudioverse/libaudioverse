@@ -102,8 +102,8 @@ def {{friendly_name}}({{input_arg_names|join(', ')}}):
     return {%for i in func_info.output_args -%}
 {%- if i.type.base=='LavHandle' and i.type.indirection == 1 -%}
     reverse_handle({{i.name}}.value)
-{%-elif i.type.base == 'char' and i.type.indirection == 1-%}
-    {{i.name}}.decode('utf8') #All strings are contractually UTF8 when returned to us.
+{%-elif i.type.base == 'char' and i.type.indirection == 2-%}{#Recall that the types show all of these with an extra level of pointer indirection.#}
+    {{i.name}}.value.decode('utf8') #All strings are contractually UTF8 when returned to us.
 {%- else -%}
     getattr({{i.name}}, 'value', {{i.name}})
 {%-endif-%}
