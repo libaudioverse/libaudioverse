@@ -50,7 +50,7 @@ rm.mul.set(time = 28.0, value = 1.0)
 rm.mul.linear_ramp_to_value(time = 30.0, value = 0.0)
 
 #This is the 3D infrastructure.
-world=libaudioverse.SimpleEnvironmentNode(simulation, "default")
+world=libaudioverse.EnvironmentNode(simulation, "default")
 world.orientation.value = (0, 1, 0, 0, 0, 1)
 
 #Turn on HRTF.
