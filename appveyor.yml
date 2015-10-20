@@ -14,8 +14,6 @@ init:
   - git config --global core.autocrlf true
 
 clone_folder: c:\projects\libaudioverse
-shallow_clone: true
-clone_depth: 5
 
 platform:
   - x86
@@ -52,15 +50,16 @@ install:
 
 
 build_script:
+  - '"C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\VsDevCmd.bat"'
   #Do this heere so we can be absolutely sure it's set right:
   - 'set include=C:\Libraries\boost_1_59_0;%include%'
-  - 'set lib=C:\Libraries\boost_1_59_0\stage\lib;%lib%'
+  - 'set lib=c:\libraries\boost_1_59_0\lib32-msvc-14.0;%lib%'
   - mkdir build
   - cd build
   #Turn off devmode to make docs be part of all.
   - 'cmake .. -DLIBAUDIOVERSE_DEVMODE:BOOL=OFF -DLIBSNDFILE_LOCATION:STRING="c:/projects/libaudioverse/tmp"'
-  #-m is parallel build.
-  - cmake --build . --config Release --target package -- /m
+  #-m is parallel build. The other makes it see environment vars.
+  - cmake --build . --config Release --target package -- /m /p:UseEnv=true
   #Go back, so that after_build works.
   - cd ..
 
