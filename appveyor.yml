@@ -14,8 +14,6 @@ init:
   - git config --global core.autocrlf true
 
 clone_folder: c:\projects\libaudioverse
-shallow_clone: true
-clone_depth: 5
 
 platform:
   - x86
