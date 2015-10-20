@@ -55,6 +55,8 @@ build_script:
   #Do this heere so we can be absolutely sure it's set right:
   - 'set include=C:\Libraries\boost_1_59_0;%include%'
   - 'set lib=c:\libraries\boost_1_59_0\lib32-msvc-14.0;%lib%'
+  #This was taken from: http://stackoverflow.com/questions/15654002/adding-additional-library-and-include-paths-when-compiling-from-command-line
+  - set UseEnv=true
   - mkdir build
   - cd build
   #Turn off devmode to make docs be part of all.
