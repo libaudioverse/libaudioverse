@@ -44,6 +44,7 @@ logging.cpp
 planner.cpp
 error.cpp
 hrtf.cpp
+utf8.cpp
 
 file_io/file_reader.cpp
 file_io/file_writer.cpp
