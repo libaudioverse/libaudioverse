@@ -33,6 +33,7 @@ Currently Libaudioverse only builds on Windows.  Libaudioverse itself will build
 
 You need the following:
 
+- Boost.  I test with 1.59.0, but other versions may work.
 - Python 3.5. If you are on Windows, the launcher must be working.
 - CMake 3.3 or later.
 - The python packages PyYAML, Jinja2, pycparser, enum34, numpy, and scipy.
