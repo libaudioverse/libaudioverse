@@ -15,7 +15,11 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/kernels.hpp>
 #include <libaudioverse/private/data.hpp>
 #include <libaudioverse/private/memory.hpp>
+#include <libaudioverse/private/utf8.hpp>
 #include <powercores/thread_local_variable.hpp>
+#include <boost/iostreams/device/mapped_file.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/filesystem/fstream.hpp>
 #include <math.h>
 #include <kiss_fftr.h>
 #include <memory>
@@ -23,6 +27,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <map>
 #include <thread>
 #include <tuple>
+#include <ios>
+#include <system_error>
 
 namespace libaudioverse_implementation {
 
@@ -134,22 +140,16 @@ int HrtfData::getLength() {
 }
 
 void HrtfData::loadFromFile(std::string path, unsigned int forSr) {
-	//first, load the file if we can.
-	FILE *fp = fopen(path.c_str(), "rb");
-	if(fp == nullptr) ERROR(Lav_ERROR_FILE, std::string("Could not find HRTF file ")+path);
-	size_t size = 0;
-	fseek(fp, 0, SEEK_END);
-	size = ftell(fp);
-	fseek(fp, 0, SEEK_SET);
-
-	//Okay, load everything.
-	char* data = new char[size];
-
-	//do the read.
-	size_t read;
-	read = fread(data, 1, size, fp);
-	loadFromBuffer(read, data, forSr);
-	delete[] data;
+	try {
+		auto p = boost::filesystem::path(utf8ToWide(path));
+		boost::iostreams::mapped_file map(p);
+		loadFromBuffer(map.size(), map.data(), forSr);
+		map.close();
+	}
+	catch(std::ios_base::failure &e) {
+		if(e.code() == std::errc::no_such_file_or_directory) ERROR(Lav_ERROR_FILE_NOT_FOUND, "Could not open HRTF file.");
+		else throw;
+	}
 }
 
 void HrtfData::loadFromDefault(unsigned int forSr) {
@@ -360,13 +360,13 @@ The first 16 bytes of every HRTF file are effectively unique, so we can use them
 This only accounts for the file itself.  See below for the caching.*/
 class HrtfId {
 	public:
-	HrtfId(FILE* fp);
+	HrtfId(boost::filesystem::fstream &f);
 	char identity[16];
 };
 
-HrtfId::HrtfId(FILE* fp) {
-	int got = fread(identity, 1, 16, fp);
-	if(got != 16) ERROR(Lav_ERROR_HRTF_INVALID, "File does not contain enough bytes for UUID.");
+HrtfId::HrtfId(boost::filesystem::fstream &f) {
+	f.read(identity, 16);
+	if(f.gcount() != 16) ERROR(Lav_ERROR_HRTF_INVALID, "Could not read HRTF ID.");
 }
 
 bool operator==(const HrtfId& a, const HrtfId& b) {
@@ -408,10 +408,10 @@ std::shared_ptr<HrtfData> createHrtfFromString(std::string path, int forSr) {
 		return h;
 	}
 	else {
-		FILE *fp = fopen(path.c_str(), "rb");
-		if(fp == nullptr) ERROR(Lav_ERROR_FILE, std::string("Could not find HRTF file ")+path);
-		auto identity = HrtfId(fp);
-		fclose(fp);
+		boost::filesystem::fstream f(boost::filesystem::path(utf8ToWide(path)), boost::filesystem::fstream::in | boost::filesystem::fstream::binary);
+		if(f.good() == false) ERROR(Lav_ERROR_FILE, std::string("Could not find HRTF file ")+path);
+		auto identity = HrtfId(f);
+		f.close();
 		std::lock_guard<std::mutex> guard(*hrtf_cache_mutex);
 		if(file_hrtf_cache->count(std::make_tuple(forSr, identity))) return file_hrtf_cache->at(std::make_tuple(forSr, identity));
 		auto h = std::make_shared<HrtfData>();
