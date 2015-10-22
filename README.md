@@ -27,6 +27,17 @@ here is an overview of the offered nodes:
 - Finally, if none of these meet your needs, it is possible to create your own node via the custom node.
 
 
+##Binaries and Support##
+
+Libaudioverse's CI server currently uploads snapshots of the master branch containing everything you need to get started on Windows.  You can get it [here](http://camlorn.net/releases/libaudioverse/libaudioverse_master.zip).
+
+There is a Google Group [here](https://groups.google.com/a/camlorn.net/forum/#!forum/libaudioverse).
+You can subscribe directly and without a Gmail address via e-mailing an empty e-mail to `libaudioverse+subscribe@camlorn.net` and clicking the link in the confirmation e-mail sent to you.
+I prefer questions to come via this avenue, as it results in your answers being Googlable in future.
+If you need to contact me in real-time, you can do so via the Libaudioverse IRC channel: `#libaudioverse` on chat.freenode.net.
+
+Please report bugs and make feature requests using the GitHub issue tracker; this saves me time for issues which I cannot fix immediately.
+
 ##Building##
 
 Currently Libaudioverse only builds on Windows.  Libaudioverse itself will build with minor changes on other platforms, but the build scripts don't know how to handle it and Libaudioverse is currently missing audio backends.  If you are on Linux or Mac, watch this space; it will build on your platform before 1.0 is released.
