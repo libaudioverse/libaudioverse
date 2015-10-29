@@ -30,7 +30,7 @@ std::shared_ptr<Node> createBufferNode(std::shared_ptr<Simulation> simulation) {
 
 void BufferNode::bufferChanged() {
 	auto buff = getProperty(Lav_BUFFER_BUFFER).getBufferValue();
-	double maxPosition= 0.0;
+	maxPosition = 0.0;
 	int newChannels= 0;
 	int newBufferLength=0;
 	if(buff==nullptr) {
@@ -91,6 +91,9 @@ void BufferNode::process() {
 		frame += floor(offset);
 		offset = offset-floor(offset);
 	}
+	double pos = (frame+offset)/simulation->getSr();
+	//Avoid both so that we don't keep triggering positionChanged.
+	getProperty(Lav_BUFFER_POSITION).setDoubleValue(std::min(pos, maxPosition), true, true);
 }
 
 //begin public api

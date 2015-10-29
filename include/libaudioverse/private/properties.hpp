@@ -76,7 +76,7 @@ class Property {
 	//The index of r1 must be strictly less than or equal to the index of r2.
 	//This condition may be lifted in future.
 	float getFloatValue(int i = 0);
-	void setFloatValue(float v, bool avoidCallbacks = false);
+	void setFloatValue(float v, bool avoidCallbacks = false, bool avoidAutomatorClear = false);
 	float getFloatDefault();
 	void setFloatDefault(float v);
 	float getFloatMin();
@@ -88,7 +88,7 @@ class Property {
 	//The index of r1 must be strictly less than or equal to the index of r2.
 	//This condition may be lifted in future.
 	double getDoubleValue(int i = 0);
-	void setDoubleValue(double v, bool avoidCallbacks = false);
+	void setDoubleValue(double v, bool avoidCallbacks = false, bool avoidAutomatorClear = false);
 	double getDoubleMin();
 	double getDoubleMax();
 	void setDoubleRange(double a, double b);

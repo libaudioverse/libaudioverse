@@ -19,7 +19,7 @@ class BufferNode: public Node {
 	virtual void process();
 	int frame = 0;
 	int buffer_length=0;
-	double offset=0.0;
+	double offset=0.0, maxPosition = 0.0;
 	bool ended = true; //True if the buffer is ended or does not exist.
 };
 

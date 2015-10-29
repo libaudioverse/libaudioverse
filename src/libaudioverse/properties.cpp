@@ -201,9 +201,9 @@ float Property::getFloatValue(int i) {
 	else return value.fval;
 }
 
-void Property::setFloatValue(float v, bool avoidCallbacks) {
+void Property::setFloatValue(float v, bool avoidCallbacks, bool avoidAutomatorClear) {
 	RC(v, fval);
-	automators.clear();
+	if(avoidAutomatorClear == false) automators.clear();
 	value.fval = v;
 	last_modified=simulation->getTickCount();
 	if(avoidCallbacks == false) firePostChangedCallback();
@@ -235,9 +235,9 @@ double Property::getDoubleValue(int i) {
 	else return value.dval;
 }
 
-void Property::setDoubleValue(double v, bool avoidCallbacks) {
+void Property::setDoubleValue(double v, bool avoidCallbacks, bool avoidAutomatorClear) {
 	RC(v, dval);
-	automators.clear();
+	if(avoidAutomatorClear == false) automators.clear();
 	value.dval = v;
 	last_modified =simulation->getTickCount();
 	if(avoidCallbacks == false) firePostChangedCallback();
