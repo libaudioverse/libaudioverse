@@ -85,6 +85,7 @@ implementations/nested_allpass_network.cpp
 nodes/allpass.cpp
 nodes/amplitude_panner.cpp
 nodes/biquad.cpp
+nodes/blit.cpp
 nodes/buffer.cpp
 nodes/buffer_timeline.cpp
 nodes/convolver.cpp

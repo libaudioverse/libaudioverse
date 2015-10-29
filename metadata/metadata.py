@@ -28,7 +28,7 @@ extensions = ['jinja2.ext.loopcontrols'])
 #the map we have here is actually very verbose, and can be flattened into something easily iterable.
 #we can then take advantage of either std::pair or std::tuple as the keys.
 joined_properties = []
-for nodekey, nodeinfo in [(i, metadata['nodes'].get(i, dict())) for i in all_info['constants'].keys() if re.match("Lav_OBJTYPE_(\w+_*)+_NODE", i)]:
+for nodekey, nodeinfo in [(i, metadata['nodes'].get(i, dict())) for i in all_info['constants'].keys() if re.match("Lav_OBJTYPE(\w+_*)+_NODE", i)]:
     #add everything from the object itself.
     for propkey, propinfo in nodeinfo.get('properties', dict()).items():
         joined_properties.append((nodekey, propkey, propinfo))
@@ -122,6 +122,10 @@ for propkey, propid, propinfo in joined_properties:
             propinfo['default'][i] = string_from_number(j, propinfo['type'])
     propinfo['normalized'] = True
 
+#Sorting these makes sure maybe-write always gets the same thing.
+joined_properties.sort()
+joined_events.sort()
+
 #do the render, and write to the file specified on the command line.
 context = {
 'joined_properties': joined_properties,
@@ -135,4 +139,4 @@ result = template.render(context)
 if not os.path.exists(os.path.split(os.path.abspath(sys.argv[1]))[0]):
     os.makedirs(os.path.split(os.path.abspath(sys.argv[1]))[0])
 
-maybe_write(sys.argv[1], result.encode('utf8'))
+maybe_write(sys.argv[1], result)

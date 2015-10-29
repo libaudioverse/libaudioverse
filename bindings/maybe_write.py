@@ -8,9 +8,9 @@ def maybe_write(path, contents):
         with open(path, 'rb') as f:
             hash1 = hashlib.sha256()
             hash2 = hashlib.sha256()
-            hash1.update(contents)
-            hash2.update(f.read().decode().encode('utf8'))
-            rewrite = hash1.digest() == hash2.digest()
+            hash1.update(contents.encode('utf8'))
+            hash2.update(f.read())
+            rewrite = hash1.digest() != hash2.digest()
     if rewrite:
         with open(path, 'wb') as f:
-            f.write(contents)
+            f.write(contents.encode('utf8'))
