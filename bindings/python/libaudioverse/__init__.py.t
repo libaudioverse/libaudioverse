@@ -601,7 +601,7 @@ class GenericNode(_HandleComparer):
     def connect(self, output, node, input):
         """Connect the specified output of this node to the specified input of another node.
         
-        As a feature of the Python bindings, nodes are kept alive if another node's input is connected to one of their outputs.
+        Nodes are kept alive if another node's input is connected to one of their outputs.
         So long as some node which this node is connected to is alive, this node will also be alive."""
         _lav.node_connect(self, output, node, input)
 
@@ -630,6 +630,10 @@ class GenericNode(_HandleComparer):
         if node is None:
             node = 0 #Force this translation.
         _lav.node_disconnect(self, output, node, input)
+
+    def isolate(self):
+        """Break all connections (both input and output) involving this node."""
+        _lav.node_isolate(self)
 
 {%for enumerant, prop in metadata['nodes']['Lav_OBJTYPE_GENERIC_NODE']['properties'].items()%}
 {{macros.implement_property(enumerant, prop)}}

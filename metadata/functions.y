@@ -377,6 +377,10 @@ functions:
       output: The output to disconnect.
       otherHandle: The node from which to disconnect.
       input: The input of the other node from which to disconnect.
+  Lav_nodeIsolate:
+    category: nodes
+    doc_description: |
+      Break all connections involving this node, for both inputs and outputs.
   Lav_nodeGetInputConnectionCount:
     category: nodes
     doc_description: |

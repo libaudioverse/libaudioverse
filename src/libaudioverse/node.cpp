@@ -490,6 +490,14 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeDisconnect(LavHandle nodeHandle, int output
 	PUB_END
 }
 
+Lav_PUBLIC_FUNCTION LavError Lav_nodeIsolate(LavHandle nodeHandle) {
+	PUB_BEGIN
+	auto n = incomingObject<Node>(nodeHandle);
+	LOCK(*n);
+	n->isolate();
+	PUB_END
+}
+
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetInputConnectionCount(LavHandle nodeHandle, unsigned int* destination) {
 	PUB_BEGIN
 	auto node = incomingObject<Node>(nodeHandle);
