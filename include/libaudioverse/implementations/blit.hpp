@@ -24,7 +24,7 @@ class Blit {
 	void reset();
 	private:
 	void recompute();
-	float frequency = 100.0f, phase = 0.0f, phaseIncrement = 0.0f, sr = 0.0f, normFactor = 1.0f;
+	double frequency = 100.0f, phase = 0.0f, phaseIncrement = 0.0f, sr = 0.0f, normFactor = 1.0f;
 	int harmonics = 0, adjusted_harmonics = 0;
 	bool shouldNormalize = false;
 };
