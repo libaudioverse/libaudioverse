@@ -209,6 +209,13 @@ enum Lav_FDN_REVERB_PROPERTIES {
 	Lav_FDN_REVERB_DELAY_MODULATION_FREQUENCY = -5,
 };
 
+enum Lav_BLIT_PROPERTIES {
+	Lav_BLIT_FREQUENCY = -1,
+	Lav_BLIT_HARMONICS = -2,
+	Lav_BLIT_PHASE = -3,
+	Lav_BLIT_SHOULD_NORMALIZE = -4,
+};
+
 #ifdef __cplusplus
 }
 #endif
