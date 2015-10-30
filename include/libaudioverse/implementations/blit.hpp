@@ -75,7 +75,7 @@ inline void Blit::setShouldNormalize(bool norm) {
 }
 
 inline void Blit::setPhase(float p) {
-	phase = p;
+	phase = 2*PI*p;
 }
 
 }
