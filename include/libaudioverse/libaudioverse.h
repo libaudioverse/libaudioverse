@@ -122,6 +122,7 @@ enum Lav_OBJECT_TYPES {
 	Lav_OBJTYPE_NESTED_ALLPASS_NETWORK_NODE,
 	Lav_OBJTYPE_FDN_REVERB_NODE,
 	Lav_OBJTYPE_BLIT_NODE,
+	Lav_OBJTYPE_DC_BLOCKER_NODE,
 };
 
 /**Node states.*/
@@ -438,6 +439,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_nestedAllpassNetworkNodeCompile(LavHandle nodeH
 Lav_PUBLIC_FUNCTION LavError Lav_createFdnReverbNode(LavHandle simulationHandle, LavHandle* destination);
 
 Lav_PUBLIC_FUNCTION LavError Lav_createBlitNode(LavHandle simulationHandle, LavHandle* destination);
+
+Lav_PUBLIC_FUNCTION LavError Lav_createDcBlockerNode(LavHandle simulationHandle, int channels, LavHandle* destination);
 
 #ifdef __cplusplus
 }
