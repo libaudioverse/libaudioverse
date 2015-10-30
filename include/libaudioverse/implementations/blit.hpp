@@ -5,7 +5,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "../private/constants.hpp"
 #include <cmath>
 #include <cfloat>
-#include <limits>
+#include <stdio.h>
 
 namespace libaudioverse_implementation {
 
@@ -34,13 +34,13 @@ inline Blit::Blit(float _sr): sr(_sr) {
 }
 
 inline float Blit::tick() {
-	double numer = std::sin(phase*(harmonics+1)/2.0);
+	double numer = std::sin(phase*(adjusted_harmonics+1)/2.0);
 	double denom = std::sin(phase/2);
 	phase += phaseIncrement;
 	//Keep us from going over 2PI. 1 decrement with an if is not sufficient if we're aliasing.
 	phase -= floorf(phase/(2*PI))*2*PI;
 	float res;
-	if(std::abs(denom) < DBL_EPSILON) res = (float)(2*harmonics+1);
+	if(std::abs(denom) < DBL_EPSILON) res = 0.0f; //The numerator goes to 0 here.
 	else res = (float)(numer/denom);
 	return res*normFactor;
 }
@@ -61,11 +61,13 @@ inline void Blit::setFrequency(float frequency) {
 
 inline void Blit::recompute() {
 	if(harmonics == 0) {
-		harmonics = floor(sr/frequency);
-		if(harmonics == 0) harmonics = 1;
+		adjusted_harmonics = floor(sr/frequency);
+		if(adjusted_harmonics == 0) adjusted_harmonics = 1;
 	}
+	else adjusted_harmonics = harmonics;
 	phaseIncrement = 2*PI*frequency/sr;
-	if(shouldNormalize) normFactor = 1.0f/harmonics;
+	//1+2cos(x)+2cos(2x)...etc...means max value of 1+2*adjusted_harmonics.
+	if(shouldNormalize) normFactor = 1.0f/(2*adjusted_harmonics+1);
 	else normFactor = 1.0f;
 }
 
