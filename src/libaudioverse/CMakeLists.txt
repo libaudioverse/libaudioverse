@@ -104,6 +104,7 @@ nodes/graph_listener.cpp
 nodes/hard_limiter.cpp
 nodes/hrtf.cpp
 nodes/iir.cpp
+nodes/leaky_integrator.cpp
 nodes/multipanner.cpp
 nodes/nested_allpass_network.cpp
 nodes/noise.cpp

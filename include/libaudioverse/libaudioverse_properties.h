@@ -216,6 +216,10 @@ enum Lav_BLIT_PROPERTIES {
 	Lav_BLIT_SHOULD_NORMALIZE = -4,
 };
 
+enum Lav_LEAKY_INTEGRATOR_PROPERTIES {
+	Lav_LEAKY_INTEGRATOR_LEAKYNESS = -1,
+};
+
 #ifdef __cplusplus
 }
 #endif
