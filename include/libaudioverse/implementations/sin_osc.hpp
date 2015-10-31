@@ -55,12 +55,16 @@ class SinOsc {
 		cx=cosf(angle);
 		sx=sinf(angle);
 	}
+
+	void setPhaseIncrement(double i) {
+		i = 2*PI*i;
+		cd = cos(i);
+		sd = sin(i);
+	}
 	
 	void setFrequency(float f) {
-		//We don't lose phase, so don't touch cx and sx.
-		sd= sinf(2*PI*f/sr);
-		cd=cosf(2*PI*f/sr);
 		frequency = f;
+		setPhaseIncrement(f/sr);
 	}
 	
 	void normalize() {
