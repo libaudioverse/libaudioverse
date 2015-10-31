@@ -43,6 +43,7 @@ void BlitNode::process() {
 
 void BlitNode::reset() {
 	oscillator.reset();
+	oscillator.setPhase(getProperty(Lav_BLIT_PHASE).getFloatValue());
 }
 
 //begin public api
