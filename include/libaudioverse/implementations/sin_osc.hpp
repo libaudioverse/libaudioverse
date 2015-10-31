@@ -78,9 +78,13 @@ class SinOsc {
 	}
 	
 	//phase is from 0 to 1 and measured in  periods.
-	void setPhase(float phase) {
-		cx = cosf(2*PI*phase);
-		sx =sinf(2*PI*phase);
+	void setPhase(double phase) {
+		cx = (float)cos(2*PI*phase);
+		sx = (float)sin(2*PI*phase);
+	}
+	
+	double getPhase() {
+		return atan2(sx, cx)/(2*PI);
 	}
 	
 	private:

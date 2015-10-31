@@ -19,7 +19,8 @@ class Blit {
 	void setFrequency(float frequency);
 	void setHarmonics(int harmonics); //If zero, adjust to get as many as possible.
 	void setShouldNormalize(bool norm);
-	void setPhase(float p);
+	void setPhase(double p);
+	double getPhase();
 	float tick();
 	void reset();
 	private:
@@ -88,8 +89,13 @@ inline void Blit::setShouldNormalize(bool norm) {
 	recompute();
 }
 
-inline void Blit::setPhase(float p) {
-	phase = 2*PI*p;
+inline void Blit::setPhase(double p) {
+	//If phase is wrapping, deal with it.
+	phase = 2*PI*(p-floor(p));
+}
+
+inline double Blit::getPhase() {
+	return phase/(2*PI);
 }
 
 }
