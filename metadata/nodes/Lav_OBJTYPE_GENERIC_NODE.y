@@ -20,6 +20,7 @@ properties:
     type: float
     default: 1.0
     range: [-INFINITY, INFINITY]
+    rate: a
     doc_description: |
       After this node processes, the value to which mul is set is used as a multiplier on the result.
       The most notable effect of this is to change the node's volume.
@@ -30,6 +31,7 @@ properties:
     type: float
     default: 0.0
     range: [-INFINITY, INFINITY]
+    rate: a
     doc_description: |
       After mul is applied, we add the value to which this property is set to the node's result.
       The purpose of add is to be used with automation support: add provides a baseline for oscillators and other similar nodes
