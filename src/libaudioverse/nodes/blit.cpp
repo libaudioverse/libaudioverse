@@ -24,7 +24,7 @@ std::shared_ptr<Node> createBlitNode(std::shared_ptr<Simulation> simulation) {
 
 void BlitNode::process() {
 	if(werePropertiesModified(this, Lav_BLIT_PHASE)) {
-		oscillator.setPhase(getProperty(Lav_BLIT_PHASE).getFloatValue());
+		oscillator.setPhase(oscillator.getPhase()+getProperty(Lav_BLIT_PHASE).getFloatValue());
 	}
 	if(werePropertiesModified(this, Lav_BLIT_HARMONICS)) oscillator.setHarmonics(getProperty(Lav_BLIT_HARMONICS).getIntValue());
 	if(werePropertiesModified(this, Lav_BLIT_FREQUENCY)) oscillator.setFrequency(getProperty(Lav_BLIT_FREQUENCY).getFloatValue());

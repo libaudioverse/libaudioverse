@@ -56,6 +56,7 @@ class SinOsc {
 		sx=sinf(angle);
 	}
 
+	//Set the phase increment per sample.
 	void setPhaseIncrement(double i) {
 		i = 2*PI*i;
 		cd = cos(i);
