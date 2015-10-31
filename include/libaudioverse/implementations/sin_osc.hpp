@@ -24,8 +24,7 @@ class SinOsc {
 		float ocx=cx, osx=sx;
 		sx = osx*cd+ocx*sd;
 		cx = ocx*cd-osx*sd;
-		//we account for phase here.
-		return osx*cp+ocx*sp;
+		return sx;
 	}
 
 	//version of tick that applies to a buffer.
@@ -33,13 +32,11 @@ class SinOsc {
 		//making these locals and putting them back increases the chance they'll get registers.
 		float lcx=cx, lsx=sx;
 		float lcd=cd, lsd=sd;
-		float lcp=cp, lsp =sp;
 		for(int i= 0; i < length; i++) {
 			float ocx=lcx, osx=lsx;
 			lsx = osx*lcd+ocx*lsd;
 			lcx = ocx*lcd-osx*lsd;
-			//we account for phase here.
-			buffer[i] = osx*lcp+ocx*lsp;
+			buffer[i] = lsx;
 		}
 		//put them back.
 		cx=lcx;
@@ -78,15 +75,12 @@ class SinOsc {
 		cx =1;
 		sd=0;
 		cd=0;
-		//phase:
-		cp =1;
-		sp = 0;
 	}
 	
 	//phase is from 0 to 1 and measured in  periods.
 	void setPhase(float phase) {
-		cp = cosf(2*PI*phase);
-		sp =sinf(2*PI*phase);
+		cx = cosf(2*PI*phase);
+		sx =sinf(2*PI*phase);
 	}
 	
 	private:
@@ -94,8 +88,6 @@ class SinOsc {
 	//internal vector is right, frequency is zero.
 	float sx = 0, cx = 1, sd = 0, cd = 0;
 	float sr; //sampling rate.
-	//sine and cosine of phase offset.
-	float cp=1, sp = 0;
 	//frequency is saved for purposes of skipping samples.
 	float frequency =0;
 };

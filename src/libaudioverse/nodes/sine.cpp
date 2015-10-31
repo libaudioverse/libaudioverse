@@ -40,6 +40,7 @@ void SineNode::process() {
 
 void SineNode::reset() {
 	oscillator.reset();
+	oscillator.setPhase(getProperty(Lav_SINE_PHASE).getFloatValue());
 }
 
 //begin public api
