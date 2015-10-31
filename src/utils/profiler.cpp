@@ -62,6 +62,7 @@ LavError createBuffer(LavHandle sim, LavHandle& h) {
 
 std::tuple<std::string, int, std::function<std::vector<LavHandle>(LavHandle, int)>> to_profile[] = {
 ENTRY("sine", 1000, Lav_createSineNode(sim, &h)),
+ENTRY("Blit", 1000, Lav_createBlitNode(sim, &h)),
 ENTRY("4-channel buffer", 100, createBuffer(sim, h)),
 ENTRY("crossfading delay line", 1000, Lav_createCrossfadingDelayNode(sim, 0.1, 1, &h)),
 ENTRY("biquad", 1000, Lav_createBiquadNode(sim, 1, &h)),
