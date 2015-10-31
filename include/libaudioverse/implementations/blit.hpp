@@ -3,9 +3,10 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #pragma once
 #include "../private/constants.hpp"
+#include "sin_osc.hpp"
 #include <cmath>
 #include <cfloat>
-#include <stdio.h>
+
 
 namespace libaudioverse_implementation {
 
@@ -28,31 +29,31 @@ class Blit {
 	double frequency = 100.0f, phase = 0.0f, phaseIncrement = 0.0f, sr = 0.0f, normFactor = 1.0f;
 	int harmonics = 0, adjusted_harmonics = 0;
 	bool shouldNormalize = false;
+	//These oscillators are set up so that we don't have to use the trig functions.
+	SinOsc numerOsc, denomOsc;
 };
 
-inline Blit::Blit(float _sr): sr(_sr) {
+inline Blit::Blit(float _sr): sr(_sr), numerOsc(_sr), denomOsc(_sr) {
 	recompute();
 }
 
 inline float Blit::tick() {
-	double numer = std::sin(phase*(adjusted_harmonics+0.5));
-	double denom = std::sin(phase/2.0);
+	double numer = numerOsc.tick();
+	double denom = denomOsc.tick();
 	float res;
 	if(std::abs(denom) < DBL_EPSILON) {
-		//This is from Dodge and Jerse (1985), Computer Music: Synthesis, Composition, and Performance. 
-		//It's probably a limit, but it wasn't worth me working through the math to find out.
-		//res = (2*adjusted_harmonics+1)*cos(phase*(adjusted_harmonics+0.5))/cos(phase/2.0);
 		res = adjusted_harmonics+1; //Derived by looking at what 1+2cos(x)+2cos(2x)... does at 0, pi, etc.
 	}
 	else res = (float)(numer/denom);
 	phase += phaseIncrement;
-	//Keep us from going over 2PI. 1 decrement with an if is not sufficient if we're aliasing.
-	phase -= floorf(phase/(2*PI))*2*PI;
+	if(phase >= 2*PI) phase -= 2*PI;
 	return res*normFactor;
 }
 
 inline void Blit::reset() {
 	phase = 0.0f;
+	numerOsc.reset();
+	denomOsc.reset();
 }
 
 inline void Blit::setHarmonics(int harmonics) {
@@ -82,6 +83,14 @@ inline void Blit::recompute() {
 	if(shouldNormalize) normFactor = 1.0f/(2*adjusted_harmonics+1);
 	//Fourier series of unnormalized BLIT has 1/period=frequency coefficient.
 	else normFactor = frequency;
+	//Configure the oscillators.
+	//Numerator has a phase increment of (adjusted_harmonics+0.5)*phaseIncrement, but these take it on the range 0...1.
+	numerOsc.setPhaseIncrement(phaseIncrement*(adjusted_harmonics+0.5)/(2*PI));
+	//Denominator's value increments by phaseIncrement/2.
+	denomOsc.setPhaseIncrement(phaseIncrement/(4*PI));
+	//The phases are also on the range 0...1, and can be computred similarly.
+	numerOsc.setPhase(phase*(adjusted_harmonics+0.5)/(2*PI));
+	denomOsc.setPhase(phase/(4*PI));
 }
 
 inline void Blit::setShouldNormalize(bool norm) {
@@ -92,6 +101,7 @@ inline void Blit::setShouldNormalize(bool norm) {
 inline void Blit::setPhase(double p) {
 	//If phase is wrapping, deal with it.
 	phase = 2*PI*(p-floor(p));
+	recompute();
 }
 
 inline double Blit::getPhase() {
