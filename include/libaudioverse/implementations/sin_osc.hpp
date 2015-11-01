@@ -18,22 +18,22 @@ cos(x+d)=cos(x)cos(d)-sin(x)sin(d)
 
 We have to use double, or the oscillator becomes erronious within only a few samples.
 
-Resync is the number of samples after which we resynchronize the oscillator; 100 is usually sufficient.
+Resync is the number of samples after which we resynchronize the oscillator; 64 is usually sufficient.
 */
 
 class SinOsc {
 	public:
-	SinOsc(float _sr, int _resync = 100): sr(_sr), resync(_resync), resyncCounter(_resync) {}
+	SinOsc(float _sr, int _resync = 64): sr(_sr), resync(_resync), resyncCounter(_resync) {}
 	
 	double tick() {
 		double ocx=cx, osx=sx;
 		sx = osx*cd+ocx*sd;
 		cx = ocx*cd-osx*sd;
-		return sx;
 		phase += phaseIncrement;
 		if(phase > 2*PI) phase -= 2*PI;
 		resyncCounter --;
 		if(resyncCounter == 0) doResync();
+		return sx;
 	}
 
 	void doResync() {
