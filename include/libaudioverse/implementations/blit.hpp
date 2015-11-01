@@ -38,11 +38,11 @@ inline float Blit::tick() {
 	double numer = std::sin(phase*(adjusted_harmonics+0.5));
 	double denom = std::sin(phase/2.0);
 	float res;
+	//This was determined experimentally by integrating the blit with a script and seeing what minimizes the error.
 	if(std::abs(denom) < DBL_EPSILON) {
 		//This is from Dodge and Jerse (1985), Computer Music: Synthesis, Composition, and Performance. 
 		//It's probably a limit, but it wasn't worth me working through the math to find out.
-		//res = (2*adjusted_harmonics+1)*cos(phase*(adjusted_harmonics+0.5))/cos(phase/2.0);
-		res = adjusted_harmonics+1; //Derived by looking at what 1+2cos(x)+2cos(2x)... does at 0, pi, etc.
+		res = (2*adjusted_harmonics+1)*cos(phase*(adjusted_harmonics+0.5))/cos(phase/2.0);
 	}
 	else res = (float)(numer/denom);
 	phase += phaseIncrement;
