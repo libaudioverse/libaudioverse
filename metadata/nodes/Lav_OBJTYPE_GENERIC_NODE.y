@@ -38,6 +38,9 @@ properties:
       How to treat channel count mismatches.
       The default is to apply mixing matrices when possible.
       
+      If set to {{"Lav_CHANNEL_INTERPRETATION_SPEAKERS"|enum}}, mixing matrices are applied to inputs.
+      Otherwise, when set to {{"Lav_CHANNEL_INTERPRETATION_DISCRETE"|enum}}, they are not.
+      
       This property is almost never needed.
 inputs: null
 outputs: null
