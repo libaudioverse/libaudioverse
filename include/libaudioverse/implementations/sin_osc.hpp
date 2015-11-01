@@ -7,7 +7,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 namespace libaudioverse_implementation {
 
-/*A fast sine oscillator with renormalizing capabilities.
+/*A fast sine oscillator.
 
 The following algorithm is based off the angle sum and difference identities.
 This is also equivalent to rotating a unit vector by f/sr radians every tick.
@@ -17,66 +17,69 @@ sin(x+d)=sin(x)cos(d)+cos(x)sin(d)
 cos(x+d)=cos(x)cos(d)-sin(x)sin(d)	
 
 We have to use double, or the oscillator becomes erronious within only a few samples.
+
+Resync is the number of samples after which we resynchronize the oscillator; 100 is usually sufficient.
 */
 
 class SinOsc {
 	public:
-	SinOsc(float _sr): sr(_sr) {}
+	SinOsc(float _sr, int _resync = 100): sr(_sr), resync(_resync), resyncCounter(_resync) {}
 	
 	double tick() {
 		double ocx=cx, osx=sx;
 		sx = osx*cd+ocx*sd;
 		cx = ocx*cd-osx*sd;
 		return sx;
+		phase += phaseIncrement;
+		if(phase > 2*PI) phase -= 2*PI;
+		resyncCounter --;
+		if(resyncCounter == 0) doResync();
 	}
 
+	void doResync() {
+		sx = sin(phase);
+		cx = cos(phase);
+		resyncCounter = resync;
+	}
+	
 	//Skips count samples.
 	//Same as calling tick count times.
 	void skipSamples(int count) {
-		//First, our angle may be derived from sx and cx:
-		float angle=atan2(sx, cx);
-		//The amount to advance by in radians.
-		//Compute periods, multiply by 2PI.
-		float advanceBy = (count/sr)*frequency*2*PI;
-		angle+=advanceBy;
-		cx=cos(angle);
-		sx=sin(angle);
+		phase += phaseIncrement*count;
+		resyncCounter = resync;
+		cx=cos(phase);
+		sx=sin(phase);
 	}
 
 	//Set the phase increment per sample.
 	void setPhaseIncrement(double i) {
-		i = 2*PI*i;
-		cd = cos(i);
-		sd = sin(i);
+		phaseIncrement = 2*PI*i;
+		cd = cos(phaseIncrement);
+		sd = sin(phaseIncrement);
 	}
 	
 	void setFrequency(float f) {
 		frequency = f;
 		setPhaseIncrement(f/sr);
 	}
-	
-	void normalize() {
-		double magnitude=sqrt(cx*cx+sx*sx);
-		sx/= magnitude;
-		cx /= magnitude;
-	}
-	
+
 	void reset() {
 		//point the internal vector at the positive x axis, also known as phase 0.
 		sx=0;
 		cx =1;
-		sd=0;
-		cd=0;
+		sd=sin(phaseIncrement);
+		cd=cos(phaseIncrement);
 	}
 	
 	//phase is from 0 to 1 and measured in  periods.
 	void setPhase(double phase) {
 		cx = cos(2*PI*phase);
 		sx = sin(2*PI*phase);
+		resyncCounter = resync;
 	}
 	
 	double getPhase() {
-		return atan2(sx, cx)/(2*PI);
+		return phase;
 	}
 	
 	private:
@@ -86,6 +89,8 @@ class SinOsc {
 	float sr; //sampling rate.
 	//frequency is saved for purposes of skipping samples.
 	double frequency =0;
+	double phase = 0, phaseIncrement = 0;
+	int resync, resyncCounter;
 };
 
 }
