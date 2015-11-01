@@ -8,13 +8,6 @@ properties:
     doc_description: |
       The node's state.  See the basics section in the Libaudioverse manual for details.
       The default is usually what you want.
-  Lav_NODE_AUTORESET:
-    name: autoreset
-    type: boolean
-    default: 1
-    doc_description: |
-      Every node has a reset function which does something specific to the node.
-      If this property is enabled, then changes to the inputs of this node will cause it to automatically reset.
   Lav_NODE_MUL:
     name: mul
     type: float

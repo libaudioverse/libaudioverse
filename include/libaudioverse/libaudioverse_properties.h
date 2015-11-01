@@ -23,9 +23,8 @@ Values below -100 are reserved for standard events and properties on all objects
 
 enum lav_STANDARD_PROPERTIES {
 	Lav_NODE_STATE = -100,
-	Lav_NODE_AUTORESET = -101,
-	Lav_NODE_MUL = -102,
-	Lav_NODE_ADD = -103,
+	Lav_NODE_MUL = -101,
+	Lav_NODE_ADD = -102,
 	Lav_NODE_CHANNEL_INTERPRETATION = -104,
 };
 
