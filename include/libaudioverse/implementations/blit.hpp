@@ -35,7 +35,6 @@ inline Blit::Blit(float _sr): sr(_sr) {
 }
 
 inline float Blit::tick() {
-	double numer = std::sin(phase*(adjusted_harmonics+0.5));
 	double denom = std::sin(phase/2.0);
 	float res;
 	//This was determined experimentally by integrating the blit with a script and seeing what minimizes the error.
@@ -44,7 +43,10 @@ inline float Blit::tick() {
 		//It's probably a limit, but it wasn't worth me working through the math to find out.
 		res = (2*adjusted_harmonics+1)*cos(phase*(adjusted_harmonics+0.5))/cos(phase/2.0);
 	}
-	else res = (float)(numer/denom);
+	else {
+		double numer = std::sin(phase*(adjusted_harmonics+0.5));
+		res = (float)(numer/denom);
+	}
 	phase += phaseIncrement;
 	//Keep us from going over 2PI. 1 decrement with an if is not sufficient if we're aliasing.
 	phase -= floorf(phase/(2*PI))*2*PI;
