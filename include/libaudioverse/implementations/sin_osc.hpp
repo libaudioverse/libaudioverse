@@ -7,40 +7,27 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 namespace libaudioverse_implementation {
 
-//A fast sine oscillator with renormalizing capabilities.
-//This is in the header because we want inlining.
-//The following algorithm is based off the angle sum and difference identities.
-//This is also equivalent to rotating a unit vector by f/sr radians every tick.
-/*Trig identities:
+/*A fast sine oscillator with renormalizing capabilities.
+
+The following algorithm is based off the angle sum and difference identities.
+This is also equivalent to rotating a unit vector by f/sr radians every tick.
+
+Trig identities:
 sin(x+d)=sin(x)cos(d)+cos(x)sin(d)
 cos(x+d)=cos(x)cos(d)-sin(x)sin(d)	
+
+We have to use double, or the oscillator becomes erronious within only a few samples.
 */
 
 class SinOsc {
 	public:
 	SinOsc(float _sr): sr(_sr) {}
 	
-	float tick() {
-		float ocx=cx, osx=sx;
+	double tick() {
+		double ocx=cx, osx=sx;
 		sx = osx*cd+ocx*sd;
 		cx = ocx*cd-osx*sd;
 		return sx;
-	}
-
-	//version of tick that applies to a buffer.
-	void fillBuffer(int length, float* buffer) {
-		//making these locals and putting them back increases the chance they'll get registers.
-		float lcx=cx, lsx=sx;
-		float lcd=cd, lsd=sd;
-		for(int i= 0; i < length; i++) {
-			float ocx=lcx, osx=lsx;
-			lsx = osx*lcd+ocx*lsd;
-			lcx = ocx*lcd-osx*lsd;
-			buffer[i] = lsx;
-		}
-		//put them back.
-		cx=lcx;
-		sx=lsx;
 	}
 
 	//Skips count samples.
@@ -52,8 +39,8 @@ class SinOsc {
 		//Compute periods, multiply by 2PI.
 		float advanceBy = (count/sr)*frequency*2*PI;
 		angle+=advanceBy;
-		cx=cosf(angle);
-		sx=sinf(angle);
+		cx=cos(angle);
+		sx=sin(angle);
 	}
 
 	//Set the phase increment per sample.
@@ -69,7 +56,7 @@ class SinOsc {
 	}
 	
 	void normalize() {
-		float magnitude=sqrtf(cx*cx+sx*sx);
+		double magnitude=sqrt(cx*cx+sx*sx);
 		sx/= magnitude;
 		cx /= magnitude;
 	}
@@ -84,8 +71,8 @@ class SinOsc {
 	
 	//phase is from 0 to 1 and measured in  periods.
 	void setPhase(double phase) {
-		cx = (float)cos(2*PI*phase);
-		sx = (float)sin(2*PI*phase);
+		cx = cos(2*PI*phase);
+		sx = sin(2*PI*phase);
 	}
 	
 	double getPhase() {
@@ -95,10 +82,10 @@ class SinOsc {
 	private:
 	//s=sin, c=cos
 	//internal vector is right, frequency is zero.
-	float sx = 0, cx = 1, sd = 0, cd = 0;
+	double sx = 0, cx = 1, sd = 0, cd = 0;
 	float sr; //sampling rate.
 	//frequency is saved for purposes of skipping samples.
-	float frequency =0;
+	double frequency =0;
 };
 
 }
