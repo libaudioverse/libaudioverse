@@ -30,7 +30,11 @@ class SinOsc {
 		sx = osx*cd+ocx*sd;
 		cx = ocx*cd-osx*sd;
 		phase += phaseIncrement;
-		if(phase > 2*PI) phase -= 2*PI;
+		if(phase > phaseWrap) {
+			int m = phase/phaseWrap;
+			phase = phase-m*phaseWrap;
+			doResync();
+		}
 		resyncCounter --;
 		if(resyncCounter == 0) doResync();
 		return sx;
@@ -82,6 +86,11 @@ class SinOsc {
 		return phase;
 	}
 	
+	//Usually this is 2PI, but things like the blit need custom configurations.
+	void setPhaseWrap(double p) {
+		phaseWrap = p*2*PI;
+	}
+	
 	private:
 	//s=sin, c=cos
 	//internal vector is right, frequency is zero.
@@ -89,7 +98,7 @@ class SinOsc {
 	float sr; //sampling rate.
 	//frequency is saved for purposes of skipping samples.
 	double frequency =0;
-	double phase = 0, phaseIncrement = 0;
+	double phase = 0, phaseIncrement = 0, phaseWrap = 2*PI;
 	int resync, resyncCounter;
 };
 
