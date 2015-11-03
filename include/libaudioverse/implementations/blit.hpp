@@ -54,10 +54,6 @@ inline double Blit::tick() {
 		double nc = cos(p*(adjusted_harmonics+0.5));
 		double dc = cos(p/2);
 		res = (2*adjusted_harmonics+1)*nc/dc;
-		if(res < 0) {
-			printf("Numer=%f, denom=%f, harmonics=%i\n", p*(adjusted_harmonics+90.5), p/2, adjusted_harmonics);
-			printf("%f %f %f %f\n", p, nc, dc, res);
-		}
 	}
 	else res = numer/denom;
 	phase += phaseIncrement;
