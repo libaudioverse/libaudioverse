@@ -26,24 +26,23 @@ class SinOsc {
 	SinOsc(float _sr, int _resync = 64): sr(_sr), resync(_resync), resyncCounter(_resync) {}
 	
 	double tick() {
-		if(phase > phaseWrap) {
-			int m = phase/phaseWrap;
-			phase = phase-m*phaseWrap;
-			doResync();
-		}
 		resyncCounter --;
+		if(resyncCounter == 0) doResync();
 		double ocx=cx, osx=sx;
 		sx = osx*cd+ocx*sd;
 		cx = ocx*cd-osx*sd;
 		phase += phaseIncrement;
-		if(resyncCounter == 0) doResync();
+		if(phase > phaseWrap) {
+			phase -= floor(phase/phaseWrap)*phaseWrap;
+			doResync(); //In case phaseWrap isn't 1.
+		}
 		//Return the old one, so that we start at phase zero properly.
 		return osx;
 	}
 
 	void doResync() {
-		sx = sin(phase);
-		cx = cos(phase);
+		sx = sin(2*PI*phase);
+		cx = cos(2*PI*phase);
 		resyncCounter = resync;
 	}
 	
@@ -51,16 +50,15 @@ class SinOsc {
 	//Same as calling tick count times.
 	void skipSamples(int count) {
 		phase += phaseIncrement*count;
-		resyncCounter = resync;
-		cx=cos(phase);
-		sx=sin(phase);
+		phase -= floor(phase/phaseWrap)*phaseWrap;
+		doResync();
 	}
 
 	//Set the phase increment per sample.
 	void setPhaseIncrement(double i) {
-		phaseIncrement = 2*PI*i;
-		cd = cos(phaseIncrement);
-		sd = sin(phaseIncrement);
+		phaseIncrement = i;
+		cd = cos(phaseIncrement*2*PI);
+		sd = sin(phaseIncrement*2*PI);
 	}
 	
 	void setFrequency(float f) {
@@ -69,27 +67,24 @@ class SinOsc {
 	}
 
 	void reset() {
-		//point the internal vector at the positive x axis, also known as phase 0.
-		sx=0;
-		cx =1;
-		sd=sin(phaseIncrement);
-		cd=cos(phaseIncrement);
+		setPhase(0.0);
+		doResync();
 	}
 	
 	//phase is from 0 to 1 and measured in  periods.
-	void setPhase(double phase) {
-		cx = cos(2*PI*phase);
-		sx = sin(2*PI*phase);
-		resyncCounter = resync;
+	void setPhase(double p) {
+		p -= (int)p;
+		phase = p;
+		doResync();
 	}
 	
 	double getPhase() {
 		return phase;
 	}
 	
-	//Usually this is 2PI, but things like the blit need custom configurations.
+	//Usually this is 1, but things like the blit need custom configurations.
 	void setPhaseWrap(double p) {
-		phaseWrap = p*2*PI;
+		phaseWrap = p;
 	}
 	
 	private:
@@ -99,7 +94,7 @@ class SinOsc {
 	float sr; //sampling rate.
 	//frequency is saved for purposes of skipping samples.
 	double frequency =0;
-	double phase = 0, phaseIncrement = 0, phaseWrap = 2*PI;
+	double phase = 0, phaseIncrement = 0, phaseWrap = 1.0;
 	int resync, resyncCounter;
 };
 
