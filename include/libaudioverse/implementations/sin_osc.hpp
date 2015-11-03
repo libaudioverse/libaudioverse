@@ -23,7 +23,7 @@ Resync is the number of samples after which we resynchronize the oscillator; 64 
 
 class SinOsc {
 	public:
-	SinOsc(float _sr, int _resync = 64): sr(_sr), resync(_resync), resyncCounter(_resync) {}
+	SinOsc(float _sr, int _resync = 100): sr(_sr), resync(_resync), resyncCounter(_resync) {}
 	
 	double tick() {
 		resyncCounter --;
@@ -34,7 +34,7 @@ class SinOsc {
 		phase += phaseIncrement;
 		if(phase > phaseWrap) {
 			phase -= floor(phase/phaseWrap)*phaseWrap;
-			doResync(); //In case phaseWrap isn't 1.
+			if(phaseWrap != 1.0) doResync();
 		}
 		//Return the old one, so that we start at phase zero properly.
 		return osx;
