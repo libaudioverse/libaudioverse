@@ -45,12 +45,19 @@ inline double Blit::tick() {
 	double res;
 	//Note that the oscillators are only ever "perfect" at the beginning and immediately after a resync.
 	//Therefore we have to allow for some leeway here.
-	//The following number was found by determining the error on a sine node to be about 1e-4, and then choosing something larger than it.
-	if(std::abs(denom) < 1e-3) {
+	//The following number was found by determining the error on a sine node to be about 1e-4, and then experimenting.
+	//If this is too large, then the formula will bounce between 0 and pi at the beginning of every cycle.
+	if(std::abs(denom) < 1e-6) {
 		//This is from Dodge and Jerse (1985), Computer Music: Synthesis, Composition, and Performance. 
 		//It's probably a limit, but it wasn't worth me working through the math to find out.
 		double p = 2*PI*phase;
-		res = (2*adjusted_harmonics+1)*cos(p*(adjusted_harmonics+0.5))/cos(p/2.0);
+		double nc = cos(p*(adjusted_harmonics+0.5));
+		double dc = cos(p/2);
+		res = (2*adjusted_harmonics+1)*nc/dc;
+		if(res < 0) {
+			printf("Numer=%f, denom=%f, harmonics=%i\n", p*(adjusted_harmonics+90.5), p/2, adjusted_harmonics);
+			printf("%f %f %f %f\n", p, nc, dc, res);
+		}
 	}
 	else res = numer/denom;
 	phase += phaseIncrement;
@@ -77,8 +84,8 @@ inline void Blit::recompute() {
 		adjusted_harmonics = floor((sr/2)/frequency);
 		//Keep the numerator from aliasing.
 		if((adjusted_harmonics+0.5)*sr >= sr/2) adjusted_harmonics -= 1;
-		//But we need at least one, whether or not we alias.
-		if(adjusted_harmonics <= 0) adjusted_harmonics = 1;
+		//The formula does not break for harmonics = 0.
+		if(adjusted_harmonics < 0) adjusted_harmonics = 0;
 	}
 	else adjusted_harmonics = harmonics;
 	phaseIncrement = frequency/sr;
