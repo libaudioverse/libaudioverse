@@ -26,9 +26,10 @@ class SinOsc {
 	SinOsc(float _sr, int _resync = 64): sr(_sr), resync(_resync), resyncCounter(_resync) {}
 	
 	double tick() {
-		double ocx=cx, osx=sx;
-		sx = osx*cd+ocx*sd;
-		cx = ocx*cd-osx*sd;
+		//We have to return what we are now, so that the first tick is at phase zero instead of zero and a bit.
+		double res = sx;
+		double nsx = sx*cd+cx*sd;
+		double ncx = cx*cd-sx*sd;
 		phase += phaseIncrement;
 		if(phase > phaseWrap) {
 			int m = phase/phaseWrap;
@@ -37,7 +38,11 @@ class SinOsc {
 		}
 		resyncCounter --;
 		if(resyncCounter == 0) doResync();
-		return sx;
+		else {
+			sx = nsx;
+			cx = ncx;
+		}
+		return res;
 	}
 
 	void doResync() {
