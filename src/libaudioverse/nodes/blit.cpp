@@ -33,11 +33,11 @@ void BlitNode::process() {
 	if(freq.needsARate()) {
 		for(int i = 0; i < block_size; i++) {
 			oscillator.setFrequency(freq.getFloatValue(i));
-			output_buffers[0][i] = oscillator.tick();
+			output_buffers[0][i] = (float)oscillator.tick();
 		}
 	}
 	else {
-		for(int i = 0; i < block_size; i++) output_buffers[0][i] = oscillator.tick();
+		for(int i = 0; i < block_size; i++) output_buffers[0][i] = (float)oscillator.tick();
 	}
 }
 

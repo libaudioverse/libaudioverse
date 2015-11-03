@@ -25,7 +25,7 @@ class Blit {
 	void setShouldNormalize(bool norm);
 	void setPhase(double p);
 	double getPhase();
-	float tick();
+	double tick();
 	void reset();
 	private:
 	void recompute();
@@ -39,10 +39,10 @@ inline Blit::Blit(float _sr): sr(_sr), numerOsc(_sr), denomOsc(_sr) {
 	recompute();
 }
 
-inline float Blit::tick() {
+inline double Blit::tick() {
 	double numer = numerOsc.tick();
 	double denom = denomOsc.tick();
-	float res;
+	double res;
 	//Note that the oscillators are only ever "perfect" at the beginning and immediately after a resync.
 	//Therefore we have to allow for some leeway here.
 	//The following number was found by determining the error on a sine node to be about 1e-4, and then choosing something larger than it.
@@ -52,7 +52,7 @@ inline float Blit::tick() {
 		double p = 2*PI*phase;
 		res = (2*adjusted_harmonics+1)*cos(p*(adjusted_harmonics+0.5))/cos(p/2.0);
 	}
-	else res = (float)(numer/denom);
+	else res = numer/denom;
 	phase += phaseIncrement;
 	phase -= floorf(phase);
 	return res*normFactor;
