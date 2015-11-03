@@ -75,12 +75,9 @@ inline void Blit::setFrequency(float frequency) {
 inline void Blit::recompute() {
 	if(harmonics == 0) {
 		adjusted_harmonics = floor((sr/2)/frequency);
-		//If we divided the sampling rate evenly, we have a harmonic at nyquist.
-		//This would be fine, but the numerator of the above function is then technically aliasing.
-		if(adjusted_harmonics*sr >= sr/2) adjusted_harmonics -= 1;
-		//We have a harmonic at dc, always.  The rest of the harmonics want to cancel in pairs. To that end, we need an odd adjuisted harmonics for the best approximation.
-		if(adjusted_harmonics%2 == 0) adjusted_harmonics -= 1;
-		//But we need at least one.
+		//Keep the numerator from aliasing.
+		if((adjusted_harmonics+0.5)*sr >= sr/2) adjusted_harmonics -= 1;
+		//But we need at least one, whether or not we alias.
 		if(adjusted_harmonics <= 0) adjusted_harmonics = 1;
 	}
 	else adjusted_harmonics = harmonics;
