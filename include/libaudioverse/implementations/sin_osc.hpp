@@ -26,16 +26,16 @@ class SinOsc {
 	SinOsc(float _sr, int _resync = 100): sr(_sr), resync(_resync), resyncCounter(_resync) {}
 	
 	double tick() {
+		if(phase > phaseWrap) {
+			phase -= floor(phase/phaseWrap)*phaseWrap;
+			if(phaseWrap != 1.0) doResync();
+		}
 		resyncCounter --;
 		if(resyncCounter == 0) doResync();
 		double ocx=cx, osx=sx;
 		sx = osx*cd+ocx*sd;
 		cx = ocx*cd-osx*sd;
 		phase += phaseIncrement;
-		if(phase > phaseWrap) {
-			phase -= floor(phase/phaseWrap)*phaseWrap;
-			if(phaseWrap != 1.0) doResync();
-		}
 		//Return the old one, so that we start at phase zero properly.
 		return osx;
 	}
@@ -73,7 +73,7 @@ class SinOsc {
 	
 	//phase is from 0 to 1 and measured in  periods.
 	void setPhase(double p) {
-		p -= (int)p;
+		p -= floor(p);
 		phase = p;
 		doResync();
 	}

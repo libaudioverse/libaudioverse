@@ -2,6 +2,7 @@
 This file is part of Libaudioverse, a library for 3D and environmental audio simulation, and is released under the terms of the Gnu General Public License Version 3 or (at your option) any later version.
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #pragma once
+#include "sin_osc.hpp"
 #include "../private/constants.hpp"
 #include <cmath>
 #include <cfloat>
@@ -12,6 +13,9 @@ namespace libaudioverse_implementation {
 /**A bandlimited impulse train with configurable harmonics.
 
 A number of interesting waveforms can be constructed from this bandlimited impulse train, most notably triangle and square.
+
+This class is based off the following trig identity, but optimized to hell and using fast sine oscillators:
+1+2cos(x)+2cos(2x)+...+2cos(nx)=sin((n+0.5) phase)/sin(phase / 2)
 */
 class Blit {
 	public:
@@ -28,33 +32,34 @@ class Blit {
 	double frequency = 100.0f, phase = 0.0f, phaseIncrement = 0.0f, sr = 0.0f, normFactor = 1.0f;
 	int harmonics = 0, adjusted_harmonics = 0;
 	bool shouldNormalize = false;
+	SinOsc numerOsc, denomOsc;
 };
 
-inline Blit::Blit(float _sr): sr(_sr) {
+inline Blit::Blit(float _sr): sr(_sr), numerOsc(_sr), denomOsc(_sr) {
 	recompute();
 }
 
 inline float Blit::tick() {
-	double denom = std::sin(phase/2.0);
+	double numer = numerOsc.tick();
+	double denom = denomOsc.tick();
 	float res;
-	//This was determined experimentally by integrating the blit with a script and seeing what minimizes the error.
-	if(std::abs(denom) < DBL_EPSILON) {
+	//Note that the oscillators are only ever "perfect" at the beginning and immediately after a resync.
+	//Therefore we have to allow for some leeway here.
+	//The following number was found by determining the error on a sine node to be about 1e-4, and then choosing something larger than it.
+	if(std::abs(denom) < 1e-3) {
 		//This is from Dodge and Jerse (1985), Computer Music: Synthesis, Composition, and Performance. 
 		//It's probably a limit, but it wasn't worth me working through the math to find out.
-		res = (2*adjusted_harmonics+1)*cos(phase*(adjusted_harmonics+0.5))/cos(phase/2.0);
+		double p = 2*PI*phase;
+		res = (2*adjusted_harmonics+1)*cos(p*(adjusted_harmonics+0.5))/cos(p/2.0);
 	}
-	else {
-		double numer = std::sin(phase*(adjusted_harmonics+0.5));
-		res = (float)(numer/denom);
-	}
+	else res = (float)(numer/denom);
 	phase += phaseIncrement;
-	//Keep us from going over 2PI. 1 decrement with an if is not sufficient if we're aliasing.
-	phase -= floorf(phase/(2*PI))*2*PI;
+	phase -= floorf(phase);
 	return res*normFactor;
 }
 
 inline void Blit::reset() {
-	phase = 0.0f;
+	setPhase(0.0);
 }
 
 inline void Blit::setHarmonics(int harmonics) {
@@ -79,11 +84,18 @@ inline void Blit::recompute() {
 		if(adjusted_harmonics <= 0) adjusted_harmonics = 1;
 	}
 	else adjusted_harmonics = harmonics;
-	phaseIncrement = 2*PI*frequency/sr;
+	phaseIncrement = frequency/sr;
 	//1+2cos(x)+2cos(2x)...etc...means max value of 1+2*adjusted_harmonics.
 	if(shouldNormalize) normFactor = 1.0f/(2*adjusted_harmonics+1);
 	//Fourier series of unnormalized BLIT has 1/period=frequency coefficient.
 	else normFactor = frequency;
+	//Set up the oscillators.
+	numerOsc.setPhaseWrap(adjusted_harmonics+0.5);
+	denomOsc.setPhaseWrap(0.5);
+	numerOsc.setPhase(phase*(adjusted_harmonics+0.5));
+	denomOsc.setPhase(0.5*phase);
+	numerOsc.setPhaseIncrement((adjusted_harmonics+0.5)*phaseIncrement);
+	denomOsc.setPhaseIncrement(phaseIncrement*0.5);
 }
 
 inline void Blit::setShouldNormalize(bool norm) {
@@ -93,7 +105,7 @@ inline void Blit::setShouldNormalize(bool norm) {
 
 inline void Blit::setPhase(double p) {
 	//If phase is wrapping, deal with it.
-	phase = 2*PI*(p-floor(p));
+	phase = p-floor(p);
 }
 
 inline double Blit::getPhase() {
