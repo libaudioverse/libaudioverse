@@ -63,6 +63,8 @@ inline void AdditiveSquare::setFrequency(float frequency) {
 	for(int i = 0; i < adjusted_harmonics; i++) {
 		oscillators_array[i].setFrequency(frequency*(2*(i+1)-1));
 	}
+	//We force the phase to be what we need, so that the higher harmonics align properly.
+	setPhase(getPhase());
 }
 
 inline float AdditiveSquare::getFrequency() {
@@ -90,8 +92,9 @@ inline void AdditiveSquare::readjustHarmonics() {
 	int newHarmonics;
 	if(harmonics == 0) {
 		//Number of harmonics we can get between 0 and nyquist.
-		newHarmonics = (int)((sr/2)/frequency);
-		if(newHarmonics == 0) newHarmonics = 1;
+		double nyquist = sr/2.0;
+		double range = nyquist-frequency;
+		newHarmonics = 1+range/(2*frequency);
 	}
 	else newHarmonics = harmonics;
 	oscillators.resize(newHarmonics, SinOsc(sr));
