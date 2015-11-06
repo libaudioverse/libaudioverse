@@ -35,6 +35,7 @@ class AdditiveSquare {
 	int harmonics = 0, adjusted_harmonics = 0;
 	float frequency = 100;
 	float sr;
+	double normFactor = 1.0;
 };
 
 inline AdditiveSquare::AdditiveSquare(float _sr): sr(_sr) {
@@ -47,10 +48,7 @@ inline AdditiveSquare::AdditiveSquare(float _sr): sr(_sr) {
 inline double AdditiveSquare::tick() {
 	double sum = 0.0;
 	for(int i = 0; i < adjusted_harmonics; i++) sum += oscillators_array[i].tick()/(2*(i+1)-1);
-	//4/PI comes from the Wikipedia definition of square wave. The second constant accounts for the Gibbs phenomenon.
-	//The final term was derived experimentally, by figuring out what the maximum and minimum look like.
-	//Without it, we overshoot very slightly, which is worse than undershooting very slightly.
-	return sum*(4.0/PI)*(1.0/(1.0+2.0*WILBRAHAM_GIBBS))*(1.0/1.08013);
+	return sum*normFactor;
 }
 
 inline void AdditiveSquare::reset() {
@@ -103,6 +101,12 @@ inline void AdditiveSquare::readjustHarmonics() {
 	double p = getPhase();
 	for(int i = adjusted_harmonics; i < newHarmonics; i++) oscillators_array[i].setPhase((2*(i+1)-1)*p);
 	adjusted_harmonics = newHarmonics;
+	//4/PI comes from the Wikipedia definition of square wave. The second constant accounts for the Gibbs phenomenon.
+	//The final term was derived experimentally, by figuring out what the maximum and minimum look like.
+	//Without it, we overshoot very slightly, which is worse than undershooting very slightly.
+	if(adjusted_harmonics > 1) normFactor = (4.0/PI)*(1.0/(1.0+2.0*WILBRAHAM_GIBBS))*(1.0/1.01);
+	//Otherwise, we have 1 harmonics, and that's a trivial case.
+	else normFactor = 1.0;
 }
 
 }
