@@ -116,7 +116,7 @@ nodes/recorder.cpp
 nodes/ringmod.cpp
 nodes/sine.cpp
 nodes/split_merge.cpp #contains two nodes under the same class.
-nodes/square.cpp
+nodes/additive_square.cpp
 nodes/three_band_eq.cpp
 
 #automators

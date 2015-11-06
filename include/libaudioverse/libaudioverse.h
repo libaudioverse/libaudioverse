@@ -101,7 +101,7 @@ enum Lav_OBJECT_TYPES {
 	Lav_OBJTYPE_MULTIPANNER_NODE,
 	Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK_NODE,
 
-	Lav_OBJTYPE_SQUARE_NODE,
+	Lav_OBJTYPE_ADDITIVE_SQUARE_NODE,
 	Lav_OBJTYPE_NOISE_NODE,
 	Lav_OBJTYPE_IIR_NODE,
 	Lav_OBJTYPE_GAIN_NODE,
@@ -340,7 +340,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeReset(LavHandle nodeHandle);
 //also see libaudioverse3d.h.
 
 Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavHandle simulationHandle, LavHandle* destination);
-Lav_PUBLIC_FUNCTION LavError Lav_createSquareNode(LavHandle simulationHandle, LavHandle* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_createAdditiveSquareNode(LavHandle simulationHandle, LavHandle* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createNoiseNode(LavHandle simulationHandle, LavHandle* destination);
 
 Lav_PUBLIC_FUNCTION LavError Lav_createHrtfNode(LavHandle simulationHandle, const char* hrtfPath, LavHandle* destination);
