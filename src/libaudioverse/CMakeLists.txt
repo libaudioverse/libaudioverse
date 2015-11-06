@@ -82,6 +82,8 @@ implementations/interpolated_delay_line.cpp
 implementations/nested_allpass_network.cpp
 
 #specific node types.
+nodes/additive_square.cpp
+nodes/additive_triangle.cpp
 nodes/allpass.cpp
 nodes/amplitude_panner.cpp
 nodes/biquad.cpp
@@ -116,7 +118,6 @@ nodes/recorder.cpp
 nodes/ringmod.cpp
 nodes/sine.cpp
 nodes/split_merge.cpp #contains two nodes under the same class.
-nodes/additive_square.cpp
 nodes/three_band_eq.cpp
 
 #automators
