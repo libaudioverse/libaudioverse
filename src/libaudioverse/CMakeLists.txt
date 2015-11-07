@@ -82,6 +82,7 @@ implementations/interpolated_delay_line.cpp
 implementations/nested_allpass_network.cpp
 
 #specific node types.
+nodes/additive_saw.cpp
 nodes/additive_square.cpp
 nodes/additive_triangle.cpp
 nodes/allpass.cpp
