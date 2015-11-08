@@ -16,13 +16,13 @@ void becomeAudioThread() {
 	DWORD unused = 0;
 	//yes this string is magic. See the MMCSS docs on MSDN.
 	task = AvSetMmThreadCharacteristics("Pro Audio", &unused);
-	if(task) logDebug("Made a thread a pro audio thread using MMCSS.");
+	if(task == 0) logDebug("Failed to make a thread a pro audio thread using MMCSS.");
 }
 
 void unbecomeAudioThread() {
 	if(task) {
 		AvRevertMmThreadCharacteristics(task);
-		logDebug("Reverted an MMCSS thread.");
+		if(task == 0) logDebug("Failed to revert an MMCSS thread.");
 		task = 0; //So that we aren't one anymore.
 	}
 }
