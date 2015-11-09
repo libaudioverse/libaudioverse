@@ -22,9 +22,9 @@ class DcBlocker {
 	double h0 = 0.0;
 };
 
-DcBlocker::DcBlocker(float _sr): sr(_sr) {}
+inline DcBlocker::DcBlocker(float _sr): sr(_sr) {}
 
-float DcBlocker::tick(float input) {
+inline float DcBlocker::tick(float input) {
 	//Direct form II, do the recursive filter first.
 	double rec = input-a1*h0;
 	double out = rec-h0;
@@ -32,7 +32,7 @@ float DcBlocker::tick(float input) {
 	return (float)out;
 }
 
-void DcBlocker::reset() {
+inline void DcBlocker::reset() {
 	h0 = 0.0;
 }
 
