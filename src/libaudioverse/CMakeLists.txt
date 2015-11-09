@@ -71,7 +71,7 @@ kernels/dot.cpp
 
 #Like kernels, but stateful.
 implementations/iir.cpp
-implementations/panner.cpp
+implementations/amplitude_panner.cpp
 implementations/delayringbuffer.cpp
 implementations/crossfadingdelayline.cpp
 implementations/dopplering_delay_line.cpp

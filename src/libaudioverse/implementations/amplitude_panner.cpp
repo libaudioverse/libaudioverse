@@ -3,7 +3,7 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #include <libaudioverse/private/kernels.hpp>
 #include <libaudioverse/private/dspmath.hpp>
-#include <libaudioverse/implementations/panner.hpp>
+#include <libaudioverse/implementations/amplitude_panner.hpp>
 #include <libaudioverse/private/constants.hpp>
 #include <algorithm>
 #include <functional>
@@ -11,17 +11,17 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 namespace libaudioverse_implementation {
 
-void PannerImplementation::reset() {
+void AmplitudePanner::reset() {
 	channels.clear();
 }
 
-void PannerImplementation::addEntry(float angle, unsigned int channel) {
+void AmplitudePanner::addEntry(float angle, unsigned int channel) {
 	channels.emplace_back(ringmodf(angle, 360.0f), channel);
 	std::sort(channels.begin(), channels.end(),
-	[](PannerEntry &a, PannerEntry& b) {return a.angle < b.angle;});
+	[](AmplitudePannerEntry &a, AmplitudePannerEntry& b) {return a.angle < b.angle;});
 }
 
-void PannerImplementation::pan(float angle, unsigned int block_size, float* input, unsigned int outputCount, float** outputs) {
+void AmplitudePanner::pan(float angle, unsigned int block_size, float* input, unsigned int outputCount, float** outputs) {
 	//the two degenerates: 0 and 1 channels.
 	if(input == nullptr || outputs == nullptr) return;
 	if(channels.size() == 0 || channels.size() == 1) {

@@ -9,19 +9,19 @@ namespace libaudioverse_implementation {
 //An n-channel panner.
 //very very private. This does almost no error checking.
 
-struct PannerEntry {
-	PannerEntry(float _angle, unsigned int _c): angle(_angle), channel(_c) {}
+struct AmplitudePannerEntry {
+	AmplitudePannerEntry(float _angle, unsigned int _c): angle(_angle), channel(_c) {}
 	float angle;
 	unsigned int channel;
 };
 
-class PannerImplementation {
+class AmplitudePanner {
 	public:
 	void reset();
 	void addEntry(float angle, unsigned int channel);
 	void pan(float angle, unsigned int block_size, float* input, unsigned int outputCount, float** outputs);
 	private:
-	std::vector<PannerEntry> channels;
+	std::vector<AmplitudePannerEntry> channels;
 };
 
 }
