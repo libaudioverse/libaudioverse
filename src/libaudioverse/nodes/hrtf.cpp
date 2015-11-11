@@ -31,8 +31,6 @@ void HrtfNode::process() {
 	panner.setAzimuth(getProperty(Lav_PANNER_AZIMUTH).getFloatValue());
 	panner.setElevation(getProperty(Lav_PANNER_ELEVATION).getFloatValue());
 	panner.setShouldCrossfade(getProperty(Lav_PANNER_SHOULD_CROSSFADE).getIntValue() == 1);
-	panner.setShouldUseMinimumPhase(getProperty(Lav_PANNER_USE_MINIMUM_PHASE).getIntValue() == 1);
-	panner.setSpeedOfSound(getProperty(Lav_PANNER_SPEED_OF_SOUND).getFloatValue());
 	panner.pan(input_buffers[0], output_buffers[0], output_buffers[1]);
 }
 

@@ -22,38 +22,6 @@ properties:
     doc_description: |
       What type of panning to use.
       Possibilities include HRTF, stereo, 5.1, and 7.1 speaker configurations.
-  Lav_PANNER_HEAD_WIDTH:
-    type: float
-    name: head_width
-    default: 0.15
-    range: [0.0, INFINITY]
-    doc_description: |
-      The width of the head of the listener, in meters.
-      
-      This property controls the HRTF panning strategy only.
-  Lav_PANNER_SPEED_OF_SOUND:
-    name: speed_of_sound
-    type: float
-    default: 440.0
-    range: [1.0, INFINITY]
-    doc_desccription: |
-      The speed of sound, in meters per second.
-      
-      This property controls the HRTF panning strategy only.
-  Lav_PANNER_DISTANCE:
-    name: distance
-    type: float
-    default: 1.0
-    range: [0.0, INFINITY]
-    doc_description: |
-      The distance of the sound source from the listener, in meters.
-      
-      This property does not introduce attenuation.
-      It is used only for computing interaural time differences, which are distance-dependent.
-      
-      This property is clamped to be greater than the head width at runtime.
-      
-      This property applies only to the HRTF panning strategy.
   Lav_PANNER_BANK_SPREAD:
     default: 360.0
     type: float
@@ -80,16 +48,6 @@ properties:
     doc_description: |
       If true, then the azimuth controls the center of the cone.
       Otherwise, the azimuth controls the left edge of the cone.
-  Lav_PANNER_USE_MINIMUM_PHASE:
-    name: use_linear_phase
-    type: boolean
-    default: 0
-    doc_desccription: |
-      Whether or not to convert the HRTF to minimum phase.
-      
-      If the dataset is not already minimum phase, enabling this property makes computing the coefficients much more expensive.
-      
-      This property applies only to the HRTF panning strategy.
 inputs: constructor
 outputs:
   - [dynamic, "Depends on the currently set panning strategy.", "The signal, panned according to the configured panning strategy."]

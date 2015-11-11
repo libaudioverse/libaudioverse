@@ -52,11 +52,6 @@ void MultipannerNode::configureForwardedProperties() {
 	amplitude_panner->forwardProperty(Lav_PANNER_SHOULD_CROSSFADE, us, Lav_PANNER_SHOULD_CROSSFADE);
 	hrtf_panner->forwardProperty(Lav_PANNER_SHOULD_CROSSFADE, us, Lav_PANNER_SHOULD_CROSSFADE);
 	//strategy is already only us.
-	//hrtf specifics:
-	hrtf_panner->forwardProperty(Lav_PANNER_SPEED_OF_SOUND, us, Lav_PANNER_SPEED_OF_SOUND);
-	hrtf_panner->forwardProperty(Lav_PANNER_DISTANCE, us, Lav_PANNER_DISTANCE);
-	hrtf_panner->forwardProperty(Lav_PANNER_HEAD_WIDTH, us, Lav_PANNER_HEAD_WIDTH);
-	hrtf_panner->forwardProperty(Lav_PANNER_EAR_POSITION, us, Lav_PANNER_EAR_POSITION);
 }
 
 void MultipannerNode::strategyChanged() {
