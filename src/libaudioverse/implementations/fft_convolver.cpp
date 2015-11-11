@@ -87,4 +87,9 @@ void FftConvolver::convolveFft(kiss_fft_cpx *fft, float* output) {
 	std::copy(workspace+block_size, workspace+workspace_size, tail);
 }
 
+void FftConvolver::reset() {
+	std::fill(workspace, workspace+workspace_size, 0.0f);
+	std::fill(tail, tail+tail_size, 0.0f);
+}
+
 }

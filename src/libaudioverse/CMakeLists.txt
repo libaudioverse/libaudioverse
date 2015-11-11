@@ -80,6 +80,7 @@ implementations/fft_convolver.cpp
 implementations/biquad.cpp
 implementations/interpolated_delay_line.cpp
 implementations/nested_allpass_network.cpp
+implementations/hrtf_panner.cpp
 
 #specific node types.
 nodes/additive_saw.cpp

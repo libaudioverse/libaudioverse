@@ -36,6 +36,7 @@ class FftConvolver {
 	//This fft will be valid until either getFft or convolve is called.
 	//This exists for a very very few special cases in Libaudioverse.
 	kiss_fft_cpx* getFft(float* input);
+	void reset();
 	private:
 	int block_size = 0, fft_size = 0, tail_size= 0, workspace_size = 0;
 	float*workspace = nullptr, *tail = nullptr;
