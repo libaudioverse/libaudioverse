@@ -66,42 +66,6 @@ temporary_buffer2([&] () {
 [&](float** p) {
 	freeTemporaryBuffer(*p);
 	delete p;
-}),
-fft([&]() {
-	kiss_fftr_cfg* p = new kiss_fftr_cfg;
-	*p = createFft();
-	return p;
-},
-[&](kiss_fftr_cfg* p) {
-	freeFft(*p);
-	delete p;
-}),
-ifft([&]() {
-	kiss_fftr_cfg* p = new kiss_fftr_cfg;
-	*p = createIfft();
-	return p;
-},
-[&](kiss_fftr_cfg* p) {
-	freeIfft(*p);
-	delete p;
-}),
-fft_data([&]() {
-	auto p = new kiss_fft_cpx*;
-	*p = createFftData();
-	return p;
-},
-[&](kiss_fft_cpx** p) {
-	freeFftData(*p);
-	delete p;
-}),
-fft_time_data([&]() {
-	auto p = new float*;
-	*p = createFftTimeData();
-	return p;
-},
-[&](float** p) {
-	freeFftTimeData(*p);
-	delete p;
 })
 {
 }
@@ -115,24 +79,6 @@ HrtfData::~HrtfData() {
 	}
 	delete[] hrirs;
 	delete[] azimuth_counts;
-}
-
-void HrtfData::linearPhase(float* buffer) {
-	//Read the thread locals.
-	float* fft_time_data = *(this->fft_time_data);
-	kiss_fft_cpx* fft_data = *(this->fft_data);
-	//Note that this is in effect circular convolution with a truncation.
-	std::copy(buffer, buffer+hrir_length, fft_time_data);
-	std::fill(fft_time_data+hrir_length, fft_time_data+hrir_length*2, 0.0f);
-	kiss_fftr(*fft, fft_time_data, fft_data);
-	for(int i = 0; i < hrir_length+1; i++) {
-		fft_data[i].r = cabs(fft_data[i].r, fft_data[i].i);
-		fft_data[i].i = 0.0f;
-	}
-	kiss_fftri(*ifft, fft_data, fft_time_data);
-	//Apply the downscaling that kissfft requires, otherwise this is too loud.
-	//Also accomplish copying back to the starting point.
-	scalarMultiplicationKernel(hrir_length, 1.0f/(2*hrir_length), fft_time_data, buffer);
 }
 
 int HrtfData::getLength() {
@@ -232,7 +178,7 @@ void HrtfData::loadFromBuffer(unsigned int length, char* buffer, unsigned int fo
 //some final preparation is done afterwords.
 //This is very complicated, thus the heavy commenting.
 //todo: can this be made simpler?
-void HrtfData::computeCoefficientsMono(float elevation, float azimuth, float* out, bool linphase) {
+void HrtfData::computeCoefficientsMono(float elevation, float azimuth, float* out) {
 	//clamp the elevation.
 	if(elevation < min_elevation) {elevation = (float)min_elevation;}
 	else if(elevation > max_elevation) {elevation = (float)max_elevation;}
@@ -281,35 +227,20 @@ void HrtfData::computeCoefficientsMono(float elevation, float azimuth, float* ou
 		azimuthIndex2 = ringmodi(azimuthIndex2, azimuthCount);
 
 		//this is probably the only part of this that can't go wrong, assuming the above calculations are all correct.  Interpolate between the two azimuths.
-		if(linphase == false) {
-			for(int j = 0; j < hrir_length; j++) {
-				out[j] += elevationWeights[i]*(azimuthWeight1*azimuths[azimuthIndex1][j]+azimuthWeight2*azimuths[azimuthIndex2][j]);
-			}
-		}
-		//otherwise, the slower version; this involves copies and the fft.
-		else {
-			//Read the thread locals.
-			float *temporary_buffer1 = *(this->temporary_buffer1);
-			float* temporary_buffer2 = *(this->temporary_buffer2);
-			std::copy(azimuths[azimuthIndex1], azimuths[azimuthIndex1]+hrir_length, temporary_buffer1);
-			std::copy(azimuths[azimuthIndex2], azimuths[azimuthIndex2]+hrir_length, temporary_buffer2);
-			linearPhase(temporary_buffer1);
-			linearPhase(temporary_buffer2);
-			for(int j = 0; j < hrir_length; j++) {
-				out[j] += elevationWeights[i]*(temporary_buffer1[j]*azimuthWeight1+temporary_buffer2[j]*azimuthWeight2);
-			}
+		for(int j = 0; j < hrir_length; j++) {
+			out[j] += elevationWeights[i]*(azimuthWeight1*azimuths[azimuthIndex1][j]+azimuthWeight2*azimuths[azimuthIndex2][j]);
 		}
 	}
 }
 
-void HrtfData::computeCoefficientsStereo(float elevation, float azimuth, float *left, float* right, bool linphase) {
+void HrtfData::computeCoefficientsStereo(float elevation, float azimuth, float *left, float* right) {
 	//wrap azimuth to be > 0 and < 360.
 	azimuth = ringmodf(azimuth, 360.0f);
 	//the hrtf datasets are right ear coefficients.  Consequently, the right ear requires no changes.
-	computeCoefficientsMono(elevation, azimuth, right, linphase);
+	computeCoefficientsMono(elevation, azimuth, right);
 	//the left ear is found at an azimuth which is reflectred about 0 degrees.
 	azimuth = ringmodf(360-azimuth, 360.0f);
-	computeCoefficientsMono(elevation, azimuth, left, linphase);
+	computeCoefficientsMono(elevation, azimuth, left);
 }
 
 //Create and free buffers.
@@ -320,38 +251,6 @@ float* HrtfData::createTemporaryBuffer() {
 }
 
 void HrtfData::freeTemporaryBuffer(float* b) {
-	freeArray(b);
-}
-
-kiss_fftr_cfg HrtfData::createFft() {
-	return kiss_fftr_alloc(hrir_length*2, 0, nullptr, nullptr);
-}
-
-kiss_fftr_cfg HrtfData::createIfft() {
-	return kiss_fftr_alloc(hrir_length*2, 1, nullptr, nullptr);
-}
-
-void HrtfData::freeFft(kiss_fftr_cfg& d) {
-	kiss_fftr_free(d);
-}
-
-void HrtfData::freeIfft(kiss_fftr_cfg& d) {
-	kiss_fftr_free(d);
-}
-
-kiss_fft_cpx* HrtfData::createFftData() {
-	return allocArray<kiss_fft_cpx>(hrir_length+1);
-}
-
-void HrtfData::freeFftData(kiss_fft_cpx* d) {
-	freeArray(d);
-}
-
-float* HrtfData::createFftTimeData() {
-	return allocArray<float>(hrir_length*2);
-}
-
-void HrtfData::freeFftTimeData(float* b) {
 	freeArray(b);
 }
 

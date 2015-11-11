@@ -14,13 +14,11 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 namespace libaudioverse_implementation {
 
-HrtfPanner::HrtfPanner(int _block_size, float _sr, std::shared_ptr<HrtfData> _hrtf): block_size(_block_size), sr(_sr), hrtf(_hrtf),
-//We leave a little headroom here for safety.
-left_itd_line(2*_block_size/_sr, _sr), right_itd_line(2*_block_size/_sr, _sr) {
+HrtfPanner::HrtfPanner(int _block_size, float _sr, std::shared_ptr<HrtfData> _hrtf): block_size(_block_size), sr(_sr), hrtf(_hrtf) {
 	response_length = hrtf->getLength();
 	left_response = allocArray<float>(response_length);
 	right_response = allocArray<float>(response_length);
-	hrtf->computeCoefficientsStereo(azimuth, elevation, left_response, right_response, should_use_minimum_phase);
+	hrtf->computeCoefficientsStereo(azimuth, elevation, left_response, right_response);
 	left_convolver = new FftConvolver(block_size);
 	right_convolver = new FftConvolver(block_size);
 	prev_left_convolver = new FftConvolver(block_size);
@@ -28,8 +26,6 @@ left_itd_line(2*_block_size/_sr, _sr), right_itd_line(2*_block_size/_sr, _sr) {
 	left_convolver->setResponse(response_length, left_response);
 	right_convolver->setResponse(response_length, right_response);
 	crossfade_workspace = allocArray<float>(block_size);
-	left_itd_line.setInterpolationTime(block_size/sr);
-	right_itd_line.setInterpolationTime(block_size/sr);
 	input_fft = allocArray<kiss_fft_cpx>(left_convolver->getFftSize());
 	fft_workspace = allocArray<float>(left_convolver->getFftSize());
 	fft = kiss_fftr_alloc(left_convolver->getFftSize(), 0, nullptr, nullptr);
@@ -56,7 +52,7 @@ void HrtfPanner::pan(float* input, float *left_output, float *right_output) {
 	std::swap(right_convolver, prev_right_convolver);
 	left_convolver->reset();
 	right_convolver->reset();
-	hrtf->computeCoefficientsStereo(elevation, azimuth, left_response, right_response, should_use_minimum_phase);
+	hrtf->computeCoefficientsStereo(elevation, azimuth, left_response, right_response);
 	left_convolver->setResponse(response_length, left_response);
 	right_convolver->setResponse(response_length, right_response);
 	//FFT of the input.
@@ -78,8 +74,6 @@ void HrtfPanner::pan(float* input, float *left_output, float *right_output) {
 }	
 
 void HrtfPanner::reset() {
-	left_itd_line.reset();
-	right_itd_line.reset();
 	left_convolver->reset();
 	right_convolver->reset();
 	prev_left_convolver->reset();
@@ -108,30 +102,6 @@ void HrtfPanner::setShouldCrossfade(bool cf) {
 
 bool HrtfPanner::getShouldCrossfade() {
 	return should_crossfade;
-}
-
-void HrtfPanner::setHeadWidth(float hw) {
-	head_width = hw;
-}
-
-float HrtfPanner::getHeadWidth() {
-	return head_width;
-}
-
-void HrtfPanner::setSpeedOfSound(float sos) {
-	speed_of_sound = sos;
-}
-
-float HrtfPanner::getSpeedOfSound() {
-	return speed_of_sound;
-}
-
-void HrtfPanner::setShouldUseMinimumPhase(bool v) {
-	should_use_minimum_phase = v;
-}
-
-bool HrtfPanner::getShouldUseMinimumPhase() {
-	return should_use_minimum_phase;
 }
 
 void HrtfPanner::setCrossfadeThreshold(float threshold) {

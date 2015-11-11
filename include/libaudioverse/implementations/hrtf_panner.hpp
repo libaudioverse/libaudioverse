@@ -24,15 +24,6 @@ class HrtfPanner {
 	float getElevation();
 	void setShouldCrossfade(bool cf);
 	bool getShouldCrossfade();
-	//meters.
-	void setHeadWidth(float width);
-	float getHeadWidth();
-	//Meters per second.
-	void setSpeedOfSound(float sos);
-	float getSpeedOfSound();
-	//If true, make the dataset minphase and apply IDT.
-	void setShouldUseMinimumPhase(bool v);
-	bool getShouldUseMinimumPhase();
 	//The threshold after which we will crossfade as (azimuth+elevation) > threshold.
 	//Also known as manhattan distance.
 	void setCrossfadeThreshold(float threshold);
@@ -46,8 +37,6 @@ class HrtfPanner {
 	FftConvolver *left_convolver, *right_convolver, *prev_left_convolver, *prev_right_convolver;
 	//When crossfading, we calculate both outputs and then fade.
 	float* crossfade_workspace;
-	//These lines are used when we apply the interaural time difference.
-	CrossfadingDelayLine left_itd_line, right_itd_line;
 	//The fft of our input can be calculated once and reused for up to 4 convolutions with the FftConvolver.
 	//We go to the size the convolver wants, so we need a temporary buffer as well.
 	kiss_fftr_cfg fft;
@@ -59,9 +48,6 @@ class HrtfPanner {
 	float azimuth = 0, elevation = 0, prev_azimuth = 0, prev_elevation  = 0;
 	float crossfade_threshold = 0;
 	bool should_crossfade = true;
-	float speed_of_sound = 443;
-	float head_width = 0.15f;
-	bool should_use_minimum_phase = false;
 };
 
 }
