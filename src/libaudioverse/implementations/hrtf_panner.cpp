@@ -69,7 +69,6 @@ void HrtfPanner::pan(float* input, float *left_output, float *right_output) {
 		prev_right_convolver->convolveFft(input_fft, crossfade_workspace);
 		for(int i = 0; i < block_size; i++) right_output[i] = (block_size-i)*delta*crossfade_workspace[i]+i*delta*right_output[i];
 	}
-	//Todo: apply the ITD when using minimum phase.
 	prev_azimuth = azimuth;
 	prev_elevation = elevation;
 }	
