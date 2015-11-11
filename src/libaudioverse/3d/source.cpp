@@ -207,7 +207,6 @@ void SourceNode::update(EnvironmentInfo &env) {
 	//Set the output panner, a multipanner.
 	panner_node->getProperty(Lav_PANNER_AZIMUTH).setFloatValue(azimuth);
 	panner_node->getProperty(Lav_PANNER_ELEVATION).setFloatValue(elevation);
-	panner_node->getProperty(Lav_PANNER_DISTANCE).setFloatValue(distance);
 	panner_node ->getProperty(Lav_NODE_MUL).setFloatValue(dryGain);
 	//Set the panners for effect sends; note that these are not multipanners and only have azimuth and elevation.
 	for(auto &i: effect_panners) {
