@@ -63,42 +63,14 @@ properties:
       This property is clamped to be greater than the head width at runtime.
       
       This property applies only to the HRTF panning strategy.
-  Lav_PANNER_EAR_POSITION:
-    name: ear_position
-    default: 0.1
-    range: [-1.0, 1.0]
-    type: float
-    doc_description: |
-      The horizontal offset of the axis defined by the ears from that of the center of the head.
-      
-      This is represented as a multiplier of the head's radius, half the head's width.
-      Positive values are backward and negative ones forward.
-      
-      This property applies only to the HRTF panning strategy.
-  Lav_PANNER_APPLY_ITD:
-    name: apply_itd
-    type: boolean
-    default: 0
-    doc_description: |
-      Whether or not to apply the interaural time difference.
-      
-      When sound is heard, it will arrive at one ear before the other.
-      This property controls whether or not to add additional delay to the panning effect in order to simulate this.
-      If enabled, HRTFs become more computationally expensive, but allow for configurability via the {{"distance"|codelit}}, {{"head_width"|codelit}}, and {{"ear_position"|codelit}} properties.
-      
-      Changing this property will cause an audible glitch in audio.
-      
-      This property applies only to the HRTF panning strategy.
-  Lav_PANNER_USE_LINEAR_PHASE:
-    name: use_linear_phase
+  Lav_PANNER_USE_MINIMUM_PHASE:
+    name: use_minimum_phase
     type: boolean
     default: 0
     doc_desccription: |
-      Whether or not to convert the HRTF to linear phase.
+      Whether or not to convert the HRTF to minimum phase and to apply the ITD ourselves.
       
-      This is typically used when {{"apply_idt"|codelit}} is enabled, in order to work properly with datasets that are not already converted to linear phase.
-      
-      Enabling this property adds 8 FFT/IFFT pairs to the computation of the HRIR.
+      If the HRTF dataset is not already minimum phase, this property will greatly increase the expense of computing the coefficients.
       
       This property applies only to the HRTF panning strategy.
 inputs:

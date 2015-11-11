@@ -49,8 +49,10 @@ class HrtfPanner {
 	//These lines are used when we apply the interaural time difference.
 	CrossfadingDelayLine left_itd_line, right_itd_line;
 	//The fft of our input can be calculated once and reused for up to 4 convolutions with the FftConvolver.
+	//We go to the size the convolver wants, so we need a temporary buffer as well.
 	kiss_fftr_cfg fft;
 	kiss_fft_cpx *input_fft;
+	float *fft_workspace = nullptr;
 	int block_size;
 	int response_length;
 	float sr;
