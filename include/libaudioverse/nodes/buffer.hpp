@@ -3,6 +3,7 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #pragma once
 #include "../private/node.hpp"
+#include "../implementations/buffer_player.hpp"
 #include <memory>
 
 namespace libaudioverse_implementation {
@@ -17,10 +18,7 @@ class BufferNode: public Node {
 	void positionChanged();
 	void bufferChanged();
 	virtual void process();
-	int frame = 0;
-	int buffer_length=0;
-	double offset=0.0, maxPosition = 0.0;
-	bool ended = true; //True if the buffer is ended or does not exist.
+	BufferPlayer player;
 };
 
 std::shared_ptr<Node> createBufferNode(std::shared_ptr<Simulation> simulation);

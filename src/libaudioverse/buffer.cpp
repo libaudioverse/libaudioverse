@@ -71,7 +71,7 @@ float Buffer::getSample(int frame, int channel) {
 }
 
 float Buffer::getSampleWithMixingMatrix(int frame, int channel, int maxChannels) {
-	if(frame > this->frames) return 0.0f;
+	if(maxChannels == this->channels) return getSample(frame, channel);
 	ensureRemixingWorkspace(maxChannels);
 	audio_io::remixAudioInterleaved(1, this->channels, data+frame*this->channels, maxChannels, remixing_workspace);
 	return remixing_workspace[channel];

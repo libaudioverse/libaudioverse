@@ -25,7 +25,7 @@ filenode.connect_simulation(0)
 commands = """Commands:
 play
 pause
-pitch_bend <number>
+rate <number>
 seek <seconds>
 quit
 """
@@ -44,9 +44,9 @@ while True:
         elif command[0] == 'seek':
             to = float(command[1])
             filenode.position.value = to
-        elif command[0] == 'pitch_bend':
+        elif command[0] == 'rate':
             to = float(command[1])
-            filenode.pitch_bend.value = to
+            filenode.rate.value = to
     except Exception as e:
         print "Libaudioverse error.  Unrecognized command, or invalid syntax."
         print commands
