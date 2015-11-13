@@ -3,35 +3,25 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #pragma once
 #include "../private/node.hpp"
-#include <vector>
+#include <map>
 #include <memory>
 
 namespace libaudioverse_implementation {
 
 class Simulation;
 class Buffer;
-
-class ScheduledBuffer {
-	public:
-	ScheduledBuffer(std::shared_ptr<Buffer> buffer, double time, float delta, int outputChannels);
-	bool add(float* destination, int maxFrames, int channel); //returns true when there is no more to write.
-	std::shared_ptr<Buffer> buffer;
-	int length = 0, output_channels = 0, buffer_channels = 0;
-	std::vector<int> position;
-	float offset = 0.0f;
-	double time;
-	float delta = 1.0;
-};
+class BufferPlayer;
 
 class BufferTimelineNode: public Node {
 	public:
 	BufferTimelineNode(std::shared_ptr<Simulation> simulation, int channels);
+	~BufferTimelineNode();
 	void process() override;
 	void scheduleBuffer(double time, float delta, std::shared_ptr<Buffer> buffer);
 	void reset() override;
 	private:
-	std::vector<ScheduledBuffer> scheduled_buffers;
-	std::vector<ScheduledBuffer> active_buffers;
+	std::multimap<double, BufferPlayer*> scheduled_buffers;
+	std::vector<float*> workspace;
 	double time = 0.0;
 	int output_channels = 0;
 };

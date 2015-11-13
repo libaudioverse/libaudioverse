@@ -78,7 +78,7 @@ inline void BufferPlayer::process(int channels, float** outputs) {
 			intermediate_destination[chan][i] = (float)(weight1*a+weight2*b);
 		}
 		offset+=rate;
-		frame += floor(offset);
+		frame += (int)floor(offset);
 		offset = offset-floor(offset);
 	}
 	//Remix to the destination.
@@ -95,7 +95,7 @@ inline void BufferPlayer::setBuffer(std::shared_ptr<Buffer> b) {
 	buffer_length = b ? b->getLength() : 0;
 	//Ensure we have enough intermediate buffers.
 	if(b) {
-		while(intermediate_destination.size() < b->getChannels()) intermediate_destination.push_back(allocArray<float>(block_size));
+		while(intermediate_destination.size() < (unsigned int)b->getChannels()) intermediate_destination.push_back(allocArray<float>(block_size));
 	}
 	buffer_channels = b ? b->getChannels() : 0;
 }
@@ -105,7 +105,7 @@ inline std::shared_ptr<Buffer> BufferPlayer::getBuffer() {
 }
 
 inline void BufferPlayer::setPosition(double p) {
-	frame = p*sr;
+	frame = (int)(p*sr);
 	//We want this to be sample-perfect whenever possible.
 	offset = 0.0;
 	ended = frame >= buffer_length;

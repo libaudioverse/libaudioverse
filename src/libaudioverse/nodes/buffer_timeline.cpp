@@ -9,100 +9,59 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/simulation.hpp>
 #include <libaudioverse/private/properties.hpp>
-#include <libaudioverse/private/dspmath.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/memory.hpp>
-#include <libaudioverse/private/constants.hpp>
+#include <libaudioverse/private/kernels.hpp>
 #include <libaudioverse/private/buffer.hpp>
-#include <limits>
+#include <libaudioverse/private/helper_templates.hpp>
+#include <libaudioverse/implementations/buffer_player.hpp>
 #include <iterator>
 #include <vector>
 
 namespace libaudioverse_implementation {
 
-ScheduledBuffer::ScheduledBuffer(std::shared_ptr<Buffer> buffer, double time, float delta, int outputChannels) {
-	this->buffer=buffer;
-	this->output_channels=outputChannels;
-	this->time = time;
-	this->length=buffer->getLength();
-	this->buffer_channels = buffer->getChannels();
-	this->delta = delta;
-	this->position.resize(output_channels, 0);
-}
-
-bool ScheduledBuffer::add(float* destination, int maxFrames, int channel) {
-	//linear interpolation with mixing matrix application.
-	//this should really be optimized.
-	float s1, s2, w1, w2;
-	int i1, i2;
-	//guard against zero-length buffers:
-	if(length== 0) return true;
-	for(int frame = 0; frame < maxFrames; frame++) {
-		i1 = position[channel];
-		i2=std::min(position[channel]+1, length-1);
-		w1 = 1-offset;
-		w2 = offset;
-		s1 = buffer->getSampleWithMixingMatrix(i1, channel, output_channels);
-		s2 = buffer->getSampleWithMixingMatrix(i2, channel, output_channels);
-		destination[frame] += s1*w1+s2*w2;
-		offset+=delta;
-		position[channel] += (int)floorf(offset);
-		offset-=floorf(offset);
-		if(position[channel] == length) return true;
-	}
-	return false;
-}
-
-//So we can compare them for insertion purposes.
-bool operator<(const ScheduledBuffer &a, const ScheduledBuffer &b) {
-	return a.time < b.time;
-}
-
 BufferTimelineNode::BufferTimelineNode(std::shared_ptr<Simulation> simulation, int channels): Node(Lav_OBJTYPE_BUFFER_TIMELINE_NODE, simulation, 0, channels) {
 	if(channels <= 0) ERROR(Lav_ERROR_RANGE, "Channels must be greater than 0.");
 	appendOutputConnection(0, channels);
 	output_channels= channels;
+	for(int i = 0; i < channels; i++) workspace.push_back(allocArray<float>(simulation->getBlockSize()));
 }
 
 std::shared_ptr<Node> createBufferTimelineNode(std::shared_ptr<Simulation> simulation, int channels) {
 	return standardNodeCreation<BufferTimelineNode>(simulation, channels);
 }
 
+BufferTimelineNode::~BufferTimelineNode() {
+	for(auto &i: workspace) freeArray(i);
+	for(auto &i: scheduled_buffers) delete i.second;
+}
+
 void BufferTimelineNode::process() {
-	for(auto i=scheduled_buffers.begin(); i !=scheduled_buffers.end(); i++) {
-		if(i->time > time+(1.0f/simulation->getSr())*block_size) break; //the queue is sorted, we do want break.
-		active_buffers.push_back(*i);
-		i = scheduled_buffers.erase(i);
-		//We can invalidate the loop and need to check heree.
-		if(i== scheduled_buffers.end()) break; //may be because of the delete.
-	}
-	for(auto i = active_buffers.begin(); i!=active_buffers.end(); i++) {
-		bool done = false;
-		int offset = 0;
-		if(i->time > time) offset = std::min<int>((i->time-time)*simulation->getSr(), block_size);
-		int writing = block_size-offset;
-		if(writing== 0) continue;
-		for(int j = 0; j < num_output_buffers; j++) {
-			done = i->add(output_buffers[j]+offset, writing, j);
+	filter(scheduled_buffers, [&](auto &val)->bool {
+		if(val.first > time) return true;
+		if(val.second->getEndedCount()) {
+			delete val.second;
+			return false;
 		}
-		if(done) {
-			i= active_buffers.erase(i);
-			if(i ==active_buffers.end()) break;
-		}
-	}
+		//Otherwise, add and keep.
+		val.second->process(output_channels, &workspace[0]);
+		for(int i = 0; i < output_channels; i++) additionKernel(block_size, workspace[i], output_buffers[i], output_buffers[i]);
+		return true;
+	});
 	time+=block_size/simulation->getSr();
 }
 
 void BufferTimelineNode::scheduleBuffer(double time, float delta, std::shared_ptr<Buffer> buffer) {
 	time+=this->time; //time is relative to the node's internal time.
-	auto sb=ScheduledBuffer(buffer, time, delta, output_channels);
-	auto insertBefore=std::upper_bound(scheduled_buffers.begin(), scheduled_buffers.end(), sb);
-	scheduled_buffers.insert(insertBefore, sb);
+	auto player = new BufferPlayer(simulation->getBlockSize(), simulation->getSr());
+	player->setBuffer(buffer);
+	player->setRate(delta);
+	scheduled_buffers.insert(decltype(scheduled_buffers)::value_type(time, player));
 }
 
 void BufferTimelineNode::reset() {
+	for(auto &i: scheduled_buffers) delete i.second;
 	scheduled_buffers.clear();
-	active_buffers.clear();
 }
 
 //begin public API.
