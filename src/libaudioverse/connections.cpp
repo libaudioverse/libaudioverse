@@ -121,7 +121,7 @@ void InputConnection::disconnectHalf(std::shared_ptr<OutputConnection> connectio
 
 void InputConnection::forgetConnection(OutputConnection* which) {
 	filter(connected_to, [](decltype(connected_to)::value_type &k, OutputConnection* t)->bool {
-		return k.first.get() == t;
+		return k.first.get() != t;
 	}, which);
 }
 
