@@ -1,12 +1,17 @@
 from setuptools import setup, find_packages
 from glob import glob
+import pypandoc
 
 __version__ = '0.8.dev1'
 
 setup(
     name = 'libaudioverse',
     version = __version__,
-    description = """Python bindings for Libaudioverse, a library for 3d and environmental audio""",
+    author = "Austin Hicks",
+    author_email = "camlorn@camlorn.net",
+    url = "http://github.com/camlorn/libaudioverse",
+    description = "A library for 3D, environmental audio, and synthesis.",
+    long_description = pypandoc.convert('readme.md', 'rst'),
     package_dir = {'libaudioverse': 'libaudioverse'},
     packages = find_packages(),
     package_data = {'libaudioverse':
@@ -16,7 +21,7 @@ setup(
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         'Programming Language :: Python',
-        'License :: OSI Approved :: GPL',
+        'License :: OSI Approved :: GNU General Public License (GPL)',
         'Topic :: Software Development :: Libraries'
     ],
     zip_safe = False,

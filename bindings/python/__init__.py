@@ -67,7 +67,8 @@ def make_python(info):
         'libaudioverse/_lav.py' : env.get_template('libaudioverse/_lav.py.t').render(context),
         'libaudioverse/_libaudioverse.py' : env.get_template('libaudioverse/_libaudioverse.py.t').render(context),
         'libaudioverse/__init__.py': env.get_template('libaudioverse/__init__.py.t').render(context),
-        'setup.py': open(os.path.join(source_dir, 'setup.py.t')).read(),
+        'setup.py': open(os.path.join(source_dir, 'setup.py')).read(),
+        'readme.md': open(os.path.join(info['root_dir'], 'readme.md')).read(),
         'dll_location': 'libaudioverse',
         'libsndfile_location': 'libaudioverse',
         'additional_directories': [

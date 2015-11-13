@@ -3,9 +3,11 @@ Libaudioverse
 
 [![Windows Build status](https://ci.appveyor.com/api/projects/status/wmoa6isbe8fdmg2c?svg=true)](https://ci.appveyor.com/project/camlorn/libaudioverse)
 
+[GitHub](http://github.com/camlorn/libaudioverse)
+
 ##Introduction##
 
-Libaudioverse is a highly flexible realtime audio synthesis library.
+Libaudioverse is a highly flexible realtime audio synthesis library designed to be bound to as many languages as possible.
 Potential applications include games, realtime music synthesis, voice chat, implementations of WebAudio, and more.
 Libaudioverse supports the best possible backends it can for each platform, and uses both SSE2 and threads for increased performance.
 
@@ -26,10 +28,12 @@ here is an overview of the offered nodes:
 - You can record audio with the recorder, or intercept audio anywhere in the graph of nodes with the graph listener.
 - Finally, if none of these meet your needs, it is possible to create your own node via the custom node.
 
+NOTE: This is pre-alpha and currently only supports Windows.  Ports to Linux and Mac are planned.
 
 ##Binaries and Support##
 
 Libaudioverse's CI server currently uploads snapshots of the master branch containing everything you need to get started on Windows.  You can get it [here](http://camlorn.net/releases/libaudioverse/libaudioverse_master.zip).
+For Python, you may obtain a more stable release with `pip install libaudioverse`.
 
 There is a Google Group [here](https://groups.google.com/a/camlorn.net/forum/#!forum/libaudioverse).
 You can subscribe directly and without a Gmail address via e-mailing an empty e-mail to `libaudioverse+subscribe@camlorn.net` and clicking the link in the confirmation e-mail sent to you.
@@ -42,12 +46,17 @@ Please report bugs and make feature requests using the GitHub issue tracker; thi
 
 Currently Libaudioverse only builds on Windows.  Libaudioverse itself will build with minor changes on other platforms, but the build scripts don't know how to handle it and Libaudioverse is currently missing audio backends.  If you are on Linux or Mac, watch this space; it will build on your platform before 1.0 is released.
 
+You will need to build Libaudioverse from the GitHub repository.  Packaging it as a collection of C files that compile via the package manager for your language is all but impossible.
+If Libaudioverse is available via a package manager for your language, then binaries should be available and uploaded for all supported platforms.
+
+
 You need the following:
 
 - Boost.  I test with 1.59.0, but other versions may work.
 - Python 3.5. If you are on Windows, the launcher must be working.
 - CMake 3.3 or later.
-- The python packages PyYAML, Jinja2, pycparser, enum34, numpy, and scipy.
+- The python packages PyYAML, Pypandoc, Jinja2, pycparser, enum34, numpy, and scipy.
+- A working installation of pandoc.
 - A C++11 capable compiler.  For Windows, this must be Visual Studio 2015 or later.
 
 NOTE: Visual Studio 2015 does not include the C++ components by default.

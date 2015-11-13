@@ -13,6 +13,7 @@ compiler_c_flags: Flags used with .c files
 compiler_cxx_flags: Flags used with C++ files.
 linker_flags: Flags for the linker.
 build_type: The build type.
+root_dir: Absolute path to the root of the repository.
 """
 
 from pycparser import *
@@ -219,6 +220,7 @@ def get_all_info():
 
     all_info['important_enums'] = important_enums
     all_info['git_revision'] = get_git_revision()
+    all_info['root_dir'] = get_root_directory()
     all_info.update(get_flags()) #get the compiler and linker flags, etc.
     all_info_cache =all_info
     return copy.deepcopy(all_info)
