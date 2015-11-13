@@ -3,16 +3,19 @@ This file is part of Libaudioverse, a library for 3D and environmental audio sim
 A copy of the GPL, as well as other important copyright and licensing information, may be found in the file 'LICENSE' in the root of the Libaudioverse repository.  Should this file be missing or unavailable to you, see <http://www.gnu.org/licenses/>.*/
 #pragma once
 #include "../private/buffer.hpp"
+#include "../private/memory.hpp"
+#include <audio_io/audio_io.hpp>
 #include <memory>
+#include <vector>
 
 namespace libaudioverse_implementation {
-
 
 class Simulation;
 
 class BufferPlayer {
 	public:
 	BufferPlayer(int _block_size, float _sr);
+	~BufferPlayer();
 	void process(int channels, float** outputs);
 	void setBuffer(std::shared_ptr<Buffer> buff);
 	std::shared_ptr<Buffer> getBuffer();
@@ -35,9 +38,18 @@ class BufferPlayer {
 	float sr;
 	int block_size;
 	int ended_count = 0;
+	//Channels of the current buffer.
+	//This is used in a for loop in process, we don't want to call buffer->getChannels() hundreds of times a second.
+	int buffer_channels = 0;
+	//We get our output, and then downmix it ourselves.
+	std::vector<float*> intermediate_destination;
 };
 
 inline BufferPlayer::BufferPlayer(int _block_size, float _sr): sr(_sr), block_size(_block_size) {}
+
+inline BufferPlayer::~BufferPlayer() {
+	for(auto &i: intermediate_destination) freeArray(i);
+}
 
 inline void BufferPlayer::process(int channels, float** outputs) {
 	if(buffer == nullptr) return; //no buffer.
@@ -54,21 +66,23 @@ inline void BufferPlayer::process(int channels, float** outputs) {
 			//Otherwise we loop.
 			frame= 0;
 		}
-		for(int chan =0; chan < channels; chan++) {
+		for(int chan =0; chan < buffer_channels; chan++) {
 			//This is standard linear interpolation.
-			double a = buffer->getSampleWithMixingMatrix(frame, chan, channels);
+			double a = buffer->getSample(frame, chan);
 			double b;
-			if(frame+1 < buffer_length) b = buffer->getSampleWithMixingMatrix(frame+1, chan, channels); //okay, we have one more sample after this one.
-			else if(is_looping) b =buffer->getSampleWithMixingMatrix(0, chan, channels); //We have a next sample, but it's looped to the beginning.
+			if(frame+1 < buffer_length) b = buffer->getSample(frame+1, chan); //okay, we have one more sample after this one.
+			else if(is_looping) b =buffer->getSample(0, chan); //We have a next sample, but it's looped to the beginning.
 			else b = 0.0; //no next sample.
 			double weight1 = 1-offset;
 			double weight2 = offset;
-			outputs[chan][i] = (float)(weight1*a+weight2*b);
+			intermediate_destination[chan][i] = (float)(weight1*a+weight2*b);
 		}
 		offset+=rate;
 		frame += floor(offset);
 		offset = offset-floor(offset);
 	}
+	//Remix to the destination.
+	audio_io::remixAudioUninterleaved(block_size, buffer_channels, &intermediate_destination[0], channels, outputs);
 }
 
 inline void BufferPlayer::setBuffer(std::shared_ptr<Buffer> b) {
@@ -79,6 +93,11 @@ inline void BufferPlayer::setBuffer(std::shared_ptr<Buffer> b) {
 	if(b) ended = false;
 	else ended = true;
 	buffer_length = b ? b->getLength() : 0;
+	//Ensure we have enough intermediate buffers.
+	if(b) {
+		while(intermediate_destination.size() < b->getChannels()) intermediate_destination.push_back(allocArray<float>(block_size));
+	}
+	buffer_channels = b ? b->getChannels() : 0;
 }
 
 inline std::shared_ptr<Buffer> BufferPlayer::getBuffer() {
