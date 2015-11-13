@@ -30,13 +30,15 @@ void BlitNode::process() {
 	if(werePropertiesModified(this, Lav_OSCILLATOR_FREQUENCY)) oscillator.setFrequency(getProperty(Lav_OSCILLATOR_FREQUENCY).getFloatValue());
 	if(werePropertiesModified(this, Lav_BLIT_SHOULD_NORMALIZE)) oscillator.setShouldNormalize(getProperty(Lav_BLIT_SHOULD_NORMALIZE).getIntValue() == 1);
 	auto &freq = getProperty(Lav_OSCILLATOR_FREQUENCY);
-	if(freq.needsARate()) {
+	auto &freqMul = getProperty(Lav_OSCILLATOR_FREQUENCY_MULTIPLIER);
+	if(freq.needsARate()| freqMul.needsARate()) {
 		for(int i = 0; i < block_size; i++) {
-			oscillator.setFrequency(freq.getFloatValue(i));
+			oscillator.setFrequency(freq.getFloatValue(i)*freqMul.getFloatValue(i));
 			output_buffers[0][i] = (float)oscillator.tick();
 		}
 	}
 	else {
+		oscillator.setFrequency(freq.getFloatValue()*freqMul.getFloatValue());
 		for(int i = 0; i < block_size; i++) output_buffers[0][i] = (float)oscillator.tick();
 	}
 }

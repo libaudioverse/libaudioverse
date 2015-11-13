@@ -7,6 +7,15 @@ properties:
     rate: a
     doc_description: |
       The frequency of the sine wave in HZ.
+  Lav_OSCILLATOR_FREQUENCY_MULTIPLIER:
+    name: frequency_multiplier
+    type: float
+    range: [-INFINITY, INFINITY]
+    rate: a
+    doc_description: |
+      An additional multiplicative factor applied to the frequency of the oscillator.
+      
+      This is useful for creating instruments, as the notes of the standard musical scale fall on frequency multiples of a reference pitch, rather than a linear increase.
   Lav_OSCILLATOR_PHASE:
     name: phase
     range: [0.0, 1.0]

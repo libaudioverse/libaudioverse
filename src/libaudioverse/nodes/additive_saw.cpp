@@ -25,14 +25,15 @@ void AdditiveSawNode::process() {
 	if(werePropertiesModified(this, Lav_SAW_HARMONICS)) oscillator.setHarmonics(getProperty(Lav_SAW_HARMONICS).getIntValue());
 	if(werePropertiesModified(this, Lav_OSCILLATOR_PHASE)) oscillator.setPhase(getProperty(Lav_OSCILLATOR_PHASE).getFloatValue()+oscillator.getPhase());
 	auto &freq = getProperty(Lav_OSCILLATOR_FREQUENCY);
-	if(freq.needsARate()) {
+	auto &freqMul = getProperty(Lav_OSCILLATOR_FREQUENCY_MULTIPLIER);
+	if(freq.needsARate() || freqMul.needsARate()) {
 		for(int i = 0; i < block_size; i++) {
-			oscillator.setFrequency(freq.getFloatValue(i));
+			oscillator.setFrequency(freq.getFloatValue(i)*freqMul.getFloatValue(i));
 			output_buffers[0][i] = oscillator.tick();
 		}
 	}
 	else {
-		oscillator.setFrequency(freq.getFloatValue());
+		oscillator.setFrequency(freq.getFloatValue()*freqMul.getFloatValue());
 		for(int i = 0; i < block_size; i++) {
 			output_buffers[0][i] = oscillator.tick();
 		}

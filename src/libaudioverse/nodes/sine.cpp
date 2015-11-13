@@ -24,17 +24,18 @@ std::shared_ptr<Node> createSineNode(std::shared_ptr<Simulation> simulation) {
 
 void SineNode::process() {
 	if(werePropertiesModified(this, Lav_OSCILLATOR_PHASE)) oscillator.setPhase(oscillator.getPhase()+getProperty(Lav_OSCILLATOR_PHASE).getFloatValue());
-	auto &freqProp = getProperty(Lav_OSCILLATOR_FREQUENCY);
-	if(freqProp.needsARate()==false) {
-		oscillator.setFrequency(freqProp.getFloatValue());
-		for(int i = 0; i < block_size; i++) {
-			output_buffers[0][i] = (float)oscillator.tick();
+	auto &freq = getProperty(Lav_OSCILLATOR_FREQUENCY);
+	auto &freqMul = getProperty(Lav_OSCILLATOR_FREQUENCY_MULTIPLIER);
+	if(freq.needsARate() | freqMul.needsARate()) {
+		for(int i=0; i < block_size; i++) {
+			oscillator.setFrequency(freq.getFloatValue(i)*freqMul.getFloatValue(i));
+			output_buffers[0][i] = oscillator.tick();
 		}
 	}
 	else {
-		for(int i=0; i < block_size; i++) {
-			oscillator.setFrequency(freqProp.getFloatValue(i));
-			output_buffers[0][i] = oscillator.tick();
+		oscillator.setFrequency(freq.getFloatValue()*freqMul.getFloatValue());
+		for(int i = 0; i < block_size; i++) {
+			output_buffers[0][i] = (float)oscillator.tick();
 		}
 	}
 }
