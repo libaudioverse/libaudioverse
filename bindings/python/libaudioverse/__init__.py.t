@@ -632,7 +632,7 @@ class GenericNode(_HandleComparer):
         _lav.node_disconnect(self, output, node, input)
 
     def isolate(self):
-        """Break all connections (both input and output) involving this node."""
+        """Disconnect all outputs."""
         _lav.node_isolate(self)
 
 {%for enumerant, prop in metadata['nodes']['Lav_OBJTYPE_GENERIC_NODE']['properties'].items()%}

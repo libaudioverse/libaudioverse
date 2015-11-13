@@ -380,7 +380,8 @@ functions:
   Lav_nodeIsolate:
     category: nodes
     doc_description: |
-      Break all connections involving this node, for both inputs and outputs.
+      Equivalent to disconnecting all of the outputs of this node.
+      After a call to isolate, this node will no longer be affecting audio in any way.
   Lav_nodeGetInputConnectionCount:
     category: nodes
     doc_description: |
