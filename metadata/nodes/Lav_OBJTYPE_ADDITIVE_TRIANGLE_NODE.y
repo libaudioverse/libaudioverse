@@ -9,6 +9,7 @@ properties:
   Lav_OSCILLATOR_FREQUENCY_MULTIPLIER:
     name: frequency_multiplier
     type: float
+    default: 1.0
     range: [-INFINITY, INFINITY]
     rate: a
     doc_description: |
