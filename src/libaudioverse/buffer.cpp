@@ -53,17 +53,6 @@ float Buffer::getSample(int frame, int channel) {
 	return data[frame*channels+channel];
 }
 
-float Buffer::getSampleWithMixingMatrix(int frame, int channel, int maxChannels) {
-	thread_local std::vector<float> before;
-	thread_local std::vector<float> after;
-	if(maxChannels == this->channels) return getSample(frame, channel);
-	if(before.size() < this->channels) before.resize(this->channels);
-	if(after.size() < maxChannels) after.resize(maxChannels);
-	for(int i = 0; i < this->channels; i++) before[i] = this->data[frame*this->channels+i];
-	audio_io::remixAudioInterleaved(1, this->channels, &before[0], maxChannels, &after[0]);
-	return after[channel];
-}
-
 void Buffer::normalize() {
 	float min = *std::min_element(data, data+channels*frames);
 	float max = *std::max_element(data, data+channels*frames);

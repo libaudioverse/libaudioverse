@@ -22,9 +22,6 @@ class Buffer: public ExternalObject {
 	//It is possible the compiler would optimize this, but running  in debug mode is already really painful and the trade-off here is worth it.
 	//a single sample without mixing:
 	float getSample(int frame, int channel);
-	//And with mixing:
-	float getSampleWithMixingMatrix(int frame, int channel, int maxChannels);
-
 	//meet lockable concept:
 	void lock();
 	void unlock();
