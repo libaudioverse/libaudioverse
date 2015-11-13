@@ -19,7 +19,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #define ITERATIONS 200
 float storage[BLOCK_SIZE*2] = {0};
 //This is a big block of data so we can profile buffers.
-#define BUFFER_SIZE 32768
+#define BUFFER_SIZE 32768*4
 float buffer[BUFFER_SIZE] = {0.0f};
 
 #define ERRCHECK(x) do {\

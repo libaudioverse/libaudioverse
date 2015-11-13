@@ -7,6 +7,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <audio_io/audio_io.hpp>
 #include <memory>
 #include <vector>
+#include <algorithm>
 
 namespace libaudioverse_implementation {
 
@@ -55,31 +56,41 @@ inline void BufferPlayer::process(int channels, float** outputs) {
 	if(buffer == nullptr) return; //no buffer.
 	if(buffer_length== 0) return;
 	if(ended) return;
-	//We do the looping check first so we can break out if we have issues.
-	for(int i =0; i < block_size; i++) {
-		if(frame >= buffer_length) { //past end.
-			ended_count ++;
-			if(is_looping == false) {
-				ended = true;
-				return;
+	//This is an optimizable case, and a fairly common one.  It degrades to a memcpy when we can do it.
+	if(rate == 1.0 && offset < 1e-5 && frame+block_size < buffer_length) {
+		for(int ch = 0; ch < buffer_channels; ch++) {
+			float* p=buffer->getPointer(frame, ch);
+			std::copy(p, p+block_size, intermediate_destination[ch]);
+		}
+		frame += block_size;
+	}
+	else {
+		//We do the looping check first so we can break out if we have issues.
+		for(int i =0; i < block_size; i++) {
+			if(frame >= buffer_length) { //past end.
+				ended_count ++;
+				if(is_looping == false) {
+					ended = true;
+					return;
+				}
+				//Otherwise we loop.
+				frame= 0;
 			}
-			//Otherwise we loop.
-			frame= 0;
+			for(int chan =0; chan < buffer_channels; chan++) {
+				//This is standard linear interpolation.
+				double a = buffer->getSample(frame, chan);
+				double b;
+				if(frame+1 < buffer_length) b = buffer->getSample(frame+1, chan); //okay, we have one more sample after this one.
+				else if(is_looping) b =buffer->getSample(0, chan); //We have a next sample, but it's looped to the beginning.
+				else b = 0.0; //no next sample.
+				double weight1 = 1-offset;
+				double weight2 = offset;
+				intermediate_destination[chan][i] = (float)(weight1*a+weight2*b);
+			}
+			offset+=rate;
+			frame += (int)floor(offset);
+			offset = offset-floor(offset);
 		}
-		for(int chan =0; chan < buffer_channels; chan++) {
-			//This is standard linear interpolation.
-			double a = buffer->getSample(frame, chan);
-			double b;
-			if(frame+1 < buffer_length) b = buffer->getSample(frame+1, chan); //okay, we have one more sample after this one.
-			else if(is_looping) b =buffer->getSample(0, chan); //We have a next sample, but it's looped to the beginning.
-			else b = 0.0; //no next sample.
-			double weight1 = 1-offset;
-			double weight2 = offset;
-			intermediate_destination[chan][i] = (float)(weight1*a+weight2*b);
-		}
-		offset+=rate;
-		frame += (int)floor(offset);
-		offset = offset-floor(offset);
 	}
 	//Remix to the destination.
 	audio_io::remixAudioUninterleaved(block_size, buffer_channels, &intermediate_destination[0], channels, outputs);
