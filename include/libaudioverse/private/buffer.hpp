@@ -18,13 +18,6 @@ class Buffer: public ExternalObject {
 	int getChannels();
 	//This can be used outside the lock; the only thing it does is read simulation's sr value which can never change by definition.
 	void loadFromArray(int sr, int channels, int frames, float* inputData);
-	//Writes uninterleaved data resampled appropriately for the simulation being used.
-	//This remixes according to the built-in Libaudioverse remixing rules as necessary.
-	//Returns count of written frames.
-	int writeData(int startFrame, int channels, int frames, float** outputs);
-	//Writes an output channel.  It is assumed the array is already zeroed.
-	//maxChannels is the maximum channels of the node using this function. Buffers know how to upmix and downmix using the Libaudioverse rules.
-	int writeChannel(int startFrame, int channel, int maxChannels, int frames, float* dest);
 	//The following two functions do not check if the requested frame is past the end for efficiency.
 	//It is possible the compiler would optimize this, but running  in debug mode is already really painful and the trade-off here is worth it.
 	//a single sample without mixing:
@@ -40,14 +33,11 @@ class Buffer: public ExternalObject {
 	//This can't be undone.
 	void normalize();
 	private:
-	void ensureRemixingWorkspace(int length);
 	int channels = 0;
 	int frames = 0;
 	int sr = 0;
-	float* data = nullptr, *data_end = nullptr;
+	float* data = nullptr;
 	std::shared_ptr<Simulation> simulation;
-	float* remixing_workspace = nullptr;
-	int remixing_workspace_length = 0;
 };
 
 std::shared_ptr<Buffer> createBuffer(std::shared_ptr<Simulation>simulation);

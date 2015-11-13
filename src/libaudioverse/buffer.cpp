@@ -24,7 +24,6 @@ std::shared_ptr<Buffer> createBuffer(std::shared_ptr<Simulation>simulation) {
 
 Buffer::~Buffer() {
 	if(data) delete[] data;
-	if(remixing_workspace) freeArray(remixing_workspace);
 }
 
 std::shared_ptr<Simulation> Buffer::getSimulation() {
@@ -47,23 +46,7 @@ void Buffer::loadFromArray(int sr, int channels, int frames, float* inputData) {
 	int simulationSr= (int)simulation->getSr();
 	staticResamplerKernel(sr, simulationSr, channels, frames, inputData, &(this->frames), &data);
 	if(data==nullptr) ERROR(Lav_ERROR_MEMORY);
-	data_end=data+this->frames*channels;
 	this->channels = channels;
-}
-
-int Buffer::writeData(int startFrame, int channels, int frames, float** outputs) {
-	//Figure out how much we can write.
-	int canWrite = std::max(startFrame-this->frames, 0);
-	int willWrite = std::min(canWrite, frames);
-	if(willWrite == 0) return 0;
-	ensureRemixingWorkspace(channels*willWrite);
-	audio_io::remixAudioInterleaved(willWrite, this->channels, data+this->channels*startFrame, channels, remixing_workspace);
-	for(int i = 0; i < willWrite; i++) {
-		for(int chan = 0; chan < channels; chan++) {
-			outputs[chan][i] = remixing_workspace[chan*channels+i];
-		}
-	}
-	return willWrite;
 }
 
 float Buffer::getSample(int frame, int channel) {
@@ -71,10 +54,14 @@ float Buffer::getSample(int frame, int channel) {
 }
 
 float Buffer::getSampleWithMixingMatrix(int frame, int channel, int maxChannels) {
+	thread_local std::vector<float> before;
+	thread_local std::vector<float> after;
 	if(maxChannels == this->channels) return getSample(frame, channel);
-	ensureRemixingWorkspace(maxChannels);
-	audio_io::remixAudioInterleaved(1, this->channels, data+frame*this->channels, maxChannels, remixing_workspace);
-	return remixing_workspace[channel];
+	if(before.size() < this->channels) before.resize(this->channels);
+	if(after.size() < maxChannels) after.resize(maxChannels);
+	for(int i = 0; i < this->channels; i++) before[i] = this->data[frame*this->channels+i];
+	audio_io::remixAudioInterleaved(1, this->channels, &before[0], maxChannels, &after[0]);
+	return after[channel];
 }
 
 void Buffer::normalize() {
@@ -83,17 +70,6 @@ void Buffer::normalize() {
 	float normfactor = std::max(fabs(min), fabs(max));
 	normfactor = 1.0f/normfactor;
 	scalarMultiplicationKernel(channels*frames, normfactor, data, data);
-}
-
-void Buffer::ensureRemixingWorkspace(int length) {
-	if(remixing_workspace_length >= length) return;
-	else {
-		if(remixing_workspace) {
-			freeArray(remixing_workspace);
-			remixing_workspace = nullptr;
-		}
-		remixing_workspace = allocArray<float>(length);
-	}
 }
 
 void Buffer::lock() {
