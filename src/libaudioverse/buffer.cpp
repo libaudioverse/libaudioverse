@@ -47,10 +47,20 @@ void Buffer::loadFromArray(int sr, int channels, int frames, float* inputData) {
 	staticResamplerKernel(sr, simulationSr, channels, frames, inputData, &(this->frames), &data);
 	if(data==nullptr) ERROR(Lav_ERROR_MEMORY);
 	this->channels = channels;
+	if(this->channels == 1) return; //It's already uninterleaved.
+	//Uninterleave the data and delete the old one.
+	float* newData = new float[this->channels*this->frames];
+	for(int ch = 0; ch < this->channels; ch++) {
+		for(int i = 0; i < this->frames; i++) {
+			newData[ch*this->frames+i] = data[this->channels*i+ch];
+		}
+	}
+	delete[] data;
+	data = newData;
 }
 
 float Buffer::getSample(int frame, int channel) {
-	return data[frame*channels+channel];
+	return data[frames*channel+frame];
 }
 
 void Buffer::normalize() {
