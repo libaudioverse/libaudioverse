@@ -22,6 +22,8 @@ class Buffer: public ExternalObject {
 	//It is possible the compiler would optimize this, but running  in debug mode is already really painful and the trade-off here is worth it.
 	//a single sample without mixing:
 	float getSample(int frame, int channel);
+	//Get a pointer to part of the buffer, so that we can memcpy and stuff.
+	float* getPointer(int frame, int channel);
 	//meet lockable concept:
 	void lock();
 	void unlock();

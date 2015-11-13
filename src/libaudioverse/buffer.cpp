@@ -63,6 +63,10 @@ float Buffer::getSample(int frame, int channel) {
 	return data[frames*channel+frame];
 }
 
+float* Buffer::getPointer(int frame, int channel) {
+	return data+channel*frames+frame;
+}
+
 void Buffer::normalize() {
 	float min = *std::min_element(data, data+channels*frames);
 	float max = *std::max_element(data, data+channels*frames);
