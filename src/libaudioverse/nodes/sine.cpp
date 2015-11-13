@@ -23,8 +23,8 @@ std::shared_ptr<Node> createSineNode(std::shared_ptr<Simulation> simulation) {
 }
 
 void SineNode::process() {
-	if(werePropertiesModified(this, Lav_SINE_PHASE)) oscillator.setPhase(oscillator.getPhase()+getProperty(Lav_SINE_PHASE).getFloatValue());
-	auto &freqProp = getProperty(Lav_SINE_FREQUENCY);
+	if(werePropertiesModified(this, Lav_OSCILLATOR_PHASE)) oscillator.setPhase(oscillator.getPhase()+getProperty(Lav_OSCILLATOR_PHASE).getFloatValue());
+	auto &freqProp = getProperty(Lav_OSCILLATOR_FREQUENCY);
 	if(freqProp.needsARate()==false) {
 		oscillator.setFrequency(freqProp.getFloatValue());
 		for(int i = 0; i < block_size; i++) {
@@ -41,7 +41,7 @@ void SineNode::process() {
 
 void SineNode::reset() {
 	oscillator.reset();
-	oscillator.setPhase(getProperty(Lav_SINE_PHASE).getFloatValue());
+	oscillator.setPhase(getProperty(Lav_OSCILLATOR_PHASE).getFloatValue());
 }
 
 //begin public api

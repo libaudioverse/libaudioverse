@@ -23,8 +23,8 @@ std::shared_ptr<Node> createAdditiveSquareNode(std::shared_ptr<Simulation> simul
 
 void AdditiveSquareNode::process() {
 	if(werePropertiesModified(this, Lav_SQUARE_HARMONICS)) oscillator.setHarmonics(getProperty(Lav_SQUARE_HARMONICS).getIntValue());
-	if(werePropertiesModified(this, Lav_SQUARE_PHASE)) oscillator.setPhase(getProperty(Lav_SQUARE_PHASE).getFloatValue()+oscillator.getPhase());
-	auto &freq = getProperty(Lav_SQUARE_FREQUENCY);
+	if(werePropertiesModified(this, Lav_OSCILLATOR_PHASE)) oscillator.setPhase(getProperty(Lav_OSCILLATOR_PHASE).getFloatValue()+oscillator.getPhase());
+	auto &freq = getProperty(Lav_OSCILLATOR_FREQUENCY);
 	if(freq.needsARate()) {
 		for(int i = 0; i < block_size; i++) {
 			oscillator.setFrequency(freq.getFloatValue(i));
@@ -41,7 +41,7 @@ void AdditiveSquareNode::process() {
 
 void AdditiveSquareNode::reset() {
 	oscillator.reset();
-	oscillator.setPhase(getProperty(Lav_SQUARE_PHASE).getFloatValue());
+	oscillator.setPhase(getProperty(Lav_OSCILLATOR_PHASE).getFloatValue());
 }
 
 //begin public api

@@ -23,8 +23,8 @@ std::shared_ptr<Node> createAdditiveTriangleNode(std::shared_ptr<Simulation> sim
 
 void AdditiveTriangleNode::process() {
 	if(werePropertiesModified(this, Lav_TRIANGLE_HARMONICS)) oscillator.setHarmonics(getProperty(Lav_TRIANGLE_HARMONICS).getIntValue());
-	if(werePropertiesModified(this, Lav_TRIANGLE_PHASE)) oscillator.setPhase(getProperty(Lav_TRIANGLE_PHASE).getFloatValue()+oscillator.getPhase());
-	auto &freq = getProperty(Lav_TRIANGLE_FREQUENCY);
+	if(werePropertiesModified(this, Lav_OSCILLATOR_PHASE)) oscillator.setPhase(getProperty(Lav_OSCILLATOR_PHASE).getFloatValue()+oscillator.getPhase());
+	auto &freq = getProperty(Lav_OSCILLATOR_FREQUENCY);
 	if(freq.needsARate()) {
 		for(int i = 0; i < block_size; i++) {
 			oscillator.setFrequency(freq.getFloatValue(i));
@@ -41,7 +41,7 @@ void AdditiveTriangleNode::process() {
 
 void AdditiveTriangleNode::reset() {
 	oscillator.reset();
-	oscillator.setPhase(getProperty(Lav_TRIANGLE_PHASE).getFloatValue());
+	oscillator.setPhase(getProperty(Lav_OSCILLATOR_PHASE).getFloatValue());
 }
 
 //begin public api

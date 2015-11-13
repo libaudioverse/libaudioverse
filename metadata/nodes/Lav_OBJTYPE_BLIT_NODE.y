@@ -1,5 +1,5 @@
 properties:
-  Lav_BLIT_FREQUENCY:
+  Lav_OSCILLATOR_FREQUENCY:
     name: frequency
     type: float
     default: 440.0
@@ -7,7 +7,7 @@ properties:
     rate: a
     doc_description: |
       The frequency of the impulse train in HZ.
-  Lav_BLIT_PHASE:
+  Lav_OSCILLATOR_PHASE:
     name: phase
     range: [0.0, 1.0]
     type: float

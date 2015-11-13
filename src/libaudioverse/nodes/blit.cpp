@@ -23,13 +23,13 @@ std::shared_ptr<Node> createBlitNode(std::shared_ptr<Simulation> simulation) {
 }
 
 void BlitNode::process() {
-	if(werePropertiesModified(this, Lav_BLIT_PHASE)) {
-		oscillator.setPhase(oscillator.getPhase()+getProperty(Lav_BLIT_PHASE).getFloatValue());
+	if(werePropertiesModified(this, Lav_OSCILLATOR_PHASE)) {
+		oscillator.setPhase(oscillator.getPhase()+getProperty(Lav_OSCILLATOR_PHASE).getFloatValue());
 	}
 	if(werePropertiesModified(this, Lav_BLIT_HARMONICS)) oscillator.setHarmonics(getProperty(Lav_BLIT_HARMONICS).getIntValue());
-	if(werePropertiesModified(this, Lav_BLIT_FREQUENCY)) oscillator.setFrequency(getProperty(Lav_BLIT_FREQUENCY).getFloatValue());
+	if(werePropertiesModified(this, Lav_OSCILLATOR_FREQUENCY)) oscillator.setFrequency(getProperty(Lav_OSCILLATOR_FREQUENCY).getFloatValue());
 	if(werePropertiesModified(this, Lav_BLIT_SHOULD_NORMALIZE)) oscillator.setShouldNormalize(getProperty(Lav_BLIT_SHOULD_NORMALIZE).getIntValue() == 1);
-	auto &freq = getProperty(Lav_BLIT_FREQUENCY);
+	auto &freq = getProperty(Lav_OSCILLATOR_FREQUENCY);
 	if(freq.needsARate()) {
 		for(int i = 0; i < block_size; i++) {
 			oscillator.setFrequency(freq.getFloatValue(i));
@@ -43,7 +43,7 @@ void BlitNode::process() {
 
 void BlitNode::reset() {
 	oscillator.reset();
-	oscillator.setPhase(getProperty(Lav_BLIT_PHASE).getFloatValue());
+	oscillator.setPhase(getProperty(Lav_OSCILLATOR_PHASE).getFloatValue());
 }
 
 //begin public api

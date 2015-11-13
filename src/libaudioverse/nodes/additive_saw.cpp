@@ -23,8 +23,8 @@ std::shared_ptr<Node> createAdditiveSawNode(std::shared_ptr<Simulation> simulati
 
 void AdditiveSawNode::process() {
 	if(werePropertiesModified(this, Lav_SAW_HARMONICS)) oscillator.setHarmonics(getProperty(Lav_SAW_HARMONICS).getIntValue());
-	if(werePropertiesModified(this, Lav_SAW_PHASE)) oscillator.setPhase(getProperty(Lav_SAW_PHASE).getFloatValue()+oscillator.getPhase());
-	auto &freq = getProperty(Lav_SAW_FREQUENCY);
+	if(werePropertiesModified(this, Lav_OSCILLATOR_PHASE)) oscillator.setPhase(getProperty(Lav_OSCILLATOR_PHASE).getFloatValue()+oscillator.getPhase());
+	auto &freq = getProperty(Lav_OSCILLATOR_FREQUENCY);
 	if(freq.needsARate()) {
 		for(int i = 0; i < block_size; i++) {
 			oscillator.setFrequency(freq.getFloatValue(i));
@@ -41,7 +41,7 @@ void AdditiveSawNode::process() {
 
 void AdditiveSawNode::reset() {
 	oscillator.reset();
-	oscillator.setPhase(getProperty(Lav_SAW_PHASE).getFloatValue());
+	oscillator.setPhase(getProperty(Lav_OSCILLATOR_PHASE).getFloatValue());
 }
 
 //begin public api

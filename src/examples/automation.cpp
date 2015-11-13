@@ -24,13 +24,13 @@ void main() {
 	ERRCHECK(Lav_createSimulation(44100, 8192, &simulation));
 	ERRCHECK(Lav_simulationSetOutputDevice(simulation, -1, 2, 0.0, 0.1, 0.2));
 	ERRCHECK(Lav_createSineNode(simulation, &node));
-	ERRCHECK(Lav_nodeSetFloatProperty(node, Lav_SINE_FREQUENCY, 0));
+	ERRCHECK(Lav_nodeSetFloatProperty(node, Lav_OSCILLATOR_FREQUENCY, 0));
 	ERRCHECK(Lav_nodeConnectSimulation(node, 0));
 	ERRCHECK(Lav_automationLinearRampToValue(node, Lav_NODE_MUL, 8.0, 0.05));
-	ERRCHECK(Lav_automationLinearRampToValue(node, Lav_SINE_FREQUENCY, 2.0, 500.0));
-	ERRCHECK(Lav_automationLinearRampToValue(node, Lav_SINE_FREQUENCY, 4.0, 300.0));
-	ERRCHECK(Lav_automationLinearRampToValue(node, Lav_SINE_FREQUENCY, 6.0, 500.0));
-	ERRCHECK(Lav_automationLinearRampToValue(node, Lav_SINE_FREQUENCY, 8.0, 100.0));
+	ERRCHECK(Lav_automationLinearRampToValue(node, Lav_OSCILLATOR_FREQUENCY, 2.0, 500.0));
+	ERRCHECK(Lav_automationLinearRampToValue(node, Lav_OSCILLATOR_FREQUENCY, 4.0, 300.0));
+	ERRCHECK(Lav_automationLinearRampToValue(node, Lav_OSCILLATOR_FREQUENCY, 6.0, 500.0));
+	ERRCHECK(Lav_automationLinearRampToValue(node, Lav_OSCILLATOR_FREQUENCY, 8.0, 100.0));
 	std::this_thread::sleep_for(std::chrono::milliseconds(10000));
 	Lav_shutdown();
 }
