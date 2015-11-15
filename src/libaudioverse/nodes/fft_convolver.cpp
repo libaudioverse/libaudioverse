@@ -47,6 +47,7 @@ void FftConvolverNode::setResponse(int channel, int length, float* response) {
 	if(channel >= channels || channel < 0) ERROR(Lav_ERROR_RANGE, "Channel out of range.");
 	if(length < 1) ERROR(Lav_ERROR_RANGE, "Response must be at least one sample.");
 	convolvers[channel]->setResponse(length, response);
+	convolvers[channel]->reset();
 }
 
 void FftConvolverNode::setResponseFromFile(std::string path, int fileChannel, int convolverChannel) {

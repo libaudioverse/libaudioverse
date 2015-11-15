@@ -45,7 +45,6 @@ void FftConvolver::setResponse(int length, float* newResponse) {
 		block_fft=allocArray<kiss_fft_cpx>(fft_size);
 	}
 	memset(workspace, 0, sizeof(float)*workspace_size);
-	memset(tail, 0, sizeof(float)*tail_size);
 	//Store the fft of the response.
 	std::copy(newResponse, newResponse+length, workspace);
 	kiss_fftr(fft, workspace, response_fft);
