@@ -2,7 +2,11 @@ from setuptools import setup, find_packages
 from glob import glob
 import pypandoc
 
-__version__ = '0.8.dev1'
+if os.getenv("APPVEYOR_BUILD_VERSION") is not None:
+    __version__ = os.getenv("APPVEYOR_BUILD_VERSION")
+else:
+    #This is a placeholder that indicates it came from someone's repository instead of an official release or CI.
+    __version__ = '0.8.rep'
 
 setup(
     name = 'libaudioverse',
