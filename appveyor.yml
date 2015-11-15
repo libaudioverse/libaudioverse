@@ -45,7 +45,6 @@ install:
   - cd lib
   - appveyor DownloadFile http://camlorn.net/appveyor/libsndfile32/libsndfile-1.lib
   - cd ../..
-  - pandoc
   - gem install asciidoctor
 
 
