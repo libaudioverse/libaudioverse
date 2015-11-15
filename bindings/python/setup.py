@@ -1,6 +1,7 @@
 from setuptools import setup, find_packages
 from glob import glob
 import pypandoc
+import os
 
 if os.getenv("APPVEYOR_BUILD_VERSION") is not None:
     __version__ = os.getenv("APPVEYOR_BUILD_VERSION")
