@@ -6,6 +6,7 @@ import ctypes
 import collections
 import functools
 from . import _libaudioverse
+import six
 
 #These are not from libaudioverse.
 #Implement a method by which the public libaudioverse module may register its exception classes for error code translation.
@@ -63,7 +64,7 @@ def reverse_handle(handle):
     {{arg.name}} = {{arg.name}}.encode('utf8') #All strings are contractually UTF8 when entering Libaudioverse.
 {%elif arg.type.indirection == 1%}
     if isinstance({{arg.name}}, collections.Sized):
-        if not isinstance({{arg.name}}, basestring):
+        if not (isinstance({{arg.name}}, six.binary_type) or isinstance({{arg.name}}, six.text_type)):
             {{arg.name}}_t = {{arg.type|ctypes_string(1)}}*len({{arg.name}})
             #Try to use the buffer interfaces, if we can.
             try:
