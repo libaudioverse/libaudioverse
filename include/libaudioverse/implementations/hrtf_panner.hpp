@@ -6,7 +6,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "delayline.hpp"
 #include "convolvers.hpp"
 #include <memory>
-#include <kiss_fftr.h>
 
 namespace libaudioverse_implementation {
 
@@ -37,11 +36,6 @@ class HrtfPanner {
 	BlockConvolver *left_convolver, *right_convolver, *prev_left_convolver, *prev_right_convolver;
 	//When crossfading, we calculate both outputs and then fade.
 	float* crossfade_workspace;
-	//The fft of our input can be calculated once and reused for up to 4 convolutions with the FftConvolver.
-	//We go to the size the convolver wants, so we need a temporary buffer as well.
-	kiss_fftr_cfg fft;
-	kiss_fft_cpx *input_fft;
-	float *fft_workspace = nullptr;
 	int block_size;
 	int response_length;
 	float sr;

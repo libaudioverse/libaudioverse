@@ -7,7 +7,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/implementations/hrtf_panner.hpp>
 #include <libaudioverse/implementations/delayline.hpp>
 #include <libaudioverse/implementations/convolvers.hpp>
-#include <kiss_fftr.h>
 #include <algorithm>
 #include <memory>
 #include <math.h>
