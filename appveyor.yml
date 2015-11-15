@@ -44,7 +44,10 @@ install:
   - mkdir lib
   - cd lib
   - appveyor DownloadFile http://camlorn.net/appveyor/libsndfile32/libsndfile-1.lib
-  - cd ../..
+  - cd ..
+  - appveyor DownloadFile http://camlorn.net/appveyor/pandoc.exe
+  - cd ..
+  - set path=c:\projects\libaudioverse\tmp;%path%
   - gem install asciidoctor
 
 
