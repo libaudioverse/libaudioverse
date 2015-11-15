@@ -10,6 +10,8 @@ environment:
   DEPLOYMENT_USERNAME: camlorn
   DEPLOYMENT_PASSWORD:
     secure: N+y3x+7kivMfuMDkYVN7CQ==
+  PYPI_PASSWORD:
+    secure: QCiljp1jjjC1d8WyllDTJg==
 init:
   - git config --global core.autocrlf true
 
