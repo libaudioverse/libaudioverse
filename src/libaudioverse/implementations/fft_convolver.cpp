@@ -84,7 +84,7 @@ void FftConvolver::convolveFft(kiss_fft_cpx *fft, float* output) {
 	//Also copy to the output at the same time.
 	scalarMultiplicationKernel(block_size, 1.0/workspace_size, workspace, output);
 	//Copy out the tail.
-	std::copy(workspace+block_size, workspace+workspace_size, tail);
+		std::copy(workspace+block_size, workspace+workspace_size, tail);
 }
 
 void FftConvolver::reset() {

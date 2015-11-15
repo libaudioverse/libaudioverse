@@ -48,10 +48,12 @@ void HrtfPanner::pan(float* input, float *left_output, float *right_output) {
 	//Do we need to crossfade? We do if we've moved more than the threshold and crossfading is being allowed.
 	bool needsCrossfade = should_crossfade && fabs(azimuth-prev_azimuth)+fabs(elevation-prev_elevation) >= crossfade_threshold;
 	if(azimuth != prev_azimuth || elevation != prev_elevation) {
-		std::swap(left_convolver, prev_left_convolver);
-		std::swap(right_convolver, prev_right_convolver);
-		left_convolver->reset();
-		right_convolver->reset();
+		if(needsCrossfade) {
+			std::swap(left_convolver, prev_left_convolver);
+			std::swap(right_convolver, prev_right_convolver);
+			left_convolver->reset();
+			right_convolver->reset();
+		}
 		hrtf->computeCoefficientsStereo(elevation, azimuth, left_response, right_response);
 		left_convolver->setResponse(response_length, left_response);
 		right_convolver->setResponse(response_length, right_response);
