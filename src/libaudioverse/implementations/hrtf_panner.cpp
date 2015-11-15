@@ -19,29 +19,23 @@ HrtfPanner::HrtfPanner(int _block_size, float _sr, std::shared_ptr<HrtfData> _hr
 	left_response = allocArray<float>(response_length);
 	right_response = allocArray<float>(response_length);
 	hrtf->computeCoefficientsStereo(azimuth, elevation, left_response, right_response);
-	left_convolver = new FftConvolver(block_size);
-	right_convolver = new FftConvolver(block_size);
-	prev_left_convolver = new FftConvolver(block_size);
-	prev_right_convolver = new FftConvolver(block_size);
+	left_convolver = new BlockConvolver(block_size);
+	right_convolver = new BlockConvolver(block_size);
+	prev_left_convolver = new BlockConvolver(block_size);
+	prev_right_convolver = new BlockConvolver(block_size);
 	left_convolver->setResponse(response_length, left_response);
 	right_convolver->setResponse(response_length, right_response);
 	crossfade_workspace = allocArray<float>(block_size);
-	input_fft = allocArray<kiss_fft_cpx>(left_convolver->getFftSize());
-	fft_workspace = allocArray<float>(left_convolver->getFftSize());
-	fft = kiss_fftr_alloc(left_convolver->getFftSize(), 0, nullptr, nullptr);
 }
 
 HrtfPanner::~HrtfPanner() {
 	freeArray(left_response);
 	freeArray(right_response);
 	freeArray(crossfade_workspace);
-	freeArray(input_fft);
-	freeArray(fft_workspace);
 	delete left_convolver;
 	delete right_convolver;
 	delete prev_left_convolver;
 	delete prev_right_convolver;
-	kiss_fft_free(fft);
 }
 
 void HrtfPanner::pan(float* input, float *left_output, float *right_output) {
@@ -58,17 +52,14 @@ void HrtfPanner::pan(float* input, float *left_output, float *right_output) {
 		left_convolver->setResponse(response_length, left_response);
 		right_convolver->setResponse(response_length, right_response);
 	}
-	//FFT of the input.
-	std::copy(input, input+block_size, fft_workspace);
-	kiss_fftr(fft, fft_workspace, input_fft);
 	//These two convolutions always happen.
-	left_convolver->convolveFft(input_fft, left_output);
-	right_convolver->convolveFft(input_fft, right_output);
+	left_convolver->convolve(input, left_output);
+	right_convolver->convolve(input, right_output);
 	if(needsCrossfade) {
 		double delta = 1.0/block_size;
-		prev_left_convolver->convolveFft(input_fft, crossfade_workspace);
+		prev_left_convolver->convolve(input, crossfade_workspace);
 		for(int i = 0; i < block_size; i++) left_output[i] = (block_size-i)*delta*crossfade_workspace[i]+i*delta*left_output[i];
-		prev_right_convolver->convolveFft(input_fft, crossfade_workspace);
+		prev_right_convolver->convolve(input, crossfade_workspace);
 		for(int i = 0; i < block_size; i++) right_output[i] = (block_size-i)*delta*crossfade_workspace[i]+i*delta*right_output[i];
 	}
 	prev_azimuth = azimuth;

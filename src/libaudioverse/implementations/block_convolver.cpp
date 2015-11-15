@@ -48,4 +48,8 @@ void BlockConvolver::convolve(float* input, float* output) {
 	convolutionKernel(history, block_size, output, response_length, response);
 }
 
+void BlockConvolver::reset() {
+	std::fill(history, history+block_size+response_length, 0.0f);
+}
+
 }

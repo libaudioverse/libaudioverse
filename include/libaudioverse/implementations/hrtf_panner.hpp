@@ -34,7 +34,7 @@ class HrtfPanner {
 	//Left and right HRIR responses.
 	float *left_response = nullptr, *right_response = nullptr;
 	//Convolvers, current and previous.
-	FftConvolver *left_convolver, *right_convolver, *prev_left_convolver, *prev_right_convolver;
+	BlockConvolver *left_convolver, *right_convolver, *prev_left_convolver, *prev_right_convolver;
 	//When crossfading, we calculate both outputs and then fade.
 	float* crossfade_workspace;
 	//The fft of our input can be calculated once and reused for up to 4 convolutions with the FftConvolver.

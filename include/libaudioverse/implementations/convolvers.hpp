@@ -15,6 +15,7 @@ class BlockConvolver {
 	//Note: this function zeros the history if the new response has a different length.
 	void setResponse(int length, float* newResponse);
 	void convolve(float* input, float* output);
+	void reset();
 	private:
 	float* response = nullptr, *history = nullptr;
 	int block_size = 0, response_length = 0;
