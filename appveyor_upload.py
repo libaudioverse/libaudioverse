@@ -32,7 +32,7 @@ with paramiko.SFTPClient.from_transport(transport) as sftp:
     
 print("Attempting to rename wheel for Pypi upload.")
 #We know exactly where the wheel lives.
-path = r"c:\projects\in_progress\libaudioverse\build\bindings\python\dist\*any.whl"
+path = r"c:\projects\libaudioverse\build\bindings\python\dist\*any.whl"
 #Get its name.
 possibles=glob.glob(path)
 if len(possibles) == 0:
