@@ -80,7 +80,7 @@ after_build:
   - cd libaudioverse_docs
   #This either commits or doesn't, if it doesn't it's no loss.
   - git add -A .
-  - 'git commit -a -m "Update documentation for %APPVEYOR_BUILD_VERSION%"
+  - 'git commit -a -m "Update documentation for %APPVEYOR_BUILD_VERSION%"'
   - git push
   - cd ../..
   #And then Pypi, etc.
