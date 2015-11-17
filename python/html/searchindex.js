@@ -1,0 +1,1 @@
+Search.setIndex({envversion:47,filenames:["api","index"],objects:{},objnames:{},objtypes:{},terms:{content:1,index:1,modul:1,page:1,search:1},titles:["The Libaudioverse API","Welcome to Libaudioverse&#8217;s documentation!"],titleterms:{api:0,document:1,indic:1,libaudiovers:[0,1],tabl:1,welcom:1}})
