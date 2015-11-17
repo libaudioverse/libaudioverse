@@ -76,7 +76,7 @@ after_build:
   - cd tmp
   - 'git clone https://camlorn:%GIT_PASSWORD%@github.com/camlorn/libaudioverse -b gh-pages --single-branch libaudioverse_docs'
   - 'cp ..\build\documentation\libaudioverse_manual.html libaudioverse_docs\libaudioverse_manual.html'
-  - 'xcopy /I /Q /E ..\build\bindings\python\docs\_build libaudioverse_docs\python'
+  - 'xcopy /I /Q /E ..\build\bindings\python\docs\_build\html libaudioverse_docs\python'
   - cd libaudioverse_docs
   #This either commits or doesn't, if it doesn't it's no loss.
   - git add -A .
