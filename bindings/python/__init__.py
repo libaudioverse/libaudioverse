@@ -43,8 +43,9 @@ def ctypes_function_helper(func, typedef_prefix):
     return "ctypes.CFUNCTYPE(" + argstr + ")"
 
 def post_generate(dir):
-    """Make a wheel, later installed via cmake."""
+    """Make a wheel and build docs."""
     subprocess.call(["py", "-3", "setup.py", "bdist_wheel", "--universal"], shell=True)
+    subprocess.call(["py", "-3", "setup.py", "build_sphinx"], shell = True  )
 
 def make_python(info):
     #get our directory.
@@ -68,6 +69,7 @@ def make_python(info):
         'libaudioverse/_libaudioverse.py' : env.get_template('libaudioverse/_libaudioverse.py.t').render(context),
         'libaudioverse/__init__.py': env.get_template('libaudioverse/__init__.py.t').render(context),
         'setup.py': open(os.path.join(source_dir, 'setup.py')).read(),
+        'setup.cfg': open(os.path.join(source_dir, 'setup.cfg')).read(),
         'readme.md': open(os.path.join(info['root_dir'], 'readme.md')).read(),
         'dll_location': 'libaudioverse',
         'libsndfile_location': 'libaudioverse',
