@@ -4969,6 +4969,25 @@ The most notable node of this type is the amplitude panner.</p>
 <div class="sect3">
 <h4 id="_properties">Properties</h4>
 <div class="sect4">
+<h5 id="_state">state</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_NODE_STATE</p>
+</div>
+<div class="paragraph">
+<p>Type: int</p>
+</div>
+<div class="paragraph">
+<p>Range: A value from the <a href="#enum-Lav_NODE_STATES">Lav_NODE_STATES</a> enumeration.</p>
+</div>
+<div class="paragraph">
+<p>Default Value: Lav_NODESTATE_PLAYING</p>
+</div>
+<div class="paragraph">
+<p>The node&#8217;s state.  See the basics section in the Libaudioverse manual for details.
+The default is usually what you want.</p>
+</div>
+</div>
+<div class="sect4">
 <h5 id="_add">add</h5>
 <div class="paragraph">
 <p>C Enumeration Value: Lav_NODE_ADD</p>
@@ -4986,25 +5005,6 @@ The most notable node of this type is the amplitude panner.</p>
 <p>After mul is applied, we add the value to which this property is set to the node&#8217;s result.
 The purpose of add is to be used with automation support: add provides a baseline for oscillators and other similar nodes
 so that when connected to properties, we can make the value of this node vary between a specified minimum and maximum.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_state">state</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_NODE_STATE</p>
-</div>
-<div class="paragraph">
-<p>Type: int</p>
-</div>
-<div class="paragraph">
-<p>Range: A value from the <a href="#enum-Lav_NODE_STATES">Lav_NODE_STATES</a> enumeration.</p>
-</div>
-<div class="paragraph">
-<p>Default Value: Lav_NODESTATE_PLAYING</p>
-</div>
-<div class="paragraph">
-<p>The node&#8217;s state.  See the basics section in the Libaudioverse manual for details.
-The default is usually what you want.</p>
 </div>
 </div>
 <div class="sect4">
@@ -5104,6 +5104,24 @@ This is not fixable using additive synthesis and is a frequency dependent effect
 <div class="sect3">
 <h4 id="_properties_2">Properties</h4>
 <div class="sect4">
+<h5 id="_frequency">frequency</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_OSCILLATOR_FREQUENCY</p>
+</div>
+<div class="paragraph">
+<p>Type: float</p>
+</div>
+<div class="paragraph">
+<p>Range: [0, 'INFINITY']</p>
+</div>
+<div class="paragraph">
+<p>Default Value: 440.0</p>
+</div>
+<div class="paragraph">
+<p>The frequency of the saw wave, in hertz.</p>
+</div>
+</div>
+<div class="sect4">
 <h5 id="_harmonics">harmonics</h5>
 <div class="paragraph">
 <p>C Enumeration Value: Lav_SAW_HARMONICS</p>
@@ -5128,21 +5146,22 @@ To avoid this, make sure that <code>frequency*harmonics</code> never goes over h
 </div>
 </div>
 <div class="sect4">
-<h5 id="_frequency">frequency</h5>
+<h5 id="_phase">phase</h5>
 <div class="paragraph">
-<p>C Enumeration Value: Lav_OSCILLATOR_FREQUENCY</p>
+<p>C Enumeration Value: Lav_OSCILLATOR_PHASE</p>
 </div>
 <div class="paragraph">
 <p>Type: float</p>
 </div>
 <div class="paragraph">
-<p>Range: [0, 'INFINITY']</p>
+<p>Range: [0.0, 1.0]</p>
 </div>
 <div class="paragraph">
-<p>Default Value: 440.0</p>
+<p>Default Value: 0.0</p>
 </div>
 <div class="paragraph">
-<p>The frequency of the saw wave, in hertz.</p>
+<p>The phase of the saw wave.
+This is measured in periods, not in radians.</p>
 </div>
 </div>
 <div class="sect4">
@@ -5164,25 +5183,6 @@ To avoid this, make sure that <code>frequency*harmonics</code> never goes over h
 </div>
 <div class="paragraph">
 <p>This is useful for creating instruments, as the notes of the standard musical scale fall on frequency multiples of a reference pitch, rather than a linear increase.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_phase">phase</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_OSCILLATOR_PHASE</p>
-</div>
-<div class="paragraph">
-<p>Type: float</p>
-</div>
-<div class="paragraph">
-<p>Range: [0.0, 1.0]</p>
-</div>
-<div class="paragraph">
-<p>Default Value: 0.0</p>
-</div>
-<div class="paragraph">
-<p>The phase of the saw wave.
-This is measured in periods, not in radians.</p>
 </div>
 </div>
 </div>
@@ -5252,24 +5252,22 @@ This is not fixable using additive synthesis and is a frequency dependent effect
 </div>
 </div>
 <div class="sect4">
-<h5 id="_frequency_multiplier_2">frequency_multiplier</h5>
+<h5 id="_phase_2">phase</h5>
 <div class="paragraph">
-<p>C Enumeration Value: Lav_OSCILLATOR_FREQUENCY_MULTIPLIER</p>
+<p>C Enumeration Value: Lav_OSCILLATOR_PHASE</p>
 </div>
 <div class="paragraph">
 <p>Type: float</p>
 </div>
 <div class="paragraph">
-<p>Range: ['-INFINITY', 'INFINITY']</p>
+<p>Range: [0.0, 1.0]</p>
 </div>
 <div class="paragraph">
-<p>Default Value: 1.0</p>
+<p>Default Value: 0.0</p>
 </div>
 <div class="paragraph">
-<p>An additional multiplicative factor applied to the frequency of the oscillator.</p>
-</div>
-<div class="paragraph">
-<p>This is useful for creating instruments, as the notes of the standard musical scale fall on frequency multiples of a reference pitch, rather than a linear increase.</p>
+<p>The phase of the square wave.
+This is measured in periods, not in radians.</p>
 </div>
 </div>
 <div class="sect4">
@@ -5297,22 +5295,24 @@ To avoid this, make sure that <code>2*frequency*(2*harmonics-1)</code> never goe
 </div>
 </div>
 <div class="sect4">
-<h5 id="_phase_2">phase</h5>
+<h5 id="_frequency_multiplier_2">frequency_multiplier</h5>
 <div class="paragraph">
-<p>C Enumeration Value: Lav_OSCILLATOR_PHASE</p>
+<p>C Enumeration Value: Lav_OSCILLATOR_FREQUENCY_MULTIPLIER</p>
 </div>
 <div class="paragraph">
 <p>Type: float</p>
 </div>
 <div class="paragraph">
-<p>Range: [0.0, 1.0]</p>
+<p>Range: ['-INFINITY', 'INFINITY']</p>
 </div>
 <div class="paragraph">
-<p>Default Value: 0.0</p>
+<p>Default Value: 1.0</p>
 </div>
 <div class="paragraph">
-<p>The phase of the square wave.
-This is measured in periods, not in radians.</p>
+<p>An additional multiplicative factor applied to the frequency of the oscillator.</p>
+</div>
+<div class="paragraph">
+<p>This is useful for creating instruments, as the notes of the standard musical scale fall on frequency multiples of a reference pitch, rather than a linear increase.</p>
 </div>
 </div>
 </div>
@@ -5383,24 +5383,22 @@ This is not fixable using additive synthesis and is a frequency dependent effect
 </div>
 </div>
 <div class="sect4">
-<h5 id="_frequency_multiplier_3">frequency_multiplier</h5>
+<h5 id="_phase_3">phase</h5>
 <div class="paragraph">
-<p>C Enumeration Value: Lav_OSCILLATOR_FREQUENCY_MULTIPLIER</p>
+<p>C Enumeration Value: Lav_OSCILLATOR_PHASE</p>
 </div>
 <div class="paragraph">
 <p>Type: float</p>
 </div>
 <div class="paragraph">
-<p>Range: ['-INFINITY', 'INFINITY']</p>
+<p>Range: [0.0, 1.0]</p>
 </div>
 <div class="paragraph">
-<p>Default Value: 1.0</p>
+<p>Default Value: 0.0</p>
 </div>
 <div class="paragraph">
-<p>An additional multiplicative factor applied to the frequency of the oscillator.</p>
-</div>
-<div class="paragraph">
-<p>This is useful for creating instruments, as the notes of the standard musical scale fall on frequency multiples of a reference pitch, rather than a linear increase.</p>
+<p>The phase of the triangle wave.
+This is measured in periods, not in radians.</p>
 </div>
 </div>
 <div class="sect4">
@@ -5428,22 +5426,24 @@ To avoid this, make sure that <code>2*frequency*(2*harmonics-1)</code> never goe
 </div>
 </div>
 <div class="sect4">
-<h5 id="_phase_3">phase</h5>
+<h5 id="_frequency_multiplier_3">frequency_multiplier</h5>
 <div class="paragraph">
-<p>C Enumeration Value: Lav_OSCILLATOR_PHASE</p>
+<p>C Enumeration Value: Lav_OSCILLATOR_FREQUENCY_MULTIPLIER</p>
 </div>
 <div class="paragraph">
 <p>Type: float</p>
 </div>
 <div class="paragraph">
-<p>Range: [0.0, 1.0]</p>
+<p>Range: ['-INFINITY', 'INFINITY']</p>
 </div>
 <div class="paragraph">
-<p>Default Value: 0.0</p>
+<p>Default Value: 1.0</p>
 </div>
 <div class="paragraph">
-<p>The phase of the triangle wave.
-This is measured in periods, not in radians.</p>
+<p>An additional multiplicative factor applied to the frequency of the oscillator.</p>
+</div>
+<div class="paragraph">
+<p>This is useful for creating instruments, as the notes of the standard musical scale fall on frequency multiples of a reference pitch, rather than a linear increase.</p>
 </div>
 </div>
 </div>
@@ -5505,24 +5505,25 @@ This is measured in periods, not in radians.</p>
 <div class="sect3">
 <h4 id="_properties_5">Properties</h4>
 <div class="sect4">
-<h5 id="_coefficient">coefficient</h5>
+<h5 id="_delay_samples">delay_samples</h5>
 <div class="paragraph">
-<p>C Enumeration Value: Lav_ALLPASS_COEFFICIENT</p>
+<p>C Enumeration Value: Lav_ALLPASS_DELAY_SAMPLES</p>
 </div>
 <div class="paragraph">
-<p>Type: float</p>
+<p>Type: int</p>
 </div>
 <div class="paragraph">
-<p>Range: ['-INFINITY', 'INFINITY']</p>
+<p>Range: dynamic</p>
 </div>
 <div class="paragraph">
-<p>Default Value: See Description</p>
+<p>Default Value: 1</p>
 </div>
 <div class="paragraph">
-<p>The coefficient of the allpass filter&#8217;s transfer function.</p>
+<p>The delay of the delay line in samples.
+The range of this property depends on the maxDelay parameter to the constructor.</p>
 </div>
 <div class="paragraph">
-<p>For those not familiar with digital signal processing, this controls how quickly the repeating echoes created by this filter decay.</p>
+<p>Note that values less than 1 sample still introduce delay.</p>
 </div>
 </div>
 <div class="sect4">
@@ -5546,28 +5547,6 @@ Note that for this node, it is impossible to get rid of the crossfade completely
 </div>
 </div>
 <div class="sect4">
-<h5 id="_delay_samples">delay_samples</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_ALLPASS_DELAY_SAMPLES</p>
-</div>
-<div class="paragraph">
-<p>Type: int</p>
-</div>
-<div class="paragraph">
-<p>Range: dynamic</p>
-</div>
-<div class="paragraph">
-<p>Default Value: 1</p>
-</div>
-<div class="paragraph">
-<p>The delay of the delay line in samples.
-The range of this property depends on the maxDelay parameter to the constructor.</p>
-</div>
-<div class="paragraph">
-<p>Note that values less than 1 sample still introduce delay.</p>
-</div>
-</div>
-<div class="sect4">
 <h5 id="_delay_max">delay_max</h5>
 <div class="paragraph">
 <p>C Enumeration Value: Lav_ALLPASS_DELAY_SAMPLES_MAX</p>
@@ -5583,6 +5562,27 @@ The range of this property depends on the maxDelay parameter to the constructor.
 </div>
 <div class="paragraph">
 <p>The max delay as set at the node&#8217;s creation time.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_coefficient">coefficient</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_ALLPASS_COEFFICIENT</p>
+</div>
+<div class="paragraph">
+<p>Type: float</p>
+</div>
+<div class="paragraph">
+<p>Range: ['-INFINITY', 'INFINITY']</p>
+</div>
+<div class="paragraph">
+<p>Default Value: See Description</p>
+</div>
+<div class="paragraph">
+<p>The coefficient of the allpass filter&#8217;s transfer function.</p>
+</div>
+<div class="paragraph">
+<p>For those not familiar with digital signal processing, this controls how quickly the repeating echoes created by this filter decay.</p>
 </div>
 </div>
 </div>
@@ -5644,22 +5644,6 @@ The additional function Lav_amplitudePannerNodeConfigureStandardChannelMap can s
 <div class="sect3">
 <h4 id="_properties_6">Properties</h4>
 <div class="sect4">
-<h5 id="_has_lfe">has_lfe</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_PANNER_HAS_LFE</p>
-</div>
-<div class="paragraph">
-<p>Type: boolean</p>
-</div>
-<div class="paragraph">
-<p>Default Value: 0</p>
-</div>
-<div class="paragraph">
-<p>Whether the current channel map has an LFE channel or not.
-If it does, this is assumed to be channel 4.</p>
-</div>
-</div>
-<div class="sect4">
 <h5 id="_channel_map">channel_map</h5>
 <div class="paragraph">
 <p>C Enumeration Value: Lav_PANNER_CHANNEL_MAP</p>
@@ -5677,53 +5661,23 @@ These channels are then combined and produced as the single output of the panner
 </div>
 </div>
 <div class="sect4">
-<h5 id="_should_crossfade">should_crossfade</h5>
+<h5 id="_elevation">elevation</h5>
 <div class="paragraph">
-<p>C Enumeration Value: Lav_PANNER_SHOULD_CROSSFADE</p>
-</div>
-<div class="paragraph">
-<p>Type: boolean</p>
+<p>C Enumeration Value: Lav_PANNER_ELEVATION</p>
 </div>
 <div class="paragraph">
-<p>Default Value: 1</p>
+<p>Type: float</p>
 </div>
 <div class="paragraph">
-<p>Whether or not to instantly move to the new position.
-If crossfading is disabled, large movements of the panner will cause audible clicks.
-Disabling crossfading can aid performance under hevay workloads, especially with the HRTF panner.
-If crossfading is enabled, moving the panner will slowly fade it to the new position over the next block.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_has_center">has_center</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_PANNER_HAS_CENTER</p>
+<p>Range: [-90.0, 90.0]</p>
 </div>
 <div class="paragraph">
-<p>Type: boolean</p>
+<p>Default Value: 0.0</p>
 </div>
 <div class="paragraph">
-<p>Default Value: 0</p>
-</div>
-<div class="paragraph">
-<p>Whether the currently specified channel map has a center channel.
-if it does, this is assumed to be channel 3.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_skip_lfe">skip_lfe</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_PANNER_SKIP_LFE</p>
-</div>
-<div class="paragraph">
-<p>Type: boolean</p>
-</div>
-<div class="paragraph">
-<p>Default Value: 1</p>
-</div>
-<div class="paragraph">
-<p>This property controls whether or not the LFE channel is reserved, i.e. skipped.
-You  almost always want this on.</p>
+<p>The vertical angle of the panner in degrees.
+0 is horizontal and positive values are upwards.
+Note that, for amplitude panners, this has no effect and exists only to allow swapping with the HRTF panner without changing code.</p>
 </div>
 </div>
 <div class="sect4">
@@ -5786,23 +5740,69 @@ You  almost always want this on.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_elevation">elevation</h5>
+<h5 id="_has_lfe">has_lfe</h5>
 <div class="paragraph">
-<p>C Enumeration Value: Lav_PANNER_ELEVATION</p>
+<p>C Enumeration Value: Lav_PANNER_HAS_LFE</p>
 </div>
 <div class="paragraph">
-<p>Type: float</p>
+<p>Type: boolean</p>
 </div>
 <div class="paragraph">
-<p>Range: [-90.0, 90.0]</p>
+<p>Default Value: 0</p>
 </div>
 <div class="paragraph">
-<p>Default Value: 0.0</p>
+<p>Whether the current channel map has an LFE channel or not.
+If it does, this is assumed to be channel 4.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_skip_lfe">skip_lfe</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_PANNER_SKIP_LFE</p>
 </div>
 <div class="paragraph">
-<p>The vertical angle of the panner in degrees.
-0 is horizontal and positive values are upwards.
-Note that, for amplitude panners, this has no effect and exists only to allow swapping with the HRTF panner without changing code.</p>
+<p>Type: boolean</p>
+</div>
+<div class="paragraph">
+<p>Default Value: 1</p>
+</div>
+<div class="paragraph">
+<p>This property controls whether or not the LFE channel is reserved, i.e. skipped.
+You  almost always want this on.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_has_center">has_center</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_PANNER_HAS_CENTER</p>
+</div>
+<div class="paragraph">
+<p>Type: boolean</p>
+</div>
+<div class="paragraph">
+<p>Default Value: 0</p>
+</div>
+<div class="paragraph">
+<p>Whether the currently specified channel map has a center channel.
+if it does, this is assumed to be channel 3.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_should_crossfade">should_crossfade</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_PANNER_SHOULD_CROSSFADE</p>
+</div>
+<div class="paragraph">
+<p>Type: boolean</p>
+</div>
+<div class="paragraph">
+<p>Default Value: 1</p>
+</div>
+<div class="paragraph">
+<p>Whether or not to instantly move to the new position.
+If crossfading is disabled, large movements of the panner will cause audible clicks.
+Disabling crossfading can aid performance under hevay workloads, especially with the HRTF panner.
+If crossfading is enabled, moving the panner will slowly fade it to the new position over the next block.</p>
 </div>
 </div>
 </div>
@@ -5961,25 +5961,6 @@ It is found here:
 </div>
 </div>
 <div class="sect4">
-<h5 id="_frequency_4">frequency</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_BIQUAD_FREQUENCY</p>
-</div>
-<div class="paragraph">
-<p>Type: float</p>
-</div>
-<div class="paragraph">
-<p>Range: [0, 'INFINITY']</p>
-</div>
-<div class="paragraph">
-<p>Default Value: 2000.0</p>
-</div>
-<div class="paragraph">
-<p>This is the frequency of interest.
-What specifically this means depends on the selected filter type; for example, it is the cutoff frequency for lowpass and highpass.</p>
-</div>
-</div>
-<div class="sect4">
 <h5 id="_dbgain">dbgain</h5>
 <div class="paragraph">
 <p>C Enumeration Value: Lav_BIQUAD_DBGAIN</p>
@@ -5996,6 +5977,25 @@ What specifically this means depends on the selected filter type; for example, i
 <div class="paragraph">
 <p>This property is a the gain in decibals to be used with the peaking and shelving filters.
 It measures the gain that these filters apply to the part of the signal they boost.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_frequency_4">frequency</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_BIQUAD_FREQUENCY</p>
+</div>
+<div class="paragraph">
+<p>Type: float</p>
+</div>
+<div class="paragraph">
+<p>Range: [0, 'INFINITY']</p>
+</div>
+<div class="paragraph">
+<p>Default Value: 2000.0</p>
+</div>
+<div class="paragraph">
+<p>This is the frequency of interest.
+What specifically this means depends on the selected filter type; for example, it is the cutoff frequency for lowpass and highpass.</p>
 </div>
 </div>
 </div>
@@ -6037,22 +6037,20 @@ It measures the gain that these filters apply to the part of the signal they boo
 <div class="sect3">
 <h4 id="_properties_8">Properties</h4>
 <div class="sect4">
-<h5 id="_harmonics_4">harmonics</h5>
+<h5 id="_should_normalize">should_normalize</h5>
 <div class="paragraph">
-<p>C Enumeration Value: Lav_BLIT_HARMONICS</p>
+<p>C Enumeration Value: Lav_BLIT_SHOULD_NORMALIZE</p>
 </div>
 <div class="paragraph">
-<p>Type: int</p>
+<p>Type: boolean</p>
 </div>
 <div class="paragraph">
-<p>Range: [0, 'MAX_INT']</p>
+<p>Default Value: 1</p>
 </div>
 <div class="paragraph">
-<p>Default Value: 0</p>
-</div>
-<div class="paragraph">
-<p>The number of harmonics to include.
-0 requests automatic adjustment.  When 0, the algorithm this node represents will include as many harmonics as it can without aliasing.</p>
+<p>If false, the produced BLIT will have an integral of 1 over every period.
+If true, the produced blit will be normalized to be between 1 and -1, and suitable for audio.
+The default is true.</p>
 </div>
 </div>
 <div class="sect4">
@@ -6074,6 +6072,44 @@ It measures the gain that these filters apply to the part of the signal they boo
 </div>
 </div>
 <div class="sect4">
+<h5 id="_phase_4">phase</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_OSCILLATOR_PHASE</p>
+</div>
+<div class="paragraph">
+<p>Type: float</p>
+</div>
+<div class="paragraph">
+<p>Range: [0.0, 1.0]</p>
+</div>
+<div class="paragraph">
+<p>Default Value: 0.0</p>
+</div>
+<div class="paragraph">
+<p>The phase of the impulse train.
+This is measured in periods, not in radians.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_harmonics_4">harmonics</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_BLIT_HARMONICS</p>
+</div>
+<div class="paragraph">
+<p>Type: int</p>
+</div>
+<div class="paragraph">
+<p>Range: [0, 'MAX_INT']</p>
+</div>
+<div class="paragraph">
+<p>Default Value: 0</p>
+</div>
+<div class="paragraph">
+<p>The number of harmonics to include.
+0 requests automatic adjustment.  When 0, the algorithm this node represents will include as many harmonics as it can without aliasing.</p>
+</div>
+</div>
+<div class="sect4">
 <h5 id="_frequency_multiplier_4">frequency_multiplier</h5>
 <div class="paragraph">
 <p>C Enumeration Value: Lav_OSCILLATOR_FREQUENCY_MULTIPLIER</p>
@@ -6092,42 +6128,6 @@ It measures the gain that these filters apply to the part of the signal they boo
 </div>
 <div class="paragraph">
 <p>This is useful for creating instruments, as the notes of the standard musical scale fall on frequency multiples of a reference pitch, rather than a linear increase.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_should_normalize">should_normalize</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_BLIT_SHOULD_NORMALIZE</p>
-</div>
-<div class="paragraph">
-<p>Type: boolean</p>
-</div>
-<div class="paragraph">
-<p>Default Value: 1</p>
-</div>
-<div class="paragraph">
-<p>If false, the produced BLIT will have an integral of 1 over every period.
-If true, the produced blit will be normalized to be between 1 and -1, and suitable for audio.
-The default is true.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_phase_4">phase</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_OSCILLATOR_PHASE</p>
-</div>
-<div class="paragraph">
-<p>Type: float</p>
-</div>
-<div class="paragraph">
-<p>Range: [0.0, 1.0]</p>
-</div>
-<div class="paragraph">
-<p>Default Value: 0.0</p>
-</div>
-<div class="paragraph">
-<p>The phase of the impulse train.
-This is measured in periods, not in radians.</p>
 </div>
 </div>
 </div>
@@ -6169,6 +6169,21 @@ The output of this node will have as many channels as the buffer does, so connec
 </div>
 <div class="sect3">
 <h4 id="_properties_9">Properties</h4>
+<div class="sect4">
+<h5 id="_looping">looping</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_BUFFER_LOOPING</p>
+</div>
+<div class="paragraph">
+<p>Type: boolean</p>
+</div>
+<div class="paragraph">
+<p>Default Value: 0</p>
+</div>
+<div class="paragraph">
+<p>If true, this node continues playing the same buffer from the beginning after it reaches the end.</p>
+</div>
+</div>
 <div class="sect4">
 <h5 id="_rate">rate</h5>
 <div class="paragraph">
@@ -6228,21 +6243,6 @@ if the buffer is not looping, this can be used to determine when the buffer is e
 if the buffer is configured to loop, the counter will count up every time the end of a loop is reached.
 Note that this property can technically wrap if your buffer node manages to end 2147483647 times.
 This should be impossible, save for the most long-running applications and shortest meaningful buffers.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_looping">looping</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_BUFFER_LOOPING</p>
-</div>
-<div class="paragraph">
-<p>Type: boolean</p>
-</div>
-<div class="paragraph">
-<p>Default Value: 0</p>
-</div>
-<div class="paragraph">
-<p>If true, this node continues playing the same buffer from the beginning after it reaches the end.</p>
 </div>
 </div>
 <div class="sect4">
@@ -6566,50 +6566,21 @@ Delay lines have uses in echo and reverb, as well as many more esoteric effects.
 <div class="sect3">
 <h4 id="_properties_11">Properties</h4>
 <div class="sect4">
-<h5 id="_interpolation_time_2">interpolation_time</h5>
+<h5 id="_delay_max_2">delay_max</h5>
 <div class="paragraph">
-<p>C Enumeration Value: Lav_DELAY_INTERPOLATION_TIME</p>
+<p>C Enumeration Value: Lav_DELAY_DELAY_MAX</p>
 </div>
 <div class="paragraph">
 <p>Type: float</p>
 </div>
 <div class="paragraph">
-<p>Range: [0.001, 'INFINITY']</p>
+<p>Range:</p>
 </div>
 <div class="paragraph">
-<p>Default Value: 0.001</p>
+<p>Default Value: See Description</p>
 </div>
 <div class="paragraph">
-<p>When the delay property is changed, the delay line crossfades between the old position and the new one.
-This property sets how long this crossfade will take.
-Note that for this node, it is impossible to get rid of the crossfade completely.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_delay">delay</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_DELAY_DELAY</p>
-</div>
-<div class="paragraph">
-<p>Type: float</p>
-</div>
-<div class="paragraph">
-<p>Range: dynamic</p>
-</div>
-<div class="paragraph">
-<p>Default Value: 0.0</p>
-</div>
-<div class="paragraph">
-<p>The delay of the delay line in seconds.
-The range of this property depends on the maxDelay parameter to the constructor.</p>
-</div>
-<div class="paragraph">
-<p>Note that values less than 1 sample still introduce delay.</p>
-</div>
-<div class="paragraph">
-<p>If you are going to connect nodes to or otherwise automate one of the delay properties, you need to use this one.
-The delay_samples property exists for advanced DSP applications that sometimes need sample-perfect accuracy.
-Changing delay_samples will cancel automators on this property.</p>
+<p>The max delay as set at the node&#8217;s creation time.</p>
 </div>
 </div>
 <div class="sect4">
@@ -6630,6 +6601,26 @@ Changing delay_samples will cancel automators on this property.</p>
 <p>The feedback coefficient.
 The output of the delay line is fed back into the delay line, multiplied by this coefficient.
 Setting feedback to small values can make echoes, comb filters, and a variety of other effects.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_interpolation_time_2">interpolation_time</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_DELAY_INTERPOLATION_TIME</p>
+</div>
+<div class="paragraph">
+<p>Type: float</p>
+</div>
+<div class="paragraph">
+<p>Range: [0.001, 'INFINITY']</p>
+</div>
+<div class="paragraph">
+<p>Default Value: 0.001</p>
+</div>
+<div class="paragraph">
+<p>When the delay property is changed, the delay line crossfades between the old position and the new one.
+This property sets how long this crossfade will take.
+Note that for this node, it is impossible to get rid of the crossfade completely.</p>
 </div>
 </div>
 <div class="sect4">
@@ -6662,21 +6653,30 @@ You should use this property for one-off delay changes, as automation and node c
 </div>
 </div>
 <div class="sect4">
-<h5 id="_delay_max_2">delay_max</h5>
+<h5 id="_delay">delay</h5>
 <div class="paragraph">
-<p>C Enumeration Value: Lav_DELAY_DELAY_MAX</p>
+<p>C Enumeration Value: Lav_DELAY_DELAY</p>
 </div>
 <div class="paragraph">
 <p>Type: float</p>
 </div>
 <div class="paragraph">
-<p>Range:</p>
+<p>Range: dynamic</p>
 </div>
 <div class="paragraph">
-<p>Default Value: See Description</p>
+<p>Default Value: 0.0</p>
 </div>
 <div class="paragraph">
-<p>The max delay as set at the node&#8217;s creation time.</p>
+<p>The delay of the delay line in seconds.
+The range of this property depends on the maxDelay parameter to the constructor.</p>
+</div>
+<div class="paragraph">
+<p>Note that values less than 1 sample still introduce delay.</p>
+</div>
+<div class="paragraph">
+<p>If you are going to connect nodes to or otherwise automate one of the delay properties, you need to use this one.
+The delay_samples property exists for advanced DSP applications that sometimes need sample-perfect accuracy.
+Changing delay_samples will cancel automators on this property.</p>
 </div>
 </div>
 </div>
@@ -6878,6 +6878,24 @@ Delay lines have uses in echo and reverb, as well as many more esoteric effects.
 <div class="sect3">
 <h4 id="_properties_12">Properties</h4>
 <div class="sect4">
+<h5 id="_delay_max_3">delay_max</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_DELAY_DELAY_MAX</p>
+</div>
+<div class="paragraph">
+<p>Type: float</p>
+</div>
+<div class="paragraph">
+<p>Range:</p>
+</div>
+<div class="paragraph">
+<p>Default Value: See Description</p>
+</div>
+<div class="paragraph">
+<p>The max delay as set at the node&#8217;s creation time.</p>
+</div>
+</div>
+<div class="sect4">
 <h5 id="_interpolation_time_3">interpolation_time</h5>
 <div class="paragraph">
 <p>C Enumeration Value: Lav_DELAY_INTERPOLATION_TIME</p>
@@ -6898,33 +6916,6 @@ Note that for this node, it is impossible to get rid of the crossfade completely
 </div>
 <div class="paragraph">
 <p>On this delay line, the interpolation time is the total duration of a pitch bend caused by moving the delay.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_delay_2">delay</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_DELAY_DELAY</p>
-</div>
-<div class="paragraph">
-<p>Type: float</p>
-</div>
-<div class="paragraph">
-<p>Range: dynamic</p>
-</div>
-<div class="paragraph">
-<p>Default Value: 0.0</p>
-</div>
-<div class="paragraph">
-<p>The delay of the delay line in seconds.
-The range of this property depends on the maxDelay parameter to the constructor.</p>
-</div>
-<div class="paragraph">
-<p>Note that values less than 1 sample still introduce delay.</p>
-</div>
-<div class="paragraph">
-<p>If you are going to connect nodes to or otherwise automate one of the delay properties, you need to use this one.
-The delay_samples property exists for advanced DSP applications that sometimes need sample-perfect accuracy.
-Changing delay_samples will cancel automators on this property.</p>
 </div>
 </div>
 <div class="sect4">
@@ -6957,21 +6948,30 @@ You should use this property for one-off delay changes, as automation and node c
 </div>
 </div>
 <div class="sect4">
-<h5 id="_delay_max_3">delay_max</h5>
+<h5 id="_delay_2">delay</h5>
 <div class="paragraph">
-<p>C Enumeration Value: Lav_DELAY_DELAY_MAX</p>
+<p>C Enumeration Value: Lav_DELAY_DELAY</p>
 </div>
 <div class="paragraph">
 <p>Type: float</p>
 </div>
 <div class="paragraph">
-<p>Range:</p>
+<p>Range: dynamic</p>
 </div>
 <div class="paragraph">
-<p>Default Value: See Description</p>
+<p>Default Value: 0.0</p>
 </div>
 <div class="paragraph">
-<p>The max delay as set at the node&#8217;s creation time.</p>
+<p>The delay of the delay line in seconds.
+The range of this property depends on the maxDelay parameter to the constructor.</p>
+</div>
+<div class="paragraph">
+<p>Note that values less than 1 sample still introduce delay.</p>
+</div>
+<div class="paragraph">
+<p>If you are going to connect nodes to or otherwise automate one of the delay properties, you need to use this one.
+The delay_samples property exists for advanced DSP applications that sometimes need sample-perfect accuracy.
+Changing delay_samples will cancel automators on this property.</p>
 </div>
 </div>
 </div>
@@ -7019,22 +7019,52 @@ Any functionality to change a property on all sources needs to be implemented by
 <div class="sect3">
 <h4 id="_properties_13">Properties</h4>
 <div class="sect4">
-<h5 id="_default_max_distance">default_max_distance</h5>
+<h5 id="_orientation">orientation</h5>
 <div class="paragraph">
-<p>C Enumeration Value: Lav_ENVIRONMENT_DEFAULT_MAX_DISTANCE</p>
+<p>C Enumeration Value: Lav_3D_ORIENTATION</p>
 </div>
 <div class="paragraph">
-<p>Type: float</p>
+<p>Type: float6</p>
 </div>
 <div class="paragraph">
-<p>Range: [0.0, 'INFINITY']</p>
+<p>Default Value: [0.0, 0.0, -1.0, 0.0, 1.0, 0.0]</p>
 </div>
 <div class="paragraph">
-<p>Default Value: 50.0</p>
+<p>The orientation of the listener.
+The first three elements are a vector representing the direction in which the listener is looking
+and the second 3 a vector representing the direction in which a rod pointing out of the top of the listener&#8217;s head would be pointing</p>
 </div>
 <div class="paragraph">
-<p>The default max distance for new sources.
-The max distance of a source is the maximum distance at which that source will be audible.</p>
+<p>This property packs these vectors because they must never be modified separately.
+Additionally, they should both be unit vectors and must also be orthoganal.</p>
+</div>
+<div class="paragraph">
+<p>the default situates the listener such that positive x is right, positive y is up, and positive z is behind the listener.
+The setting (0, 1, 0, 0, 0, 1) will situate the listener such that
+positive x is right and positive y is forward.
+For those not familiar with trigonometry and who wish to consider positive x east and positivve y north, the following formula
+will turn the listener to face a scertain direction specified in radians clockwise of north:
+(sin(theta), cos(theta), 0, 0, 0, 1).
+As usual, note that radians=degrees*PI/180.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_default_distance_model">default_distance_model</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_ENVIRONMENT_DEFAULT_DISTANCE_MODEL</p>
+</div>
+<div class="paragraph">
+<p>Type: int</p>
+</div>
+<div class="paragraph">
+<p>Range: A value from the <a href="#enum-Lav_DISTANCE_MODELS">Lav_DISTANCE_MODELS</a> enumeration.</p>
+</div>
+<div class="paragraph">
+<p>Default Value: Lav_DISTANCE_MODEL_LINEAR</p>
+</div>
+<div class="paragraph">
+<p>The default distance model for newly created sources.
+Distance models control how quickly sources get quieter as they move away from the listener.</p>
 </div>
 </div>
 <div class="sect4">
@@ -7103,70 +7133,22 @@ or where the app changes the panning strategies of sources after creation.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_default_panning_strategy">default_panning_strategy</h5>
+<h5 id="_default_max_distance">default_max_distance</h5>
 <div class="paragraph">
-<p>C Enumeration Value: Lav_ENVIRONMENT_DEFAULT_PANNER_STRATEGY</p>
-</div>
-<div class="paragraph">
-<p>Type: int</p>
+<p>C Enumeration Value: Lav_ENVIRONMENT_DEFAULT_MAX_DISTANCE</p>
 </div>
 <div class="paragraph">
-<p>Range: A value from the <a href="#enum-Lav_PANNING_STRATEGIES">Lav_PANNING_STRATEGIES</a> enumeration.</p>
+<p>Type: float</p>
 </div>
 <div class="paragraph">
-<p>Default Value: 1</p>
+<p>Range: [0.0, 'INFINITY']</p>
 </div>
 <div class="paragraph">
-<p>the default panner strategy for the internal panner of new sources.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_default_distance_model">default_distance_model</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_ENVIRONMENT_DEFAULT_DISTANCE_MODEL</p>
+<p>Default Value: 50.0</p>
 </div>
 <div class="paragraph">
-<p>Type: int</p>
-</div>
-<div class="paragraph">
-<p>Range: A value from the <a href="#enum-Lav_DISTANCE_MODELS">Lav_DISTANCE_MODELS</a> enumeration.</p>
-</div>
-<div class="paragraph">
-<p>Default Value: Lav_DISTANCE_MODEL_LINEAR</p>
-</div>
-<div class="paragraph">
-<p>The default distance model for newly created sources.
-Distance models control how quickly sources get quieter as they move away from the listener.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_orientation">orientation</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_3D_ORIENTATION</p>
-</div>
-<div class="paragraph">
-<p>Type: float6</p>
-</div>
-<div class="paragraph">
-<p>Default Value: [0.0, 0.0, -1.0, 0.0, 1.0, 0.0]</p>
-</div>
-<div class="paragraph">
-<p>The orientation of the listener.
-The first three elements are a vector representing the direction in which the listener is looking
-and the second 3 a vector representing the direction in which a rod pointing out of the top of the listener&#8217;s head would be pointing</p>
-</div>
-<div class="paragraph">
-<p>This property packs these vectors because they must never be modified separately.
-Additionally, they should both be unit vectors and must also be orthoganal.</p>
-</div>
-<div class="paragraph">
-<p>the default situates the listener such that positive x is right, positive y is up, and positive z is behind the listener.
-The setting (0, 1, 0, 0, 0, 1) will situate the listener such that
-positive x is right and positive y is forward.
-For those not familiar with trigonometry and who wish to consider positive x east and positivve y north, the following formula
-will turn the listener to face a scertain direction specified in radians clockwise of north:
-(sin(theta), cos(theta), 0, 0, 0, 1).
-As usual, note that radians=degrees*PI/180.</p>
+<p>The default max distance for new sources.
+The max distance of a source is the maximum distance at which that source will be audible.</p>
 </div>
 </div>
 <div class="sect4">
@@ -7182,6 +7164,24 @@ As usual, note that radians=degrees*PI/180.</p>
 </div>
 <div class="paragraph">
 <p>The position of the listener, in world coordinates.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_default_panning_strategy">default_panning_strategy</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_ENVIRONMENT_DEFAULT_PANNER_STRATEGY</p>
+</div>
+<div class="paragraph">
+<p>Type: int</p>
+</div>
+<div class="paragraph">
+<p>Range: A value from the <a href="#enum-Lav_PANNING_STRATEGIES">Lav_PANNING_STRATEGIES</a> enumeration.</p>
+</div>
+<div class="paragraph">
+<p>Default Value: 1</p>
+</div>
+<div class="paragraph">
+<p>the default panner strategy for the internal panner of new sources.</p>
 </div>
 </div>
 </div>
@@ -7376,62 +7376,6 @@ If a stereo signal is fed into the reverb and the reverb is likewise connected t
 <div class="sect3">
 <h4 id="_properties_14">Properties</h4>
 <div class="sect4">
-<h5 id="_t60">t60</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_FDN_REVERB_T60</p>
-</div>
-<div class="paragraph">
-<p>Type: float</p>
-</div>
-<div class="paragraph">
-<p>Range: [0.0, 'INFINITY']</p>
-</div>
-<div class="paragraph">
-<p>Default Value: 1.0</p>
-</div>
-<div class="paragraph">
-<p>The <code>t60</code> is the time it takes the reverb to decay by 60 decibals.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_delay_modulation_frequency">delay_modulation_frequency</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_FDN_REVERB_DELAY_MODULATION_FREQUENCY</p>
-</div>
-<div class="paragraph">
-<p>Type: float</p>
-</div>
-<div class="paragraph">
-<p>Range: [0.0, 500.0]</p>
-</div>
-<div class="paragraph">
-<p>Default Value: 10.0</p>
-</div>
-<div class="paragraph">
-<p>Controls how fast the internal delay lines modulate.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_delay_modulation_depth">delay_modulation_depth</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_FDN_REVERB_DELAY_MODULATION_DEPTH</p>
-</div>
-<div class="paragraph">
-<p>Type: float</p>
-</div>
-<div class="paragraph">
-<p>Range: [0.0, 1.0]</p>
-</div>
-<div class="paragraph">
-<p>Default Value: 0.0</p>
-</div>
-<div class="paragraph">
-<p>Controls how deep the modulation of the delay lines is.
-Increasing this property slightly makes the late reverb sound less metallic, while extremely high values add chorus-like effects.
-This property acts as a multiplier, and the correspondance between it and physical units is intentionally left unspecified.</p>
-</div>
-</div>
-<div class="sect4">
 <h5 id="_density">density</h5>
 <div class="paragraph">
 <p>C Enumeration Value: Lav_FDN_REVERB_DENSITY</p>
@@ -7469,6 +7413,62 @@ Extremely low values sound "grainy"; extremely high values tend to resonate.</p>
 Lowering this property leads to softer and less harsh reverb.</p>
 </div>
 </div>
+<div class="sect4">
+<h5 id="_delay_modulation_depth">delay_modulation_depth</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_FDN_REVERB_DELAY_MODULATION_DEPTH</p>
+</div>
+<div class="paragraph">
+<p>Type: float</p>
+</div>
+<div class="paragraph">
+<p>Range: [0.0, 1.0]</p>
+</div>
+<div class="paragraph">
+<p>Default Value: 0.0</p>
+</div>
+<div class="paragraph">
+<p>Controls how deep the modulation of the delay lines is.
+Increasing this property slightly makes the late reverb sound less metallic, while extremely high values add chorus-like effects.
+This property acts as a multiplier, and the correspondance between it and physical units is intentionally left unspecified.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_delay_modulation_frequency">delay_modulation_frequency</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_FDN_REVERB_DELAY_MODULATION_FREQUENCY</p>
+</div>
+<div class="paragraph">
+<p>Type: float</p>
+</div>
+<div class="paragraph">
+<p>Range: [0.0, 500.0]</p>
+</div>
+<div class="paragraph">
+<p>Default Value: 10.0</p>
+</div>
+<div class="paragraph">
+<p>Controls how fast the internal delay lines modulate.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_t60">t60</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_FDN_REVERB_T60</p>
+</div>
+<div class="paragraph">
+<p>Type: float</p>
+</div>
+<div class="paragraph">
+<p>Range: [0.0, 'INFINITY']</p>
+</div>
+<div class="paragraph">
+<p>Default Value: 1.0</p>
+</div>
+<div class="paragraph">
+<p>The <code>t60</code> is the time it takes the reverb to decay by 60 decibals.</p>
+</div>
+</div>
 </div>
 </div>
 <div class="sect2">
@@ -7496,74 +7496,6 @@ Each input and output pair represent the input and output of a specific delay li
 </div>
 <div class="sect3">
 <h4 id="_properties_15">Properties</h4>
-<div class="sect4">
-<h5 id="_delay_max_4">delay_max</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_FDN_MAX_DELAY</p>
-</div>
-<div class="paragraph">
-<p>Type: float</p>
-</div>
-<div class="paragraph">
-<p>Range:</p>
-</div>
-<div class="paragraph">
-<p>Default Value: See Description</p>
-</div>
-<div class="paragraph">
-<p>The maximum delay any of the internal delay lines may be set to.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_delays">delays</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_FDN_DELAYS</p>
-</div>
-<div class="paragraph">
-<p>Type: float_array</p>
-</div>
-<div class="paragraph">
-<p>Default Value: See Description</p>
-</div>
-<div class="paragraph">
-<p>The lengths of the delay lines in seconds.
-This array must be <code>channels</code> long.
-All values must be positive and no more than the maximum delay specified to the constructor.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_output_gains">output_gains</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_FDN_OUTPUT_GAINS</p>
-</div>
-<div class="paragraph">
-<p>Type: float_array</p>
-</div>
-<div class="paragraph">
-<p>Default Value: See Description</p>
-</div>
-<div class="paragraph">
-<p>Allows control of the individual gains of the output.
-These gains do not apply to the feedback path and are only for controlling relative output levels.
-The array for this property allows any floating point values, and must be exactly <code>channels</code> long.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_filter_types">filter_types</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_FDN_FILTER_TYPES</p>
-</div>
-<div class="paragraph">
-<p>Type: int_array</p>
-</div>
-<div class="paragraph">
-<p>Default Value: See Description</p>
-</div>
-<div class="paragraph">
-<p>Allows insertion of filters in the feedback paths.
-These filters can be individually enabled and disabled; the default is disabled.</p>
-</div>
-</div>
 <div class="sect4">
 <h5 id="_matrix">matrix</h5>
 <div class="paragraph">
@@ -7601,6 +7533,74 @@ The supplied array must have a length equal to the square of the channels specif
 <div class="paragraph">
 <p>The frequencies of the filters.
 The range of this property is 0 to Nyquist, or half the sampling rate.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_delay_max_4">delay_max</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_FDN_MAX_DELAY</p>
+</div>
+<div class="paragraph">
+<p>Type: float</p>
+</div>
+<div class="paragraph">
+<p>Range:</p>
+</div>
+<div class="paragraph">
+<p>Default Value: See Description</p>
+</div>
+<div class="paragraph">
+<p>The maximum delay any of the internal delay lines may be set to.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_output_gains">output_gains</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_FDN_OUTPUT_GAINS</p>
+</div>
+<div class="paragraph">
+<p>Type: float_array</p>
+</div>
+<div class="paragraph">
+<p>Default Value: See Description</p>
+</div>
+<div class="paragraph">
+<p>Allows control of the individual gains of the output.
+These gains do not apply to the feedback path and are only for controlling relative output levels.
+The array for this property allows any floating point values, and must be exactly <code>channels</code> long.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_delays">delays</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_FDN_DELAYS</p>
+</div>
+<div class="paragraph">
+<p>Type: float_array</p>
+</div>
+<div class="paragraph">
+<p>Default Value: See Description</p>
+</div>
+<div class="paragraph">
+<p>The lengths of the delay lines in seconds.
+This array must be <code>channels</code> long.
+All values must be positive and no more than the maximum delay specified to the constructor.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_filter_types">filter_types</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_FDN_FILTER_TYPES</p>
+</div>
+<div class="paragraph">
+<p>Type: int_array</p>
+</div>
+<div class="paragraph">
+<p>Default Value: See Description</p>
+</div>
+<div class="paragraph">
+<p>Allows insertion of filters in the feedback paths.
+These filters can be individually enabled and disabled; the default is disabled.</p>
 </div>
 </div>
 </div>
@@ -7815,76 +7815,6 @@ If feedback is applied, it is this filtered output that is used.</p>
 <div class="sect3">
 <h4 id="_properties_16">Properties</h4>
 <div class="sect4">
-<h5 id="_feedback_2">feedback</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_FILTERED_DELAY_FEEDBACK</p>
-</div>
-<div class="paragraph">
-<p>Type: float</p>
-</div>
-<div class="paragraph">
-<p>Range: ['-INFINITY', 'INFINITY']</p>
-</div>
-<div class="paragraph">
-<p>Default Value: 0.0</p>
-</div>
-<div class="paragraph">
-<p>The feedback coefficient.
-The output of the delay line is fed back into the delay line, multiplied by this coefficient.
-Setting feedback to small values can make echoes, comb filters, and a variety of other effects.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_delay_max_5">delay_max</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_FILTERED_DELAY_DELAY_MAX</p>
-</div>
-<div class="paragraph">
-<p>Type: float</p>
-</div>
-<div class="paragraph">
-<p>Range:</p>
-</div>
-<div class="paragraph">
-<p>Default Value: See Description</p>
-</div>
-<div class="paragraph">
-<p>The max delay as set at the node&#8217;s creation time.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_q_2">q</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_FILTERED_DELAY_Q</p>
-</div>
-<div class="paragraph">
-<p>Type: float</p>
-</div>
-<div class="paragraph">
-<p>Range: [0.001, 'INFINITY']</p>
-</div>
-<div class="paragraph">
-<p>Default Value: 0.5</p>
-</div>
-<div class="paragraph">
-<p>Q is a mathematically complex parameter, a full description of which is beyond the scope of this manual.
-For lowpass, bandpass, and high pass filters, Q can be interpreted as a measure of resonation.
-For Q&#8656;0.5, the filter is said to be damped:
-it will cut frequencies.
-For Q&gt;0.5, however, some frequencies are likely to be boosted.</p>
-</div>
-<div class="paragraph">
-<p>Q controls the bandwidth for the bandpass and peaking filter types
-as well as the slope for the shelving EQ.</p>
-</div>
-<div class="paragraph">
-<p>For everything except the peaking filter, this property follows the normal definition of Q in the electrical engineering literature.
-For more specifics, see the Audio EQ Cookbook.
-It is found here:
-<a href="http://www.musicdsp.org/files/Audio-EQ-Cookbook.txt" class="bare">http://www.musicdsp.org/files/Audio-EQ-Cookbook.txt</a></p>
-</div>
-</div>
-<div class="sect4">
 <h5 id="_filter_type_2">filter_type</h5>
 <div class="paragraph">
 <p>C Enumeration Value: Lav_FILTERED_DELAY_FILTER_TYPE</p>
@@ -7904,22 +7834,21 @@ This determines the interpretations of the other properties on this node.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_frequency_6">frequency</h5>
+<h5 id="_delay_max_5">delay_max</h5>
 <div class="paragraph">
-<p>C Enumeration Value: Lav_FILTERED_DELAY_FREQUENCY</p>
+<p>C Enumeration Value: Lav_FILTERED_DELAY_DELAY_MAX</p>
 </div>
 <div class="paragraph">
 <p>Type: float</p>
 </div>
 <div class="paragraph">
-<p>Range: [0, 'INFINITY']</p>
+<p>Range:</p>
 </div>
 <div class="paragraph">
-<p>Default Value: 2000.0</p>
+<p>Default Value: See Description</p>
 </div>
 <div class="paragraph">
-<p>This is the frequency of interest.
-What specifically this means depends on the selected filter type; for example, it is the cutoff frequency for lowpass and highpass.</p>
+<p>The max delay as set at the node&#8217;s creation time.</p>
 </div>
 </div>
 <div class="sect4">
@@ -7961,6 +7890,58 @@ It measures the gain that these filters apply to the part of the signal they boo
 </div>
 </div>
 <div class="sect4">
+<h5 id="_q_2">q</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_FILTERED_DELAY_Q</p>
+</div>
+<div class="paragraph">
+<p>Type: float</p>
+</div>
+<div class="paragraph">
+<p>Range: [0.001, 'INFINITY']</p>
+</div>
+<div class="paragraph">
+<p>Default Value: 0.5</p>
+</div>
+<div class="paragraph">
+<p>Q is a mathematically complex parameter, a full description of which is beyond the scope of this manual.
+For lowpass, bandpass, and high pass filters, Q can be interpreted as a measure of resonation.
+For Q&#8656;0.5, the filter is said to be damped:
+it will cut frequencies.
+For Q&gt;0.5, however, some frequencies are likely to be boosted.</p>
+</div>
+<div class="paragraph">
+<p>Q controls the bandwidth for the bandpass and peaking filter types
+as well as the slope for the shelving EQ.</p>
+</div>
+<div class="paragraph">
+<p>For everything except the peaking filter, this property follows the normal definition of Q in the electrical engineering literature.
+For more specifics, see the Audio EQ Cookbook.
+It is found here:
+<a href="http://www.musicdsp.org/files/Audio-EQ-Cookbook.txt" class="bare">http://www.musicdsp.org/files/Audio-EQ-Cookbook.txt</a></p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_feedback_2">feedback</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_FILTERED_DELAY_FEEDBACK</p>
+</div>
+<div class="paragraph">
+<p>Type: float</p>
+</div>
+<div class="paragraph">
+<p>Range: ['-INFINITY', 'INFINITY']</p>
+</div>
+<div class="paragraph">
+<p>Default Value: 0.0</p>
+</div>
+<div class="paragraph">
+<p>The feedback coefficient.
+The output of the delay line is fed back into the delay line, multiplied by this coefficient.
+Setting feedback to small values can make echoes, comb filters, and a variety of other effects.</p>
+</div>
+</div>
+<div class="sect4">
 <h5 id="_interpolation_time_4">interpolation_time</h5>
 <div class="paragraph">
 <p>C Enumeration Value: Lav_FILTERED_DELAY_INTERPOLATION_TIME</p>
@@ -7978,6 +7959,25 @@ It measures the gain that these filters apply to the part of the signal they boo
 <p>When the delay property is changed, the delay line crossfades between the old position and the new one.
 This property sets how long this crossfade will take.
 Note that for this node, it is impossible to get rid of the crossfade completely.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_frequency_6">frequency</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_FILTERED_DELAY_FREQUENCY</p>
+</div>
+<div class="paragraph">
+<p>Type: float</p>
+</div>
+<div class="paragraph">
+<p>Range: [0, 'INFINITY']</p>
+</div>
+<div class="paragraph">
+<p>Default Value: 2000.0</p>
+</div>
+<div class="paragraph">
+<p>This is the frequency of interest.
+What specifically this means depends on the selected filter type; for example, it is the cutoff frequency for lowpass and highpass.</p>
 </div>
 </div>
 </div>
@@ -8089,42 +8089,6 @@ For a stable filter, the value of this property should usually between -1 and 1.
 <div class="sect3">
 <h4 id="_extra_functions_5">Extra Functions</h4>
 <div class="sect4">
-<h5 id="_configure_allpass">configure_allpass</h5>
-<div class="paragraph">
-<p>Prototype: <code>LavError Lav_firstOrderFilterNodeConfigureAllpass(LavHandle nodeHandle, float frequency)</code></p>
-</div>
-<div class="paragraph">
-<p>Configure this node as an allpass.
-You specify the \(\frac{\pi}{2}\) frequency.
-You get a filter with a phase of \(\pi\) at DC and 0 at Nyquist.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Parameters</caption>
-<colgroup>
-<col style="width: 33%;">
-<col style="width: 33%;">
-<col style="width: 33%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">nodeHandle</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The node to manipulate.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">frequency</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The frequency at which the filter has a phase of \(\frac{\pi}{2}\).  Must be between 0 and Nyquist.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect4">
 <h5 id="_configure_lowpass">configure_lowpass</h5>
 <div class="paragraph">
 <p>Prototype: <code>LavError Lav_firstOrderFilterNodeConfigureLowpass(LavHandle nodeHandle, float frequency)</code></p>
@@ -8190,6 +8154,42 @@ This is identical to the <a href="#node-Lav_OBJTYPE_ONE_POLE_FILTER_NODE">One-Po
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">frequency</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The <code>-3 DB</code> frequency. Must be between 0 and Nyquist.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect4">
+<h5 id="_configure_allpass">configure_allpass</h5>
+<div class="paragraph">
+<p>Prototype: <code>LavError Lav_firstOrderFilterNodeConfigureAllpass(LavHandle nodeHandle, float frequency)</code></p>
+</div>
+<div class="paragraph">
+<p>Configure this node as an allpass.
+You specify the \(\frac{\pi}{2}\) frequency.
+You get a filter with a phase of \(\pi\) at DC and 0 at Nyquist.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Parameters</caption>
+<colgroup>
+<col style="width: 33%;">
+<col style="width: 33%;">
+<col style="width: 33%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">nodeHandle</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The node to manipulate.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">frequency</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The frequency at which the filter has a phase of \(\frac{\pi}{2}\).  Must be between 0 and Nyquist.</p></td>
 </tr>
 </tbody>
 </table>
@@ -8414,22 +8414,22 @@ or an HRTF of your own.</p>
 <div class="sect3">
 <h4 id="_properties_18">Properties</h4>
 <div class="sect4">
-<h5 id="_azimuth_2">azimuth</h5>
+<h5 id="_elevation_2">elevation</h5>
 <div class="paragraph">
-<p>C Enumeration Value: Lav_PANNER_AZIMUTH</p>
+<p>C Enumeration Value: Lav_PANNER_ELEVATION</p>
 </div>
 <div class="paragraph">
 <p>Type: float</p>
 </div>
 <div class="paragraph">
-<p>Range: ['-INFINITY', 'INFINITY']</p>
+<p>Range: [-90.0, 90.0]</p>
 </div>
 <div class="paragraph">
 <p>Default Value: 0.0</p>
 </div>
 <div class="paragraph">
-<p>The horizontal angle of the panner in degrees.
-0 is straight ahead and positive values are clockwise.</p>
+<p>The vertical angle of the panner in degrees.
+0 is horizontal and positive values move upward.</p>
 </div>
 </div>
 <div class="sect4">
@@ -8451,22 +8451,22 @@ Unlike other panner types, the audio artifacts produced by disabling crossfading
 </div>
 </div>
 <div class="sect4">
-<h5 id="_elevation_2">elevation</h5>
+<h5 id="_azimuth_2">azimuth</h5>
 <div class="paragraph">
-<p>C Enumeration Value: Lav_PANNER_ELEVATION</p>
+<p>C Enumeration Value: Lav_PANNER_AZIMUTH</p>
 </div>
 <div class="paragraph">
 <p>Type: float</p>
 </div>
 <div class="paragraph">
-<p>Range: [-90.0, 90.0]</p>
+<p>Range: ['-INFINITY', 'INFINITY']</p>
 </div>
 <div class="paragraph">
 <p>Default Value: 0.0</p>
 </div>
 <div class="paragraph">
-<p>The vertical angle of the panner in degrees.
-0 is horizontal and positive values move upward.</p>
+<p>The horizontal angle of the panner in degrees.
+0 is straight ahead and positive values are clockwise.</p>
 </div>
 </div>
 </div>
@@ -8737,22 +8737,22 @@ For something more nontraditional, use an amplitude panner.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_azimuth_3">azimuth</h5>
+<h5 id="_elevation_3">elevation</h5>
 <div class="paragraph">
-<p>C Enumeration Value: Lav_PANNER_AZIMUTH</p>
+<p>C Enumeration Value: Lav_PANNER_ELEVATION</p>
 </div>
 <div class="paragraph">
 <p>Type: float</p>
 </div>
 <div class="paragraph">
-<p>Range: ['-INFINITY', 'INFINITY']</p>
+<p>Range: [-90.0, 90.0]</p>
 </div>
 <div class="paragraph">
 <p>Default Value: 0.0</p>
 </div>
 <div class="paragraph">
-<p>The horizontal angle of the panner, in degrees.
-0 is straight ahead and positive values are clockwise.</p>
+<p>The vertical angle of the panner, in degrees.
+0 is horizontal and positive values are vertical.</p>
 </div>
 </div>
 <div class="sect4">
@@ -8772,22 +8772,22 @@ Lack of crossfading introduces audible artifacts when the panner is moved and yo
 </div>
 </div>
 <div class="sect4">
-<h5 id="_elevation_3">elevation</h5>
+<h5 id="_azimuth_3">azimuth</h5>
 <div class="paragraph">
-<p>C Enumeration Value: Lav_PANNER_ELEVATION</p>
+<p>C Enumeration Value: Lav_PANNER_AZIMUTH</p>
 </div>
 <div class="paragraph">
 <p>Type: float</p>
 </div>
 <div class="paragraph">
-<p>Range: [-90.0, 90.0]</p>
+<p>Range: ['-INFINITY', 'INFINITY']</p>
 </div>
 <div class="paragraph">
 <p>Default Value: 0.0</p>
 </div>
 <div class="paragraph">
-<p>The vertical angle of the panner, in degrees.
-0 is horizontal and positive values are vertical.</p>
+<p>The horizontal angle of the panner, in degrees.
+0 is straight ahead and positive values are clockwise.</p>
 </div>
 </div>
 </div>
@@ -8871,162 +8871,6 @@ The primary use of this node is for experimentation purposes and the development
 <div class="sect3">
 <h4 id="_extra_functions_7">Extra Functions</h4>
 <div class="sect4">
-<h5 id="_append_biquad">append_biquad</h5>
-<div class="paragraph">
-<p>Prototype: <code>LavError Lav_nestedAllpassNetworkNodeAppendBiquad(LavHandle nodeHandle, int type, double frequency, double dbGain, double q)</code></p>
-</div>
-<div class="paragraph">
-<p>No description available</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Parameters</caption>
-<colgroup>
-<col style="width: 33%;">
-<col style="width: 33%;">
-<col style="width: 33%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">nodeHandle</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The node to manipulate.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>int</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">type</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A value from the <a href="#enum-Lav_BIQUAD_TYPES">Lav_BIQUAD_TYPES</a> enum.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">frequency</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The frequency of interest.  The meaning is determined from the filter type.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">dbGain</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Used for some filter types, namely highshelf, lowshelf, and notch.  values are in DB.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">q</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The q of the filter.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect4">
-<h5 id="_compile">compile</h5>
-<div class="paragraph">
-<p>Prototype: <code>LavError Lav_nestedAllpassNetworkNodeCompile(LavHandle nodeHandle)</code></p>
-</div>
-<div class="paragraph">
-<p>Compile the current set of commands, replace the currently running filter with the new one, and clear the current set of commands.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Parameters</caption>
-<colgroup>
-<col style="width: 33%;">
-<col style="width: 33%;">
-<col style="width: 33%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">nodeHandle</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The node to manipulate.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect4">
-<h5 id="_append_allpass">append_allpass</h5>
-<div class="paragraph">
-<p>Prototype: <code>LavError Lav_nestedAllpassNetworkNodeAppendAllpass(LavHandle nodeHandle, int delay, float coefficient)</code></p>
-</div>
-<div class="paragraph">
-<p>Append an ordinary first-order allpass at the current nesting level.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Parameters</caption>
-<colgroup>
-<col style="width: 33%;">
-<col style="width: 33%;">
-<col style="width: 33%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">nodeHandle</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The node to manipulate.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>int</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">delay</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The delay of the allpass in samples.  Must be at least 1.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">coefficient</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The coefficient of the allpass.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect4">
-<h5 id="_append_one_pole">append_one_pole</h5>
-<div class="paragraph">
-<p>Prototype: <code>LavError Lav_nestedAllpassNetworkNodeAppendOnePole(LavHandle nodeHandle, float frequency, int isHighpass)</code></p>
-</div>
-<div class="paragraph">
-<p>Appenda  one-pole filter.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Parameters</caption>
-<colgroup>
-<col style="width: 33%;">
-<col style="width: 33%;">
-<col style="width: 33%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">nodeHandle</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The node to manipulate.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">frequency</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The <code>-3 DB</code> frequency.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>int</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">isHighpass</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0 for lowpass, 1 for highpass.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect4">
 <h5 id="_append_reader">append_reader</h5>
 <div class="paragraph">
 <p>Prototype: <code>LavError Lav_nestedAllpassNetworkNodeAppendReader(LavHandle nodeHandle, float mul)</code></p>
@@ -9102,6 +8946,74 @@ All appended filters will be appended to the allpass&#8217;s internal delay line
 </table>
 </div>
 <div class="sect4">
+<h5 id="_compile">compile</h5>
+<div class="paragraph">
+<p>Prototype: <code>LavError Lav_nestedAllpassNetworkNodeCompile(LavHandle nodeHandle)</code></p>
+</div>
+<div class="paragraph">
+<p>Compile the current set of commands, replace the currently running filter with the new one, and clear the current set of commands.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Parameters</caption>
+<colgroup>
+<col style="width: 33%;">
+<col style="width: 33%;">
+<col style="width: 33%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">nodeHandle</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The node to manipulate.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect4">
+<h5 id="_append_one_pole">append_one_pole</h5>
+<div class="paragraph">
+<p>Prototype: <code>LavError Lav_nestedAllpassNetworkNodeAppendOnePole(LavHandle nodeHandle, float frequency, int isHighpass)</code></p>
+</div>
+<div class="paragraph">
+<p>Appenda  one-pole filter.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Parameters</caption>
+<colgroup>
+<col style="width: 33%;">
+<col style="width: 33%;">
+<col style="width: 33%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">nodeHandle</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The node to manipulate.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">frequency</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The <code>-3 DB</code> frequency.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>int</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">isHighpass</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0 for lowpass, 1 for highpass.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect4">
 <h5 id="_end_nesting">end_nesting</h5>
 <div class="paragraph">
 <p>Prototype: <code>LavError Lav_nestedAllpassNetworkNodeEndNesting(LavHandle nodeHandle)</code></p>
@@ -9132,6 +9044,148 @@ Behavior is undefined if this function is called without an enclosing allpass fi
 </tbody>
 </table>
 </div>
+<div class="sect4">
+<h5 id="_append_allpass">append_allpass</h5>
+<div class="paragraph">
+<p>Prototype: <code>LavError Lav_nestedAllpassNetworkNodeAppendAllpass(LavHandle nodeHandle, int delay, float coefficient)</code></p>
+</div>
+<div class="paragraph">
+<p>Append an ordinary first-order allpass at the current nesting level.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Parameters</caption>
+<colgroup>
+<col style="width: 33%;">
+<col style="width: 33%;">
+<col style="width: 33%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">nodeHandle</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The node to manipulate.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>int</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">delay</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The delay of the allpass in samples.  Must be at least 1.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">coefficient</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The coefficient of the allpass.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect4">
+<h5 id="_append_biquad">append_biquad</h5>
+<div class="paragraph">
+<p>Prototype: <code>LavError Lav_nestedAllpassNetworkNodeAppendBiquad(LavHandle nodeHandle, int type, double frequency, double dbGain, double q)</code></p>
+</div>
+<div class="paragraph">
+<p>No description available</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Parameters</caption>
+<colgroup>
+<col style="width: 33%;">
+<col style="width: 33%;">
+<col style="width: 33%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">nodeHandle</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The node to manipulate.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>int</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A value from the <a href="#enum-Lav_BIQUAD_TYPES">Lav_BIQUAD_TYPES</a> enum.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">frequency</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The frequency of interest.  The meaning is determined from the filter type.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">dbGain</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Used for some filter types, namely highshelf, lowshelf, and notch.  values are in DB.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">q</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The q of the filter.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="node-Lav_OBJTYPE_GAIN_NODE">No Document Name Available Node</h3>
+<div class="paragraph">
+<p>C Type Identifier: <code>Lav_OBJTYPE_GAIN_NODE</code></p>
+</div>
+<div class="paragraph">
+<p>Constructor: <code>LavError Lav_createGainNode(LavHandle simulationHandle, int channels, LavHandle* destination)</code></p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Inputs</caption>
+<colgroup>
+<col style="width: 33%;">
+<col style="width: 33%;">
+<col style="width: 33%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Index</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Channels</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The number of channels for this input depends on parameters to this node&#8217;s constructor.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The signal whose gain is to be changed.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Outputs</caption>
+<colgroup>
+<col style="width: 33%;">
+<col style="width: 33%;">
+<col style="width: 33%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Index</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Channels</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The number of channels for this input depends on parameters to this node&#8217;s constructor.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The signal with its gain changed.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>This node is essentially in instantiated generic node, offering only the functionality therein
+Its purpose is to allow changing the gain or adding offset to a large collection of nodes.
+One possible use is as a simple mixer: point all the nodes to be mixed at the input, set mul, and then point the output at the destination for the mixed audio.</p>
 </div>
 </div>
 <div class="sect2">
@@ -9203,6 +9257,21 @@ Note that the output is a combination of the current and target inputs while cro
 </div>
 </div>
 <div class="sect4">
+<h5 id="_is_crossfading">is_crossfading</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_CROSSFADER_IS_CROSSFADING</p>
+</div>
+<div class="paragraph">
+<p>Type: boolean</p>
+</div>
+<div class="paragraph">
+<p>Default Value: 0</p>
+</div>
+<div class="paragraph">
+<p>True if we are crossfading, otherwise false.</p>
+</div>
+</div>
+<div class="sect4">
 <h5 id="_target_input">target_input</h5>
 <div class="paragraph">
 <p>C Enumeration Value: Lav_CROSSFADER_TARGET_INPUT</p>
@@ -9221,21 +9290,6 @@ Note that the output is a combination of the current and target inputs while cro
 </div>
 <div class="paragraph">
 <p>When not crossfading, the meaning of the value of this property is meaningless.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_is_crossfading">is_crossfading</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_CROSSFADER_IS_CROSSFADING</p>
-</div>
-<div class="paragraph">
-<p>Type: boolean</p>
-</div>
-<div class="paragraph">
-<p>Default Value: 0</p>
-</div>
-<div class="paragraph">
-<p>True if we are crossfading, otherwise false.</p>
 </div>
 </div>
 </div>
@@ -9303,60 +9357,6 @@ Crossfades of duration 0 do not fire the finished event.</p>
 </tbody>
 </table>
 </div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="node-Lav_OBJTYPE_GAIN_NODE">No Document Name Available Node</h3>
-<div class="paragraph">
-<p>C Type Identifier: <code>Lav_OBJTYPE_GAIN_NODE</code></p>
-</div>
-<div class="paragraph">
-<p>Constructor: <code>LavError Lav_createGainNode(LavHandle simulationHandle, int channels, LavHandle* destination)</code></p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Inputs</caption>
-<colgroup>
-<col style="width: 33%;">
-<col style="width: 33%;">
-<col style="width: 33%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Index</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Channels</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The number of channels for this input depends on parameters to this node&#8217;s constructor.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The signal whose gain is to be changed.</p></td>
-</tr>
-</tbody>
-</table>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Outputs</caption>
-<colgroup>
-<col style="width: 33%;">
-<col style="width: 33%;">
-<col style="width: 33%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Index</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Channels</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The number of channels for this input depends on parameters to this node&#8217;s constructor.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The signal with its gain changed.</p></td>
-</tr>
-</tbody>
-</table>
-<div class="paragraph">
-<p>This node is essentially in instantiated generic node, offering only the functionality therein
-Its purpose is to allow changing the gain or adding offset to a large collection of nodes.
-One possible use is as a simple mixer: point all the nodes to be mixed at the input, set mul, and then point the output at the destination for the mixed audio.</p>
 </div>
 </div>
 <div class="sect2">
@@ -9583,22 +9583,21 @@ Each input corresponds to a panner, starting with the panner set to the lowest a
 <div class="sect3">
 <h4 id="_properties_24">Properties</h4>
 <div class="sect4">
-<h5 id="_strategy_2">strategy</h5>
+<h5 id="_spread">spread</h5>
 <div class="paragraph">
-<p>C Enumeration Value: Lav_PANNER_STRATEGY</p>
+<p>C Enumeration Value: Lav_PANNER_BANK_SPREAD</p>
 </div>
 <div class="paragraph">
-<p>Type: int</p>
+<p>Type: float</p>
 </div>
 <div class="paragraph">
-<p>Range: A value from the <a href="#enum-Lav_PANNING_STRATEGIES">Lav_PANNING_STRATEGIES</a> enumeration.</p>
+<p>Range: [0.0, 360.0]</p>
 </div>
 <div class="paragraph">
-<p>Default Value: Lav_PANNING_STRATEGY_STEREO</p>
+<p>Default Value: 360.0</p>
 </div>
 <div class="paragraph">
-<p>What type of panning to use.
-Possibilities include HRTF, stereo, 5.1, and 7.1 speaker configurations.</p>
+<p>No description available.</p>
 </div>
 </div>
 <div class="sect4">
@@ -9621,21 +9620,38 @@ Possibilities include HRTF, stereo, 5.1, and 7.1 speaker configurations.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_spread">spread</h5>
+<h5 id="_strategy_2">strategy</h5>
 <div class="paragraph">
-<p>C Enumeration Value: Lav_PANNER_BANK_SPREAD</p>
+<p>C Enumeration Value: Lav_PANNER_STRATEGY</p>
 </div>
 <div class="paragraph">
-<p>Type: float</p>
+<p>Type: int</p>
 </div>
 <div class="paragraph">
-<p>Range: [0.0, 360.0]</p>
+<p>Range: A value from the <a href="#enum-Lav_PANNING_STRATEGIES">Lav_PANNING_STRATEGIES</a> enumeration.</p>
 </div>
 <div class="paragraph">
-<p>Default Value: 360.0</p>
+<p>Default Value: Lav_PANNING_STRATEGY_STEREO</p>
 </div>
 <div class="paragraph">
-<p>No description available.</p>
+<p>What type of panning to use.
+Possibilities include HRTF, stereo, 5.1, and 7.1 speaker configurations.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_is_centered">is_centered</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_PANNER_BANK_IS_CENTERED</p>
+</div>
+<div class="paragraph">
+<p>Type: boolean</p>
+</div>
+<div class="paragraph">
+<p>Default Value: 0</p>
+</div>
+<div class="paragraph">
+<p>If true, then the azimuth controls the center of the cone.
+Otherwise, the azimuth controls the left edge of the cone.</p>
 </div>
 </div>
 <div class="sect4">
@@ -9671,22 +9687,6 @@ This is the same as the number of inputs to the node.</p>
 <div class="paragraph">
 <p>Whether or not the panners should crossfade.
 Lack of crossfading introduces audible artifacts when the panner is moved.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_is_centered">is_centered</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_PANNER_BANK_IS_CENTERED</p>
-</div>
-<div class="paragraph">
-<p>Type: boolean</p>
-</div>
-<div class="paragraph">
-<p>Default Value: 0</p>
-</div>
-<div class="paragraph">
-<p>If true, then the azimuth controls the center of the cone.
-Otherwise, the azimuth controls the left edge of the cone.</p>
 </div>
 </div>
 </div>
@@ -10165,81 +10165,6 @@ To hear a source, you must connect its environment to something instead.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_position_3">position</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_3D_POSITION</p>
-</div>
-<div class="paragraph">
-<p>Type: float3</p>
-</div>
-<div class="paragraph">
-<p>Default Value: [0.0, 0.0, 0.0]</p>
-</div>
-<div class="paragraph">
-<p>The position of the source in world coordinates.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_max_reverb_level">max_reverb_level</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_SOURCE_MAX_REVERB_LEVEL</p>
-</div>
-<div class="paragraph">
-<p>Type: float</p>
-</div>
-<div class="paragraph">
-<p>Range: [0.0, 1.0]</p>
-</div>
-<div class="paragraph">
-<p>Default Value: 0.6</p>
-</div>
-<div class="paragraph">
-<p>The maximum amount of audio to be diverted to reverb sends, if any.</p>
-</div>
-<div class="paragraph">
-<p>Behavior is undefined if this property is ever less than Lav_SOURCE_MIN_REVERB_LEVEL.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_panner_strategy">panner_strategy</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_SOURCE_PANNER_STRATEGY</p>
-</div>
-<div class="paragraph">
-<p>Type: int</p>
-</div>
-<div class="paragraph">
-<p>Range: A value from the <a href="#enum-Lav_PANNING_STRATEGIES">Lav_PANNING_STRATEGIES</a> enumeration.</p>
-</div>
-<div class="paragraph">
-<p>Default Value: Lav_PANNING_STRATEGY_STEREO</p>
-</div>
-<div class="paragraph">
-<p>The strategy for the internal multipanner.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_size">size</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_SOURCE_SIZE</p>
-</div>
-<div class="paragraph">
-<p>Type: float</p>
-</div>
-<div class="paragraph">
-<p>Range: [0.0, 'INFINITY']</p>
-</div>
-<div class="paragraph">
-<p>Default Value: 0.0</p>
-</div>
-<div class="paragraph">
-<p>The size of the source.
-Sources are approximated as spheres.
-The size is used to determine the closest point on the source to the listener, and is the radius of this sphere.
-Size currently has no other effect.</p>
-</div>
-</div>
-<div class="sect4">
 <h5 id="_reverb_distance">reverb_distance</h5>
 <div class="paragraph">
 <p>C Enumeration Value: Lav_SOURCE_REVERB_DISTANCE</p>
@@ -10265,6 +10190,101 @@ Lav_SOURCE_DISTANCE_MODEL controls how this crossfading takes place.</p>
 </div>
 </div>
 <div class="sect4">
+<h5 id="_max_distance">max_distance</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_SOURCE_MAX_DISTANCE</p>
+</div>
+<div class="paragraph">
+<p>Type: float</p>
+</div>
+<div class="paragraph">
+<p>Range: [0.0, 'INFINITY']</p>
+</div>
+<div class="paragraph">
+<p>Default Value: 50.0</p>
+</div>
+<div class="paragraph">
+<p>The maximum distance from the listener at which the source will be audible.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_size">size</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_SOURCE_SIZE</p>
+</div>
+<div class="paragraph">
+<p>Type: float</p>
+</div>
+<div class="paragraph">
+<p>Range: [0.0, 'INFINITY']</p>
+</div>
+<div class="paragraph">
+<p>Default Value: 0.0</p>
+</div>
+<div class="paragraph">
+<p>The size of the source.
+Sources are approximated as spheres.
+The size is used to determine the closest point on the source to the listener, and is the radius of this sphere.
+Size currently has no other effect.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_distance_model">distance_model</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_SOURCE_DISTANCE_MODEL</p>
+</div>
+<div class="paragraph">
+<p>Type: int</p>
+</div>
+<div class="paragraph">
+<p>Range: A value from the <a href="#enum-Lav_DISTANCE_MODELS">Lav_DISTANCE_MODELS</a> enumeration.</p>
+</div>
+<div class="paragraph">
+<p>Default Value: Lav_DISTANCE_MODEL_LINEAR</p>
+</div>
+<div class="paragraph">
+<p>The distance model determines how quickly sources get quieter as they move away from the listener.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_panner_strategy">panner_strategy</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_SOURCE_PANNER_STRATEGY</p>
+</div>
+<div class="paragraph">
+<p>Type: int</p>
+</div>
+<div class="paragraph">
+<p>Range: A value from the <a href="#enum-Lav_PANNING_STRATEGIES">Lav_PANNING_STRATEGIES</a> enumeration.</p>
+</div>
+<div class="paragraph">
+<p>Default Value: Lav_PANNING_STRATEGY_STEREO</p>
+</div>
+<div class="paragraph">
+<p>The strategy for the internal multipanner.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_orientation_2">orientation</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_3D_ORIENTATION</p>
+</div>
+<div class="paragraph">
+<p>Type: float6</p>
+</div>
+<div class="paragraph">
+<p>Default Value: [0.0, 0.0, -1.0, 0.0, 1.0, 0.0]</p>
+</div>
+<div class="paragraph">
+<p>The orientation of the source.
+This is not currently used.
+In future, it will be used for sound cones and filters on sources facing away.
+The interpretation is the same as that for the listener: the first 3 values are the direction of the front and the second 3 the direction of the top.
+Note that these must both be unit vectors and that they must be orthoganal.
+They are packed because, also like the listener, they must never be modified separately.</p>
+</div>
+</div>
+<div class="sect4">
 <h5 id="_head_relative">head_relative</h5>
 <div class="paragraph">
 <p>C Enumeration Value: Lav_SOURCE_HEAD_RELATIVE</p>
@@ -10282,6 +10302,27 @@ Lav_SOURCE_DISTANCE_MODEL controls how this crossfading takes place.</p>
 <p>Sources which are head relative interpret their positions in the default coordinate system, relative to the listener.
 Positive x is right, positive y is up, and positive z is behind the listener.
 The orientation and position properties of an environment do not affect head relative sources, making them ideal for such things as footsteps and/or HUD effects that should be panned.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_max_reverb_level">max_reverb_level</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_SOURCE_MAX_REVERB_LEVEL</p>
+</div>
+<div class="paragraph">
+<p>Type: float</p>
+</div>
+<div class="paragraph">
+<p>Range: [0.0, 1.0]</p>
+</div>
+<div class="paragraph">
+<p>Default Value: 0.6</p>
+</div>
+<div class="paragraph">
+<p>The maximum amount of audio to be diverted to reverb sends, if any.</p>
+</div>
+<div class="paragraph">
+<p>Behavior is undefined if this property is ever less than Lav_SOURCE_MIN_REVERB_LEVEL.</p>
 </div>
 </div>
 <div class="sect4">
@@ -10312,59 +10353,18 @@ Libaudioverse therefore chooses to use this scalar quantity and to attempt to do
 </div>
 </div>
 <div class="sect4">
-<h5 id="_distance_model">distance_model</h5>
+<h5 id="_position_3">position</h5>
 <div class="paragraph">
-<p>C Enumeration Value: Lav_SOURCE_DISTANCE_MODEL</p>
-</div>
-<div class="paragraph">
-<p>Type: int</p>
+<p>C Enumeration Value: Lav_3D_POSITION</p>
 </div>
 <div class="paragraph">
-<p>Range: A value from the <a href="#enum-Lav_DISTANCE_MODELS">Lav_DISTANCE_MODELS</a> enumeration.</p>
+<p>Type: float3</p>
 </div>
 <div class="paragraph">
-<p>Default Value: Lav_DISTANCE_MODEL_LINEAR</p>
+<p>Default Value: [0.0, 0.0, 0.0]</p>
 </div>
 <div class="paragraph">
-<p>The distance model determines how quickly sources get quieter as they move away from the listener.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_orientation_2">orientation</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_3D_ORIENTATION</p>
-</div>
-<div class="paragraph">
-<p>Type: float6</p>
-</div>
-<div class="paragraph">
-<p>Default Value: [0.0, 0.0, -1.0, 0.0, 1.0, 0.0]</p>
-</div>
-<div class="paragraph">
-<p>The orientation of the source.
-This is not currently used.
-In future, it will be used for sound cones and filters on sources facing away.
-The interpretation is the same as that for the listener: the first 3 values are the direction of the front and the second 3 the direction of the top.
-Note that these must both be unit vectors and that they must be orthoganal.
-They are packed because, also like the listener, they must never be modified separately.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_max_distance">max_distance</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_SOURCE_MAX_DISTANCE</p>
-</div>
-<div class="paragraph">
-<p>Type: float</p>
-</div>
-<div class="paragraph">
-<p>Range: [0.0, 'INFINITY']</p>
-</div>
-<div class="paragraph">
-<p>Default Value: 50.0</p>
-</div>
-<div class="paragraph">
-<p>The maximum distance from the listener at which the source will be audible.</p>
+<p>The position of the source in world coordinates.</p>
 </div>
 </div>
 </div>
@@ -10495,6 +10495,25 @@ They are packed because, also like the listener, they must never be modified sep
 </div>
 </div>
 <div class="sect4">
+<h5 id="_phase_5">phase</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_OSCILLATOR_PHASE</p>
+</div>
+<div class="paragraph">
+<p>Type: float</p>
+</div>
+<div class="paragraph">
+<p>Range: [0.0, 1.0]</p>
+</div>
+<div class="paragraph">
+<p>Default Value: 0.0</p>
+</div>
+<div class="paragraph">
+<p>The phase of the sine node.
+This is measured in periods, not in radians.</p>
+</div>
+</div>
+<div class="sect4">
 <h5 id="_frequency_multiplier_5">frequency_multiplier</h5>
 <div class="paragraph">
 <p>C Enumeration Value: Lav_OSCILLATOR_FREQUENCY_MULTIPLIER</p>
@@ -10513,25 +10532,6 @@ They are packed because, also like the listener, they must never be modified sep
 </div>
 <div class="paragraph">
 <p>This is useful for creating instruments, as the notes of the standard musical scale fall on frequency multiples of a reference pitch, rather than a linear increase.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_phase_5">phase</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_OSCILLATOR_PHASE</p>
-</div>
-<div class="paragraph">
-<p>Type: float</p>
-</div>
-<div class="paragraph">
-<p>Range: [0.0, 1.0]</p>
-</div>
-<div class="paragraph">
-<p>Default Value: 0.0</p>
-</div>
-<div class="paragraph">
-<p>The phase of the sine node.
-This is measured in periods, not in radians.</p>
 </div>
 </div>
 </div>
@@ -10604,42 +10604,6 @@ Still, this is the least expensive of the Libaudioverse equalizers, and is suffi
 <div class="sect3">
 <h4 id="_properties_28">Properties</h4>
 <div class="sect4">
-<h5 id="_midband_dbgain">midband_dbgain</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_THREE_BAND_EQ_MIDBAND_DBGAIN</p>
-</div>
-<div class="paragraph">
-<p>Type: float</p>
-</div>
-<div class="paragraph">
-<p>Range: ['-INFINITY', 'INFINITY']</p>
-</div>
-<div class="paragraph">
-<p>Default Value: 0.0</p>
-</div>
-<div class="paragraph">
-<p>The gain to apply to the middle band of the equalizer.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_highband_dbgain">highband_dbgain</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_THREE_BAND_EQ_HIGHBAND_DBGAIN</p>
-</div>
-<div class="paragraph">
-<p>Type: float</p>
-</div>
-<div class="paragraph">
-<p>Range: ['-INFINITY', 'INFINITY']</p>
-</div>
-<div class="paragraph">
-<p>Default Value: 0.0</p>
-</div>
-<div class="paragraph">
-<p>The gain to apply to the highest frequency band as decibals.</p>
-</div>
-</div>
-<div class="sect4">
 <h5 id="_lowband_dbgain">lowband_dbgain</h5>
 <div class="paragraph">
 <p>C Enumeration Value: Lav_THREE_BAND_EQ_LOWBAND_DBGAIN</p>
@@ -10655,6 +10619,24 @@ Still, this is the least expensive of the Libaudioverse equalizers, and is suffi
 </div>
 <div class="paragraph">
 <p>The gain of the lowest frequency band as decibals.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_highband_frequency">highband_frequency</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_THREE_BAND_EQ_HIGHBAND_FREQUENCY</p>
+</div>
+<div class="paragraph">
+<p>Type: float</p>
+</div>
+<div class="paragraph">
+<p>Range: dynamic</p>
+</div>
+<div class="paragraph">
+<p>Default Value: 1000.0</p>
+</div>
+<div class="paragraph">
+<p>The frequency that divides the middle band from the high band.</p>
 </div>
 </div>
 <div class="sect4">
@@ -10679,21 +10661,39 @@ Still, this is the least expensive of the Libaudioverse equalizers, and is suffi
 </div>
 </div>
 <div class="sect4">
-<h5 id="_highband_frequency">highband_frequency</h5>
+<h5 id="_highband_dbgain">highband_dbgain</h5>
 <div class="paragraph">
-<p>C Enumeration Value: Lav_THREE_BAND_EQ_HIGHBAND_FREQUENCY</p>
+<p>C Enumeration Value: Lav_THREE_BAND_EQ_HIGHBAND_DBGAIN</p>
 </div>
 <div class="paragraph">
 <p>Type: float</p>
 </div>
 <div class="paragraph">
-<p>Range: dynamic</p>
+<p>Range: ['-INFINITY', 'INFINITY']</p>
 </div>
 <div class="paragraph">
-<p>Default Value: 1000.0</p>
+<p>Default Value: 0.0</p>
 </div>
 <div class="paragraph">
-<p>The frequency that divides the middle band from the high band.</p>
+<p>The gain to apply to the highest frequency band as decibals.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_midband_dbgain">midband_dbgain</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_THREE_BAND_EQ_MIDBAND_DBGAIN</p>
+</div>
+<div class="paragraph">
+<p>Type: float</p>
+</div>
+<div class="paragraph">
+<p>Range: ['-INFINITY', 'INFINITY']</p>
+</div>
+<div class="paragraph">
+<p>Default Value: 0.0</p>
+</div>
+<div class="paragraph">
+<p>The gain to apply to the middle band of the equalizer.</p>
 </div>
 </div>
 </div>
@@ -10708,10 +10708,9 @@ Still, this is the least expensive of the Libaudioverse equalizers, and is suffi
 This section concerns itself only with those enumerations that are important by themselves.</p>
 </div>
 <div class="sect2">
-<h3 id="enum-Lav_DISTANCE_MODELS">Lav_DISTANCE_MODELS</h3>
+<h3 id="enum-Lav_PROPERTY_TYPES">Lav_PROPERTY_TYPES</h3>
 <div class="paragraph">
-<p>used in the 3D components of this library.
-Indicates how sound should become quieter as objects move away from the listener.</p>
+<p>Indicates the type of a property.</p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Members</caption>
@@ -10725,16 +10724,107 @@ Indicates how sound should become quieter as objects move away from the listener
 <td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_LINEAR</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Sound falls off as <code>1-(distance/maxDistance)</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_INT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Property holds a 32-bit integer.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_EXPONENTIAL</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Sounds fall off as <code>1/distance</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_FLOAT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Property holds a 32-bit floating point value.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_INVERSE_SQUARE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Sounds fall off as <code>1/min(distance, maxDistance)^2</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_DOUBLE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Property holds a 64-bit double.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_STRING</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Property holds a string.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_FLOAT3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Property holds a float3, a vector of 3 floats.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_FLOAT6</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Property holds a float6, a vector of 6 floats.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_FLOAT_ARRAY</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Property is an array of floats.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_INT_ARRAY</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Property is an array of ints.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_BUFFER</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Property holds a handle to a buffer.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="enum-Lav_LOGGING_LEVELS">Lav_LOGGING_LEVELS</h3>
+<div class="paragraph">
+<p>Possible levels for logging.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Members</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_CRITICAL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Undocumented.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_INFO</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Undocumented.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_DEBUG</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Undocumented.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_OFF</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Undocumented.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="enum-Lav_NODE_STATES">Lav_NODE_STATES</h3>
+<div class="paragraph">
+<p>used to indicate the state of a node.
+This is the value of the node&#8217;s state property and determins how the node is processed.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Members</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NODESTATE_PAUSED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This node is paused.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NODESTATE_PLAYING</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This node advances if other nodes need audio from it.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NODESTATE_ALWAYS_PLAYING</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This node advances always.</p></td>
 </tr>
 </tbody>
 </table>
@@ -10790,168 +10880,6 @@ Indicates how sound should become quieter as objects move away from the listener
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_IDENTITY</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">This filter does nothing.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="enum-Lav_NODE_STATES">Lav_NODE_STATES</h3>
-<div class="paragraph">
-<p>used to indicate the state of a node.
-This is the value of the node&#8217;s state property and determins how the node is processed.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Members</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NODESTATE_PAUSED</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">This node is paused.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NODESTATE_PLAYING</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">This node advances if other nodes need audio from it.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NODESTATE_ALWAYS_PLAYING</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">This node advances always.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="enum-Lav_PANNING_STRATEGIES">Lav_PANNING_STRATEGIES</h3>
-<div class="paragraph">
-<p>Indicates a strategy to use for panning.
-This is mostly for the <a href="#node-Lav_OBJTYPE_MULTIPANNER_NODE">multipanner node</a> and the 3D components of this library.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Members</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_HRTF</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates HRTF panning.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_STEREO</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates stereo panning.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_SURROUND40</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates 4.0 surround sound (quadraphonic) panning.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_SURROUND51</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Undocumented.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_SURROUND71</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates 7.1 surround sound panning.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="enum-Lav_LOGGING_LEVELS">Lav_LOGGING_LEVELS</h3>
-<div class="paragraph">
-<p>Possible levels for logging.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Members</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_CRITICAL</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Undocumented.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_INFO</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Undocumented.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_DEBUG</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Undocumented.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_OFF</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Undocumented.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="enum-Lav_PROPERTY_TYPES">Lav_PROPERTY_TYPES</h3>
-<div class="paragraph">
-<p>Indicates the type of a property.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Members</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_INT</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Property holds a 32-bit integer.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_FLOAT</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Property holds a 32-bit floating point value.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_DOUBLE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Property holds a 64-bit double.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_STRING</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Property holds a string.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_FLOAT3</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Property holds a float3, a vector of 3 floats.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_FLOAT6</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Property holds a float6, a vector of 6 floats.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_FLOAT_ARRAY</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Property is an array of floats.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_INT_ARRAY</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Property is an array of ints.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_BUFFER</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Property holds a handle to a buffer.</p></td>
 </tr>
 </tbody>
 </table>
@@ -11047,12 +10975,84 @@ This is mostly for the <a href="#node-Lav_OBJTYPE_MULTIPANNER_NODE">multipanner 
 </tbody>
 </table>
 </div>
+<div class="sect2">
+<h3 id="enum-Lav_PANNING_STRATEGIES">Lav_PANNING_STRATEGIES</h3>
+<div class="paragraph">
+<p>Indicates a strategy to use for panning.
+This is mostly for the <a href="#node-Lav_OBJTYPE_MULTIPANNER_NODE">multipanner node</a> and the 3D components of this library.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Members</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_HRTF</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates HRTF panning.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_STEREO</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates stereo panning.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_SURROUND40</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates 4.0 surround sound (quadraphonic) panning.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_SURROUND51</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Undocumented.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_SURROUND71</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates 7.1 surround sound panning.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="enum-Lav_DISTANCE_MODELS">Lav_DISTANCE_MODELS</h3>
+<div class="paragraph">
+<p>used in the 3D components of this library.
+Indicates how sound should become quieter as objects move away from the listener.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Members</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_LINEAR</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sound falls off as <code>1-(distance/maxDistance)</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_EXPONENTIAL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sounds fall off as <code>1/distance</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_INVERSE_SQUARE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sounds fall off as <code>1/min(distance, maxDistance)^2</code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-11-18 18:08:59 Greenwich Standard Time
+Last updated 2015-11-18 23:22:34 Greenwich Standard Time
 </div>
 </div>
 <script type="text/x-mathjax-config">
