@@ -3,6 +3,7 @@ from collections import OrderedDict
 import re
 from .. import transformers, get_info, doc_helper
 from . import doc_filters
+import os
 import os.path
 import subprocess
 
@@ -44,8 +45,12 @@ def ctypes_function_helper(func, typedef_prefix):
 
 def post_generate(dir):
     """Make a wheel and build docs."""
-    subprocess.call(["py", "-3", "setup.py", "bdist_wheel", "--universal"], shell=True)
-    subprocess.call(["py", "-3", "setup.py", "build_sphinx"], shell = True  )
+    if os.getenv('APPVEYOR') is not None:
+        version = "-3.5-32"
+    else:
+        version = "-3"
+    subprocess.call(["py", version, "setup.py", "bdist_wheel", "--universal"], shell=True)
+    subprocess.call(["py", version, "setup.py", "build_sphinx"], shell = True  )
 
 def make_python(info):
     #get our directory.

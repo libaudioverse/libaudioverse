@@ -14,7 +14,7 @@ environment:
     secure: QCiljp1jjjC1d8WyllDTJg==
   GIT_PASSWORD:
     secure: o8Y0zRhvBAfOEI3iq+Gumw==
-  PY_PYTHON: 3.5-32
+
 init:
   - git config --global core.autocrlf true
 
