@@ -70,24 +70,24 @@ build_script:
   #Go back, so that after_build works.
   - cd ..
 
-after_build:
+#after_build:
   #Docs
-  - echo Deploying docs.
-  - cd tmp
-  - 'git clone https://camlorn:%GIT_PASSWORD%@github.com/camlorn/libaudioverse -b gh-pages --single-branch libaudioverse_docs'
-  - 'cd libaudioverse_docs\docs'
-  - git rm -rf .
-  - 'cp ..\..\..\build\documentation\libaudioverse_manual.html libaudioverse_manual.html'
-  - 'xcopy /I /Q /E ..\..\..\build\bindings\python\docs\_build\html python'
+  #- echo Deploying docs.
+  #- cd tmp
+  #- 'git clone https://camlorn:%GIT_PASSWORD%@github.com/camlorn/libaudioverse -b gh-pages --single-branch libaudioverse_docs'
+  #- 'cd libaudioverse_docs\docs'
+  #- git rm -rf .
+  #- 'cp ..\..\..\build\documentation\libaudioverse_manual.html libaudioverse_manual.html'
+  #- 'xcopy /I /Q /E ..\..\..\build\bindings\python\docs\_build\html python'
   #This either commits or doesn't, if it doesn't it's no loss.
-  - git add -A .
-  - cd ..
-  - 'git commit -m "Update documentation for %APPVEYOR_BUILD_VERSION%"'
-  - git push
-  - cd ../..
+  #- git add -A .
+  #- cd ..
+  #- 'git commit -m "Update documentation for %APPVEYOR_BUILD_VERSION%"'
+  #- git push
+  #- cd ../..
   #And then Pypi, etc.
-  - echo Uploading Windows build to camlorn.net.
-  - py -3 appveyor_upload.py
+  #- echo Uploading Windows build to camlorn.net.
+  #- py -3 appveyor_upload.py
 
 artifacts:
   - path: 'build\libaudioverse_master.zip'
