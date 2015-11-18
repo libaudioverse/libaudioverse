@@ -11,4 +11,5 @@ from . import asciidoc_filters
 
 def prepare_docs(all_info):
     bindings.doc_helper.prepare_docs(all_info,
-    enum =asciidoc_filters.enum, node = asciidoc_filters.node, param = asciidoc_filters.param, codelit=asciidoc_filters.codelit)
+    enum =asciidoc_filters.enum, node = asciidoc_filters.node, param = asciidoc_filters.param, codelit=asciidoc_filters.codelit,
+    latex = asciidoc_filters.latex)

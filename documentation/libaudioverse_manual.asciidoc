@@ -1,4 +1,6 @@
 = Libaudioverse 0.8 Reference Manual
+Austin Hicks
+:stem: latexmath
 :toc:
 :toclevels: 1
 

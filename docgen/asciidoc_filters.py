@@ -16,3 +16,6 @@ def param(all_info, x):
 
 def codelit(all_info, x):
     return "`{}`".format(x)
+
+def latex(all_info, s):
+    return "stem:[{}]".format(s)
