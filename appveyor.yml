@@ -70,7 +70,8 @@ build_script:
   #Go back, so that after_build works.
   - cd ..
 
-#after_build:
+after_build:
+  - py -3 -v
   #Docs
   #- echo Deploying docs.
   #- cd tmp
