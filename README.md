@@ -30,6 +30,23 @@ here is an overview of the offered nodes:
 
 NOTE: This is pre-alpha and currently only supports Windows.  Ports to Linux and Mac are planned.
 
+##Documentation and Examples##
+
+There are two sources of Libaudioverse documentation.
+
+The first is the [language-agnostic manual](http://camlorn.github.io/libaudioverse/docs/libaudioverse_manual.html), which discusses Libaudioverse from a general perspective.
+This manual contains the reference for the C API and an overview of Libaudioverse's core concepts.
+Most examples in this manual are in Python.
+
+The second source of documentation is the API reference for your language of choice.
+At the moment, this means [the Python API reference](http://camlorn.github.io/libaudioverse/python/index.html).
+The API references contain installation instructions and any notes specific to the language in question.
+
+Examples for all supported languages may be found in the [GitHub repository](http://github.com/camlorn/libaudioverse).
+These sets of examples aim to be equivalent and to demonstrate most critical features of Libaudioverse.
+This library is easy.
+in many cases, the examples will be enough to get you started.
+
 ##Binaries and Support##
 
 Libaudioverse's CI server currently uploads snapshots of the master branch containing everything you need to get started on Windows.  You can get it [here](http://camlorn.net/releases/libaudioverse/libaudioverse_master.zip).
