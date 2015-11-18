@@ -45,7 +45,7 @@ The API references contain installation instructions and any notes specific to t
 Examples for all supported languages may be found in the [GitHub repository](http://github.com/camlorn/libaudioverse).
 These sets of examples aim to be equivalent and to demonstrate most critical features of Libaudioverse.
 This library is easy.
-in many cases, the examples will be enough to get you started.
+In many cases, the examples will be enough to get you started.
 
 ##Binaries and Support##
 
