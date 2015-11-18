@@ -53,7 +53,7 @@ def make_python(info):
     #prepare our docs:
     doc_helper.prepare_docs(info,
     node=doc_filters.node, param=doc_filters.param, enum = doc_filters.enum,
-    codelit=doc_filters.codelit)
+    codelit=doc_filters.codelit, latex = doc_filters.latex)
     #we have to inject into the global namespace: the templates should not have to move typedef info around for us.
     global typedefs
     typedefs = info['typedefs']

@@ -41,6 +41,8 @@ The second is the string to transform."""
 
     for name, d in all_info['metadata']['nodes'].items():
         d['doc_description'] = render(d.get('doc_description', no_doc_description))
+        for prop in d.get('properties', dict()).values():
+            prop['doc_description'] = render(prop.get('doc_description', ""))
         for name, func in d.get('extra_functions', dict()).items():
             prepare_function(func)
         #callbacks are function-like enough:

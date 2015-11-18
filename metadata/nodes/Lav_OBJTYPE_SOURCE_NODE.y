@@ -102,7 +102,7 @@ properties:
       
       It is extremely difficult to map occlusion to a physical quantity.
       In the real world, occlusion depends on mass, density, molecular structure, and a huge number of other factors.
-      Libaudioverse therefore chooses to use this scalar quantity and to attempt to "do the right thing."
+      Libaudioverse therefore chooses to use this scalar quantity and to attempt to do the right thing.
 extra_functions:
   Lav_sourceNodeFeedEffect:
     doc_description: |

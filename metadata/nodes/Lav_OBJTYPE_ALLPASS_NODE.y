@@ -38,7 +38,6 @@ outputs:
   - [constructor, "The filtered signal."]
 doc_name: allpass
 doc_description: |
-  Implements a first-order allpass filter whose transfer function is {{"\frac{c+Z^{-d} }{1 + cZ^{-d} }"|latex}} where {{"c"|codelit}} is the coefficient and {{"d"|codelit}} the delay in samples.
+  Implements a first-order allpass filter whose transfer function is {{"\\frac{c+Z^{-d} }{1 + cZ^{-d} }"|latex}} where {{"c"|codelit}} is the coefficient and {{"d"|codelit}} the delay in samples.
   
   This filter is useful in various reverb designs.
-  It can be thought of as a series of decaying echoes recurring every {{"delay_samples"|codelit}} samples, whose starting amplitude and overall decay time are controlled by the {{"delay_samples"|codelit}} property.
