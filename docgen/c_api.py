@@ -27,9 +27,9 @@ def make_c_api(all_info):
         verify_all_parameters_documented(all_info, all_info['metadata']['functions'])
     env = jinja2.Environment(loader=jinja2.PackageLoader(__package__, ""), undefined=jinja2.StrictUndefined, trim_blocks=True)
     env.filters.update(transformers.get_jinja2_filters(all_info))
+    env.filters.update(asciidoc_filters.bound_filters(all_info))
     context=dict()
     context.update(all_info)
     context['functions_by_category'] = functions_by_category
     template=env.get_template("c_api.t")
-
     return template.render(context)

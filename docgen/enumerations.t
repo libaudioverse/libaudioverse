@@ -7,6 +7,7 @@ This section concerns itself only with those enumerations that are important by 
 
 {%for name, info in metadata['enumerations'].items()%}
 
+[[enum-{{name}}]]
 === {{name}}
 
 {{info['doc_description']}}

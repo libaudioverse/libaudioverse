@@ -95,7 +95,7 @@ Type: {{propinfo[1]['type']}}
 
 {%if propinfo[1]['type'] in ["int", "float", "double"]%}
 Range: {%if 'value_enum' in propinfo[1]-%}
-A value from the `{{propinfo[1]['value_enum']}}` enumeration.
+A value from the {{propinfo[1]['value_enum']|enum}} enumeration.
 {%else-%}
 {{propinfo[1].get('range', '')}}
 {%endif%}
