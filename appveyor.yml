@@ -52,6 +52,7 @@ install:
   - appveyor DownloadFile http://camlorn.net/appveyor/libsndfile32/libsndfile-1.lib
   - cd ..
   - appveyor DownloadFile http://camlorn.net/appveyor/pandoc.exe
+  - appveyor DownloadFile http://camlorn.net/appveyor/jom.exe
   - cd ..
   - set path=c:\projects\libaudioverse\tmp;%path%
   - gem install asciidoctor
@@ -65,9 +66,8 @@ build_script:
   - mkdir build
   - cd build
   #Turn off devmode to make docs be part of all.
-  - 'cmake .. -DLIBAUDIOVERSE_DEVMODE:BOOL=OFF -DLIBSNDFILE_LOCATION:STRING="c:/projects/libaudioverse/tmp"'
-  #-m is parallel build. The other makes it see environment vars.
-  - cmake --build . --config Release --target package -- /m /p:UseEnv=true
+  - 'cmake .. -G "NMake Makefiles JOM" -DLIBAUDIOVERSE_DEVMODE:BOOL=OFF -DLIBSNDFILE_LOCATION:STRING="c:/projects/libaudioverse/tmp"'
+  - cmake --build . --config Release --target package
   #Go back, so that after_build works.
   - cd ..
 
