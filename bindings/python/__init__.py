@@ -47,15 +47,15 @@ def ctypes_function_helper(func, typedef_prefix):
 def post_generate(dir):
     """Make a wheel and build docs."""
     if os.getenv('APPVEYOR') is not None:
-        version = "-3.5-32"
-        print("In Appveyor. Using", version)
+        command = [r"c:\python35\python.exe"]
+        print("In Appveyor. Using", command)
     else:
-        version = "-3"
-        print("Not in Appveyor. Using", version)
+        command = ["py", "-3"]
+        print("Not in Appveyor. Using", command)
     print("Building wheel and documentation for Python bindings.")
     sys.stdout.flush()
-    subprocess.call(["py", version, "setup.py", "bdist_wheel", "--universal"], shell=True)
-    subprocess.call(["py", version, "setup.py", "build_sphinx"], shell = True  )
+    subprocess.call(command + ["setup.py", "bdist_wheel", "--universal"], shell=True)
+    subprocess.call(command + ["setup.py", "build_sphinx"], shell = True  )
 
 def make_python(info):
     #get our directory.
