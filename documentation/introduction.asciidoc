@@ -1,17 +1,16 @@
 == Introduction
 
-Libaudioverse is a system for the development of realtime audio effects and synthesis.  Its capabilities include filters, 3D simulation, oscillators, and a variety of other useful tools needed to construct engaging audio experiences.  The readme provides a detailed overview from the perspective of why you might wish to use Libaudioverse, whereas this manual is focused on how it works.  If you found this manual first, the readme is a much better place to start.
+Libaudioverse is a system for the development of realtime audio effects and synthesis.
+Its capabilities include filters, 3D simulation, oscillators, and a variety of other useful tools needed to construct engaging audio experiences.
+The http://github.com/camlorn/libaudioverse[readme] provides a detailed overview from the perspective of why you might wish to use Libaudioverse, whereas this manual is focused on how it works.
+If you found this manual first, the readme is a much better place to start.
 
 The rest of this manual discusses Libaudioverse from a technical point of view.
 For those looking for tutorials, see <<tutorials,Tutorials>>.
 The <<basics,section discussing basic concepts>> is required reading for anyone wanting to get far.
 When demonstrating concepts, the programming language of choice for this manual is Python, but a discussion of the C API can be found <<c-api,here>>.
 
-=== Some Important Notes On This Manual
-
 Libaudioverse is programming language agnostic.
-If your language supports a thread-safe C FFI including at least 2 levels of pointer indirection, function pointers, and being called from threads that are not the main thread, it is more than possible to get Libaudioverse working for you.
 Where possible, language bindings will contain specific documentation in the format most common to your language of choice, but it is impractical for this manual to cover all languages.
 To that end, this manual uses Python for examples and attempts to avoid discussing specific language features as much as possible.
-
-If you need to bind Libaudioverse to your language, see <<c-api,the description of the C API>>.
+In order to find out if documentation is available for your language, see the http://github.com/camlorn/libaudioverse[readme].
