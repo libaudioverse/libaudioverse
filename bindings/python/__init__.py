@@ -6,6 +6,7 @@ from . import doc_filters
 import os
 import os.path
 import subprocess
+import sys
 
 ctypes_map = {
 'int' : 'ctypes.c_int',
@@ -47,8 +48,12 @@ def post_generate(dir):
     """Make a wheel and build docs."""
     if os.getenv('APPVEYOR') is not None:
         version = "-3.5-32"
+        print("In Appveyor. Using", version)
     else:
         version = "-3"
+        print("Not in Appveyor. Using", version)
+    print("Building wheel and documentation for Python bindings.")
+    sys.stdout.flush()
     subprocess.call(["py", version, "setup.py", "bdist_wheel", "--universal"], shell=True)
     subprocess.call(["py", version, "setup.py", "build_sphinx"], shell = True  )
 
