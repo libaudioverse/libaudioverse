@@ -6,8 +6,6 @@ Austin Hicks
 
 include::introduction.asciidoc[tabsize=4]
 
-include::build_instructions.asciidoc[tabsize=4]
-
 include::tutorials.asciidoc[tabsize=4]
 
 include::basics.asciidoc[tabsize=4]
