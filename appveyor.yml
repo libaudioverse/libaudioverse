@@ -14,6 +14,7 @@ environment:
     secure: QCiljp1jjjC1d8WyllDTJg==
   GIT_PASSWORD:
     secure: o8Y0zRhvBAfOEI3iq+Gumw==
+  PYCMD: 'c:\python35\python.exe'
 
 init:
   - git config --global core.autocrlf true
@@ -27,15 +28,14 @@ configuration:
 
 
 install:
-  - 'c:\python35\python.exe'
-  - "py -3 -m pip install -U setuptools sphinx"
+  - "%PYCMD% -m pip install -U setuptools sphinx"
   #Override pycrypto. 2.6.1 is broken on Python 3 due to an absolute import, so grab the beta:
-  - "py -3 -m pip install https://ftp.dlitz.net/pub/dlitz/crypto/pycrypto/pycrypto-2.7a1.tar.gz"
+  - "%PYCMD% -m pip install https://ftp.dlitz.net/pub/dlitz/crypto/pycrypto/pycrypto-2.7a1.tar.gz"
   #Bring in jinja2, pycparser, etc. Paramiko needs pycrypto.
-  - "py -3 -m pip install jinja2 pycparser pyyaml paramiko wheel twine pypandoc sphinx"
+  - "%PYCMD% -m pip install jinja2 pycparser pyyaml paramiko wheel twine pypandoc sphinx"
   #Numpy and scipy, from my server.
-  - "py -3 -m pip install http://camlorn.net/appveyor/numpy-1.10.1+mkl-cp35-none-win_amd64.whl"
-  - "py -3 -m pip install http://camlorn.net/appveyor/scipy-0.16.0-cp35-none-win_amd64.whl"
+  - "%PYCMD% -m pip install http://camlorn.net/appveyor/numpy-1.10.1+mkl-cp35-none-win_amd64.whl"
+  - "%PYCMD% -m pip install http://camlorn.net/appveyor/scipy-0.16.0-cp35-none-win_amd64.whl"
   #This next one gets a bit interesting: we need to download and silently install libsndfile.
   - mkdir tmp
   - cd tmp
@@ -89,7 +89,7 @@ after_build:
   - cd ../..
   #And then Pypi, etc.
   #- echo Uploading Windows build to camlorn.net.
-  #- py -3 appveyor_upload.py
+  #- %PYCMD% appveyor_upload.py
 
 artifacts:
   - path: 'build\libaudioverse_master.zip'
