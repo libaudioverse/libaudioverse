@@ -89,8 +89,8 @@ after_build:
   - git push
   - cd ../..
   #And then Pypi, etc.
-  #- echo Uploading Windows build to camlorn.net.
-  #- py -3 appveyor_upload.py
+  - echo Uploading Windows build to camlorn.net.
+  - py -3 appveyor_upload.py
 
 artifacts:
   - path: 'build\libaudioverse_master.zip'
