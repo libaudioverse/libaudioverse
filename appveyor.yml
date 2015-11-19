@@ -36,7 +36,7 @@ install:
   - "py -3 -m pip install http://camlorn.net/appveyor/numpy-1.10.1+mkl-cp35-none-win_amd64.whl"
   - "py -3 -m pip install http://camlorn.net/appveyor/scipy-0.16.0-cp35-none-win_amd64.whl"
   #Minimum stuff for setup.py to build the wheel and docs in a 32-bit Python.
-  - 'c:\python35\python -m pip install -U setuptools sphinx pypandoc'
+  - 'c:\python35\python -m pip install -U setuptools sphinx pypandoc wheel'
   #This next one gets a bit interesting: we need to download and silently install libsndfile.
   - mkdir tmp
   - cd tmp
