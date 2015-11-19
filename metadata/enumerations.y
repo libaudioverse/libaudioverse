@@ -58,7 +58,7 @@ enumerations:
       Lav_PANNING_STRATEGY_HRTF: Indicates HRTF panning.
       Lav_PANNING_STRATEGY_STEREO: Indicates stereo panning.
       Lav_PANNING_STRATEGY_SURROUND40: Indicates 4.0 surround sound (quadraphonic) panning.
-      lav_PANNING_STRATEGY_SURROUND51: Indicates 5.1 surround sound panning.
+      Lav_PANNING_STRATEGY_SURROUND51: Indicates 5.1 surround sound panning.
       Lav_PANNING_STRATEGY_SURROUND71: Indicates 7.1 surround sound panning.
   Lav_BIQUAD_TYPES:
     doc_description: |
