@@ -1,8 +1,8 @@
-[[basics]]
-== Basic Concepts of Libaudioverse
+[[technical]]
+== Technical Description Of Libaudioverse
 
-In order to begin using Libaudioverse's 3d components, it is not necessary to fully understand this section.
-For a gentler and much more hands-on introduction, see the tutorials.
+This section of the manual describes Libaudioverse from a high-level perspective and provides technical details required to optimize and troubleshoot your application.
+For a gentler and much more hands-on introduction, see the <<overview,overview>>.
 
 [[basics-simulation]]
 === The Simulation

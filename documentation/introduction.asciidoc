@@ -6,11 +6,9 @@ The http://github.com/camlorn/libaudioverse[readme] provides a detailed overview
 If you found this manual first, the readme is a much better place to start.
 
 The rest of this manual discusses Libaudioverse from a technical point of view.
-For those looking for tutorials, see <<tutorials,Tutorials>>.
-The <<basics,section discussing basic concepts>> is required reading for anyone wanting to get far.
+You probably want to read in order, though advanced readers may prefer to skip to the <<technical,technical overview>>.
 When demonstrating concepts, the programming language of choice for this manual is Python, but a discussion of the C API can be found <<c-api,here>>.
 
 Libaudioverse is programming language agnostic.
 Where possible, language bindings will contain specific documentation in the format most common to your language of choice, but it is impractical for this manual to cover all languages.
-To that end, this manual uses Python for examples and attempts to avoid discussing specific language features as much as possible.
 In order to find out if documentation is available for your language, see the http://github.com/camlorn/libaudioverse[readme].
