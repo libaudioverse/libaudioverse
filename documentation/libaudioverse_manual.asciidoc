@@ -6,9 +6,9 @@ Austin Hicks
 
 include::introduction.asciidoc[tabsize=4]
 
-include::tutorials.asciidoc[tabsize=4]
+include::overview.asciidoc[tabsize=4]
 
-include::basics.asciidoc[tabsize=4]
+include::technical.asciidoc[tabsize=4]
 
 include::binding_notes.asciidoc[tabsize=4]
 
