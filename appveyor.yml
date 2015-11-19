@@ -27,6 +27,7 @@ configuration:
 
 
 install:
+  - 'c:\python35\python.exe'
   - "py -3 -m pip install -U setuptools sphinx"
   #Override pycrypto. 2.6.1 is broken on Python 3 due to an absolute import, so grab the beta:
   - "py -3 -m pip install https://ftp.dlitz.net/pub/dlitz/crypto/pycrypto/pycrypto-2.7a1.tar.gz"
