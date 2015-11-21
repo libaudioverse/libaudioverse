@@ -37,6 +37,10 @@ extra_functions:
     params:
       duration: The duration of the crossfade.
       input: The input to crossfade to.
+callbacks:  
+  finished:
+    doc_description: |
+      Called outside the audio thread when the currently scheduled crossfade finishes.
 inputs: constructor
 outputs:
   - [dynamic, "Depends on the channel count given to the constructor.", "The output of the crossfade."]
