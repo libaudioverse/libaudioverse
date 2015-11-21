@@ -62,7 +62,7 @@ void BufferNode::process() {
 	player.process(buff->getChannels(), &output_buffers[0]);
 	getProperty(Lav_BUFFER_POSITION).setDoubleValue(player.getPosition());
 	for(int i = player.getEndedCount(); i > prevEndedCount; i--) {
-		//Call callback.
+		simulation->enqueueTask(end_callback);
 	}
 	getProperty(Lav_BUFFER_ENDED_COUNT).setIntValue(player.getEndedCount());
 }
@@ -74,6 +74,21 @@ Lav_PUBLIC_FUNCTION LavError Lav_createBufferNode(LavHandle simulationHandle, La
 	LOCK(*simulation);
 	auto retval = createBufferNode(simulation);
 	*destination = outgoingObject<Node>(retval);
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_bufferNodeSetEndCallback(LavHandle nodeHandle, LavParameterlessCallback callback, void* userdata) {
+	PUB_BEGIN
+	auto n = incomingObject<BufferNode>(nodeHandle);
+	LOCK(*n);
+	if(callback) {
+		std::weak_ptr<BufferNode> nw = n;
+		n->end_callback.setCallback([nw, callback, userdata] () {
+			auto s = nw.lock();
+			if(s) callback(outgoingObject(s), userdata);
+		});
+	}
+	else n->end_callback.clear();
 	PUB_END
 }
 

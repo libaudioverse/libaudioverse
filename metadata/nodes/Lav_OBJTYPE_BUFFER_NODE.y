@@ -39,6 +39,10 @@ properties:
       if the buffer is configured to loop, the counter will count up every time the end of a loop is reached.
       Note that this property can technically wrap if your buffer node manages to end 2147483647 times.
       This should be impossible, save for the most long-running applications and shortest meaningful buffers.
+callbacks:
+  end:
+    doc_description: |
+      Called outside the audio threads every time the buffer reaches the end of the audio data.
 inputs: null
 outputs:
   - [ dynamic, "Depends on the currently playing buffer.", "The output from the buffer being played."]

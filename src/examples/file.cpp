@@ -40,8 +40,7 @@ void main(int argc, char** args) {
 	LavHandle limit;
 	ERRCHECK(Lav_createHardLimiterNode(simulation, 2, &limit));
 	ERRCHECK(Lav_nodeConnect(node, 0, limit, 0));
-	//TODO: use the callback.
-	//ERRCHECK(Lav_nodeSetEvent(node, Lav_BUFFER_END_EVENT, endOfBufferCallback, nullptr));
+	ERRCHECK(Lav_bufferNodeSetEndCallback(node, endOfBufferCallback, nullptr));
 	ERRCHECK(Lav_nodeConnectSimulation(limit, 0));
 	//enter the transducer loop.
 	char command[1024];

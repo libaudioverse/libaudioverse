@@ -44,6 +44,7 @@ def cleanup_callback(all_info, name, callback, for_node):
     callback['callback_func'] = callback_func
     callback['callback_typedef'] = callback_typedef
     callback['setter_name'] = setter_name
+    if 'params' not in callback: callback['params'] = dict()
     #Two parameters are special, and present for all callbacks.  Document them:
     callback['params']['nodeHandle'] = "The node which called this callback."
     callback['params']['userdata'] = "The userdata parameter as passed to the setter for this callback."

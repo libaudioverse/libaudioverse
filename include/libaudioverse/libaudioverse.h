@@ -12,6 +12,7 @@ extern "C" {
 
 typedef int LavError;
 typedef int LavHandle;
+typedef void (*LavParameterlessCallback)(LavHandle object, void* userdata);
 
 /**Does whatever is appropriate on a given platform to expose a Libaudioverse function publically.*/
 #ifdef _MSC_VER
@@ -392,6 +393,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createChannelSplitterNode(LavHandle simulationH
 Lav_PUBLIC_FUNCTION LavError Lav_createChannelMergerNode(LavHandle simulationHandle, int channels, LavHandle* destination);
 
 Lav_PUBLIC_FUNCTION LavError Lav_createBufferNode(LavHandle simulationHandle, LavHandle* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_bufferNodeSetEndCallback(LavHandle nodeHandle, LavParameterlessCallback callback, void* userdata);
 
 Lav_PUBLIC_FUNCTION LavError Lav_createBufferTimelineNode(LavHandle simulationHandle, int channels, LavHandle* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_bufferTimelineNodeScheduleBuffer(LavHandle nodeHandle, LavHandle bufferHandle, double time, float pitchBend);
