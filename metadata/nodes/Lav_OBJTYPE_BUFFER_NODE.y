@@ -35,15 +35,10 @@ properties:
     read_only: true
     doc_description: |
       Increments every time the buffer reaches it's end.
-      if the buffer is not looping, this can be used to determine when the buffer is ended, without using the event interface.
+      if the buffer is not looping, this can be used to determine when the buffer is ended, without using the callback.
       if the buffer is configured to loop, the counter will count up every time the end of a loop is reached.
       Note that this property can technically wrap if your buffer node manages to end 2147483647 times.
       This should be impossible, save for the most long-running applications and shortest meaningful buffers.
-events:
-  Lav_BUFFER_END_EVENT:
-    name: end
-    doc_description: |
-      Fires each time this node reaches the end of the associated buffer.
 inputs: null
 outputs:
   - [ dynamic, "Depends on the currently playing buffer.", "The output from the buffer being played."]

@@ -25,14 +25,6 @@ properties:
     default: 0
     doc_description: |
       True if we are crossfading, otherwise false.
-events:
-  Lav_CROSSFADER_FINISHED_EVENT:
-    name: finished
-    doc_description: |
-      Fires when a non-instantaneous crossfade finishes.
-      
-      This event is primarily used for optimization.
-      It should be used to unhook nodes that are no longer needed.
 extra_functions:
   Lav_crossfaderNodeCrossfade:
     doc_description: |

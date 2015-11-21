@@ -5,17 +5,7 @@ properties:
     range: [0.0, INFINITY]
     default: 0.03
     doc_description: |
-      When the remaining audio in the push node has a duration less than this property, the audio event fires.
-events:
-  Lav_PUSH_AUDIO_EVENT:
-    name: audio
-    multifiring_protection: true
-    doc_description: |
-      Fired when the remaining duration of the audio in this node is less than the threshold property.
-  Lav_PUSH_OUT_EVENT:
-    name: out
-    doc_description: |
-      Fired when the node has no more audio at all.
+      When the remaining audio in the push node has a duration less than this property, the audio callback is called.
 extra_functions:
   Lav_pushNodeFeed:
     doc_description: |
