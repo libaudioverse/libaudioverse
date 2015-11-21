@@ -4,7 +4,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include "../libaudioverse.h"
 #include "properties.hpp"
-#include "events.hpp"
 #include "memory.hpp"
 #include "connections.hpp"
 #include <map>
@@ -100,9 +99,7 @@ class Node: public Job {
 	void removePropertyBackref(int ourProperty, std::shared_ptr<Node> toNode, int toProperty);
 	//call pred on all the properties that immediately forward to which.
 	void visitPropertyBackrefs(int which, std::function<void(Property&)> pred);
-	
-	//event helper methods.
-	Event& getEvent(int which);
+
 
 	//meet the lockable concept.
 	//Warning: these aren't virtual because they're just so that our macro works; all locking still forwards to devices.
@@ -128,7 +125,6 @@ class Node: public Job {
 	//These are the back references, used for property callbacks.
 	std::map<int, std::set<std::tuple<std::weak_ptr<Node>, int>, PropertyBackrefComparer>> forwarded_property_backrefs;
 	
-	std::map<int, Event> events;
 	std::vector<float*> input_buffers;
 	std::vector<float*> output_buffers;
 	std::vector<std::shared_ptr<InputConnection>> input_connections;

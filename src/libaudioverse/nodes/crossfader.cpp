@@ -55,7 +55,7 @@ void CrossfaderNode::finishCrossfade() {
 	current_weight = 1.0f;
 	target_weight = 0.0f;
 	crossfading = false;
-	getEvent(Lav_CROSSFADER_FINISHED_EVENT).fire();
+	//Call callback.
 }
 
 void CrossfaderNode::process() {

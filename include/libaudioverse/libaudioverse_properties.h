@@ -13,8 +13,6 @@ It is worth keeping separate because it will grow rapidly and contain documentat
 
 The standard for naming is:
 Lav_NODETYPE_PROPNAME
-or
-Lav_NODETYPE_callbackname_EVENT
 
 Furthermore, all libaudioverse properties are negative.
 
@@ -106,8 +104,6 @@ enum Lav_DELAY_PROPERTIES {
 
 enum Lav_PUSH_NODE_PROPERTIES {
 	Lav_PUSH_THRESHOLD = -1,
-	Lav_PUSH_AUDIO_EVENT = -2,
-	Lav_PUSH_OUT_EVENT = -3,
 };
 
 //biquad objects.
@@ -153,7 +149,6 @@ enum Lav_BUFFER_PROPERTIES {
 	Lav_BUFFER_RATE = -3,
 	Lav_BUFFER_LOOPING = -4,
 	Lav_BUFFER_ENDED_COUNT = -5,
-	Lav_BUFFER_END_EVENT = -1,
 };
 
 enum Lav_CONVOLVER_PROPERTIES {
@@ -183,7 +178,6 @@ enum Lav_CROSSFADER_PROPERTIES {
 	Lav_CROSSFADER_CURRENT_INPUT = -1,
 	Lav_CROSSFADER_TARGET_INPUT = -2,
 	Lav_CROSSFADER_IS_CROSSFADING = -3,
-	Lav_CROSSFADER_FINISHED_EVENT = -4,
 };
 
 enum Lav_ONE_POLE_FILTER_PROPERTIES {

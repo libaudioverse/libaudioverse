@@ -126,24 +126,6 @@ def shutdown():
     _initialized = False
     _lav.shutdown()
 
-class _EventCallbackWrapper(object):
-    r"""Wraps events into something sane.  Do not use externally."""
-
-    def __init__(self, for_node, slot, callback, additional_args):
-        #We have to hold onto the int representation.
-        self.node_handle = for_node.handle.handle
-        self.additional_arguments = additional_args
-        self.slot = slot
-        self.callback = callback
-        self.fptr = _libaudioverse.LavEventCallback(self)
-        _lav.node_set_event(for_node.handle, slot, self.fptr, None)
-
-    def __call__(self, node, userdata):
-        #Throw it in a _HandleBox, and then resurrect.
-        #This is safe because we're in a callback and nodes cannot be deleted from callbacks.
-        actual_node= _resurrect(_lav._HandleBox(self.node_handle))
-        self.callback(actual_node, *self.additional_arguments)
-
 class _CallbackWrapper(object):
 
     def __init__(self, node, cb, additional_args, additional_kwargs):
@@ -576,7 +558,6 @@ class GenericNode(_HandleComparer):
                 _object_states[handle.handle] = dict()
                 self._state = _object_states[handle.handle]
                 self._state['simulation'] = _resurrect(_lav.node_get_simulation(self.handle))
-                self._state['events'] = dict()
                 self._state['callbacks'] = dict()
                 self._state['input_connection_count'] =_lav.node_get_input_connection_count(self)
                 self._state['output_connection_count'] = _lav.node_get_output_connection_count(self)
@@ -638,9 +619,6 @@ class GenericNode(_HandleComparer):
 {%for enumerant, prop in metadata['nodes']['Lav_OBJTYPE_GENERIC_NODE']['properties'].items()%}
 {{macros.implement_property(enumerant, prop)}}
 {%endfor%}
-{%for enumerant, info in metadata['nodes']['Lav_OBJTYPE_GENERIC_NODE'].get('events', dict()).items()%}
-{{macros.implement_event(info['name'], "_libaudioverse." + enumerant, info)}}
-{%endfor%}
 
     def reset(self):
         r"""Perform the node-specific reset operation.
@@ -678,10 +656,6 @@ class {{friendly_name}}Node(GenericNode):
 
 {%for enumerant, prop in property_dict.items()%}
 {{macros.implement_property(enumerant, prop)}}
-
-{%endfor%}
-{%for enumerant, info in metadata['nodes'].get(node_name, dict()).get('events', dict()).items()%}
-{{macros.implement_event(info['name'], "_libaudioverse." + enumerant, info)}}
 
 {%endfor%}
 

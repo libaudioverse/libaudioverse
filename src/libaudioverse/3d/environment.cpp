@@ -139,7 +139,8 @@ void EnvironmentNode::playAsync(std::shared_ptr<Buffer> buffer, float x, float y
 	//If we update the source, it might cull.  We can then reset it to avoid HRTF crossfading.
 	s->update(environment_info);
 	s->reset(); //Avoid crossfading the hrtf.	
-	b->getEvent(Lav_BUFFER_END_EVENT).setHandler([b, e, s, simulation] (std::shared_ptr<Node> unused1, void* unused2) mutable {
+	//This needs rewriting on whatever we replace events with.
+	/*b->getEvent(Lav_BUFFER_END_EVENT).setHandler([b, e, s, simulation] (std::shared_ptr<Node> unused1, void* unused2) mutable {
 		//Recall that events do not hold locks when fired.
 		//So lock the simulation.
 		LOCK(*simulation);
@@ -159,7 +160,7 @@ void EnvironmentNode::playAsync(std::shared_ptr<Buffer> buffer, float x, float y
 		b.reset();
 		s.reset();
 		e.reset();
-	});
+	});*/
 }
 
 std::shared_ptr<Node> EnvironmentNode::getOutputNode() {

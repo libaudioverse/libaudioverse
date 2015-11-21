@@ -60,21 +60,11 @@ Node::Node(int type, std::shared_ptr<Simulation> simulation, unsigned int numInp
 	this->simulation= simulation;
 	//request properties from the metadata module.
 	properties = makePropertyTable(type);
-	//and events.
-	events = makeEventTable(type);
-
 	//Associate properties to this node:
 	for(auto i: properties) {
 		auto &prop = properties[i.first];
 		prop.associateNode(this);
 		prop.associateSimulation(simulation);
-	}
-
-	//Loop through callbacks, associating them with our simulation.
-	//map iterators dont' give references, only operator[].
-	for(auto i: events) {
-		events[i.first].associateSimulation(simulation);
-		events[i.first].associateNode(this);
 	}
 
 	//allocations can be done simply by redirecting through resize after our initialization step.
@@ -341,11 +331,6 @@ void Node::visitPropertyBackrefs(int which, std::function<void(Property&)> pred)
 			pred(n_s->getProperty(w, false));
 		}
 	}
-}
-
-Event& Node::getEvent(int which) {
-	if(events.count(which) == 0) ERROR(Lav_ERROR_RANGE, "Event does not exist.");
-	return events[which];
 }
 
 void Node::lock() {
@@ -832,39 +817,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeGetBufferProperty(LavHandle nodeHandle, int
 	PUB_BEGIN
 	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_BUFFER);
 	*destination = outgoingObject(prop.getBufferValue());
-	PUB_END
-}
-
-//callback setup/configure/retrieval.
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetEventHandler(LavHandle nodeHandle, int event, LavEventCallback *destination) {
-	PUB_BEGIN
-	auto ptr = incomingObject<Node>(nodeHandle);
-	LOCK(*ptr);
-	*destination = ptr->getEvent(event).getExternalHandler();
-	PUB_END
-}
-
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetEventUserDataPointer(LavHandle nodeHandle, int event, void** destination) {
-	PUB_BEGIN
-	auto ptr = incomingObject<Node>(nodeHandle);
-	LOCK(*ptr);
-	*destination = ptr->getEvent(event).getUserData();
-	PUB_END
-}
-
-Lav_PUBLIC_FUNCTION LavError Lav_nodeSetEvent(LavHandle nodeHandle, int event, LavEventCallback handler, void* userData) {
-	PUB_BEGIN
-	auto ptr = incomingObject<Node>(nodeHandle);
-	LOCK(*ptr);
-	auto &ev = ptr->getEvent(event);
-	if(handler) {
-		ev.setHandler([=](std::shared_ptr<Node> o, void* d) { handler(outgoingObject(o), d);});
-		ev.setExternalHandler(handler);
-		ev.setUserData(userData);
-	} else {
-		ev.setHandler(std::function<void(std::shared_ptr<Node>, void*)>());
-		ev.setExternalHandler(nullptr);
-	}
 	PUB_END
 }
 

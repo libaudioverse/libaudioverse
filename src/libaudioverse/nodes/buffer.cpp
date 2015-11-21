@@ -62,7 +62,7 @@ void BufferNode::process() {
 	player.process(buff->getChannels(), &output_buffers[0]);
 	getProperty(Lav_BUFFER_POSITION).setDoubleValue(player.getPosition());
 	for(int i = player.getEndedCount(); i > prevEndedCount; i--) {
-		getEvent(Lav_BUFFER_END_EVENT).fire();
+		//Call callback.
 	}
 	getProperty(Lav_BUFFER_ENDED_COUNT).setIntValue(player.getEndedCount());
 }

@@ -42,7 +42,7 @@ void PushNode::process() {
 		push_offset = 0;
 		resampler->write(workspace+got*push_channels, simulation->getBlockSize()-got);
 		if(fired_out_callback == false) {
-			getEvent(Lav_PUSH_OUT_EVENT).fire();
+			//Call the callback for being out of data.
 			fired_out_callback = true;
 		}
 	}
@@ -54,7 +54,7 @@ void PushNode::process() {
 	float threshold = getProperty(Lav_PUSH_THRESHOLD).getFloatValue();
 	float remaining = resampler->estimateAvailableFrames()/(float)simulation->getSr();
 	if(remaining < threshold) {
-		getEvent(Lav_PUSH_AUDIO_EVENT).fire();
+		//call the low on audio callback.
 	}
 }
 

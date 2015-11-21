@@ -325,14 +325,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_automationLinearRampToValue(LavHandle nodeHandl
 Lav_PUBLIC_FUNCTION LavError Lav_automationSet(LavHandle nodeHandle, int slot, double time, double value);
 Lav_PUBLIC_FUNCTION LavError Lav_automationEnvelope(LavHandle nodeHandle, int slot, double time, double duration, int valuesLength, double *values);
 
-/**events.
-Unlike callbacks, which are dedicated on a per-node basis, events fire in a background thread. It is safe to call the Libaudioverse API from a firing event.
-It is documented which of these will fire more than once.  Most events will wait for you to return from the handler before firing a duplicate event.  It is wise to be as quick as possible.*/
-EXTERN_FUNCTION typedef void (*LavEventCallback)(LavHandle cause, void* userdata);
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetEventHandler(LavHandle nodeHandle, int event, LavEventCallback *destination);
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetEventUserDataPointer(LavHandle nodeHandle, int event, void** destination);
-Lav_PUBLIC_FUNCTION LavError Lav_nodeSetEvent(LavHandle nodeHandle, int event, LavEventCallback handler, void* userData);
-
 /**Performs the node-specific reset operation.
 
 This does not reset properties, merely internal histories and the like.  Specifically what this means depends on the node; see the manual.*/

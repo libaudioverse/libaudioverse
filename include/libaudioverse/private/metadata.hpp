@@ -4,13 +4,11 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include <map>
 #include "properties.hpp"
-#include "events.hpp"
 
 namespace libaudioverse_implementation {
 
 void initializeMetadata();
 std::map<int, Property> makePropertyTable(int objtype);
-std::map<int, Event> makeEventTable(int objtyp);
 const char* getGitRevision();
 const char* getCompilerCFlags();
 const char* getCompilerCxxFlags();

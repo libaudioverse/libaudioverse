@@ -38,7 +38,6 @@ buffer.cpp
 properties.cpp
 initialization.cpp
 memory.cpp
-events.cpp
 simulation.cpp
 logging.cpp
 planner.cpp

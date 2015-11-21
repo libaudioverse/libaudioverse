@@ -606,28 +606,6 @@ functions:
       duration: The duration of the envelope.
       valuesLength: The length of the values array.
       values: The points of the envelope, sampled every {{"duration/valuesLength"|codelit}} seconds.
-  Lav_nodeGetEventHandler:
-    category: nodes
-    doc_description: |
-      Gets an event handler for a specified event.
-    params:
-      event: The index of the event.
-  Lav_nodeGetEventUserDataPointer:
-    category: nodes
-    doc_description: |
-      Get the userdata of the specified event, if any.
-      When event handlers are registered, the userdata is an extra parameter which is passed to them when the event fires.
-    params:
-      event: The index of the event of interest.
-      destination: After a call to this function, contains the value of the userdata pointer if any, otherwise NULL.
-  Lav_nodeSetEvent:
-    category: nodes
-    doc_description: |
-      Set an event handler.
-    params:
-      event: The event's index.
-      handler: The function to use as the event handler.
-      userData: An extra parameter which is passed to the handler.
   Lav_nodeReset:
     category: nodes
     doc_description: |

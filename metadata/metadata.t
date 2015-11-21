@@ -8,7 +8,6 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/libaudioverse3d.h>
 #include <libaudioverse/private/properties.hpp>
-#include <libaudioverse/private/events.hpp>
 #include <libaudioverse/private/metadata.hpp>
 #include <limits>
 #include <tuple>
@@ -37,17 +36,10 @@ namespace libaudioverse_implementation {
 std::map<std::tuple<int, int>, Property> *default_property_instances = nullptr;
 std::map<int, std::set<int>> *properties_by_node_type;
 
-//exactly the same thing for events.
-std::map<std::tuple<int, int>, Event> *default_event_instances = nullptr;
-std::map<int, std::set<int>> *events_by_node_type = nullptr;
-
 void initializeMetadata() {
 	properties_by_node_type = new std::map<int, std::set<int>>();
 	default_property_instances = new std::map<std::tuple<int, int>, Property>();
-	events_by_node_type = new std::map<int, std::set<int>>();
-	default_event_instances = new std::map<std::tuple<int, int>, Event>();
 	Property* tempProp= nullptr; //a temporary that we use a bunch of times.
-	Event *tempevt = nullptr; //similarly for callbacks.
 	{%for objid, propid, prop in joined_properties%}
 	//<%prop['name']%> on <%objid%>
 	{
@@ -84,15 +76,6 @@ void initializeMetadata() {
 	(*properties_by_node_type)[<%objid%>].insert(<%propid%>);
 	}
 	{%endfor%}
-	{#very similar logic for events, but simpler because there's only ever the one type#}
-	{%for objid, evtid, evtinfo in joined_events%}
-	tempevt = new Event();
-	tempevt->setName("<%evtinfo["name"]%>");
-	tempevt->setNoMultifire(<%evtinfo['multifiring_protection']|lower%>);
-	(*default_event_instances)[std::tuple<int, int>(<%objid%>, <%evtid%>)] = *tempevt;
-	delete tempevt;
-	(*events_by_node_type)[<%objid%>].insert(<%evtid%>);
-	{%endfor%}
 }
 
 
@@ -101,15 +84,6 @@ std::map<int, Property> makePropertyTable(int nodetype) {
 	std::map<int, Property> retval;
 	for(auto index: needed) {
 		retval[index] = (*default_property_instances)[std::tuple<int, int>(nodetype, index)];
-	}
-	return retval;
-}
-
-std::map<int, Event> makeEventTable(int nodetype) {
-	std::map<int, Event> retval;
-	std::set<int> needed = (*events_by_node_type)[nodetype];
-	for(auto index: needed) {
-		retval[index] = (*default_event_instances)[std::tuple<int, int>(nodetype, index)];
 	}
 	return retval;
 }
