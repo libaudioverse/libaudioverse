@@ -80,7 +80,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createBufferNode(LavHandle simulationHandle, La
 Lav_PUBLIC_FUNCTION LavError Lav_bufferNodeSetEndCallback(LavHandle nodeHandle, LavParameterlessCallback callback, void* userdata) {
 	PUB_BEGIN
 	auto n = incomingObject<BufferNode>(nodeHandle);
-	LOCK(*n);
 	if(callback) {
 		n->end_callback->setCallback(wrapParameterlessCallback(n, callback, userdata));
 	}

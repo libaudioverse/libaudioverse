@@ -97,7 +97,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_pushNodeFeed(LavHandle nodeHandle, unsigned int
 Lav_PUBLIC_FUNCTION LavError Lav_pushNodeSetLowCallback(LavHandle nodeHandle, LavParameterlessCallback callback, void* userdata) {
 	PUB_BEGIN
 	auto n =  incomingObject<PushNode>(nodeHandle);
-	LOCK(*n);
 	if(callback) n->low_callback->setCallback(wrapParameterlessCallback(n, callback, userdata));
 	else n->low_callback->clear();
 	PUB_END
@@ -106,7 +105,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_pushNodeSetLowCallback(LavHandle nodeHandle, La
 Lav_PUBLIC_FUNCTION LavError Lav_pushNodeSetUnderrunCallback(LavHandle nodeHandle, LavParameterlessCallback callback, void* userdata) {
 	PUB_BEGIN
 	auto n = incomingObject<PushNode>(nodeHandle);
-	LOCK(*n);
 	if(callback) n->underrun_callback->setCallback(wrapParameterlessCallback(n, callback, userdata));
 	else n->underrun_callback->clear();
 	PUB_END

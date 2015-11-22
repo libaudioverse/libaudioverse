@@ -99,7 +99,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_crossfaderNodeCrossfade(LavHandle nodeHandle, f
 Lav_PUBLIC_FUNCTION LavError Lav_crossfaderNodeSetFinishedCallback(LavHandle nodeHandle, LavParameterlessCallback callback, void* userdata) {
 	PUB_BEGIN
 	auto n = incomingObject<CrossfaderNode>(nodeHandle);
-	LOCK(*n);
 	if(callback) {
 		n->finished_callback->setCallback(wrapParameterlessCallback(n, callback, userdata));
 	}
