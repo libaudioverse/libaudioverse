@@ -82,11 +82,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_bufferNodeSetEndCallback(LavHandle nodeHandle, 
 	auto n = incomingObject<BufferNode>(nodeHandle);
 	LOCK(*n);
 	if(callback) {
-		std::weak_ptr<BufferNode> nw = n;
-		n->end_callback->setCallback([nw, callback, userdata] () {
-			auto s = nw.lock();
-			if(s) callback(outgoingObject(s), userdata);
-		});
+		n->end_callback->setCallback(wrapParameterlessCallback(n, callback, userdata));
 	}
 	else n->end_callback->clear();
 	PUB_END

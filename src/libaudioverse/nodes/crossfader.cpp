@@ -101,11 +101,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_crossfaderNodeSetFinishedCallback(LavHandle nod
 	auto n = incomingObject<CrossfaderNode>(nodeHandle);
 	LOCK(*n);
 	if(callback) {
-		auto nw = std::weak_ptr<CrossfaderNode>(n);
-		n->finished_callback->setCallback([nw, callback, userdata] () {
-			auto s = nw.lock();
-			if(s) callback(outgoingObject(s), userdata);
-		});
+		n->finished_callback->setCallback(wrapParameterlessCallback(n, callback, userdata));
 	}
 	else n->finished_callback->clear();
 	PUB_END
