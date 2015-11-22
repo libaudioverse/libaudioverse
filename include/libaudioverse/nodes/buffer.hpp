@@ -21,7 +21,7 @@ class BufferNode: public Node {
 	void bufferChanged();
 	virtual void process();
 	BufferPlayer player;
-	Callback<void()> end_callback;
+	std::shared_ptr<Callback<void()>> end_callback;
 };
 
 std::shared_ptr<Node> createBufferNode(std::shared_ptr<Simulation> simulation);

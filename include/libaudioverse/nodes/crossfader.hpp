@@ -17,7 +17,7 @@ class CrossfaderNode: public Node {
 	//Immediately finish the current crossfade.
 	void finishCrossfade();
 	void process();
-	Callback<void()> finished_callback;
+	std::shared_ptr<Callback<void()>> finished_callback;
 	private:
 	int channels = 0;
 	int current = 0, target = 0;

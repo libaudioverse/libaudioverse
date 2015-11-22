@@ -18,7 +18,7 @@ class PushNode: public Node {
 	~PushNode();
 	void process();
 	void feed(unsigned int length, float* buffer);
-	Callback<void()> low_callback, underrun_callback;
+	std::shared_ptr<Callback<void()>> low_callback, underrun_callback;
 	unsigned int input_sr = 0;
 	std::shared_ptr<speex_resampler_cpp::Resampler> resampler = nullptr;
 	float* workspace = nullptr;

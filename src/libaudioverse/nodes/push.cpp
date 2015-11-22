@@ -42,7 +42,7 @@ void PushNode::process() {
 		push_offset = 0;
 		resampler->write(workspace+got*push_channels, simulation->getBlockSize()-got);
 		if(fired_underrun_callback == false) {
-			simulation->enqueueTask(underrun_callback);
+			simulation->enqueueTask([=] () {(*underrun_callback)();});
 			fired_underrun_callback = true;
 		}
 	}
@@ -54,7 +54,7 @@ void PushNode::process() {
 	float threshold = getProperty(Lav_PUSH_THRESHOLD).getFloatValue();
 	float remaining = resampler->estimateAvailableFrames()/(float)simulation->getSr();
 	if(remaining < threshold && fired_underrun_callback == false) {
-		simulation->enqueueTask(low_callback);
+		simulation->enqueueTask([=] () {(*low_callback)();});
 	}
 }
 
@@ -98,8 +98,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_pushNodeSetLowCallback(LavHandle nodeHandle, La
 	PUB_BEGIN
 	auto n =  incomingObject<PushNode>(nodeHandle);
 	LOCK(*n);
-	if(callback) n->low_callback.setCallback(wrapParameterlessCallback(n, callback, userdata));
-	else n->low_callback.clear();
+	if(callback) n->low_callback->setCallback(wrapParameterlessCallback(n, callback, userdata));
+	else n->low_callback->clear();
 	PUB_END
 }
 
@@ -107,8 +107,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_pushNodeSetUnderrunCallback(LavHandle nodeHandl
 	PUB_BEGIN
 	auto n = incomingObject<PushNode>(nodeHandle);
 	LOCK(*n);
-	if(callback) n->underrun_callback.setCallback(wrapParameterlessCallback(n, callback, userdata));
-	else n->underrun_callback.clear();
+	if(callback) n->underrun_callback->setCallback(wrapParameterlessCallback(n, callback, userdata));
+	else n->underrun_callback->clear();
 	PUB_END
 }
 

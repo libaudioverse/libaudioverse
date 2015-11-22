@@ -62,7 +62,7 @@ void BufferNode::process() {
 	player.process(buff->getChannels(), &output_buffers[0]);
 	getProperty(Lav_BUFFER_POSITION).setDoubleValue(player.getPosition());
 	for(int i = player.getEndedCount(); i > prevEndedCount; i--) {
-		simulation->enqueueTask(end_callback);
+		simulation->enqueueTask([=] () {(*end_callback)();});
 	}
 	getProperty(Lav_BUFFER_ENDED_COUNT).setIntValue(player.getEndedCount());
 }
@@ -83,12 +83,12 @@ Lav_PUBLIC_FUNCTION LavError Lav_bufferNodeSetEndCallback(LavHandle nodeHandle, 
 	LOCK(*n);
 	if(callback) {
 		std::weak_ptr<BufferNode> nw = n;
-		n->end_callback.setCallback([nw, callback, userdata] () {
+		n->end_callback->setCallback([nw, callback, userdata] () {
 			auto s = nw.lock();
 			if(s) callback(outgoingObject(s), userdata);
 		});
 	}
-	else n->end_callback.clear();
+	else n->end_callback->clear();
 	PUB_END
 }
 
