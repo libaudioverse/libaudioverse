@@ -6,6 +6,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "memory.hpp"
 #include <functional>
 #include <memory>
+#include <mutex>
 
 namespace libaudioverse_implementation {
 
@@ -23,15 +24,29 @@ class Callback<ResultT (ArgsT...)> {
 	Callback(std::function<ResultT()> _default): default(_default) {}
 	
 	ResultT operator()(ArgsT... args) {
-	if(callback) return callback(args...);
-	else return default();
+		std::lock_guard<std::recursive_mutex> g(mutex);
+		if(callback) return callback(args...);
+		else return default();
 	}
 	
-	void setDefault(std::function<ResultT(ArgsT...)>f) {default= f;}
-	void setCallback(std::function<ResultT(ArgsT...)> f) {callback = f;}
-	void clear() {callback = nullptr;}
+	void setDefault(std::function<ResultT(ArgsT...)>f) {
+		std::lock_guard<std::recursive_mutex> g(mutex);
+		default= f;
+	}
+
+	void setCallback(std::function<ResultT(ArgsT...)> f) {
+		std::lock_guard<std::recursive_mutex> g(mutex);
+		callback = f;
+	}
+	
+	void clear() {
+		std::lock_guard<std::recursive_mutex> g(mutex);
+		callback = nullptr;
+	}
+	
 	private:
 	std::function<ResultT(ArgsT...)> callback, default;
+	std::recursive_mutex mutex;
 };
 
 inline auto wrapParameterlessCallback(std::shared_ptr<ExternalObject> obj, LavParameterlessCallback cb, void* userdata) {
