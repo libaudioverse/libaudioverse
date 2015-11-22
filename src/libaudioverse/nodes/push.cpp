@@ -41,9 +41,9 @@ void PushNode::process() {
 		memset(push_buffer, 0, sizeof(float)*push_channels*push_frames);
 		push_offset = 0;
 		resampler->write(workspace+got*push_channels, simulation->getBlockSize()-got);
-		if(fired_out_callback == false) {
-			//Call the callback for being out of data.
-			fired_out_callback = true;
+		if(fired_underrun_callback == false) {
+			simulation->enqueueTask(underrun_callback);
+			fired_underrun_callback = true;
 		}
 	}
 	for(unsigned int i = 0; i < push_channels*block_size; i++) {
@@ -53,13 +53,13 @@ void PushNode::process() {
 	}
 	float threshold = getProperty(Lav_PUSH_THRESHOLD).getFloatValue();
 	float remaining = resampler->estimateAvailableFrames()/(float)simulation->getSr();
-	if(remaining < threshold) {
-		//call the low on audio callback.
+	if(remaining < threshold && fired_underrun_callback == false) {
+		simulation->enqueueTask(low_callback);
 	}
 }
 
 void PushNode::feed(unsigned int length, float* buffer) {
-	fired_out_callback = false;
+	fired_underrun_callback = false;
 	if(length%push_channels != 0) ERROR(Lav_ERROR_RANGE, "Length must be a multiple of the configured channels.");
 	unsigned int frames = length/push_channels;
 	unsigned int offset = 0;
@@ -91,6 +91,24 @@ Lav_PUBLIC_FUNCTION LavError Lav_pushNodeFeed(LavHandle nodeHandle, unsigned int
 	LOCK(*node);
 	if(node->getType() != Lav_OBJTYPE_PUSH_NODE) ERROR(Lav_ERROR_TYPE_MISMATCH, "Expected a push node.");
 	std::static_pointer_cast<PushNode>(node)->feed(length, buffer);
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_pushNodeSetLowCallback(LavHandle nodeHandle, LavParameterlessCallback callback, void* userdata) {
+	PUB_BEGIN
+	auto n =  incomingObject<PushNode>(nodeHandle);
+	LOCK(*n);
+	if(callback) n->low_callback.setCallback(wrapParameterlessCallback(n, callback, userdata));
+	else n->low_callback.clear();
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_pushNodeSetUnderrunCallback(LavHandle nodeHandle, LavParameterlessCallback callback, void* userdata) {
+	PUB_BEGIN
+	auto n = incomingObject<PushNode>(nodeHandle);
+	LOCK(*n);
+	if(callback) n->underrun_callback.setCallback(wrapParameterlessCallback(n, callback, userdata));
+	else n->underrun_callback.clear();
 	PUB_END
 }
 

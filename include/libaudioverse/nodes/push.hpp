@@ -4,6 +4,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include "../libaudioverse.h"
 #include "../private/node.hpp"
+#include "../private/callback.hpp"
 #include <speex_resampler_cpp.hpp>
 #include <memory>
 
@@ -17,6 +18,7 @@ class PushNode: public Node {
 	~PushNode();
 	void process();
 	void feed(unsigned int length, float* buffer);
+	Callback<void()> low_callback, underrun_callback;
 	unsigned int input_sr = 0;
 	std::shared_ptr<speex_resampler_cpp::Resampler> resampler = nullptr;
 	float* workspace = nullptr;
@@ -25,7 +27,7 @@ class PushNode: public Node {
 	unsigned int push_channels = 0;
 	unsigned int push_frames = 1024;
 	unsigned int push_offset = 0;
-	bool fired_out_callback = false;
+	bool fired_underrun_callback = false;
 };
 
 std::shared_ptr<Node> createPushNode(std::shared_ptr<Simulation> simulation, unsigned int inputSr, unsigned int channels);
