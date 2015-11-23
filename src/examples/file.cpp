@@ -22,7 +22,7 @@ void endOfBufferCallback(LavHandle ignoredObject, void* ignored) {
 
 void main(int argc, char** args) {
 	if(argc != 2) {
-		printf("Syntax: %s <path>");
+		printf("Syntax: %s <path>", args[0]);
 		return;
 	}
 
