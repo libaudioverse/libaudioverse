@@ -1,4 +1,5 @@
 {%import 'macros.t' as macros with context%}
+[[nodes]]
 == Libaudioverse  Node Reference
 
 This section is an overview of all Libaudioverse nodes.
