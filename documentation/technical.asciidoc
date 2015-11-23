@@ -4,29 +4,39 @@
 This section of the manual describes Libaudioverse from a high-level perspective and provides technical details required to optimize and troubleshoot your application.
 For a gentler and much more hands-on introduction, see the <<overview,overview>>.
 
-[[basics-simulation]]
+[[technical-introduction]]
+=== Introduction
+
+[[tecchnical-object_lifetime]]
+=== Object Lifetime
+
+[[technical-simulation]]
 === The Simulation
 
-[[basics-buffers]]
+[[technical-audio_output]]
+==== Audio Output
+
+[[technical-atomicity]]
+==== Which Operations are Atomic?
+
+[[technical-buffers]]
 === Buffers
 
-[[basics-nodes]]
+[[technical-nodes]]
 === Nodes
 
-[[basics-properties]]
-=== Properties
+[[technical-connections]]
+==== Connections and Automatic Audio Channel Count Conversion
 
-[[basics-connections]]
-=== Connections
- 
-[[basics-channels]]
-=== Channels and Automatic Conversion
+[[technical-properties]]
+==== Properties 
 
-[[basics-audio-processing]]
-=== Audio Processing and Extracting Audio
+[[technical-automation]]
+==== Autiomation and Property Connections
 
-[[basics-devices]]
-=== Audio Devices
 
-[[basics-events-callbacks]]
-=== Events and Callbacks
+[[technical-events-callbacks]]
+==== Callbacks
+
+[[technical-audio_processing_algorithm]]
+=== Pseudocode for the Audio Processing Algorithm
