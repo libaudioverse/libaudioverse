@@ -293,3 +293,99 @@ See the <<node-Lav_OBJTYPE_FDN_REVERB_NODE,documentation>> for more.
 
 You have as many effect sends as you want, limited only by computation capacity.
 Sources have functions to connect and disconnect themselves from effect sends in a fully configurable manner, and you can feel free to make your own custom effects, as well as the ones demonstrated here.
+
+=== Using Automators
+
+This sets up a siren-like effect and then turns off the sine node.
+
+....
+import time
+import libaudioverse
+libaudioverse.initialize()
+
+s=libaudioverse.Simulation()
+n=libaudioverse.SineNode(s)
+
+n.frequency = 300
+n.frequency.llinear_ramp_to_value(1.0, 600)
+n.frequency.linear_ramp_to_value(2.0, 300)
+n.frequency.linear_ramp_to_value(3.0, 600)
+n.frequency.linear_ramp_to_value(4.0, 600)
+n.frequency.linear_ramp_to_value(5.0, 300)
+
+n.mul.set(5.1, 1.0)
+n.mul.linear_ramp_to_value(5.2, 0.0)
+
+n.connect_simulation(0)
+s.set_output_device(-1)
+time.sleep(8.0)
+....
+
+The above example demonstrates automators.
+
+Libaudioverse processes audio in blocks.
+Properties are read and then audio is produced using them.
+The problem with this setup is that there is no way to allow user code to be called more rapidly than once per block, and even then it is possible for user code to miss one due to thread preemption and other such inconveniences.
+
+Consequently, Libaudioverse introduces automators, functions which schedule changes on float and double properties.
+
+The linear ramp is an automator which begins moving the value of the property to the specified value.
+The first argument is the time at which the property much reach the target value erelative to the current time, and the second the value which must be reached.
+Set is a similar function, but instead moves the value instantaneously.
+
+What we do in the above example, therefore, is schedule a triangular sweep of the frequency between 300 HZ and 600 HZ.
+Then we schedule a fade-out using the set and linear ramp.
+
+There are two notable points about automators worth specifically pointing out, though the first may or may not be obvious.
+
+First, the linear ramp and many other automators use the "previous" value of the property.
+To that end, it is necessary to set the property to the starting piont before automating it.
+If you don't, then it will start from wherever it was last set; this may or not be a problem, depending on application structure.
+
+Second, setting a property cancels all pending automators.
+This is to avoid strange conditions and make validation of inputs possible.
+
+Finally, the ssetup with mul is a bit strange.
+Since linear ramps start immediately, it is often necessary to schedule another automator before them.
+Since we don't want mul to start ramping until a bit after 5 seconds, we use the set automator.
+This makes the linear ramp's previous value the endpoint of the set automator, such that it only takes effect afterwords.
+if that line is commented out, the sine node will get progressively quieter for the entire example.
+
+Properties come in two variations, a-rate and k-rate.
+Most properties are k-rate properties, and their value is computed once per block.
+Some are processed as much as every sample, such as the sine node's frequency and the mul propperty on all nodes.
+These are the a-rate properties.
+An advantage of automators is that they are computed per-sample when used on a-rate properties: the times specified in the above sample will not be rounded to the nearest block and updates will not be choppy even if the block size is increased to absurd values.
+
+=== Connecting Nodes to Properties
+
+This example sets up ring modulation.
+As with other examples, you will want to run it interactively; this one is worth experimenting with.
+
+....
+import libaudioverse
+libaudioverse.initialize()
+
+s = libaudioverse.Simulation()
+n1, n2 = SineNode(s), SineNode(s)
+
+n2.mul = 0.0
+
+n1.frequency = 100
+n2.frequency=400
+
+n1.connect_property(0, n2.mul)
+n2.connect_simulation(0)
+s.set_output_device(-1)
+....
+
+The above example shows how to connect  the output of a node to a property on another.
+This works with float and double properties, and all others will throw an error.
+
+The resulting property's value is the current value as set by you or scheduled automators, summed with the value of the node's output.
+As with automators, this type of control can be sample-perfect on a-rate properties.
+Put simply, conneccted nodes act as offsets and not absolute values.
+
+You can connect multiple nodes with the same property.
+They function identically to 1-channel inputs, including downmixing logic.
+While Libaudioverse already has a ringmod node which is admittedly much more efficient, this is the simplest example to demonstrate it with.
