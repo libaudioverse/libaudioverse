@@ -18,13 +18,6 @@ class DoppleringDelayNode: public Node {
 	protected:
 	void delayChanged();
 	void recomputeDelta();
-	//Callbacks for when delay_samples and delay get changed.
-	void updateDelay();
-	void updateDelaySamples();
-	//This flag prevents the above two callbacks from ping-ponging.
-	bool is_syncing_properties = false;
-	//Set to either Lav_DELAY_DELAY or Lav_DELAY_DELAY_SAMPLES if the property changed. Otherwise 0.
-	int last_updated_delay_property = 0;
 	//Standard stuff for delay lines.
 	unsigned int delay_line_length = 0;
 	DoppleringDelayLine **lines;

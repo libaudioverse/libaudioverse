@@ -18,14 +18,6 @@ class CrossfadingDelayNode: public Node {
 	protected:
 	void delayChanged();
 	void recomputeDelta();
-	//These do not touch the line. They keep properties in sync.
-	//updateDelayInSamples is called when delay changes; updateDelay when delay_samples changes.
-	void updateDelaySamples();
-	void updateDelay();
-	//Flag to prevent "ping-pong" in the above callbacks.
-	bool is_syncing_properties = false;
-	//Either 0, Lav_DELAY_DELAY, or Lav_DELAY_DELAY_SAMPLES.
-	int last_updated_delay_property = 0;
 	unsigned int delay_line_length = 0;
 	CrossfadingDelayLine **lines;
 	int channels;

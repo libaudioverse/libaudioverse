@@ -15,19 +15,12 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 namespace libaudioverse_implementation {
 
 DoppleringDelayNode::DoppleringDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, int channels): Node(Lav_OBJTYPE_DOPPLERING_DELAY_NODE, simulation, channels, channels) {
-	if(channels <= 0) ERROR(Lav_ERROR_RANGE, "lineCOunt must be greater than 0.");
+	if(channels <= 0) ERROR(Lav_ERROR_RANGE, "lineCount must be greater than 0.");
 	this->channels = channels;
 	lines = new DoppleringDelayLine*[channels]();
 	for(unsigned int i = 0; i < channels; i++) lines[i] = new DoppleringDelayLine(maxDelay, simulation->getSr());
 	getProperty(Lav_DELAY_DELAY).setFloatRange(0.0f, maxDelay);
-	getProperty(Lav_DELAY_DELAY_SAMPLES).setDoubleRange(0.0, maxDelay*(double)simulation->getSr());
-	//These callbacks link these properties to each other.
-	getProperty(Lav_DELAY_DELAY).setPostChangedCallback([&] () {updateDelaySamples();});
-	getProperty(Lav_DELAY_DELAY_SAMPLES).setPostChangedCallback([&] () {updateDelay();});
-	//finally, set the read-only max delay.
 	getProperty(Lav_DELAY_DELAY_MAX).setFloatValue(maxDelay);
-	//Set us up as though delay just changed.
-	last_updated_delay_property = Lav_DELAY_DELAY;
 	appendInputConnection(0, channels);
 	appendOutputConnection(0, channels);
 }
@@ -47,37 +40,12 @@ void DoppleringDelayNode::recomputeDelta() {
 }
 
 void DoppleringDelayNode::delayChanged() {
-	if(last_updated_delay_property == Lav_DELAY_DELAY) {
-		float newDelay = getProperty(Lav_DELAY_DELAY).getFloatValue();
-		for(int i = 0; i < channels; i++) lines[i]->setDelay(newDelay);
-	}
-	else {
-		int delayInSamples = (int)getProperty(Lav_DELAY_DELAY_SAMPLES).getDoubleValue();
-		for(int i = 0; i < channels; i++) lines[i]->setDelayInSamples(delayInSamples);
-	}
-	last_updated_delay_property = 0;
-}
-
-void DoppleringDelayNode::updateDelaySamples() {
-	if(is_syncing_properties) return; //The other callback is why we were called.
-	double newValue = getProperty(Lav_DELAY_DELAY).getFloatValue()*(double)simulation->getSr();
-	is_syncing_properties = true;
-	getProperty(Lav_DELAY_DELAY_SAMPLES).setDoubleValue(newValue);
-	is_syncing_properties = false;
-	last_updated_delay_property = Lav_DELAY_DELAY;
-}
-
-void DoppleringDelayNode::updateDelay() {
-	if(is_syncing_properties) return; //The other callback is why we were called.
-	double newValue = getProperty(Lav_DELAY_DELAY_SAMPLES).getDoubleValue()/simulation->getSr();
-	is_syncing_properties = true;
-	getProperty(Lav_DELAY_DELAY).setFloatValue(newValue);
-	is_syncing_properties = false;
-	last_updated_delay_property = Lav_DELAY_DELAY_SAMPLES;
+	float newDelay = getProperty(Lav_DELAY_DELAY).getFloatValue();
+	for(int i = 0; i < channels; i++) lines[i]->setDelay(newDelay);
 }
 
 void DoppleringDelayNode::process() {
-	if(last_updated_delay_property != 0) delayChanged();
+	if(werePropertiesModified(this, Lav_DELAY_DELAY)) delayChanged();
 	if(werePropertiesModified(this, Lav_DELAY_INTERPOLATION_TIME)) recomputeDelta();
 	for(int output = 0; output < num_output_buffers; output++) {
 		auto &line = *lines[output];
