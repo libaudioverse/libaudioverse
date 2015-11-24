@@ -39,7 +39,7 @@ This manual contains the reference for the C API and an overview of Libaudiovers
 Most examples in this manual are in Python.
 
 The second source of documentation is the API reference for your language of choice.
-At the moment, this means [the Python API reference](http://camlorn.github.io/libaudioverse/python/index.html).
+At the moment, this means [the Python API reference](http://camlorn.github.io/libaudioverse/docs/python/index.html).
 The API references contain installation instructions and any notes specific to the language in question.
 
 Examples for all supported languages may be found in the [GitHub repository](http://github.com/camlorn/libaudioverse).
