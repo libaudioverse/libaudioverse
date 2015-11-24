@@ -232,12 +232,12 @@ The default is playing.
 - Add. A float.  This is an additional additive factor (DC offset) applied to the outputs of the node.
 
 [[technical-automation]]
-==== Autiomation and Property Connections
+==== Automation and Property Connections
 
 While all other types of properties are exactly the value they are currently set to, float and double properties have two additional features which allow for fine-grained control.
 The value of a float or double property is actually a sum of all of the following:
 
-- The set value.
+- The set value, if no automators are currently effecting the property.
 
 - The automation value, computed by looking at the automation timeline.
 
@@ -249,21 +249,21 @@ First is the set value.  This is fairly self-explanatory: call `Lav_nodeSetFloat
 
 Second is the automation timeline.
 Automators include such things as <<function-Lav_automationLinearRampToValue,Lav_automationLinearRampToValue>> and <<function-Lav_automationEnvelope,Lav_automationEnvelope>>
+When in use, the automation timeline takes the place of the set value; note that setting the property explicitly will cancel all automators.
 
 Only one automator can be in effect at any given time.
 They have both a duration and a starting point.
 Automators such as the envelope have a non-zero duration, and will move the value of the property appropriately as described by the provided array.
-Other atuomators such as linear ramps have a duration of zero.
+Other automators such as linear ramps have a duration of zero.
 These types of automators will affect the property starting at the end of the last automator.
 Attempting to schedule an automator during the duration of another automator (or such that they start at the same exact time for those automators which have a duration of zero) is an error.
 
-Finally is the connection.
-Every float and double property can be treated as a mono input via the function <<function-Lav_nodeConnectProperty,Lav_nodeConnectProperty>>.
+Finally, every float and double property can be treated as a mono input via the function <<function-Lav_nodeConnectProperty,Lav_nodeConnectProperty>>.
 The value of all connected nodes is converted and summed, and then acts as an additional additive factor.
 
-Finally, proper use of these features includes understanding k-rate versus a-rate properties, terms borrowed from csound.
+Proper use of these features includes understanding k-rate versus a-rate properties, terms borrowed from csound.
 A k-rate property has it's value read at the beginning of every block, while an a-rate property has it's value read more often.
-Usually a-rate properties are read every sample, but this is not a guarantee.
+Usually a-rate properties are read every sample, but this is not a guarantee;
 if an a-rate property is read less often, this will be documented in the description.
 
 [[technical-callbacks]]
