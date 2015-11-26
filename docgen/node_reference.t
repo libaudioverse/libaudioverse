@@ -1,4 +1,5 @@
 {%import 'macros.t' as macros with context%}
+
 [[nodes]]
 == Libaudioverse  Node Reference
 
@@ -24,6 +25,7 @@ The most notable node of this type is the amplitude panner.
 {%for node_name in sorted_nodes%}
 {%set node = nodes[node_name]%}
 {%set doc_header = (node['doc_name']+" node") | title%}
+
 [[node-{{node_name}}]]
 === {{doc_header}}
 
@@ -41,7 +43,7 @@ The number of inputs to this node is described below.
 {%else%}
 [caption=""]
 .Inputs
-|====
+|===
 |Index | Channels | Description
 {%for info in node['inputs']%}
 {%if info[0] == "dynamic"%}
@@ -52,7 +54,7 @@ The number of inputs to this node is described below.
 |{{loop.index0}} |{{info[0]}} |{{info[1]}}
 {%endif%}
 {%endfor%}
-|====
+|===
 {%endif%}
 
 {%if not node['outputs']%}
@@ -64,7 +66,7 @@ The outputs of this node are described below.
 {%else%}
 [caption=""]
 .Outputs
-|====
+|===
 |Index | Channels | Description
 {%for info in node['outputs']%}
 {%if info[0] == "dynamic"%}
@@ -75,7 +77,7 @@ The outputs of this node are described below.
 |{{loop.index0}} |{{info[0]}} |{{info[1]}}
 {%endif%}
 {%endfor%}
-|====
+|===
 {%endif%}
 
 {%endif%}
@@ -147,4 +149,5 @@ Callback Prototype: {{info['callback_func']|function_to_string}}
 
 {%endfor%}
 {%endif%}
+
 {%endfor%}

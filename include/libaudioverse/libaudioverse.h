@@ -12,7 +12,7 @@ extern "C" {
 
 typedef int LavError;
 typedef int LavHandle;
-typedef void (*LavParameterlessCallback)(LavHandle object, void* userdata);
+typedef void (*LavParameterlessCallback)(LavHandle nodeHandle, void* userdata);
 
 /**Does whatever is appropriate on a given platform to expose a Libaudioverse function publically.*/
 #ifdef _MSC_VER
