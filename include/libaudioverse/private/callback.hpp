@@ -7,33 +7,24 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <functional>
 #include <memory>
 #include <mutex>
+#include <type_traits>
 
 namespace libaudioverse_implementation {
 
 /**Helper template encapsulating a callback.*/
 
-template<typename IgnoredT>
-class Callback;
+template<typename ResultT, typename... ArgsT>
+class CallbackWithoutResult;
 
 template<typename ResultT, typename... ArgsT>
-class Callback<ResultT (ArgsT...)> {
+class CallbackWithoutResult<ResultT(ArgsT...)>  {
 	public:
-	//use the default construction of the type, if possible.
-	Callback(): Callback([] () {}) {}
-	//We specify the callable. This is an exact match.
-	Callback(std::function<ResultT()> _default): default(_default) {}
-	
+	CallbackWithoutResult() = default;
 	ResultT operator()(ArgsT... args) {
 		std::lock_guard<std::recursive_mutex> g(mutex);
-		if(callback) return callback(args...);
-		else return default();
+		if(callback) callback(args...);
 	}
 	
-	void setDefault(std::function<ResultT(ArgsT...)>f) {
-		std::lock_guard<std::recursive_mutex> g(mutex);
-		default= f;
-	}
-
 	void setCallback(std::function<ResultT(ArgsT...)> f) {
 		std::lock_guard<std::recursive_mutex> g(mutex);
 		callback = f;
@@ -44,10 +35,44 @@ class Callback<ResultT (ArgsT...)> {
 		callback = nullptr;
 	}
 	
-	private:
-	std::function<ResultT(ArgsT...)> callback, default;
+	protected:
+	std::function<ResultT(ArgsT...)> callback;
 	std::recursive_mutex mutex;
 };
+
+template<typename ResultT, typename... ArgsT>
+class CallbackWithResult;
+
+template<typename ResultT, typename... ArgsT>
+class CallbackWithResult<ResultT(ArgsT...)>: CallbackWithoutResult<ResultT(ArgsT...)> {
+	public:
+	ResultT operator()(ArgsT... args) {
+		std::lock_guard<std::recursive_mutex> g(mutex);
+		if(callback) return callback(args...);
+		else return default;
+	}
+	
+	void setDefault(ResultT d) {
+		std::lock_guard<std::recursive_mutex> g(mutex);
+		default = d;
+	}
+	
+	protected:
+	ResultT default = {};
+};
+
+//Avoid bringing in boost. This is stupid easy, so.
+template<typename ResultT, typename... ArgsT>
+class ResultType;
+
+template<typename ResultT, typename... ArgsT>
+class ResultType<ResultT(ArgsT...)> {
+	public:
+	typedef ResultT type;
+};
+
+template<typename FuncT>
+using Callback = typename std::conditional<std::is_same<typename ResultType<FuncT>::type, void>::value, CallbackWithoutResult<FuncT>, CallbackWithResult<FuncT>>::type;
 
 inline auto wrapParameterlessCallback(std::shared_ptr<ExternalObject> obj, LavParameterlessCallback cb, void* userdata) {
 	auto wobj = std::weak_ptr<ExternalObject>(obj);
