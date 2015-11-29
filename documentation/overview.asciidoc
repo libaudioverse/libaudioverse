@@ -2,8 +2,11 @@
 == Overview
 
 This section tries to get you started with Libaudioverse quickly.
-<<technical,a high-level technical overview>> can be found further along in this manual, but this section is probably what you actually want when you're starting.
+<<technical,A high-level technical overview>> can be found further along in this manual, but this section is probably what you actually want when you're starting.
+
 Each subsection starts with some Python  code and follows it with an explanation.
+The translation to the C API should be fairly straightforward.
+In the cases where it is not, this manual will make an effort to tell you what you need to use.
 
 === Playing a Sine Wave
 
@@ -31,11 +34,14 @@ time.sleep(5.0)
 libaudioverse.shutdown()
 ....
 
-The first and last lines are simple initialization, and every program needs them.
-Failure to initialize Libaudioverse will lead to errors, as will attempting to access Libaudioverse objects after shutdown.
-
 This program synthesizes a sine wave for 5 seconds using a sine node.
 The default frequency for a sine node is 440 HZ.
+
+The first and last lines are simple initialization, and every program needs them.
+Failure to initialize Libaudioverse will lead to errors, as will attempting to access Libaudioverse objects after shutdown.
+For exploration, it is generally safe not to call `shutdown`.
+This is typical practice when calling `python -i` to test a script interactively, as is done in other sections of this overview.
+Failure to call `shutdown` will crash rarely, but it is still very important to have it in production code as this can and will happen.
 
 Nodes are referred to by their class names (`SineNode`), their C enumerations (`Lav_OBJTYPE_SINE_NODE`) or an English description derived from their name, depending on the context.
 For the most part, nodes either synthesize, process, or analyze audio.
@@ -45,7 +51,7 @@ In this case, we take the output of the sine node and connect it to the simulati
 Any output connected to the simulation is audible at the speakers.
 
 When you connect outputs to destinations with different channel counts, Libaudioverse will automatically do the necessary conversions to make everything work.
-There is a detailed description of this algorithm elsewhere in this manual, but for the most part you need only know that Libaudioverse  understands and automatically converts between mono, stereo, 4.0, 5.1, and 7.1 without input on your part.
+There is a detailed description of this algorithm <<technical-connections,elsewhere in this manual>>, but for the most part you need only know that Libaudioverse  understands and automatically converts between mono, stereo, 4.0, 5.1, and 7.1 without input on your part.
 
 When requesting output devices, the default audio device is always -1.
 In addition, Libaudioverse will attempt to change audio devices if the  default changes.
@@ -74,15 +80,15 @@ for i in xrange(0, 1010, 10):
 ....
 
 In addition to inputs, all nodes have properties.
-Every node has at least mul and add.
-Mul represents volume and ranges from -INFINITY to INFINITY.
-If you set mul to a negative value, the node's output will be negated.
-Add, not shown here, is the second of 3 standard properties, and adds a specific amount of DC offset.
+Every node has at least `mul` and `add`.
+`Mul` represents volume and ranges from -INFINITY to INFINITY.
+If you set `mul` to a negative value, the node's output will be negated.
+`Add`, not shown here, is the second of 3 standard properties, and adds a specific amount of DC offset.
 
 Oscillators such as the sine node also have a number of other properties.
-Every oscillator has frequency, phase, and frequency_multiplier.
-Frequency is always in hertz, and phase is on the range 0 to 1.
-Frequency_multiplier is an additional multiplier applied to the frequency of the oscillator, and is useful when building instruments; moving up and down by an octave on the musical scale is a doubling or halving of the frequency.
+Every oscillator has `frequency`, `phase`, and `frequency_multiplier`.
+`Frequency` is always in hertz, and `phase` is on the range 0 to 1.
+`Frequency_multiplier` is an additional multiplier applied to the frequency of the oscillator, and is useful when building instruments; moving up and down by an octave on the musical scale is a doubling or halving of the frequency.
 
 === Buffers and Playing Files
 
@@ -115,14 +121,14 @@ libaudioverse.shutdown()
 A buffer represents a chunk of decoded, resampled audio.
 They can be loaded from a number of sources, but by far the most common is from a file.
 
-Buffer nodes play the specified buffer, and have four properties of interest: position, looping, rate, and end_count.
-Position is the current position of the buffer in seconds, looping controls if we loop, and end_count counts the number of times it has reached the end.
-End_count exists so that you can play buffers synchronously or otherwise tell when they have ended without the overhead of using callbacks,  described later.
-Rate controls the playback rate of the buffer.  1.0 is normal speed, 2.0 is twice as fast, etc.
+Buffer nodes play the specified buffer, and have four properties of interest: `position`, `looping`, `rate`, and `end_count`.
+`Position` is the current position of the buffer in seconds, `looping` controls if we loop, and `end_count` counts the number of times it has reached the end.
+`End_count` exists so that you can play buffers synchronously or otherwise tell when they have ended without the overhead of using callbacks,  described later.
+`Rate` controls the playback rate of the buffer.  1.0 is normal speed, 2.0 is twice as fast, etc.
 
 As mentioned above, buffers store uncompressed, decoded audio data as float32, resampled to match the sampling rate of their simulation.
 This means they are quite large.
-Caching buffers is therefore very highly recommended, as 1 second of mono audio will take 176KB and a minute of stereo audio will take about 21 megabytes.
+Caching buffers is therefore very highly recommended, as 1 second of mono audio will take 176KB and a minute of stereo audio will take about 21 MB.
 You cannot share buffers between simulations, but you can easily share them between buffer nodes.
 
 === Panning
@@ -157,19 +163,19 @@ The multipanner is an example of a node with an input.
 Inputs are also numbered starting at 0, and accept a specific number of audio channels.
 In this case, the multipanner has only one mono input.
 If the channel count of the outputs connected to the input is different, Libaudioverse will perform its in-built conversion algorithms.
-In addition, it is possible to connect multiple outputs to the same input.
-In this case, the input will add all of the outputs, suitably converted to match its channel count.
+Multiple outputs may be connected to the same input.
+In this case, the input will add all of the outputs, suitably converted to match the input's channel count.
 
-The three properties of interest on a multipanner are azimuth, elevation, and strategy.
-All panners have the first two, but strategy is unique to the multipanner.
+The three properties of interest on a multipanner are `azimuth`, `elevation`, and `strategy`.
+All panners have the first two, but `strategy` is unique to the multipanner.
 
-Azimuth is an angle in degrees, such that 0 is straight in front, 90 is straight to the right, 180 is behind, and 270 is to the left.
+`Azimuth` is an angle in degrees, such that 0 is straight in front, 90 is straight to the right, 180 is behind, and 270 is to the left.
 Angles greater than 359 will wrap and negative values are allowed.
 
-Elevation is an elevation from the horizontal plane, ranging from -90 to 90.
-Unlike azimuth, elevation does not wrap, and is  only audible when using the HRTf strategy.
+`Elevation` is an elevation from the horizontal plane, ranging from -90 to 90.
+Unlike `azimuth`, elevation does not wrap, and is  only audible when using the HRTf strategy.
 
-Finally, strategy controls the panning strategy to use.
+Finally, `strategy` controls the panning strategy to use.
 You may see the allowed values by inspecting the <<enum-Lav_PANNING_STRATEGIES,Lav_PANNING_STRATEGIES>> enumeration, bound in Python as `libaudioverse.PanningStrategies.hrtf`, `libaudioverse.PanningStrategies.stereo`, etc.
 
 === Higher-level 3D components
@@ -199,10 +205,12 @@ s.set_output_device(-1)
 ....
 
 The 3D components of Libaudioverse primarily involve two objects: an environment and a source node.
+
 Environments represent the listener, provide defaults for new sources, aggregate source output, and allow for the creation of effect sends (see the next section).
 
-Output 0 of an environment node is the output from all sources created using the environment.
+Sources act as simple speakers.
 A source takes the environment from which it is to be created as the second parameter to its constructor.
+All audio sent through sources is panned, aggregated, and sent through output 0 of the source's environment.
 
 It is important to note that unlike other nodes, sources are always connected to the environment with which they were created.
 Also unlike other nodes, this connection is implicit and weak.
@@ -213,34 +221,40 @@ If you do not hold a strong reference to them, they will be garbage collected.
 This is usually what you want.
 You can find more information on object lifetimes in the <<technical,technical overview>>.
 
-Environments and sources are the only nodes to make use of float3 and float6 properties, vectors of 3 and 6 floats respectively.
+Environments and sources are the only nodes to make use of `float3` and `float6` properties, vectors of 3 and 6 floats respectively.
 In Python, these are represented as 3-tuples and 6-tuples; changing only one component at a time is not allowed because vector updates need to always be atomic.
 
 An environment has two properties of note, `position` and `orientation`.
 
-Position is the position of the listener, and orientation the listener's orientation.
-Position is represented as a float3, that is a vector of x, y, and z.
+`Position` is the position of the listener, and `orientation` the listener's orientation.
+`Position` is represented as a float3, that is a vector of x, y, and z.
 Without changing the orientation, the default coordinate system is as follows: positive x is right, positive y is up, and negative z is forward.
 This was chosen to match OpenGL and OpenAL.
 
-Orientation is represented as a float6.
+Orientation is represented as a `float6`.
 The first three values of this are the at vector, a unit vector pointing in the direction that the listener is facing.
 The second three are the up vector, a unit vector  pointing in the direction of the top of the listener.
 These vectors must always be perpendicular.
 If they are not, undefined behavior results.
 
-There are two useful values for the orientation property.
+There are two useful values for the `orientation` property.
+
 The first, `(0, 1, 0, 0, 0, 1)` orients the coordinate system such that positive x is right, positive y is forward, and positive z is up.
 This is useful for side-scrollers or other applications that do not involve turning.
-As a reference for those who do not know trigonometry, you can import math and use `(math.sin(theta), math.cos(theta), 0, 0, 0, 1)` to represent orientations as radians clockwise from north.
+
+The second is provided as a reference for those who do not know trigonometry, you can import math and use `(math.sin(theta), math.cos(theta), 0, 0, 0, 1)` to represent orientations as radians clockwise from north.
 If you need to use degrees, note that `theta = degrees*math.pi/180.0`.
 
-The main property of interest on sources is `position`, the same as the environment's position but for sources.
+There are two immediately interesting properties on sources.
+The first is `position`, the same as the environment's position but for sources.
 The coordinate system of a source depends greatly on how you calculate the orientation of the listener, but using either or both of the above-suggested values will allow you to make east positive x and north positive y.
-The other interesting property of a source is `occlusion`, a value from 0 to 1.
+The other is `occlusion`, a value from 0 to 1.
 This property controls an occlusion model, such that 0 is unoccluded and 1 is fully occluded.
 Libaudioverse is unfortunately incapable of calculating occlusion for you, as this depends greatly on how you represent your level maps.
 If you periodically update the `occlusion` property on all sources, however, Libaudioverse is more than happy to synthesize it.
+
+There are many other properties on sources controlling the distance model and panning technique, but this section is quite long enough as-is.
+You will want to be sure to read <<node-Lav_OBJTYPE_ENVIRONMENT_NODE,the Environment Node documentation>> and <<node-Lav_OBJTYPE_SOURCE_NODE,the Source Node documentation>>.
 
 Finally, we must discuss `output_channels` and `default_panning_strategy`.
 For technical reasons beyond the control of Libaudioverse, it is not possible to properly detect the type of audio device the user is using.
@@ -253,14 +267,13 @@ Setting it before creating any sources allows you to quickly and conveniently en
 
 Unfortunately, it is possible for sources to have different panning strategies.
 This is somewhat intensional, as you might choose to use stereo on less-important sources and HRTF on more-important ones in order to save CPU processing power.
+
 But it leads to a difficult-to-resolve ambiguity.
 If you set some of your sources to panning strategies with different channel counts, the environment is then unable to determine how many output channels it needs to have.
+You might have meant the one with the lower channel count, but you might also have meant the one with the higher channel count.
 
 In order to make it explicit and deterministic, environments require you to also specify the `output_channels` property.
 Use 2 for stereo and HRTF, 4 for quad, 6 for 5.1, and 8 for 7.1.
-
-As this section is long already, a great number of properties and capabilities are being glossed over.
-You certainly wish to read the documentation for the <<node-Lav_OBJTYPE_ENVIRONMENT_NODE,environment node>> and the <<node-Lav_OBJTYPE_SOURCE_NODE,source node>>.
 
 === Using Reverb
 
@@ -276,6 +289,7 @@ reverb.connect_simulation(0)
 
 This example sets up an effect send, an additional output on the environment which is intended to be routed through effects.
 Sources also pan a copy of their audio through the effect sends, using any strategy but HRTF as determined by the channel count.
+Since we exclude HRTF, there is no ambiguity and a separate parameter would be redundant.
 
 In this example we specify that all sources created and any created in future should be connected to the effect send, that it is for reverb, and that it has 4 channels.
 Any attempt to create an effect send for reverb without using 4 channels will error.
@@ -284,8 +298,8 @@ Unlike non-reverb sends, effect sends for reverb pan their audio differently, su
 `create_effect_send` returns the index of the newly created output, which we then feed through an FDN reverb and then to the simulation.
 FDN reverbs are very simple reverberators.
 The two most important properties are `density` and `t60`.
-`density` ranges from 0 to 1, specifying how close together the reflections are.
-`t60` is the time it will take for the reverb to decay by 60 decibals, assuming that you play and then stop some input.
+`Density` ranges from 0 to 1, specifying how close together the reflections are.
+`T60` is the time it will take for the reverb to decay by 60 decibals, assuming that you play and then stop some input.
 You can think of `t60` as roughly analogous to the reverb's duration.
 
 FDN reverbs also contain configurable lowpass filters, and the ability to modulate the delay lines.
@@ -319,43 +333,49 @@ n.mul.linear_ramp_to_value(5.2, 0.0)
 n.connect_simulation(0)
 s.set_output_device(-1)
 time.sleep(8.0)
+
+libaudioverse.shutdown()
 ....
 
 The above example demonstrates automators.
 
-Libaudioverse processes audio in blocks.
-Properties are read and then audio is produced using them.
-The problem with this setup is that there is no way to allow user code to be called more rapidly than once per block, and even then it is possible for user code to miss one due to thread preemption and other such inconveniences.
+Libaudioverse processes audio in blocks, submitting each block to the sound card before beginning the next.
+During the processing of a block, no API call can have effect.
+The problem with this setup is that there is no way to allow user code to be called more rapidly than once per block.
+Worse yet, being called exactly once per block requires extra work and degrades performance.
 
 Consequently, Libaudioverse introduces automators, functions which schedule changes on float and double properties.
 
 The linear ramp is an automator which begins moving the value of the property to the specified value.
-The first argument is the time at which the property much reach the target value erelative to the current time, and the second the value which must be reached.
-Set is a similar function, but instead moves the value instantaneously.
+The first argument is the time at which the property must reach the target value erelative to the current time, and the second the value which must be reached.
+Set is a similar function, but instead moves the value instantaneously at the specified time.
+Note that all times are specified relative to now, and that it is not possible to schedule automators in the past.
 
 What we do in the above example, therefore, is schedule a triangular sweep of the frequency between 300 HZ and 600 HZ.
 Then we schedule a fade-out using the set and linear ramp.
 
-There are two notable points about automators worth specifically pointing out, though the first may or may not be obvious.
+There are three notable points about automators worth specifically pointing out, though the first may or may not be obvious.
 
 First, the linear ramp and many other automators use the "previous" value of the property.
-To that end, it is necessary to set the property to the starting piont before automating it.
+To that end, it is necessary to set the property to the starting point before automating it.
 If you don't, then it will start from wherever it was last set; this may or not be a problem, depending on application structure.
 
 Second, setting a property cancels all pending automators.
 This is to avoid strange conditions and make validation of inputs possible.
 
-Finally, the ssetup with mul is a bit strange.
+Finally, the setup with mul is a bit strange.
 Since linear ramps start immediately, it is often necessary to schedule another automator before them.
 Since we don't want mul to start ramping until a bit after 5 seconds, we use the set automator.
 This makes the linear ramp's previous value the endpoint of the set automator, such that it only takes effect afterwords.
-if that line is commented out, the sine node will get progressively quieter for the entire example.
+If that line is commented out, the sine node will get progressively quieter for the entire example rather than rapidly fading out at the end.
 
 Properties come in two variations, a-rate and k-rate.
 Most properties are k-rate properties, and their value is computed once per block.
 Some are processed as much as every sample, such as the sine node's frequency and the mul propperty on all nodes.
-These are the a-rate properties.
-An advantage of automators is that they are computed per-sample when used on a-rate properties: the times specified in the above sample will not be rounded to the nearest block and updates will not be choppy even if the block size is increased to absurd values.
+These are referred to as the a-rate properties.
+
+The biggest advantage of automators is that they are computed per-sample on a-rate properties.
+Since both `mul` and `frequency` are a-rate, the above example will not become choppy, even should the block size be set absurdly high.
 
 === Connecting Nodes to Properties
 
@@ -379,13 +399,16 @@ n2.connect_simulation(0)
 s.set_output_device(-1)
 ....
 
-The above example shows how to connect  the output of a node to a property on another.
-This works with float and double properties, and all others will throw an error.
+The above example shows how to connect  the output of a node to a property.
+This works only with float and double properties.
+Attempting to do it to any other property type will cause an error.
 
-The resulting property's value is the current value as set by you or scheduled automators, summed with the value of the node's output.
 As with automators, this type of control can be sample-perfect on a-rate properties.
-Put simply, conneccted nodes act as offsets and not absolute values.
+Unlike automators, connected nodes act as offsets to whatever the property would be without the node.
+It is common, therefore, to first set the target property to 0.
 
-You can connect multiple nodes with the same property.
+You can connect multiple outputs to the property.
 They function identically to 1-channel inputs, including downmixing logic.
+
 While Libaudioverse already has a ringmod node which is admittedly much more efficient, this is the simplest example to demonstrate it with.
+A similar technique can be used to set up FM synthesis or continuous filter sweeping, as well as a wide variety of other interesting effects.
