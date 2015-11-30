@@ -126,12 +126,14 @@ WinmmOutputDevice::~WinmmOutputDevice() {
 }
 
 void WinmmOutputDevice::stop() {
+	if(stopped) return;
 	logInfo("Winmm device shutting down.");
 	//Shut down the thread.
 	if(winmm_mixing_thread.joinable()) {
 		winmm_mixing_flag.clear();
 		winmm_mixing_thread.join();
 	}
+	stopped = true;
 }
 
 std::tuple<WAVEHDR*, short*> WinmmOutputDevice::getWinmmBuffer() {

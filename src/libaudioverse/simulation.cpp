@@ -101,6 +101,10 @@ void Simulation::doMaintenance() {
 
 void Simulation::setOutputDevice(int index, int channels, float minLatency, float startLatency, float maxLatency) {
 	if(index < -1) ERROR(Lav_ERROR_RANGE, "Index -1 is default; all other negative numbers are invalid.");
+	if(output_device) {
+		output_device->stop();
+	}
+	std::lock_guard<std::recursive_mutex> g(mutex);
 	auto factory = getOutputDeviceFactory();
 	if(factory == nullptr) ERROR(Lav_ERROR_CANNOT_INIT_AUDIO, "Failed to get output device factory.");
 	auto sptr = std::static_pointer_cast<Simulation>(shared_from_this());
@@ -251,7 +255,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_simulationGetSr(LavHandle simulationHandle, int
 Lav_PUBLIC_FUNCTION LavError Lav_simulationSetOutputDevice(LavHandle simulationHandle, int index, int channels, float minLatency, float startLatency, float maxLatency) {
 	PUB_BEGIN
 	auto sim = incomingObject<Simulation>(simulationHandle);
-	LOCK(*sim);
+	//This is threadsafe and needs to be entered properly so it can make sure we dont' edadlock in audio_io.
 	sim->setOutputDevice(index, channels, minLatency, startLatency, maxLatency);
 	PUB_END
 }

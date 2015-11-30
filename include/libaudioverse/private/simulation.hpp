@@ -58,6 +58,7 @@ class Simulation: public Job {
 	void unlock() {mutex.unlock();}
 
 	//associate with the specified device index.
+	//This must absolutely absolutely absolutely be called without the lock, it's threadsafe.
 	void setOutputDevice(int index, int channels, float minLatency, float startLatency, float maxLatency);
 	void clearOutputDevice();
 

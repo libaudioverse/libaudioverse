@@ -98,10 +98,12 @@ WasapiOutputDevice::~WasapiOutputDevice() {
 }
 
 void WasapiOutputDevice::stop() {
+	if(stopped) return;
 	logInfo("Wasapi device shutting down.");
 	logDebug("Stopping a Wasapi device.");
 	should_continue.clear();
 	wasapi_mixing_thread.join();
+	stopped = true;
 }
 
 void WasapiOutputDevice::wasapiMixingThreadFunction() {

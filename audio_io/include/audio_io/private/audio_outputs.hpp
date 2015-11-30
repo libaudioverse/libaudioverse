@@ -16,14 +16,12 @@ class OutputDeviceImplementation: public OutputDevice {
 	virtual ~OutputDeviceImplementation();
 	//Callback parameters: output buffer, number of channels to write.
 	virtual void init(std::function<void(float*, int)> callback, int inputFrames, int inputChannels, int inputSr, int outputChannels, int outputSr);
-	//used by the factory to stop playing devices at shutdown.
-	//Destrructor code should go here.  The destructor should then delegate to this function.  It is an error to continue using objects after deinitialization of the factory.
-	virtual void stop();
 	int input_frames, input_channels, input_sr, output_channels, output_sr;
 	//This one is an estimate.  The amount of frames to write to trigger the callback approximately once.
 	int output_frames;
 	std::shared_ptr<SampleFormatConverter> sample_format_converter;
 	std::function<void(float*, int)> callback;
+	bool stopped = false; //Used by subclasses.
 	friend class OutputDeviceFactoryImplementation;
 };
 

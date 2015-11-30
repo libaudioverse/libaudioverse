@@ -31,9 +31,6 @@ void OutputDeviceImplementation::init(std::function<void(float*, int)> callback,
 OutputDeviceImplementation::~OutputDeviceImplementation() {
 }
 
-void OutputDeviceImplementation::stop() {
-}
-
 OutputDeviceFactoryImplementation::~OutputDeviceFactoryImplementation() {
 	logInfo("Output device factory is dying.  Terminating all devices.");
 	for(auto p: created_devices) {

@@ -54,6 +54,9 @@ class NoBackendError: public AudioIOError {
 class OutputDevice {
 	public:
 	virtual ~OutputDevice() {}
+	//These are usually accessed via shared pointers. This function makes sure that the output device is stopped, blocking until it stops.
+	//TODO: we need to be able to restart them.
+	virtual void stop() = 0;
 };
 
 class OutputDeviceFactory {
