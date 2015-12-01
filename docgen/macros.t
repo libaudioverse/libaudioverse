@@ -30,6 +30,8 @@
 {%set name = info_dict.get('name', c_name)%}
 {%set function_object = functions[c_name]%}
 {%set function_documentation = info_dict['doc_description']%}
+
+[[function-{{c_name}}]]
 ===== {{name}}
 
 Prototype: `{{function_object | function_to_string}}`

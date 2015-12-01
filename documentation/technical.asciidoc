@@ -52,7 +52,7 @@ This function exists primarily to assist bindings in knowing when they need to i
 When a handle's reference count goes to 0, it is not immediately deleted.
 It merely becomes internral once more.
 It is possible to see the handle once more externally, for example by querying the buffer node's buffer property.
-In this case, <<function-Lav_handleGetAndClearFirstAccess,Lav_handleGetAndClearFirstAccess>> will again return true and clear the flag.
+In this case, <<function-Lav_handleGetAndClearFirstAccess>> will again return true and clear the flag.
 
 There are special rules for the 3 most common Libaudioverse object types.  They are as follows:
 
@@ -62,8 +62,8 @@ There are special rules for the 3 most common Libaudioverse object types.  They 
 
 - Buffers are alive as long as they are assigned to a buffer property, or otherwise in use.
 
-In order to detect the death of a handle, Libaudioverse provides the <<function-Lav_setHandleDestroyedCallback,Lav_setHandleDestroyedCallback>> function.
-handle values are not reused unless the application manages to overflow a 32-bit signed integer.
+In order to detect the death of a handle, Libaudioverse provides the <<function-Lav_setHandleDestroyedCallback>> function.
+Handle values are not reused unless the application manages to overflow a 32-bit signed integer.
 Most bindings therefore use the proxy pattern: the objects that user code deals with are thin proxies containing the handle and a pointer to global state.
 When the handle destroyed callback is called, the global state is then destroyed.
 This allows for keeping callback objects and other such resources alive in languages with garbage collectors, as not to invalidate pointers held by Libaudioverse.
@@ -73,89 +73,90 @@ The handle destroyed callback must do its best to not block whenever possible, a
 === The Simulation
 
 The simulation is the main entry point to Libaudioverse.
-You need one before you can do anything.
+Creating all other Libaudioverse objects requires a simulation to first be created.
 
 The two most crutial pieces of information needed for the simulation are the block size and sample rate.
 The latter is self-explanatory.
-The block size is the number of samples to process at once, and must be a multiple of 4 for SIMD purposes.
-You create a simulation with <<function-Lav_createSimulation>>.
+The block size is the number of samples to process at once, and must be a multiple of 4.
+Simulations are created with <<function-Lav_createSimulation>>.
 
 By default, Libaudioverse will use one thread per core on the current system for audio mixing.
-If you need to change this, use <<function-Lav_simulationSetThreads,Lav_simulationSetThreads>>
+This may be changed via <<function-Lav_simulationSetThreads>>
 
-Simulations handle audio output, as well as being a place to put semi-global state.
-You can have more than one per application, but all Libaudioverse objects are associated with exactly one simulation in a permanent manner.
-Any attempt to cross the boundary in such a way that would lead to an object being used with another simulation than the one it was created with in any way will result in an error.
+Simulations handle audio output and hold state, provided via dependency injection to created objects.
+All Libaudioverse objects are associated with exactly one simulation in a permanent manner.
+Any attempt to cross the boundary between two simulations will result in an error.
+As an example, this can happen if an application attempts to connect nodes from two different simulations.
 
 [[technical-audio_output]]
 ==== Audio Output
 
 Simulations are the final destination for audio, and output may be retrieved in 3 ways.
+In all cases, Libaudioverse applies the audio upmixing and downmixing algorithms as specified <<technical-connections,here>> to reach the required channel count.
+None of the following three methods of receiving audio should be mixed; doing so results in undefined behavior.
 
-The first is with <<function-Lav_getBlock,Lav_getBlock>>, which fills a buffer that you allocate with a block of audio data.
-Libaudioverse applies the audio upmixing and downmixing algorithms to reach your specified channel count.
-To get details on these, see <<technical-connections,here>>.
+<<function-Lav_getBlock>>  fills a buffer allocated by the calling application with a block of audio data.
 
-The second way to get audio is <<function-Lav_simulationWriteFile,Lav_simulationWriteFile>>.
-This drives the simulation for the specified duration, synthesizing as fast as possible and writing to the specified file.
-File format is determined from the extension of the provided path.
+<<function-Lav_simulationWriteFile>> drives the simulation for the specified duration, synthesizing as fast as possible and writing to the specified file.
+The file format is determined from the extension of the provided path.
 The supported file formats are not currently documented as this is in flux, but you are guaranteed to have at least .wav and .ogg.
 
-Finally, you can use an audio device.
+The final option is to call <<function-Lav_simulationSetOutputDevice>>.
+This links the simulation to a specific audio device.
+<<function-Lav_simulationSetOutputDevice>> takes a number of parameters, discussed in detail below.
+
 Libaudioverse represents specific audio devices with positive indices starting at 0.
 The default audio device is -1.
-You set a simulation's audio device with <<function-Lav_simulationSetOutputDevice,Lav_simulationSetOutputDevice>>.
-This is equivalent exactly to repeated `Lav_simulationGetBlock` calls, save that the audio is being fed to an audio card.
-You set the minimum, maximum, and starting latencies. Minimum latency should almost always be 0.0 and maximum should almost always be 0.1 or higher.
+Furthermore, using the audio device -1 will attempt to follow the user's default audio device, even if it should change while Libaudioverse is outputting audio.
+This feature is not always possible and depends on the platform in use.
+
+The minimum, maximum, and starting latencies are hints to Libaudioverse as to the latency characteristics of the calling application.
+They may not be respected.
+Minimum latency should almost always be 0.0 and maximum should almost always be 0.1 or higher.
 The starting latency depends on the application, but 0.05 is usually a good value.
 Libaudioverse continually estimates how much time it is taking to prepare blocks, adjusting the latency between the minimum and maximum.
-If your application begins using more CPU, then latency will rise in order to give Libaudioverse more headroom when mixing blocks; if it begins using less, latency will fall.
-Multiple calls to `Lav_simulationSetOutputDevice` are allowed, though playback will not be gapless.
+If the application begins using more CPU, then latency will rise in order to give Libaudioverse more headroom when mixing blocks; if it begins using less, latency will fall.
 
-NOTE: Audio stacks are limited.
+Multiple calls to <<function-Lav_simulationSetOutputDevice>> are allowed, though playback may not be gapless.
+
+IMPORTANT: Audio stacks are limited.
 There is no reliable way to properly detect channel counts for all setups.
 For this reason, your application should assume that it is running on a set of stereo speakers (2 channels, don't apply HRTFs) until the user specifies otherwise.
 If you use the wrong channel count, Libaudioverse will apply the remixing algorithms but the experience will be sub-par.
-Always trust the user in this case.
+Always trust the user; if it is important for your application to know if it is running on surround sound, ask or direct users to an options menu before choosing on their behalf.
 
 [[technical-atomicity]]
-==== Dealing with Atomicity
+==== Atomicity
 
-When using audio output, Libaudioverse might decide to advance a block at any time.
-For this reason, it is possible to hear partial changes to node configurations unless applications are configured properly.
+Libaudioverse outputs audio in blocks.
+When outputting to an audio device, any operation which may be completed with one function call will either be completely audible or not audible on the next block.
+if the operation in question can be done in one function call, hearing partial results is not possible.
 
-The short version is that any call to a Libaudioverse function can be heard only if it completes and only after it completes.
-This is why 3D vectors force you to set all 3 (or 6, if it's orientation) components at the same time.
+There are three ways to ensure that operations which take more than one function call are only audible when finished:
 
-There are two ways to make a set of operations complete without being audible if Libaudioverse decides to advance a block.
+- Perform the operations on a set of disconnected nodes before connecting them.
 
-The first is with <<function-Lav_simulationLock,Lav_simulationLock>> and <<function-Lav_simulationUnlock,Lav_simulationUnlock>>.
-If the simulation is not being used for audio, it can in effect be used as a horribly inefficient mutex.
-Between a call to these functions, Libaudioverse cannot advance a block and no other thread (even yours) can access anything that uses this simulatioon directly or indirectly.
-All calls  from any other thread but the one that called `Lav_simulationLock` and involving any object associated with this simulation will block until `Lav_simulationUnlock` gets called.
+- use <<function-Lav_simulationLock>> and <<function-Lav_simulationUnlock>>.  Note that, as these function names imply, simulations function as mutexes; lock inversion and other concerns can apply in multithreaded scenarios.
 
-The simplest case is to wrap your game tick or what have you in `Lav_simulationLock` and `Lav_simulationUnlock`.
-In all languages which Libaudioverse is bound to,  these functions are bound in the way that is considered best practice for locks.
-For example, Python uses with blocks and makes the simulation's class a context manager.
-When using these functions, all considerations you would give to a lock apply.
+- Set a per-block callback which Libaudioverse will call just before mixing every block.  This can be done with <<function-Lav_simulationSetBlockCallback>>.
 
-The second way to have atomicity is to use the audio processing algorithm.
-This is by far more advanced, but can provide superior performance and lower latency for those capable of taking advantage of it.
-Since nodes do not process until they are connected directly or indirectly to the simulation, you can do whatever you want before connecting them.
-While this only applies in some cases, using it where it does apply is recommended.
-Perhaps the most obvious place this is useful is in something along the lines of a MIDI synthesizer: you can set everything up before connecting the final node to the simulation, and when the node is done you can disconnect the final node first.
+Most games will want to use <<function-Lav_simulationLock>> before beginning their per-frame audio update, and <<function-Lav_simulationUnlock>> afterwords.
+failure to call <<function-Lav_simulationUnlock>> in a timely manner will cause audio glitching; failure to call it at all will cause silence and freeze Libaudioverse's background threads.
+
+The per-block callback is for advanced synthesis applications which need a stronger guarantee: not only is the operation happening completely before the next block, it is running every block.
+Using the per-block callback for a game's frame updates will lead to massively degraded performance on both sides.
 
 [[technical-buffers]]
 === Buffers
 
-Buffers are the simplest type of object in Libaudioverse.
-They store un-encoded float32 audio data at the sampling rate of the simulation.
-They can be loaded from files or arrays, and will resample the data when loaded.
+Buffers store un-encoded float32 audio data at the sampling rate of the simulation.
+They can be loaded from files or arrays, and will resample the data exactly once when loaded.
+Buffers are most commonly used  with <<node-Lav_OBJTYPE_BUFFER_NODE,buffer nodes>>.
 
-You will usually pair a buffer with a <<node-Lav_OBJTYPE_BUFFER_NODE,buffer node>>.
-No state to do with playback is stored in the buffer.
+Save for the contained audio data, buffers are stateless; using them requires coupling them with a node.
 Since buffers are quite large, using a cache is recommended.
-You can safely share a buffer between any number of buffer nodes or similar.
+Buffers may safely be used in more than one place at a time.
+Modifying a buffer's audio data while it is in use will result in an error.
 
 [[technical-nodes]]
 === Nodes
@@ -170,9 +171,10 @@ To see what kinds of specific nodes are on offer, see the <<nodes,Nodes section>
 Nodes have 0 or more inputs and 0 or more outputs.
 Outputs are connected to inputs in a many-to-many relationship, such that each input acts as a mixer.
 Libaudioverse makes the opinionated decision that connections are made from outputs to inputs and broken in the same manner.
-The two functions relevant to node-to-node connections are <<function-Lav_nodeConnect,Lav_nodeConnect>> and <<function-Lav_nodeDisconnect,Lav_nodeDisconnect>>.
-Connecting nodes to the simulation is accomplished with <<function-Lav_nodeConnectSimulation,Lav_nodeConnectSimulation>>.
-<<function-Lav_nodeConnectProperty,Lav_nodeConnectProperty>> will be discussed later.
+
+The two functions relevant to node-to-node connections are <<function-Lav_nodeConnect>> and <<function-Lav_nodeDisconnect>>.
+Connecting nodes to the simulation is accomplished with <<function-Lav_nodeConnectSimulation>>.
+<<function-Lav_nodeConnectProperty>> will be discussed later.
 
 All inputs and outputs have a documented channel count.
 Libaudioverse has intrinsic understanding of the following channel counts, and can freely and automatically convert between them:
@@ -206,36 +208,40 @@ If the node's state is paused, time does not advance for it under any circumstan
 
 - The node's state is always playing.
 
-You can find highly technical details on the audio algorithm <<technical-audio_algorithm,here>>.
+Highly technical details on the audio algorithm are <<technical-audio_algorithm,here>>.
 
 [[technical-properties]]
 ==== Properties 
 
-All nodes have at least the three standard properties mul, add, and state.
-Most have more, however.
-These are managed through a variety of functions depending on the property type, i.e. <<function-Lav_nodeSetIntProperty,Lav_nodeSetIntProperty>>.
-The list is too long to be linked here.
+Properties control aspects of nodes in the manner that their name suggests.
+They are managed through a variety of functions depending on the property type, i.e. <<function-Lav_nodeSetIntProperty>>.
 
-Properties are one of the following types:
+The full list of property management functions is too long to be listed here, but they all follow a similar naming pattern.
+`Lav_nodeSetTypeProperty` and `Lav_nodeGetTypeProperty`, where `Type` is the property's type, are the most important.
+
+Properties are always of one of the following types:
 int (32-bit signed integer), float, double, float3, float6, string, array of int, array of float, or buffer.
+
 Boolean properties are int properties with the range 0 to 1, and are used as int properties in the C bindings.
-Some int properties must take their values from an enum, which is also documented.
+They exist for bindings generation and documentation clarity.
 
-Float3 and float6 properties are packed vectors primarily used fotr the 3D components.
-The purpose of float3 and float6 is to provide a fast path which array properties cannot provide.
-It is not common to see these properties outside the <<node-Lav_OBJTYPE_ENVIRONMENT_NODE,environment>> and <<node-Lav_OBJTYPE_SOURCE_NODE,source>> nodes.
+Some int properties must take their values from an enum.
+When this is the case, the enum is documented.
 
-The thre standard properties are as follows:
+Float3 and float6 properties are packed vectors primarily used for the 3D components.
+The purpose of float3 and float6 properties are to provide a fast path for orientations and positions, and to reduce need for <<function-Lav_simulationLock>> and <<function-Lav_simulationUnlock>>.
 
-- State. An int. This property takes its value from the <<enum-Lav_OBJECT_STATES,Lav_OBJECT_STATES>> enumeration.
+There are three standard properties on all nodes.  They are as follows, with more complete documentation <<node-Lav_OBJTYPE_GENERIC_NODE,here>>:
+
+- `State`. An int. This property takes its value from the <<enum-Lav_OBJECT_STATES>> enumeration.
 Nodes which are playing are used as-needed.
 Nodes which are paused act as though they are always outputting zeros.
 Nodes which are always playing always process, even if no one needs their output.
 The default is playing.
 
-- Mul. A float.  This is a multiplier (naively volume) which is applied to the node's outputs before add.
+- `Mul`. A float.  This is a multiplier (naively volume) which is applied to the node's outputs before `add`.
 
-- Add. A float.  This is an additional additive factor (DC offset) applied to the outputs of the node.
+- `Add`. A float.  This is an additional additive factor (DC offset) applied to the outputs of the node after the application of `mul`.
 
 [[technical-automation]]
 ==== Automation and Property Connections
@@ -260,11 +266,11 @@ When in use, the automation timeline takes the place of the set value; note that
 Only one automator can be in effect at any given time.
 They have both a duration and a starting point.
 Automators such as the envelope have a non-zero duration, and will move the value of the property appropriately as described by the provided array.
-Other automators such as linear ramps have a duration of zero.
-These types of automators will affect the property starting at the end of the last automator.
+Other automators such as linear ramps have a duration of zero and affect the property starting when the previous automator ends.
+
 Attempting to schedule an automator during the duration of another automator (or such that they start at the same exact time for those automators which have a duration of zero) is an error.
 
-Finally, every float and double property can be treated as a mono input via the function <<function-Lav_nodeConnectProperty,Lav_nodeConnectProperty>>.
+Finally, every float and double property can be treated as a mono input via the function <<function-Lav_nodeConnectProperty>>.
 The value of all connected nodes is converted and summed, and then acts as an additional additive factor.
 
 Proper use of these features includes understanding k-rate versus a-rate properties, terms borrowed from csound.
@@ -275,29 +281,36 @@ if an a-rate property is read less often, this will be documented in the descrip
 [[technical-callbacks]]
 ==== Callbacks
 
-Some nodes have callbacks, which are and work exactly as they sound like they do.
+Some nodes have callbacks, which work exactly as the name suggests.
 
 What needs to be mentioned about callbacks that makes them deserve a section is this: they can be called in two places, and which place will always be documented.
 
-Any callback which does not explicitly specify that it is called outside the audio thread should not have the Libaudioverse API used from it.
-If the Libaudioverse API can be used from such a callback, then those parts which are safe will be documented.
+Any callback which does not explicitly specify that it is called outside the audio thread is allowed to run in the audio thread.
+These callbacks should consequently not have the Libaudioverse API used from it.
+If the Libaudioverse API can be used from such a callback, then the specific parts of the API that should be used will be outlined.
+Using the Libaudioverse API in an incorrect manner from a callback which is called inside the audio thread will lead to undefined behavior.
+Said undefined behavior will be well down the road to outright crashing.
 
 The other place that callbacks can be called is on a background thread owned by the simulation.
 This will be clearly documented.
 This thread is created even if you opt to use `Lav_simulationGetBlock`.
 In this case, using the Libaudioverse API is safe.
 
-In the first case, blocking is a very bad idea (again, unless otherwise documented).
-Since the callback runs in the audio threads, blocking inside it will cause audio to take longer to synthesize.
-In the latter case, blocking for very short periods will not cause a large degradation in audio performance, but other callbacks behind the currently executing one may or may not get stuck waiting on the current one to finish.
+Blocking in a callback is usually a bad idea.
+If the callback is running in the audio threads, blocking will decrease performance and cause Libaudioverse to begin adjusting the latency upward.
+In extreme cases, blocking in the audio threads will cause glitching.
+Blocking inside callbacks which are not in the audio threads will stop further callbacks from executing, but will otherwise not degrade performance immediately.
+It should be noted that Libaudioverse sometimes uses the thread on which these callbacks run internally, and that blocking the callback queue may cause resources to build up over time.
 
-You cannot assume that only one callback will execute at once in either case, and they should always, always be threadsafe.
+No guarantee is made that only one callback will execute at a time.
+All callbacks should be fully threadsafe.
 
 [[technical-audio_processing_algorithm]]
 ===  Details on the Audio Processing Algorithm
 
 This section tells you everything you need or want to know about the audio processing algorithm.
 You probably don't need to read it on a first or second or fiftieth read-through of the manual, but it's here for those applications that need to squeeze every last iota of performance out of Libaudioverse.
+
 The algorithm is stated in many other places in this manual in a simpler form: if you can walk along the node in question's outputs via any path that leads only through unpaused nodes to the simulation, then the node in question will process.
 
 ==== Theoretical pseudocode
@@ -328,7 +341,7 @@ for i in simulation.always_playing_nodes:
     process(i)
 ....
 
-==== Justification
+==== Justification and Working With the Algorithm
 
 This algorithm looks complicated, and it is.
 But it's also necessary and helpful.
@@ -339,11 +352,11 @@ It would be possible to require everyone to call finalize on everything, but thi
 With the above algorithm, it is sufficient to pause or disconnect only one node on the death of an enemy in a game, to provide a concrete example.
 Since nodes only process if needed, having tens or hundreds of objects that aren't needed but haven't been garbage collected yet does nothing to the CPU.
 
-The helpfulness is twofold.
+There are two reasons for this complexity.
 
-First, in most cases, nothing is lost over the simpler process-everything algorithm.
+First, in most cases, nothing is lost over the simpler process-everything algorithm, but you no longer need to worry about dispose methods.
 For most apps, pretending that everything is processed is a sufficient model to properly use Libaudioverse.
-The convenience of not having to call a dispose method is gained without the drop in performance it might entail.
+You should certainly do so until it becomes a problem, because chances are that it never will.
 
 The second helpful feature of this algorithm is useful in synthesis applications.
 It is possible to set up complicated networks of objects and to load files and to do generally whatever else is required without having said objects advance.
@@ -353,9 +366,7 @@ Until these nodes are connected, they don't play.
 To that end, one can use a <<node-Lav_OBJTYPE_GAIN_NODE<gain node>>, route everything through it, and connect the gain node when done.
 The final connection plays, and all of the nodes can be paused (and not take CPU) simply by pausing the gain node.
 
-==== The Real Algorithm
-
-As stated at the beginning of this section, this isn't the real algorithm.
+==== The Real Algorithm and Optimizing your Application
 
 In practice, Libaudioverse precalculates the order of execution of nodes in a somewhat expensive process called replanning.
 This is then cached until any operation which changes the order.
@@ -375,5 +386,6 @@ Second, Libaudioverse can sometimes run better in the single-threaded case.
 If you have only a few nodes or cannot do anything but have only a couple nodes per tier, switching Libaudioverse to single-threaded mode may actually improve performance, as the planning and dispatch of nodes to threads has an overhead.
 
 Finally, try to group operations that invalidate the plan.
-Most notably this is connections and disconnections of outputs, but state changes also do it.
+Most notably this is connections and disconnections of outputs, but state changes also cause invalidation.
 If you're planning to execute extremely large numbers of such operations, using <<function-Lav_simulationLock,Lav_simulationLock>> and <<function-Lav_simulationUnlock,Lav_simulationUnlock>> may be worthwhile.
+The replanning algorithm has a high complexity, and so applications with more nodes will benefit more from this particular optimization.
