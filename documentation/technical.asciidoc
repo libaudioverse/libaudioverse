@@ -29,40 +29,45 @@ Failure to do so may lead to crashes, depending on what is or is not created.
 It is not safe to assume that Libaudioverse will properly clean itself up at process exit without a call to <<function-Lav_shutdown,Lav_shutdown>>, though failing to do so is common in exploratory situations for languages which provide a REPL.
 
 [[tecchnical-object_lifetime]]
-=== Object and Pointer Lifetime
+=== Pointer Ownership and Object Lifetime
 
-When Libaudioverse needs to return a buffer of memory, it will always allocate a new buffer and copy to it unless otherwise specified.
-Free these buffers with <<function-Lav_free,Lav_free>> or <<function-Lav_shutdown,Lav_shutdown>>.
-Either of these functions will kill them instantly.
-Never use free on these pointers.
-In addition to the problems caused on Windows in event of crossing between CRT versions, this will cause Libaudioverse to crash at some point in the future.
+==== Pointer Ownership
 
-Object handles are reference counted.
-The count is managed via <<function-Lav_handleIncRef,Lav_handleIncRef>> and <<function-Lav_handleDecRef,Lav_handleDecRef>>.
+When Libaudioverse returns a buffer of memory, it always allocates a copy.
+The calling application is responsible for freeing this buffer, always through <<function-Lav_free,Lav_free>>.
+Use of `free` from the standard library on these pointers will crash.
 
-On the first external access by any means (whether you creeated the handle or not, though creation is almost always the case), the function <<function-Lav_handleGetAndClearFirstAccess,Lav_handleGetAndClearFirstAccess>> will result in a nonzero value.
-If it results in a zero value, this is not the first access.
-In that case, the reference count should be incremented.
-All handles exit Libaudioverse with a reference count of 1 on the first access.
+When <<function-Lav_shutdown,Lav_shutdown>> is called, all pointers that libaudioverse allocated are immediately freed.
 
-Unfortunately it's not quite as simple as that.
-Libaudioverse's internal references do not show up on the reference count, and a goal of Libaudioverse is proper garbage collection.
-To that end, a reference count of zero means deletion at some point in the future, not immediately.
-Take as an example buffers: a buffer may still be assigned to a buffer property, even though the reference count has been decremented to zero.
-In this case, reading the buffer property will result in a handle with reference count of 1 and the first external access bit set--just as though you had never seen it.
+==== Object Lifetime
 
-What this means is that it is possible for pending callbacks or exploration functions to again see these objects.
-if the application needs to know when an object is deleted, the handle destruction callback can be set.
-This callback will be called on the thread that last uses the handle.
-This means it may not be an application thread, and so the callback should most definitively not block.
-It may also be called before `Lav_handleDecRef` returns.
-By the time the callback is called, the handle is completely invalid.
-use <<function-Lav_setHandleDestroyedCallback>>.
-Libaudioverse guarantees that you will never see the same object again; furthermore, handle values will not be reused.
+There are three functions dealing with handle management: <<function-Lav_handleIncRef,Lav_handleIncRef>>, <<function-Lav_handleDecRef,Lav_handleDecRef>>, and <<function-Lav_handleGetAndClearFirstAccess,Lav_handleGetAndClearFirstAccess>>.
 
-If you're writing a language binding, consider the proxy pattern: store the global state in a dictionary or other object until after the handle destruction callback is called, then clear out the record.
-You can wrap the handles in proxy objects that read this state.
-This is the approach used by the official Libaudioverse bindings, in  any language where it is applicable.
+A handle is either external or internal.
+Handles are external if and only if their reference count is greater than or equal to 1.
+The function <<function-Lav_handleGetAndClearFirstAccess>> indicates whether a handle has just transitioned from the internal to external states, clearing an internal flag.
+On first access, a handle's reference count is always one.
+This function exists primarily to assist bindings in knowing when they need to increment the handle's reference count.
+
+When a handle's reference count goes to 0, it is not immediately deleted.
+It merely becomes internral once more.
+It is possible to see the handle once more externally, for example by querying the buffer node's buffer property.
+In this case, <<function-Lav_handleGetAndClearFirstAccess,Lav_handleGetAndClearFirstAccess>> will again return true and clear the flag.
+
+There are special rules for the 3 most common Libaudioverse object types.  They are as follows:
+
+- A simulation is alive so long as any object created using the simulation is still alive.
+
+- A node is alive so long as it has an output connected to another node that is also still alive.
+
+- Buffers are alive as long as they are assigned to a buffer property, or otherwise in use.
+
+In order to detect the death of a handle, Libaudioverse provides the <<function-Lav_setHandleDestroyedCallback,Lav_setHandleDestroyedCallback>> function.
+handle values are not reused unless the application manages to overflow a 32-bit signed integer.
+Most bindings therefore use the proxy pattern: the objects that user code deals with are thin proxies containing the handle and a pointer to global state.
+When the handle destroyed callback is called, the global state is then destroyed.
+This allows for keeping callback objects and other such resources alive in languages with garbage collectors, as not to invalidate pointers held by Libaudioverse.
+The handle destroyed callback must do its best to not block whenever possible, as it may be called from any thread.
 
 [[technical-simulation]]
 === The Simulation
@@ -174,13 +179,14 @@ Libaudioverse has intrinsic understanding of the following channel counts, and c
 
 . Libaudioverse Channel Count and Ordering
 [options="header,footer"]
-|====
+|===
 | Count | Name | Order
 | 1 | Mono | Mono
 | 2 | Stereo | Left, Right
 | 4 | 4.0 Surround (quad) | front left, front right, back left, back right
 | 6 | 5.1 surround | front left, front right, center, lfe, back left, back right
 | 8 | 7.1 Surround | front left, front right, center, lfe, back left, back right, side left, side right
+|===
 
 Where applicable, libaudioverse prefers to copy WebAudio's conversion algorithms.
 This is used for everything save conversions involving 7.1, for which the WebAudio spec fails to specify anything.
