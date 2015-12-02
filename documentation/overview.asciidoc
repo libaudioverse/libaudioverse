@@ -67,17 +67,20 @@ import time
 
 libaudioverse.initialize()
 s=libaudioverse.Simulation()
-n=SineNode(s)
+n = libaudioverse.SineNode(s)
 n.frequency = 0
 n.connect_simulation(0)
 s.set_output_device(-1)
 
 #Recall that Python omits the last value.
-for i in xrange(0, 1010, 10):
+for i in range(0, 1010, 10):
     n.mul.value = i/1000.0
     n.frequency.value = i
     time.sleep(0.02)
 ....
+
+This example has audible artifacts.
+The reasoning for this and how to fix it will be explained in a later section.
 
 In addition to inputs, all nodes have properties.
 Every node has at least `mul` and `add`.
@@ -101,8 +104,8 @@ libaudioverse.initialize()
 
 simulation = libaudioverse.Simulation()
 
-print "Enter a path to a sound file."
-path = raw_input()
+print("Enter a path to a sound file.")
+path = input()
 
 buffer=libaudioverse.Buffer(simulation)
 buffer.load_from_file(path)
@@ -113,8 +116,8 @@ buffer_player.connect_simulation(0)
 
 simulation.set_output_device(-1)
 
-print "Press enter to exit."
-raw_input()
+print("Press enter to exit.")
+input()
 libaudioverse.shutdown()
 ....
 
@@ -123,7 +126,8 @@ They can be loaded from a number of sources, but by far the most common is from 
 
 Buffer nodes play the specified buffer, and have four properties of interest: `position`, `looping`, `rate`, and `end_count`.
 `Position` is the current position of the buffer in seconds, `looping` controls if we loop, and `end_count` counts the number of times it has reached the end.
-`End_count` exists so that you can play buffers synchronously or otherwise tell when they have ended without the overhead of using callbacks,  described later.
+`End_count` exists so that you can play buffers synchronously or otherwise tell when they have ended without the coding complexity of using callbacks,  described later.
+Note that callbacks will be more efficient for this purpose, as `end_count` requires spin waiting.
 `Rate` controls the playback rate of the buffer.  1.0 is normal speed, 2.0 is twice as fast, etc.
 
 As mentioned above, buffers store uncompressed, decoded audio data as float32, resampled to match the sampling rate of their simulation.
@@ -151,6 +155,7 @@ buffer_player.looping = True
 panner=libaudioverse.MultipannerNode(s, "default")
 buffer_player.connect(output = 0, node = panner, input = 0)
 panner.connect_simulation(0)
+s.set_output_device(-1)
 ....
 
 Multipanners are the most commonly used panner, as they support switching between HRTf, stereo, 4.0, 5.1, and 7.1 at runtime and without recreating objects.
@@ -187,18 +192,18 @@ As with the above example, copy it to a file and run with `python -i`.
 import libaudioverse
 libaudioverse.initialize()
 
-s=libaudioverse.simulation()
-n=BufferNode(s)
-b=Buffer(s)
+s=libaudioverse.Simulation()
+n=libaudioverse.BufferNode(s)
+b=libaudioverse.Buffer(s)
 b.load_from_file("sound.wav")
 n.buffer = b
 
 e = libaudioverse.EnvironmentNode(s, "default")
-e.default_panning_strategy = PanningStrategies.hrtf
+e.default_panning_strategy = libaudioverse.PanningStrategies.hrtf
 e.output_channels = 2
 e.connect_simulation(0)
 
-o=SourceNode(s, e)
+o=libaudioverse.SourceNode(s, e)
 n.connect(0, o, 0)
 
 s.set_output_device(-1)
@@ -282,7 +287,7 @@ As with the proceeding examples, run it with `python -i`.
 
 ....
 reverb = libaudioverse.FdnReverbNode(s)
-send = e.add_effect_send(channels = 4, is_reverb = True, connect-by_default = True)
+send = e.add_effect_send(channels = 4, is_reverb = True, connect_by_default = True)
 e.connect(send, reverb, 0)
 reverb.connect_simulation(0)
 ....
@@ -321,11 +326,11 @@ s=libaudioverse.Simulation()
 n=libaudioverse.SineNode(s)
 
 n.frequency = 300
-n.frequency.llinear_ramp_to_value(1.0, 600)
+n.frequency.linear_ramp_to_value(1.0, 600)
 n.frequency.linear_ramp_to_value(2.0, 300)
 n.frequency.linear_ramp_to_value(3.0, 600)
-n.frequency.linear_ramp_to_value(4.0, 600)
-n.frequency.linear_ramp_to_value(5.0, 300)
+n.frequency.linear_ramp_to_value(4.0, 300)
+n.frequency.linear_ramp_to_value(5.0, 600)
 
 n.mul.set(5.1, 1.0)
 n.mul.linear_ramp_to_value(5.2, 0.0)
@@ -338,13 +343,11 @@ libaudioverse.shutdown()
 ....
 
 The above example demonstrates automators.
-
 Libaudioverse processes audio in blocks, submitting each block to the sound card before beginning the next.
 During the processing of a block, no API call can have effect.
 The problem with this setup is that there is no way to allow user code to be called more rapidly than once per block.
 Worse yet, being called exactly once per block requires extra work and degrades performance.
-
-Consequently, Libaudioverse introduces automators, functions which schedule changes on float and double properties.
+Automators exist to allow smoothe property modifications despite this downside.
 
 The linear ramp is an automator which begins moving the value of the property to the specified value.
 The first argument is the time at which the property must reach the target value erelative to the current time, and the second the value which must be reached.
@@ -387,7 +390,7 @@ import libaudioverse
 libaudioverse.initialize()
 
 s = libaudioverse.Simulation()
-n1, n2 = SineNode(s), SineNode(s)
+n1, n2 = libaudioverse.SineNode(s), libaudioverse.SineNode(s)
 
 n2.mul = 0.0
 
