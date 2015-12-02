@@ -81,7 +81,7 @@ The block size is the number of samples to process at once, and must be a multip
 Simulations are created with <<function-Lav_createSimulation>>.
 
 By default, Libaudioverse will use one thread per core on the current system for audio mixing.
-This may be changed via <<function-Lav_simulationSetThreads>>
+This may be changed via <<function-Lav_simulationSetThreads>>.
 
 Simulations handle audio output and hold state, provided via dependency injection to created objects.
 All Libaudioverse objects are associated with exactly one simulation in a permanent manner.
@@ -95,7 +95,7 @@ Simulations are the final destination for audio, and output may be retrieved in 
 In all cases, Libaudioverse applies the audio upmixing and downmixing algorithms as specified <<technical-connections,here>> to reach the required channel count.
 None of the following three methods of receiving audio should be mixed; doing so results in undefined behavior.
 
-<<function-Lav_getBlock>>  fills a buffer allocated by the calling application with a block of audio data.
+<<function-Lav_simulationGetBlock>>  fills a buffer allocated by the calling application with a block of audio data.
 
 <<function-Lav_simulationWriteFile>> drives the simulation for the specified duration, synthesizing as fast as possible and writing to the specified file.
 The file format is determined from the extension of the provided path.
@@ -130,7 +130,7 @@ Always trust the user; if it is important for your application to know if it is 
 
 Libaudioverse outputs audio in blocks.
 When outputting to an audio device, any operation which may be completed with one function call will either be completely audible or not audible on the next block.
-if the operation in question can be done in one function call, hearing partial results is not possible.
+If the operation in question can be done in one function call, hearing partial results is not possible.
 
 There are three ways to ensure that operations which take more than one function call are only audible when finished:
 
@@ -141,7 +141,7 @@ There are three ways to ensure that operations which take more than one function
 - Set a per-block callback which Libaudioverse will call just before mixing every block.  This can be done with <<function-Lav_simulationSetBlockCallback>>.
 
 Most games will want to use <<function-Lav_simulationLock>> before beginning their per-frame audio update, and <<function-Lav_simulationUnlock>> afterwords.
-failure to call <<function-Lav_simulationUnlock>> in a timely manner will cause audio glitching; failure to call it at all will cause silence and freeze Libaudioverse's background threads.
+Failure to call <<function-Lav_simulationUnlock>> in a timely manner will cause audio glitching; failure to call it at all will cause silence and freeze Libaudioverse's background threads.
 
 The per-block callback is for advanced synthesis applications which need a stronger guarantee: not only is the operation happening completely before the next block, it is running every block.
 Using the per-block callback for a game's frame updates will lead to massively degraded performance on both sides.
@@ -179,8 +179,6 @@ Connecting nodes to the simulation is accomplished with <<function-Lav_nodeConne
 All inputs and outputs have a documented channel count.
 Libaudioverse has intrinsic understanding of the following channel counts, and can freely and automatically convert between them:
 
-. Libaudioverse Channel Count and Ordering
-[options="header,footer"]
 |===
 | Count | Name | Order
 | 1 | Mono | Mono
@@ -260,7 +258,7 @@ These will be discussed here.
 First is the set value.  This is fairly self-explanatory: call `Lav_nodeSetFloatProperty`.
 
 Second is the automation timeline.
-Automators include such things as <<function-Lav_automationLinearRampToValue,Lav_automationLinearRampToValue>> and <<function-Lav_automationEnvelope,Lav_automationEnvelope>>
+Automators include such things as <<function-Lav_automationLinearRampToValue,Lav_automationLinearRampToValue>> and <<function-Lav_automationEnvelope,Lav_automationEnvelope>>.
 When in use, the automation timeline takes the place of the set value; note that setting the property explicitly will cancel all automators.
 
 Only one automator can be in effect at any given time.
@@ -363,7 +361,7 @@ It is possible to set up complicated networks of objects and to load files and t
 This was mentioned briefly in the section on <<technical-atomicity,atomicity>>.
 The upshot is that it allows one to configure 6 sine nodes or create 4 synchronized buffer nodes and load their data without having to worry about the concerns in the atomicity section.
 Until these nodes are connected, they don't play.
-To that end, one can use a <<node-Lav_OBJTYPE_GAIN_NODE<gain node>>, route everything through it, and connect the gain node when done.
+To that end, one can use a <<node-Lav_OBJTYPE_GAIN_NODE,gain node>>, route everything through it, and connect the gain node when done.
 The final connection plays, and all of the nodes can be paused (and not take CPU) simply by pausing the gain node.
 
 ==== The Real Algorithm and Optimizing your Application
