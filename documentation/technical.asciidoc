@@ -231,7 +231,7 @@ The purpose of float3 and float6 properties are to provide a fast path for orien
 
 There are three standard properties on all nodes.  They are as follows, with more complete documentation <<node-Lav_OBJTYPE_GENERIC_NODE,here>>:
 
-- `State`. An int. This property takes its value from the <<enum-Lav_OBJECT_STATES>> enumeration.
+- `State`. An int. This property takes its value from the <<enum-Lav_NODE_STATES>> enumeration.
 Nodes which are playing are used as-needed.
 Nodes which are paused act as though they are always outputting zeros.
 Nodes which are always playing always process, even if no one needs their output.
