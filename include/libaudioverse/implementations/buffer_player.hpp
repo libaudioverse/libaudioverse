@@ -30,7 +30,7 @@ class BufferPlayer {
 	int getEndedCount();
 	void resetEndedCount();
 	private:
-	std::shared_ptr<Buffer> buffer;
+	std::shared_ptr<Buffer> buffer = nullptr;
 	int frame = 0;
 	int buffer_length=0;
 	double offset=0.0, rate = 1.0;
@@ -50,6 +50,7 @@ inline BufferPlayer::BufferPlayer(int _block_size, float _sr): sr(_sr), block_si
 
 inline BufferPlayer::~BufferPlayer() {
 	for(auto &i: intermediate_destination) freeArray(i);
+	if(buffer) buffer->decrementUseCount();
 }
 
 inline void BufferPlayer::process(int channels, float** outputs) {
@@ -97,7 +98,9 @@ inline void BufferPlayer::process(int channels, float** outputs) {
 }
 
 inline void BufferPlayer::setBuffer(std::shared_ptr<Buffer> b) {
+	if(buffer) buffer->decrementUseCount();
 	buffer = b;
+	if(b) b->incrementUseCount();
 	frame = 0;
 	offset = 0.0;
 	resetEndedCount();
@@ -148,6 +151,7 @@ inline int BufferPlayer::getEndedCount() {
 }
 
 inline void BufferPlayer::resetEndedCount() {
+	ended_count = 0;
 }
 
 }

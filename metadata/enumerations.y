@@ -20,6 +20,7 @@ enumerations:
       Lav_ERROR_PROPERTY_IS_READ_ONLY: Attempt to set a read-only property.
       Lav_ERROR_OVERLAPPING_AUTOMATORS: An attempt to schedule an automator within the duration of another.
       Lav_ERROR_CANNOT_CONNECT_TO_PROPERTY: Attempt to connect a node to a property which cannot be automated.
+      Lav_ERROR_BUFFER_IN_USE: Indicates an attempt to modify a buffer while something is reading its data.
       Lav_ERROR_INTERNAL: If you see this error, it's a bug.
   Lav_PROPERTY_TYPES:
     doc_description: |

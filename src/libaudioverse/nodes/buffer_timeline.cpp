@@ -53,6 +53,7 @@ void BufferTimelineNode::process() {
 
 void BufferTimelineNode::scheduleBuffer(double time, float delta, std::shared_ptr<Buffer> buffer) {
 	time+=this->time; //time is relative to the node's internal time.
+	//The buffer player handles the buffer's use count.
 	auto player = new BufferPlayer(simulation->getBlockSize(), simulation->getSr());
 	player->setBuffer(buffer);
 	player->setRate(delta);

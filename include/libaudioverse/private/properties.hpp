@@ -197,7 +197,6 @@ class Property {
 };
 
 
-
 //helper methods to quickly make properties.
 Property* createIntProperty(const char* name, int default, int min, int max);
 Property* createFloatProperty(const char* name, float default, float min, float max);

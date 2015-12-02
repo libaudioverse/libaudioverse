@@ -4,6 +4,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/automators.hpp>
+#include <libaudioverse/private/buffer.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/simulation.hpp>
 #include <libaudioverse/private/connections.hpp>
@@ -18,6 +19,7 @@ Property::Property(int property_type): type(property_type) {}
 Property::~Property() {
 	if(value_buffer) freeArray(value_buffer);
 	if(node_buffer) freeArray(node_buffer);
+	if(buffer_value) buffer_value->decrementUseCount();
 }
 
 void Property::associateNode(Node* node) {
@@ -40,6 +42,7 @@ void Property::reset(bool avoidCallbacks) {
 	string_value = default_string_value;
 	farray_value = default_farray_value;
 	iarray_value = default_iarray_value;
+	if(buffer_value) buffer_value->decrementUseCount();
 	buffer_value=nullptr;
 	automators.clear();
 	if(avoidCallbacks == false) firePostChangedCallback();
@@ -472,7 +475,9 @@ std::shared_ptr<Buffer> Property::getBufferValue() {
 }
 
 void Property::setBufferValue(std::shared_ptr<Buffer> b, bool avoidCallbacks) {
+	if(buffer_value) buffer_value->decrementUseCount();
 	buffer_value=b;
+	if(b) b->incrementUseCount();
 	last_modified = simulation->getTickCount();
 	if(avoidCallbacks == false) firePostChangedCallback();
 }

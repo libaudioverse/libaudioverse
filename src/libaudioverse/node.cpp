@@ -808,7 +808,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeSetBufferProperty(LavHandle nodeHandle, int
 	PUB_BEGIN
 	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_BUFFER);
 	auto buff=incomingObject<Buffer>(bufferHandle, true);
-	if(buff->getSimulation() != node_ptr->getSimulation()) ERROR(Lav_ERROR_CANNOT_CROSS_SIMULATIONS, "Buffer is not from the same simulation as the node.");
+	if(buff && buff->getSimulation() != node_ptr->getSimulation()) ERROR(Lav_ERROR_CANNOT_CROSS_SIMULATIONS, "Buffer is not from the same simulation as the node.");
 	prop.setBufferValue(buff);
 	PUB_END
 }

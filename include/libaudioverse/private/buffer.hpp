@@ -4,6 +4,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #pragma once
 #include "memory.hpp"
 #include <memory>
+#include <atomic>
+
 
 namespace libaudioverse_implementation {
 class Simulation;
@@ -31,12 +33,19 @@ class Buffer: public ExternalObject {
 	//Normalize the buffer: divide by the sample furthest from zero.
 	//This can't be undone.
 	void normalize();
+	
+	//Lock and unlock the user's ability to change the buffer's contents.
+	//These three functions are technically threadsafe, as they all use an atomic variable.
+	void incrementUseCount();
+	void decrementUseCount();
+	void throwIfInUse();
 	private:
 	int channels = 0;
 	int frames = 0;
 	int sr = 0;
 	float* data = nullptr;
 	std::shared_ptr<Simulation> simulation;
+	std::atomic<int> use_count{0};
 };
 
 std::shared_ptr<Buffer> createBuffer(std::shared_ptr<Simulation>simulation);

@@ -11,6 +11,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/error.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <algorithm>
+#include <atomic>
+
 
 namespace libaudioverse_implementation {
 
@@ -83,6 +85,20 @@ void Buffer::unlock() {
 	simulation->unlock();
 }
 
+void Buffer::incrementUseCount() {
+	use_count.fetch_add(1);
+}
+
+void Buffer::decrementUseCount() {
+	use_count.fetch_add(-1);
+}
+
+void Buffer::throwIfInUse() {
+	if(use_count.load()) {
+		ERROR(Lav_ERROR_BUFFER_IN_USE, "You cannot modify buffers while something is using their data.");
+	}
+}
+
 //begin public api
 
 Lav_PUBLIC_FUNCTION LavError Lav_createBuffer(LavHandle simulationHandle, LavHandle* destination) {
@@ -109,6 +125,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_bufferLoadFromFile(LavHandle bufferHandle, cons
 	f.readAll(data);
 	{
 		LOCK(*buff);
+		buff->throwIfInUse();
 		buff->loadFromArray(f.getSr(), f.getChannelCount(), f.getSampleCount()/f.getChannelCount(), data);
 	}
 	freeArray(data);
@@ -119,6 +136,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_bufferLoadFromArray(LavHandle bufferHandle, int
 	PUB_BEGIN
 	auto buff=incomingObject<Buffer>(bufferHandle);
 	LOCK(*buff);
+	buff->throwIfInUse();
 	buff->loadFromArray(sr, channels, frames, data);
 	PUB_END
 }
@@ -127,6 +145,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_bufferNormalize(LavHandle bufferHandle) {
 	PUB_BEGIN
 	auto b = incomingObject<Buffer>(bufferHandle);
 	LOCK(*b);
+	b->throwIfInUse();
 	b->normalize();
 	PUB_END
 }
