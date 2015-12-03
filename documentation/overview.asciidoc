@@ -8,6 +8,9 @@ Each subsection starts with some Python  code and follows it with an explanation
 The translation to the C API should be fairly straightforward.
 In the cases where it is not, this manual will make an effort to tell you what you need to use.
 
+Note that the following examples work with Python 3.
+Changes for Python 2 are minimal.
+
 === Playing a Sine Wave
 
 Output a sine wave for 5 seconds:
