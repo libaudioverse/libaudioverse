@@ -3,6 +3,7 @@
 
 This section tries to get you started with Libaudioverse quickly.
 <<technical,A high-level technical overview>> can be found further along in this manual, but this section is probably what you actually want when you're starting.
+Reading in order is recommended.
 
 Each subsection starts with some Python  code and follows it with an explanation.
 The translation to the C API should be fairly straightforward.
