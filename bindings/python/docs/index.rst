@@ -11,6 +11,7 @@ Contents:
 .. toctree::
    :maxdepth: 2
    
+   python-specifics
    api
 
 Welcome to the documentation for the Libaudioverse Python bindings.
