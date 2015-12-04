@@ -4,6 +4,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/kernels.hpp>
 #include <libaudioverse/private/dspmath.hpp>
 #include <libaudioverse/private/memory.hpp>
+#include <libaudioverse/private/workspace.hpp>
 #include <libaudioverse/implementations/hrtf_panner.hpp>
 #include <libaudioverse/implementations/delayline.hpp>
 #include <libaudioverse/implementations/convolvers.hpp>
@@ -13,24 +14,23 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 namespace libaudioverse_implementation {
 
+thread_local Workspace<float> left_response_workspace, right_response_workspace;
+thread_local Workspace<float> crossfade_workspace;
+
 HrtfPanner::HrtfPanner(int _block_size, float _sr, std::shared_ptr<HrtfData> _hrtf): block_size(_block_size), sr(_sr), hrtf(_hrtf) {
 	response_length = hrtf->getLength();
-	left_response = allocArray<float>(response_length);
-	right_response = allocArray<float>(response_length);
-	hrtf->computeCoefficientsStereo(azimuth, elevation, left_response, right_response);
+	float* left_response_ptr= left_response_workspace.get(response_length);
+	float* right_response_ptr = right_response_workspace.get(response_length);
+	hrtf->computeCoefficientsStereo(azimuth, elevation, left_response_ptr, right_response_ptr);
 	left_convolver = new BlockConvolver(block_size);
 	right_convolver = new BlockConvolver(block_size);
 	prev_left_convolver = new BlockConvolver(block_size);
 	prev_right_convolver = new BlockConvolver(block_size);
-	left_convolver->setResponse(response_length, left_response);
-	right_convolver->setResponse(response_length, right_response);
-	crossfade_workspace = allocArray<float>(block_size);
+	left_convolver->setResponse(response_length, left_response_ptr);
+	right_convolver->setResponse(response_length, right_response_ptr);
 }
 
 HrtfPanner::~HrtfPanner() {
-	freeArray(left_response);
-	freeArray(right_response);
-	freeArray(crossfade_workspace);
 	delete left_convolver;
 	delete right_convolver;
 	delete prev_left_convolver;
@@ -47,19 +47,22 @@ void HrtfPanner::pan(float* input, float *left_output, float *right_output) {
 			left_convolver->reset();
 			right_convolver->reset();
 		}
-		hrtf->computeCoefficientsStereo(elevation, azimuth, left_response, right_response);
-		left_convolver->setResponse(response_length, left_response);
-		right_convolver->setResponse(response_length, right_response);
+		float* left_response_ptr = left_response_workspace.get(response_length);
+		float* right_response_ptr = right_response_workspace.get(response_length);
+		hrtf->computeCoefficientsStereo(elevation, azimuth, left_response_ptr, right_response_ptr);
+		left_convolver->setResponse(response_length, left_response_ptr);
+		right_convolver->setResponse(response_length, right_response_ptr);
 	}
 	//These two convolutions always happen.
 	left_convolver->convolve(input, left_output);
 	right_convolver->convolve(input, right_output);
 	if(needsCrossfade) {
 		double delta = 1.0/block_size;
-		prev_left_convolver->convolve(input, crossfade_workspace);
-		for(int i = 0; i < block_size; i++) left_output[i] = (block_size-i)*delta*crossfade_workspace[i]+i*delta*left_output[i];
-		prev_right_convolver->convolve(input, crossfade_workspace);
-		for(int i = 0; i < block_size; i++) right_output[i] = (block_size-i)*delta*crossfade_workspace[i]+i*delta*right_output[i];
+		float* crossfade_ptr = crossfade_workspace.get(block_size);
+		prev_left_convolver->convolve(input, crossfade_ptr);
+		for(int i = 0; i < block_size; i++) left_output[i] = (block_size-i)*delta*crossfade_ptr[i]+i*delta*left_output[i];
+		prev_right_convolver->convolve(input, crossfade_ptr);
+		for(int i = 0; i < block_size; i++) right_output[i] = (block_size-i)*delta*crossfade_ptr[i]+i*delta*right_output[i];
 	}
 	prev_azimuth = azimuth;
 	prev_elevation = elevation;

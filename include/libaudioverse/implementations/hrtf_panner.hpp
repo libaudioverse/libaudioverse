@@ -29,13 +29,8 @@ class HrtfPanner {
 	float getCrossfadeThreshold();
 	private:
 	std::shared_ptr<HrtfData> hrtf;
-	//Workspaces and pointers:
-	//Left and right HRIR responses.
-	float *left_response = nullptr, *right_response = nullptr;
 	//Convolvers, current and previous.
 	BlockConvolver *left_convolver, *right_convolver, *prev_left_convolver, *prev_right_convolver;
-	//When crossfading, we calculate both outputs and then fade.
-	float* crossfade_workspace;
 	int block_size;
 	int response_length;
 	float sr;
