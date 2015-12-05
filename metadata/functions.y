@@ -9,11 +9,9 @@ functions:
     doc_description: |
       Shuts down Libaudioverse.
       You must call this function at the end of your application.
-      Failure to do so may cause crashes as Libaudioverse may attempt to make use of resources you passed it as your app shuts down,
-      for example callbacks.
-      
+      Failure to do so may cause crashes.
       Once this function has been called, all pointers and handles from Libaudioverse are invalid.
-      Continuing to make use of any resource Libaudioverse has given you after this point will cause crashing.
+      Libaudioverse cannot be safely reinitialized.
   Lav_isInitialized:
     category: core
     doc_description: |
@@ -22,7 +20,7 @@ functions:
     category: core
     doc_description: |
       Get the message corresponding to the last error that happened on this thread.
-      The returned pionter is valid until another error occurs.
+      The returned pointer is valid until another error occurs.
       The main purpose of this function is debugging and bindings.
   Lav_errorGetFile:
     category: core
@@ -39,14 +37,10 @@ functions:
     category: core
     doc_description: |
       Frees pointers that Libaudioverse gives  you.
-      There are a limited number of cases wherein Libaudioverse will return a newly allocated pointer.
-      Such cases should be clearly documented in this manual.
-      In order to free such memory, be sure to use this function rather than the normal system free:
-      on some platforms, the Libaudioverse DLL may not be using the same C runtime,
-      and the memory passed to you may be allocated from internal caches.
+      In order to free pointers from Libaudioverse, be sure to use this function rather than the normal system free.
       
       This function is no-op after shutdown, but should not be used before initialization.
-      This behavior simplifies writing garbage-collected bindings to Libaudioverse, and should not be relied on directly.
+      This behavior simplifies writing garbage-collected bindings to Libaudioverse, and should not be relied on in C code.
     params:
       ptr: The pointer to free.
   Lav_handleIncRef:
@@ -65,16 +59,10 @@ functions:
       Decrement the reference count of a Libaudioverse handle.
       This function is the equivalent to Lav_free for objects.
       Note that this is only a decrement.
-      if you call it in the middle of a block or in a variety of other situations, you may see the same handle again via a callback.
-      
-      It is not possible for Libaudioverse to provide a guaranteed freeing function.
-      Such a function would have to block, making it unusable in garbage collected languages.
-      Furthermore, in the case of objects like buffers, various internal Libaudioverse properties could conceivably need to hold onto the object.
-      Internally, Libaudioverse uses shared pointers to make sure this cannot happen,
-      but at the cost of not being able to guarantee instant resource freeing.
+      If you call it in the middle of a block or in a variety of other situations, you may see the same handle again via a callback.
       
       This function is no-op after shutdown, but should not be used before initialization.
-      This behavior simplifies writing garbage-collected bindings to Libaudioverse, and should not be relied on directly.
+      This behavior simplifies writing garbage-collected bindings to Libaudioverse, and should not be relied on directly by C programs.
     params:
       handle: The handle whose reference count we are decrementing.
   Lav_handleGetAndClearFirstAccess:
@@ -82,7 +70,6 @@ functions:
     doc_description: |
       Checks the handle's first access flag and clears it.
       This is an atomic operation, used by bindings to automatically increment and decrement handle reference counts appropriately.
-      Namely, in the case of this function indicating that the first access flag is set, we avoid incrementing the reference count as it is 1 but we have no other external copies of the handle which will be decremented.
     params:
       handle: The handle to check.
       destination: 1 if the first access flag is set, otherwise 0.
@@ -90,6 +77,7 @@ functions:
     category: core
     doc_description: |
       For debugging.  Allows obtaining the current reference count of the handle.
+      This function is not guaranteed to be reliable; do not assume that it is correct or change application behavior based off it.
     params:
       handle: The handle to obtain the reference count of
       destination: After a call to this function, contains the reference count of the handle.
@@ -134,12 +122,9 @@ functions:
     category: core
     doc_description: |
       Set the callback to be called when a Libaudioverse handle is permanently destroyed.
-      Libaudioverse handles cannot be reused.
+      Libaudioverse guarantees that handle values will not be recycled.
       When this callback is called, it is the last time your program can see the specific handle in question,
       and further use of that handle will cause crashes.
-      
-      This exists primarily for language bindings.
-      If there is a case in which your C app must know if a handle is still valid, you may have design issues.
     params:
       cb: The callback to be called when handles are destroyed.
   Lav_deviceGetCount:
@@ -182,9 +167,8 @@ functions:
     category: simulations
     doc_description: |
       Gets a block of audio from the simulation and advances its time.
-      using this with a simulation that is outputting audio to an audio device will not work well.
-      
       You must allocate enough space to hold exactly one block of audio: the simulation's block size times the number of channels requested floating point values.
+      Note that mixing this function with other output methods invokes undefined behavior.
     params:
       simulationHandle: The handle of the simulation to read a block from.
       channels: The number of channels we want. The simulations' output will be upmixed or downmixed as appropriate.
@@ -215,31 +199,32 @@ functions:
       index: The output device  the simulation is to play on.
       channels: The number of channels we wish to output.
       minLatency: The minimum latency your application can tolerate. 0.0 is a good value in most cases.
-      startLatency: A hint as to the latency the audio backend should start with.
-      maxLatency: The maximum latency your application can tolerate.
+      startLatency: A hint as to the latency the audio backend should start with. 0.05 is a suggested default.
+      maxLatency: The maximum latency your application can tolerate. 0.1 or even 0.2 is a suggested default.
   Lav_simulationClearOutputDevice:
     category: simulations
     doc_description: |
       Clear a simulation's output device.
       
       This is no-op if no output device has been set.
-      If it has, this function will block until queued audio finishes.
       
       After a call to this function, it is again safe to use `Lav_simulationGetBlock`.
   Lav_simulationLock:
     category: simulations
     doc_description: |
-      All operations between a call to this function and a call to `Lav_simulationUnlock` will happen together, with no blocks mixed between them.
+      All operations between a call to this function and a call to {{"Lav_simulationUnlock"|function}} will happen together, with no blocks mixed between them.
       This is equivalent to assuming that the simulation is a lock, with  all of the required caution that implies.
+      No other thread will be able to access this simulation or objects created from it until {{"Lav_simulationUnlock"|function}} is called.
       If you do not call {{"Lav_simulationUnlock"|function}} in a timely manner, then audio will stop until you do.
-      accessing another simulation for which your app uses {{"Lav_simulationLock"|function}} or
-      locking or unlocking another lock are both  dangerous operations.
-      Blocking will cause glitches in audio, but is otherwise safe.
+      
+      Pairs of {{"Lav_simulationLock"|function}} and {{"Lav_simulationUnlock"|function}} nest safely.
   Lav_simulationUnlock:
     category: simulations
     doc_description: |
       Release the internal lock of a simulation, allowing normal operation to resume.
       This is to be used after a call to {{"Lav_simulationLock"|function}} and on the same thread as that call; calling it in any other circumstance or on any other thread invokes undefined behavior.
+      
+      Pairs of {{"Lav_simulationLock"|function}} and {{"Lav_simulationUnlock"|function}} nest safely.
   Lav_simulationSetBlockCallback:
     category: simulations
     doc_description: |
@@ -315,9 +300,9 @@ functions:
       data: A pointer to the beginning of the array to load from.
   Lav_bufferNormalize:
     category: buffers
-    dosc_descriptionL: |
+    doc_description: |
       Normalize the buffer.
-      This function divides by the sample whose value is furthest from zero.
+      This function divides by the sample whose absolute value is greatest.
       The effect is to make sounds as loud as possible without clipping or otherwise distorting the sound.
     params:
       bufferHandle: The buffer to normalize.
@@ -494,7 +479,7 @@ functions:
     category: nodes
     doc_description: |
       Find out whether or not a property has a dynamic range.
-      Properties with dynamic ranges change their ranges at specified times, as documented by the documentation for the property of interrest.
+      Properties with dynamic ranges change their ranges at specified times, as documented by the documentation for the property of interest.
     params:
       destination: After a call to this function, contains 1 if the property has a dynamic range, otherwise 0.
   Lav_nodeReplaceFloatArrayProperty:
@@ -526,7 +511,7 @@ functions:
   Lav_nodeReplaceIntArrayProperty:
     category: nodes
     doc_description: |
-      Replace the array contained by a int array property with a new array.
+      Replace the array contained by an int array property with a new array.
       Note that, as usual, memory is copied, not shared.
     params:
       length: The length of the new array.
@@ -578,7 +563,7 @@ functions:
     doc_description: |
       Sets up a linear ramp.
       
-      The value of a linear ramp begins at the end of the last automation and linearly increases to the start time of this automator, after which the property holds steady unless more automators are scheduled.
+      The value of a linear ramp begins at the end of the last automator and linearly increases to the start time of this automator, after which the property holds steady unless more automators are scheduled.
     params:
       slot: The slot of the property to automate.
       time: The time at which we must be at the specified value.
@@ -610,4 +595,5 @@ functions:
     category: nodes
     doc_description: |
       Reset a node.
-      What this means depends on the node in question, so see its documentation.
+      What this means depends on the node in question.
+      Properties are not touched by node resetting.

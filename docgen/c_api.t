@@ -8,14 +8,14 @@ This section of the Libaudioverse documentation documents the low-level C API.
 === Functions By Category
 
 The following is a complete listing of non-node-specific Libaudioverse functions.
-if you do not see a function here, it is documented with its node.
+If you do not see a function here, it is documented with its node.
 
 Each function lists a description, the full C prototype, and information on all involved typedefs.
-This manual does not have a dedicated section for typedefs as there are a sizeable number of them, and most are used with only one or two functions.
 The `LavError` and `LavHandle` typedefs are intensionally omitted: both typedef to int.
 
 All functions return error codes which should be checked.
-Error  conditions are not documented; see the enum section of this documentation for specific information on possible error return values.
+Error  conditions are not documented at this time; see the enum section of this documentation for specific information on possible error return values.
+Most error conditions are indicative of programmer error.
 
 {%for category_info in metadata['function_categories']%}
 ==== {{category_info['doc_name']}}

@@ -4,7 +4,7 @@
 |===
 |Type |Name |Description
 {%for arg in function_object.args%}
-|`{{arg.type | type_to_string}}`
+|`pass:[{{arg.type | type_to_string}}]`
 |{{arg.name}}
 |{{arg_dict[arg.name]}}
 {%endfor%}
@@ -20,7 +20,7 @@
 |Name |Actual Type
 {%for name, typedef in involved_typedefs%}
 |{{name}}
-|`{{typedef|type_to_string}}`
+|`pass:[{{typedef|type_to_string}}]`
 {%endfor%}
 |===
 
