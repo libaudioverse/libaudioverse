@@ -35,7 +35,7 @@ The second is the string to transform."""
         if 'params' in func: #some functions don't have params
             for n, p in func['params'].items():
                 func['params'][n] = render(p)
-
+                
     for name, func in all_info['metadata']['functions'].items():
         prepare_function(func)
 

@@ -3,6 +3,7 @@ import glob
 import os
 import os.path
 import re
+import collections
 
 def cleanup_function(all_info, name, d):
     """This function ignores category so we can use it on node extra functions."""
@@ -49,10 +50,6 @@ def cleanup_callback(all_info, name, callback, for_node):
     callback['params']['nodeHandle'] = "The node which called this callback."
     callback['params']['userdata'] = "The userdata parameter as passed to the setter for this callback."
 
-def cleanup_event(i):
-    i['doc_description'] = i.get('doc_description', 'No description available.')
-    i['multifiring_protection'] = i.get('multifiring_protection', False)
-
 def cleanup_extra_function(all_info, name, d, for_node):
     d['doc_description'] = d.get('doc_description', 'No description available')
     cleanup_function(all_info, name, d) #add parameters, etc.
@@ -77,9 +74,6 @@ def cleanup_node(all_info, name, node):
     if 'properties' not in node:
         node['has_properties'] = False
         node['properties'] = dict() #empty properties.
-    if 'events' not in node:
-        node['has_events'] = False
-        node['events'] = dict()
     if 'extra_functions' not in node:
         node['has_extra_functions'] = False
         node['extra_functions'] = dict()
@@ -88,8 +82,6 @@ def cleanup_node(all_info, name, node):
         node['callbacks'] = dict()
     for i in node['properties'].values():
         cleanup_property(i)
-    for i in node['events'].values():
-        cleanup_event(i)
     for n, i in node['callbacks'].items():
         cleanup_callback(all_info, n, i, name)
     for n, d in node['extra_functions'].items():
@@ -118,7 +110,7 @@ def make_metadata(all_info):
     "metadata"
     ))
 
-    #First, build the base dict. This is metada.yaml:
+    #First, build the base dict. This is metadata.yaml:
     with open(os.path.join(metadata_dir, "metadata.y")) as f:
         metadata = yaml.load(f)
 
@@ -141,5 +133,12 @@ def make_metadata(all_info):
     #run over all the functions, cleaning them up:
     for name, func in metadata['functions'].items():
         cleanup_function(all_info, name, func)
-
+    
+    #We want to sort everything into OrderedDicts.
+    metadata['functions'] = collections.OrderedDict(sorted(metadata['functions'].items(), key = lambda x: x[0]))
+    metadata['nodes'] = collections.OrderedDict(sorted(metadata['nodes'].items(), key = lambda x: x[1].get('doc_name', 'zzzzz')))
+    for i, j in metadata['nodes'].items():
+        j['properties'] = collections.OrderedDict(sorted(j['properties'].items(), key = lambda x: x[1]['name']))
+        j['extra_functions'] = collections.OrderedDict(sorted(j['extra_functions'].items(), key = lambda x: x[0]))
+        j['callbacks'] = collections.OrderedDict(sorted(j['callbacks'].items(), key = lambda x: x[0]))
     return metadata

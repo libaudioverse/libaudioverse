@@ -35,7 +35,7 @@ This node has no inputs.
 {%elif node['inputs'] == "constructor"%}
 The number of inputs to this node depends on parameters to its constructor.
 {%elif node['inputs'] == "described"%}
-The number of inputs to this node is described below.
+The inputs of this node are described below.
 {%else%}
 [caption=""]
 .Inputs
@@ -83,7 +83,6 @@ The outputs of this node are described below.
 {%if nodes[node_name]['has_properties']%}
 ==== Properties
 
-
 {%for propinfo in nodes[node_name]['properties'].items()%}
 
 ===== {{propinfo[1]['name']}}
@@ -92,6 +91,7 @@ C Enumeration Value: {{propinfo[0]}}
 
 Type: {{propinfo[1]['type']}}
 
+{%if not propinfo[1]['read_only']%}
 {%if propinfo[1]['type'] in ["int", "float", "double"]%}
 Range: {%if 'value_enum' in propinfo[1]-%}
 A value from the {{propinfo[1]['value_enum']|enum}} enumeration.
@@ -102,23 +102,15 @@ A value from the {{propinfo[1]['value_enum']|enum}} enumeration.
 
 Default Value: {{propinfo[1].get('default', 'See Description')}}
 
+Rate: {{propinfo[1]['rate']}}
+{%else%}
+This property is read-only.
+{%endif%}
+
 {{propinfo[1]['doc_description']}}
 
 {%endfor%}
 
-
-{%endif%}
-{%if nodes[node_name]['has_events']%}
-==== Events
-
-{%for callinfo in nodes[node_name]['events'].items()%}
-
-===== {{callinfo[1]['name']}}
-C Enumeration Value: {{callinfo[0]}}
-
-{{callinfo[1]['doc_description']}}
-
-{%endfor%}
 
 {%endif%}
 
