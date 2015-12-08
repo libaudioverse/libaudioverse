@@ -14,5 +14,6 @@ doc_name: buffer timeline
 doc_description: |
   Represents timelines of buffers.
   
-  This node provides the ability to schedule buffers to play at any specific time in the future to sample accuracy.
-  it is possible for buffers to be scheduled with pitch bend.
+  This node provides the ability to schedule buffers to play at any specific time in the future.
+  This node supports pitch bending scheduled buffers.
+  There is no limit to the number of buffers which may be scheduled at any given time, and polyphony is supported.

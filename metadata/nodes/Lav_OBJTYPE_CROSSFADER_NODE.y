@@ -8,7 +8,7 @@ properties:
     doc_description: |
       The input which the current crossfade is headed for.
       
-      When not crossfading, the meaning of the value of this property is meaningless.
+      When not crossfading, this property is meaningless.
   Lav_CROSSFADER_CURRENT_INPUT:
     name: current_input
     type: int
@@ -44,7 +44,7 @@ callbacks:
 inputs: constructor
 outputs:
   - [dynamic, "Depends on the channel count given to the constructor.", "The output of the crossfade."]
-name: crossfader
+doc_name: crossfader
 doc_description: |
   A crossfader is a node  which allows for selection of exactly one input.
   The selection can be changed by crossfading, a technique whereby the currently selected input is slowly faded out and the new one faded in.

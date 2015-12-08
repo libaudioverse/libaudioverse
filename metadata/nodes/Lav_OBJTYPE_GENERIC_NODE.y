@@ -27,8 +27,6 @@ properties:
     rate: a
     doc_description: |
       After mul is applied, we add the value to which this property is set to the node's result.
-      The purpose of add is to be used with automation support: add provides a baseline for oscillators and other similar nodes
-      so that when connected to properties, we can make the value of this node vary between a specified minimum and maximum.
   Lav_NODE_CHANNEL_INTERPRETATION:
     name: channel_interpretation
     type: int

@@ -4,6 +4,7 @@ properties:
     type: float
     default: 440.0
     range: [0, INFINITY]
+    rate: a
     doc_description: |
       The frequency of the saw wave, in hertz.
   Lav_OSCILLATOR_FREQUENCY_MULTIPLIER:
@@ -32,13 +33,13 @@ properties:
     doc_description: |
       The number of harmonics.
       0 requests automatic adjustment.
-      use a nonzero value if you intend to sweep the saw wave.
+      Use a nonzero value if you intend to sweep the saw wave.
       
       While this property has no max value, any combination of frequency and harmonics that leads to aliasing will alias.
       To avoid this, make sure that {{"frequency*harmonics"|codelit}} never goes over half your chosen sampling rate.
 inputs: null
 outputs:
-  - [1, "A triangle wave."]
+  - [1, "A saw wave."]
 doc_name: additive saw
 doc_description: |
   The most accurate, least featureful, and slowest saw oscillator.

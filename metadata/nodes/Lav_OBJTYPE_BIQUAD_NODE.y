@@ -15,18 +15,11 @@ properties:
     doc_description: |
       Q is a mathematically complex parameter, a full description of which is beyond the scope of this manual.
       Naively, Q can be interpreted as a measure of resonation.
-      For Q<=0.5, the filter is said to be damped:
+      For {{"Q<=0.5"|codelit}}, the filter is said to be damped:
       it will cut frequencies.
       For Q>0.5, however, some frequencies are likely to be boosted.
       
       Q controls the bandwidth for the bandpass and peaking filter types
-      as well as the S parameter for the shelving EQ.
-      Changing any of these three properties will change the other two, so be warned.
-      
-      The relationship to bw is: 1/Q = 2*sinh(ln(2)/2*BW*w0/sin(w0))
-      
-      The relationship to s is: 1/Q = sqrt((A + 1/A)*(1/S - 1) + 2)
-      
       For everything except the peaking filter, this property follows the normal definition of Q in the electrical engineering literature.
       For more specifics, see the Audio EQ Cookbook.
       It is found here:

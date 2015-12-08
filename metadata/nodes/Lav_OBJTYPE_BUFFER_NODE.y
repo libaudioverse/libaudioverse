@@ -12,7 +12,7 @@ properties:
     range: dynamic
     doc_description: |
       The position of playback, in seconds.
-      The range of this property corresponds the the total duration of the buffer.
+      The range of this property corresponds to the total duration of the buffer.
   Lav_BUFFER_RATE:
     name: rate
     type: double
@@ -35,7 +35,7 @@ properties:
     read_only: true
     doc_description: |
       Increments every time the buffer reaches it's end.
-      if the buffer is not looping, this can be used to determine when the buffer is ended, without using the callback.
+      If the buffer is not looping, this can be used to determine when the buffer is ended, without using the callback.
       if the buffer is configured to loop, the counter will count up every time the end of a loop is reached.
       Note that this property can technically wrap if your buffer node manages to end 2147483647 times.
       This should be impossible, save for the most long-running applications and shortest meaningful buffers.

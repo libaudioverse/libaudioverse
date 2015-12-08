@@ -23,7 +23,7 @@ properties:
     doc_description: |
       Whether or not to instantly move to the new position.
       If crossfading is disabled, large movements of the panner will cause audible clicks.
-      Disabling crossfading can aid performance under hevay workloads, especially with the HRTF panner.
+      Disabling crossfading can aid performance under heavy workloads, especially with the HRTF panner.
       If crossfading is enabled, moving the panner will slowly fade it to the new position over the next block.
   Lav_PANNER_CHANNEL_MAP:
     name: channel_map
@@ -63,7 +63,7 @@ properties:
     default: 0
     doc_description: |
       Whether the currently specified channel map has a center channel.
-      if it does, this is assumed to be channel 3.
+      If it does, this is assumed to be channel 3.
   Lav_PANNER_PASSTHROUGH:
     name: passthrough
     type: float

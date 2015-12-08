@@ -32,13 +32,13 @@ properties:
     doc_description: |
       The number of harmonics.
       0 requests automatic adjustment.
-      use a nonzero value if you intend to sweep the triangle wave.
+      Use a nonzero value if you intend to sweep the triangle wave.
       
       While this property has no max value, any combination of frequency and harmonics that leads to aliasing will alias.
       To avoid this, make sure that {{"2*frequency*(2*harmonics-1)"|codelit}} never goes over half your chosen sampling rate.
 inputs: null
 outputs:
-  - [1, "A traignle wave."]
+  - [1, "A triangle wave."]
 doc_name: additive triangle
 doc_description: |
   The most accurate, least featureful, and slowest triangle oscillator.

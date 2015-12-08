@@ -7,12 +7,8 @@ This section is an overview of all Libaudioverse nodes.
 
 For binding-specific references, see the bindings themselves.
 Python uses docstrings, for example.
-Also see the Binding-specific Notes section of this documentation.
 
 Usually, the names of  nodes can be inferred by mentally stripping the `Lav_OBJTYPE_` prefix from the identifying constant and looking for `suffix_object` or `SuffixObject` depending on the conventions of your language.
-These transformations are done for you in this document, listed as Camelcase Identifier and underscore identifier, respectively.
-
-For a discussion of property types, see Property Types.  For a discussion of callbacksk see Callbacks.  This document is focused only on the  nodes themselves.
 
 Any function not described in the <<c-api,C API section>> is a "extra function", a function which breaks the usual property model.
 Extra functions do any number of things and are documented with the node that they manipulate.
@@ -72,7 +68,7 @@ The outputs of this node are described below.
 {%if info[0] == "dynamic"%}
 |{{loop.index0}} |{{info[1]}} |{{info[2]}}
 {%elif info[0] == "constructor"%}
-|{{loop.index0}} |The number of channels for this input depends on parameters to this node's constructor. |{{info[1]}}
+|{{loop.index0}} |The number of channels for this output depends on parameters to this node's constructor. |{{info[1]}}
 {%else%}
 |{{loop.index0}} |{{info[0]}} |{{info[1]}}
 {%endif%}
@@ -133,7 +129,7 @@ C Enumeration Value: {{callinfo[0]}}
 ===== {{name}}
 Setter: {{functions[info['setter_name']]|function_to_string}}
 
-Callback Prototype: {{info['callback_func']|function_to_string}}
+Callback Prototype: pass:[{{info['callback_func']|function_to_string}}]
 
 {{macros.render_args_table("Callback Parameters", info['callback_func'], info['params'])}}
 
