@@ -14,14 +14,15 @@ properties:
     range: [-90.0, 90.0]
     doc_description: |
       The vertical angle of the panner, in degrees.
-      0 is horizontal and positive values are vertical.
+      0 is horizontal and positive values are upward.
   Lav_PANNER_SHOULD_CROSSFADE:
     name: should_crossfade
     type: boolean
     default: 1
     doc_description: |
       Whether or not this panner should crossfade.
-      Lack of crossfading introduces audible artifacts when the panner is moved and you usually want this on.
+      Lack of crossfading introduces audible artifacts when the panner is moved.
+      You usually want this on.
   Lav_PANNER_STRATEGY:
     name: strategy
     default: Lav_PANNING_STRATEGY_STEREO

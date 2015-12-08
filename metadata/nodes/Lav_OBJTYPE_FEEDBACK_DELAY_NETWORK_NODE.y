@@ -25,7 +25,7 @@ properties:
       A column vector is formed by reading all delay lines.
       This vector is multiplied by this matrix, and then fed back into the delay lines.
       
-      The matrix is stored in column-major order.
+      The matrix is stored in row-major order.
       The supplied array must have a length equal to the square of the channels specified to the constructor.
   Lav_FDN_FILTER_TYPES:
     name: filter_types
@@ -43,7 +43,7 @@ properties:
       The frequencies of the filters.
       The range of this property is 0 to Nyquist, or half the sampling rate.
   Lav_FDN_MAX_DELAY:
-    name: delay_max
+    name: max_delay
     type: float
     read_only: true
     doc_description: |

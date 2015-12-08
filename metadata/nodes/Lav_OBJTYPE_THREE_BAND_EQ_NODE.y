@@ -49,8 +49,8 @@ doc_description: |
   The lowest of these bands begins at {{"lowband_frequency"|codelit}} and continues down to {{"0 hz"|codelit}}.
   The highest is from {{"highband_frequency"|codelit}} and continues until nyquist.
   The middle is the remaining space between the low and high band.
-  if the high band begins below the low band, behavior is undefined, but will almost certainly not do what you want.
+  If the high band begins below the low band, behavior is undefined, but will almost certainly not do what you want.
   Libaudioverse does not check for this case.
   
   The slopes that this node institutes are not perfect and cannot increase effectively beyond a certain point.
-  Still, this is the least expensive of the Libaudioverse equalizers, and is sufficient for many simpler applications.
+  This is the least expensive of the Libaudioverse equalizers, and is sufficient for many simpler applications.

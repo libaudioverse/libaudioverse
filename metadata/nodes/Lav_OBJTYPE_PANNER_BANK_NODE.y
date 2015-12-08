@@ -27,7 +27,7 @@ properties:
     type: float
     name: spread
     range: [0.0, 360.0]
-    doc_descripption: |
+    doc_description: |
       An angle in degrees.
       Defines a cone across which the panners in this bank are spread.
       

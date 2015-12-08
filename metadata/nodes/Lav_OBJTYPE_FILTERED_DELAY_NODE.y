@@ -14,8 +14,7 @@ properties:
     range: [-INFINITY, INFINITY]
     doc_description: |
       The feedback coefficient.
-      The output of the delay line is fed back into the delay line, multiplied by this coefficient.
-      Setting feedback to small values can make echoes, comb filters, and a variety of other effects.
+      The output of the filter is fed back into the delay line, multiplied by this coefficient.
   Lav_FILTERED_DELAY_INTERPOLATION_TIME:
     name: interpolation_time
     type: float
@@ -82,4 +81,6 @@ doc_name: filtered delay
 doc_description: |
   This node consists of a delay line with a biquad filter attached.
   The output of the delay line is filtered.
-  If feedback is applied, it is this filtered output that is used.
+  The difference between this node and a delay line and filter pair is that this node will use the filtered output for the feedback.
+  
+  This node is equivalent to the delay line in the Karplus-strong algorithm.

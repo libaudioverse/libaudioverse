@@ -134,6 +134,7 @@ Callback Prototype: pass:[{{info['callback_func']|function_to_string}}]
 {{macros.render_args_table("Callback Parameters", info['callback_func'], info['params'])}}
 
 {{info['doc_description']}}
+
 {%endfor%}
 {%endif%}
 

@@ -121,8 +121,9 @@ doc_name: simple source
 doc_description: |
   The source node allows the spatialization of sound that passes through it.
   Sources have one input which is mono, to which a node should be connected.
-  the audio from the input is spatialized according both to the source's properties and those on its environment, 
-  and passed directly to the environment.
+  The audio from the input is spatialized according both to the source's properties and those on its environment, and passed directly to the environment.
   Sources have no outputs.
   To hear a source, you must connect its environment to something instead.
   
+  Since the source communicates with the environment through a nonstandard mechanism, environments do not keep their sources alive.
+  If you are in a garbage collected language, failure to hold on to the source nodes will cause them to go silent.

@@ -44,7 +44,7 @@ outputs:
   - [4, "The signal with reverb applied."]
 doc_name: fdn reverb
 doc_description: |
-  An 8 delay line FDN reverberator, based off a houseolder reflection.
+  An 8 delay line FDN reverberator, based off a householder reflection.
   
   This reverb takes as its input and outputs ats its output quadraphonic audio.
   Panning effects will still be observed at the output with some bias.

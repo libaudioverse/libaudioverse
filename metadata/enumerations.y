@@ -47,10 +47,10 @@ enumerations:
     doc_description: |
       Possible levels for logging.
     members:
-      Lav_LOG_LEVEL_OFF: No log messages will be generated.
-      Lav_LOG_LEVEL_CRITICAL: Logs critical messages such as failures to initialize and error conditions.
-      Lav_LOG_LEVEL_INFO: Logs informative messages.
-      Lav_LOG_LEVEL_DEBUG: Logs everything possible.
+      Lav_LOGGING_LEVEL_OFF: No log messages will be generated.
+      Lav_LOGGING_LEVEL_CRITICAL: Logs critical messages such as failures to initialize and error conditions.
+      Lav_LOGGING_LEVEL_INFO: Logs informative messages.
+      Lav_LOGGING_LEVEL_DEBUG: Logs everything possible.
   Lav_PANNING_STRATEGIES:
     doc_description: |
       Indicates a strategy to use for panning.
