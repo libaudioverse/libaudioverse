@@ -17,14 +17,15 @@ class EnvelopeAutomator: public Automator {
 	virtual double getFinalValue();
 	double* envelope = nullptr;
 	int points=0;
-	double point_delta=0;
+	//Number of intervals is points-1, this is the duration of each interval.
+	double interval_duration = 0;
 };
 
 EnvelopeAutomator::EnvelopeAutomator(Property* p, double scheduledTime, double duration, int points, double* values): Automator(p, scheduledTime) {
 	envelope = new double[points]();
 	this->points = points;
 	this->duration =duration;
-	this->point_delta = duration/points;
+	this->interval_duration = duration/(points-1);
 	std::copy(values, values+points, envelope);
 }
 
@@ -33,14 +34,16 @@ double EnvelopeAutomator::getValue(double time) {
 	if(delta < 0) return initial_value;
 	if(delta > duration) return envelope[points-1];
 	//linear interpolate.
-	int p1 = (int)((delta/duration)*points);
+	//This is the index of the first interval between points, not the first point.
+	//The fact that it happens to be the first point of said interval is coincidental.
+	int p1 = (int)((delta/duration)*(points-1));
 	p1 =std::min(p1, points-1);
 	int p2 = std::min(p1+1, points-1);
 	if(p1==p2) return envelope[p1]; //because this only happens at the last point.
-	double t1 = point_delta*p1;
-	double t2 = point_delta*p2;
-	double w1 =(t2-delta)/point_delta;
-	double w2= (delta-t1)/point_delta;
+	double t1 = interval_duration*p1;
+	double t2 = interval_duration*p2;
+	double w1 =(t2-delta)/interval_duration;
+	double w2= (delta-t1)/interval_duration;
 	return envelope[p1]*w1+envelope[p2]*w2;
 }
 
