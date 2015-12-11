@@ -32,7 +32,7 @@ properties:
       Defines a cone across which the panners in this bank are spread.
       
       This cone always inclues the endpoints, and the panners are separated as {{"spread/(panner_count-1)"|codelit}}.
-      This implies that for {"spread=360.0"|codelit}}, the first and last inputs are effectively the same.
+      This implies that for {{"spread=360.0"|codelit}}, the first and last inputs are effectively the same.
   Lav_PANNER_BANK_COUNT:
     name: count
     type: int

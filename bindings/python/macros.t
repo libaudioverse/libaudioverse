@@ -16,7 +16,16 @@ self._property_instances[_libaudioverse.{{enumerant}}] = {{prop['type']|undersco
 
     @property
     def {{prop['name']}}(self):   
-        """{{prop.get('doc_description', "")}}"""
+        """Type: {{prop['type']}}
+
+{%if not prop['read_only']%}
+{%-if 'value_enum' in prop%}Range: :any:`{{prop['value_enum']|without_lav|underscores_to_camelcase(True)}}`
+{%-elif 'range' in prop and prop['type'] != 'boolean'%}Range: {{prop['range']}}
+{%-endif%}
+{%-else%}This property is read-only.
+{%-endif%}
+
+{{prop.get('doc_description', "")}}"""
         return self._property_instances[_libaudioverse.{{enumerant}}]
 
 {%if not prop['read_only']%}
