@@ -30,8 +30,11 @@ def find_datafiles():
 {%set constants = constants_by_enum[name]%}
 {%set constants_prefix = common_prefix(constants.keys())%}
 class {{name|without_lav|underscores_to_camelcase(True)}}(enum.IntEnum):
+    {%if name in metadata['enumerations']%}"""{{metadata['enumerations'][name]['doc_description']}}"""{%endif%}
+
 {%for i, j in constants.items()%}
     {{i|strip_prefix(constants_prefix)|lower}} = {{j}}
+    {%if name in metadata['enumerations']%}"""{{metadata['enumerations'][name]['members'][i]}}"""{%endif%}
 {%endfor%}
 {%endfor%}
 

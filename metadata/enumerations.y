@@ -82,3 +82,21 @@ enumerations:
       Lav_DISTANCE_MODEL_LINEAR: Sound falls off as {{"1-(distance/maxDistance)"|codelit}}.
       Lav_DISTANCE_MODEL_EXPONENTIAL: Sounds fall off as {{"1/distance"|codelit}}.
       Lav_DISTANCE_MODEL_INVERSE_SQUARE: Sounds fall off as {{"1/min(distance, maxDistance)^2"|codelit}}.
+  Lav_FDN_FILTER_TYPES:
+    doc_description: Possible filter types for a feedback delay network's feedback path.
+    members:
+      Lav_FDN_FILTER_TYPE_DISABLED: Don't insert filters on the feedback path.
+      Lav_FDN_FILTER_TYPE_LOWPASS: Insert lowpass filters on the FDN's feedback path.
+      Lav_FDN_FILTER_TYPE_HIGHPASS: Insert highpass filters on the FDN's feedback path.
+  Lav_CHANNEL_INTERPRETATIONS:
+    doc_description: Specifies how to treat inputs to this node for upmixing and downmixing.
+    members:
+      Lav_CHANNEL_INTERPRETATION_DISCRETE: If channel counts mismatch, don't apply mixing matrices. Either drop or fill with zeros as appropriate.
+      Lav_CHANNEL_INTERPRETATION_SPEAKERS: Apply mixing matrices if needed.
+  Lav_NOISE_TYPES:
+    doc_description: Specifies types of noise.
+    members:
+      Lav_NOISE_TYPE_WHITE: gaussian white noise.
+      Lav_NOISE_TYPE_PINK: Pink noise.  Pink noise falls off at 3 DB per octave.
+      Lav_NOISE_TYPE_BROWN: Brown noise.  Brown noise decreases at 6 DB per octave.
+  
