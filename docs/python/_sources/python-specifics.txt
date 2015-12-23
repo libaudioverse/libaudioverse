@@ -6,7 +6,7 @@ The following are brief notes on Python-specific binding features and how the Li
 Comparing Objects
 --------------------
 
-Libaudioverse objects are thin proxiesover handles, with their global state stored elsewhre in the Libaudioverse module.
+Libaudioverse objects are thin proxies over handles, with their global state stored elsewhre in the Libaudioverse module.
 Consequently, you need to use `==`, not `is`.
 `is` will work sometimes, but no guarantee is made that two node objects in different variables are the same proxy instance.
 
