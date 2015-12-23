@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Welcome to Libaudioverse’s documentation! &mdash; Libaudioverse 0.8.dev102 documentation</title>
+  <title>Welcome to Libaudioverse’s documentation! &mdash; Libaudioverse 0.8.dev103 documentation</title>
   
 
   
@@ -30,8 +30,8 @@
   
 
   
-    <link rel="top" title="Libaudioverse 0.8.dev102 documentation" href="#"/>
-        <link rel="next" title="The Libaudioverse API" href="api.html"/> 
+    <link rel="top" title="Libaudioverse 0.8.dev103 documentation" href="#"/>
+        <link rel="next" title="Python-specific Notes" href="python-specifics.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -81,6 +81,7 @@
             
             
                 <ul>
+<li class="toctree-l1"><a class="reference internal" href="python-specifics.html">Python-specific Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">The Libaudioverse API</a></li>
 </ul>
 
@@ -131,9 +132,24 @@
 <p>Contents:</p>
 <div class="toctree-wrapper compound">
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="python-specifics.html">Python-specific Notes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="python-specifics.html#comparing-objects">Comparing Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python-specifics.html#properties">Properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python-specifics.html#callbacks">Callbacks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python-specifics.html#atomicity-and-simulation-locking">Atomicity and Simulation Locking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python-specifics.html#name-conversion">name Conversion</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">The Libaudioverse API</a></li>
 </ul>
 </div>
+<p>Welcome to the documentation for the Libaudioverse Python bindings.
+Libaudioverse is a multi-language library for audio synthesis along the lines of WebAudio, aimed primarily at games.
+Among it&#8217;s many features, it includes a fully functioning 3D simulation, environmental reverb, and a large number of components for instrument and sound synthesis.</p>
+<p>As Libaudioverse is language-agnostic, this page provides only a Python API reference.
+You can find examples <a class="reference external" href="http://github.com/camlorn/libaudioverse">at the official GitHub repository</a>.
+There are also a number of conceptual overviews <a class="reference external" href="http://camlorn.github.io/libaudioverse/docs/libaudioverse_manual.html">in the language-agnostic manual</a>.
+Since Python is the closest language to pseudocode, the language-agnostic manual primarily uses it for examples.</p>
 </div>
 <div class="section" id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
@@ -151,7 +167,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="api.html" class="btn btn-neutral float-right" title="The Libaudioverse API" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="python-specifics.html" class="btn btn-neutral float-right" title="Python-specific Notes" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
     </div>
@@ -183,7 +199,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.8.dev102',
+            VERSION:'0.8.dev103',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

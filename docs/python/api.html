@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>The Libaudioverse API &mdash; Libaudioverse 0.8.dev102 documentation</title>
+  <title>The Libaudioverse API &mdash; Libaudioverse 0.8.dev103 documentation</title>
   
 
   
@@ -30,8 +30,8 @@
   
 
   
-    <link rel="top" title="Libaudioverse 0.8.dev102 documentation" href="index.html"/>
-        <link rel="prev" title="Welcome to Libaudioverse’s documentation!" href="index.html"/> 
+    <link rel="top" title="Libaudioverse 0.8.dev103 documentation" href="index.html"/>
+        <link rel="prev" title="Python-specific Notes" href="python-specifics.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -81,6 +81,7 @@
             
             
                 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="python-specifics.html">Python-specific Notes</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">The Libaudioverse API</a></li>
 </ul>
 
@@ -144,22 +145,31 @@ This is not fixable using additive synthesis and is a frequency dependent effect
 <dl class="attribute">
 <dt id="libaudioverse.AdditiveSawNode.frequency">
 <code class="descname">frequency</code><a class="headerlink" href="#libaudioverse.AdditiveSawNode.frequency" title="Permalink to this definition">¶</a></dt>
-<dd><p>The frequency of the saw wave, in hertz.</p>
+<dd><p>Type: float</p>
+<p>Range: [0, INFINITY]</p>
+<p>Default value: 440.0</p>
+<p>The frequency of the saw wave, in hertz.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.AdditiveSawNode.frequency_multiplier">
 <code class="descname">frequency_multiplier</code><a class="headerlink" href="#libaudioverse.AdditiveSawNode.frequency_multiplier" title="Permalink to this definition">¶</a></dt>
-<dd><p>An additional multiplicative factor applied to the frequency of the oscillator.</p>
+<dd><p>Type: float</p>
+<p>Range: [-INFINITY, INFINITY]</p>
+<p>Default value: 1.0</p>
+<p>An additional multiplicative factor applied to the frequency of the oscillator.</p>
 <p>This is useful for creating instruments, as the notes of the standard musical scale fall on frequency multiples of a reference pitch, rather than a linear increase.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.AdditiveSawNode.harmonics">
 <code class="descname">harmonics</code><a class="headerlink" href="#libaudioverse.AdditiveSawNode.harmonics" title="Permalink to this definition">¶</a></dt>
-<dd><p>The number of harmonics.
+<dd><p>Type: int</p>
+<p>Range: [0, MAX_INT]</p>
+<p>Default value: 0</p>
+<p>The number of harmonics.
 0 requests automatic adjustment.
-use a nonzero value if you intend to sweep the saw wave.</p>
+Use a nonzero value if you intend to sweep the saw wave.</p>
 <p>While this property has no max value, any combination of frequency and harmonics that leads to aliasing will alias.
 To avoid this, make sure that <code class="docutils literal"><span class="pre">frequency*harmonics</span></code> never goes over half your chosen sampling rate.</p>
 </dd></dl>
@@ -167,7 +177,10 @@ To avoid this, make sure that <code class="docutils literal"><span class="pre">f
 <dl class="attribute">
 <dt id="libaudioverse.AdditiveSawNode.phase">
 <code class="descname">phase</code><a class="headerlink" href="#libaudioverse.AdditiveSawNode.phase" title="Permalink to this definition">¶</a></dt>
-<dd><p>The phase of the saw wave.
+<dd><p>Type: float</p>
+<p>Range: [0.0, 1.0]</p>
+<p>Default value: 0.0</p>
+<p>The phase of the saw wave.
 This is measured in periods, not in radians.</p>
 </dd></dl>
 
@@ -186,22 +199,31 @@ This is not fixable using additive synthesis and is a frequency dependent effect
 <dl class="attribute">
 <dt id="libaudioverse.AdditiveSquareNode.frequency">
 <code class="descname">frequency</code><a class="headerlink" href="#libaudioverse.AdditiveSquareNode.frequency" title="Permalink to this definition">¶</a></dt>
-<dd><p>The frequency of the square wave, in hertz.</p>
+<dd><p>Type: float</p>
+<p>Range: [0, INFINITY]</p>
+<p>Default value: 440.0</p>
+<p>The frequency of the square wave, in hertz.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.AdditiveSquareNode.frequency_multiplier">
 <code class="descname">frequency_multiplier</code><a class="headerlink" href="#libaudioverse.AdditiveSquareNode.frequency_multiplier" title="Permalink to this definition">¶</a></dt>
-<dd><p>An additional multiplicative factor applied to the frequency of the oscillator.</p>
+<dd><p>Type: float</p>
+<p>Range: [-INFINITY, INFINITY]</p>
+<p>Default value: 1.0</p>
+<p>An additional multiplicative factor applied to the frequency of the oscillator.</p>
 <p>This is useful for creating instruments, as the notes of the standard musical scale fall on frequency multiples of a reference pitch, rather than a linear increase.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.AdditiveSquareNode.harmonics">
 <code class="descname">harmonics</code><a class="headerlink" href="#libaudioverse.AdditiveSquareNode.harmonics" title="Permalink to this definition">¶</a></dt>
-<dd><p>The number of harmonics.
+<dd><p>Type: int</p>
+<p>Range: [0, MAX_INT]</p>
+<p>Default value: 0</p>
+<p>The number of harmonics.
 0 requests automatic adjustment.
-use a nonzero value if you intend to sweep the square wave.</p>
+Use a nonzero value if you intend to sweep the square wave.</p>
 <p>While this property has no max value, any combination of frequency and harmonics that leads to aliasing will alias.
 To avoid this, make sure that <code class="docutils literal"><span class="pre">2*frequency*(2*harmonics-1)</span></code> never goes over half your chosen sampling rate.</p>
 </dd></dl>
@@ -209,7 +231,10 @@ To avoid this, make sure that <code class="docutils literal"><span class="pre">2
 <dl class="attribute">
 <dt id="libaudioverse.AdditiveSquareNode.phase">
 <code class="descname">phase</code><a class="headerlink" href="#libaudioverse.AdditiveSquareNode.phase" title="Permalink to this definition">¶</a></dt>
-<dd><p>The phase of the square wave.
+<dd><p>Type: float</p>
+<p>Range: [0.0, 1.0]</p>
+<p>Default value: 0.0</p>
+<p>The phase of the square wave.
 This is measured in periods, not in radians.</p>
 </dd></dl>
 
@@ -229,22 +254,31 @@ This is not fixable using additive synthesis and is a frequency dependent effect
 <dl class="attribute">
 <dt id="libaudioverse.AdditiveTriangleNode.frequency">
 <code class="descname">frequency</code><a class="headerlink" href="#libaudioverse.AdditiveTriangleNode.frequency" title="Permalink to this definition">¶</a></dt>
-<dd><p>The frequency of the triangle wave, in hertz.</p>
+<dd><p>Type: float</p>
+<p>Range: [0, INFINITY]</p>
+<p>Default value: 440.0</p>
+<p>The frequency of the triangle wave, in hertz.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.AdditiveTriangleNode.frequency_multiplier">
 <code class="descname">frequency_multiplier</code><a class="headerlink" href="#libaudioverse.AdditiveTriangleNode.frequency_multiplier" title="Permalink to this definition">¶</a></dt>
-<dd><p>An additional multiplicative factor applied to the frequency of the oscillator.</p>
+<dd><p>Type: float</p>
+<p>Range: [-INFINITY, INFINITY]</p>
+<p>Default value: 1.0</p>
+<p>An additional multiplicative factor applied to the frequency of the oscillator.</p>
 <p>This is useful for creating instruments, as the notes of the standard musical scale fall on frequency multiples of a reference pitch, rather than a linear increase.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.AdditiveTriangleNode.harmonics">
 <code class="descname">harmonics</code><a class="headerlink" href="#libaudioverse.AdditiveTriangleNode.harmonics" title="Permalink to this definition">¶</a></dt>
-<dd><p>The number of harmonics.
+<dd><p>Type: int</p>
+<p>Range: [0, MAX_INT]</p>
+<p>Default value: 0</p>
+<p>The number of harmonics.
 0 requests automatic adjustment.
-use a nonzero value if you intend to sweep the triangle wave.</p>
+Use a nonzero value if you intend to sweep the triangle wave.</p>
 <p>While this property has no max value, any combination of frequency and harmonics that leads to aliasing will alias.
 To avoid this, make sure that <code class="docutils literal"><span class="pre">2*frequency*(2*harmonics-1)</span></code> never goes over half your chosen sampling rate.</p>
 </dd></dl>
@@ -252,7 +286,10 @@ To avoid this, make sure that <code class="docutils literal"><span class="pre">2
 <dl class="attribute">
 <dt id="libaudioverse.AdditiveTriangleNode.phase">
 <code class="descname">phase</code><a class="headerlink" href="#libaudioverse.AdditiveTriangleNode.phase" title="Permalink to this definition">¶</a></dt>
-<dd><p>The phase of the triangle wave.
+<dd><p>Type: float</p>
+<p>Range: [0.0, 1.0]</p>
+<p>Default value: 0.0</p>
+<p>The phase of the triangle wave.
 This is measured in periods, not in radians.</p>
 </dd></dl>
 
@@ -266,20 +303,27 @@ This is measured in periods, not in radians.</p>
 <dl class="attribute">
 <dt id="libaudioverse.AllpassNode.coefficient">
 <code class="descname">coefficient</code><a class="headerlink" href="#libaudioverse.AllpassNode.coefficient" title="Permalink to this definition">¶</a></dt>
-<dd><p>The coefficient of the allpass filter&#8217;s transfer function.</p>
+<dd><p>Type: float</p>
+<p>Range: [-INFINITY, INFINITY]</p>
+<p>The coefficient of the allpass filter&#8217;s transfer function.</p>
 <p>For those not familiar with digital signal processing, this controls how quickly the repeating echoes created by this filter decay.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.AllpassNode.delay_max">
 <code class="descname">delay_max</code><a class="headerlink" href="#libaudioverse.AllpassNode.delay_max" title="Permalink to this definition">¶</a></dt>
-<dd><p>The max delay as set at the node&#8217;s creation time.</p>
+<dd><p>Type: int</p>
+<p>This property is read-only.</p>
+<p>The max delay as set at the node&#8217;s creation time.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.AllpassNode.delay_samples">
 <code class="descname">delay_samples</code><a class="headerlink" href="#libaudioverse.AllpassNode.delay_samples" title="Permalink to this definition">¶</a></dt>
-<dd><p>The delay of the delay line in samples.
+<dd><p>Type: int</p>
+<p>Range: dynamic</p>
+<p>Default value: 1</p>
+<p>The delay of the delay line in samples.
 The range of this property depends on the maxDelay parameter to the constructor.</p>
 <p>Note that values less than 1 sample still introduce delay.</p>
 </dd></dl>
@@ -287,7 +331,10 @@ The range of this property depends on the maxDelay parameter to the constructor.
 <dl class="attribute">
 <dt id="libaudioverse.AllpassNode.interpolation_time">
 <code class="descname">interpolation_time</code><a class="headerlink" href="#libaudioverse.AllpassNode.interpolation_time" title="Permalink to this definition">¶</a></dt>
-<dd><p>When the delay_samples property is changed, the delay line crossfades between the old position and the new one.
+<dd><p>Type: float</p>
+<p>Range: [0.001, INFINITY]</p>
+<p>Default value: 0.001</p>
+<p>When the delay_samples property is changed, the delay line crossfades between the old position and the new one.
 Essentially, this property sets how long it will take the allpass filter to settle after a delay change.
 Note that for this node, it is impossible to get rid of the crossfade completely.</p>
 </dd></dl>
@@ -304,14 +351,20 @@ The additional function Lav_amplitudePannerNodeConfigureStandardChannelMap can s
 <dl class="attribute">
 <dt id="libaudioverse.AmplitudePannerNode.azimuth">
 <code class="descname">azimuth</code><a class="headerlink" href="#libaudioverse.AmplitudePannerNode.azimuth" title="Permalink to this definition">¶</a></dt>
-<dd><p>The horizontal angle of the panner in degrees.
+<dd><p>Type: float</p>
+<p>Range: [-INFINITY, INFINITY]</p>
+<p>Default value: 0.0</p>
+<p>The horizontal angle of the panner in degrees.
 0 is directly ahead, and positive values are clockwise.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.AmplitudePannerNode.channel_map">
 <code class="descname">channel_map</code><a class="headerlink" href="#libaudioverse.AmplitudePannerNode.channel_map" title="Permalink to this definition">¶</a></dt>
-<dd><p>The angles of the speakers in the order in which they are to be mapped to channels.
+<dd><p>Type: float_array</p>
+<p>Range: [-INFINITY, INFINITY]</p>
+<p>Default value: [-90, 90]</p>
+<p>The angles of the speakers in the order in which they are to be mapped to channels.
 The first speaker will be mapped to the first channel, the second to the second, etc.
 These channels are then combined and produced as the single output of the panner.</p>
 </dd></dl>
@@ -326,7 +379,10 @@ The possible standard configurations are found in the <a class="reference intern
 <dl class="attribute">
 <dt id="libaudioverse.AmplitudePannerNode.elevation">
 <code class="descname">elevation</code><a class="headerlink" href="#libaudioverse.AmplitudePannerNode.elevation" title="Permalink to this definition">¶</a></dt>
-<dd><p>The vertical angle of the panner in degrees.
+<dd><p>Type: float</p>
+<p>Range: [-90.0, 90.0]</p>
+<p>Default value: 0.0</p>
+<p>The vertical angle of the panner in degrees.
 0 is horizontal and positive values are upwards.
 Note that, for amplitude panners, this has no effect and exists only to allow swapping with the HRTF panner without changing code.</p>
 </dd></dl>
@@ -334,21 +390,28 @@ Note that, for amplitude panners, this has no effect and exists only to allow sw
 <dl class="attribute">
 <dt id="libaudioverse.AmplitudePannerNode.has_center">
 <code class="descname">has_center</code><a class="headerlink" href="#libaudioverse.AmplitudePannerNode.has_center" title="Permalink to this definition">¶</a></dt>
-<dd><p>Whether the currently specified channel map has a center channel.
-if it does, this is assumed to be channel 3.</p>
+<dd><p>Type: boolean</p>
+<p>Default value: False</p>
+<p>Whether the currently specified channel map has a center channel.
+If it does, this is assumed to be channel 3.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.AmplitudePannerNode.has_lfe">
 <code class="descname">has_lfe</code><a class="headerlink" href="#libaudioverse.AmplitudePannerNode.has_lfe" title="Permalink to this definition">¶</a></dt>
-<dd><p>Whether the current channel map has an LFE channel or not.
+<dd><p>Type: boolean</p>
+<p>Default value: False</p>
+<p>Whether the current channel map has an LFE channel or not.
 If it does, this is assumed to be channel 4.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.AmplitudePannerNode.passthrough">
 <code class="descname">passthrough</code><a class="headerlink" href="#libaudioverse.AmplitudePannerNode.passthrough" title="Permalink to this definition">¶</a></dt>
-<dd><p>Controls how much of the &#8220;dry&#8221; signal is passed through.</p>
+<dd><p>Type: float</p>
+<p>Range: [0.0, 1.0]</p>
+<p>Default value: 0.0</p>
+<p>Controls how much of the &#8220;dry&#8221; signal is passed through.</p>
 <p>Higher values make the panning less obvious.</p>
 <p>Specifically, the input signal is added to all outputs with <code class="docutils literal"><span class="pre">passthrough</span></code> as the gain, and <code class="docutils literal"><span class="pre">1-passthrough</span></code> as the gain of the panned signal.</p>
 </dd></dl>
@@ -356,23 +419,29 @@ If it does, this is assumed to be channel 4.</p>
 <dl class="attribute">
 <dt id="libaudioverse.AmplitudePannerNode.should_crossfade">
 <code class="descname">should_crossfade</code><a class="headerlink" href="#libaudioverse.AmplitudePannerNode.should_crossfade" title="Permalink to this definition">¶</a></dt>
-<dd><p>Whether or not to instantly move to the new position.
+<dd><p>Type: boolean</p>
+<p>Default value: True</p>
+<p>Whether or not to instantly move to the new position.
 If crossfading is disabled, large movements of the panner will cause audible clicks.
-Disabling crossfading can aid performance under hevay workloads, especially with the HRTF panner.
+Disabling crossfading can aid performance under heavy workloads, especially with the HRTF panner.
 If crossfading is enabled, moving the panner will slowly fade it to the new position over the next block.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.AmplitudePannerNode.skip_center">
 <code class="descname">skip_center</code><a class="headerlink" href="#libaudioverse.AmplitudePannerNode.skip_center" title="Permalink to this definition">¶</a></dt>
-<dd><p>This property controls whether or not the center channel is reserved, i.e. skipped.
+<dd><p>Type: boolean</p>
+<p>Default value: True</p>
+<p>This property controls whether or not the center channel is reserved, i.e. skipped.
 You  almost always want this on.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.AmplitudePannerNode.skip_lfe">
 <code class="descname">skip_lfe</code><a class="headerlink" href="#libaudioverse.AmplitudePannerNode.skip_lfe" title="Permalink to this definition">¶</a></dt>
-<dd><p>This property controls whether or not the LFE channel is reserved, i.e. skipped.
+<dd><p>Type: boolean</p>
+<p>Default value: True</p>
+<p>This property controls whether or not the LFE channel is reserved, i.e. skipped.
 You  almost always want this on.</p>
 </dd></dl>
 
@@ -437,38 +506,46 @@ It may be found at:
 <dl class="attribute">
 <dt id="libaudioverse.BiquadNode.dbgain">
 <code class="descname">dbgain</code><a class="headerlink" href="#libaudioverse.BiquadNode.dbgain" title="Permalink to this definition">¶</a></dt>
-<dd><p>This property is a the gain in decibals to be used with the peaking and shelving filters.
+<dd><p>Type: float</p>
+<p>Range: [-INFINITY, INFINITY]</p>
+<p>Default value: 0.0</p>
+<p>This property is a the gain in decibals to be used with the peaking and shelving filters.
 It measures the gain that these filters apply to the part of the signal they boost.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.BiquadNode.filter_type">
 <code class="descname">filter_type</code><a class="headerlink" href="#libaudioverse.BiquadNode.filter_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>The type of the filter.
+<dd><p>Type: int</p>
+<p>Range: <a class="reference internal" href="#libaudioverse.BiquadTypes" title="libaudioverse.BiquadTypes"><code class="xref any py py-class docutils literal"><span class="pre">BiquadTypes</span></code></a></p>
+<p>Default value: <a class="reference internal" href="#libaudioverse.BiquadTypes.lowpass" title="libaudioverse.BiquadTypes.lowpass"><code class="xref any py py-attr docutils literal"><span class="pre">BiquadTypes.lowpass</span></code></a></p>
+<p>The type of the filter.
 This determines the interpretations of the other properties on this node.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.BiquadNode.frequency">
 <code class="descname">frequency</code><a class="headerlink" href="#libaudioverse.BiquadNode.frequency" title="Permalink to this definition">¶</a></dt>
-<dd><p>This is the frequency of interest.
+<dd><p>Type: float</p>
+<p>Range: [0, INFINITY]</p>
+<p>Default value: 2000.0</p>
+<p>This is the frequency of interest.
 What specifically this means depends on the selected filter type; for example, it is the cutoff frequency for lowpass and highpass.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.BiquadNode.q">
 <code class="descname">q</code><a class="headerlink" href="#libaudioverse.BiquadNode.q" title="Permalink to this definition">¶</a></dt>
-<dd><p>Q is a mathematically complex parameter, a full description of which is beyond the scope of this manual.
+<dd><p>Type: float</p>
+<p>Range: [0.001, INFINITY]</p>
+<p>Default value: 0.5</p>
+<p>Q is a mathematically complex parameter, a full description of which is beyond the scope of this manual.
 Naively, Q can be interpreted as a measure of resonation.
-For Q&lt;=0.5, the filter is said to be damped:
+For <code class="docutils literal"><span class="pre">Q&lt;=0.5</span></code>, the filter is said to be damped:
 it will cut frequencies.
 For Q&gt;0.5, however, some frequencies are likely to be boosted.</p>
 <p>Q controls the bandwidth for the bandpass and peaking filter types
-as well as the S parameter for the shelving EQ.
-Changing any of these three properties will change the other two, so be warned.</p>
-<p>The relationship to bw is: 1/Q = 2*sinh(ln(2)/2*BW*w0/sin(w0))</p>
-<p>The relationship to s is: 1/Q = sqrt((A + 1/A)*(1/S - 1) + 2)</p>
-<p>For everything except the peaking filter, this property follows the normal definition of Q in the electrical engineering literature.
+For everything except the peaking filter, this property follows the normal definition of Q in the electrical engineering literature.
 For more specifics, see the Audio EQ Cookbook.
 It is found here:
 <a class="reference external" href="http://www.musicdsp.org/files/Audio-EQ-Cookbook.txt">http://www.musicdsp.org/files/Audio-EQ-Cookbook.txt</a></p>
@@ -479,7 +556,61 @@ It is found here:
 <dl class="class">
 <dt id="libaudioverse.BiquadTypes">
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">BiquadTypes</code><a class="headerlink" href="#libaudioverse.BiquadTypes" title="Permalink to this definition">¶</a></dt>
-<dd><p>An enumeration.</p>
+<dd><p>Indicates a biquad filter type, used with the <a class="reference internal" href="#libaudioverse.BiquadNode" title="libaudioverse.BiquadNode"><code class="xref py py-class docutils literal"><span class="pre">BiquadNode</span></code></a> and in a few other places.</p>
+<dl class="attribute">
+<dt id="libaudioverse.BiquadTypes.allpass">
+<code class="descname">allpass</code><em class="property"> = &lt;BiquadTypes.allpass: 4&gt;</em><a class="headerlink" href="#libaudioverse.BiquadTypes.allpass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates an allpass filter.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.BiquadTypes.bandpass">
+<code class="descname">bandpass</code><em class="property"> = &lt;BiquadTypes.bandpass: 2&gt;</em><a class="headerlink" href="#libaudioverse.BiquadTypes.bandpass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates a bandpass filter.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.BiquadTypes.highpass">
+<code class="descname">highpass</code><em class="property"> = &lt;BiquadTypes.highpass: 1&gt;</em><a class="headerlink" href="#libaudioverse.BiquadTypes.highpass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates a highpass filter.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.BiquadTypes.highshelf">
+<code class="descname">highshelf</code><em class="property"> = &lt;BiquadTypes.highshelf: 7&gt;</em><a class="headerlink" href="#libaudioverse.BiquadTypes.highshelf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates a highshelf filter.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.BiquadTypes.identity">
+<code class="descname">identity</code><em class="property"> = &lt;BiquadTypes.identity: 8&gt;</em><a class="headerlink" href="#libaudioverse.BiquadTypes.identity" title="Permalink to this definition">¶</a></dt>
+<dd><p>This filter does nothing.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.BiquadTypes.lowpass">
+<code class="descname">lowpass</code><em class="property"> = &lt;BiquadTypes.lowpass: 0&gt;</em><a class="headerlink" href="#libaudioverse.BiquadTypes.lowpass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates a lowpass filter.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.BiquadTypes.lowshelf">
+<code class="descname">lowshelf</code><em class="property"> = &lt;BiquadTypes.lowshelf: 6&gt;</em><a class="headerlink" href="#libaudioverse.BiquadTypes.lowshelf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates a lowshelf filter.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.BiquadTypes.notch">
+<code class="descname">notch</code><em class="property"> = &lt;BiquadTypes.notch: 3&gt;</em><a class="headerlink" href="#libaudioverse.BiquadTypes.notch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates a notch filter.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.BiquadTypes.peaking">
+<code class="descname">peaking</code><em class="property"> = &lt;BiquadTypes.peaking: 5&gt;</em><a class="headerlink" href="#libaudioverse.BiquadTypes.peaking" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates a peaking filter.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -489,34 +620,48 @@ It is found here:
 <dl class="attribute">
 <dt id="libaudioverse.BlitNode.frequency">
 <code class="descname">frequency</code><a class="headerlink" href="#libaudioverse.BlitNode.frequency" title="Permalink to this definition">¶</a></dt>
-<dd><p>The frequency of the impulse train in HZ.</p>
+<dd><p>Type: float</p>
+<p>Range: [0, INFINITY]</p>
+<p>Default value: 440.0</p>
+<p>The frequency of the impulse train in HZ.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.BlitNode.frequency_multiplier">
 <code class="descname">frequency_multiplier</code><a class="headerlink" href="#libaudioverse.BlitNode.frequency_multiplier" title="Permalink to this definition">¶</a></dt>
-<dd><p>An additional multiplicative factor applied to the frequency of the oscillator.</p>
+<dd><p>Type: float</p>
+<p>Range: [-INFINITY, INFINITY]</p>
+<p>Default value: 1.0</p>
+<p>An additional multiplicative factor applied to the frequency of the oscillator.</p>
 <p>This is useful for creating instruments, as the notes of the standard musical scale fall on frequency multiples of a reference pitch, rather than a linear increase.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.BlitNode.harmonics">
 <code class="descname">harmonics</code><a class="headerlink" href="#libaudioverse.BlitNode.harmonics" title="Permalink to this definition">¶</a></dt>
-<dd><p>The number of harmonics to include.
+<dd><p>Type: int</p>
+<p>Range: [0, MAX_INT]</p>
+<p>Default value: 0</p>
+<p>The number of harmonics to include.
 0 requests automatic adjustment.  When 0, the algorithm this node represents will include as many harmonics as it can without aliasing.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.BlitNode.phase">
 <code class="descname">phase</code><a class="headerlink" href="#libaudioverse.BlitNode.phase" title="Permalink to this definition">¶</a></dt>
-<dd><p>The phase of the impulse train.
+<dd><p>Type: float</p>
+<p>Range: [0.0, 1.0]</p>
+<p>Default value: 0.0</p>
+<p>The phase of the impulse train.
 This is measured in periods, not in radians.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.BlitNode.should_normalize">
 <code class="descname">should_normalize</code><a class="headerlink" href="#libaudioverse.BlitNode.should_normalize" title="Permalink to this definition">¶</a></dt>
-<dd><p>If false, the produced BLIT will have an integral of 1 over every period.
+<dd><p>Type: boolean</p>
+<p>Default value: True</p>
+<p>If false, the produced BLIT will have an integral of 1 over every period.
 If true, the produced blit will be normalized to be between 1 and -1, and suitable for audio.
 The default is true.</p>
 </dd></dl>
@@ -573,6 +718,12 @@ This class adds extra marshalling to make sure that boolean properties show up a
 
 </dd></dl>
 
+<dl class="exception">
+<dt id="libaudioverse.BufferInUseError">
+<em class="property">exception </em><code class="descclassname">libaudioverse.</code><code class="descname">BufferInUseError</code><a class="headerlink" href="#libaudioverse.BufferInUseError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates an attempt to modify a buffer while something is reading its data.</p>
+</dd></dl>
+
 <dl class="class">
 <dt id="libaudioverse.BufferNode">
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">BufferNode</code><span class="sig-paren">(</span><em>simulation</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.BufferNode" title="Permalink to this definition">¶</a></dt>
@@ -581,45 +732,64 @@ The output of this node will have as many channels as the buffer does, so connec
 <dl class="attribute">
 <dt id="libaudioverse.BufferNode.buffer">
 <code class="descname">buffer</code><a class="headerlink" href="#libaudioverse.BufferNode.buffer" title="Permalink to this definition">¶</a></dt>
-<dd><p>The currently playing buffer.
+<dd><p>Type: buffer</p>
+<p>The currently playing buffer.
 Setting this property will reset position.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="libaudioverse.BufferNode.end_event">
-<code class="descname">end_event</code><a class="headerlink" href="#libaudioverse.BufferNode.end_event" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fires each time this node reaches the end of the associated buffer.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.BufferNode.ended_count">
 <code class="descname">ended_count</code><a class="headerlink" href="#libaudioverse.BufferNode.ended_count" title="Permalink to this definition">¶</a></dt>
-<dd><p>Increments every time the buffer reaches it&#8217;s end.
-if the buffer is not looping, this can be used to determine when the buffer is ended, without using the event interface.
+<dd><p>Type: int</p>
+<p>This property is read-only.</p>
+<p>Increments every time the buffer reaches it&#8217;s end.
+If the buffer is not looping, this can be used to determine when the buffer is ended, without using the callback.
 if the buffer is configured to loop, the counter will count up every time the end of a loop is reached.
 Note that this property can technically wrap if your buffer node manages to end 2147483647 times.
 This should be impossible, save for the most long-running applications and shortest meaningful buffers.</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="libaudioverse.BufferNode.get_end_callback">
+<code class="descname">get_end_callback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.BufferNode.get_end_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the end callback.</p>
+<p>This is a feature of the Python bindings and is not available in the C API.  See the setter for specific documentation on this callback.</p>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="libaudioverse.BufferNode.looping">
 <code class="descname">looping</code><a class="headerlink" href="#libaudioverse.BufferNode.looping" title="Permalink to this definition">¶</a></dt>
-<dd><p>If true, this node continues playing the same buffer from the beginning after it reaches the end.</p>
+<dd><p>Type: boolean</p>
+<p>Default value: False</p>
+<p>If true, this node continues playing the same buffer from the beginning after it reaches the end.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.BufferNode.position">
 <code class="descname">position</code><a class="headerlink" href="#libaudioverse.BufferNode.position" title="Permalink to this definition">¶</a></dt>
-<dd><p>The position of playback, in seconds.
-The range of this property corresponds the the total duration of the buffer.</p>
+<dd><p>Type: double</p>
+<p>Range: dynamic</p>
+<p>Default value: 0.0</p>
+<p>The position of playback, in seconds.
+The range of this property corresponds to the total duration of the buffer.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.BufferNode.rate">
 <code class="descname">rate</code><a class="headerlink" href="#libaudioverse.BufferNode.rate" title="Permalink to this definition">¶</a></dt>
-<dd><p>A multiplier that applies to playback rate.
+<dd><p>Type: double</p>
+<p>Range: [0, INFINITY]</p>
+<p>Default value: 1.0</p>
+<p>A multiplier that applies to playback rate.
 1.0 is identity.
 Values less than 1.0 cause a decrease in pitch and values greater than 1.0 cause an increase in pitch.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="libaudioverse.BufferNode.set_end_callback">
+<code class="descname">set_end_callback</code><span class="sig-paren">(</span><em>callback</em>, <em>additional_args=None</em>, <em>additional_kwargs=None</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.BufferNode.set_end_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the end callback.</p>
+<p>Called outside the audio threads every time the buffer reaches the end of the audio data.</p>
 </dd></dl>
 
 </dd></dl>
@@ -635,8 +805,9 @@ Values less than 1.0 cause a decrease in pitch and values greater than 1.0 cause
 <dt id="libaudioverse.BufferTimelineNode">
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">BufferTimelineNode</code><span class="sig-paren">(</span><em>simulation</em>, <em>channels</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.BufferTimelineNode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Represents timelines of buffers.</p>
-<p>This node provides the ability to schedule buffers to play at any specific time in the future to sample accuracy.
-it is possible for buffers to be scheduled with pitch bend.</p>
+<p>This node provides the ability to schedule buffers to play at any specific time in the future.
+This node supports pitch bending scheduled buffers.
+There is no limit to the number of buffers which may be scheduled at any given time, and polyphony is supported.</p>
 <dl class="method">
 <dt id="libaudioverse.BufferTimelineNode.schedule_buffer">
 <code class="descname">schedule_buffer</code><span class="sig-paren">(</span><em>node</em>, <em>buffer</em>, <em>time</em>, <em>pitch_bend</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.BufferTimelineNode.schedule_buffer" title="Permalink to this definition">¶</a></dt>
@@ -673,7 +844,19 @@ The time is relative to now.</p>
 <dl class="class">
 <dt id="libaudioverse.ChannelInterpretations">
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">ChannelInterpretations</code><a class="headerlink" href="#libaudioverse.ChannelInterpretations" title="Permalink to this definition">¶</a></dt>
-<dd><p>An enumeration.</p>
+<dd><p>Specifies how to treat inputs to this node for upmixing and downmixing.</p>
+<dl class="attribute">
+<dt id="libaudioverse.ChannelInterpretations.discrete">
+<code class="descname">discrete</code><em class="property"> = &lt;ChannelInterpretations.discrete: 0&gt;</em><a class="headerlink" href="#libaudioverse.ChannelInterpretations.discrete" title="Permalink to this definition">¶</a></dt>
+<dd><p>If channel counts mismatch, don&#8217;t apply mixing matrices. Either drop or fill with zeros as appropriate.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.ChannelInterpretations.speakers">
+<code class="descname">speakers</code><em class="property"> = &lt;ChannelInterpretations.speakers: 1&gt;</em><a class="headerlink" href="#libaudioverse.ChannelInterpretations.speakers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply mixing matrices if needed.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -702,7 +885,10 @@ modify the channels individually, and then merge them with a <a class="reference
 <dl class="attribute">
 <dt id="libaudioverse.ConvolverNode.impulse_response">
 <code class="descname">impulse_response</code><a class="headerlink" href="#libaudioverse.ConvolverNode.impulse_response" title="Permalink to this definition">¶</a></dt>
-<dd><p>The impulse response to convolve the input with.</p>
+<dd><p>Type: float_array</p>
+<p>Range: [-INFINITY, INFINITY]</p>
+<p>Default value: [1.0]</p>
+<p>The impulse response to convolve the input with.</p>
 </dd></dl>
 
 </dd></dl>
@@ -729,30 +915,43 @@ Crossfades of duration 0 do not fire the finished event.</p>
 <dl class="attribute">
 <dt id="libaudioverse.CrossfaderNode.current_input">
 <code class="descname">current_input</code><a class="headerlink" href="#libaudioverse.CrossfaderNode.current_input" title="Permalink to this definition">¶</a></dt>
-<dd><p>The currently active input.</p>
+<dd><p>Type: int</p>
+<p>Range: dynamic</p>
+<p>Default value: 0</p>
+<p>The currently active input.</p>
 <p>Writing to this property is equivalent to crossfading with a time of 0.
 Note that the output is a combination of the current and target inputs while crossfading.</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="libaudioverse.CrossfaderNode.finished_event">
-<code class="descname">finished_event</code><a class="headerlink" href="#libaudioverse.CrossfaderNode.finished_event" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fires when a non-instantaneous crossfade finishes.</p>
-<p>This event is primarily used for optimization.
-It should be used to unhook nodes that are no longer needed.</p>
+<dl class="method">
+<dt id="libaudioverse.CrossfaderNode.get_finished_callback">
+<code class="descname">get_finished_callback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.CrossfaderNode.get_finished_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the finished callback.</p>
+<p>This is a feature of the Python bindings and is not available in the C API.  See the setter for specific documentation on this callback.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.CrossfaderNode.is_crossfading">
 <code class="descname">is_crossfading</code><a class="headerlink" href="#libaudioverse.CrossfaderNode.is_crossfading" title="Permalink to this definition">¶</a></dt>
-<dd><p>True if we are crossfading, otherwise false.</p>
+<dd><p>Type: boolean</p>
+<p>Default value: False</p>
+<p>True if we are crossfading, otherwise false.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="libaudioverse.CrossfaderNode.set_finished_callback">
+<code class="descname">set_finished_callback</code><span class="sig-paren">(</span><em>callback</em>, <em>additional_args=None</em>, <em>additional_kwargs=None</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.CrossfaderNode.set_finished_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the finished callback.</p>
+<p>Called outside the audio thread when the currently scheduled crossfade finishes.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.CrossfaderNode.target_input">
 <code class="descname">target_input</code><a class="headerlink" href="#libaudioverse.CrossfaderNode.target_input" title="Permalink to this definition">¶</a></dt>
-<dd><p>The input which the current crossfade is headed for.</p>
-<p>When not crossfading, the meaning of the value of this property is meaningless.</p>
+<dd><p>Type: int</p>
+<p>This property is read-only.</p>
+<p>The input which the current crossfade is headed for.</p>
+<p>When not crossfading, this property is meaningless.</p>
 </dd></dl>
 
 </dd></dl>
@@ -765,35 +964,29 @@ Delay lines have uses in echo and reverb, as well as many more esoteric effects.
 <dl class="attribute">
 <dt id="libaudioverse.CrossfadingDelayNode.delay">
 <code class="descname">delay</code><a class="headerlink" href="#libaudioverse.CrossfadingDelayNode.delay" title="Permalink to this definition">¶</a></dt>
-<dd><p>The delay of the delay line in seconds.
+<dd><p>Type: float</p>
+<p>Range: dynamic</p>
+<p>Default value: 0.0</p>
+<p>The delay of the delay line in seconds.
 The range of this property depends on the maxDelay parameter to the constructor.</p>
 <p>Note that values less than 1 sample still introduce delay.</p>
-<p>If you are going to connect nodes to or otherwise automate one of the delay properties, you need to use this one.
-The delay_samples property exists for advanced DSP applications that sometimes need sample-perfect accuracy.
-Changing delay_samples will cancel automators on this property.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.CrossfadingDelayNode.delay_max">
 <code class="descname">delay_max</code><a class="headerlink" href="#libaudioverse.CrossfadingDelayNode.delay_max" title="Permalink to this definition">¶</a></dt>
-<dd><p>The max delay as set at the node&#8217;s creation time.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="libaudioverse.CrossfadingDelayNode.delay_samples">
-<code class="descname">delay_samples</code><a class="headerlink" href="#libaudioverse.CrossfadingDelayNode.delay_samples" title="Permalink to this definition">¶</a></dt>
-<dd><p>The delay of the delay line in samples.</p>
-<p>This property&#8217;s range depends on the maximum delay.  Values of 0 will introduce delay of 1 sample.</p>
-<p>This property is a double  so that it can accurately reflect the delay property.
-Setting it to a fractional value will make it arbitrarily pick one of the adjacent samples.</p>
-<p>Note that changing this property has the same effect as writing to the delay property: automation will be cancelled for both.
-You should use this property for one-off delay changes, as automation and node connection will behave unpredictably.</p>
+<dd><p>Type: float</p>
+<p>This property is read-only.</p>
+<p>The max delay as set at the node&#8217;s creation time.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.CrossfadingDelayNode.feedback">
 <code class="descname">feedback</code><a class="headerlink" href="#libaudioverse.CrossfadingDelayNode.feedback" title="Permalink to this definition">¶</a></dt>
-<dd><p>The feedback coefficient.
+<dd><p>Type: float</p>
+<p>Range: [-INFINITY, INFINITY]</p>
+<p>Default value: 0.0</p>
+<p>The feedback coefficient.
 The output of the delay line is fed back into the delay line, multiplied by this coefficient.
 Setting feedback to small values can make echoes, comb filters, and a variety of other effects.</p>
 </dd></dl>
@@ -801,7 +994,10 @@ Setting feedback to small values can make echoes, comb filters, and a variety of
 <dl class="attribute">
 <dt id="libaudioverse.CrossfadingDelayNode.interpolation_time">
 <code class="descname">interpolation_time</code><a class="headerlink" href="#libaudioverse.CrossfadingDelayNode.interpolation_time" title="Permalink to this definition">¶</a></dt>
-<dd><p>When the delay property is changed, the delay line crossfades between the old position and the new one.
+<dd><p>Type: float</p>
+<p>Range: [0.001, INFINITY]</p>
+<p>Default value: 0.001</p>
+<p>When the delay property is changed, the delay line crossfades between the old position and the new one.
 This property sets how long this crossfade will take.
 Note that for this node, it is impossible to get rid of the crossfade completely.</p>
 </dd></dl>
@@ -853,7 +1049,26 @@ channels is not reliable, and your application should default to stereo while pr
 <dl class="class">
 <dt id="libaudioverse.DistanceModels">
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">DistanceModels</code><a class="headerlink" href="#libaudioverse.DistanceModels" title="Permalink to this definition">¶</a></dt>
-<dd><p>An enumeration.</p>
+<dd><p>used in the 3D components of this library.
+Indicates how sound should become quieter as objects move away from the listener.</p>
+<dl class="attribute">
+<dt id="libaudioverse.DistanceModels.exponential">
+<code class="descname">exponential</code><em class="property"> = &lt;DistanceModels.exponential: 1&gt;</em><a class="headerlink" href="#libaudioverse.DistanceModels.exponential" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sounds fall off as <code class="docutils literal"><span class="pre">1/distance</span></code>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.DistanceModels.inverse_square">
+<code class="descname">inverse_square</code><em class="property"> = &lt;DistanceModels.inverse_square: 2&gt;</em><a class="headerlink" href="#libaudioverse.DistanceModels.inverse_square" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sounds fall off as <code class="docutils literal"><span class="pre">1/min(distance,</span> <span class="pre">maxDistance)^2</span></code>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.DistanceModels.linear">
+<code class="descname">linear</code><em class="property"> = &lt;DistanceModels.linear: 0&gt;</em><a class="headerlink" href="#libaudioverse.DistanceModels.linear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sound falls off as <code class="docutils literal"><span class="pre">1-(distance/maxDistance)</span></code>.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -864,35 +1079,29 @@ Delay lines have uses in echo and reverb, as well as many more esoteric effects.
 <dl class="attribute">
 <dt id="libaudioverse.DoppleringDelayNode.delay">
 <code class="descname">delay</code><a class="headerlink" href="#libaudioverse.DoppleringDelayNode.delay" title="Permalink to this definition">¶</a></dt>
-<dd><p>The delay of the delay line in seconds.
+<dd><p>Type: float</p>
+<p>Range: dynamic</p>
+<p>Default value: 0.0</p>
+<p>The delay of the delay line in seconds.
 The range of this property depends on the maxDelay parameter to the constructor.</p>
 <p>Note that values less than 1 sample still introduce delay.</p>
-<p>If you are going to connect nodes to or otherwise automate one of the delay properties, you need to use this one.
-The delay_samples property exists for advanced DSP applications that sometimes need sample-perfect accuracy.
-Changing delay_samples will cancel automators on this property.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.DoppleringDelayNode.delay_max">
 <code class="descname">delay_max</code><a class="headerlink" href="#libaudioverse.DoppleringDelayNode.delay_max" title="Permalink to this definition">¶</a></dt>
-<dd><p>The max delay as set at the node&#8217;s creation time.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="libaudioverse.DoppleringDelayNode.delay_samples">
-<code class="descname">delay_samples</code><a class="headerlink" href="#libaudioverse.DoppleringDelayNode.delay_samples" title="Permalink to this definition">¶</a></dt>
-<dd><p>The delay of the delay line in samples.</p>
-<p>This property&#8217;s range depends on the maximum delay.  Values of 0 will introduce delay of 1 sample.</p>
-<p>This property is a double  so that it can accurately reflect the delay property.
-Setting it to a fractional value will make it arbitrarily pick one of the adjacent samples.</p>
-<p>Note that changing this property has the same effect as writing to the delay property: automation will be cancelled.
-You should use this property for one-off delay changes, as automation and node connection will behave unpredictably.</p>
+<dd><p>Type: float</p>
+<p>This property is read-only.</p>
+<p>The max delay as set at the node&#8217;s creation time.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.DoppleringDelayNode.interpolation_time">
 <code class="descname">interpolation_time</code><a class="headerlink" href="#libaudioverse.DoppleringDelayNode.interpolation_time" title="Permalink to this definition">¶</a></dt>
-<dd><p>When the delay property is changed, the delay line moves the delay to the new position.
+<dd><p>Type: float</p>
+<p>Range: [0.001, INFINITY]</p>
+<p>Default value: 0.01</p>
+<p>When the delay property is changed, the delay line moves the delay to the new position.
 This property sets how long this  will take.
 Note that for this node, it is impossible to get rid of the crossfade completely.</p>
 <p>On this delay line, the interpolation time is the total duration of a pitch bend caused by moving the delay.</p>
@@ -934,34 +1143,49 @@ as sources move away from the listener, their dry path becomes less but the audi
 <dl class="attribute">
 <dt id="libaudioverse.EnvironmentNode.default_distance_model">
 <code class="descname">default_distance_model</code><a class="headerlink" href="#libaudioverse.EnvironmentNode.default_distance_model" title="Permalink to this definition">¶</a></dt>
-<dd><p>The default distance model for newly created sources.
+<dd><p>Type: int</p>
+<p>Range: <a class="reference internal" href="#libaudioverse.DistanceModels" title="libaudioverse.DistanceModels"><code class="xref any py py-class docutils literal"><span class="pre">DistanceModels</span></code></a></p>
+<p>Default value: <a class="reference internal" href="#libaudioverse.DistanceModels.linear" title="libaudioverse.DistanceModels.linear"><code class="xref any py py-attr docutils literal"><span class="pre">DistanceModels.linear</span></code></a></p>
+<p>The default distance model for newly created sources.
 Distance models control how quickly sources get quieter as they move away from the listener.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.EnvironmentNode.default_max_distance">
 <code class="descname">default_max_distance</code><a class="headerlink" href="#libaudioverse.EnvironmentNode.default_max_distance" title="Permalink to this definition">¶</a></dt>
-<dd><p>The default max distance for new sources.
+<dd><p>Type: float</p>
+<p>Range: [0.0, INFINITY]</p>
+<p>Default value: 50.0</p>
+<p>The default max distance for new sources.
 The max distance of a source is the maximum distance at which that source will be audible.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.EnvironmentNode.default_panning_strategy">
 <code class="descname">default_panning_strategy</code><a class="headerlink" href="#libaudioverse.EnvironmentNode.default_panning_strategy" title="Permalink to this definition">¶</a></dt>
-<dd><p>the default panner strategy for the internal panner of new sources.</p>
+<dd><p>Type: int</p>
+<p>Range: <a class="reference internal" href="#libaudioverse.PanningStrategies" title="libaudioverse.PanningStrategies"><code class="xref any py py-class docutils literal"><span class="pre">PanningStrategies</span></code></a></p>
+<p>Default value: <a class="reference internal" href="#libaudioverse.PanningStrategies.stereo" title="libaudioverse.PanningStrategies.stereo"><code class="xref any py py-attr docutils literal"><span class="pre">PanningStrategies.stereo</span></code></a></p>
+<p>the default panner strategy for the internal panner of new sources.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.EnvironmentNode.default_reverb_distance">
 <code class="descname">default_reverb_distance</code><a class="headerlink" href="#libaudioverse.EnvironmentNode.default_reverb_distance" title="Permalink to this definition">¶</a></dt>
-<dd><p>The default distance at which a source will be heard only in the reverb.</p>
+<dd><p>Type: float</p>
+<p>Range: [0.0, INFINITY]</p>
+<p>Default value: 30.0</p>
+<p>The default distance at which a source will be heard only in the reverb.</p>
 <p>See documentation on the <a class="reference internal" href="#libaudioverse.SourceNode" title="libaudioverse.SourceNode"><code class="xref py py-class docutils literal"><span class="pre">SourceNode</span></code></a> node.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.EnvironmentNode.default_size">
 <code class="descname">default_size</code><a class="headerlink" href="#libaudioverse.EnvironmentNode.default_size" title="Permalink to this definition">¶</a></dt>
-<dd><p>The default size for new sources.
+<dd><p>Type: float</p>
+<p>Range: [0.0, INFINITY]</p>
+<p>Default value: 0.0</p>
+<p>The default size for new sources.
 Sources aare approximated as spheres, with 0 being the special case of a point source.
 Size is used to determine the listener&#8217;s distance from a source.</p>
 </dd></dl>
@@ -969,7 +1193,9 @@ Size is used to determine the listener&#8217;s distance from a source.</p>
 <dl class="attribute">
 <dt id="libaudioverse.EnvironmentNode.orientation">
 <code class="descname">orientation</code><a class="headerlink" href="#libaudioverse.EnvironmentNode.orientation" title="Permalink to this definition">¶</a></dt>
-<dd><p>The orientation of the listener.
+<dd><p>Type: float6</p>
+<p>Default value: [0.0, 0.0, -1.0, 0.0, 1.0, 0.0]</p>
+<p>The orientation of the listener.
 The first three elements are a vector representing the direction in which the listener is looking
 and the second 3 a vector representing the direction in which a rod pointing out of the top of the listener&#8217;s head would be pointing</p>
 <p>This property packs these vectors because they must never be modified separately.
@@ -986,7 +1212,10 @@ As usual, note that radians=degrees*PI/180.</p>
 <dl class="attribute">
 <dt id="libaudioverse.EnvironmentNode.output_channels">
 <code class="descname">output_channels</code><a class="headerlink" href="#libaudioverse.EnvironmentNode.output_channels" title="Permalink to this definition">¶</a></dt>
-<dd><p>Environments are not smart enough to determine the number of channels their output needs to have.
+<dd><p>Type: int</p>
+<p>Range: [0, 8]</p>
+<p>Default value: 2</p>
+<p>Environments are not smart enough to determine the number of channels their output needs to have.
 If you are using something greater than stereo, i.e. 5.1, you need to change this property.
 The specific issue solved by this property is the case in which one source is set to something different than all others,
 or where the app changes the panning strategies of sources after creation.</p>
@@ -1004,7 +1233,9 @@ When the buffer finishes playing, the source is automatically disposed of.</p>
 <dl class="attribute">
 <dt id="libaudioverse.EnvironmentNode.position">
 <code class="descname">position</code><a class="headerlink" href="#libaudioverse.EnvironmentNode.position" title="Permalink to this definition">¶</a></dt>
-<dd><p>The position of the listener, in world coordinates.</p>
+<dd><p>Type: float3</p>
+<p>Default value: [0.0, 0.0, 0.0]</p>
+<p>The position of the listener, in world coordinates.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1012,27 +1243,51 @@ When the buffer finishes playing, the source is automatically disposed of.</p>
 <dl class="class">
 <dt id="libaudioverse.FdnFilterTypes">
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">FdnFilterTypes</code><a class="headerlink" href="#libaudioverse.FdnFilterTypes" title="Permalink to this definition">¶</a></dt>
-<dd><p>An enumeration.</p>
+<dd><p>Possible filter types for a feedback delay network&#8217;s feedback path.</p>
+<dl class="attribute">
+<dt id="libaudioverse.FdnFilterTypes.disabled">
+<code class="descname">disabled</code><em class="property"> = &lt;FdnFilterTypes.disabled: 0&gt;</em><a class="headerlink" href="#libaudioverse.FdnFilterTypes.disabled" title="Permalink to this definition">¶</a></dt>
+<dd><p>Don&#8217;t insert filters on the feedback path.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.FdnFilterTypes.highpass">
+<code class="descname">highpass</code><em class="property"> = &lt;FdnFilterTypes.highpass: 2&gt;</em><a class="headerlink" href="#libaudioverse.FdnFilterTypes.highpass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert highpass filters on the FDN&#8217;s feedback path.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.FdnFilterTypes.lowpass">
+<code class="descname">lowpass</code><em class="property"> = &lt;FdnFilterTypes.lowpass: 1&gt;</em><a class="headerlink" href="#libaudioverse.FdnFilterTypes.lowpass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert lowpass filters on the FDN&#8217;s feedback path.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
 <dt id="libaudioverse.FdnReverbNode">
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">FdnReverbNode</code><span class="sig-paren">(</span><em>simulation</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.FdnReverbNode" title="Permalink to this definition">¶</a></dt>
-<dd><p>An 8 delay line FDN reverberator, based off a houseolder reflection.</p>
+<dd><p>An 8 delay line FDN reverberator, based off a householder reflection.</p>
 <p>This reverb takes as its input and outputs ats its output quadraphonic audio.
 Panning effects will still be observed at the output with some bias.
 If a stereo signal is fed into the reverb and the reverb is likewise connected to a stereo output, the input signal&#8217;s volume will effectively be halved.</p>
 <dl class="attribute">
 <dt id="libaudioverse.FdnReverbNode.cutoff_frequency">
 <code class="descname">cutoff_frequency</code><a class="headerlink" href="#libaudioverse.FdnReverbNode.cutoff_frequency" title="Permalink to this definition">¶</a></dt>
-<dd><p>Controls the frequencies of lowpass filters on the feedback path of the reverb.
+<dd><p>Type: float</p>
+<p>Range: dynamic</p>
+<p>Default value: 5000</p>
+<p>Controls the frequencies of lowpass filters on the feedback path of the reverb.
 Lowering this property leads to softer and less harsh reverb.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.FdnReverbNode.delay_modulation_depth">
 <code class="descname">delay_modulation_depth</code><a class="headerlink" href="#libaudioverse.FdnReverbNode.delay_modulation_depth" title="Permalink to this definition">¶</a></dt>
-<dd><p>Controls how deep the modulation of the delay lines is.
+<dd><p>Type: float</p>
+<p>Range: [0.0, 1.0]</p>
+<p>Default value: 0.0</p>
+<p>Controls how deep the modulation of the delay lines is.
 Increasing this property slightly makes the late reverb sound less metallic, while extremely high values add chorus-like effects.
 This property acts as a multiplier, and the correspondance between it and physical units is intentionally left unspecified.</p>
 </dd></dl>
@@ -1040,20 +1295,29 @@ This property acts as a multiplier, and the correspondance between it and physic
 <dl class="attribute">
 <dt id="libaudioverse.FdnReverbNode.delay_modulation_frequency">
 <code class="descname">delay_modulation_frequency</code><a class="headerlink" href="#libaudioverse.FdnReverbNode.delay_modulation_frequency" title="Permalink to this definition">¶</a></dt>
-<dd><p>Controls how fast the internal delay lines modulate.</p>
+<dd><p>Type: float</p>
+<p>Range: [0.0, 500.0]</p>
+<p>Default value: 10.0</p>
+<p>Controls how fast the internal delay lines modulate.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.FdnReverbNode.density">
 <code class="descname">density</code><a class="headerlink" href="#libaudioverse.FdnReverbNode.density" title="Permalink to this definition">¶</a></dt>
-<dd><p>Controls the density of the reverb.
+<dd><p>Type: float</p>
+<p>Range: [0.0, 1.0]</p>
+<p>Default value: 0.5</p>
+<p>Controls the density of the reverb.
 Extremely low values sound &#8220;grainy&#8221;; extremely high values tend to resonate.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.FdnReverbNode.t60">
 <code class="descname">t60</code><a class="headerlink" href="#libaudioverse.FdnReverbNode.t60" title="Permalink to this definition">¶</a></dt>
-<dd><p>The <code class="docutils literal"><span class="pre">t60</span></code> is the time it takes the reverb to decay by 60 decibals.</p>
+<dd><p>Type: float</p>
+<p>Range: [0.0, INFINITY]</p>
+<p>Default value: 1.0</p>
+<p>The <code class="docutils literal"><span class="pre">t60</span></code> is the time it takes the reverb to decay by 60 decibals.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1067,15 +1331,10 @@ Unless you know  what a  feedback delay network is and have a specific reason fo
 <p>This node has <cite>n</cite> inputs and outputs, where <cite>n</cite> is the <cite>lines</cite> parameter to the constructor.
 Each input and output pair represent the input and output of a specific delay line, respectively.</p>
 <dl class="attribute">
-<dt id="libaudioverse.FeedbackDelayNetworkNode.delay_max">
-<code class="descname">delay_max</code><a class="headerlink" href="#libaudioverse.FeedbackDelayNetworkNode.delay_max" title="Permalink to this definition">¶</a></dt>
-<dd><p>The maximum delay any of the internal delay lines may be set to.</p>
-</dd></dl>
-
-<dl class="attribute">
 <dt id="libaudioverse.FeedbackDelayNetworkNode.delays">
 <code class="descname">delays</code><a class="headerlink" href="#libaudioverse.FeedbackDelayNetworkNode.delays" title="Permalink to this definition">¶</a></dt>
-<dd><p>The lengths of the delay lines in seconds.
+<dd><p>Type: float_array</p>
+<p>The lengths of the delay lines in seconds.
 This array must be <code class="docutils literal"><span class="pre">channels</span></code> long.
 All values must be positive and no more than the maximum delay specified to the constructor.</p>
 </dd></dl>
@@ -1083,31 +1342,44 @@ All values must be positive and no more than the maximum delay specified to the 
 <dl class="attribute">
 <dt id="libaudioverse.FeedbackDelayNetworkNode.filter_frequencies">
 <code class="descname">filter_frequencies</code><a class="headerlink" href="#libaudioverse.FeedbackDelayNetworkNode.filter_frequencies" title="Permalink to this definition">¶</a></dt>
-<dd><p>The frequencies of the filters.
+<dd><p>Type: float_array</p>
+<p>The frequencies of the filters.
 The range of this property is 0 to Nyquist, or half the sampling rate.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.FeedbackDelayNetworkNode.filter_types">
 <code class="descname">filter_types</code><a class="headerlink" href="#libaudioverse.FeedbackDelayNetworkNode.filter_types" title="Permalink to this definition">¶</a></dt>
-<dd><p>Allows insertion of filters in the feedback paths.
+<dd><p>Type: int_array</p>
+<p>Range: <a class="reference internal" href="#libaudioverse.FdnFilterTypes" title="libaudioverse.FdnFilterTypes"><code class="xref any py py-class docutils literal"><span class="pre">FdnFilterTypes</span></code></a></p>
+<p>Allows insertion of filters in the feedback paths.
 These filters can be individually enabled and disabled; the default is disabled.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.FeedbackDelayNetworkNode.matrix">
 <code class="descname">matrix</code><a class="headerlink" href="#libaudioverse.FeedbackDelayNetworkNode.matrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>The feedback matrix.</p>
+<dd><p>Type: float_array</p>
+<p>The feedback matrix.</p>
 <p>A column vector is formed by reading all delay lines.
 This vector is multiplied by this matrix, and then fed back into the delay lines.</p>
-<p>The matrix is stored in column-major order.
+<p>The matrix is stored in row-major order.
 The supplied array must have a length equal to the square of the channels specified to the constructor.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.FeedbackDelayNetworkNode.max_delay">
+<code class="descname">max_delay</code><a class="headerlink" href="#libaudioverse.FeedbackDelayNetworkNode.max_delay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Type: float</p>
+<p>This property is read-only.</p>
+<p>The maximum delay any of the internal delay lines may be set to.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.FeedbackDelayNetworkNode.output_gains">
 <code class="descname">output_gains</code><a class="headerlink" href="#libaudioverse.FeedbackDelayNetworkNode.output_gains" title="Permalink to this definition">¶</a></dt>
-<dd><p>Allows control of the individual gains of the output.
+<dd><p>Type: float_array</p>
+<p>Allows control of the individual gains of the output.
 These gains do not apply to the feedback path and are only for controlling relative output levels.
 The array for this property allows any floating point values, and must be exactly <cite>channels</cite> long.</p>
 </dd></dl>
@@ -1154,53 +1426,73 @@ This node is capable of handling impulses longer than a second, a case for which
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">FilteredDelayNode</code><span class="sig-paren">(</span><em>simulation</em>, <em>max_delay</em>, <em>channels</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.FilteredDelayNode" title="Permalink to this definition">¶</a></dt>
 <dd><p>This node consists of a delay line with a biquad filter attached.
 The output of the delay line is filtered.
-If feedback is applied, it is this filtered output that is used.</p>
+The difference between this node and a delay line and filter pair is that this node will use the filtered output for the feedback.</p>
+<p>This node is equivalent to the delay line in the Karplus-strong algorithm.</p>
 <dl class="attribute">
 <dt id="libaudioverse.FilteredDelayNode.dbgain">
 <code class="descname">dbgain</code><a class="headerlink" href="#libaudioverse.FilteredDelayNode.dbgain" title="Permalink to this definition">¶</a></dt>
-<dd><p>This property is a the gain in decibals to be used with the peaking and shelving filters.
+<dd><p>Type: float</p>
+<p>Range: [-INFINITY, INFINITY]</p>
+<p>Default value: 0.0</p>
+<p>This property is a the gain in decibals to be used with the peaking and shelving filters.
 It measures the gain that these filters apply to the part of the signal they boost.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.FilteredDelayNode.delay">
 <code class="descname">delay</code><a class="headerlink" href="#libaudioverse.FilteredDelayNode.delay" title="Permalink to this definition">¶</a></dt>
-<dd><p>The delay of the delay line in seconds.
+<dd><p>Type: float</p>
+<p>Range: dynamic</p>
+<p>Default value: 0.0</p>
+<p>The delay of the delay line in seconds.
 The range of this property depends on the maxDelay parameter to the constructor.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.FilteredDelayNode.delay_max">
 <code class="descname">delay_max</code><a class="headerlink" href="#libaudioverse.FilteredDelayNode.delay_max" title="Permalink to this definition">¶</a></dt>
-<dd><p>The max delay as set at the node&#8217;s creation time.</p>
+<dd><p>Type: float</p>
+<p>This property is read-only.</p>
+<p>The max delay as set at the node&#8217;s creation time.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.FilteredDelayNode.feedback">
 <code class="descname">feedback</code><a class="headerlink" href="#libaudioverse.FilteredDelayNode.feedback" title="Permalink to this definition">¶</a></dt>
-<dd><p>The feedback coefficient.
-The output of the delay line is fed back into the delay line, multiplied by this coefficient.
-Setting feedback to small values can make echoes, comb filters, and a variety of other effects.</p>
+<dd><p>Type: float</p>
+<p>Range: [-INFINITY, INFINITY]</p>
+<p>Default value: 0.0</p>
+<p>The feedback coefficient.
+The output of the filter is fed back into the delay line, multiplied by this coefficient.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.FilteredDelayNode.filter_type">
 <code class="descname">filter_type</code><a class="headerlink" href="#libaudioverse.FilteredDelayNode.filter_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>The type of the filter.
+<dd><p>Type: int</p>
+<p>Range: <a class="reference internal" href="#libaudioverse.BiquadTypes" title="libaudioverse.BiquadTypes"><code class="xref any py py-class docutils literal"><span class="pre">BiquadTypes</span></code></a></p>
+<p>Default value: <a class="reference internal" href="#libaudioverse.BiquadTypes.lowpass" title="libaudioverse.BiquadTypes.lowpass"><code class="xref any py py-attr docutils literal"><span class="pre">BiquadTypes.lowpass</span></code></a></p>
+<p>The type of the filter.
 This determines the interpretations of the other properties on this node.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.FilteredDelayNode.frequency">
 <code class="descname">frequency</code><a class="headerlink" href="#libaudioverse.FilteredDelayNode.frequency" title="Permalink to this definition">¶</a></dt>
-<dd><p>This is the frequency of interest.
+<dd><p>Type: float</p>
+<p>Range: [0, INFINITY]</p>
+<p>Default value: 2000.0</p>
+<p>This is the frequency of interest.
 What specifically this means depends on the selected filter type; for example, it is the cutoff frequency for lowpass and highpass.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.FilteredDelayNode.interpolation_time">
 <code class="descname">interpolation_time</code><a class="headerlink" href="#libaudioverse.FilteredDelayNode.interpolation_time" title="Permalink to this definition">¶</a></dt>
-<dd><p>When the delay property is changed, the delay line crossfades between the old position and the new one.
+<dd><p>Type: float</p>
+<p>Range: [0.001, INFINITY]</p>
+<p>Default value: 0.001</p>
+<p>When the delay property is changed, the delay line crossfades between the old position and the new one.
 This property sets how long this crossfade will take.
 Note that for this node, it is impossible to get rid of the crossfade completely.</p>
 </dd></dl>
@@ -1208,7 +1500,10 @@ Note that for this node, it is impossible to get rid of the crossfade completely
 <dl class="attribute">
 <dt id="libaudioverse.FilteredDelayNode.q">
 <code class="descname">q</code><a class="headerlink" href="#libaudioverse.FilteredDelayNode.q" title="Permalink to this definition">¶</a></dt>
-<dd><p>Q is a mathematically complex parameter, a full description of which is beyond the scope of this manual.
+<dd><p>Type: float</p>
+<p>Range: [0.001, INFINITY]</p>
+<p>Default value: 0.5</p>
+<p>Q is a mathematically complex parameter, a full description of which is beyond the scope of this manual.
 For lowpass, bandpass, and high pass filters, Q can be interpreted as a measure of resonation.
 For Q&lt;=0.5, the filter is said to be damped:
 it will cut frequencies.
@@ -1258,7 +1553,10 @@ This is equivalent to the <a class="reference internal" href="#libaudioverse.One
 <dl class="attribute">
 <dt id="libaudioverse.FirstOrderFilterNode.pole">
 <code class="descname">pole</code><a class="headerlink" href="#libaudioverse.FirstOrderFilterNode.pole" title="Permalink to this definition">¶</a></dt>
-<dd><p>The position of the pole on the real axis.</p>
+<dd><p>Type: float</p>
+<p>Range: [-INFINITY, INFINITY]</p>
+<p>Default value: 0.0</p>
+<p>The position of the pole on the real axis.</p>
 <p>The pole may be positioned anywhere, but stable filters  usually keep all poles inside the unit circle.
 For a stable filter, the value of this property should usually between -1 and 1.</p>
 </dd></dl>
@@ -1266,7 +1564,10 @@ For a stable filter, the value of this property should usually between -1 and 1.
 <dl class="attribute">
 <dt id="libaudioverse.FirstOrderFilterNode.zero">
 <code class="descname">zero</code><a class="headerlink" href="#libaudioverse.FirstOrderFilterNode.zero" title="Permalink to this definition">¶</a></dt>
-<dd><p>The position of the zero on the real axis.</p>
+<dd><p>Type: float</p>
+<p>Range: [-INFINITY, INFINITY]</p>
+<p>Default value: 0.0</p>
+<p>The position of the zero on the real axis.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1298,7 +1599,7 @@ For a stable filter, the value of this property should usually between -1 and 1.
 <dl class="class">
 <dt id="libaudioverse.GainNode">
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">GainNode</code><span class="sig-paren">(</span><em>simulation</em>, <em>channels</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.GainNode" title="Permalink to this definition">¶</a></dt>
-<dd><p>This node is essentially in instantiated generic node, offering only the functionality therein
+<dd><p>This node is essentially in instantiated generic node, offering only the functionality therein.
 Its purpose is to allow changing the gain or adding offset to a large collection of nodes.
 One possible use is as a simple mixer: point all the nodes to be mixed at the input, set mul, and then point the output at the destination for the mixed audio.</p>
 </dd></dl>
@@ -1317,15 +1618,19 @@ One possible use is as a simple mixer: point all the nodes to be mixed at the in
 <dl class="attribute">
 <dt id="libaudioverse.GenericNode.add">
 <code class="descname">add</code><a class="headerlink" href="#libaudioverse.GenericNode.add" title="Permalink to this definition">¶</a></dt>
-<dd><p>After mul is applied, we add the value to which this property is set to the node&#8217;s result.
-The purpose of add is to be used with automation support: add provides a baseline for oscillators and other similar nodes
-so that when connected to properties, we can make the value of this node vary between a specified minimum and maximum.</p>
+<dd><p>Type: float</p>
+<p>Range: [-INFINITY, INFINITY]</p>
+<p>Default value: 0.0</p>
+<p>After mul is applied, we add the value to which this property is set to the node&#8217;s result.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.GenericNode.channel_interpretation">
 <code class="descname">channel_interpretation</code><a class="headerlink" href="#libaudioverse.GenericNode.channel_interpretation" title="Permalink to this definition">¶</a></dt>
-<dd><p>How to treat channel count mismatches.
+<dd><p>Type: int</p>
+<p>Range: <a class="reference internal" href="#libaudioverse.ChannelInterpretations" title="libaudioverse.ChannelInterpretations"><code class="xref any py py-class docutils literal"><span class="pre">ChannelInterpretations</span></code></a></p>
+<p>Default value: <a class="reference internal" href="#libaudioverse.ChannelInterpretations.speakers" title="libaudioverse.ChannelInterpretations.speakers"><code class="xref any py py-attr docutils literal"><span class="pre">ChannelInterpretations.speakers</span></code></a></p>
+<p>How to treat channel count mismatches.
 The default is to apply mixing matrices when possible.</p>
 <p>If set to <code class="xref py py-class docutils literal"><span class="pre">ChannelInterpretationSpeakers</span></code>, mixing matrices are applied to inputs.
 Otherwise, when set to <code class="xref py py-class docutils literal"><span class="pre">ChannelInterpretationDiscrete</span></code>, they are not.</p>
@@ -1378,7 +1683,10 @@ So long as some node which this node is connected to is alive, this node will al
 <dl class="attribute">
 <dt id="libaudioverse.GenericNode.mul">
 <code class="descname">mul</code><a class="headerlink" href="#libaudioverse.GenericNode.mul" title="Permalink to this definition">¶</a></dt>
-<dd><p>After this node processes, the value to which mul is set is used as a multiplier on the result.
+<dd><p>Type: float</p>
+<p>Range: [-INFINITY, INFINITY]</p>
+<p>Default value: 1.0</p>
+<p>After this node processes, the value to which mul is set is used as a multiplier on the result.
 The most notable effect of this is to change the node&#8217;s volume.
 A variety of other uses exist, however, especially as regards to nodes which are connected to properties.
 Mul is applied before add.</p>
@@ -1394,7 +1702,10 @@ Mul is applied before add.</p>
 <dl class="attribute">
 <dt id="libaudioverse.GenericNode.state">
 <code class="descname">state</code><a class="headerlink" href="#libaudioverse.GenericNode.state" title="Permalink to this definition">¶</a></dt>
-<dd><p>The node&#8217;s state.  See the basics section in the Libaudioverse manual for details.
+<dd><p>Type: int</p>
+<p>Range: <a class="reference internal" href="#libaudioverse.NodeStates" title="libaudioverse.NodeStates"><code class="xref any py py-class docutils literal"><span class="pre">NodeStates</span></code></a></p>
+<p>Default value: <a class="reference internal" href="#libaudioverse.NodeStates.playing" title="libaudioverse.NodeStates.playing"><code class="xref any py py-attr docutils literal"><span class="pre">NodeStates.playing</span></code></a></p>
+<p>The node&#8217;s state.  See the basics section in the Libaudioverse manual for details.
 The default is usually what you want.</p>
 </dd></dl>
 
@@ -1403,8 +1714,9 @@ The default is usually what you want.</p>
 <dl class="class">
 <dt id="libaudioverse.GraphListenerNode">
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">GraphListenerNode</code><span class="sig-paren">(</span><em>simulation</em>, <em>channels</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.GraphListenerNode" title="Permalink to this definition">¶</a></dt>
-<dd><p>This node defines a callback which is called with the audio data passing through this node for the current block.
-Graph listeners can be used to implement cases wherein the app wishes to capture audio from some part of the graph of connected nodes in realtime.</p>
+<dd><p>This node defines a callback which is called every block.
+The callback is passed pointers to the audio data passing through this node for the current block.
+The effect is that this node allows observing audio passing through any location in the audio graph.</p>
 <dl class="method">
 <dt id="libaudioverse.GraphListenerNode.get_listening_callback">
 <code class="descname">get_listening_callback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.GraphListenerNode.get_listening_callback" title="Permalink to this definition">¶</a></dt>
@@ -1416,7 +1728,8 @@ Graph listeners can be used to implement cases wherein the app wishes to capture
 <dt id="libaudioverse.GraphListenerNode.set_listening_callback">
 <code class="descname">set_listening_callback</code><span class="sig-paren">(</span><em>callback</em>, <em>additional_args=None</em>, <em>additional_kwargs=None</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.GraphListenerNode.set_listening_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the listening callback.</p>
-<p>When set, audio is passed to this callback.</p>
+<p>When set, audio is passed to this callback every block.
+This callback is called inside the audio threads; do not block.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1444,21 +1757,29 @@ or an HRTF of your own.</p>
 <dl class="attribute">
 <dt id="libaudioverse.HrtfNode.azimuth">
 <code class="descname">azimuth</code><a class="headerlink" href="#libaudioverse.HrtfNode.azimuth" title="Permalink to this definition">¶</a></dt>
-<dd><p>The horizontal angle of the panner in degrees.
+<dd><p>Type: float</p>
+<p>Range: [-INFINITY, INFINITY]</p>
+<p>Default value: 0.0</p>
+<p>The horizontal angle of the panner in degrees.
 0 is straight ahead and positive values are clockwise.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.HrtfNode.elevation">
 <code class="descname">elevation</code><a class="headerlink" href="#libaudioverse.HrtfNode.elevation" title="Permalink to this definition">¶</a></dt>
-<dd><p>The vertical angle of the panner in degrees.
+<dd><p>Type: float</p>
+<p>Range: [-90.0, 90.0]</p>
+<p>Default value: 0.0</p>
+<p>The vertical angle of the panner in degrees.
 0 is horizontal and positive values move upward.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.HrtfNode.should_crossfade">
 <code class="descname">should_crossfade</code><a class="headerlink" href="#libaudioverse.HrtfNode.should_crossfade" title="Permalink to this definition">¶</a></dt>
-<dd><p>By default, panners crossfade their output.
+<dd><p>Type: boolean</p>
+<p>Default value: True</p>
+<p>By default, panners crossfade their output.
 This property allows such functionality to be disabled.
 Note that for HRTF nodes, crossfading is more important than for other panner types.
 Unlike other panner types, the audio artifacts produced by disabling crossfading are noticeable, even for updates of only a few degrees.</p>
@@ -1520,7 +1841,10 @@ If you feed this node a signal that is zero, it will slowly decrease the output 
 <dl class="attribute">
 <dt id="libaudioverse.LeakyIntegratorNode.leakyness">
 <code class="descname">leakyness</code><a class="headerlink" href="#libaudioverse.LeakyIntegratorNode.leakyness" title="Permalink to this definition">¶</a></dt>
-<dd><p>The leakyness (or time constant) of the integrator.</p>
+<dd><p>Type: double</p>
+<p>Range: [0.0, 1.0]</p>
+<p>Default value: 1.0</p>
+<p>The leakyness (or time constant) of the integrator.</p>
 <p>If you feed the leaky integrator a constant signal of 0, then this property&#8217;s value is the percent decrease as observed after 1 second.</p>
 </dd></dl>
 
@@ -1542,7 +1866,31 @@ If you feed this node a signal that is zero, it will slowly decrease the output 
 <dl class="class">
 <dt id="libaudioverse.LoggingLevels">
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">LoggingLevels</code><a class="headerlink" href="#libaudioverse.LoggingLevels" title="Permalink to this definition">¶</a></dt>
-<dd><p>An enumeration.</p>
+<dd><p>Possible levels for logging.</p>
+<dl class="attribute">
+<dt id="libaudioverse.LoggingLevels.critical">
+<code class="descname">critical</code><em class="property"> = &lt;LoggingLevels.critical: 10&gt;</em><a class="headerlink" href="#libaudioverse.LoggingLevels.critical" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logs critical messages such as failures to initialize and error conditions.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.LoggingLevels.debug">
+<code class="descname">debug</code><em class="property"> = &lt;LoggingLevels.debug: 30&gt;</em><a class="headerlink" href="#libaudioverse.LoggingLevels.debug" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logs everything possible.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.LoggingLevels.info">
+<code class="descname">info</code><em class="property"> = &lt;LoggingLevels.info: 20&gt;</em><a class="headerlink" href="#libaudioverse.LoggingLevels.info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logs informative messages.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.LoggingLevels.off">
+<code class="descname">off</code><em class="property"> = &lt;LoggingLevels.off: 40&gt;</em><a class="headerlink" href="#libaudioverse.LoggingLevels.off" title="Permalink to this definition">¶</a></dt>
+<dd><p>No log messages will be generated.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="exception">
@@ -1560,28 +1908,40 @@ Capabilities include switching from HRTF to stereo and back, a useful property f
 <dl class="attribute">
 <dt id="libaudioverse.MultipannerNode.azimuth">
 <code class="descname">azimuth</code><a class="headerlink" href="#libaudioverse.MultipannerNode.azimuth" title="Permalink to this definition">¶</a></dt>
-<dd><p>The horizontal angle of the panner, in degrees.
+<dd><p>Type: float</p>
+<p>Range: [-INFINITY, INFINITY]</p>
+<p>Default value: 0.0</p>
+<p>The horizontal angle of the panner, in degrees.
 0 is straight ahead and positive values are clockwise.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.MultipannerNode.elevation">
 <code class="descname">elevation</code><a class="headerlink" href="#libaudioverse.MultipannerNode.elevation" title="Permalink to this definition">¶</a></dt>
-<dd><p>The vertical angle of the panner, in degrees.
-0 is horizontal and positive values are vertical.</p>
+<dd><p>Type: float</p>
+<p>Range: [-90.0, 90.0]</p>
+<p>Default value: 0.0</p>
+<p>The vertical angle of the panner, in degrees.
+0 is horizontal and positive values are upward.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.MultipannerNode.should_crossfade">
 <code class="descname">should_crossfade</code><a class="headerlink" href="#libaudioverse.MultipannerNode.should_crossfade" title="Permalink to this definition">¶</a></dt>
-<dd><p>Whether or not this panner should crossfade.
-Lack of crossfading introduces audible artifacts when the panner is moved and you usually want this on.</p>
+<dd><p>Type: boolean</p>
+<p>Default value: True</p>
+<p>Whether or not this panner should crossfade.
+Lack of crossfading introduces audible artifacts when the panner is moved.
+You usually want this on.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.MultipannerNode.strategy">
 <code class="descname">strategy</code><a class="headerlink" href="#libaudioverse.MultipannerNode.strategy" title="Permalink to this definition">¶</a></dt>
-<dd><p>What type of panning to use.
+<dd><p>Type: int</p>
+<p>Range: <a class="reference internal" href="#libaudioverse.PanningStrategies" title="libaudioverse.PanningStrategies"><code class="xref any py py-class docutils literal"><span class="pre">PanningStrategies</span></code></a></p>
+<p>Default value: <a class="reference internal" href="#libaudioverse.PanningStrategies.stereo" title="libaudioverse.PanningStrategies.stereo"><code class="xref any py py-attr docutils literal"><span class="pre">PanningStrategies.stereo</span></code></a></p>
+<p>What type of panning to use.
 Possibilities include HRTF, stereo, 5.1, and 7.1 speaker configurations.
 For something more nontraditional, use an amplitude panner.</p>
 </dd></dl>
@@ -1591,7 +1951,9 @@ For something more nontraditional, use an amplitude panner.</p>
 <dl class="class">
 <dt id="libaudioverse.NestedAllpassNetworkNode">
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">NestedAllpassNetworkNode</code><span class="sig-paren">(</span><em>simulation</em>, <em>channels</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.NestedAllpassNetworkNode" title="Permalink to this definition">¶</a></dt>
-<dd><p>This node implements nested first-order allpass filters.</p>
+<dd><p>This node is deprecated.
+A more capable node along the same lines is planned, at which point this one will disappear.</p>
+<p>This node implements nested first-order allpass filters.</p>
 <p>In order to specify how this nesting works, one must call the various control functions.
 This node&#8217;s operation is somewhat analogous to old-style OpenGL programming: there is an implicit context that is manipulated via calling functions, as opposed to a set of properties to be set.</p>
 <p>Filters may be appended in series.
@@ -1614,7 +1976,8 @@ The primary use of this node is for experimentation purposes and the development
 <dl class="method">
 <dt id="libaudioverse.NestedAllpassNetworkNode.append_biquad">
 <code class="descname">append_biquad</code><span class="sig-paren">(</span><em>node</em>, <em>type</em>, <em>frequency</em>, <em>db_gain</em>, <em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.NestedAllpassNetworkNode.append_biquad" title="Permalink to this definition">¶</a></dt>
-<dd><p>No description available</p>
+<dd><p>Append a biquad filter.
+This is the same as the <a class="reference internal" href="#libaudioverse.BiquadNode" title="libaudioverse.BiquadNode"><code class="xref py py-class docutils literal"><span class="pre">BiquadNode</span></code></a>.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1656,7 +2019,26 @@ Behavior is undefined if this function is called without an enclosing allpass fi
 <dl class="class">
 <dt id="libaudioverse.NodeStates">
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">NodeStates</code><a class="headerlink" href="#libaudioverse.NodeStates" title="Permalink to this definition">¶</a></dt>
-<dd><p>An enumeration.</p>
+<dd><p>used to indicate the state of a node.
+This is the value of the node&#8217;s state property and determins how the node is processed.</p>
+<dl class="attribute">
+<dt id="libaudioverse.NodeStates.always_playing">
+<code class="descname">always_playing</code><em class="property"> = &lt;NodeStates.always_playing: 2&gt;</em><a class="headerlink" href="#libaudioverse.NodeStates.always_playing" title="Permalink to this definition">¶</a></dt>
+<dd><p>This node advances always.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.NodeStates.paused">
+<code class="descname">paused</code><em class="property"> = &lt;NodeStates.paused: 0&gt;</em><a class="headerlink" href="#libaudioverse.NodeStates.paused" title="Permalink to this definition">¶</a></dt>
+<dd><p>This node is paused.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.NodeStates.playing">
+<code class="descname">playing</code><em class="property"> = &lt;NodeStates.playing: 1&gt;</em><a class="headerlink" href="#libaudioverse.NodeStates.playing" title="Permalink to this definition">¶</a></dt>
+<dd><p>This node advances if other nodes need audio from it.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -1666,13 +2048,18 @@ Behavior is undefined if this function is called without an enclosing allpass fi
 <dl class="attribute">
 <dt id="libaudioverse.NoiseNode.noise_type">
 <code class="descname">noise_type</code><a class="headerlink" href="#libaudioverse.NoiseNode.noise_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>The type of noise to generate.</p>
+<dd><p>Type: int</p>
+<p>Range: <a class="reference internal" href="#libaudioverse.NoiseTypes" title="libaudioverse.NoiseTypes"><code class="xref any py py-class docutils literal"><span class="pre">NoiseTypes</span></code></a></p>
+<p>Default value: <a class="reference internal" href="#libaudioverse.NoiseTypes.white" title="libaudioverse.NoiseTypes.white"><code class="xref any py py-attr docutils literal"><span class="pre">NoiseTypes.white</span></code></a></p>
+<p>The type of noise to generate.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.NoiseNode.should_normalize">
 <code class="descname">should_normalize</code><a class="headerlink" href="#libaudioverse.NoiseNode.should_normalize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Whether or not to normalize the output.
+<dd><p>Type: boolean</p>
+<p>Default value: False</p>
+<p>Whether or not to normalize the output.
 Some types of noise are quieter without this enabled.
 Turning it on is sometimes helpful and sometimes not.</p>
 </dd></dl>
@@ -1682,7 +2069,25 @@ Turning it on is sometimes helpful and sometimes not.</p>
 <dl class="class">
 <dt id="libaudioverse.NoiseTypes">
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">NoiseTypes</code><a class="headerlink" href="#libaudioverse.NoiseTypes" title="Permalink to this definition">¶</a></dt>
-<dd><p>An enumeration.</p>
+<dd><p>Specifies types of noise.</p>
+<dl class="attribute">
+<dt id="libaudioverse.NoiseTypes.brown">
+<code class="descname">brown</code><em class="property"> = &lt;NoiseTypes.brown: 2&gt;</em><a class="headerlink" href="#libaudioverse.NoiseTypes.brown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Brown noise.  Brown noise decreases at 6 DB per octave.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.NoiseTypes.pink">
+<code class="descname">pink</code><em class="property"> = &lt;NoiseTypes.pink: 1&gt;</em><a class="headerlink" href="#libaudioverse.NoiseTypes.pink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pink noise.  Pink noise falls off at 3 DB per octave.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.NoiseTypes.white">
+<code class="descname">white</code><em class="property"> = &lt;NoiseTypes.white: 0&gt;</em><a class="headerlink" href="#libaudioverse.NoiseTypes.white" title="Permalink to this definition">¶</a></dt>
+<dd><p>gaussian white noise.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="exception">
@@ -1711,14 +2116,19 @@ If said property is true, the filter becomes a highpass.</p>
 <dl class="attribute">
 <dt id="libaudioverse.OnePoleFilterNode.frequency">
 <code class="descname">frequency</code><a class="headerlink" href="#libaudioverse.OnePoleFilterNode.frequency" title="Permalink to this definition">¶</a></dt>
-<dd><p>The -3 DB frequency of the filter.</p>
+<dd><p>Type: float</p>
+<p>Range: dynamic</p>
+<p>Default value: 500.0</p>
+<p>The -3 DB frequency of the filter.</p>
 <p>The range of this property is from 0 to half the sampling rate.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.OnePoleFilterNode.is_highpass">
 <code class="descname">is_highpass</code><a class="headerlink" href="#libaudioverse.OnePoleFilterNode.is_highpass" title="Permalink to this definition">¶</a></dt>
-<dd><p>True if the filter is a highpass.</p>
+<dd><p>Type: boolean</p>
+<p>Default value: False</p>
+<p>True if the filter is a highpass.</p>
 <p>If this property is false, the filter is a lowpass.</p>
 </dd></dl>
 
@@ -1741,41 +2151,59 @@ Each input corresponds to a panner, starting with the panner set to the lowest a
 <dl class="attribute">
 <dt id="libaudioverse.PannerBankNode.azimuth">
 <code class="descname">azimuth</code><a class="headerlink" href="#libaudioverse.PannerBankNode.azimuth" title="Permalink to this definition">¶</a></dt>
-<dd><p>The horizontal angle of the panner, in degrees.
+<dd><p>Type: float</p>
+<p>Range: [-INFINITY, INFINITY]</p>
+<p>Default value: 0.0</p>
+<p>The horizontal angle of the panner, in degrees.
 0 is straight ahead and positive values are clockwise.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.PannerBankNode.count">
 <code class="descname">count</code><a class="headerlink" href="#libaudioverse.PannerBankNode.count" title="Permalink to this definition">¶</a></dt>
-<dd><p>The number of panners being used by this node.
+<dd><p>Type: int</p>
+<p>This property is read-only.</p>
+<p>The number of panners being used by this node.
 This is the same as the number of inputs to the node.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.PannerBankNode.is_centered">
 <code class="descname">is_centered</code><a class="headerlink" href="#libaudioverse.PannerBankNode.is_centered" title="Permalink to this definition">¶</a></dt>
-<dd><p>If true, then the azimuth controls the center of the cone.
+<dd><p>Type: boolean</p>
+<p>Default value: False</p>
+<p>If true, then the azimuth controls the center of the cone.
 Otherwise, the azimuth controls the left edge of the cone.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.PannerBankNode.should_crossfade">
 <code class="descname">should_crossfade</code><a class="headerlink" href="#libaudioverse.PannerBankNode.should_crossfade" title="Permalink to this definition">¶</a></dt>
-<dd><p>Whether or not the panners should crossfade.
+<dd><p>Type: boolean</p>
+<p>Default value: True</p>
+<p>Whether or not the panners should crossfade.
 Lack of crossfading introduces audible artifacts when the panner is moved.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.PannerBankNode.spread">
 <code class="descname">spread</code><a class="headerlink" href="#libaudioverse.PannerBankNode.spread" title="Permalink to this definition">¶</a></dt>
-<dd><p>No description available.</p>
+<dd><p>Type: float</p>
+<p>Range: [0.0, 360.0]</p>
+<p>Default value: 360.0</p>
+<p>An angle in degrees.
+Defines a cone across which the panners in this bank are spread.</p>
+<p>This cone always inclues the endpoints, and the panners are separated as <code class="docutils literal"><span class="pre">spread/(panner_count-1)</span></code>.
+This implies that for <code class="docutils literal"><span class="pre">spread=360.0</span></code>, the first and last inputs are effectively the same.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.PannerBankNode.strategy">
 <code class="descname">strategy</code><a class="headerlink" href="#libaudioverse.PannerBankNode.strategy" title="Permalink to this definition">¶</a></dt>
-<dd><p>What type of panning to use.
+<dd><p>Type: int</p>
+<p>Range: <a class="reference internal" href="#libaudioverse.PanningStrategies" title="libaudioverse.PanningStrategies"><code class="xref any py py-class docutils literal"><span class="pre">PanningStrategies</span></code></a></p>
+<p>Default value: <a class="reference internal" href="#libaudioverse.PanningStrategies.stereo" title="libaudioverse.PanningStrategies.stereo"><code class="xref any py py-attr docutils literal"><span class="pre">PanningStrategies.stereo</span></code></a></p>
+<p>What type of panning to use.
 Possibilities include HRTF, stereo, 5.1, and 7.1 speaker configurations.</p>
 </dd></dl>
 
@@ -1784,7 +2212,38 @@ Possibilities include HRTF, stereo, 5.1, and 7.1 speaker configurations.</p>
 <dl class="class">
 <dt id="libaudioverse.PanningStrategies">
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">PanningStrategies</code><a class="headerlink" href="#libaudioverse.PanningStrategies" title="Permalink to this definition">¶</a></dt>
-<dd><p>An enumeration.</p>
+<dd><p>Indicates a strategy to use for panning.
+This is mostly for the <a class="reference internal" href="#libaudioverse.MultipannerNode" title="libaudioverse.MultipannerNode"><code class="xref py py-class docutils literal"><span class="pre">MultipannerNode</span></code></a> and the 3D components of this library.</p>
+<dl class="attribute">
+<dt id="libaudioverse.PanningStrategies.hrtf">
+<code class="descname">hrtf</code><em class="property"> = &lt;PanningStrategies.hrtf: 0&gt;</em><a class="headerlink" href="#libaudioverse.PanningStrategies.hrtf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates HRTF panning.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.PanningStrategies.stereo">
+<code class="descname">stereo</code><em class="property"> = &lt;PanningStrategies.stereo: 1&gt;</em><a class="headerlink" href="#libaudioverse.PanningStrategies.stereo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates stereo panning.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.PanningStrategies.surround40">
+<code class="descname">surround40</code><em class="property"> = &lt;PanningStrategies.surround40: 2&gt;</em><a class="headerlink" href="#libaudioverse.PanningStrategies.surround40" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates 4.0 surround sound (quadraphonic) panning.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.PanningStrategies.surround51">
+<code class="descname">surround51</code><em class="property"> = &lt;PanningStrategies.surround51: 3&gt;</em><a class="headerlink" href="#libaudioverse.PanningStrategies.surround51" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates 5.1 surround sound panning.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.PanningStrategies.surround71">
+<code class="descname">surround71</code><em class="property"> = &lt;PanningStrategies.surround71: 4&gt;</em><a class="headerlink" href="#libaudioverse.PanningStrategies.surround71" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates 7.1 surround sound panning.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="exception">
@@ -1796,7 +2255,61 @@ Possibilities include HRTF, stereo, 5.1, and 7.1 speaker configurations.</p>
 <dl class="class">
 <dt id="libaudioverse.PropertyTypes">
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">PropertyTypes</code><a class="headerlink" href="#libaudioverse.PropertyTypes" title="Permalink to this definition">¶</a></dt>
-<dd><p>An enumeration.</p>
+<dd><p>Indicates the type of a property.</p>
+<dl class="attribute">
+<dt id="libaudioverse.PropertyTypes.buffer">
+<code class="descname">buffer</code><em class="property"> = &lt;PropertyTypes.buffer: 8&gt;</em><a class="headerlink" href="#libaudioverse.PropertyTypes.buffer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Property holds a handle to a buffer.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.PropertyTypes.double">
+<code class="descname">double</code><em class="property"> = &lt;PropertyTypes.double: 2&gt;</em><a class="headerlink" href="#libaudioverse.PropertyTypes.double" title="Permalink to this definition">¶</a></dt>
+<dd><p>Property holds a 64-bit double.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.PropertyTypes.float">
+<code class="descname">float</code><em class="property"> = &lt;PropertyTypes.float: 1&gt;</em><a class="headerlink" href="#libaudioverse.PropertyTypes.float" title="Permalink to this definition">¶</a></dt>
+<dd><p>Property holds a 32-bit floating point value.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.PropertyTypes.float3">
+<code class="descname">float3</code><em class="property"> = &lt;PropertyTypes.float3: 4&gt;</em><a class="headerlink" href="#libaudioverse.PropertyTypes.float3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Property holds a float3, a vector of 3 floats.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.PropertyTypes.float6">
+<code class="descname">float6</code><em class="property"> = &lt;PropertyTypes.float6: 5&gt;</em><a class="headerlink" href="#libaudioverse.PropertyTypes.float6" title="Permalink to this definition">¶</a></dt>
+<dd><p>Property holds a float6, a vector of 6 floats.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.PropertyTypes.float_array">
+<code class="descname">float_array</code><em class="property"> = &lt;PropertyTypes.float_array: 6&gt;</em><a class="headerlink" href="#libaudioverse.PropertyTypes.float_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Property is an array of floats.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.PropertyTypes.int">
+<code class="descname">int</code><em class="property"> = &lt;PropertyTypes.int: 0&gt;</em><a class="headerlink" href="#libaudioverse.PropertyTypes.int" title="Permalink to this definition">¶</a></dt>
+<dd><p>Property holds a 32-bit integer.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.PropertyTypes.int_array">
+<code class="descname">int_array</code><em class="property"> = &lt;PropertyTypes.int_array: 7&gt;</em><a class="headerlink" href="#libaudioverse.PropertyTypes.int_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Property is an array of ints.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.PropertyTypes.string">
+<code class="descname">string</code><em class="property"> = &lt;PropertyTypes.string: 3&gt;</em><a class="headerlink" href="#libaudioverse.PropertyTypes.string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Property holds a string.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -1828,28 +2341,47 @@ Audio is queued as it is pushed to this node and then played as fast as possible
 This node can be used to avoid writing a queue of audio yourself, as it essentially implements said functionality.
 If you need low latency audio or the ability to run something like the Opus encoder&#8217;s
 ability to cover for missing frames, you need a pull node.</p>
-<dl class="attribute">
-<dt id="libaudioverse.PushNode.audio_event">
-<code class="descname">audio_event</code><a class="headerlink" href="#libaudioverse.PushNode.audio_event" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fired when the remaining duration of the audio in this node is less than the threshold property.</p>
-</dd></dl>
-
 <dl class="method">
 <dt id="libaudioverse.PushNode.feed">
 <code class="descname">feed</code><span class="sig-paren">(</span><em>node</em>, <em>length</em>, <em>frames</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.PushNode.feed" title="Permalink to this definition">¶</a></dt>
 <dd><p>Feed more audio data into the internal queue.</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="libaudioverse.PushNode.out_event">
-<code class="descname">out_event</code><a class="headerlink" href="#libaudioverse.PushNode.out_event" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fired when the node has no more audio at all.</p>
+<dl class="method">
+<dt id="libaudioverse.PushNode.get_low_callback">
+<code class="descname">get_low_callback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.PushNode.get_low_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the low callback.</p>
+<p>This is a feature of the Python bindings and is not available in the C API.  See the setter for specific documentation on this callback.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="libaudioverse.PushNode.get_underrun_callback">
+<code class="descname">get_underrun_callback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.PushNode.get_underrun_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the underrun callback.</p>
+<p>This is a feature of the Python bindings and is not available in the C API.  See the setter for specific documentation on this callback.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="libaudioverse.PushNode.set_low_callback">
+<code class="descname">set_low_callback</code><span class="sig-paren">(</span><em>callback</em>, <em>additional_args=None</em>, <em>additional_kwargs=None</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.PushNode.set_low_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the low callback.</p>
+<p>Called once per block and outside the audio thread when there is less than the specified threshold audio remaining.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="libaudioverse.PushNode.set_underrun_callback">
+<code class="descname">set_underrun_callback</code><span class="sig-paren">(</span><em>callback</em>, <em>additional_args=None</em>, <em>additional_kwargs=None</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.PushNode.set_underrun_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the underrun callback.</p>
+<p>Called exactly once and outside the audio thread when the node runs out of audio completely.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.PushNode.threshold">
 <code class="descname">threshold</code><a class="headerlink" href="#libaudioverse.PushNode.threshold" title="Permalink to this definition">¶</a></dt>
-<dd><p>When the remaining audio in the push node has a duration less than this property, the audio event fires.</p>
+<dd><p>Type: float</p>
+<p>Range: [0.0, INFINITY]</p>
+<p>Default value: 0.03</p>
+<p>When the remaining audio in the push node has a duration less than this property, the low callback is called.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1962,20 +2494,29 @@ To enumerate output devices, use enumerate_output_devices.</p>
 <dl class="attribute">
 <dt id="libaudioverse.SineNode.frequency">
 <code class="descname">frequency</code><a class="headerlink" href="#libaudioverse.SineNode.frequency" title="Permalink to this definition">¶</a></dt>
-<dd><p>The frequency of the sine wave in HZ.</p>
+<dd><p>Type: float</p>
+<p>Range: [0, INFINITY]</p>
+<p>Default value: 440.0</p>
+<p>The frequency of the sine wave in HZ.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.SineNode.frequency_multiplier">
 <code class="descname">frequency_multiplier</code><a class="headerlink" href="#libaudioverse.SineNode.frequency_multiplier" title="Permalink to this definition">¶</a></dt>
-<dd><p>An additional multiplicative factor applied to the frequency of the oscillator.</p>
+<dd><p>Type: float</p>
+<p>Range: [-INFINITY, INFINITY]</p>
+<p>Default value: 1.0</p>
+<p>An additional multiplicative factor applied to the frequency of the oscillator.</p>
 <p>This is useful for creating instruments, as the notes of the standard musical scale fall on frequency multiples of a reference pitch, rather than a linear increase.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.SineNode.phase">
 <code class="descname">phase</code><a class="headerlink" href="#libaudioverse.SineNode.phase" title="Permalink to this definition">¶</a></dt>
-<dd><p>The phase of the sine node.
+<dd><p>Type: float</p>
+<p>Range: [0.0, 1.0]</p>
+<p>Default value: 0.0</p>
+<p>The phase of the sine node.
 This is measured in periods, not in radians.</p>
 </dd></dl>
 
@@ -1986,14 +2527,18 @@ This is measured in periods, not in radians.</p>
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">SourceNode</code><span class="sig-paren">(</span><em>simulation</em>, <em>environment</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.SourceNode" title="Permalink to this definition">¶</a></dt>
 <dd><p>The source node allows the spatialization of sound that passes through it.
 Sources have one input which is mono, to which a node should be connected.
-the audio from the input is spatialized according both to the source&#8217;s properties and those on its environment, 
-and passed directly to the environment.
+The audio from the input is spatialized according both to the source&#8217;s properties and those on its environment, and passed directly to the environment.
 Sources have no outputs.
 To hear a source, you must connect its environment to something instead.</p>
+<p>Since the source communicates with the environment through a nonstandard mechanism, environments do not keep their sources alive.
+If you are in a garbage collected language, failure to hold on to the source nodes will cause them to go silent.</p>
 <dl class="attribute">
 <dt id="libaudioverse.SourceNode.distance_model">
 <code class="descname">distance_model</code><a class="headerlink" href="#libaudioverse.SourceNode.distance_model" title="Permalink to this definition">¶</a></dt>
-<dd><p>The distance model determines how quickly sources get quieter as they move away from the listener.</p>
+<dd><p>Type: int</p>
+<p>Range: <a class="reference internal" href="#libaudioverse.DistanceModels" title="libaudioverse.DistanceModels"><code class="xref any py py-class docutils literal"><span class="pre">DistanceModels</span></code></a></p>
+<p>Default value: <a class="reference internal" href="#libaudioverse.DistanceModels.linear" title="libaudioverse.DistanceModels.linear"><code class="xref any py py-attr docutils literal"><span class="pre">DistanceModels.linear</span></code></a></p>
+<p>The distance model determines how quickly sources get quieter as they move away from the listener.</p>
 </dd></dl>
 
 <dl class="method">
@@ -2005,7 +2550,9 @@ To hear a source, you must connect its environment to something instead.</p>
 <dl class="attribute">
 <dt id="libaudioverse.SourceNode.head_relative">
 <code class="descname">head_relative</code><a class="headerlink" href="#libaudioverse.SourceNode.head_relative" title="Permalink to this definition">¶</a></dt>
-<dd><p>Whether or not to consider this source&#8217;s position to always be relative to the listener.</p>
+<dd><p>Type: boolean</p>
+<p>Default value: False</p>
+<p>Whether or not to consider this source&#8217;s position to always be relative to the listener.</p>
 <p>Sources which are head relative interpret their positions in the default coordinate system, relative to the listener.
 Positive x is right, positive y is up, and positive z is behind the listener.
 The orientation and position properties of an environment do not affect head relative sources, making them ideal for such things as footsteps and/or HUD effects that should be panned.</p>
@@ -2014,20 +2561,29 @@ The orientation and position properties of an environment do not affect head rel
 <dl class="attribute">
 <dt id="libaudioverse.SourceNode.max_distance">
 <code class="descname">max_distance</code><a class="headerlink" href="#libaudioverse.SourceNode.max_distance" title="Permalink to this definition">¶</a></dt>
-<dd><p>The maximum distance from the listener at which the source will be audible.</p>
+<dd><p>Type: float</p>
+<p>Range: [0.0, INFINITY]</p>
+<p>Default value: 50.0</p>
+<p>The maximum distance from the listener at which the source will be audible.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.SourceNode.max_reverb_level">
 <code class="descname">max_reverb_level</code><a class="headerlink" href="#libaudioverse.SourceNode.max_reverb_level" title="Permalink to this definition">¶</a></dt>
-<dd><p>The maximum amount of audio to be diverted to reverb sends, if any.</p>
+<dd><p>Type: float</p>
+<p>Range: [0.0, 1.0]</p>
+<p>Default value: 0.6</p>
+<p>The maximum amount of audio to be diverted to reverb sends, if any.</p>
 <p>Behavior is undefined if this property is ever less than Lav_SOURCE_MIN_REVERB_LEVEL.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.SourceNode.min_reverb_level">
 <code class="descname">min_reverb_level</code><a class="headerlink" href="#libaudioverse.SourceNode.min_reverb_level" title="Permalink to this definition">¶</a></dt>
-<dd><p>The minimum reverb level allowed.</p>
+<dd><p>Type: float</p>
+<p>Range: [0.0, 1.0]</p>
+<p>Default value: 0.15</p>
+<p>The minimum reverb level allowed.</p>
 <p>if a send is configured to be a reverb send, this is the minimum amount of audio that will be diverted to it.</p>
 <p>Behavior is undefined if this property is ever greater than the value you give to Lav_SOURCE_MAX_REVERB_LEVEL.</p>
 </dd></dl>
@@ -2035,7 +2591,10 @@ The orientation and position properties of an environment do not affect head rel
 <dl class="attribute">
 <dt id="libaudioverse.SourceNode.occlusion">
 <code class="descname">occlusion</code><a class="headerlink" href="#libaudioverse.SourceNode.occlusion" title="Permalink to this definition">¶</a></dt>
-<dd><p>A scalar representing how occluded this source is.</p>
+<dd><p>Type: float</p>
+<p>Range: [0.0, 1.0]</p>
+<p>Default value: 0.0</p>
+<p>A scalar representing how occluded this source is.</p>
 <p>This property controls internal filters of the source that make occluded objects sound muffled.
 A value of 1.0 is a fully occluded source, which will be all but silent; a value of 0.0 has no effect.</p>
 <p>It is extremely difficult to map occlusion to a physical quantity.
@@ -2046,7 +2605,9 @@ Libaudioverse therefore chooses to use this scalar quantity and to attempt to do
 <dl class="attribute">
 <dt id="libaudioverse.SourceNode.orientation">
 <code class="descname">orientation</code><a class="headerlink" href="#libaudioverse.SourceNode.orientation" title="Permalink to this definition">¶</a></dt>
-<dd><p>The orientation of the source.
+<dd><p>Type: float6</p>
+<p>Default value: [0.0, 0.0, -1.0, 0.0, 1.0, 0.0]</p>
+<p>The orientation of the source.
 This is not currently used.
 In future, it will be used for sound cones and filters on sources facing away.
 The interpretation is the same as that for the listener: the first 3 values are the direction of the front and the second 3 the direction of the top.
@@ -2057,19 +2618,27 @@ They are packed because, also like the listener, they must never be modified sep
 <dl class="attribute">
 <dt id="libaudioverse.SourceNode.panner_strategy">
 <code class="descname">panner_strategy</code><a class="headerlink" href="#libaudioverse.SourceNode.panner_strategy" title="Permalink to this definition">¶</a></dt>
-<dd><p>The strategy for the internal multipanner.</p>
+<dd><p>Type: int</p>
+<p>Range: <a class="reference internal" href="#libaudioverse.PanningStrategies" title="libaudioverse.PanningStrategies"><code class="xref any py py-class docutils literal"><span class="pre">PanningStrategies</span></code></a></p>
+<p>Default value: <a class="reference internal" href="#libaudioverse.PanningStrategies.stereo" title="libaudioverse.PanningStrategies.stereo"><code class="xref any py py-attr docutils literal"><span class="pre">PanningStrategies.stereo</span></code></a></p>
+<p>The strategy for the internal multipanner.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.SourceNode.position">
 <code class="descname">position</code><a class="headerlink" href="#libaudioverse.SourceNode.position" title="Permalink to this definition">¶</a></dt>
-<dd><p>The position of the source in world coordinates.</p>
+<dd><p>Type: float3</p>
+<p>Default value: [0.0, 0.0, 0.0]</p>
+<p>The position of the source in world coordinates.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.SourceNode.reverb_distance">
 <code class="descname">reverb_distance</code><a class="headerlink" href="#libaudioverse.SourceNode.reverb_distance" title="Permalink to this definition">¶</a></dt>
-<dd><p>The distance at which the source will only be heard through the reverb effect sends.</p>
+<dd><p>Type: float</p>
+<p>Range: [0.0, INFINITY]</p>
+<p>Default value: 30.0</p>
+<p>The distance at which the source will only be heard through the reverb effect sends.</p>
 <p>If this source is not feeding any effect sends configured as reverbs, this property has no effect.</p>
 <p>For values greater than Lav_SOURCE_MAX_DISTANCE, the source will always be heard at least somewhat in the dry path.
 Lav_SOURCE_DISTANCE_MODEL controls how this crossfading takes place.</p>
@@ -2078,7 +2647,10 @@ Lav_SOURCE_DISTANCE_MODEL controls how this crossfading takes place.</p>
 <dl class="attribute">
 <dt id="libaudioverse.SourceNode.size">
 <code class="descname">size</code><a class="headerlink" href="#libaudioverse.SourceNode.size" title="Permalink to this definition">¶</a></dt>
-<dd><p>The size of the source.
+<dd><p>Type: float</p>
+<p>Range: [0.0, INFINITY]</p>
+<p>Default value: 0.0</p>
+<p>The size of the source.
 Sources are approximated as spheres.
 The size is used to determine the closest point on the source to the listener, and is the radius of this sphere.
 Size currently has no other effect.</p>
@@ -2106,39 +2678,54 @@ Size currently has no other effect.</p>
 <p>The lowest of these bands begins at <code class="docutils literal"><span class="pre">lowband_frequency</span></code> and continues down to <code class="docutils literal"><span class="pre">0</span> <span class="pre">hz</span></code>.
 The highest is from <code class="docutils literal"><span class="pre">highband_frequency</span></code> and continues until nyquist.
 The middle is the remaining space between the low and high band.
-if the high band begins below the low band, behavior is undefined, but will almost certainly not do what you want.
+If the high band begins below the low band, behavior is undefined, but will almost certainly not do what you want.
 Libaudioverse does not check for this case.</p>
 <p>The slopes that this node institutes are not perfect and cannot increase effectively beyond a certain point.
-Still, this is the least expensive of the Libaudioverse equalizers, and is sufficient for many simpler applications.</p>
+This is the least expensive of the Libaudioverse equalizers, and is sufficient for many simpler applications.</p>
 <dl class="attribute">
 <dt id="libaudioverse.ThreeBandEqNode.highband_dbgain">
 <code class="descname">highband_dbgain</code><a class="headerlink" href="#libaudioverse.ThreeBandEqNode.highband_dbgain" title="Permalink to this definition">¶</a></dt>
-<dd><p>The gain to apply to the highest frequency band as decibals.</p>
+<dd><p>Type: float</p>
+<p>Range: [-INFINITY, INFINITY]</p>
+<p>Default value: 0.0</p>
+<p>The gain to apply to the highest frequency band as decibals.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.ThreeBandEqNode.highband_frequency">
 <code class="descname">highband_frequency</code><a class="headerlink" href="#libaudioverse.ThreeBandEqNode.highband_frequency" title="Permalink to this definition">¶</a></dt>
-<dd><p>The frequency that divides the middle band from the high band.</p>
+<dd><p>Type: float</p>
+<p>Range: dynamic</p>
+<p>Default value: 1000.0</p>
+<p>The frequency that divides the middle band from the high band.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.ThreeBandEqNode.lowband_dbgain">
 <code class="descname">lowband_dbgain</code><a class="headerlink" href="#libaudioverse.ThreeBandEqNode.lowband_dbgain" title="Permalink to this definition">¶</a></dt>
-<dd><p>The gain of the lowest frequency band as decibals.</p>
+<dd><p>Type: float</p>
+<p>Range: [-INFINITY, INFINITY]</p>
+<p>Default value: 0.0</p>
+<p>The gain of the lowest frequency band as decibals.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.ThreeBandEqNode.lowband_frequency">
 <code class="descname">lowband_frequency</code><a class="headerlink" href="#libaudioverse.ThreeBandEqNode.lowband_frequency" title="Permalink to this definition">¶</a></dt>
-<dd><p>The frequency that divides the low and middle bands.</p>
+<dd><p>Type: float</p>
+<p>Range: dynamic</p>
+<p>Default value: 300.0</p>
+<p>The frequency that divides the low and middle bands.</p>
 <p>This ranges from 0 to nyquist.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.ThreeBandEqNode.midband_dbgain">
 <code class="descname">midband_dbgain</code><a class="headerlink" href="#libaudioverse.ThreeBandEqNode.midband_dbgain" title="Permalink to this definition">¶</a></dt>
-<dd><p>The gain to apply to the middle band of the equalizer.</p>
+<dd><p>Type: float</p>
+<p>Range: [-INFINITY, INFINITY]</p>
+<p>Default value: 0.0</p>
+<p>The gain to apply to the middle band of the equalizer.</p>
 </dd></dl>
 
 </dd></dl>
@@ -2193,7 +2780,7 @@ You must call it before the interpreter shuts down. Failure to do so will allow 
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
       
-        <a href="index.html" class="btn btn-neutral" title="Welcome to Libaudioverse’s documentation!" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="python-specifics.html" class="btn btn-neutral" title="Python-specific Notes" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -2224,7 +2811,7 @@ You must call it before the interpreter shuts down. Failure to do so will allow 
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.8.dev102',
+            VERSION:'0.8.dev103',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
