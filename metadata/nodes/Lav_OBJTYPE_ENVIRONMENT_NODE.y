@@ -52,7 +52,7 @@ properties:
   Lav_ENVIRONMENT_DEFAULT_PANNER_STRATEGY:
     name: default_panning_strategy
     type: int
-    default: 1
+    default: Lav_PANNING_STRATEGY_STEREO
     value_enum: Lav_PANNING_STRATEGIES
     doc_description: |
       the default panner strategy for the internal panner of new sources.

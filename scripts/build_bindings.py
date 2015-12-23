@@ -2,7 +2,7 @@
 import os.path
 import sys
 import jinja2
-sys.path = [os.path.split(os.path.split(__file__)[0])[0]] + sys.path
+sys.path = [os.path.split(os.path.split(os.path.abspath(__file__))[0])[0]] + sys.path
 import bindings.make_bindings
 
 

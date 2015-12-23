@@ -100,7 +100,7 @@ A value from the {{propinfo[1]['value_enum']|enum}} enumeration.
 {%endif%}
 {%endif%}
 
-Default Value: {{propinfo[1].get('default', 'See Description')}}
+Default Value: {{propinfo[1].get('default', 'See below')}}
 
 Rate: {{propinfo[1]['rate']}}
 {%else%}

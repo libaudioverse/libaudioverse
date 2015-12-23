@@ -125,7 +125,7 @@ def get_jinja2_filters(all_info):
         'type_to_string': type_to_string,
     }
 
-def get_jinja2_functions():
+def get_jinja2_functions(all_info):
     return {
         'common_prefix': common_prefix,
     }
