@@ -9,10 +9,10 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <sndfile.h>
 #include <libaudioverse/private/file.hpp>
 #include <libaudioverse/libaudioverse.h>
-#include <sndfile.h>
 #include <libaudioverse/private/error.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/utf8.hpp>
+#include <inttypes.h>
 
 namespace libaudioverse_implementation {
 
@@ -69,10 +69,11 @@ unsigned int FileReader::readAll(float* buffer) {
 	return read(getFrameCount(), buffer);
 }
 
-void FileReader::seek(unsigned int frame) {
-	if(handle == NULL) return;
+int64_t FileReader::seek(unsigned int frame) {
+	if(handle == NULL) return -1;
 	if(frame >= getFrameCount()) frame = getFrameCount()-1;
-	sf_seek(handle, frame, SEEK_SET);
+	int64_t result = sf_seek(handle, frame, SEEK_SET);
+	return result;
 }
 
 }
