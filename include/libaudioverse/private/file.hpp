@@ -22,6 +22,7 @@ class FileReader: std::enable_shared_from_this<FileReader>  {
 	unsigned int getSampleCount();
 	unsigned int readAll(float* buffer);
 	unsigned int read(unsigned int frames, float* buffer);
+	void seek(unsigned int frame); //Clamps in case of out of range.
 	protected:
 	SNDFILE* handle = nullptr;
 	SF_INFO info;

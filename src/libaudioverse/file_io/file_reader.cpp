@@ -69,4 +69,10 @@ unsigned int FileReader::readAll(float* buffer) {
 	return read(getFrameCount(), buffer);
 }
 
+void FileReader::seek(unsigned int frame) {
+	if(handle == NULL) return;
+	if(frame >= getFrameCount()) frame = getFrameCount()-1;
+	sf_seek(handle, frame, SEEK_SET);
+}
+
 }
