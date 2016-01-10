@@ -24,6 +24,9 @@ class FileStreamer {
 	void setIsLooping(bool l);
 	bool getIsLooping();
 	//Increments every time the buffer ends.
+	//Only true if and only if we aren't looping, otherwise false.
+	//This last fact is important for the node's process method.
+	//Also, this can be significantly (on the order of up to 100 MS) ahead of schedule.
 	bool getEnded();
 	private:
 	void feedResampler();
