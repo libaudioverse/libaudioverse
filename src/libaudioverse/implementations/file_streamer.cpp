@@ -41,6 +41,8 @@ void FileStreamer::process(float** outputs) {
 }
 
 void FileStreamer::feedResampler() {
+	//If we're ended, short-circuit.
+	if(ended) return;
 	//First, write stuff to the workspace, of size _block_size.
 	unsigned int needed = block_size;
 	unsigned int got = 0;
@@ -63,7 +65,7 @@ void FileStreamer::feedResampler() {
 	}
 	std::fill(ptr, workspace_before_resampling+block_size*reader.getChannelCount(), 0.0f);
 	//And then feed the resampler.
-	resampler->read(workspace_before_resampling);
+	if(got) resampler->read(workspace_before_resampling);
 }
 
 void FileStreamer::setPosition(double position) {
@@ -74,7 +76,9 @@ void FileStreamer::setPosition(double position) {
 }
 
 double FileStreamer::getPosition() {
-	return position;
+	//Position is estimated using floating point math, and can drift over the technical max by up to 0.99th of a sample.
+	//We clamp so that user code can pretend that it doesn't.
+	return std::min(position, duration);
 }
 
 double FileStreamer::getDuration() {

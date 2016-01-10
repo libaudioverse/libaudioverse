@@ -11,6 +11,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/constants.hpp>
 #include <string>
+#include <memory>
 #include <math.h>
 
 namespace libaudioverse_implementation {
@@ -20,6 +21,7 @@ streamer(path, simulation->getBlockSize(), simulation->getSr()) {
 	resize(0, streamer.getChannels());
 	appendOutputConnection(0, streamer.getChannels());
 	getProperty(Lav_FILE_STREAMER_POSITION).setDoubleRange(0.0, streamer.getDuration());
+	end_callback = std::make_shared<Callback<void()>>();
 }
 
 std::shared_ptr<Node> createFileStreamerNode(std::shared_ptr<Simulation> simulation, std::string path) {
@@ -27,7 +29,7 @@ std::shared_ptr<Node> createFileStreamerNode(std::shared_ptr<Simulation> simulat
 }
 
 void FileStreamerNode::process() {
-	if(werePropertiesModified(this, Lav_FILE_STREAMER_POSITION)) streamer.setPosition(getProperty(Lav_BUFFER_POSITION).getDoubleValue());
+	if(werePropertiesModified(this, Lav_FILE_STREAMER_POSITION)) streamer.setPosition(getProperty(Lav_FILE_STREAMER_POSITION).getDoubleValue());
 	if(werePropertiesModified(this, Lav_FILE_STREAMER_LOOPING)) streamer.setIsLooping(getProperty(Lav_FILE_STREAMER_LOOPING).getIntValue() != 0);
 	streamer.process(&output_buffers[0]);
 	getProperty(Lav_FILE_STREAMER_POSITION).setDoubleValue(streamer.getPosition());
@@ -39,7 +41,9 @@ void FileStreamerNode::process() {
 				sum += fabs(o[i]);
 			}
 		}
-		if(sum < 1e-3) {
+		//Eventually the resampler in the streamer will be forced to stop writing.
+		//At this point, the sum will actually be exactly zero; this is not a mistake.
+		if(sum == 0.0f) {
 			//It's quiet enough for us to go ahead and stop it.
 			getProperty(Lav_FILE_STREAMER_ENDED).setIntValue(1);
 			simulation->enqueueTask([=] () {(*end_callback)();});

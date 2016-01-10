@@ -16,6 +16,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/buffer.hpp>
 #include <limits>
 #include <vector>
+#include <memory>
 
 namespace libaudioverse_implementation {
 
@@ -23,6 +24,7 @@ BufferNode::BufferNode(std::shared_ptr<Simulation> simulation): Node(Lav_OBJTYPE
 player(simulation->getBlockSize(), simulation->getSr()) {
 	appendOutputConnection(0, 1);
 	getProperty(Lav_BUFFER_BUFFER).setPostChangedCallback([&] () {bufferChanged();});
+	end_callback = std::make_shared<Callback<void()>>();
 }
 
 std::shared_ptr<Node> createBufferNode(std::shared_ptr<Simulation> simulation) {
