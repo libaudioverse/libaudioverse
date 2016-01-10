@@ -19,6 +19,7 @@ FileStreamerNode::FileStreamerNode(std::shared_ptr<Simulation> simulation, std::
 streamer(path, simulation->getBlockSize(), simulation->getSr()) {
 	resize(0, streamer.getChannels());
 	appendOutputConnection(0, streamer.getChannels());
+	getProperty(Lav_FILE_STREAMER_POSITION).setDoubleRange(0.0, streamer.getDuration());
 }
 
 std::shared_ptr<Node> createFileStreamerNode(std::shared_ptr<Simulation> simulation, std::string path) {
