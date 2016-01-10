@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>The Libaudioverse API &mdash; Libaudioverse 0.8.dev104 documentation</title>
+  <title>The Libaudioverse API &mdash; Libaudioverse 0.8.dev105 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="Libaudioverse 0.8.dev104 documentation" href="index.html"/>
+    <link rel="top" title="Libaudioverse 0.8.dev105 documentation" href="index.html"/>
         <link rel="prev" title="Python-specific Notes" href="python-specifics.html"/> 
 
   
@@ -1419,6 +1419,62 @@ This node is capable of handling impulses longer than a second, a case for which
 <dt id="libaudioverse.FileNotFoundError">
 <em class="property">exception </em><code class="descclassname">libaudioverse.</code><code class="descname">FileNotFoundError</code><a class="headerlink" href="#libaudioverse.FileNotFoundError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Libaudioverse could not find a specified file.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="libaudioverse.FileStreamerNode">
+<em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">FileStreamerNode</code><span class="sig-paren">(</span><em>simulation</em>, <em>path</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.FileStreamerNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Streams a file, which must be specified to the constructor and cannot be changed thereafter.</p>
+<p>This node is a stopgap solution, and should be considered temporary.
+It will likely remain for backward compatibility.
+Libaudioverse plans to eventually offer a more generic streaming node that also supports web addresses; such a node will have a completely different, less buffer-like interface.</p>
+<p>In order to stream a file, it must be passed through a resampler.
+Consequentlty, the position property is slightly inaccurate and the ended property and callback are slightly delayed.</p>
+<dl class="attribute">
+<dt id="libaudioverse.FileStreamerNode.ended">
+<code class="descname">ended</code><a class="headerlink" href="#libaudioverse.FileStreamerNode.ended" title="Permalink to this definition">¶</a></dt>
+<dd><p>Type: boolean</p>
+<p>This property is read-only.</p>
+<p>Switches from false to true once the stream has ended completely and gone silent.
+This property will never go true unless looping is false.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="libaudioverse.FileStreamerNode.get_end_callback">
+<code class="descname">get_end_callback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.FileStreamerNode.get_end_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the end callback.</p>
+<p>This is a feature of the Python bindings and is not available in the C API.  See the setter for specific documentation on this callback.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.FileStreamerNode.looping">
+<code class="descname">looping</code><a class="headerlink" href="#libaudioverse.FileStreamerNode.looping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Type: boolean</p>
+<p>Default value: False</p>
+<p>If true, this node repeats the file from the beginning once it reaches the end.
+Note that setting looping means that ended will never go true.
+If ended is already true, it may take until the end of the next processing block for ended to properly go false once more.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.FileStreamerNode.position">
+<code class="descname">position</code><a class="headerlink" href="#libaudioverse.FileStreamerNode.position" title="Permalink to this definition">¶</a></dt>
+<dd><p>Type: double</p>
+<p>Range: dynamic</p>
+<p>Default value: 0.0</p>
+<p>The position of playback, in seconds.
+The range of this property corresponds to the total duration of the file.
+Note that this property may be slightly inaccurate because this node has to pass data through a resampler.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="libaudioverse.FileStreamerNode.set_end_callback">
+<code class="descname">set_end_callback</code><span class="sig-paren">(</span><em>callback</em>, <em>additional_args=None</em>, <em>additional_kwargs=None</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.FileStreamerNode.set_end_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the end callback.</p>
+<p>Called outside the audio threads after the stream has both reached its end and gone silent.
+When called, ended will be set to true,.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -2811,7 +2867,7 @@ You must call it before the interpreter shuts down. Failure to do so will allow 
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.8.dev104',
+            VERSION:'0.8.dev105',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
