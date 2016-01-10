@@ -94,4 +94,8 @@ bool FileStreamer::getEnded() {
 	return ended;
 }
 
+int FileStreamer::getChannels() {
+	return (int)reader.getChannelCount();
+}
+
 }

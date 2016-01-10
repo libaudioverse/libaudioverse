@@ -28,6 +28,7 @@ class FileStreamer {
 	//This last fact is important for the node's process method.
 	//Also, this can be significantly (on the order of up to 100 MS) ahead of schedule.
 	bool getEnded();
+	int getChannels();
 	private:
 	void feedResampler();
 	int block_size = 0;

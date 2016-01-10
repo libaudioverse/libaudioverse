@@ -101,6 +101,7 @@ nodes/dopplering_delay.cpp
 nodes/fdn_reverb.cpp
 nodes/feedback_delay_network.cpp
 nodes/fft_convolver.cpp
+nodes/file_streamer.cpp
 nodes/filtered_delay.cpp
 nodes/first_order_filter.cpp
 nodes/gain.cpp
