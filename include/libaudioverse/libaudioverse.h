@@ -128,6 +128,7 @@ enum Lav_OBJECT_TYPES {
 	Lav_OBJTYPE_BLIT_NODE,
 	Lav_OBJTYPE_DC_BLOCKER_NODE,
 	Lav_OBJTYPE_LEAKY_INTEGRATOR_NODE,
+	Lav_OBJTYPE_FILE_STREAMER_NODE,
 };
 
 /**Node states.*/
@@ -447,6 +448,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_createBlitNode(LavHandle simulationHandle, LavH
 Lav_PUBLIC_FUNCTION LavError Lav_createDcBlockerNode(LavHandle simulationHandle, int channels, LavHandle* destination);
 
 Lav_PUBLIC_FUNCTION LavError Lav_createLeakyIntegratorNode(LavHandle simulationHandle, int channels, LavHandle* destination);
+
+Lav_PUBLIC_FUNCTION LavError Lav_createFileStreamerNode(LavHandle simulationHandle, const char* path, LavHandle* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_fileStreamerNodeSetEndCallback(LavHandle nodeHandle, LavParameterlessCallback callback, void* userdata);
 
 #ifdef __cplusplus
 }
