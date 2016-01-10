@@ -26,7 +26,6 @@ class FileStreamer {
 	//Increments every time the buffer ends.
 	//Only true if and only if we aren't looping, otherwise false.
 	//This last fact is important for the node's process method.
-	//Also, this can be significantly (on the order of up to 100 MS) ahead of schedule.
 	bool getEnded();
 	int getChannels();
 	private:
@@ -39,7 +38,7 @@ class FileStreamer {
 	int channels = 0;
 	double position = 0.0, duration  = 0.0, position_per_sample = 0.0;
 	int64_t position_in_frames = 0;
-	bool is_looping = false, ended = false;
+	bool is_looping = false, ended_before_resampling = false, ended_after_resampling = false;
 };
 
 }

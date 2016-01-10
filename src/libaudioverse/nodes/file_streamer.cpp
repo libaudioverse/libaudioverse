@@ -34,20 +34,8 @@ void FileStreamerNode::process() {
 	streamer.process(&output_buffers[0]);
 	getProperty(Lav_FILE_STREAMER_POSITION).setDoubleValue(streamer.getPosition());
 	if(streamer.getEnded()) {
-		//We only end if we're silent, which can be computed as a sum of absolute values.
-		float sum = 0.0f;
-		for(auto &o: output_buffers) {
-			for(int i = 0; i < block_size; i++) {
-				sum += fabs(o[i]);
-			}
-		}
-		//Eventually the resampler in the streamer will be forced to stop writing.
-		//At this point, the sum will actually be exactly zero; this is not a mistake.
-		if(sum == 0.0f) {
-			//It's quiet enough for us to go ahead and stop it.
-			getProperty(Lav_FILE_STREAMER_ENDED).setIntValue(1);
-			simulation->enqueueTask([=] () {(*end_callback)();});
-		}
+		getProperty(Lav_FILE_STREAMER_ENDED).setIntValue(1);
+		simulation->enqueueTask([=] () {(*end_callback)();});
 	}
 	else getProperty(Lav_FILE_STREAMER_ENDED).setIntValue(0);
 }

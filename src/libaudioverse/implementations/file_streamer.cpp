@@ -31,18 +31,19 @@ void FileStreamer::process(float** outputs) {
 	float* ptr = workspace_after_resampling;
 	while(got < block_size) {
 		int gotThisIteration = resampler->write(workspace_after_resampling, block_size-got);
-		if(gotThisIteration == 0 && ended == false) feedResampler();
+		if(gotThisIteration == 0 && ended_before_resampling == false) feedResampler();
 		else if(gotThisIteration == 0) break;
 		got += gotThisIteration;
 		ptr += gotThisIteration*reader.getChannelCount();
 	}
 	std::fill(ptr, workspace_after_resampling+block_size*reader.getChannelCount(), 0.0f);
+	if(got == 0 && ended_before_resampling) ended_after_resampling = true;
 	uninterleaveSamples(reader.getChannelCount(), block_size, workspace_after_resampling, reader.getChannelCount(), outputs);
 }
 
 void FileStreamer::feedResampler() {
 	//If we're ended, short-circuit.
-	if(ended) return;
+	if(ended_before_resampling) return;
 	//First, write stuff to the workspace, of size _block_size.
 	unsigned int needed = block_size;
 	unsigned int got = 0;
@@ -59,7 +60,7 @@ void FileStreamer::feedResampler() {
 			reader.seek(0);
 		}
 		else if(got == 0) { //This is probably the end, and Libsndfile annoyingly doesn't make it clear.
-			ended = true;
+			ended_before_resampling = true;
 			break;
 		}
 	}
@@ -72,7 +73,8 @@ void FileStreamer::setPosition(double position) {
 	position = std::min(position, duration);
 	reader.seek(reader.getSr()*position);
 	this->position = position;
-	ended = false;
+	ended_before_resampling = false;
+	ended_after_resampling = false;
 }
 
 double FileStreamer::getPosition() {
@@ -87,7 +89,10 @@ double FileStreamer::getDuration() {
 
 void FileStreamer::setIsLooping(bool l) {
 	is_looping = l;
-	if(l) ended = false;
+	if(l) {
+		ended_before_resampling = false;
+		ended_after_resampling = false;
+	}
 }
 
 bool FileStreamer::getIsLooping() {
@@ -95,7 +100,7 @@ bool FileStreamer::getIsLooping() {
 }
 
 bool FileStreamer::getEnded() {
-	return ended;
+	return ended_after_resampling;
 }
 
 int FileStreamer::getChannels() {
