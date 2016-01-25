@@ -65,7 +65,7 @@ class Simulation: public Job {
 	//Tasks that need to run in the background.
 	void enqueueTask(std::function<void(void)>);
 	//Set the block callback.
-	void setBlockCallback(LavBlockCallback cb, void* userdata);
+	void setBlockCallback(LavTimeCallback cb, void* userdata);
 
 	//Write to a file.
 	void writeFile(std::string path, int channels, double duration, bool mayApplyMixingMatrix);
@@ -93,7 +93,7 @@ class Simulation: public Job {
 		auto c = [=] () {
 			callable(args...);
 		};
-		scheduleCall(c);
+		scheduleCall(when, c);
 	}
 	
 	protected:
@@ -128,7 +128,7 @@ class Simulation: public Job {
 
 	//support for callbacks and time.
 	double time = 0.0;
-	LavBlockCallback block_callback = nullptr;
+	LavTimeCallback block_callback = nullptr;
 	void* block_callback_userdata =nullptr;
 	double block_callback_set_time = 0.0;
 	std::multimap<double, std::function<void(void)>> scheduled_callbacks;

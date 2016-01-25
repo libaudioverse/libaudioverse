@@ -13,6 +13,8 @@ extern "C" {
 typedef int LavError;
 typedef int LavHandle;
 typedef void (*LavParameterlessCallback)(LavHandle nodeHandle, void* userdata);
+//Like parameterless callback, but for callbacks that need to know about time.
+typedef void (*LavTimeCallback)(LavHandle handle, double time, void* userdata);
 
 /**Does whatever is appropriate on a given platform to expose a Libaudioverse function publically.*/
 #ifdef _MSC_VER
@@ -234,12 +236,13 @@ This callback is called with a handle to the simulation and a double.  The doubl
 For audio output devices, this callback is called in the mixing thread.  If it blocks, audio stops. Don't.
 It is safe to call Libaudioverse from this callback.
 To clear, use null as the callback.*/
-typedef void (*LavBlockCallback)(LavHandle handle, double time, void* userdata);
-Lav_PUBLIC_FUNCTION LavError Lav_simulationSetBlockCallback(LavHandle simulationHandle, LavBlockCallback callback, void* userdata);
+Lav_PUBLIC_FUNCTION LavError Lav_simulationSetBlockCallback(LavHandle simulationHandle, LavTimeCallback callback, void* userdata);
 Lav_PUBLIC_FUNCTION LavError Lav_simulationWriteFile(LavHandle simulationHandle, const char* path, int channels, double duration, int mayApplyMixingMatrix);
 
 Lav_PUBLIC_FUNCTION LavError Lav_simulationSetThreads(LavHandle simulationHandle, int threads);
 Lav_PUBLIC_FUNCTION LavError Lav_simulationGetThreads(LavHandle simulationHandle, int* destination);
+
+Lav_PUBLIC_FUNCTION LavError Lav_simulationCallIn(LavHandle simulationHandle, double when, int inAudioThread, LavTimeCallback cb, void* userdata);
 
 /**Buffers.
 Buffers are chunks of audio data from any source.  A variety of nodes to work with buffers exist.*/

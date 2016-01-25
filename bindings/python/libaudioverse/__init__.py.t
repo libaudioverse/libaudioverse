@@ -247,7 +247,7 @@ For full details of this class, see the Libaudioverse manual."""
         with self._lock:
             if callback is not None:
                 wrapper = _CallbackWrapper(self, callback, additional_args if additional_args is not None else (), additional_kwargs if additional_kwargs is not None else dict())
-                ctypes_callback=_libaudioverse.LavBlockCallback(wrapper)
+                ctypes_callback=_libaudioverse.LavTimeCallback(wrapper)
                 _lav.simulation_set_block_callback(self, ctypes_callback, None)
                 self._state['block_callback'] = (callback, wrapper, ctypes_callback)
             else:

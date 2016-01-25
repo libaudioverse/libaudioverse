@@ -196,7 +196,7 @@ void Simulation::backgroundTaskThreadFunction() {
 	}
 }
 
-void Simulation::setBlockCallback(LavBlockCallback callback, void* userdata) {
+void Simulation::setBlockCallback(LavTimeCallback callback, void* userdata) {
 	block_callback = callback;
 	block_callback_set_time = getCurrentTime();
 	block_callback_userdata=userdata;
@@ -301,7 +301,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_simulationUnlock(LavHandle simulationHandle) {
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_simulationSetBlockCallback(LavHandle handle, LavBlockCallback callback, void* userdata) {
+Lav_PUBLIC_FUNCTION LavError Lav_simulationSetBlockCallback(LavHandle handle, LavTimeCallback callback, void* userdata) {
 	PUB_BEGIN
 	incomingObject<Simulation>(handle)->setBlockCallback(callback, userdata);
 	PUB_END
@@ -329,6 +329,24 @@ Lav_PUBLIC_FUNCTION LavError Lav_simulationGetThreads(LavHandle simulationHandle
 	auto sim = incomingObject<Simulation>(simulationHandle);
 	LOCK(*sim);
 	*destination = sim->getThreads();
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_simulationCallIn(LavHandle simulationHandle, double when, int inAudioThread, LavTimeCallback cb, void* userdata) {
+	PUB_BEGIN
+	auto sim = incomingObject<Simulation>(simulationHandle);
+	std::weak_ptr<Simulation> simWeak = sim;
+	auto wrapped_callback = [simWeak, userdata, cb] () {
+		auto simStrong = simWeak.lock();
+		//This should always be a valid weak pointer, but we check here just in case.
+		if(simStrong) {
+			double t = simStrong->getCurrentTime();
+			cb(outgoingObject(simStrong), t, userdata);
+		}
+	};
+	LOCK(*sim);
+	if(inAudioThread) sim->scheduleCallInAudioThread(when, wrapped_callback);
+	else sim->scheduleCallOutsideAudioThread(when, wrapped_callback);
 	PUB_END
 }
 
