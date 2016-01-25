@@ -26,6 +26,7 @@ CrossfaderNode::CrossfaderNode(std::shared_ptr<Simulation> sim, int channels, in
 	getProperty(Lav_CROSSFADER_CURRENT_INPUT).setPostChangedCallback([&] () {
 		crossfade(0.0, getProperty(Lav_CROSSFADER_CURRENT_INPUT).getIntValue());
 	});
+	finished_callback = std::make_shared<Callback<void()>>();
 }
 
 std::shared_ptr<Node> createCrossfaderNode(std::shared_ptr<Simulation> simulation, int channels, int inputs) {
