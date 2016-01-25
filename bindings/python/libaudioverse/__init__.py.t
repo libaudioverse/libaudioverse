@@ -131,15 +131,18 @@ def shutdown():
 
 class _CallbackWrapper(object):
 
-    def __init__(self, node, cb, additional_args, additional_kwargs):
-        self.additional_args = additional_args
-        self.additional_kwargs = additional_kwargs
+    def __init__(self, for_object, cb, additional_args, additional_kwargs, remove_from_set = None):
+        self.additional_args = additional_args if additional_args is not None else ()
+        self.additional_kwargs = additional_kwargs if additional_kwargs is not None else dict()
         self.cb = cb
-        self.node_handle = node.handle.handle
+        self.object_handle = for_object.handle.handle
+        self.remove_from_set = remove_from_set
 
     def __call__(self, *args):
-        needed_args = (_resurrect(_lav._HandleBox(self.node_handle)), )+args[1:-1] #be sure to eliminate userdata, which is always the last argument.
-        return self.cb(*needed_args, **self.additional_kwargs)
+        needed_args = (_resurrect(_lav._HandleBox(self.object_handle)), )+args[1:-1]+self.additional_args #be sure to eliminate userdata, which is always the last argument.
+        retval = self.cb(*needed_args, **self.additional_kwargs)
+        if self.remove_from_set:
+            self.remove_from_set.remove(self)
 
 class DeviceInfo(object):
     r"""Represents info on a audio device.
@@ -200,6 +203,7 @@ For full details of this class, see the Libaudioverse manual."""
                 _object_states[handle.handle] = dict()
                 _object_states[handle.handle]['lock'] = threading.Lock()
                 _object_states[handle.handle]['block_callback'] = None
+                _object_states[handle.handle]['scheduled_callbacks'] = set()
             self._state = _object_states[handle.handle]
             self.handle = handle
             self._lock = self._state['lock']
@@ -246,7 +250,7 @@ For full details of this class, see the Libaudioverse manual."""
         Wraps lav_simulationSetBlockCallback."""
         with self._lock:
             if callback is not None:
-                wrapper = _CallbackWrapper(self, callback, additional_args if additional_args is not None else (), additional_kwargs if additional_kwargs is not None else dict())
+                wrapper = _CallbackWrapper(self, callback, additional_args, additional_kwargs)
                 ctypes_callback=_libaudioverse.LavTimeCallback(wrapper)
                 _lav.simulation_set_block_callback(self, ctypes_callback, None)
                 self._state['block_callback'] = (callback, wrapper, ctypes_callback)
@@ -258,6 +262,19 @@ For full details of this class, see the Libaudioverse manual."""
         r"""The Python bindings provide the ability to retrieve callback objects.  This function retrieves the set block callback, if any."""
         with self._lock:
             return self._state['block_callback'][0]
+
+    def call_in(self, when, callback, extra_args = None, extra_kwargs = None, in_audio_thread = False):
+        r"""Schedule a fucntion to run in the future.
+        
+        If in_audio_thread is false, it is safe to call the Libaudioverse API.
+        
+        Wraps Lav_simulationCallIn."""
+        with self._lock:
+            wrapped = _CallbackWrapper(self, callback, extra_args, extra_kwargs, self._state['scheduled_callbacks'])
+            ct = _libaudioverse.LavTimeCallback(wrapped)
+            wrapped.ctypes = ct #Ugly, but works and everything else was worse than this at time of writing.
+            _lav.simulation_call_in(self.handle, when, in_audio_thread, ct, None)
+            self._state['scheduled_callbacks'].add(wrapped)
 
     def write_file(self, path, channels, duration, may_apply_mixing_matrix=True):
         r"""Write blocks of data to a file.

@@ -97,7 +97,7 @@ void Simulation::getBlock(float* out, unsigned int channels, bool mayApplyMixing
 	tick_count ++;
 	//Finally, we have to call any scheduled callbacks for this block.
 	filter(scheduled_callbacks, [&](auto item, double t) {
-		if(t <= item.first) {
+		if(t >= item.first) {
 			item.second();
 			return false; //to kill.
 		}
