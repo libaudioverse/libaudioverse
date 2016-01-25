@@ -76,7 +76,30 @@ class Simulation: public Job {
 
 	//called when connections are formed or lost, or when a node is deleted.
 	void invalidatePlan();
+	
+	//Get the time. This is relative to whenever the simulation was created, and advances with getBlock.
+	double getCurrentTime();
+	
+	//Schedule something to run in a while, inside the audio thread.
+	//when is relative to now.
+	template<typename CallableT, typename... ArgsT>
+	void scheduleCallInAudioThread(double when, CallableT callable, ArgsT... args) {
+		scheduleCall(when, [=] () {callable(args...);});
+	}
+	
+	//Like callAfterInAudioThread, but for things outside the audio thread.
+	template<typename CallableT, typename... ArgsT>
+	void scheduleCallOutsideAudioThread(double when, CallableT callable, ArgsT... args) {
+		auto c = [=] () {
+			callable(args...);
+		};
+		scheduleCall(c);
+	}
+	
 	protected:
+	//Schedule a call in when seconds.
+	void scheduleCall(double when, std::function<void(void)> func);
+	
 	//the connection to which nodes connect themselves if their output should be audible.
 	std::shared_ptr<InputConnection> final_output_connection;
 	//pointers to output buffers that the above connection can write to.
@@ -103,10 +126,12 @@ class Simulation: public Job {
 	int maintenance_start = 0; //also part of node processing. Used to stagger calls to doMaintenance on nodes so that we're not randomly spiking the tick length.
 	int maintenance_rate = 5; //call on every 5th object.
 
-	//support for the block callback.
-	double block_callback_time = 0.0;
+	//support for callbacks and time.
+	double time = 0.0;
 	LavBlockCallback block_callback = nullptr;
 	void* block_callback_userdata =nullptr;
+	double block_callback_set_time = 0.0;
+	std::multimap<double, std::function<void(void)>> scheduled_callbacks;
 	
 	Planner* planner = nullptr;
 	int threads = 1;

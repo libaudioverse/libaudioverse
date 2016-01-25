@@ -61,8 +61,11 @@ Simulation::~Simulation() {
 
 //Yes, this uses goto. Yes, goto is evil. We need a single point of exit.
 void Simulation::getBlock(float* out, unsigned int channels, bool mayApplyMixingMatrix) {
-	if(out == nullptr || channels == 0) goto end; //nothing to do.
-	if(block_callback) block_callback(outgoingObject(this->shared_from_this()), block_callback_time, block_callback_userdata);
+	if(out == nullptr || channels == 0) {
+		memset(out, 0, sizeof(float)*channels*block_size);
+		goto end;
+	}
+	if(block_callback) block_callback(outgoingObject(this->shared_from_this()), getCurrentTime()-block_callback_set_time, block_callback_userdata);
 	//configure our connection to the number of channels requested.
 	final_output_connection->reconfigure(0, channels);
 	//append buffers to the final_outputs vector until it's big enough.
@@ -81,8 +84,8 @@ void Simulation::getBlock(float* out, unsigned int channels, bool mayApplyMixing
 	final_output_connection->addNodeless(&final_outputs[0], true);
 	//interleave the samples.
 	interleaveSamples(channels, block_size, channels, &final_outputs[0], out);
-	block_callback_time +=block_size/sr;
 	end:
+	time +=block_size/sr;
 	int maintenance_count=maintenance_start;
 	filterWeakPointers(maintenance_nodes, [&](std::shared_ptr<Node> &i_s) {
 		if(maintenance_count % maintenance_rate== 0) i_s->doMaintenance();
@@ -92,6 +95,14 @@ void Simulation::getBlock(float* out, unsigned int channels, bool mayApplyMixing
 	//and ourselves.
 	if(maintenance_start%maintenance_rate == 0) doMaintenance();
 	tick_count ++;
+	//Finally, we have to call any scheduled callbacks for this block.
+	filter(scheduled_callbacks, [&](auto item, double t) {
+		if(t <= item.first) {
+			item.second();
+			return false; //to kill.
+		}
+		else return true; //to keep.
+	}, getCurrentTime());
 }
 
 void Simulation::doMaintenance() {
@@ -187,7 +198,7 @@ void Simulation::backgroundTaskThreadFunction() {
 
 void Simulation::setBlockCallback(LavBlockCallback callback, void* userdata) {
 	block_callback = callback;
-	block_callback_time = 0.0;
+	block_callback_set_time = getCurrentTime();
 	block_callback_userdata=userdata;
 }
 
@@ -216,6 +227,14 @@ int Simulation::getThreads() {
 
 void Simulation::invalidatePlan() {
 	planner->invalidatePlan();
+}
+
+double Simulation::getCurrentTime() {
+	return time;
+}
+
+void Simulation::scheduleCall(double when, std::function<void(void)> func) {
+	scheduled_callbacks.insert(std::make_pair(getCurrentTime()+when, func));
 }
 
 //begin public API
