@@ -269,6 +269,24 @@ functions:
     category: simulations
     doc_description: |
       Get the number of threads that the simulation is currently using.
+  Lav_simulationCallIn:
+    category: simulations
+    doc_description: |
+      Schedule a function to run in the future.
+      
+      This function is either called inside the audio thread or outside the audio thread.
+      If called inside the audio thread, it must exit quickly and not call the Libaudioverse API.
+      If called outside the audio thread, it can call the Libaudioverse API and will not block audio.
+      This is the same as node callbacks.
+      
+      Time advances for simulations if and only if they are processing audio for some purpose; this callback is called in audio time, as it were.
+      The precision of the callback is limited by the block size.
+      Smaller block sizes will call callbacks more precisely.
+    params:
+      when: The number of seconds from the current time to call the callback.
+      inAudioThread: If nonzero, call the callback in the audio thread.
+      cb: The callback to call.
+      userdata: An extra parameter that will be passed to the callback.
   Lav_createBuffer:
     category: buffers
     doc_description: |
