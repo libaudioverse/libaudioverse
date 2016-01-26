@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>The Libaudioverse API &mdash; Libaudioverse 0.8.dev105 documentation</title>
+  <title>The Libaudioverse API &mdash; Libaudioverse 0.8.dev106 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="Libaudioverse 0.8.dev105 documentation" href="index.html"/>
+    <link rel="top" title="Libaudioverse 0.8.dev106 documentation" href="index.html"/>
         <link rel="prev" title="Python-specific Notes" href="python-specifics.html"/> 
 
   
@@ -2492,6 +2492,14 @@ The two inputs will be converted to mono and then multiplied, before being sent 
 <p>Instances of this class are context managers.  Using the with statement on an instance of this class invoke&#8217;s Libaudioverse&#8217;s atomic block support.</p>
 <p>For full details of this class, see the Libaudioverse manual.</p>
 <dl class="method">
+<dt id="libaudioverse.Simulation.call_in">
+<code class="descname">call_in</code><span class="sig-paren">(</span><em>when</em>, <em>callback</em>, <em>extra_args=None</em>, <em>extra_kwargs=None</em>, <em>in_audio_thread=False</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.Simulation.call_in" title="Permalink to this definition">¶</a></dt>
+<dd><p>Schedule a fucntion to run in the future.</p>
+<p>If in_audio_thread is false, it is safe to call the Libaudioverse API.</p>
+<p>Wraps Lav_simulationCallIn.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="libaudioverse.Simulation.clear_output_device">
 <code class="descname">clear_output_device</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.Simulation.clear_output_device" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clears the output device, stopping audio and allowing use of get_block again.</p>
@@ -2867,7 +2875,7 @@ You must call it before the interpreter shuts down. Failure to do so will allow 
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.8.dev105',
+            VERSION:'0.8.dev106',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
