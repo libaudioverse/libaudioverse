@@ -12,11 +12,14 @@ environment:
     secure: N+y3x+7kivMfuMDkYVN7CQ==
   PYPI_PASSWORD:
     secure: QCiljp1jjjC1d8WyllDTJg==
-  GIT_PASSWORD:
-    secure: o8Y0zRhvBAfOEI3iq+Gumw==
+  GIT_ACCESS_TOKEN:
+    secure: FrzZP1OqCF4loe2RCRD4CQo3gRpDAJh0iE5y4/2YU9AJuXoCv138slux3gVMIMdH
 
 init:
   - git config --global core.autocrlf true
+  - git config --global credential.helper store
+  - 'git config --global user.name "Austin Hicks"'
+  - git config --global user.email camlorn@camlorn.net
 
 clone_folder: c:\projects\libaudioverse
 
@@ -27,6 +30,8 @@ configuration:
 
 
 install:
+  #Store our git credentials.
+  - ps: Add-Content "$env:USERPROFILE\.git-credentials" "https://$($env:GIT_ACCESS_TOKEN):x-oauth-basic@github.com`n"
   - "py -3 -m pip install -U setuptools sphinx"
   #Override pycrypto. 2.6.1 is broken on Python 3 due to an absolute import, so grab the beta:
   - "py -3 -m pip install https://ftp.dlitz.net/pub/dlitz/crypto/pycrypto/pycrypto-2.7a1.tar.gz"
@@ -77,7 +82,7 @@ after_build:
   #Docs
   - echo Deploying docs.
   - cd tmp
-  - 'git clone https://camlorn:%GIT_PASSWORD%@github.com/camlorn/libaudioverse -b gh-pages --single-branch libaudioverse_docs'
+  - 'git clone https://github.com/camlorn/libaudioverse -b gh-pages --single-branch libaudioverse_docs'
   - 'cd libaudioverse_docs\docs'
   - git rm -rf .
   - 'cp ..\..\..\build\documentation\libaudioverse_manual.html libaudioverse_manual.html'
