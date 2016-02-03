@@ -20,6 +20,7 @@ class Buffer;
 class EffectSendConfiguration {
 	public:
 	int channels = 0; //1, 2, 4, 6, or 8.
+	int start = 0; //The output we start at.
 	bool is_reverb = false; //For 4-channel effect sends, if we should use reverb-type panning.
 	bool connect_by_default = false; //If sources should be connected to this send by default.
 };
@@ -31,29 +32,35 @@ class EnvironmentInfo {
 	glm::mat4 world_to_listener_transform;
 };
 
-class EnvironmentNode: public SubgraphNode {
+/**The sorce and environment model does not use the standard node and implementation separation.
+
+Sources write directly to special buffers in the environment, which are then copied to the environment's output in the process method.
+*/
+
+class EnvironmentNode: public Node {
 	public:
 	EnvironmentNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf);
+	~EnvironmentNode();
 	void registerSourceForUpdates(std::shared_ptr<SourceNode> source, bool useEffectSends = true);
 	//Maybe change our output channels.
 	//Also update sources, which might reconfigure themselves.
 	virtual void willTick() override;
+	virtual void process() override;
 	std::shared_ptr<HrtfData> getHrtf();
 	//Play buffer asynchronously at specified position, destroying the source when done.
 	void playAsync(std::shared_ptr<Buffer> buffer, float x, float y, float z, bool isDry = false);
-	//Get the output.
-	//This is needed for effect sends, which must jump directly to it.
-	std::shared_ptr<Node> getOutputNode();
 	//Manage effect sends.
 	//Returns the integer identifier of the send.
 	int addEffectSend(int channels, bool isReverb, bool connecctByDefault);
 	EffectSendConfiguration& getEffectSend(int which);
+	//This is a public variable; sources write directly to these buffers.
+	//There are always at least 8 buffers, with additional buffers appended for effect sends.
+	std::vector<float*> source_buffers;
 	private:
 	//while these may be parents (through virtue of the panners we give out), they also have to hold a reference to us-and that reference must be strong.
 	//the world is more capable of handling a source that dies than a source a world that dies.
 	std::set<std::weak_ptr<SourceNode>, std::owner_less<std::weak_ptr<SourceNode>>> sources;
 	std::shared_ptr<HrtfData > hrtf;
-	std::shared_ptr<Node> output=nullptr;
 	EnvironmentInfo environment_info;
 	std::vector<EffectSendConfiguration> effect_sends;
 	

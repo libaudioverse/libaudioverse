@@ -47,8 +47,7 @@ inline void subgraphNodeVisitDependencies(JobT&& start, CallableT&& callable, Ar
 
 template<typename JobT, typename CallableT, typename... ArgsT>
 inline void environmentVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&... args) {
-	subgraphNodeVisitDependencies(std::static_pointer_cast<SubgraphNode>(start), callable, args...);
-	//Other dependencies: all our sources.
+	//dependencies: all our sources.
 	for(auto w: start->sources) {
 		auto n = w.lock();
 		if(n) {
