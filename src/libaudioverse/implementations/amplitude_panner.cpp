@@ -11,7 +11,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 namespace libaudioverse_implementation {
 
-void AmplitudePanner::reset() {
+void AmplitudePanner::clearMap() {
 	channels.clear();
 }
 
@@ -71,6 +71,11 @@ void AmplitudePanner::pan(float angle, unsigned int block_size, float* input, un
 		else if(i == channel2) for(unsigned int j = 0; j < block_size; j++) outputs[i][j] = weight2*input[j];
 		else memset(outputs[i], 0, sizeof(float)*block_size);
 	}
+}
+
+void AmplitudePanner::readMap(int entries, float* map) {
+	clearMap();
+	for(int i = 0; i < entries; i++) if(map[i] != INFINITY) addEntry(map[i], i);
 }
 
 }

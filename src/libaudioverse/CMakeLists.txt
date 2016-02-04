@@ -60,6 +60,9 @@ dsp/complex.cpp
 #It appears that CMake dies hard if this isn't an absolute path.
 "${CMAKE_CURRENT_BINARY_DIR}/metadata.cpp"
 
+#Various constants, etc.
+data/panning_maps.cpp
+
 #mathematical kernels for common dsp operations.
 kernels/convolution.cpp
 kernels/resamplers.cpp
@@ -81,6 +84,7 @@ implementations/biquad.cpp
 implementations/interpolated_delay_line.cpp
 implementations/nested_allpass_network.cpp
 implementations/hrtf_panner.cpp
+implementations/multipanner.cpp
 
 #specific node types.
 nodes/additive_saw.cpp
