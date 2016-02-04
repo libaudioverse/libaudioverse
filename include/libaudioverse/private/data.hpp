@@ -11,4 +11,10 @@ namespace libaudioverse_implementation {
 extern char default_hrtf[];
 extern unsigned int default_hrtf_size;
 
+//These are the default panning maps, used by things like the multipanner.
+extern float standard_panning_map_stereo[];
+extern float standard_panning_map_surround40[];
+extern float standard_panning_map_surround51[];
+extern float standard_panning_map_surround71[];
+
 }

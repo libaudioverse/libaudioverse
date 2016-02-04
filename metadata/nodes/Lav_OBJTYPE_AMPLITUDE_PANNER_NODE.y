@@ -36,45 +36,9 @@ properties:
       The angles of the speakers in the order in which they are to be mapped to channels.
       The first speaker will be mapped to the first channel, the second to the second, etc.
       These channels are then combined and produced as the single output of the panner.
-  Lav_PANNER_SKIP_LFE:
-    name: skip_lfe
-    type: boolean
-    default: 1
-    doc_description: |
-      This property controls whether or not the LFE channel is reserved, i.e. skipped.
-      You  almost always want this on.
-  Lav_PANNER_HAS_LFE:
-    name: has_lfe
-    type: boolean
-    default: 0
-    doc_description: |
-      Whether the current channel map has an LFE channel or not.
-      If it does, this is assumed to be channel 4.
-  Lav_PANNER_SKIP_CENTER:
-    name: skip_center
-    type: boolean
-    default: 1
-    doc_description: |
-      This property controls whether or not the center channel is reserved, i.e. skipped.
-      You  almost always want this on.
-  Lav_PANNER_HAS_CENTER:
-    name: has_center
-    type: boolean
-    default: 0
-    doc_description: |
-      Whether the currently specified channel map has a center channel.
-      If it does, this is assumed to be channel 3.
-  Lav_PANNER_PASSTHROUGH:
-    name: passthrough
-    type: float
-    range: [0.0, 1.0]
-    default: 0.0
-    doc_description: |
-      Controls how much of the "dry" signal is passed through.
       
-      Higher values make the panning less obvious.
-      
-      Specifically, the input signal is added to all outputs with {{"passthrough"|codelit}} as the gain, and {{"1-passthrough"|codelit}} as the gain of the panned signal.
+      You can use floating point infinity to indicate a channel should be skipped.
+      This functionality is used by all of the standard channel maps to skip the center and LFE channels.
 extra_functions:
   Lav_amplitudePannerNodeConfigureStandardMap:
     doc_description: |

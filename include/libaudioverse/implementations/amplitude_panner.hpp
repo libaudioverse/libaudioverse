@@ -17,9 +17,10 @@ struct AmplitudePannerEntry {
 
 class AmplitudePanner {
 	public:
-	void reset();
+	void clearMap();
 	void addEntry(float angle, unsigned int channel);
 	void pan(float angle, unsigned int block_size, float* input, unsigned int outputCount, float** outputs);
+	void readMap(int entries, float* map);
 	private:
 	std::vector<AmplitudePannerEntry> channels;
 };
