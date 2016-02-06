@@ -228,7 +228,7 @@ void 	SourceNode::handleOcclusion() {
 	float frequencyScaleFactor = 1000.0/exp(1);
 	//Note: 0 must be furthest away from the origin, unlike frequency.
 	float scaledFrequency = frequencyScaleFactor*exp(1-occlusionPercent);
-	occlusion_filter.configure(Lav_BIQUAD_TYPE_LOWPASS, scaledFrequency, dbgain, 0.5);
+	occlusion_filter.configure(Lav_BIQUAD_TYPE_HIGHSHELF, scaledFrequency, dbgain, 0.5);
 }
 
 //Begin public API.
