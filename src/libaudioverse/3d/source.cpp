@@ -128,6 +128,7 @@ void SourceNode::update(EnvironmentInfo &env) {
 		culled = true;
 		return;
 	}
+	else culled = false;
 	float xz = sqrtf(npos.x*npos.x+npos.z*npos.z);
 	//elevation and azimuth, in degrees.
 	float elevation = atan2f(npos.y, xz)/PI*180.0f;
