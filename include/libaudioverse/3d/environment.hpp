@@ -53,6 +53,7 @@ class EnvironmentNode: public Node {
 	//Returns the integer identifier of the send.
 	int addEffectSend(int channels, bool isReverb, bool connecctByDefault);
 	EffectSendConfiguration& getEffectSend(int which);
+	int getEffectSendCount();
 	//This is a public variable; sources write directly to these buffers.
 	//There are always at least 8 buffers, with additional buffers appended for effect sends.
 	std::vector<float*> source_buffers;

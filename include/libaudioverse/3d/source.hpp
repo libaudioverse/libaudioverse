@@ -15,29 +15,29 @@ namespace libaudioverse_implementation {
 
 class EnvironmentNode;
 class EnvironmentInfo;
-class Node;
+class HrtfData;
 
-class SourceNode: public SubgraphNode {
+class SourceNode: public Node {
 	public:
 	SourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentNode> environment);
 	~SourceNode();
 	void reset() override;
-	void process() override;
 	void feedEffect(int which);
 	void stopFeedingEffect(int which);
 	void update(EnvironmentInfo &env);
+	virtual void process() override;
 	void handleStateUpdates(bool shouldCull);
 	void handleOcclusion();
 	private:
 	bool culled = false;
+	float dry_gain, reverb_gain;
 	HrtfPanner hrtf_panner;
-	AmplitudePanner amplitude_panner;
+	AmplitudePanner stereo_panner, surround40_panner, surround51_panner, surround71_panner;
 	BiquadFilter occlusion_filter;
 	std::shared_ptr<EnvironmentNode> environment;
-
-	template<typename JobT, typename CallableT, typename... ArgsT>
-	friend void sourceVisitDependencies(JobT&& start, CallableT &&callable, ArgsT&&... args);
+	std::shared_ptr<HrtfData> hrtf_data;
+	std::set<int> fed_effects;
 };
 
-std::shared_ptr<Node> createSourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentNode> environment);
+std::shared_ptr<SourceNode> createSourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentNode> environment);
 }
