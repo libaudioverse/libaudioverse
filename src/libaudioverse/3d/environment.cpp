@@ -195,6 +195,9 @@ EffectSendConfiguration& EnvironmentNode::getEffectSend(int which) {
 	return effect_sends[which];
 }
 
+int EnvironmentNode::getEffectSendCount() {
+	return (int)effect_sends.size();
+}
 
 //begin public api
 

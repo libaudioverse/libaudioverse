@@ -67,9 +67,22 @@ std::shared_ptr<SourceNode> createSourceNode(std::shared_ptr<Simulation> simulat
 }
 
 void SourceNode::feedEffect(int which) {
+	if(which < 0 || which >= environment->getEffectSendCount()) ERROR(Lav_ERROR_RANGE, "Invalid effect send.");
+	if(fed_effects.count(which)) return; //no-op.
+	AmplitudePanner* p;
+	int c = environment->getEffectSend(which).channels;
+	if(c == 1) p = nullptr;
+	else if(c == 2) p = &stereo_panner;
+	else if(c == 4) p = &surround40_panner;
+	else if(c == 6) p = &surround51_panner;
+	else if(c == 8) p = &surround71_panner;
+	else ERROR(Lav_ERROR_INTERNAL, "Got invalid effect send count somehow.");
+	fed_effects[which] = p;
 }
 
 void SourceNode::stopFeedingEffect(int which) {
+	if(which < 0 || which >= environment->getEffectSendCount()) ERROR(Lav_ERROR_RANGE, "Invalid effect send.");
+	if(fed_effects.count(which)) fed_effects.erase(which);
 }
 
 void SourceNode::reset() {
@@ -128,7 +141,7 @@ void SourceNode::update(EnvironmentInfo &env) {
 	float scaledReverbMultiplier = minReverbLevel+(maxReverbLevel-minReverbLevel)*unscaledReverbMultiplier;
 	reverb_gain = dry_gain*scaledReverbMultiplier;
 	int reverbCount = 0;
-	for(auto s: fed_effects) reverbCount += environment->getEffectSend(s).is_reverb;
+	for(auto s: fed_effects) reverbCount += environment->getEffectSend(s.first).is_reverb;
 	//The logic here is that this is the average gain for all the diffuse field.
 	if(reverbCount) reverb_gain /= reverbCount;
 	//Bring in mul.
@@ -146,6 +159,7 @@ void SourceNode::update(EnvironmentInfo &env) {
 	surround51_panner.setElevation(elevation);
 	surround71_panner.setAzimuth(azimuth);
 	surround71_panner.setElevation(elevation);
+	handleOcclusion();
 }
 
 void SourceNode::process() {
@@ -184,11 +198,27 @@ void SourceNode::process() {
 		break;
 	}
 	for(int i = 0; i < channels; i++) if(panBuffers[i]) multiplicationAdditionKernel(block_size, dry_gain, panBuffers[i], environment->source_buffers[i], environment->source_buffers[i]);
+	for(auto &s: fed_effects) {
+		auto &send = environment->getEffectSend(s.first);
+		auto &p = s.second;
+		float g = send.is_reverb ? reverb_gain : dry_gain;
+		if(send.channels == 1) multiplicationAdditionKernel(block_size, g, occluded, environment->source_buffers[send.start], environment->source_buffers[send.start]);
+		else {
+			p->pan(occluded, panBuffers);
+			for(int i = 0; i < send.channels; i++) if(panBuffers[i]) multiplicationAdditionKernel(block_size, g, panBuffers[i], environment->source_buffers[send.start+i], environment->source_buffers[send.start+i]);
+		}
+	}
 }
 
 void 	SourceNode::handleOcclusion() {
 	//We need a db gain and a frequency from the linear occlusion value.
 	float occlusionPercent = getProperty(Lav_SOURCE_OCCLUSION).getFloatValue();
+	if(occlusionPercent = 0.0f) {
+		//Configure as wire and return.
+		//We can go back and forth from any filter type to identity without a problem; this is safe.
+		occlusion_filter.configure(Lav_BIQUAD_TYPE_IDENTITY, 0.0f, 0.0f, 0.0f);
+		return;
+	}
 	//-70 DB is fully occluded.
 	float dbgain = occlusionPercent*-70.0f;
 	//We get the frequency via an exponential function, so that occlusion sounds roughly linear.
@@ -198,6 +228,7 @@ void 	SourceNode::handleOcclusion() {
 	float frequencyScaleFactor = 1000.0/exp(1);
 	//Note: 0 must be furthest away from the origin, unlike frequency.
 	float scaledFrequency = frequencyScaleFactor*exp(1-occlusionPercent);
+	occlusion_filter.configure(Lav_BIQUAD_TYPE_LOWPASS, scaledFrequency, dbgain, 0.5);
 }
 
 //Begin public API.

@@ -36,7 +36,7 @@ class SourceNode: public Node {
 	BiquadFilter occlusion_filter;
 	std::shared_ptr<EnvironmentNode> environment;
 	std::shared_ptr<HrtfData> hrtf_data;
-	std::set<int> fed_effects;
+	std::map<int, AmplitudePanner*> fed_effects;
 };
 
 std::shared_ptr<SourceNode> createSourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentNode> environment);
