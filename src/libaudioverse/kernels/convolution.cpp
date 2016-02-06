@@ -9,7 +9,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 namespace libaudioverse_implementation {
 
-void convolutionKernel(float* input, unsigned int outputSampleCount, float* output, unsigned int responseLength, float* response) {
+void convolutionKernel(float* input, int outputSampleCount, float* output, int responseLength, float* response) {
 	scalarMultiplicationKernel(outputSampleCount, response[responseLength-1], input, output);
 	input++;
 	for(int i = 1; i < responseLength; i++) {
