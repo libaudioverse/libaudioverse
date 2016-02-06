@@ -118,7 +118,6 @@ nodes/multipanner.cpp
 nodes/nested_allpass_network.cpp
 nodes/noise.cpp
 nodes/one_pole_filter.cpp
-nodes/panner_bank.cpp
 nodes/pull.cpp
 nodes/push.cpp
 nodes/recorder.cpp
