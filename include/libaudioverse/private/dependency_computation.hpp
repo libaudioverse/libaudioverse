@@ -40,12 +40,6 @@ inline void nodeVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&...
 }
 
 template<typename JobT, typename CallableT, typename... ArgsT>
-inline void subgraphNodeVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&... args) {
-	auto j = std::static_pointer_cast<Job>(start->subgraph_output);
-	if(j) callable(j, args...);
-}
-
-template<typename JobT, typename CallableT, typename... ArgsT>
 inline void environmentVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&... args) {
 	//dependencies: all our sources.
 	for(auto w: start->sources) {
@@ -64,7 +58,6 @@ template<typename JobT, typename CallableT, typename... ArgsT>
 inline void visitDependencies(JobT &&start, CallableT&& callable, ArgsT&&... args) {
 	TRY(Simulation, simulationVisitDependencies)
 	TRY(EnvironmentNode, environmentVisitDependencies)
-	TRY(SubgraphNode, subgraphNodeVisitDependencies)
 	TRY(Node, nodeVisitDependencies)
 }
 

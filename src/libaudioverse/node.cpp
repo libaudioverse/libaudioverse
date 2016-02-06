@@ -375,61 +375,6 @@ bool Node::canCull() {
 	return getState() == Lav_NODESTATE_PAUSED;
 }
 
-//LavSubgraphNode
-
-SubgraphNode::SubgraphNode(int type, std::shared_ptr<Simulation> simulation): Node(type, simulation, 0, 0) {
-}
-
-void SubgraphNode::setInputNode(std::shared_ptr<Node> node) {
-	subgraph_input= node;
-	simulation->invalidatePlan();
-}
-
-void SubgraphNode::setOutputNode(std::shared_ptr<Node> node) {
-	subgraph_output=node;
-	simulation->invalidatePlan();
-}
-
-int SubgraphNode::getInputConnectionCount() {
-	if(subgraph_input) return subgraph_input->getInputConnectionCount();
-	else return 0;
-}
-
-std::shared_ptr<InputConnection> SubgraphNode::getInputConnection(int which) {
-	if(which < 0|| which >= getInputConnectionCount()) ERROR(Lav_ERROR_RANGE, "Invalid input.");
-	else return subgraph_input->getInputConnection(which);
-}
-
-int SubgraphNode::getOutputBufferCount() {
-	if(subgraph_output) return subgraph_output->getOutputBufferCount();
-	else return 0;
-}
-
-float** SubgraphNode::getOutputBufferArray() {
-	if(subgraph_output) return subgraph_output->getOutputBufferArray();
-	return nullptr;
-}
-
-//This override is needed because nodes try to add their inputs, but we override where input connections come from.
-//In addition, we have no input buffers.
-void SubgraphNode::tick() {
-	last_processed = simulation->getTickCount();
-	//Zeroing the output buffers will silence our output.
-	if(getState() == Lav_NODESTATE_PAUSED) {
-		zeroOutputBuffers();
-		return;
-	}
-	tickProperties();
-	zeroInputBuffers();
-	is_processing = true;
-	num_input_buffers = input_buffers.size();
-	num_output_buffers = output_buffers.size();
-	//No process call, subgraphs  don't support it.
-	applyMul();
-	applyAdd();
-	is_processing = false;
-}
-
 //begin public api
 
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetSimulation(LavHandle handle, LavHandle* destination) {
