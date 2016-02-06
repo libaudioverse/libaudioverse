@@ -13,7 +13,8 @@ namespace libaudioverse_implementation {
 Multipanner::Multipanner(int _block_size, float _sr, std::shared_ptr<HrtfData> _hrtf_data):
 block_size(_block_size), sr(_sr), channels(2), strategy(Lav_PANNING_STRATEGY_STEREO),
 hrtf_data(_hrtf_data),
-hrtf_panner(_block_size, _sr, _hrtf_data) {
+hrtf_panner(_block_size, _sr, _hrtf_data),
+amplitude_panner(_block_size, _sr) {
 }
 
 void Multipanner::process(float* input, float** outputs) {
@@ -25,7 +26,9 @@ void Multipanner::process(float* input, float** outputs) {
 		hrtf_panner.pan(input, outputs[0], outputs[1]);
 	}
 	else {
-		amplitude_panner.pan(azimuth, block_size, input, channels, outputs);
+		amplitude_panner.setAzimuth(azimuth);
+		amplitude_panner.setElevation(elevation);
+		amplitude_panner.pan(input,  outputs);
 	}
 }
 
