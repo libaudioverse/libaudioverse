@@ -213,7 +213,7 @@ void SourceNode::process() {
 void 	SourceNode::handleOcclusion() {
 	//We need a db gain and a frequency from the linear occlusion value.
 	float occlusionPercent = getProperty(Lav_SOURCE_OCCLUSION).getFloatValue();
-	if(occlusionPercent = 0.0f) {
+	if(occlusionPercent == 0.0f) {
 		//Configure as wire and return.
 		//We can go back and forth from any filter type to identity without a problem; this is safe.
 		occlusion_filter.configure(Lav_BIQUAD_TYPE_IDENTITY, 0.0f, 0.0f, 0.0f);

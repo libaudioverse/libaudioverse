@@ -85,6 +85,7 @@ void EnvironmentNode::willTick() {
 	filterWeakPointers(sources, [&](std::shared_ptr<SourceNode> &s) {
 		s->update(environment_info);
 	});
+	for(auto p: source_buffers) std::fill(p, p+block_size, 0.0f);
 }
 
 void EnvironmentNode::process() {
