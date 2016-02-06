@@ -43,8 +43,8 @@ properties:
       The distance model determines how quickly sources get quieter as they move away from the listener.
       
       By default, this property is set to delegate, and sources consequently read from the environment.
-  Lav_SOURCE_PANNER_STRATEGY:
-    name: panner_strategy
+  Lav_SOURCE_PANNING_STRATEGY:
+    name: panning_strategy
     default: Lav_PANNING_STRATEGY_STEREO
     value_enum: Lav_PANNING_STRATEGIES
     type: int

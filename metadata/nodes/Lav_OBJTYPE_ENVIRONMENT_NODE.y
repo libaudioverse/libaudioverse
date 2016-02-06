@@ -56,7 +56,7 @@ properties:
       The default size for new sources.
       Sources aare approximated as spheres, with 0 being the special case of a point source.
       Size is used to determine the listener's distance from a source.
-  Lav_ENVIRONMENT_DEFAULT_PANNER_STRATEGY:
+  Lav_ENVIRONMENT_DEFAULT_PANNING_STRATEGY:
     name: default_panning_strategy
     type: int
     default: Lav_PANNING_STRATEGY_STEREO
