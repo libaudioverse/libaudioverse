@@ -14,6 +14,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/simulation.hpp>
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/workspace.hpp>
+#include <libaudioverse/private/kernels.hpp>
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/libaudioverse3d.h>
@@ -35,6 +36,10 @@ thread_local Workspace<float> source_workspace;
 
 SourceNode::SourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentNode> environment): Node(Lav_OBJTYPE_SOURCE_NODE, simulation, 1, 0),
 hrtf_panner(simulation->getBlockSize(), simulation->getSr(), environment->getHrtf()),
+stereo_panner(simulation->getBlockSize(), simulation->getSr()),
+surround40_panner(simulation->getBlockSize(), simulation->getSr()),
+surround51_panner(simulation->getBlockSize(), simulation->getSr()),
+surround71_panner(simulation->getBlockSize(), simulation->getSr()),
 occlusion_filter(simulation->getSr()),
 hrtf_data(environment->getHrtf()) {
 	this->environment = environment;
@@ -130,6 +135,17 @@ void SourceNode::update(EnvironmentInfo &env) {
 	float mul = getProperty(Lav_NODE_MUL).getFloatValue();
 	dry_gain*=mul;
 	reverb_gain*=mul;
+	//Apply these.
+	hrtf_panner.setAzimuth(azimuth);
+	hrtf_panner.setElevation(elevation);
+	stereo_panner.setAzimuth(azimuth);
+	stereo_panner.setElevation(elevation);
+	surround40_panner.setAzimuth(azimuth);
+	surround40_panner.setElevation(elevation);
+	surround51_panner.setAzimuth(azimuth);
+	surround51_panner.setElevation(elevation);
+	surround71_panner.setAzimuth(azimuth);
+	surround71_panner.setElevation(elevation);
 }
 
 void SourceNode::process() {
@@ -141,7 +157,7 @@ void SourceNode::process() {
 	//The two nullptrs are never, ever used by panners. Ever.
 	float* panBuffers[] = {ws+block_size, ws+2*block_size, nullptr, nullptr, ws+3*block_size, ws+4*block_size, ws+5*block_size, ws+6*block_size};
 	for(int i = 0; i < block_size; i++) occluded[i] = occlusion_filter.tick(input_buffers[0][i]);
-	int strategy = getProperty(lav_SOURCE_PANNER_STRATEGY).getIntValue();
+	int strategy = getProperty(Lav_SOURCE_PANNER_STRATEGY).getIntValue();
 	int channels = 0;
 	//The following could be replaced with a multipanner.
 	//if we did that, however, we'd have some extra, unavoidable copies.  So we don't.
@@ -151,18 +167,23 @@ void SourceNode::process() {
 		channels = 2;
 		break;
 		case Lav_PANNING_STRATEGY_STEREO:
+		stereo_panner.pan(occluded, panBuffers);
 		channels = 2;
 		break;
 		case Lav_PANNING_STRATEGY_SURROUND40:
+		surround40_panner.pan(occluded, panBuffers);
 		channels = 4;
 		break;
 		case Lav_PANNING_STRATEGY_SURROUND51:
+		surround51_panner.pan(occluded, panBuffers);
 		channels = 6;
 		break;
 		case Lav_PANNING_STRATEGY_SURROUND71:
+		surround71_panner.pan(occluded, panBuffers);
 		channels = 8;
 		break;
 	}
+	for(int i = 0; i < channels; i++) if(panBuffers[i]) multiplicationAdditionKernel(block_size, dry_gain, panBuffers[i], environment->source_buffers[i], environment->source_buffers[i]);
 }
 
 void 	SourceNode::handleOcclusion() {
