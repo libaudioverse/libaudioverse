@@ -13,8 +13,7 @@ class AmplitudePannerNode: public Node {
 	AmplitudePannerNode(std::shared_ptr<Simulation> simulation);
 	virtual void process() override;
 	void recomputeChannelMap();
-	void configureStandardChannelMap(unsigned int channels);
-	bool map_changed = true, has_center = false, has_lfe = false, skip_center = false, skip_lfe = false;
+	void configureStandardChannelMap(int channels);
 	AmplitudePanner panner;
 };
 

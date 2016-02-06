@@ -8,6 +8,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/memory.hpp>
+#include <libaudioverse/private/data.hpp>
 #include <libaudioverse/implementations/amplitude_panner.hpp>
 #include <libaudioverse/nodes/amplitude_panner.hpp>
 #include <libaudioverse/private/kernels.hpp>
@@ -15,15 +16,8 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 namespace libaudioverse_implementation {
 
-float standard_map_stereo[] = {-90.0f, 90.0f};
-float standard_map_40[] = {-45.0, 45.0, -135.0, 135.0};
-float standard_map_51[] = {-22.5f, 22.5f, -110.0f, 110.0f};
-float standard_map_71[] = {-22.5f, 22.5f, -150.0f, 150.0f, -110.0f, 110.0f};
-
-//This class needs to be public because of the multipanner, which needs to make a method call against it directly.
-//see include/libaudioverse/objects/panner.hpp.
-
-AmplitudePannerNode::AmplitudePannerNode(std::shared_ptr<Simulation> simulation): Node(Lav_OBJTYPE_AMPLITUDE_PANNER_NODE, simulation, 1, 0) {
+AmplitudePannerNode::AmplitudePannerNode(std::shared_ptr<Simulation> simulation): Node(Lav_OBJTYPE_AMPLITUDE_PANNER_NODE, simulation, 1, 0),
+panner(simulation->getBlockSize(), simulation->getSr()) {
 	appendInputConnection(0, 1);
 	appendOutputConnection(0, 0);
 	auto cb = [&](){recomputeChannelMap();};
@@ -46,23 +40,24 @@ void AmplitudePannerNode::recomputeChannelMap() {
 }
 
 void AmplitudePannerNode::process() {
-	float azimuth = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
-	panner.pan(azimuth, block_size, input_buffers[0], num_output_buffers, &output_buffers[0]);
+	if(werePropertiesModified(this, Lav_PANNER_AZIMUTH)) panner.setAzimuth(getProperty(Lav_PANNER_AZIMUTH).getFloatValue());
+	if(werePropertiesModified(this, Lav_PANNER_ELEVATION)) panner.setElevation(getProperty(Lav_PANNER_ELEVATION).getFloatValue());
+	panner.pan(input_buffers[0], &output_buffers[0]);
 }
 
-void AmplitudePannerNode::configureStandardChannelMap(unsigned int channels) {
+void AmplitudePannerNode::configureStandardChannelMap(int channels) {
 	switch(channels) {
 		case 2:
-		getProperty(Lav_PANNER_CHANNEL_MAP).replaceFloatArray(2, standard_map_stereo);
+		getProperty(Lav_PANNER_CHANNEL_MAP).replaceFloatArray(2, standard_panning_map_stereo);
 		break;
 		case 4:
-		getProperty(Lav_PANNER_CHANNEL_MAP).replaceFloatArray(4, standard_map_40);
+		getProperty(Lav_PANNER_CHANNEL_MAP).replaceFloatArray(4, standard_panning_map_surround40);
 		break;
 		case 6:
-		getProperty(Lav_PANNER_CHANNEL_MAP).replaceFloatArray(4, standard_map_51);
+		getProperty(Lav_PANNER_CHANNEL_MAP).replaceFloatArray(4, standard_panning_map_surround51);
 		break;
 		case 8:
-		getProperty(Lav_PANNER_CHANNEL_MAP).replaceFloatArray(6, standard_map_71);
+		getProperty(Lav_PANNER_CHANNEL_MAP).replaceFloatArray(6, standard_panning_map_surround71);
 		break;
 	};
 }
