@@ -45,7 +45,6 @@ hrtf_data(environment->getHrtf()) {
 	this->environment = environment;
 	handleOcclusion(); //Make sure we initialize as unoccluded.	
 	//we have to read off these defaults manually, and it must always be the last thing in the constructor.
-	getProperty(Lav_SOURCE_DISTANCE_MODEL).setIntValue(environment->getProperty(Lav_ENVIRONMENT_DEFAULT_DISTANCE_MODEL).getIntValue());
 	getProperty(Lav_SOURCE_MAX_DISTANCE).setFloatValue(environment->getProperty(Lav_ENVIRONMENT_DEFAULT_MAX_DISTANCE).getFloatValue());
 	getProperty(Lav_SOURCE_PANNER_STRATEGY).setIntValue(environment->getProperty(Lav_ENVIRONMENT_DEFAULT_PANNER_STRATEGY).getIntValue());
 	getProperty(Lav_SOURCE_SIZE).setFloatValue(environment->getProperty(Lav_ENVIRONMENT_DEFAULT_SIZE).getFloatValue());
@@ -108,6 +107,12 @@ float calculateGainForDistanceModel(int model, float distance, float maxDistance
 	return retval;
 }
 
+int SourceNode::computeDistanceModel(EnvironmentInfo& env) {
+	int dm = getProperty(Lav_SOURCE_DISTANCE_MODEL).getIntValue();
+	if(dm == Lav_DISTANCE_MODEL_DELEGATE) dm = env.distance_model;
+	return dm;
+}
+
 void SourceNode::update(EnvironmentInfo &env) {
 	//first, extract the vector of our position.
 	const float* pos = getProperty(Lav_3D_POSITION).getFloat3Value();
@@ -131,7 +136,7 @@ void SourceNode::update(EnvironmentInfo &env) {
 	//This would trigger an exception because elevation is a property with a range.
 	if(elevation > 90.0f) elevation = 90.0f;
 	if(elevation < -90.0f) elevation = -90.0f;
-	int distanceModel = getProperty(Lav_SOURCE_DISTANCE_MODEL).getIntValue();
+	int distanceModel = computeDistanceModel(env);
 	float referenceDistance = getProperty(Lav_SOURCE_SIZE).getFloatValue();
 	float reverbDistance = getProperty(Lav_SOURCE_REVERB_DISTANCE).getFloatValue();
 	dry_gain = calculateGainForDistanceModel(distanceModel, distance, maxDistance, referenceDistance);

@@ -24,6 +24,7 @@ class SourceNode: public Node {
 	void reset() override;
 	void feedEffect(int which);
 	void stopFeedingEffect(int which);
+	int computeDistanceModel(EnvironmentInfo& env);
 	void update(EnvironmentInfo &env);
 	virtual void process() override;
 	void handleStateUpdates(bool shouldCull);

@@ -30,6 +30,7 @@ Anything a source needs for updating, basically.*/
 class EnvironmentInfo {
 	public:
 	glm::mat4 world_to_listener_transform;
+	int distance_model; //Avoid going through the dictionary over and over and over.
 };
 
 /**The sorce and environment model does not use the standard node and implementation separation.

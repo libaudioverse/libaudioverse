@@ -24,14 +24,21 @@ properties:
       will turn the listener to face a scertain direction specified in radians clockwise of north:
       (sin(theta), cos(theta), 0, 0, 0, 1).
       As usual, note that radians=degrees*PI/180.
-  Lav_ENVIRONMENT_DEFAULT_DISTANCE_MODEL:
-    name: default_distance_model
+  Lav_ENVIRONMENT_DISTANCE_MODEL:
+    name: distance_model
     default: Lav_DISTANCE_MODEL_LINEAR
     type: int
     value_enum: Lav_DISTANCE_MODELS
     doc_description: |
-      The default distance model for newly created sources.
+      The distance model for any source configured to delegate to the environment.
+      Sources are configured to delegate to the environment by default.
+      
       Distance models control how quickly sources get quieter as they move away from the listener.
+      
+      Note that it is possible to set this property to {{"Lav_DISTANCE_MODEL_DELEGATE"|codelit}}.
+      Due to internal limitations, this does not generate an error.
+      Instead, this case is equivalent to a linear distance model.
+      Do not rely on this behavior.  The internal ilimitations preventing this will be lifted in future.
   Lav_ENVIRONMENT_DEFAULT_MAX_DISTANCE:
     name: default_max_distance
     range: [0.0, INFINITY]

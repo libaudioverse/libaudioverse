@@ -79,6 +79,7 @@ enumerations:
       used in the 3D components of this library.
       Indicates how sound should become quieter as objects move away from the listener.
     members:
+      Lav_DISTANCE_MODEL_DELEGATE: Delegate to another node, if we can.  Otherwise, fall back to {{"Lav_DISTANCE_MODEL_LINEAR"|codelit}}.
       Lav_DISTANCE_MODEL_LINEAR: Sound falls off as {{"1-(distance/maxDistance)"|codelit}}.
       Lav_DISTANCE_MODEL_EXPONENTIAL: Sounds fall off as {{"1/distance"|codelit}}.
       Lav_DISTANCE_MODEL_INVERSE_SQUARE: Sounds fall off as {{"1/min(distance, maxDistance)^2"|codelit}}.
