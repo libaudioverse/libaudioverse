@@ -46,7 +46,6 @@ hrtf_data(environment->getHrtf()) {
 	handleOcclusion(); //Make sure we initialize as unoccluded.	
 	//we have to read off these defaults manually, and it must always be the last thing in the constructor.
 	getProperty(Lav_SOURCE_MAX_DISTANCE).setFloatValue(environment->getProperty(Lav_ENVIRONMENT_DEFAULT_MAX_DISTANCE).getFloatValue());
-	getProperty(Lav_SOURCE_PANNING_STRATEGY).setIntValue(environment->getProperty(Lav_ENVIRONMENT_DEFAULT_PANNING_STRATEGY).getIntValue());
 	getProperty(Lav_SOURCE_SIZE).setFloatValue(environment->getProperty(Lav_ENVIRONMENT_DEFAULT_SIZE).getFloatValue());
 	getProperty(Lav_SOURCE_REVERB_DISTANCE).setFloatValue(environment->getProperty(Lav_ENVIRONMENT_DEFAULT_REVERB_DISTANCE).getFloatValue());
 	appendInputConnection(0, 1);
@@ -166,6 +165,8 @@ void SourceNode::update(EnvironmentInfo &env) {
 	surround71_panner.setAzimuth(azimuth);
 	surround71_panner.setElevation(elevation);
 	handleOcclusion();
+	panning_strategy = getProperty(Lav_SOURCE_PANNING_STRATEGY).getIntValue();
+	if(panning_strategy == Lav_PANNING_STRATEGY_DELEGATE) panning_strategy = env.panning_strategy;
 }
 
 void SourceNode::process() {
@@ -177,11 +178,11 @@ void SourceNode::process() {
 	//The two nullptrs are never, ever used by panners. Ever.
 	float* panBuffers[] = {ws+block_size, ws+2*block_size, nullptr, nullptr, ws+3*block_size, ws+4*block_size, ws+5*block_size, ws+6*block_size};
 	for(int i = 0; i < block_size; i++) occluded[i] = occlusion_filter.tick(input_buffers[0][i]);
-	int strategy = getProperty(Lav_SOURCE_PANNING_STRATEGY).getIntValue();
+
 	int channels = 0;
 	//The following could be replaced with a multipanner.
 	//if we did that, however, we'd have some extra, unavoidable copies.  So we don't.
-	switch(strategy) {
+	switch(panning_strategy) {
 		case Lav_PANNING_STRATEGY_HRTF:
 		hrtf_panner.pan(occluded, panBuffers[0], panBuffers[1]);
 		channels = 2;

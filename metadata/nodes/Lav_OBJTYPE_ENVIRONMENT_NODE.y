@@ -56,13 +56,18 @@ properties:
       The default size for new sources.
       Sources aare approximated as spheres, with 0 being the special case of a point source.
       Size is used to determine the listener's distance from a source.
-  Lav_ENVIRONMENT_DEFAULT_PANNING_STRATEGY:
-    name: default_panning_strategy
+  Lav_ENVIRONMENT_PANNING_STRATEGY:
+    name: panning_strategy
     type: int
     default: Lav_PANNING_STRATEGY_STEREO
     value_enum: Lav_PANNING_STRATEGIES
     doc_description: |
-      the default panner strategy for the internal panner of new sources.
+      The panning strategy for any source configured to delegate to the environment.
+      All new sources delegate to the environment by default.
+      
+      Note that it is possible to set this property to the delgate panning strategy.
+      Due to internal limitations, this case does not error but is instead equivalent to using stereo panning.
+      These limitations will be lifted in future; do not rely on this behavior.
   Lav_ENVIRONMENT_OUTPUT_CHANNELS:
     name: output_channels
     type: int

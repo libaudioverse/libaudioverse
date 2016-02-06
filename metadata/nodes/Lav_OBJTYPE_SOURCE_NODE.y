@@ -45,11 +45,12 @@ properties:
       By default, this property is set to delegate, and sources consequently read from the environment.
   Lav_SOURCE_PANNING_STRATEGY:
     name: panning_strategy
-    default: Lav_PANNING_STRATEGY_STEREO
+    default: Lav_PANNING_STRATEGY_DELEGATE
     value_enum: Lav_PANNING_STRATEGIES
     type: int
     doc_description: |
       The strategy for the internal multipanner.
+      By default, this delegates to the environment.
   Lav_SOURCE_HEAD_RELATIVE:
     name: head_relative
     type: boolean

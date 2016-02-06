@@ -56,6 +56,7 @@ enumerations:
       Indicates a strategy to use for panning.
       This is mostly for the {{"Lav_OBJTYPE_MULTIPANNER_NODE"|node}} and the 3D components of this library.
     members:
+      Lav_PANNING_STRATEGY_DELEGATE: Delegate the decision. Used for 3D sources.  If there is nowhere to delegate to, assumes {{"Lav_PANNING_STRATEGY_STEREO"|codelit}}.
       Lav_PANNING_STRATEGY_HRTF: Indicates HRTF panning.
       Lav_PANNING_STRATEGY_STEREO: Indicates stereo panning.
       Lav_PANNING_STRATEGY_SURROUND40: Indicates 4.0 surround sound (quadraphonic) panning.

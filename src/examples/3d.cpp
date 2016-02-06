@@ -35,7 +35,7 @@ void main(int argc, char** args) {
 	ERRCHECK(Lav_createBuffer(simulation, &buffer));
 	ERRCHECK(Lav_bufferLoadFromFile(buffer, soundFile));
 	ERRCHECK(Lav_nodeSetBufferProperty(node, Lav_BUFFER_BUFFER, buffer));
-	ERRCHECK(Lav_nodeSetIntProperty(world, Lav_ENVIRONMENT_DEFAULT_PANNER_STRATEGY, Lav_PANNING_STRATEGY_HRTF));
+	ERRCHECK(Lav_nodeSetIntProperty(world, Lav_ENVIRONMENT_PANNING_STRATEGY, Lav_PANNING_STRATEGY_HRTF));
 	ERRCHECK(Lav_createSourceNode(simulation, world, &source));
 	ERRCHECK(Lav_nodeConnect(node, 0, source, 0));
 	const int resolution = 1000, length = 3000; //length in ms.

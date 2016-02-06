@@ -30,7 +30,9 @@ Anything a source needs for updating, basically.*/
 class EnvironmentInfo {
 	public:
 	glm::mat4 world_to_listener_transform;
-	int distance_model; //Avoid going through the dictionary over and over and over.
+	//These avoid tons of property lookups.
+	//Each lookup on the environment is a shared_ptr indirection and a dictionary lookup.
+	int distance_model, panning_strategy;
 };
 
 /**The sorce and environment model does not use the standard node and implementation separation.

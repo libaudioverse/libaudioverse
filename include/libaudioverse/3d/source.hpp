@@ -32,6 +32,7 @@ class SourceNode: public Node {
 	private:
 	bool culled = false;
 	float dry_gain, reverb_gain;
+	int panning_strategy;
 	HrtfPanner hrtf_panner;
 	AmplitudePanner stereo_panner, surround40_panner, surround51_panner, surround71_panner;
 	BiquadFilter occlusion_filter;

@@ -77,6 +77,8 @@ void EnvironmentNode::willTick() {
 	}
 	environment_info.distance_model = getProperty(Lav_ENVIRONMENT_DISTANCE_MODEL).getIntValue();
 	if(environment_info.distance_model == Lav_DISTANCE_MODEL_DELEGATE) environment_info.distance_model = Lav_DISTANCE_MODEL_LINEAR;
+	environment_info.panning_strategy = getProperty(Lav_ENVIRONMENT_PANNING_STRATEGY).getIntValue();
+	if(environment_info.panning_strategy == Lav_PANNING_STRATEGY_DELEGATE) environment_info.panning_strategy = Lav_PANNING_STRATEGY_STEREO;
 	//give the new environment to the sources.
 	//this is a set of weak pointers.
 	filterWeakPointers(sources, [&](std::shared_ptr<SourceNode> &s) {
