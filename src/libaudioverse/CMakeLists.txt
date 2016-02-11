@@ -66,6 +66,7 @@ kernels/resamplers.cpp
 kernels/interleaving.cpp
 kernels/adding.cpp
 kernels/multiplying.cpp
+kernels/multiplication_addition.cpp
 kernels/dot.cpp
 
 #Like kernels, but stateful.
