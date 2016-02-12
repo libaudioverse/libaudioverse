@@ -7,7 +7,6 @@ namespace libaudioverse_implementation {
 
 /**InInterleaving and uninterleaving of samples.
 
-
 Should the output count be less than channels, uninterleaving will only use the first outputCount channels.
 Should the input count be less than channels, interleaving will assume zero for all remaining channels.
 These two cases are rare and mainly exist to enable code reuse for getting blocks out of the simulation itself.*/
@@ -20,11 +19,15 @@ void additionKernel(int length, float* a1, float* a2, float* dest);
 void scalarAdditionKernel(int length, float c, float*a1, float* dest);
 void scalarMultiplicationKernel(int length, float c, float* a1, float* dest);
 void multiplicationKernel(int length, float* a1, float* a2, float* dest);
-//found in multiplying.cpp
+
 //multiply a1 by c, sum with a2, and store result in dest.
 //a1==dest and a2==dest are, again, safe.
 void multiplicationAdditionKernel(int length, float c, float* a1, float* a2, float* dest);
-
+//A parallel version, if we can, primarily used by convolution.
+//This is equivalent to calling multiplicationAdditionKernel 4 times, advancing the  a1 pointer by 1 each time.
+//This implies that a1 must be at least 3 elements longer than a2.
+//Note that if a1 and a2 are the same buffers, this will be problematic; if theya re, a2-a1 must be greater than 3.
+void parallelMultiplicationAdditionKernel(int length, float c1, float c2, float c3, float c4,  float* a1, float* a2, float* out);
 
 /**The convolution kernel.
 The first response-1 samples of the input buffer are assumed to be a running history, so the actual length of the input buffer needs to be outputSampleCount+responseLength-1.

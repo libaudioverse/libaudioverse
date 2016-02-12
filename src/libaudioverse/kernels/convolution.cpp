@@ -6,13 +6,19 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/kernels.hpp>
 #include <string.h>
 #include <libaudioverse/private/memory.hpp>
+#include <algorithm>
 
 namespace libaudioverse_implementation {
 
 void convolutionKernel(float* input, int outputSampleCount, float* output, int responseLength, float* response) {
-	scalarMultiplicationKernel(outputSampleCount, response[responseLength-1], input, output);
-	input++;
-	for(int i = 1; i < responseLength; i++) {
+	std::fill(output, output+outputSampleCount, 0.0f);
+	int parCount = responseLength/4*4;
+	for(int i = 0; i < parCount; i += 4) {
+		parallelMultiplicationAdditionKernel(outputSampleCount, response[responseLength-i-1], response[responseLength-i-2], response[responseLength-i-3], response[responseLength-i-4],
+		input, output, output);
+		input+=4;
+	}
+	for(int i = parCount; i < responseLength; i++) {
 		float c=response[responseLength-i-1];
 		multiplicationAdditionKernel(outputSampleCount, c, input, output, output);
 		input++;
