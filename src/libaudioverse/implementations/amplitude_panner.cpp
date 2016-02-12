@@ -5,33 +5,41 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/dspmath.hpp>
 #include <libaudioverse/implementations/amplitude_panner.hpp>
 #include <libaudioverse/private/constants.hpp>
+#include <libaudioverse/private/kernels.hpp>
 #include <algorithm>
 #include <functional>
 #include <math.h>
 
 namespace libaudioverse_implementation {
 
-void AmplitudePanner::reset() {
+AmplitudePanner::AmplitudePanner(int _block_size, float _sr):
+sr(_sr), block_size(_block_size) {
+}
+
+void AmplitudePanner::clearMap() {
 	channels.clear();
 }
 
-void AmplitudePanner::addEntry(float angle, unsigned int channel) {
+void AmplitudePanner::addEntry(float angle, int channel) {
 	channels.emplace_back(ringmodf(angle, 360.0f), channel);
 	std::sort(channels.begin(), channels.end(),
 	[](AmplitudePannerEntry &a, AmplitudePannerEntry& b) {return a.angle < b.angle;});
 }
 
-void AmplitudePanner::pan(float angle, unsigned int block_size, float* input, unsigned int outputCount, float** outputs) {
+void AmplitudePanner::pan(float* input, float** outputs) {
+	//TODO: move all this logic into something that's only called when needed.
 	//the two degenerates: 0 and 1 channels.
-	if(input == nullptr || outputs == nullptr) return;
-	if(channels.size() == 0 || channels.size() == 1) {
+	if(input == nullptr || outputs == nullptr || channels.size() == 0) return;
+	if(channels.size() == 1) {
 		std::copy(input, input+block_size, outputs[channels[0].channel]);
 		return;
 	}
+	//We need a local copy.
+	float angle = azimuth;
 	angle = ringmodf(angle, 360.0f);
-	unsigned int left = 0, right = 0;
+	int left = 0, right = 0;
 	bool found_right= false;
-	for(unsigned int i = 0; i < channels.size(); i++) {
+	for(int i = 0; i < channels.size(); i++) {
 		if(channels[i].angle >= angle) {
 			right = i;
 			found_right = true;
@@ -45,8 +53,8 @@ void AmplitudePanner::pan(float angle, unsigned int block_size, float* input, un
 	else {
 		left = right == 0 ? channels.size()-1 : right-1;
 	}
-	unsigned int channel1 = channels[left].channel;
-	unsigned int channel2 = channels[right].channel;
+	int channel1 = channels[left].channel;
+	int channel2 = channels[right].channel;
 	//two cases: we wrapped or didn't.
 	float angle1, angle2, angleSum;
 	if(right == 0) { //left is all the way around, special handling is needed.
@@ -66,11 +74,29 @@ void AmplitudePanner::pan(float angle, unsigned int block_size, float* input, un
 	angleSum = angle1+angle2;
 	float weight2 = angle1/angleSum;
 	float weight1 = angle2/angleSum;
-	for(unsigned int i = 0; i < outputCount; i++) {
-		if(i == channel1) for(unsigned int j = 0; j < block_size; j++) outputs[i][j] = weight1*input[j];
-		else if(i == channel2) for(unsigned int j = 0; j < block_size; j++) outputs[i][j] = weight2*input[j];
-		else memset(outputs[i], 0, sizeof(float)*block_size);
-	}
+	scalarMultiplicationKernel(block_size, weight1, input, outputs[channel1]);
+	scalarMultiplicationKernel(block_size, weight2, input, outputs[channel2]);
+}
+
+void AmplitudePanner::readMap(int entries, float* map) {
+	clearMap();
+	for(int i = 0; i < entries; i++) if(map[i] != INFINITY) addEntry(map[i], i);
+}
+
+float AmplitudePanner::getAzimuth() {
+	return azimuth;
+}
+
+void AmplitudePanner::setAzimuth(float a) {
+	azimuth = a;
+}
+
+float AmplitudePanner::getElevation() {
+	return elevation;
+}
+
+void AmplitudePanner::setElevation(float e) {
+	elevation = e;
 }
 
 }

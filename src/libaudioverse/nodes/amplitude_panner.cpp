@@ -8,6 +8,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/memory.hpp>
+#include <libaudioverse/private/data.hpp>
 #include <libaudioverse/implementations/amplitude_panner.hpp>
 #include <libaudioverse/nodes/amplitude_panner.hpp>
 #include <libaudioverse/private/kernels.hpp>
@@ -15,23 +16,12 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 namespace libaudioverse_implementation {
 
-float standard_map_stereo[] = {-90.0f, 90.0f};
-float standard_map_40[] = {-45.0, 45.0, -135.0, 135.0};
-float standard_map_51[] = {-22.5f, 22.5f, -110.0f, 110.0f};
-float standard_map_71[] = {-22.5f, 22.5f, -150.0f, 150.0f, -110.0f, 110.0f};
-
-//This class needs to be public because of the multipanner, which needs to make a method call against it directly.
-//see include/libaudioverse/objects/panner.hpp.
-
-AmplitudePannerNode::AmplitudePannerNode(std::shared_ptr<Simulation> simulation): Node(Lav_OBJTYPE_AMPLITUDE_PANNER_NODE, simulation, 1, 0) {
+AmplitudePannerNode::AmplitudePannerNode(std::shared_ptr<Simulation> simulation): Node(Lav_OBJTYPE_AMPLITUDE_PANNER_NODE, simulation, 1, 0),
+panner(simulation->getBlockSize(), simulation->getSr()) {
 	appendInputConnection(0, 1);
 	appendOutputConnection(0, 0);
 	auto cb = [&](){recomputeChannelMap();};
 	getProperty(Lav_PANNER_CHANNEL_MAP).setPostChangedCallback(cb);
-	getProperty(Lav_PANNER_SKIP_CENTER).setPostChangedCallback(cb);
-	getProperty(Lav_PANNER_SKIP_LFE).setPostChangedCallback(cb);
-	getProperty(Lav_PANNER_HAS_LFE).setPostChangedCallback(cb);
-	getProperty(Lav_PANNER_HAS_CENTER).setPostChangedCallback(cb);
 }
 
 std::shared_ptr<Node>createAmplitudePannerNode(std::shared_ptr<Simulation> simulation) {
@@ -42,69 +32,34 @@ std::shared_ptr<Node>createAmplitudePannerNode(std::shared_ptr<Simulation> simul
 }
 
 void AmplitudePannerNode::recomputeChannelMap() {
-	panner.reset();
-	skip_lfe = getProperty(Lav_PANNER_SKIP_LFE).getIntValue() == 1;
-	skip_center = getProperty(Lav_PANNER_SKIP_CENTER).getIntValue() == 1;
-	has_lfe = getProperty(Lav_PANNER_HAS_LFE).getIntValue() == 1;
-	has_center = getProperty(Lav_PANNER_HAS_CENTER).getIntValue() == 1;
 	Property& channelMap = getProperty(Lav_PANNER_CHANNEL_MAP);
-	unsigned int max = channelMap.getFloatArrayLength();
-	if(skip_lfe && has_lfe) max++;
-	if(skip_center && has_center) max++;
-	resize(1, max);
-	getOutputConnection(0)->reconfigure(0, max);
-	unsigned int index = 0;
-	for(unsigned int i = 0; i < max; i++) {
-		if(i == 2 && skip_center) continue;
-		if(i == 3 && skip_lfe) continue;
-		float angle = channelMap.readFloatArray(index);
-		panner.addEntry(angle, i);
-		index++;
-	}
+	unsigned int newSize = channelMap.getFloatArrayLength();
+	resize(1, newSize);
+	getOutputConnection(0)->reconfigure(0, newSize);
+	panner.readMap(newSize, channelMap.getFloatArrayPtr());
 }
 
 void AmplitudePannerNode::process() {
-	float azimuth = getProperty(Lav_PANNER_AZIMUTH).getFloatValue();
-	float passthrough =getProperty(Lav_PANNER_PASSTHROUGH).getFloatValue();
-	panner.pan(azimuth, block_size, input_buffers[0], num_output_buffers, &output_buffers[0]);
-	if(passthrough != 0.0f) {
-		scalarMultiplicationKernel(block_size, passthrough, input_buffers[0], input_buffers[0]);
-		for(int i = 0; i < num_output_buffers; i++) {
-			if(i ==2 && skip_center) continue;
-			if(i==3 && skip_lfe) continue;
-			scalarMultiplicationKernel(block_size, 1.0f-passthrough, output_buffers[i], output_buffers[i]);
-			additionKernel(block_size, input_buffers[0], output_buffers[i], output_buffers[i]);
-		}
-	}
+	if(werePropertiesModified(this, Lav_PANNER_AZIMUTH)) panner.setAzimuth(getProperty(Lav_PANNER_AZIMUTH).getFloatValue());
+	if(werePropertiesModified(this, Lav_PANNER_ELEVATION)) panner.setElevation(getProperty(Lav_PANNER_ELEVATION).getFloatValue());
+	panner.pan(input_buffers[0], &output_buffers[0]);
 }
 
-void AmplitudePannerNode::configureStandardChannelMap(unsigned int channels) {
+void AmplitudePannerNode::configureStandardChannelMap(int channels) {
 	switch(channels) {
 		case 2:
-		getProperty(Lav_PANNER_CHANNEL_MAP).replaceFloatArray(2, standard_map_stereo);
-		has_center = false;
-		has_lfe = false;
+		getProperty(Lav_PANNER_CHANNEL_MAP).replaceFloatArray(2, standard_panning_map_stereo);
 		break;
 		case 4:
-		getProperty(Lav_PANNER_CHANNEL_MAP).replaceFloatArray(4, standard_map_40);
-		has_center = false;
-		has_lfe = false;
+		getProperty(Lav_PANNER_CHANNEL_MAP).replaceFloatArray(4, standard_panning_map_surround40);
 		break;
 		case 6:
-		getProperty(Lav_PANNER_CHANNEL_MAP).replaceFloatArray(4, standard_map_51);
-		has_center = true;
-		has_lfe = true;
+		getProperty(Lav_PANNER_CHANNEL_MAP).replaceFloatArray(4, standard_panning_map_surround51);
 		break;
 		case 8:
-		getProperty(Lav_PANNER_CHANNEL_MAP).replaceFloatArray(6, standard_map_71);
-		has_center = true;
-		has_lfe = true;
+		getProperty(Lav_PANNER_CHANNEL_MAP).replaceFloatArray(6, standard_panning_map_surround71);
 		break;
 	};
-	getProperty(Lav_PANNER_SKIP_LFE).setIntValue(1);
-	getProperty(Lav_PANNER_SKIP_CENTER).setIntValue(1);
-	getProperty(Lav_PANNER_HAS_LFE).setIntValue(has_lfe);
-	getProperty(Lav_PANNER_HAS_CENTER).setIntValue(has_center);
 }
 
 //begin public api

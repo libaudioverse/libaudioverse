@@ -10,7 +10,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 namespace libaudioverse_implementation {
 
-void convolutionKernel(float* input, unsigned int outputSampleCount, float* output, unsigned int responseLength, float* response) {
+void convolutionKernel(float* input, int outputSampleCount, float* output, int responseLength, float* response) {
 	std::fill(output, output+outputSampleCount, 0.0f);
 	int parCount = responseLength/4*4;
 	for(int i = 0; i < parCount; i += 4) {

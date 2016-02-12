@@ -24,14 +24,21 @@ properties:
       will turn the listener to face a scertain direction specified in radians clockwise of north:
       (sin(theta), cos(theta), 0, 0, 0, 1).
       As usual, note that radians=degrees*PI/180.
-  Lav_ENVIRONMENT_DEFAULT_DISTANCE_MODEL:
-    name: default_distance_model
+  Lav_ENVIRONMENT_DISTANCE_MODEL:
+    name: distance_model
     default: Lav_DISTANCE_MODEL_LINEAR
     type: int
     value_enum: Lav_DISTANCE_MODELS
     doc_description: |
-      The default distance model for newly created sources.
+      The distance model for any source configured to delegate to the environment.
+      Sources are configured to delegate to the environment by default.
+      
       Distance models control how quickly sources get quieter as they move away from the listener.
+      
+      Note that it is possible to set this property to {{"Lav_DISTANCE_MODEL_DELEGATE"|codelit}}.
+      Due to internal limitations, this does not generate an error.
+      Instead, this case is equivalent to a linear distance model.
+      Do not rely on this behavior.  The internal ilimitations preventing this will be lifted in future.
   Lav_ENVIRONMENT_DEFAULT_MAX_DISTANCE:
     name: default_max_distance
     range: [0.0, INFINITY]
@@ -49,13 +56,18 @@ properties:
       The default size for new sources.
       Sources aare approximated as spheres, with 0 being the special case of a point source.
       Size is used to determine the listener's distance from a source.
-  Lav_ENVIRONMENT_DEFAULT_PANNER_STRATEGY:
-    name: default_panning_strategy
+  Lav_ENVIRONMENT_PANNING_STRATEGY:
+    name: panning_strategy
     type: int
     default: Lav_PANNING_STRATEGY_STEREO
     value_enum: Lav_PANNING_STRATEGIES
     doc_description: |
-      the default panner strategy for the internal panner of new sources.
+      The panning strategy for any source configured to delegate to the environment.
+      All new sources delegate to the environment by default.
+      
+      Note that it is possible to set this property to the delgate panning strategy.
+      Due to internal limitations, this case does not error but is instead equivalent to using stereo panning.
+      These limitations will be lifted in future; do not rely on this behavior.
   Lav_ENVIRONMENT_OUTPUT_CHANNELS:
     name: output_channels
     type: int

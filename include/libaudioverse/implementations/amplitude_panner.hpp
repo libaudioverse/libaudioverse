@@ -12,16 +12,25 @@ namespace libaudioverse_implementation {
 struct AmplitudePannerEntry {
 	AmplitudePannerEntry(float _angle, unsigned int _c): angle(_angle), channel(_c) {}
 	float angle;
-	unsigned int channel;
+	int channel;
 };
 
 class AmplitudePanner {
 	public:
-	void reset();
-	void addEntry(float angle, unsigned int channel);
-	void pan(float angle, unsigned int block_size, float* input, unsigned int outputCount, float** outputs);
+	AmplitudePanner(int _block_size, float _sr);
+	void clearMap();
+	void addEntry(float angle, int channel);
+	void pan(float* input, float** outputs);
+	void readMap(int entries, float* map);
+	float getAzimuth();
+	void setAzimuth(float a);
+	float getElevation();
+	void setElevation(float e);
 	private:
 	std::vector<AmplitudePannerEntry> channels;
+	float azimuth = 0.0f, elevation = 0.0f;
+	float sr;
+	int block_size;
 };
 
 }

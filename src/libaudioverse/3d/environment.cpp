@@ -26,16 +26,12 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 namespace libaudioverse_implementation {
 
-EnvironmentNode::EnvironmentNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf): SubgraphNode(Lav_OBJTYPE_ENVIRONMENT_NODE, simulation)  {
+EnvironmentNode::EnvironmentNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf): Node(Lav_OBJTYPE_ENVIRONMENT_NODE, simulation, 0, 8)  {
 	this->hrtf = hrtf;
 	int channels = getProperty(Lav_ENVIRONMENT_OUTPUT_CHANNELS).getIntValue();
-	output = createGainNode(simulation);
-	//We alwyas have 8 buffers, and alias them with the connections.
-	output->resize(8, 8);
-	output->appendInputConnection(0, channels);
-	output->appendOutputConnection(0, channels);
 	appendOutputConnection(0, channels);
-	setOutputNode(output);
+	//Allocate the 8 internal buffers.
+	for(int i = 0; i < 8; i++) source_buffers.push_back(allocArray<float>(simulation->getBlockSize()));
 	environment_info.world_to_listener_transform = glm::lookAt(
 		glm::vec3(0.0f, 0.0f, 0.0f),
 		glm::vec3(0.0f, 0.0f, -1.0f),
@@ -48,12 +44,14 @@ std::shared_ptr<EnvironmentNode> createEnvironmentNode(std::shared_ptr<Simulatio
 	return ret;
 }
 
+EnvironmentNode::~EnvironmentNode() {
+	for(auto p: source_buffers) freeArray(p);
+}
+
 void EnvironmentNode::willTick() {
 	if(werePropertiesModified(this, Lav_ENVIRONMENT_OUTPUT_CHANNELS)) {
 		int channels = getProperty(Lav_ENVIRONMENT_OUTPUT_CHANNELS).getIntValue();
 		getOutputConnection(0)->reconfigure(0, channels);
-		output->getOutputConnection(0)->reconfigure(0, channels);
-		output->getInputConnection(0)->reconfigure(0, channels);
 	}
 	if(werePropertiesModified(this, Lav_3D_POSITION, Lav_3D_ORIENTATION)) {
 		//update the matrix.
@@ -76,17 +74,21 @@ void EnvironmentNode::willTick() {
 		m[3][1] = -posvec.y;
 		m[3][2] = -posvec.z;
 		environment_info.world_to_listener_transform = m;
-		//this debug code left in case this is still all broken.
-		/*printf("\n%f %f %f %f\n", m[0][0], m[1][0], m[2][0], m[3][0]);
-		printf("%f %f %f %f\n", m[0][1], m[1][1], m[2][1], m[3][1]);
-		printf("%f %f %f %f\n", m[0][2], m[1][2], m[2][2], m[3][2]);
-		printf("%f %f %f %f\n\n", m[0][3], m[1][3], m[2][3], m[3][3]);*/
 	}
+	environment_info.distance_model = getProperty(Lav_ENVIRONMENT_DISTANCE_MODEL).getIntValue();
+	if(environment_info.distance_model == Lav_DISTANCE_MODEL_DELEGATE) environment_info.distance_model = Lav_DISTANCE_MODEL_LINEAR;
+	environment_info.panning_strategy = getProperty(Lav_ENVIRONMENT_PANNING_STRATEGY).getIntValue();
+	if(environment_info.panning_strategy == Lav_PANNING_STRATEGY_DELEGATE) environment_info.panning_strategy = Lav_PANNING_STRATEGY_STEREO;
 	//give the new environment to the sources.
 	//this is a set of weak pointers.
 	filterWeakPointers(sources, [&](std::shared_ptr<SourceNode> &s) {
 		s->update(environment_info);
 	});
+	for(auto p: source_buffers) std::fill(p, p+block_size, 0.0f);
+}
+
+void EnvironmentNode::process() {
+	for(int i = 0; i < source_buffers.size(); i++) std::copy(source_buffers[i], source_buffers[i]+block_size, output_buffers[i]);
 }
 
 std::shared_ptr<HrtfData> EnvironmentNode::getHrtf() {
@@ -163,10 +165,6 @@ void EnvironmentNode::playAsync(std::shared_ptr<Buffer> buffer, float x, float y
 	});*/
 }
 
-std::shared_ptr<Node> EnvironmentNode::getOutputNode() {
-	return output;
-}
-
 int EnvironmentNode::addEffectSend(int channels, bool isReverb, bool connectByDefault) {
 	if(channels != 1 && channels != 2 && channels != 4 && channels != 6 && channels != 8)
 	ERROR(Lav_ERROR_RANGE, "Channel count for an effect send needs to be 1, 2, 4, 6, or 8.");
@@ -174,15 +172,15 @@ int EnvironmentNode::addEffectSend(int channels, bool isReverb, bool connectByDe
 	ERROR(Lav_ERROR_RANGE, "Reverb effects sends must have 4 channels.");
 	EffectSendConfiguration send;
 	send.channels = channels;
+	send.start = (int)source_buffers.size();
 	send.is_reverb = isReverb;
 	send.connect_by_default = connectByDefault;
 	//Resize the output gain node to have room, and append new connections.
-	int oldSize = output->getOutputBufferCount();
+	int oldSize = source_buffers.size();
 	int newSize = oldSize+send.channels;
-	output->resize(newSize, newSize);
-	output->appendInputConnection(oldSize, send.channels);
-	output->appendOutputConnection(oldSize, send.channels);
+	resize(0, newSize);
 	appendOutputConnection(oldSize, send.channels);
+	for(int i = 0; i < send.channels; i++) source_buffers.push_back(allocArray<float>(simulation->getBlockSize()));
 	int index = effect_sends.size();
 	effect_sends.push_back(send);
 	for(auto &i: sources) {
@@ -197,6 +195,9 @@ EffectSendConfiguration& EnvironmentNode::getEffectSend(int which) {
 	return effect_sends[which];
 }
 
+int EnvironmentNode::getEffectSendCount() {
+	return (int)effect_sends.size();
+}
 
 //begin public api
 

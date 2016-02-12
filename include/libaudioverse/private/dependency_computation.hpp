@@ -40,15 +40,8 @@ inline void nodeVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&...
 }
 
 template<typename JobT, typename CallableT, typename... ArgsT>
-inline void subgraphNodeVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&... args) {
-	auto j = std::static_pointer_cast<Job>(start->subgraph_output);
-	if(j) callable(j, args...);
-}
-
-template<typename JobT, typename CallableT, typename... ArgsT>
 inline void environmentVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&... args) {
-	subgraphNodeVisitDependencies(std::static_pointer_cast<SubgraphNode>(start), callable, args...);
-	//Other dependencies: all our sources.
+	//dependencies: all our sources.
 	for(auto w: start->sources) {
 		auto n = w.lock();
 		if(n) {
@@ -58,10 +51,6 @@ inline void environmentVisitDependencies(JobT&& start, CallableT&& callable, Arg
 	}
 }
 
-template<typename JobT, typename CallableT, typename... ArgsT>
-inline void sourceVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&... args) {
-	if(start->getState() != Lav_NODESTATE_PAUSED && start->culled) visitDependencies(start->input, callable, args...);
-}
 
 #define TRY(type, name)  auto casted##type = std::dynamic_pointer_cast<type>(start); if(casted##type) {name(casted##type, callable, args...);return;}
 
@@ -69,8 +58,6 @@ template<typename JobT, typename CallableT, typename... ArgsT>
 inline void visitDependencies(JobT &&start, CallableT&& callable, ArgsT&&... args) {
 	TRY(Simulation, simulationVisitDependencies)
 	TRY(EnvironmentNode, environmentVisitDependencies)
-	TRY(SourceNode, sourceVisitDependencies)
-	TRY(SubgraphNode, subgraphNodeVisitDependencies)
 	TRY(Node, nodeVisitDependencies)
 }
 

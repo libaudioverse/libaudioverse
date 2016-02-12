@@ -23,6 +23,7 @@ properties:
     range: [0.0, INFINITY]
     doc_description: |
       The maximum distance from the listener at which the source will be audible.
+      This property's default value is copied from the environment at source creation.
   Lav_SOURCE_SIZE:
     name: size
     type: float
@@ -36,17 +37,20 @@ properties:
   Lav_SOURCE_DISTANCE_MODEL:
     name: distance_model
     type: int
-    default: Lav_DISTANCE_MODEL_LINEAR
+    default: Lav_DISTANCE_MODEL_DELEGATE
     value_enum: Lav_DISTANCE_MODELS
     doc_description: |
       The distance model determines how quickly sources get quieter as they move away from the listener.
-  Lav_SOURCE_PANNER_STRATEGY:
-    name: panner_strategy
-    default: Lav_PANNING_STRATEGY_STEREO
+      
+      By default, this property is set to delegate, and sources consequently read from the environment.
+  Lav_SOURCE_PANNING_STRATEGY:
+    name: panning_strategy
+    default: Lav_PANNING_STRATEGY_DELEGATE
     value_enum: Lav_PANNING_STRATEGIES
     type: int
     doc_description: |
       The strategy for the internal multipanner.
+      By default, this delegates to the environment.
   Lav_SOURCE_HEAD_RELATIVE:
     name: head_relative
     type: boolean

@@ -25,8 +25,8 @@ enum Lav_3D_PROPERTIES {
 
 //all environments have these properties.
 enum lav_STANDARD_ENVIRONMENT_PROPERTIES {
-	Lav_ENVIRONMENT_DEFAULT_PANNER_STRATEGY = -8,
-	Lav_ENVIRONMENT_DEFAULT_DISTANCE_MODEL = -11,
+	Lav_ENVIRONMENT_PANNING_STRATEGY = -8,
+	Lav_ENVIRONMENT_DISTANCE_MODEL = -11,
 	Lav_ENVIRONMENT_DEFAULT_MAX_DISTANCE = -12,
 	Lav_ENVIRONMENT_DEFAULT_SIZE = -13,
 	Lav_ENVIRONMENT_OUTPUT_CHANNELS = -14,
@@ -38,7 +38,7 @@ enum Lav_SOURCE_PROPERTIES {
 	Lav_SOURCE_DISTANCE_MODEL = -4,
 	Lav_SOURCE_SIZE = -5,
 	Lav_SOURCE_REVERB_DISTANCE = -6,
-	Lav_SOURCE_PANNER_STRATEGY = -8,
+	Lav_SOURCE_PANNING_STRATEGY = -8,
 	Lav_SOURCE_HEAD_RELATIVE = -9,
 	Lav_SOURCE_MIN_REVERB_LEVEL = -10,
 	Lav_SOURCE_MAX_REVERB_LEVEL = -11,
@@ -46,9 +46,10 @@ enum Lav_SOURCE_PROPERTIES {
 };
 
 enum Lav_DISTANCE_MODELS {
-	Lav_DISTANCE_MODEL_LINEAR = 0, //sounds get quieter as 1-(distance/max_distance).
-	Lav_DISTANCE_MODEL_EXPONENTIAL = 1, //sounds get quieter as 1/distance.
-	Lav_DISTANCE_MODEL_INVERSE_SQUARE = 2, //sounds get quieter as 1/min(distance, max_distance)^2
+	Lav_DISTANCE_MODEL_DELEGATE = 0, //Delegate to the environment.
+	Lav_DISTANCE_MODEL_LINEAR = 1, //sounds get quieter as 1-(distance/max_distance).
+	Lav_DISTANCE_MODEL_EXPONENTIAL = 2, //sounds get quieter as 1/distance.
+	Lav_DISTANCE_MODEL_INVERSE_SQUARE = 3, //sounds get quieter as 1/min(distance, max_distance)^2
 };
 
 #ifdef __cplusplus

@@ -32,7 +32,7 @@ void parallelMultiplicationAdditionKernel(int length, float c1, float c2, float 
 /**The convolution kernel.
 The first response-1 samples of the input buffer are assumed to be a running history, so the actual length of the input buffer needs to be outputSampleCount+responseLength-1.
 */
-void convolutionKernel(float* input, unsigned int outputSampleCount, float* output, unsigned int responseLength, float* response);
+void convolutionKernel(float* input, int outputSampleCount, float* output, int responseLength, float* response);
 
 /**Same as convolutionKernel, but will crossfade from the first response to the second smoothly over the interval outputSampleCount.*/
 void crossfadeConvolutionKernel(float* input, unsigned int outputSampleCount, float* output, unsigned int responseLength, float* from, float* to);

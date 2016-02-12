@@ -143,35 +143,6 @@ class Node: public Job {
 	friend void nodeVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&... args);
 };
 
-/*needed for things that wish to encapsulate and manage nodes that the public API isn't supposed to see.
-Usage: append output connections as normal and configure as normal.
-The subgraph node forwards most calls onto the current output object, including those for getting output arrays. Consequently, the subgraph node has the same number of output buffers as the output object-and the output object may be changed.
-The properties mul and (todo) add are forwarded onto the output node before every block.
-Changing the input node is defined behavior: it will break horribly and unpredictably.
-Changing the output node is safe so long as the connections on the subgraph are reconfigured, same as for any other resize.*/
-class SubgraphNode: public Node {
-	public:
-	SubgraphNode(int type, std::shared_ptr<Simulation> simulation);
-	virtual void setInputNode(std::shared_ptr<Node> node);
-	virtual void setOutputNode(std::shared_ptr<Node> node);
-	//these all forward onto the input node.
-	int getInputConnectionCount() override;
-	std::shared_ptr<InputConnection> getInputConnection(int which) override;
-	//these forward onto the output node, making connections to the subgraph magically work.
-	int getOutputBufferCount() override;
-	float** getOutputBufferArray() override;
-
-	//Override tick because we can't try to use connections.
-	//We don't have proper input buffers, default tick will override who knows what.
-	void tick() override;
-	
-	protected:
-	std::shared_ptr<Node> subgraph_input, subgraph_output;
-	
-	template<typename JobT, typename CallableT, typename... ArgsT>
-	friend void subgraphNodeVisitDependencies(JobT&& start, CallableT &&callable, ArgsT&&... args);
-};
-
 /**This is the creation template for a node.
 Every createXXX function uses this template.*/
 template<typename NodeT, typename... ArgsT>
