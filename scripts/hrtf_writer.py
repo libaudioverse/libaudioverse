@@ -1,4 +1,4 @@
-"""This is a helper class for scripts to ipmport from various HRTF sources."""
+"""This is a helper class for scripts to import from various HRTF sources."""
 
 import numpy
 import numpy.fft as fft
@@ -54,19 +54,21 @@ class HrtfWriter(object):
                 raise valueError("Responses must all have the same length.")
         self.response_length = response_lengths[0]
         self.response_count=sum((len(elev) for elev in self.responses))
-        if print_progress:
-            print("basic sanity checks passed and HRTF Writer initialized.")
-            print("Dataset has {} responses and {} elevations".format(self.response_length, self.elevation_count))
-            print("sr =", self.samplerate)
-            print(self.elevation_count, "elevations.")
-            print("Min elevation =", self.min_elevation, "max elevation = ", self.max_elevation)
-            print("Azimuth counts: {}".format(self.azimuth_counts))
+        self.progress("basic sanity checks passed and HRTF Writer initialized.")
+        self.progress("Dataset has {} responses and {} elevations".format(self.response_length, self.elevation_count))
+        self.progress("sr =", self.samplerate)
+        self.progress(self.elevation_count, "elevations.")
+        self.progress("Min elevation =", self.min_elevation, "max elevation = ", self.max_elevation)
+        self.progress("Azimuth counts: {}".format(self.azimuth_counts))
+
+    def progress(self, *msg):
+        if self.print_progress:
+            print(*msg)
 
     def make_format_string(self):
         endianness_token= "<" if self.endianness == EndiannessTypes.little else ">"
         self.format_string=self.format_template.format(endianness_token, str(len(self.azimuth_counts))+"i", str(self.response_count*self.response_length)+"f").encode('ascii')
-        if self.print_progress:
-            print("Format string:", self.format_string)
+        self.progress("Format string:", self.format_string)
 
     def pack_data(self):
         self.make_format_string()
@@ -79,61 +81,43 @@ class HrtfWriter(object):
         *[list(response) for elevation in self.responses for response in  elevation])
         data=list(iter)
         self.packed_data = struct.pack(self.format_string, *data)
-        if self.print_progress:
-            print("Data packed. Total size is {}.".format(len(self.packed_data)))
+        self.progress("Data packed. Total size is {}.".format(len(self.packed_data)))
+
+    def map(self, func):
+        """Apply func to all impulse responses.
+        The resulting responses must all be the same length.  This function will reconfigure the length based off the first."""
+        for elev in self.responses:
+            for i, j in enumerate(elev):
+                elev[i] = func(j)
+        self.response_length = len(self.responses[0][0])
 
     def write_file(self, path):
         if not hasattr(self, 'packed_data'):
             raise ValueError("Must pack data first.")
         with open(path, "wb") as f:
             f.write(self.packed_data)
-        if self.print_progress:
-            print("Data written to {}".format(path))
+        self.progress("Data written to {}".format(path))
 
     def data_to_float64(self):
-        if self.print_progress:
-            print("Converting data to float.")
-        new_responses = []
-        for elev in self.responses:
-            new_elev = []
-            for response in elev:
-                if numpy.issubdtype(response.dtype, int):
-                    minimum = numpy.iinfo(response.dtype).min
-                    maximum = numpy.iinfo(response.dtype).max
-                    subtract=0
-                    if minimum == 0: #if the type is unsigned.
-                        subtract = maximum/2
-                    new_response = response.astype(numpy.int64)-subtract
-                    new_response = new_response/float(maximum+1) #+1 guarantees that we have no values below -1
-                    new_response = new_response.astype(numpy.float64)
-                else:
-                    new_response = response.astype(numpy.float64) #it's already a floating point type.
-                new_elev.append(new_response)
-            new_responses.append(new_elev)
-        self.responses = new_responses
-
-    def linear_phase(self):
-        """Convert all the data to linear phase."""
-        if self.print_progress:
-            print("Converting data to linear phase...")
-        new_responses=[]
-        for elev in self.responses:
-            new_elev=[]
-            for response in elev:
-                #ifft of the abs of the fft throws out all phase.
-                #Because libaudioverse doesn't do minimum phase, it's automatically delayed and all is (theoretically) happy.
-                #We overdo the fft to minimize any possible error, and then truncate.
-                response = fft.irfft(numpy.abs(fft.rfft(response, max(self.response_length, 512)))).astype(numpy.float64)
-                response = response[:self.response_length]
-                new_elev.append(response)
-            new_responses.append(new_elev)
-        self.responses=new_responses
-
+        self.progress("Converting data to float.")
+        def conv(response):
+            if numpy.issubdtype(response.dtype, int):
+                minimum = numpy.iinfo(response.dtype).min
+                maximum = numpy.iinfo(response.dtype).max
+                subtract=0
+                if minimum == 0: #if the type is unsigned.
+                    subtract = maximum/2
+                new_response = response.astype(numpy.int64)-subtract
+                new_response = new_response/float(maximum+1) #+1 guarantees that we have no values below -1
+                new_response = new_response.astype(numpy.float64)
+            else:
+                new_response = response.astype(numpy.float64) #it's already a floating point type.
+            return new_response
+        self.map(conv)
 
     def standard_build(self, path):
         """Does a standard build, that is the transformations that should be made on most HRIRs."""
-        if self.print_progress:
-            print("Standard build requested.")
+        self.progress("Standard build requested.")
         self.data_to_float64()
         self.pack_data()
         self.write_file(path)
