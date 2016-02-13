@@ -66,6 +66,8 @@ Node(Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK_NODE, simulation, channels, channels) {
 	getProperty(Lav_FDN_FILTER_TYPES).zeroArray(channels);
 	getProperty(Lav_FDN_FILTER_FREQUENCIES).setArrayLengthRange(channels, channels);
 	getProperty(Lav_FDN_FILTER_FREQUENCIES).zeroArray(channels);
+	
+	setShouldZeroOutputBuffers(false);
 }
 
 FeedbackDelayNetworkNode::~FeedbackDelayNetworkNode() {

@@ -20,6 +20,7 @@ GraphListenerNode::GraphListenerNode(std::shared_ptr<Simulation> sim, unsigned i
 	this->channels = channels;
 	appendInputConnection(0, channels);
 	appendOutputConnection(0, channels);
+	setShouldZeroOutputBuffers(false);
 }
 
 std::shared_ptr<Node> createGraphListenerNode(std::shared_ptr<Simulation> simulation, unsigned int channels) {

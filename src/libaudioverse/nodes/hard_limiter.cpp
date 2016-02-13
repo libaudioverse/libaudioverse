@@ -17,6 +17,7 @@ namespace libaudioverse_implementation {
 HardLimiterNode::HardLimiterNode(std::shared_ptr<Simulation> simulation, int channels): Node(Lav_OBJTYPE_HARD_LIMITER_NODE, simulation, channels, channels) {
 	appendInputConnection(0, channels);
 	appendOutputConnection(0, channels);
+	setShouldZeroOutputBuffers(false);
 }
 
 std::shared_ptr<Node>createHardLimiterNode(std::shared_ptr<Simulation> simulation, int channels) {

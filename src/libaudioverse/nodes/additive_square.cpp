@@ -15,6 +15,7 @@ namespace libaudioverse_implementation {
 
 AdditiveSquareNode::AdditiveSquareNode(std::shared_ptr<Simulation> simulation): Node(Lav_OBJTYPE_ADDITIVE_SQUARE_NODE, simulation, 0, 1), oscillator(simulation->getSr()) {
 	appendOutputConnection(0, 1);
+	setShouldZeroOutputBuffers(false);
 }
 
 std::shared_ptr<Node> createAdditiveSquareNode(std::shared_ptr<Simulation> simulation) {

@@ -16,6 +16,7 @@ namespace libaudioverse_implementation {
 
 SineNode::SineNode(std::shared_ptr<Simulation> simulation): Node(Lav_OBJTYPE_SINE_NODE, simulation, 0, 1), oscillator(simulation->getSr()) {
 	appendOutputConnection(0, 1);
+	setShouldZeroOutputBuffers(false);
 }
 
 std::shared_ptr<Node> createSineNode(std::shared_ptr<Simulation> simulation) {

@@ -18,6 +18,7 @@ RingmodNode::RingmodNode(std::shared_ptr<Simulation> sim): Node(Lav_OBJTYPE_RING
 	appendInputConnection(0, 1);
 	appendInputConnection(1, 1);
 	appendOutputConnection(0, 1);
+	setShouldZeroOutputBuffers(false);
 }
 
 std::shared_ptr<Node> createRingmodNode(std::shared_ptr<Simulation> simulation) {

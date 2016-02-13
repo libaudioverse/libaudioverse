@@ -21,6 +21,7 @@ LeakyIntegratorNode::LeakyIntegratorNode(std::shared_ptr<Simulation> simulation,
 	this->channels = channels;
 	integrators = new LeakyIntegrator*[channels];
 	for(int i = 0; i < channels; i++) integrators[i] = new LeakyIntegrator(simulation->getSr());
+	setShouldZeroOutputBuffers(false);
 }
 
 std::shared_ptr<Node> createLeakyIntegratorNode(std::shared_ptr<Simulation> simulation, int channels) {

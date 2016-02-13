@@ -59,6 +59,7 @@ FdnReverbNode::FdnReverbNode(std::shared_ptr<Simulation> sim): Node(Lav_OBJTYPE_
 	appendInputConnection(0, 4);
 	appendOutputConnection(0, 4);
 	getProperty(Lav_FDN_REVERB_CUTOFF_FREQUENCY).setFloatRange(0.0f, sr/2.0);
+	setShouldZeroOutputBuffers(false);
 }
 
 std::shared_ptr<Node> createFdnReverbNode(std::shared_ptr<Simulation> simulation) {

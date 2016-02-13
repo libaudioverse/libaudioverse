@@ -15,6 +15,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 namespace libaudioverse_implementation {
 
 GainNode::GainNode(std::shared_ptr<Simulation> sim): Node(Lav_OBJTYPE_GAIN_NODE, sim, 0, 0) {
+	setShouldZeroOutputBuffers(false);
 }
 
 std::shared_ptr<Node> createGainNode(std::shared_ptr<Simulation> simulation) {

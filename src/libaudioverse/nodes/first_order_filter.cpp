@@ -21,6 +21,7 @@ bank(simulation->getSr()) {
 	bank.setChannelCount(channels);
 	appendInputConnection(0, channels);
 	appendOutputConnection(0, channels);
+	setShouldZeroOutputBuffers(false);
 }
 
 std::shared_ptr<Node> createFirstOrderFilterNode(std::shared_ptr<Simulation> simulation, int channels) {

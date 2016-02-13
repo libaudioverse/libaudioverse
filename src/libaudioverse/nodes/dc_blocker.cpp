@@ -21,6 +21,7 @@ DcBlockerNode::DcBlockerNode(std::shared_ptr<Simulation> simulation, int channel
 	this->channels = channels;
 	blockers = new DcBlocker*[channels];
 	for(int i = 0; i < channels; i++) blockers[i] = new DcBlocker(simulation->getSr());
+	setShouldZeroOutputBuffers(false);
 }
 
 std::shared_ptr<Node> createDcBlockerNode(std::shared_ptr<Simulation> simulation, int channels) {

@@ -25,6 +25,7 @@ ConvolverNode::ConvolverNode(std::shared_ptr<Simulation> simulation, int channel
 	appendOutputConnection(0, channels);
 	convolvers=new BlockConvolver*[channels]();
 	for(int i= 0; i < channels; i++) convolvers[i] = new BlockConvolver(simulation->getBlockSize());
+	setShouldZeroOutputBuffers(false);
 }
 
 std::shared_ptr<Node> createConvolverNode(std::shared_ptr<Simulation> simulation, int channels) {

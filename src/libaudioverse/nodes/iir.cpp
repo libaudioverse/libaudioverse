@@ -24,6 +24,7 @@ IirNode::IirNode(std::shared_ptr<Simulation> simulation, int channels): Node(Lav
 	setCoefficients(1, defaultNumerator, 2, defaultDenominator, 1);
 	appendInputConnection(0, channels);
 	appendOutputConnection(0, channels);
+	setShouldZeroOutputBuffers(false);
 }
 
 std::shared_ptr<Node> createIirNode(std::shared_ptr<Simulation> simulation, int channels) {

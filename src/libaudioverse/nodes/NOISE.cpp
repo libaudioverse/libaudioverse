@@ -39,6 +39,7 @@ This was originally taken from Spectral Audio processing by JOS.*/
 	pinkifier.setGain(4.0);
 	brownifier.setGain(12.0);
 	appendOutputConnection(0, 1);
+	setShouldZeroOutputBuffers(false);
 }
 
 std::shared_ptr<Node> createNoiseNode(std::shared_ptr<Simulation> simulation) {

@@ -15,6 +15,7 @@ namespace libaudioverse_implementation {
 
 AdditiveSawNode::AdditiveSawNode(std::shared_ptr<Simulation> simulation): Node(Lav_OBJTYPE_ADDITIVE_SAW_NODE, simulation, 0, 1), oscillator(simulation->getSr()) {
 	appendOutputConnection(0, 1);
+	setShouldZeroOutputBuffers(false);
 }
 
 std::shared_ptr<Node> createAdditiveSawNode(std::shared_ptr<Simulation> simulation) {

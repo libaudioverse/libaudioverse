@@ -36,6 +36,7 @@ EnvironmentNode::EnvironmentNode(std::shared_ptr<Simulation> simulation, std::sh
 		glm::vec3(0.0f, 0.0f, 0.0f),
 		glm::vec3(0.0f, 0.0f, -1.0f),
 		glm::vec3(0.0f, 1.0f, 0.0f));
+	setShouldZeroOutputBuffers(false);
 }
 
 std::shared_ptr<EnvironmentNode> createEnvironmentNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf) {

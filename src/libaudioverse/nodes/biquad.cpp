@@ -23,6 +23,7 @@ bank(simulation->getSr()) {
 	prev_type = getProperty(Lav_BIQUAD_FILTER_TYPE).getIntValue();
 	appendInputConnection(0, channels);
 	appendOutputConnection(0, channels);
+	setShouldZeroOutputBuffers(false);
 }
 
 std::shared_ptr<Node> createBiquadNode(std::shared_ptr<Simulation> simulation, unsigned int channels) {

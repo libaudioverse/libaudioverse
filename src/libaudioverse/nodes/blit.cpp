@@ -16,6 +16,7 @@ namespace libaudioverse_implementation {
 
 BlitNode::BlitNode(std::shared_ptr<Simulation> simulation): Node(Lav_OBJTYPE_BLIT_NODE, simulation, 0, 1), oscillator(simulation->getSr()) {
 	appendOutputConnection(0, 1);
+	setShouldZeroOutputBuffers(false);
 }
 
 std::shared_ptr<Node> createBlitNode(std::shared_ptr<Simulation> simulation) {

@@ -23,6 +23,7 @@ bank(simulation->getSr()) {
 	reconfigureFilters();
 	appendInputConnection(0, channels);
 	appendOutputConnection(0, channels);
+	setShouldZeroOutputBuffers(false);
 }
 
 std::shared_ptr<Node> createOnePoleFilterNode(std::shared_ptr<Simulation> simulation, int channels) {

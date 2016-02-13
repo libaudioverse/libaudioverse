@@ -29,6 +29,7 @@ highband_shelves(simulation->getSr()) {
 	getProperty(Lav_THREE_BAND_EQ_HIGHBAND_FREQUENCY).setFloatRange(0.0, simulation->getSr()/2.0);
 	getProperty(Lav_THREE_BAND_EQ_LOWBAND_FREQUENCY).setFloatRange(0.0, simulation->getSr()/2.0);
 	recompute();
+	setShouldZeroOutputBuffers(false);
 }
 
 std::shared_ptr<Node> createThreeBandEqNode(std::shared_ptr<Simulation> simulation, int channels) {
