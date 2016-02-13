@@ -95,9 +95,11 @@ void Node::tickProperties() {
 
 void Node::tick() {
 	last_processed = simulation->getTickCount();
-	if(getState() == Lav_NODESTATE_PAUSED) return; //nothing to do, for we are paused.
-	//If we're paused, then our output connections short-circuit and add zero.
-	zeroOutputBuffers();
+	bool paused = getState() == Lav_NODESTATE_PAUSED;
+	if(paused) return;
+	//If we're paused, then OutputConnectiona dds zeros.
+	//Consequently, we don't do this in that case.
+	if(should_zero_output_buffers) 	zeroOutputBuffers();
 	tickProperties();
 	zeroInputBuffers();
 	//Collect parent outputs onto ours.
@@ -373,6 +375,10 @@ void Node::execute() {
 
 bool Node::canCull() {
 	return getState() == Lav_NODESTATE_PAUSED;
+}
+
+void Node::setShouldZeroOutputBuffers(bool v) {
+	should_zero_output_buffers = v;
 }
 
 //begin public api

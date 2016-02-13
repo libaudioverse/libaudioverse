@@ -117,6 +117,9 @@ class Node: public Job {
 
 	//True if we're paused.
 	bool canCull() override;
+	
+	//Various optimizations that subclasses can enable.
+	void setShouldZeroOutputBuffers(bool v);
 	protected:
 	std::shared_ptr<Simulation> simulation = nullptr;
 	std::map<int, Property> properties;
@@ -139,6 +142,8 @@ class Node: public Job {
 	Node(const Node&) = delete;
 	Node& operator=(const Node&) = delete;
 	
+	//various optimization flags.
+	bool should_zero_output_buffers = true; //Enable/disable zeroing output buffers on tick if node is unpaused.
 	template<typename JobT, typename CallableT, typename... ArgsT>
 	friend void nodeVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&... args);
 };
