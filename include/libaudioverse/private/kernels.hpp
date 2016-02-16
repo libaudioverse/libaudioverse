@@ -26,7 +26,7 @@ void multiplicationAdditionKernel(int length, float c, float* a1, float* a2, flo
 //A parallel version, if we can, primarily used by convolution.
 //This is equivalent to calling multiplicationAdditionKernel 4 times, advancing the  a1 pointer by 1 each time.
 //This implies that a1 must be at least 3 elements longer than a2.
-//Note that if a1 and a2 are the same buffers, this will be problematic; if theya re, a2-a1 must be greater than 3.
+//Note that if a1 and a2 are the same buffers, this will be problematic; if they are, a2-a1 must be greater than 3.
 void parallelMultiplicationAdditionKernel(int length, float c1, float c2, float c3, float c4,  float* a1, float* a2, float* out);
 
 /**The convolution kernel.
