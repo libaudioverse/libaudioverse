@@ -5620,6 +5620,10 @@ The additional function Lav_amplitudePannerNodeConfigureStandardChannelMap can s
 The first speaker will be mapped to the first channel, the second to the second, etc.
 These channels are then combined and produced as the single output of the panner.</p>
 </div>
+<div class="paragraph">
+<p>You can use floating point infinity to indicate a channel should be skipped.
+This functionality is used by all of the standard channel maps to skip the center and LFE channels.</p>
+</div>
 </div>
 <div class="sect4">
 <h5 id="_elevation">elevation</h5>
@@ -5645,71 +5649,6 @@ Note that, for amplitude panners, this has no effect and exists only to allow sw
 </div>
 </div>
 <div class="sect4">
-<h5 id="_has_center">has_center</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_PANNER_HAS_CENTER</p>
-</div>
-<div class="paragraph">
-<p>Type: boolean</p>
-</div>
-<div class="paragraph">
-<p>Default Value: 0</p>
-</div>
-<div class="paragraph">
-<p>Rate: k</p>
-</div>
-<div class="paragraph">
-<p>Whether the currently specified channel map has a center channel.
-If it does, this is assumed to be channel 3.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_has_lfe">has_lfe</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_PANNER_HAS_LFE</p>
-</div>
-<div class="paragraph">
-<p>Type: boolean</p>
-</div>
-<div class="paragraph">
-<p>Default Value: 0</p>
-</div>
-<div class="paragraph">
-<p>Rate: k</p>
-</div>
-<div class="paragraph">
-<p>Whether the current channel map has an LFE channel or not.
-If it does, this is assumed to be channel 4.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_passthrough">passthrough</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_PANNER_PASSTHROUGH</p>
-</div>
-<div class="paragraph">
-<p>Type: float</p>
-</div>
-<div class="paragraph">
-<p>Range: [0.0, 1.0]</p>
-</div>
-<div class="paragraph">
-<p>Default Value: 0.0</p>
-</div>
-<div class="paragraph">
-<p>Rate: k</p>
-</div>
-<div class="paragraph">
-<p>Controls how much of the "dry" signal is passed through.</p>
-</div>
-<div class="paragraph">
-<p>Higher values make the panning less obvious.</p>
-</div>
-<div class="paragraph">
-<p>Specifically, the input signal is added to all outputs with <code>passthrough</code> as the gain, and <code>1-passthrough</code> as the gain of the panned signal.</p>
-</div>
-</div>
-<div class="sect4">
 <h5 id="_should_crossfade">should_crossfade</h5>
 <div class="paragraph">
 <p>C Enumeration Value: Lav_PANNER_SHOULD_CROSSFADE</p>
@@ -5728,44 +5667,6 @@ If it does, this is assumed to be channel 4.</p>
 If crossfading is disabled, large movements of the panner will cause audible clicks.
 Disabling crossfading can aid performance under heavy workloads, especially with the HRTF panner.
 If crossfading is enabled, moving the panner will slowly fade it to the new position over the next block.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_skip_center">skip_center</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_PANNER_SKIP_CENTER</p>
-</div>
-<div class="paragraph">
-<p>Type: boolean</p>
-</div>
-<div class="paragraph">
-<p>Default Value: 1</p>
-</div>
-<div class="paragraph">
-<p>Rate: k</p>
-</div>
-<div class="paragraph">
-<p>This property controls whether or not the center channel is reserved, i.e. skipped.
-You  almost always want this on.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_skip_lfe">skip_lfe</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_PANNER_SKIP_LFE</p>
-</div>
-<div class="paragraph">
-<p>Type: boolean</p>
-</div>
-<div class="paragraph">
-<p>Default Value: 1</p>
-</div>
-<div class="paragraph">
-<p>Rate: k</p>
-</div>
-<div class="paragraph">
-<p>This property controls whether or not the LFE channel is reserved, i.e. skipped.
-You  almost always want this on.</p>
 </div>
 </div>
 </div>
@@ -7179,28 +7080,6 @@ Any functionality to change a property on all sources needs to be implemented by
 <div class="sect3">
 <h4 id="_properties_14">Properties</h4>
 <div class="sect4">
-<h5 id="_default_distance_model">default_distance_model</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_ENVIRONMENT_DEFAULT_DISTANCE_MODEL</p>
-</div>
-<div class="paragraph">
-<p>Type: int</p>
-</div>
-<div class="paragraph">
-<p>Range: A value from the <a href="#enum-Lav_DISTANCE_MODELS">Lav_DISTANCE_MODELS</a> enumeration.</p>
-</div>
-<div class="paragraph">
-<p>Default Value: Lav_DISTANCE_MODEL_LINEAR</p>
-</div>
-<div class="paragraph">
-<p>Rate: k</p>
-</div>
-<div class="paragraph">
-<p>The default distance model for newly created sources.
-Distance models control how quickly sources get quieter as they move away from the listener.</p>
-</div>
-</div>
-<div class="sect4">
 <h5 id="_default_max_distance">default_max_distance</h5>
 <div class="paragraph">
 <p>C Enumeration Value: Lav_ENVIRONMENT_DEFAULT_MAX_DISTANCE</p>
@@ -7220,27 +7099,6 @@ Distance models control how quickly sources get quieter as they move away from t
 <div class="paragraph">
 <p>The default max distance for new sources.
 The max distance of a source is the maximum distance at which that source will be audible.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_default_panning_strategy">default_panning_strategy</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_ENVIRONMENT_DEFAULT_PANNER_STRATEGY</p>
-</div>
-<div class="paragraph">
-<p>Type: int</p>
-</div>
-<div class="paragraph">
-<p>Range: A value from the <a href="#enum-Lav_PANNING_STRATEGIES">Lav_PANNING_STRATEGIES</a> enumeration.</p>
-</div>
-<div class="paragraph">
-<p>Default Value: Lav_PANNING_STRATEGY_STEREO</p>
-</div>
-<div class="paragraph">
-<p>Rate: k</p>
-</div>
-<div class="paragraph">
-<p>the default panner strategy for the internal panner of new sources.</p>
 </div>
 </div>
 <div class="sect4">
@@ -7288,6 +7146,37 @@ The max distance of a source is the maximum distance at which that source will b
 <p>The default size for new sources.
 Sources aare approximated as spheres, with 0 being the special case of a point source.
 Size is used to determine the listener&#8217;s distance from a source.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_distance_model">distance_model</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_ENVIRONMENT_DISTANCE_MODEL</p>
+</div>
+<div class="paragraph">
+<p>Type: int</p>
+</div>
+<div class="paragraph">
+<p>Range: A value from the <a href="#enum-Lav_DISTANCE_MODELS">Lav_DISTANCE_MODELS</a> enumeration.</p>
+</div>
+<div class="paragraph">
+<p>Default Value: Lav_DISTANCE_MODEL_LINEAR</p>
+</div>
+<div class="paragraph">
+<p>Rate: k</p>
+</div>
+<div class="paragraph">
+<p>The distance model for any source configured to delegate to the environment.
+Sources are configured to delegate to the environment by default.</p>
+</div>
+<div class="paragraph">
+<p>Distance models control how quickly sources get quieter as they move away from the listener.</p>
+</div>
+<div class="paragraph">
+<p>Note that it is possible to set this property to <code>Lav_DISTANCE_MODEL_DELEGATE</code>.
+Due to internal limitations, this does not generate an error.
+Instead, this case is equivalent to a linear distance model.
+Do not rely on this behavior.  The internal ilimitations preventing this will be lifted in future.</p>
 </div>
 </div>
 <div class="sect4">
@@ -7348,6 +7237,33 @@ or where the app changes the panning strategies of sources after creation.</p>
 </div>
 <div class="paragraph">
 <p>Values besides 2, 4, 6, or 8 do not usually have much meaning.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_panning_strategy">panning_strategy</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_ENVIRONMENT_PANNING_STRATEGY</p>
+</div>
+<div class="paragraph">
+<p>Type: int</p>
+</div>
+<div class="paragraph">
+<p>Range: A value from the <a href="#enum-Lav_PANNING_STRATEGIES">Lav_PANNING_STRATEGIES</a> enumeration.</p>
+</div>
+<div class="paragraph">
+<p>Default Value: Lav_PANNING_STRATEGY_STEREO</p>
+</div>
+<div class="paragraph">
+<p>Rate: k</p>
+</div>
+<div class="paragraph">
+<p>The panning strategy for any source configured to delegate to the environment.
+All new sources delegate to the environment by default.</p>
+</div>
+<div class="paragraph">
+<p>Note that it is possible to set this property to the delgate panning strategy.
+Due to internal limitations, this case does not error but is instead equivalent to using stereo panning.
+These limitations will be lifted in future; do not rely on this behavior.</p>
 </div>
 </div>
 <div class="sect4">
@@ -9796,176 +9712,6 @@ If said property is true, the filter becomes a highpass.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="node-Lav_OBJTYPE_PANNER_BANK_NODE">Panner Bank Node</h3>
-<div class="paragraph">
-<p>C Type Identifier: <code>Lav_OBJTYPE_PANNER_BANK_NODE</code></p>
-</div>
-<div class="paragraph">
-<p>Constructor: <code>LavError Lav_createPannerBankNode(LavHandle simulationHandle, int pannerCount, char* hrtfPath, LavHandle* destination)</code></p>
-</div>
-<div class="paragraph">
-<p>The number of inputs to this node depends on parameters to its constructor.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Outputs</caption>
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Index</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Channels</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Depends on the currently set panning strategy.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The signal, panned according to the configured panning strategy.</p></td>
-</tr>
-</tbody>
-</table>
-<div class="paragraph">
-<p>A bank of panners, separated to cover a configurable cone.</p>
-</div>
-<div class="paragraph">
-<p>The primary use for this node is to simulate virtual speakers.</p>
-</div>
-<div class="paragraph">
-<p>The number of panners is set by the pannerCount parameter to the constructor.
-This must be at least 2.
-Each input corresponds to a panner, starting with the panner set to the lowest angle.</p>
-</div>
-<div class="sect3">
-<h4 id="_properties_25">Properties</h4>
-<div class="sect4">
-<h5 id="_azimuth_4">azimuth</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_PANNER_AZIMUTH</p>
-</div>
-<div class="paragraph">
-<p>Type: float</p>
-</div>
-<div class="paragraph">
-<p>Range: ['-INFINITY', 'INFINITY']</p>
-</div>
-<div class="paragraph">
-<p>Default Value: 0.0</p>
-</div>
-<div class="paragraph">
-<p>Rate: k</p>
-</div>
-<div class="paragraph">
-<p>The horizontal angle of the panner, in degrees.
-0 is straight ahead and positive values are clockwise.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_count">count</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_PANNER_BANK_COUNT</p>
-</div>
-<div class="paragraph">
-<p>Type: int</p>
-</div>
-<div class="paragraph">
-<p>This property is read-only.</p>
-</div>
-<div class="paragraph">
-<p>The number of panners being used by this node.
-This is the same as the number of inputs to the node.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_is_centered">is_centered</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_PANNER_BANK_IS_CENTERED</p>
-</div>
-<div class="paragraph">
-<p>Type: boolean</p>
-</div>
-<div class="paragraph">
-<p>Default Value: 0</p>
-</div>
-<div class="paragraph">
-<p>Rate: k</p>
-</div>
-<div class="paragraph">
-<p>If true, then the azimuth controls the center of the cone.
-Otherwise, the azimuth controls the left edge of the cone.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_should_crossfade_4">should_crossfade</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_PANNER_SHOULD_CROSSFADE</p>
-</div>
-<div class="paragraph">
-<p>Type: boolean</p>
-</div>
-<div class="paragraph">
-<p>Default Value: 1</p>
-</div>
-<div class="paragraph">
-<p>Rate: k</p>
-</div>
-<div class="paragraph">
-<p>Whether or not the panners should crossfade.
-Lack of crossfading introduces audible artifacts when the panner is moved.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_spread">spread</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_PANNER_BANK_SPREAD</p>
-</div>
-<div class="paragraph">
-<p>Type: float</p>
-</div>
-<div class="paragraph">
-<p>Range: [0.0, 360.0]</p>
-</div>
-<div class="paragraph">
-<p>Default Value: 360.0</p>
-</div>
-<div class="paragraph">
-<p>Rate: k</p>
-</div>
-<div class="paragraph">
-<p>An angle in degrees.
-Defines a cone across which the panners in this bank are spread.</p>
-</div>
-<div class="paragraph">
-<p>This cone always inclues the endpoints, and the panners are separated as <code>spread/(panner_count-1)</code>.
-This implies that for <code>spread=360.0</code>, the first and last inputs are effectively the same.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_strategy_2">strategy</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_PANNER_STRATEGY</p>
-</div>
-<div class="paragraph">
-<p>Type: int</p>
-</div>
-<div class="paragraph">
-<p>Range: A value from the <a href="#enum-Lav_PANNING_STRATEGIES">Lav_PANNING_STRATEGIES</a> enumeration.</p>
-</div>
-<div class="paragraph">
-<p>Default Value: Lav_PANNING_STRATEGY_STEREO</p>
-</div>
-<div class="paragraph">
-<p>Rate: k</p>
-</div>
-<div class="paragraph">
-<p>What type of panning to use.
-Possibilities include HRTF, stereo, 5.1, and 7.1 speaker configurations.</p>
-</div>
-</div>
-</div>
-</div>
-<div class="sect2">
 <h3 id="node-Lav_OBJTYPE_PULL_NODE">Pull Node</h3>
 <div class="paragraph">
 <p>C Type Identifier: <code>Lav_OBJTYPE_PULL_NODE</code></p>
@@ -10095,7 +9841,7 @@ If you need low latency audio or the ability to run something like the Opus enco
 ability to cover for missing frames, you need a pull node.</p>
 </div>
 <div class="sect3">
-<h4 id="_properties_26">Properties</h4>
+<h4 id="_properties_25">Properties</h4>
 <div class="sect4">
 <h5 id="_threshold">threshold</h5>
 <div class="paragraph">
@@ -10467,7 +10213,7 @@ The two inputs will be converted to mono and then multiplied, before being sent 
 <p>A simple sine oscillator.</p>
 </div>
 <div class="sect3">
-<h4 id="_properties_27">Properties</h4>
+<h4 id="_properties_26">Properties</h4>
 <div class="sect4">
 <h5 id="_frequency_8">frequency</h5>
 <div class="paragraph">
@@ -10580,9 +10326,9 @@ To hear a source, you must connect its environment to something instead.</p>
 If you are in a garbage collected language, failure to hold on to the source nodes will cause them to go silent.</p>
 </div>
 <div class="sect3">
-<h4 id="_properties_28">Properties</h4>
+<h4 id="_properties_27">Properties</h4>
 <div class="sect4">
-<h5 id="_distance_model">distance_model</h5>
+<h5 id="_distance_model_2">distance_model</h5>
 <div class="paragraph">
 <p>C Enumeration Value: Lav_SOURCE_DISTANCE_MODEL</p>
 </div>
@@ -10593,13 +10339,16 @@ If you are in a garbage collected language, failure to hold on to the source nod
 <p>Range: A value from the <a href="#enum-Lav_DISTANCE_MODELS">Lav_DISTANCE_MODELS</a> enumeration.</p>
 </div>
 <div class="paragraph">
-<p>Default Value: Lav_DISTANCE_MODEL_LINEAR</p>
+<p>Default Value: Lav_DISTANCE_MODEL_DELEGATE</p>
 </div>
 <div class="paragraph">
 <p>Rate: k</p>
 </div>
 <div class="paragraph">
 <p>The distance model determines how quickly sources get quieter as they move away from the listener.</p>
+</div>
+<div class="paragraph">
+<p>By default, this property is set to delegate, and sources consequently read from the environment.</p>
 </div>
 </div>
 <div class="sect4">
@@ -10643,7 +10392,8 @@ The orientation and position properties of an environment do not affect head rel
 <p>Rate: k</p>
 </div>
 <div class="paragraph">
-<p>The maximum distance from the listener at which the source will be audible.</p>
+<p>The maximum distance from the listener at which the source will be audible.
+This property&#8217;s default value is copied from the environment at source creation.</p>
 </div>
 </div>
 <div class="sect4">
@@ -10751,9 +10501,9 @@ They are packed because, also like the listener, they must never be modified sep
 </div>
 </div>
 <div class="sect4">
-<h5 id="_panner_strategy">panner_strategy</h5>
+<h5 id="_panning_strategy_2">panning_strategy</h5>
 <div class="paragraph">
-<p>C Enumeration Value: Lav_SOURCE_PANNER_STRATEGY</p>
+<p>C Enumeration Value: Lav_SOURCE_PANNING_STRATEGY</p>
 </div>
 <div class="paragraph">
 <p>Type: int</p>
@@ -10762,13 +10512,14 @@ They are packed because, also like the listener, they must never be modified sep
 <p>Range: A value from the <a href="#enum-Lav_PANNING_STRATEGIES">Lav_PANNING_STRATEGIES</a> enumeration.</p>
 </div>
 <div class="paragraph">
-<p>Default Value: Lav_PANNING_STRATEGY_STEREO</p>
+<p>Default Value: Lav_PANNING_STRATEGY_DELEGATE</p>
 </div>
 <div class="paragraph">
 <p>Rate: k</p>
 </div>
 <div class="paragraph">
-<p>The strategy for the internal multipanner.</p>
+<p>The strategy for the internal multipanner.
+By default, this delegates to the environment.</p>
 </div>
 </div>
 <div class="sect4">
@@ -10980,7 +10731,7 @@ Libaudioverse does not check for this case.</p>
 This is the least expensive of the Libaudioverse equalizers, and is sufficient for many simpler applications.</p>
 </div>
 <div class="sect3">
-<h4 id="_properties_29">Properties</h4>
+<h4 id="_properties_28">Properties</h4>
 <div class="sect4">
 <h5 id="_highband_dbgain">highband_dbgain</h5>
 <div class="paragraph">
@@ -11099,37 +10850,6 @@ This is the least expensive of the Libaudioverse equalizers, and is sufficient f
 <div class="paragraph">
 <p>The following section lists some of Libaudioverse&#8217;s enumerations.
 This section concerns itself only with those enumerations that are important by themselves.</p>
-</div>
-<div class="sect2">
-<h3 id="enum-Lav_FDN_FILTER_TYPES">Lav_FDN_FILTER_TYPES</h3>
-<div class="paragraph">
-<p>Possible filter types for a feedback delay network&#8217;s feedback path.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Members</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_FDN_FILTER_TYPE_DISABLED</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Don&#8217;t insert filters on the feedback path.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_FDN_FILTER_TYPE_LOWPASS</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Insert lowpass filters on the FDN&#8217;s feedback path.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_FDN_FILTER_TYPE_HIGHPASS</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Insert highpass filters on the FDN&#8217;s feedback path.</p></td>
-</tr>
-</tbody>
-</table>
 </div>
 <div class="sect2">
 <h3 id="enum-Lav_CHANNEL_INTERPRETATIONS">Lav_CHANNEL_INTERPRETATIONS</h3>
@@ -11254,6 +10974,73 @@ This section concerns itself only with those enumerations that are important by 
 </table>
 </div>
 <div class="sect2">
+<h3 id="enum-Lav_NODE_STATES">Lav_NODE_STATES</h3>
+<div class="paragraph">
+<p>used to indicate the state of a node.
+This is the value of the node&#8217;s state property and determins how the node is processed.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Members</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NODESTATE_PAUSED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This node is paused.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NODESTATE_PLAYING</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This node advances if other nodes need audio from it.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NODESTATE_ALWAYS_PLAYING</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This node advances always.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="enum-Lav_LOGGING_LEVELS">Lav_LOGGING_LEVELS</h3>
+<div class="paragraph">
+<p>Possible levels for logging.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Members</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_CRITICAL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Logs critical messages such as failures to initialize and error conditions.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_INFO</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Logs informative messages.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_DEBUG</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Logs everything possible.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_OFF</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No log messages will be generated.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
 <h3 id="enum-Lav_PANNING_STRATEGIES">Lav_PANNING_STRATEGIES</h3>
 <div class="paragraph">
 <p>Indicates a strategy to use for panning.
@@ -11269,6 +11056,10 @@ This is mostly for the <a href="#node-Lav_OBJTYPE_MULTIPANNER_NODE">multipanner 
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_DELEGATE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Delegate the decision. Used for 3D sources.  If there is nowhere to delegate to, assumes <code>Lav_PANNING_STRATEGY_STEREO</code>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_HRTF</p></td>
@@ -11289,6 +11080,37 @@ This is mostly for the <a href="#node-Lav_OBJTYPE_MULTIPANNER_NODE">multipanner 
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_SURROUND71</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Indicates 7.1 surround sound panning.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="enum-Lav_NOISE_TYPES">Lav_NOISE_TYPES</h3>
+<div class="paragraph">
+<p>Specifies types of noise.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Members</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NOISE_TYPE_WHITE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">gaussian white noise.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NOISE_TYPE_PINK</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Pink noise.  Pink noise falls off at 3 DB per octave.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NOISE_TYPE_BROWN</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Brown noise.  Brown noise decreases at 6 DB per octave.</p></td>
 </tr>
 </tbody>
 </table>
@@ -11349,9 +11171,9 @@ This is mostly for the <a href="#node-Lav_OBJTYPE_MULTIPANNER_NODE">multipanner 
 </table>
 </div>
 <div class="sect2">
-<h3 id="enum-Lav_LOGGING_LEVELS">Lav_LOGGING_LEVELS</h3>
+<h3 id="enum-Lav_FDN_FILTER_TYPES">Lav_FDN_FILTER_TYPES</h3>
 <div class="paragraph">
-<p>Possible levels for logging.</p>
+<p>Possible filter types for a feedback delay network&#8217;s feedback path.</p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Members</caption>
@@ -11365,52 +11187,16 @@ This is mostly for the <a href="#node-Lav_OBJTYPE_MULTIPANNER_NODE">multipanner 
 <td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_CRITICAL</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Logs critical messages such as failures to initialize and error conditions.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_FDN_FILTER_TYPE_DISABLED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Don&#8217;t insert filters on the feedback path.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_INFO</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Logs informative messages.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_FDN_FILTER_TYPE_LOWPASS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Insert lowpass filters on the FDN&#8217;s feedback path.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_DEBUG</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Logs everything possible.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_OFF</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">No log messages will be generated.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="enum-Lav_NODE_STATES">Lav_NODE_STATES</h3>
-<div class="paragraph">
-<p>used to indicate the state of a node.
-This is the value of the node&#8217;s state property and determins how the node is processed.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Members</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NODESTATE_PAUSED</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">This node is paused.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NODESTATE_PLAYING</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">This node advances if other nodes need audio from it.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NODESTATE_ALWAYS_PLAYING</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">This node advances always.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_FDN_FILTER_TYPE_HIGHPASS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Insert highpass filters on the FDN&#8217;s feedback path.</p></td>
 </tr>
 </tbody>
 </table>
@@ -11471,37 +11257,6 @@ This is the value of the node&#8217;s state property and determins how the node 
 </table>
 </div>
 <div class="sect2">
-<h3 id="enum-Lav_NOISE_TYPES">Lav_NOISE_TYPES</h3>
-<div class="paragraph">
-<p>Specifies types of noise.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Members</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NOISE_TYPE_WHITE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">gaussian white noise.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NOISE_TYPE_PINK</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Pink noise.  Pink noise falls off at 3 DB per octave.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NOISE_TYPE_BROWN</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Brown noise.  Brown noise decreases at 6 DB per octave.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
 <h3 id="enum-Lav_DISTANCE_MODELS">Lav_DISTANCE_MODELS</h3>
 <div class="paragraph">
 <p>used in the 3D components of this library.
@@ -11517,6 +11272,10 @@ Indicates how sound should become quieter as objects move away from the listener
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_DELEGATE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Delegate to another node, if we can.  Otherwise, fall back to <code>Lav_DISTANCE_MODEL_LINEAR</code>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_LINEAR</p></td>
@@ -11538,7 +11297,7 @@ Indicates how sound should become quieter as objects move away from the listener
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-01-26 17:19:09 Greenwich Standard Time
+Last updated 2016-02-24 00:53:38 Greenwich Standard Time
 </div>
 </div>
 <script type="text/x-mathjax-config">
