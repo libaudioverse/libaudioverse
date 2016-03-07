@@ -230,7 +230,7 @@ class WinmmOutputDeviceFactory: public OutputDeviceFactoryImplementation {
 	WinmmOutputDeviceFactory();
 	virtual std::vector<std::string> getOutputNames() override;
 	virtual std::vector<int> getOutputMaxChannels() override;
-	virtual std::shared_ptr<OutputDevice> createDevice(std::function<void(float*, int)> getBuffer, int index, unsigned int channels, unsigned int sr, unsigned int blockSize, float minLatency, float startLatency, float maxLatency) override;
+	virtual std::unique_ptr<OutputDevice> createDevice(std::function<void(float*, int)> getBuffer, int index, unsigned int channels, unsigned int sr, unsigned int blockSize, float minLatency, float startLatency, float maxLatency) override;
 	virtual unsigned int getOutputCount() override;
 	virtual bool scan();
 	std::string getName() override;
@@ -252,10 +252,9 @@ std::vector<int> WinmmOutputDeviceFactory::getOutputMaxChannels() {
 	return max_channels;
 }
 
-std::shared_ptr<OutputDevice> WinmmOutputDeviceFactory::createDevice(std::function<void(float*, int)> getBuffer, int index, unsigned int channels, unsigned int sr, unsigned int blockSize, float minLatency, float startLatency, float maxLatency) {
-	std::shared_ptr<OutputDeviceImplementation> device = std::make_shared<WinmmOutputDevice>(getBuffer, blockSize, channels, index != -1 ? max_channels[index] : mapper_max_channels, index == -1 ? WAVE_MAPPER : index, sr, index == -1 ? mapper_sr : srs[index],
+std::unique_ptr<OutputDevice> WinmmOutputDeviceFactory::createDevice(std::function<void(float*, int)> getBuffer, int index, unsigned int channels, unsigned int sr, unsigned int blockSize, float minLatency, float startLatency, float maxLatency) {
+	std::unique_ptr<OutputDeviceImplementation> device = std::make_unique<WinmmOutputDevice>(getBuffer, blockSize, channels, index != -1 ? max_channels[index] : mapper_max_channels, index == -1 ? WAVE_MAPPER : index, sr, index == -1 ? mapper_sr : srs[index],
 	minLatency, startLatency, maxLatency);
-	created_devices.push_back(device);
 	return device;
 }
 

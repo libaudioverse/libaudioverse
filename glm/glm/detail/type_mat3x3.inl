@@ -56,6 +56,14 @@ namespace detail
 	}
 }//namespace detail
 
+#	ifdef GLM_STATIC_CONST_MEMBERS
+		template<typename T, precision P>
+		const tmat3x3<T, P> tmat3x3<T, P>::ZERO(static_cast<T>(0));
+
+		template<typename T, precision P>
+		const tmat3x3<T, P> tmat3x3<T, P>::IDENTITY(static_cast<T>(1));
+#	endif
+
 	// -- Constructors --
 
 #	if !GLM_HAS_DEFAULTED_FUNCTIONS || !defined(GLM_FORCE_NO_CTOR_INIT)
@@ -415,7 +423,13 @@ namespace detail
 	// -- Unary arithmetic operators --
 
 	template <typename T, precision P>
-	GLM_FUNC_QUALIFIER tmat3x3<T, P> const operator-(tmat3x3<T, P> const & m)
+	GLM_FUNC_QUALIFIER tmat3x3<T, P> operator+(tmat3x3<T, P> const & m)
+	{
+		return m;
+	}
+
+	template <typename T, precision P>
+	GLM_FUNC_QUALIFIER tmat3x3<T, P> operator-(tmat3x3<T, P> const & m)
 	{
 		return tmat3x3<T, P>(
 			-m[0], 

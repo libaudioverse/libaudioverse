@@ -35,7 +35,7 @@ std::vector<int> WasapiOutputDeviceFactory::getOutputMaxChannels() {
 	return max_channels;
 }
 
-std::shared_ptr<OutputDevice> WasapiOutputDeviceFactory::createDevice(std::function<void(float*, int)> callback, int index, unsigned int channels, unsigned int sr, unsigned int blockSize, float minLatency, float startLatency, float maxLatency) {
+std::unique_ptr<OutputDevice> WasapiOutputDeviceFactory::createDevice(std::function<void(float*, int)> callback, int index, unsigned int channels, unsigned int sr, unsigned int blockSize, float minLatency, float startLatency, float maxLatency) {
 	HRESULT res;
 	IMMDevice* dev = nullptr;
 	if(index == -1) res = APARTMENTCALL(enumerator->GetDefaultAudioEndpoint, eRender, eMultimedia, &dev);
@@ -44,8 +44,7 @@ std::shared_ptr<OutputDevice> WasapiOutputDeviceFactory::createDevice(std::funct
 		logCritical("Could not create IMMDevice instance.  COM error %i", res);
 		throw AudioIOError("Could not create IMMDeviceInstance");
 	}
-	auto ret = std::make_shared<WasapiOutputDevice>(callback, wrapComPointer(dev), blockSize, channels, sr, minLatency, startLatency, maxLatency);
-	created_devices.push_back(ret);
+	auto ret = std::make_unique<WasapiOutputDevice>(callback, wrapComPointer(dev), blockSize, channels, sr, minLatency, startLatency, maxLatency);
 	return ret;
 }
 

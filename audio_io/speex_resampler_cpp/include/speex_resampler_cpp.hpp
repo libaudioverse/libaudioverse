@@ -7,14 +7,14 @@ namespace speex_resampler_cpp {
 /**Thrown if we fail to allocate memory.*/
 class MemoryAllocationError: public std::exception {
 	public:
-	virtual const char* what() const override;
+	virtual const char* what() const noexcept override;
 };
 
 /**Thrown if Speex itself has an error.*/
 class SpeexError: public std::exception {
 	public:
 	SpeexError(int c);
-	virtual const char* what() const override;
+	virtual const char* what() const noexcept override;
 	int code;
 };
 

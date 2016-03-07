@@ -116,7 +116,7 @@ void Simulation::setOutputDevice(int index, int channels, float minLatency, floa
 		output_device->stop();
 	}
 	std::lock_guard<std::recursive_mutex> g(mutex);
-	auto factory = getOutputDeviceFactory();
+	auto &factory = getOutputDeviceFactory();
 	if(factory == nullptr) ERROR(Lav_ERROR_CANNOT_INIT_AUDIO, "Failed to get output device factory.");
 	auto sptr = std::static_pointer_cast<Simulation>(shared_from_this());
 	std::weak_ptr<Simulation> wptr(sptr);
@@ -129,15 +129,13 @@ void Simulation::setOutputDevice(int index, int channels, float minLatency, floa
 			strong->getBlock(buffer, channels);
 		}
 	};
-	std::shared_ptr<audio_io::OutputDevice> dev;
 	try {
-		dev =factory->createDevice(cb, index, channels, getSr(), getBlockSize(), minLatency, startLatency, maxLatency);
-		if(dev == nullptr) ERROR(Lav_ERROR_CANNOT_INIT_AUDIO, "Device could not be created.");
+		output_device =factory->createDevice(cb, index, channels, getSr(), getBlockSize(), minLatency, startLatency, maxLatency);
+		if(output_device == nullptr) ERROR(Lav_ERROR_CANNOT_INIT_AUDIO, "Device could not be created.");
 	}
 	catch(std::exception &e) {
 		ERROR(Lav_ERROR_CANNOT_INIT_AUDIO, e.what());
 	}
-	output_device=dev;
 }
 
 void Simulation::clearOutputDevice() {

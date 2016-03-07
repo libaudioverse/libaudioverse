@@ -11,9 +11,10 @@ namespace implementation {
 class SampleFormatConverter;
 
 class OutputDeviceImplementation: public OutputDevice {
+	public:
+	virtual ~OutputDeviceImplementation();
 	protected:
 	OutputDeviceImplementation() = default;
-	virtual ~OutputDeviceImplementation();
 	//Callback parameters: output buffer, number of channels to write.
 	virtual void init(std::function<void(float*, int)> callback, int inputFrames, int inputChannels, int inputSr, int outputChannels, int outputSr);
 	int input_frames, input_channels, input_sr, output_channels, output_sr;
@@ -21,7 +22,7 @@ class OutputDeviceImplementation: public OutputDevice {
 	int output_frames;
 	std::shared_ptr<SampleFormatConverter> sample_format_converter;
 	std::function<void(float*, int)> callback;
-	bool stopped = false; //Used by subclasses.
+	bool stopped = false; //Used by subclasses to kill the worker thread.
 	friend class OutputDeviceFactoryImplementation;
 };
 
@@ -39,6 +40,7 @@ class OutputDeviceFactoryImplementation: public OutputDeviceFactory {
 typedef OutputDeviceFactory* (*OutputDeviceFactoryCreationFunction)();
 OutputDeviceFactory* createWinmmOutputDeviceFactory();
 OutputDeviceFactory* createWasapiOutputDeviceFactory();
-	
+OutputDeviceFactory* createAlsaOutputDeviceFactory();
+
 }
 }

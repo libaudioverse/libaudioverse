@@ -60,6 +60,6 @@ int main(int argc, char** args) {
 		audio_io::shutdown();
 	}
 	catch(std::exception &e) {
-		printf("Exception: %s", e.what());
+		printf("Exception: %s\n", e.what());
 	}
 }

@@ -8,6 +8,6 @@ namespace libaudioverse_implementation {
 
 void initializeDeviceFactory();
 void shutdownDeviceFactory();
-std::shared_ptr<audio_io::OutputDeviceFactory> getOutputDeviceFactory();
+std::unique_ptr<audio_io::OutputDeviceFactory> &getOutputDeviceFactory();
 
 }

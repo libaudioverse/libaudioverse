@@ -120,7 +120,7 @@ class Simulation: public Job {
 	void backgroundTaskThreadFunction();
 
 	//our output, if any.
-	std::shared_ptr<audio_io::OutputDevice> output_device = nullptr;
+	std::unique_ptr<audio_io::OutputDevice> output_device = nullptr;
 
 	int tick_count = 0; //counts ticks.  This is part of node processing.
 	int maintenance_start = 0; //also part of node processing. Used to stagger calls to doMaintenance on nodes so that we're not randomly spiking the tick length.

@@ -12,7 +12,7 @@ int main() {
 	std::atomic<int> failed_persistency{0};
 	std::set<long long> ids;
 	std::mutex ids_mutex;
-	int count = 10000;
+	int count = 100;
 	std::vector<std::thread> threads;
 	for(int i = 0; i < count; i++) {
 		threads.push_back(powercores::safeStartThread([&] () {

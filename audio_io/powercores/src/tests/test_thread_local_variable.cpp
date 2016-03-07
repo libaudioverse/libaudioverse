@@ -13,7 +13,7 @@ int main() {
 	std::atomic<int> accum{0};
 	std::atomic<int> failed_persistent{0}; //Goes to one or more if a ThreadLocalVariable fails to hold contents.
 	std::vector<std::thread> threads;
-	int count = 10000;
+	int count = 100;
 	int multiplier = 100;
 	for(int i = 0; i < count; i++) {
 		threads.push_back(powercores::safeStartThread([&] () {

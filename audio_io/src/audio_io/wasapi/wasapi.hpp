@@ -48,7 +48,7 @@ class WasapiOutputDeviceFactory: public OutputDeviceFactoryImplementation {
 	~WasapiOutputDeviceFactory();
 	std::vector<std::string> getOutputNames() override;
 	std::vector<int> getOutputMaxChannels() override;
-	std::shared_ptr<OutputDevice> createDevice(std::function<void(float*, int)> callback, int index, unsigned int channels, unsigned int sr, unsigned int blockSize, float minLatency, float startLatency, float maxLatency) override;
+	std::unique_ptr<OutputDevice> createDevice(std::function<void(float*, int)> callback, int index, unsigned int channels, unsigned int sr, unsigned int blockSize, float minLatency, float startLatency, float maxLatency) override;
 	unsigned int getOutputCount() override;
 	std::string getName();
 	private:

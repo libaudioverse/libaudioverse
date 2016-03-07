@@ -1,0 +1,62 @@
+include(CheckIncludeFileCXX)
+include(CheckIncludeFile)
+include(FindALSA)
+
+
+#Look for the backends.
+if(WIN32)
+check_include_file("windows.h" HAVE_WINMM)
+check_include_file("mmdeviceapi.h" HAVE_WASAPI)
+else()
+set(HAVE_WINMM NO)
+set(HAVE_WASAPI NO)
+endif()
+
+if(ALSA_FOUND)
+set(HAVE_ALSA YES)
+endif()
+
+option(AUDIO_IO_USE_WINMM "Whether or not to use Winmm" ${HAVE_WINMM}) 
+option(AUDIO_IO_USE_WASAPI "Whethern or not to use the Windows Audio Session API" ${HAVE_WASAPI})
+option(AUDIO_IO_USE_ALSA "Whether or not to use the ALSA backend" ${HAVE_ALSA})
+
+set(AUDIO_IO_GOT_BACKEND NO)
+if(${AUDIO_IO_USE_WINMM})
+set(AUDIO_IO_NEEDED_LIBRARIES ${AUDIO_IO_NEEDED_LIBRARIES} winmm)
+add_definitions(-DAUDIO_IO_USE_WINMM)
+set(AUDIO_IO_NEEDED_FILES
+${AUDIO_IO_NEEDED_FILES}
+src/audio_io/winmm/winmm_output.cpp
+)
+set(AUDIO_IO_GOT_BACKEND YES)
+set(AUDIO_IO_USING_BACKENDS ${AUDIO_IO_USING_BACKENDS} winmm)
+endif()
+
+if(${AUDIO_IO_USE_WASAPI})
+add_definitions(-DAUDIO_IO_USE_WASAPI)
+set(AUDIO_IO_NEEDED_FILES
+${AUDIO_IO_NEEDED_FILES}
+src/audio_io/wasapi/output_device.cpp
+src/audio_io/wasapi/output_factory.cpp
+)
+set(AUDIO_IO_GOT_BACKEND YES)
+set(AUDIO_IO_USING_BACKENDS ${AUDIO_IO_USING_BACKENDS} wasapi)
+endif()
+
+if(AUDIO_IO_USE_ALSA)
+add_definitions(-DAUDIO_IO_USE_ALSA)
+set(AUDIO_IO_NEEDED_FILES
+src/audio_io/alsa/output_device.cpp
+src/audio_io/alsa/output_factory.cpp
+)
+include_directories(${ALSA_INCLUDE_DIR})
+set(AUDIO_IO_NEEDED_LIBRARIES ${AUDIO_IO_NEEDED_LIBRARIES} ${ALSA_LIBRARY})
+set(AUDIO_IO_GOT_BACKEND YES)
+set(AUDIO_IO_USING_BACKENDS ${AUDIO_IO_USING_BACKENDS} alsa)
+endif()
+
+if(NOT AUDIO_IO_GOT_BACKEND)
+message(FATAL_ERROR "No audio_io backends are enabled on this platform.")
+endif()
+
+message("Building with backends: ${AUDIO_IO_USING_BACKENDS}")

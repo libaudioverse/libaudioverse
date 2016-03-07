@@ -3,14 +3,14 @@
 
 namespace speex_resampler_cpp {
 
-const char* MemoryAllocationError::what() const {
+const char* MemoryAllocationError::what() const noexcept {
 	return "Failure to allocate memory.";
 }
 
 SpeexError::SpeexError(int c): code(c) {
 }
 
-const char* SpeexError::what() const {
+const char* SpeexError::what() const noexcept {
 	return speex_resampler_strerror(code);
 }
 

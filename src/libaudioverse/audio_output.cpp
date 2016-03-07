@@ -19,7 +19,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 
 namespace libaudioverse_implementation {
 
-std::shared_ptr<audio_io::OutputDeviceFactory> *audio_output_factory;
+std::unique_ptr<audio_io::OutputDeviceFactory> *audio_output_factory;
 
 void initializeDeviceFactory() {
 	try {
@@ -27,10 +27,9 @@ void initializeDeviceFactory() {
 		//Hook audio_io's logger to our logger.
 		audio_io::getLogger()->setAsForwarder(getLogger());
 		audio_io::initialize();
-		audio_output_factory = new std::shared_ptr<audio_io::OutputDeviceFactory>();
-		auto possible=audio_io::getOutputDeviceFactory();
-		if(possible != nullptr) {
-			*audio_output_factory = possible;
+		audio_output_factory = new std::unique_ptr<audio_io::OutputDeviceFactory>();
+		*audio_output_factory =audio_io::getOutputDeviceFactory();
+		if(*audio_output_factory != nullptr) {
 			logInfo("Chosen backend is %s", (*audio_output_factory)->getName().c_str());
 			return;
 		}
@@ -49,7 +48,7 @@ void shutdownDeviceFactory() {
 	audio_io::shutdown();
 }
 
-std::shared_ptr<audio_io::OutputDeviceFactory> getOutputDeviceFactory() {
+std::unique_ptr<audio_io::OutputDeviceFactory> &getOutputDeviceFactory() {
 	return *audio_output_factory;
 }
 
