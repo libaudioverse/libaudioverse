@@ -20,6 +20,9 @@ typedef void (*LavTimeCallback)(LavHandle handle, double time, void* userdata);
 #ifdef _MSC_VER
 #define DLL_PUBLIC_ATTR __declspec(dllexport)
 #endif
+#ifdef __GNUC__
+#define DLL_PUBLIC_ATTR __attribute__ ((visibility ("default")))
+#endif
 #ifndef DLL_PUBLIC_ATTR
 #define DLL_PUBLIC_ATTR
 #endif
@@ -47,6 +50,7 @@ enum Lav_ERRORS {
 	Lav_ERROR_INVALID_PROPERTY, //one of the functions taking a slot got passed an invalid number.
 	Lav_ERROR_NULL_POINTER, //you passed a NULL pointer into something that shouldn't have it.
 	Lav_ERROR_MEMORY, //a memory problem which probably isn't the fault of the application.
+	Lav_ERROR_INVALID_POINTER,
 	Lav_ERROR_INVALID_HANDLE,
 	Lav_ERROR_RANGE, //out of range function parameter.
 	Lav_ERROR_CANNOT_INIT_AUDIO, //We couldn't initialize the audio library or open a device

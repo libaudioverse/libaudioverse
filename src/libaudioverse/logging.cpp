@@ -10,16 +10,17 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <atomic>
 #include <mutex>
 #include <string>
+#include <boost/thread/once.hpp>
 
 namespace libaudioverse_implementation {
 
-std::once_flag logging_init_flag;
+boost::once_flag logging_init_flag;
 bool initialized_logging = false;
 std::atomic<LavLoggingCallback> saved_logging_callback;
 std::shared_ptr<logger_singleton::Logger> *logger = nullptr;
 
 void implicitInitLogging() {
-	std::call_once(logging_init_flag, [] () {
+	boost::call_once(logging_init_flag, [] () {
 		logger = new std::shared_ptr<logger_singleton::Logger>();
 		*logger = logger_singleton::createLogger();
 		initialized_logging = true;

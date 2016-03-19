@@ -21,7 +21,13 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/powercores/include")
 add_subdirectory(powercores)
 endif()
 
-SET(AUDIO_IO_NEEDED_LIBRARIES ${AUDIO_IO_NEEDED_LIBRARIES} speex_resampler_cpp powercores logger_singleton)
+if(NOT WIN32)
+find_package(Boost REQUIRED thread)
+else()
+message("audio_io: Assuming boost is present because Win32.")
+endif()
+
+SET(AUDIO_IO_NEEDED_LIBRARIES ${AUDIO_IO_NEEDED_LIBRARIES} ${Boost_LIBRARIES} speex_resampler_cpp powercores logger_singleton)
 
 SET(AUDIO_IO_NEEDED_FILES
 ${AUDIO_IO_NEEDED_FILES}

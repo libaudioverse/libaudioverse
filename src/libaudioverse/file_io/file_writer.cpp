@@ -13,6 +13,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/utf8.hpp>
 #include <string>
+#include <string.h>
 
 namespace libaudioverse_implementation {
 

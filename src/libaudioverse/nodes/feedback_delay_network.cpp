@@ -36,30 +36,28 @@ Node(Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK_NODE, simulation, channels, channels) {
 	//Allocate and configure the filters.
 	filters = new OnePoleFilter*[channels];
 	for(int i = 0; i < channels; i++) filters[i] = new OnePoleFilter(simulation->getSr());
-	
-	
-	std::vector<float> default(channels, 0.0f);
+	std::vector<float> defaultHolder(channels, 0.0f);
 	//Set up the properties.
 	getProperty(Lav_FDN_DELAYS).setArrayLengthRange(channels, channels);
 	getProperty(Lav_FDN_DELAYS).setFloatRange(0.0, maxDelay);
-	getProperty(Lav_FDN_DELAYS).replaceFloatArray(channels, &default[0]);	
-	getProperty(Lav_FDN_DELAYS).setFloatArrayDefault(default);
+	getProperty(Lav_FDN_DELAYS).replaceFloatArray(channels, &defaultHolder[0]);	
+	getProperty(Lav_FDN_DELAYS).setFloatArrayDefault(defaultHolder);
 	
 	getProperty(Lav_FDN_OUTPUT_GAINS).setArrayLengthRange(channels, channels);
 	getProperty(Lav_FDN_OUTPUT_GAINS).setFloatRange(-std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity());
-	default.clear();
-	default.resize(channels, 1.0f);
-	getProperty(Lav_FDN_OUTPUT_GAINS).replaceFloatArray(channels, &default[0]);
-	getProperty(Lav_FDN_OUTPUT_GAINS).setFloatArrayDefault(default);
+	defaultHolder.clear();
+	defaultHolder.resize(channels, 1.0f);
+	getProperty(Lav_FDN_OUTPUT_GAINS).replaceFloatArray(channels, &defaultHolder[0]);
+	getProperty(Lav_FDN_OUTPUT_GAINS).setFloatArrayDefault(defaultHolder);
 	//Identity matrix.
-	default.clear();
-	default.resize(channels*channels, 0.0f);
+	defaultHolder.clear();
+	defaultHolder.resize(channels*channels, 0.0f);
 	//Build an identity matrix.
-	for(int i = 0; i < channels; i++) default[i*channels+i] = 0.0f;
+	for(int i = 0; i < channels; i++) defaultHolder[i*channels+i] = 0.0f;
 	getProperty(Lav_FDN_MATRIX).setArrayLengthRange(channels*channels, channels*channels);
 	getProperty(Lav_FDN_MATRIX).setFloatRange(-std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity());
-	getProperty(Lav_FDN_MATRIX).replaceFloatArray(channels*channels, &default[0]);
-	getProperty(Lav_FDN_MATRIX).setFloatArrayDefault(default);
+	getProperty(Lav_FDN_MATRIX).replaceFloatArray(channels*channels, &defaultHolder[0]);
+	getProperty(Lav_FDN_MATRIX).setFloatArrayDefault(defaultHolder);
 	
 	//The filters.
 	getProperty(Lav_FDN_FILTER_TYPES).setArrayLengthRange(channels, channels);

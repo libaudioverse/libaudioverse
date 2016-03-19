@@ -1,11 +1,12 @@
 #This always runs which is what we need.
 add_custom_target(metadata
-COMMAND ${PYTHON_COMMAND} "${CMAKE_SOURCE_DIR}/metadata/metadata.py" "${CMAKE_CURRENT_BINARY_DIR}/metadata.cpp")
+COMMAND ${PYTHON_COMMAND} ${PYTHON_ARGS} "${CMAKE_SOURCE_DIR}/metadata/metadata.py" "${CMAKE_CURRENT_BINARY_DIR}/metadata.cpp")
 
 #These two drive the building of the default hrtf.
 add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/default_hrtf.hrtf"
 COMMAND ${PYTHON_COMMAND}
 ARGS
+"${PYTHON_ARGS}"
 "${CMAKE_SOURCE_DIR}/scripts/diffuse_mit_hrtf.py"
 "${CMAKE_SOURCE_DIR}/diffuse mit kemar dataset"
 "${CMAKE_CURRENT_BINARY_DIR}/default_hrtf.hrtf"
@@ -16,8 +17,9 @@ DEPENDS
 
 add_custom_command(
 OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/data/default_hrtf.cpp"
-COMMAND ${PYTHON_COMMAND}
+COMMAND "${PYTHON_COMMAND}"
 ARGS
+"${PYTHON_ARGS}"
 "${CMAKE_SOURCE_DIR}/scripts/convert_to_cpp_file.py" 
 "libaudioverse_implementation"
 "default_hrtf"
@@ -145,6 +147,7 @@ audio_thread.cpp
 #The hrtf is generated above.
 data/default_hrtf.cpp
 )
+
 TARGET_LINK_LIBRARIES(libaudioverse ${libaudioverse_required_libraries})
 
 #Depend on the generation of metadata.
@@ -184,37 +187,12 @@ endif()
 
 #Everything below here is installation related.
 
-set(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}/libaudioverse")
 
 #Install libaudioverse.
-install(TARGETS libaudioverse
-DESTINATION .)
+install(TARGETS libaudioverse DESTINATION lib)
 
-#Nightly readme.
-install(FILES "${CMAKE_SOURCE_DIR}/nightly_instructions.txt"
-DESTINATION .
-RENAME readme.txt)
-
-install(FILES "${CMAKE_SOURCE_DIR}/license"
-DESTINATION .
-RENAME license.txt)
-
-#Grab the headers and put them in the include directory.
 install(FILES
 "${CMAKE_SOURCE_DIR}/include/libaudioverse/libaudioverse.h"
 "${CMAKE_SOURCE_DIR}/include/libaudioverse/libaudioverse_properties.h"
 "${CMAKE_SOURCE_DIR}/include/libaudioverse/libaudioverse3d.h"
-DESTINATION "include/libaudioverse")
-
-#Copy the manual.
-install(FILES "${CMAKE_BINARY_DIR}/documentation/libaudioverse_manual.html"
-DESTINATION .)
-
-#Grab a copy of Libsndfile.
-#Note: this only applies to Windows, and only until we figure out how to statically link Libsndfile.
-install(FILES "${LIBSNDFILE_BINARY_DIR}/libsndfile-1.dll"
-DESTINATION .)
-
-#Python installation.  Grab the wheel.
-install(DIRECTORY "${CMAKE_BINARY_DIR}/bindings/python/dist/"
-DESTINATION .)
+DESTINATION include/libaudioverse)

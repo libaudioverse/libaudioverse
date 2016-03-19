@@ -48,8 +48,8 @@ void initializeMetadata() {
 	{%elif prop['type'] == 'float' or prop['type'] == 'double'-%}
 	tempProp = create<%prop['type']|capitalize%>Property("<%prop['name']%>", <%prop['default']%>, <%prop['range'][0]%>, <%prop['range'][1]%>);
 	{%elif prop['type'] == 'float3' or prop['type'] == 'float6'-%}
-	float default[] = {<%prop['default']|join(', ')%>};
-	tempProp = create<%prop['type']|capitalize%>Property("<%prop['name']%>", default);
+	float defaultValue[] = {<%prop['default']|join(', ')%>};
+	tempProp = create<%prop['type']|capitalize%>Property("<%prop['name']%>", defaultValue);
 	{%elif prop['type'] == 'int_array' or prop['type'] == 'float_array'%}
 	unsigned int minLength = <%prop['min_length']%>;
 	unsigned int maxLength = <%prop['max_length']%>;

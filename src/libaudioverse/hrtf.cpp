@@ -93,8 +93,10 @@ void HrtfData::loadFromFile(std::string path, unsigned int forSr) {
 		map.close();
 	}
 	catch(std::ios_base::failure &e) {
-		if(e.code() == std::errc::no_such_file_or_directory) ERROR(Lav_ERROR_FILE_NOT_FOUND, "Could not open HRTF file.");
-		else throw;
+		//We can't check to see why because at least Debian's GCC
+		//doesn't derive std::ios_base::failure from std::system_error.
+		//Consider using boost to find out why.
+		ERROR(Lav_ERROR_FILE, "Could not open HRTF file.");
 	}
 }
 

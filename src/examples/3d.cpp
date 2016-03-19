@@ -14,14 +14,14 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 if((x) != Lav_ERROR_NONE) {\
 	printf(#x " errored: %i", (x));\
 	Lav_shutdown();\
-	return;\
+	return 1;\
 }\
 } while(0)\
 
-void main(int argc, char** args) {
+int main(int argc, char** args) {
 	if(argc != 3) {
 		printf("Usage:%s <soundfile> <hrtf>", args[0]);
-		return;
+		return 1;
 	}
 	char *soundFile = args[1], *hrtfFile = args[2];
 	LavHandle simulation = 0;
@@ -61,4 +61,5 @@ void main(int argc, char** args) {
 		}
 	}
 	Lav_shutdown();
+	return 0;
 }

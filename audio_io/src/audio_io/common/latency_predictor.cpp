@@ -10,6 +10,7 @@ LatencyPredictor::LatencyPredictor(int historyLength, double minAllowedLatency, 
 history_length(historyLength), min_allowed_latency(minAllowedLatency), max_allowed_latency(maxAllowedLatency) {
 	history = new double[historyLength];
 	std::fill(history, history+historyLength, startLatency);
+	last_predicted_latency = startLatency;
 }
 
 LatencyPredictor::~LatencyPredictor() {
@@ -25,16 +26,18 @@ void LatencyPredictor::endPass() {
 	double timeInSeconds = delta.count()*decltype(delta)::period::num/(double)decltype(delta)::period::den;
 	history[write_pointer] = timeInSeconds;
 	write_pointer = (write_pointer + 1)%history_length;
+	doPrediction();
+}
+
+void LatencyPredictor::hadUnderrun() {
+	double proposed = latency_increment_for_underrun+last_predicted_latency;
+	if(proposed > max_allowed_latency) proposed = max_allowed_latency;
+	min_allowed_latency = proposed;
+	doPrediction();
 }
 
 double LatencyPredictor::predictLatency() {
-	//Simple average.
-	double sum = 0;
-	for(int i = 0; i < history_length; i++) sum += history[i];
-	double predicted = sum/history_length;
-	if(predicted < min_allowed_latency) predicted = min_allowed_latency;
-	if(predicted > max_allowed_latency) predicted = max_allowed_latency;
-	return predicted;
+	return last_predicted_latency;
 }
 
 int LatencyPredictor::predictLatencyInBlocks(int blockFrames, int sr) {
@@ -48,6 +51,17 @@ int LatencyPredictor::predictLatencyInBlocks(int blockFrames, int sr) {
 	//This consideration is more important than min and max latency, etc.
 	if(blocks < 2) blocks = 2;
 	return blocks;
+}
+
+void LatencyPredictor::doPrediction() {
+	/*Rationale:
+	The maximum is close to the average callback time if there is not a spike.
+	The maximum is not close to the average time if the callback likes to spike.
+	If the callback has not spiked for some time, then we come down because it has metaphorically proved itself.*/
+	double predicted = *std::max_element(history, history+history_length);
+	if(predicted < min_allowed_latency) predicted = min_allowed_latency;
+	if(predicted > max_allowed_latency) predicted = max_allowed_latency;
+	last_predicted_latency = predicted;
 }
 
 }

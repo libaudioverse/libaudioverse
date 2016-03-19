@@ -6,6 +6,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <algorithm>
 #include <functional>
 #include <math.h>
+#include <string.h>
 
 namespace libaudioverse_implementation {
 

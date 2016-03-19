@@ -23,8 +23,8 @@ std::map<void*, std::shared_ptr<void>> *external_ptrs = nullptr;
 std::recursive_mutex *memory_lock = nullptr;
 //The handles we keep alive because the external world has a copy.
 std::map<int, std::shared_ptr<ExternalObject>> *external_handles = nullptr;
-//Sometimes, the external world has handed in all its references.  But we need to be able to look it up anyway, in case we havne't deleted it.
-//This dict holds a weak reference to every handle passed to the extrernal world until the end of the program.
+//Sometimes, the external world has handed in all its references.  But we need to be able to look it up anyway, in case we haven't deleted it.
+//This dict holds a weak reference to every handle passed to the external world until the end of the program.
 std::map<int, std::weak_ptr<ExternalObject>> *weak_external_handles = nullptr;
 std::atomic<int> *max_handle = nullptr;
 LavHandleDestroyedCallback handle_destroyed_callback = nullptr;
@@ -45,10 +45,17 @@ void shutdownMemoryModule() {
 	//We're about to shut down, but sometimes there are cycles.
 	//The most notable case of this is nodes connected to the simulation: the simulation holds them and they hold the simulation.
 	//In order to help prevent bugs, we therefore isolate all nodes that we can reach.
+	//In addition, simulations hold devices which may be in the middle of processing.
+	//In this case, the simulation needs to be isolated here--if we don't, we can abandon its pointer while it's still running.
+	//This additionally results in a running thread that we never join.
 	for(auto &i: *weak_external_handles) {
 		auto s = i.second.lock();
 		auto n = std::dynamic_pointer_cast<Node>(s);
+		auto sim = std::dynamic_pointer_cast<Simulation>(s);
 		if(n) n->isolate();
+		else if(sim) {
+			sim->clearOutputDevice();
+		}
 	}
 	delete external_handles;
 	external_handles = nullptr;
@@ -100,7 +107,7 @@ bool isAligned(const void* ptr) {
 }
 
 std::function<void(ExternalObject*)> ObjectDeleter(std::shared_ptr<Simulation> simulation) {
-	return [=](ExternalObject* obj) {
+	return [=](ExternalObject* obj) mutable {
 		//We have to make sure to call the callback outside the lock.
 		//To that end, we gather information as follows, and then queue it.
 		bool isExternal;
@@ -112,6 +119,10 @@ std::function<void(ExternalObject*)> ObjectDeleter(std::shared_ptr<Simulation> s
 		delete obj;
 		//Because of the recursion, shell out to the simulation's task thread.
 		if(isExternal && handle_destroyed_callback) simulation->enqueueTask([handle] () {handle_destroyed_callback(handle);});
+		//The simulation holds weak_ptrs to nodes.
+		//weak_ptrs hold references to this deleter.
+		//Therefore there is a cycle.
+		simulation = nullptr;
 	};
 }
 

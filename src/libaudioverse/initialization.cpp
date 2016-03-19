@@ -18,8 +18,8 @@ typedef void (*initfunc_t)();
 
 
 struct InitInfo {
-	char* name;
-	initfunc_t func;
+	const char* name;
+	const initfunc_t func;
 };
 
 //These run in the order specified in this array with no parallelism.
@@ -38,8 +38,8 @@ InitInfo initializers[] = {
 typedef void (*shutdownfunc_t)();
 
 struct ShutdownInfo{
-	char* name;
-	shutdownfunc_t func;
+	const char* name;
+	const shutdownfunc_t func;
 };
 
 //These run in the order specified in this array with no parallelism.

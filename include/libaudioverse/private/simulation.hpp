@@ -41,7 +41,7 @@ class Simulation: public Job {
 	unsigned int getBlockSize() { return block_size;}
 	LavError start();
 	LavError stop();
-	LavError associateNode(std::shared_ptr<Node> node);
+	void associateNode(std::shared_ptr<Node> node);
 	//Indicates that a node should have willTick called on it.
 	void registerNodeForWillTick(std::shared_ptr<Node> node);
 	//used to register and unregister for always playing status.

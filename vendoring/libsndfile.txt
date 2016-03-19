@@ -12,13 +12,7 @@ message("Copying libsndfile-1.dll")
 file(COPY "${LIBSNDFILE_BINARY_DIR}/libsndfile-1.dll" DESTINATION "${CMAKE_BINARY_DIR}")
 INCLUDE_DIRECTORIES(${LIBSNDFILE_INCLUDE_DIR})
 LINK_DIRECTORIES(${LIBSNDFILE_LIBRARY_DIR})
-endif()
-
-
-
-if(${CMAKE_COMPILER_IS_GNUCC})
-SET(libsndfile_name sndfile)
-endif()
-if(${MSVC})
 set(libsndfile_name libsndfile-1)
+else()
+SET(libsndfile_name sndfile)
 endif()

@@ -12,7 +12,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 if((x) != Lav_ERROR_NONE) {\
 	printf(#x " errored: %i", (x));\
 	Lav_shutdown();\
-	return;\
+	return 1;\
 }\
 } while(0)\
 
@@ -20,12 +20,11 @@ void endOfBufferCallback(LavHandle ignoredObject, void* ignored) {
 	printf("End of file reached.\n");
 }
 
-void main(int argc, char** args) {
+int main(int argc, char** args) {
 	if(argc != 2) {
 		printf("Syntax: %s <path>", args[0]);
-		return;
+		return 1;
 	}
-
 	char* path = args[1];
 	LavHandle node;
 	LavHandle simulation;
@@ -62,6 +61,6 @@ void main(int argc, char** args) {
 			default: printf("Unrecognized command.\n"); break;
 		}
 	}
-	return;
 	Lav_shutdown();
+	return 0;
 }

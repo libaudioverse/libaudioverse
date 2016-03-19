@@ -51,12 +51,10 @@ void Simulation::completeInitialization() {
 }
 
 Simulation::~Simulation() {
-	printf("Deleting simulation...\n");
 	//enqueue a task which will stop the background thread.
 	enqueueTask([]() {throw ThreadTerminationException();});
 	backgroundTaskThread.join();
 	delete planner;
-	printf("Simulation deleted.\n");
 }
 
 //Yes, this uses goto. Yes, goto is evil. We need a single point of exit.
@@ -156,9 +154,8 @@ LavError Simulation::stop() {
 	return Lav_ERROR_NONE;
 }
 
-LavError Simulation::associateNode(std::shared_ptr<Node> node) {
+void Simulation::associateNode(std::shared_ptr<Node> node) {
 	nodes.insert(std::weak_ptr<Node>(node));
-	return Lav_ERROR_NONE;
 }
 
 void Simulation::registerNodeForWillTick(std::shared_ptr<Node> node) {

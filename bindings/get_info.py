@@ -67,7 +67,7 @@ def get_git_revision():
                 break
     except:
         #Too many possibilities when working with subprocess.
-        #The most notablwe is that the user might not have git.
+        #The most notable is that the user might not have git.
         revision = "could not be determined"
     return revision
 
@@ -92,7 +92,7 @@ def make_ast():
         args = '/nologo /EP ' + input_file
     else:
         command  = 'cpp'
-        args = input_file
+        args = '-P ' + input_file
     text =subprocess.check_output(command + ' ' + args, shell = True).decode() #This gives us bytes, but we're ascii anyway.
     #convert from windows to linux newlines, if needed.
     text = text.replace('\r\n', '\n')

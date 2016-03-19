@@ -198,12 +198,12 @@ class Property {
 
 
 //helper methods to quickly make properties.
-Property* createIntProperty(const char* name, int default, int min, int max);
-Property* createFloatProperty(const char* name, float default, float min, float max);
-Property* createDoubleProperty(const char* name, double default, double min, double max);
-Property* createFloat3Property(const char* name, float default[3]);
-Property* createFloat6Property(const char* name, float default[6]);
-Property* createStringProperty(const char* name, const char* default);
+Property* createIntProperty(const char* name, int defaultValue, int min, int max);
+Property* createFloatProperty(const char* name, float defaultValue, float min, float max);
+Property* createDoubleProperty(const char* name, double defaultValue, double min, double max);
+Property* createFloat3Property(const char* name, float defaultValue[3]);
+Property* createFloat6Property(const char* name, float defaultValue[6]);
+Property* createStringProperty(const char* name, const char* defaultValue);
 Property* createIntArrayProperty(const char* name, unsigned int minLength, unsigned int maxLength, unsigned int defaultLength, int minVal, int maxVal, int* defaultData);
 Property* createFloatArrayProperty(const char* name, unsigned int minLength, unsigned int maxLength, unsigned int defaultLength, float min, float max, float* defaultData);
 Property* createBufferProperty(const char* name);

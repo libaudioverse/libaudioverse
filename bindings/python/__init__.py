@@ -7,6 +7,7 @@ import os
 import os.path
 import subprocess
 import sys
+import platform
 
 ctypes_map = {
 'int' : 'ctypes.c_int',
@@ -45,17 +46,20 @@ def ctypes_function_helper(func, typedef_prefix):
     return "ctypes.CFUNCTYPE(" + argstr + ")"
 
 def post_generate(dir):
-    """Make a wheel and build docs."""
-    if os.getenv('APPVEYOR') is not None:
-        command = [r"c:\python35\python.exe"]
-        print("In Appveyor. Using", command)
+    """Make a wheel and build docs if running in Windows."""
+    if platform.system() == 'Windows':
+        if os.getenv('APPVEYOR') is not None:
+            command = [r"c:\python35\python.exe"]
+            print("In Appveyor. Using", command)
+        else:
+            command = ["py", "-3"]
+            print("Not in Appveyor. Using", command)
+        print("Building wheel and documentation for Python bindings.")
+        sys.stdout.flush()
+        subprocess.call(command + ["setup.py", "bdist_wheel", "--universal"], shell=True)
+        subprocess.call(command + ["setup.py", "build_sphinx"], shell = True  )
     else:
-        command = ["py", "-3"]
-        print("Not in Appveyor. Using", command)
-    print("Building wheel and documentation for Python bindings.")
-    sys.stdout.flush()
-    subprocess.call(command + ["setup.py", "bdist_wheel", "--universal"], shell=True)
-    subprocess.call(command + ["setup.py", "build_sphinx"], shell = True  )
+        print("Python bindings: Running on a non-windows platform. Skipping wheel and docs generation.")
 
 def make_python(info):
     #get our directory.

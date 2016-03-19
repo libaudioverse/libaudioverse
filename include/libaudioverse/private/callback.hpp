@@ -44,21 +44,21 @@ template<typename ResultT, typename... ArgsT>
 class CallbackWithResult;
 
 template<typename ResultT, typename... ArgsT>
-class CallbackWithResult<ResultT(ArgsT...)>: CallbackWithoutResult<ResultT(ArgsT...)> {
+class CallbackWithResult<ResultT(ArgsT...)>: protected CallbackWithoutResult<ResultT(ArgsT...)> {
 	public:
-	ResultT operator()(ArgsT... args) {
-		std::lock_guard<std::recursive_mutex> g(mutex);
-		if(callback) return callback(args...);
-		else return default;
+	ResultT operator()(ArgsT... args) override {
+		std::lock_guard<std::recursive_mutex> g(this->mutex);
+		if(this->callback) return this->callback(args...);
+		else return default_result;
 	}
 	
 	void setDefault(ResultT d) {
-		std::lock_guard<std::recursive_mutex> g(mutex);
-		default = d;
+		std::lock_guard<std::recursive_mutex> g(this->mutex);
+		default_result = d;
 	}
 	
 	protected:
-	ResultT default = {};
+	ResultT default_result = {};
 };
 
 //Avoid bringing in boost. This is stupid easy, so.

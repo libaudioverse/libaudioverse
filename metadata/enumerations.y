@@ -9,6 +9,7 @@ enumerations:
       Lav_ERROR_INVALID_PROPERTY: An attempt to access a property which does not exist on the specified node.
       Lav_ERROR_NULL_POINTER: You passed a null pointer into Libaudioverse in a context where null pointers are not allowed.
       Lav_ERROR_MEMORY: Libaudioverse triedd to allocate a pointer, but could not.
+      Lav_ERROR_INVALID_POINTER: Attempt to free a pointer that Libaudioverse doesn't know about.
       Lav_ERROR_INVALID_HANDLE: A value passed in as a handle is not currently a handle which is valid.
       Lav_ERROR_RANGE: A function parameter is not within a valid range.  This could be setting property values outside their range, accessing inputs and outputs that do not exist, or any of a variety of other range error conditions.
       Lav_ERROR_CANNOT_INIT_AUDIO:  The audio subsystem could not be initialized.

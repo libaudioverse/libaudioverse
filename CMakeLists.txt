@@ -11,7 +11,10 @@ project(Libaudioverse)
 
 #Are we using the Windows Python launcher?
 if(${WIN32})
-set(PYTHON_COMMAND py -3)
+set(PYTHON_COMMAND "py")
+set(PYTHON_ARGS "-3")
+elseif(UNIX)
+set(PYTHON_COMMAND python3)
 else()
 set(PYTHON_COMMAND python)
 endif()
@@ -34,6 +37,16 @@ ENDIF()
 option(LIBAUDIOVERSE_MSVC_FORCE_STATIC_RUNTIME "Force VC++ to statically link the runtime" ON)
 include("cmake_include/compiler_flags.txt")
 
+#Libraries CMake has modules for.
+find_package(Threads REQUIRED)
+if(NOT MSVC)
+find_package(Boost REQUIRED
+COMPONENTS locale iostreams filesystem thread)
+else()
+message("You are on MSVC. Skipping boost and assuming it exists.")
+message("NOTE: Boost will auto-link needed libraries.")
+endif()
+
 #Libraries we vendor.
 include("vendoring/libsndfile.txt")
 include("vendoring/glm.txt")
@@ -45,14 +58,13 @@ include("vendoring/powercores.txt")
 include("vendoring/speex_resampler_cpp.txt")
 include("vendoring/audio_io.txt")
 
-
 #All the libraries we need to link with. Platform-specific libraries are set in the include file for compiler flags.
-SET(libaudioverse_required_libraries ${libaudioverse_required_libraries} ${libsndfile_name} kissfft audio_io logger_singleton speex_resampler_cpp powercores)
+SET(libaudioverse_required_libraries ${libaudioverse_required_libraries} ${libsndfile_name} ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES} kissfft audio_io logger_singleton speex_resampler_cpp powercores)
 add_subdirectory(src)
 
 #this makes the bindings generation step always run after a Libaudioverse build.
 ADD_CUSTOM_TARGET(libaudioverse_bindings ALL
-COMMAND ${PYTHON_COMMAND} "\"${CMAKE_CURRENT_SOURCE_DIR}/scripts/build_bindings.py\""
+COMMAND ${PYTHON_COMMAND} ${PYTHON_ARGS} "\"${CMAKE_CURRENT_SOURCE_DIR}/scripts/build_bindings.py\""
 DEPENDS libaudioverse
 )
 

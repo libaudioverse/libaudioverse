@@ -13,11 +13,11 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 if((x) != Lav_ERROR_NONE) {\
 	printf(#x " errored: %i", (x));\
 	Lav_shutdown();\
-	return;\
+	return 1;\
 }\
 } while(0)\
 
-void main() {
+int main() {
 	ERRCHECK(Lav_initialize());
 	unsigned int max_devices = 0;
 	ERRCHECK(Lav_deviceGetCount(&max_devices));
@@ -33,4 +33,5 @@ void main() {
 		printf("channels: %u\n", channels);
 	}
 	Lav_shutdown();
+	return 0;
 }

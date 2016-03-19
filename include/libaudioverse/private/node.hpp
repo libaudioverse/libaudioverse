@@ -6,6 +6,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include "properties.hpp"
 #include "memory.hpp"
 #include "connections.hpp"
+#include "simulation.hpp"
 #include <map>
 #include <memory>
 #include <vector>

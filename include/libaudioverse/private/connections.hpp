@@ -32,7 +32,6 @@ class OutputConnection {
 	Node* node = nullptr;
 	int start, count, block_size;
 	std::set<std::weak_ptr<InputConnection>, std::owner_less<std::weak_ptr<InputConnection>>> connected_to;
-	std::shared_ptr<Simulation> simulation;
 };
 
 /**Unlike output connections, input connections may have a null node, so long as the nodeless functions are used.
@@ -62,7 +61,6 @@ class InputConnection {
 	Node* node;
 	int start, count, block_size;
 	std::map<std::shared_ptr<OutputConnection>, std::shared_ptr<Node>> connected_to;
-	std::shared_ptr<Simulation> simulation;
 };
 
 void makeConnection(std::shared_ptr<OutputConnection> output, std::shared_ptr<InputConnection> input);

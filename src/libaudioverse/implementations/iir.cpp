@@ -14,6 +14,7 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 #include <math.h>
 #include <libaudioverse/private/constants.hpp>
 #include <stdio.h>
+#include <string.h>
 #include <libaudioverse/private/error.hpp>
 
 namespace libaudioverse_implementation {

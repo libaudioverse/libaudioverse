@@ -22,15 +22,15 @@ float storage[BLOCK_SIZE*2] = {0};
 if((x) != Lav_ERROR_NONE) {\
 	printf(#x " errored: %i", (x));\
 	Lav_shutdown();\
-	return;\
+	return 1;\
 }\
 } while(0)\
 
-void main(int argc, char** args) {
+int main(int argc, char** args) {
 	ERRCHECK(Lav_initialize());
 	if(argc < 2) {
 		printf("Usage: %s <hrtf file> [thread_count]", args[0]);
-		return;
+		return 1;
 	}
 	LavHandle simulation;
 	LavHandle world;
@@ -42,7 +42,7 @@ void main(int argc, char** args) {
 		sscanf(args[2], "%i", &threads);
 		if(threads < 1) {
 			printf("Threads must be greater than 0.\n");
-			return;
+			return 1;
 		}
 	}
 	//some setup: create a world and a simulation.
@@ -74,4 +74,5 @@ void main(int argc, char** args) {
 	float blocksPerSec =44100/1024;
 	float estimate = 1.0f/t/blocksPerSec;
 	printf("Estimate: %f sources maximum\n", estimate);
+	return 0;
 }

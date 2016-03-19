@@ -80,13 +80,13 @@ ENTRY("32x32 FDN", 1, Lav_createFeedbackDelayNetworkNode(sim, 1.0f, 32, &h)),
 };
 int to_profile_size=sizeof(to_profile)/sizeof(to_profile[0]);
 
-void main(int argc, char** args) {
+int main(int argc, char** args) {
 	int threads = 1;
 	if(argc == 2) {
 		sscanf(args[1], "%i", &threads);
 		if(threads < 1) {
 			printf("Threads must be greater 1.\n");
-			return;
+			return 1;
 		}
 	}
 	printf("Running profile tests on %i threads\n", threads);

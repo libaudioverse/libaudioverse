@@ -566,52 +566,52 @@ void Property::firePostChangedCallback() {
 //Property creators.
 
 
-Property* createIntProperty(const char* name, int default, int min, int max) {
+Property* createIntProperty(const char* name, int defaultValue, int min, int max) {
 	Property* retval = new Property(Lav_PROPERTYTYPE_INT);
-	retval->setIntDefault(default);
+	retval->setIntDefault(defaultValue);
 	retval->setIntRange(min, max);
 	retval->setName(name);
 	retval->reset();
 	return retval;
 }
 
-Property* createFloatProperty(const char* name, float default, float min, float max) {
+Property* createFloatProperty(const char* name, float defaultValue, float min, float max) {
 	Property* retval = new Property(Lav_PROPERTYTYPE_FLOAT);
 	retval->setName(name);
-	retval->setFloatDefault(default);
+	retval->setFloatDefault(defaultValue);
 	retval->setFloatRange(min, max);
 	retval->reset();
 	return retval;
 }
 
-Property* createDoubleProperty(const char* name, double default, double min, double max) {
+Property* createDoubleProperty(const char* name, double defaultValue, double min, double max) {
 	Property* retval = new Property(Lav_PROPERTYTYPE_DOUBLE);
-	retval->setDoubleDefault(default);
+	retval->setDoubleDefault(defaultValue);
 	retval->setDoubleRange(min, max);
 	retval->setName(name);
 	retval->reset();
 	return retval;
 }
 
-Property* createFloat3Property(const char* name, float default[3]) {
+Property* createFloat3Property(const char* name, float defaultValue[3]) {
 	Property* retval = new Property(Lav_PROPERTYTYPE_FLOAT3);
-	retval->setFloat3Default(default);
+	retval->setFloat3Default(defaultValue);
 	retval->setName(name);
 	retval->reset();
 	return retval;
 }
 
-Property* createFloat6Property(const char* name, float v[6]) {
+Property* createFloat6Property(const char* name, float defaultValue[6]) {
 	Property* retval = new Property(Lav_PROPERTYTYPE_FLOAT6);
-	retval->setFloat6Default(v);
+	retval->setFloat6Default(defaultValue);
 	retval->setName(name);
 	retval->reset();
 	return retval;
 }	
 
-Property* createStringProperty(const char* name, const char* default) {
+Property* createStringProperty(const char* name, const char* defaultValue) {
 	Property* retval = new Property(Lav_PROPERTYTYPE_STRING);
-	retval->setStringDefault(default);
+	retval->setStringDefault(defaultValue);
 	retval->setName(name);
 	retval->reset();
 	return retval;

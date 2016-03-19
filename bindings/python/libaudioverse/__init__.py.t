@@ -13,12 +13,11 @@ import functools
 import threading
 import logging
 import six.moves
-
+import platform
+import glob
+import os.path
 
 def find_datafiles():
-    import glob
-    import platform
-    import os.path
     if platform.system() != 'Windows':
         return []
     dlls = glob.glob(os.path.join(__path__[0], '*.dll'))

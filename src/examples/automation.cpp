@@ -13,11 +13,11 @@ A copy of the GPL, as well as other important copyright and licensing informatio
 if((x) != Lav_ERROR_NONE) {\
 	printf(#x " errored: %i", (x));\
 	Lav_shutdown();\
-	return;\
+	return 1;\
 }\
 } while(0)\
 
-void main() {
+int main() {
 	LavHandle simulation;
 	LavHandle node;
 	ERRCHECK(Lav_initialize());
@@ -33,4 +33,5 @@ void main() {
 	ERRCHECK(Lav_automationLinearRampToValue(node, Lav_OSCILLATOR_FREQUENCY, 8.0, 100.0));
 	std::this_thread::sleep_for(std::chrono::milliseconds(10000));
 	Lav_shutdown();
+	return 0;
 }

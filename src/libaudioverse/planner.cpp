@@ -117,10 +117,16 @@ void Planner::clearStrongPlan() {
 
 void Planner::initializeStrongPlan() {
 	for(auto &bin: weak_plan) {
-		plan[bin.first].assign(bin.second.begin(), bin.second.end());
-		for(auto &j: plan[bin.first]) if(j == nullptr) {
-			invalidatePlan();
-			return;
+		auto &b = plan[bin.first];
+		b.resize(bin.second.size());
+		int i = 0;
+		for(auto &j: bin.second) {
+			b[i] = j.lock();
+			if(b[i] == nullptr) {
+				invalidatePlan();
+				return;
+			}
+			i++;
 		}
 	}
 }
