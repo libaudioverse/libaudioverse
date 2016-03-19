@@ -10852,195 +10852,6 @@ This is the least expensive of the Libaudioverse equalizers, and is sufficient f
 This section concerns itself only with those enumerations that are important by themselves.</p>
 </div>
 <div class="sect2">
-<h3 id="enum-Lav_CHANNEL_INTERPRETATIONS">Lav_CHANNEL_INTERPRETATIONS</h3>
-<div class="paragraph">
-<p>Specifies how to treat inputs to this node for upmixing and downmixing.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Members</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_CHANNEL_INTERPRETATION_DISCRETE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">If channel counts mismatch, don&#8217;t apply mixing matrices. Either drop or fill with zeros as appropriate.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_CHANNEL_INTERPRETATION_SPEAKERS</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Apply mixing matrices if needed.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="enum-Lav_ERRORS">Lav_ERRORS</h3>
-<div class="paragraph">
-<p>All functions in this library return one of the following enum values, indicating their error condition.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Members</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_NONE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">No error occured.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_UNKNOWN</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Something went wrong.  This error indicates that we couldn&#8217;t figure out what.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_TYPE_MISMATCH</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates an attempt to manipulate a property through a function that does not work with that property&#8217;s type.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_INVALID_PROPERTY</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">An attempt to access a property which does not exist on the specified node.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_NULL_POINTER</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">You passed a null pointer into Libaudioverse in a context where null pointers are not allowed.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_MEMORY</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Libaudioverse triedd to allocate a pointer, but could not.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_INVALID_HANDLE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A value passed in as a handle is not currently a handle which is valid.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_RANGE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A function parameter is not within a valid range.  This could be setting property values outside their range, accessing inputs and outputs that do not exist, or any of a variety of other range error conditions.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_CANNOT_INIT_AUDIO</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The audio subsystem could not be initialized.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_FILE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Represents a miscelaneous file error.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_FILE_NOT_FOUND</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Libaudioverse could not find a specified file.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_HRTF_INVALID</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">An attempt to use an invalid HRTF database.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_CANNOT_CROSS_SIMULATIONS</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">An attempt was made to relate two objects from different simulations. This could be assigning to buffer properties, connecting nodes, or any other such condition.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_CAUSES_CYCLE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The requested operation would cause a cycle in the graph of nodes that need processing.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_PROPERTY_IS_READ_ONLY</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Attempt to set a read-only property.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_OVERLAPPING_AUTOMATORS</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">An attempt to schedule an automator within the duration of another.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_CANNOT_CONNECT_TO_PROPERTY</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Attempt to connect a node to a property which cannot be automated.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_BUFFER_IN_USE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates an attempt to modify a buffer while something is reading its data.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_INTERNAL</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">If you see this error, it&#8217;s a bug.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="enum-Lav_NODE_STATES">Lav_NODE_STATES</h3>
-<div class="paragraph">
-<p>used to indicate the state of a node.
-This is the value of the node&#8217;s state property and determins how the node is processed.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Members</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NODESTATE_PAUSED</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">This node is paused.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NODESTATE_PLAYING</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">This node advances if other nodes need audio from it.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NODESTATE_ALWAYS_PLAYING</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">This node advances always.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="enum-Lav_LOGGING_LEVELS">Lav_LOGGING_LEVELS</h3>
-<div class="paragraph">
-<p>Possible levels for logging.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Members</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_CRITICAL</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Logs critical messages such as failures to initialize and error conditions.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_INFO</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Logs informative messages.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_DEBUG</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Logs everything possible.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_OFF</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">No log messages will be generated.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
 <h3 id="enum-Lav_PANNING_STRATEGIES">Lav_PANNING_STRATEGIES</h3>
 <div class="paragraph">
 <p>Indicates a strategy to use for panning.
@@ -11080,37 +10891,6 @@ This is mostly for the <a href="#node-Lav_OBJTYPE_MULTIPANNER_NODE">multipanner 
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_SURROUND71</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Indicates 7.1 surround sound panning.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="enum-Lav_NOISE_TYPES">Lav_NOISE_TYPES</h3>
-<div class="paragraph">
-<p>Specifies types of noise.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Members</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NOISE_TYPE_WHITE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">gaussian white noise.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NOISE_TYPE_PINK</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Pink noise.  Pink noise falls off at 3 DB per octave.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NOISE_TYPE_BROWN</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Brown noise.  Brown noise decreases at 6 DB per octave.</p></td>
 </tr>
 </tbody>
 </table>
@@ -11171,37 +10951,6 @@ This is mostly for the <a href="#node-Lav_OBJTYPE_MULTIPANNER_NODE">multipanner 
 </table>
 </div>
 <div class="sect2">
-<h3 id="enum-Lav_FDN_FILTER_TYPES">Lav_FDN_FILTER_TYPES</h3>
-<div class="paragraph">
-<p>Possible filter types for a feedback delay network&#8217;s feedback path.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Members</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_FDN_FILTER_TYPE_DISABLED</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Don&#8217;t insert filters on the feedback path.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_FDN_FILTER_TYPE_LOWPASS</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Insert lowpass filters on the FDN&#8217;s feedback path.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_FDN_FILTER_TYPE_HIGHPASS</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Insert highpass filters on the FDN&#8217;s feedback path.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
 <h3 id="enum-Lav_PROPERTY_TYPES">Lav_PROPERTY_TYPES</h3>
 <div class="paragraph">
 <p>Indicates the type of a property.</p>
@@ -11257,6 +11006,261 @@ This is mostly for the <a href="#node-Lav_OBJTYPE_MULTIPANNER_NODE">multipanner 
 </table>
 </div>
 <div class="sect2">
+<h3 id="enum-Lav_ERRORS">Lav_ERRORS</h3>
+<div class="paragraph">
+<p>All functions in this library return one of the following enum values, indicating their error condition.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Members</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_NONE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No error occured.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_UNKNOWN</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Something went wrong.  This error indicates that we couldn&#8217;t figure out what.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_TYPE_MISMATCH</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates an attempt to manipulate a property through a function that does not work with that property&#8217;s type.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_INVALID_PROPERTY</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An attempt to access a property which does not exist on the specified node.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_NULL_POINTER</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">You passed a null pointer into Libaudioverse in a context where null pointers are not allowed.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_MEMORY</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Libaudioverse triedd to allocate a pointer, but could not.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_INVALID_POINTER</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Attempt to free a pointer that Libaudioverse doesn&#8217;t know about.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_INVALID_HANDLE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A value passed in as a handle is not currently a handle which is valid.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_RANGE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A function parameter is not within a valid range.  This could be setting property values outside their range, accessing inputs and outputs that do not exist, or any of a variety of other range error conditions.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_CANNOT_INIT_AUDIO</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The audio subsystem could not be initialized.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_FILE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Represents a miscelaneous file error.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_FILE_NOT_FOUND</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Libaudioverse could not find a specified file.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_HRTF_INVALID</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An attempt to use an invalid HRTF database.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_CANNOT_CROSS_SIMULATIONS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An attempt was made to relate two objects from different simulations. This could be assigning to buffer properties, connecting nodes, or any other such condition.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_CAUSES_CYCLE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The requested operation would cause a cycle in the graph of nodes that need processing.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_PROPERTY_IS_READ_ONLY</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Attempt to set a read-only property.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_OVERLAPPING_AUTOMATORS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An attempt to schedule an automator within the duration of another.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_CANNOT_CONNECT_TO_PROPERTY</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Attempt to connect a node to a property which cannot be automated.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_BUFFER_IN_USE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates an attempt to modify a buffer while something is reading its data.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_INTERNAL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If you see this error, it&#8217;s a bug.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="enum-Lav_FDN_FILTER_TYPES">Lav_FDN_FILTER_TYPES</h3>
+<div class="paragraph">
+<p>Possible filter types for a feedback delay network&#8217;s feedback path.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Members</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_FDN_FILTER_TYPE_DISABLED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Don&#8217;t insert filters on the feedback path.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_FDN_FILTER_TYPE_LOWPASS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Insert lowpass filters on the FDN&#8217;s feedback path.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_FDN_FILTER_TYPE_HIGHPASS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Insert highpass filters on the FDN&#8217;s feedback path.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="enum-Lav_NOISE_TYPES">Lav_NOISE_TYPES</h3>
+<div class="paragraph">
+<p>Specifies types of noise.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Members</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NOISE_TYPE_WHITE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">gaussian white noise.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NOISE_TYPE_PINK</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Pink noise.  Pink noise falls off at 3 DB per octave.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NOISE_TYPE_BROWN</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Brown noise.  Brown noise decreases at 6 DB per octave.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="enum-Lav_LOGGING_LEVELS">Lav_LOGGING_LEVELS</h3>
+<div class="paragraph">
+<p>Possible levels for logging.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Members</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_CRITICAL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Logs critical messages such as failures to initialize and error conditions.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_INFO</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Logs informative messages.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_DEBUG</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Logs everything possible.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_OFF</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No log messages will be generated.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="enum-Lav_NODE_STATES">Lav_NODE_STATES</h3>
+<div class="paragraph">
+<p>used to indicate the state of a node.
+This is the value of the node&#8217;s state property and determins how the node is processed.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Members</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NODESTATE_PAUSED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This node is paused.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NODESTATE_PLAYING</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This node advances if other nodes need audio from it.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NODESTATE_ALWAYS_PLAYING</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This node advances always.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="enum-Lav_CHANNEL_INTERPRETATIONS">Lav_CHANNEL_INTERPRETATIONS</h3>
+<div class="paragraph">
+<p>Specifies how to treat inputs to this node for upmixing and downmixing.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Members</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_CHANNEL_INTERPRETATION_DISCRETE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If channel counts mismatch, don&#8217;t apply mixing matrices. Either drop or fill with zeros as appropriate.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_CHANNEL_INTERPRETATION_SPEAKERS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Apply mixing matrices if needed.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
 <h3 id="enum-Lav_DISTANCE_MODELS">Lav_DISTANCE_MODELS</h3>
 <div class="paragraph">
 <p>used in the 3D components of this library.
@@ -11297,7 +11301,7 @@ Indicates how sound should become quieter as objects move away from the listener
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-02-24 00:53:38 Greenwich Standard Time
+Last updated 2016-03-19 22:17:52 Greenwich Standard Time
 </div>
 </div>
 <script type="text/x-mathjax-config">
