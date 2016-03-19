@@ -33,10 +33,8 @@ install:
   #Store our git credentials.
   - ps: Add-Content "$env:USERPROFILE\.git-credentials" "https://$($env:GIT_ACCESS_TOKEN):x-oauth-basic@github.com`n"
   - 'c:\python35\python -m pip install -U setuptools sphinx'
-  #Override pycrypto. 2.6.1 is broken on Python 3 due to an absolute import, so grab the beta:
-  - 'c:\python35\python -m pip install https://ftp.dlitz.net/pub/dlitz/crypto/pycrypto/pycrypto-2.7a1.tar.gz'
   #Bring in jinja2, pycparser, etc. Paramiko needs pycrypto.
-  - 'c:\python35\python -m pip install jinja2 pycparser pyyaml paramiko wheel twine pypandoc sphinx'
+  - 'c:\python35\python -m pip install jinja2 pycparser pyyaml wheel twine pypandoc sphinx'
   #Numpy and scipy, from my server.
   - 'c:\python35\python -m pip install http://camlorn.net/appveyor/numpy-1.10.1+mkl-cp35-none-win32.whl'
   - 'c:\python35\python -m pip install http://camlorn.net/appveyor/scipy-0.16.1-cp35-none-win32.whl'
@@ -95,4 +93,4 @@ after_build:
   - cd ../..
   #And then Pypi, etc.
   - echo Uploading Windows build
-  - py -3 appveyor_upload.py
+  - 'c:\python35\python appveyor_upload.py'
