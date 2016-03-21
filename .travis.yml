@@ -18,8 +18,8 @@ matrix:
 
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -y libasound2-dev libboost-all-dev python3-numpy python3-scipy libsndfile1-dev libffi-dev pandoc python3-pip
-  - sudo python3 -m pip install cffi pyyaml jinja2 pypandoc
+  - sudo apt-get install -y libasound2-dev libboost-all-dev python3-numpy python3-scipy libsndfile1-dev libffi-dev pandoc python3-pip python3-yaml
+  - sudo python3 -m pip install pycparser jinja2 pypandoc
 
 script:
   - mkdir build
