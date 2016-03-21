@@ -1,6 +1,9 @@
 Powercores
 ==========
 
+[![Windows Build status](https://ci.appveyor.com/api/projects/status/i9weg9bwijybpxxt?svg=true)](https://ci.appveyor.com/project/camlorn/powercores)
+[![Linux Build Status](https://travis-ci.org/camlorn/powercores.svg?branch=master)](https://travis-ci.org/camlorn/powercores)
+
 Higher level multithreading for C++.  This library uses C++11 features wherever possible.
 
 Note: This is definitely a work in progress and will develop alongside [Libaudioverse](http://github.com/camlorn/libaudioverse).  unlike Libaudioverse, it is released under the unlicense, so you can use it or modify it for any reason and any purpose.  See the LICENSE file for specifics.

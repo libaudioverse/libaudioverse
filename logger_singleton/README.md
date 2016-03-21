@@ -1,4 +1,8 @@
 # logger_singleton#
+
+[![Windows Build status](https://ci.appveyor.com/api/projects/status/7wd1o8ly7h39cvuw?svg=true)](https://ci.appveyor.com/project/camlorn/logger-singleton)
+[![Linux Build Status](https://travis-ci.org/camlorn/logger_singleton.svg?branch=master)](https://travis-ci.org/camlorn/logger_singleton)
+
 A logging singleton intended primarily for actiing as a bridge to client code in my other projects. Runs anywhere C++11 does.
 I wrote this because I don't need a framework.
 I only need the ability to send log messages to a user-supplied callback.

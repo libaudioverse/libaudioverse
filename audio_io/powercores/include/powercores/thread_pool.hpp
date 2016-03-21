@@ -41,7 +41,8 @@ class ThreadPool {
 	/**Submit a job, possibly with arguments, to all threads.*/
 	template<typename CallableT, typename... ArgsT>
 	void submitJobToAllThreads(CallableT &&callable, ArgsT&&... args) {
-		auto job = [callable, args...]() mutable {
+		//This is a GCC workaround. MSVC and Clang can capture callable as-is.
+		auto job = [callable = callable, args...]() mutable {
 			callable(args...);
 		};
 		for(auto &i: job_queues) i->enqueue(job);
@@ -90,7 +91,7 @@ class ThreadPool {
 	The function receives the result of dereferencing the iterator and any additional arguments, and will run in some unspecified order.  The iterators must be random access.*/
 	template<typename CallableT, typename IterT, typename... ArgsT>
 	void map(CallableT &&callable, IterT begin, IterT end, ArgsT&&... args) {
-		auto executor = [callable, args...](IterT subrangeBegin, IterT subrangeEnd) {
+		auto executor = [callable = callable, args...](IterT subrangeBegin, IterT subrangeEnd) {
 			for(; subrangeBegin != subrangeEnd; subrangeBegin++) callable(*subrangeBegin, args...);
 		};
 		int amount = end-begin;

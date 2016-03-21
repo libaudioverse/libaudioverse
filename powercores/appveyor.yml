@@ -1,0 +1,16 @@
+clone_folder: c:\projects\powercores
+
+platform:
+  - x86
+configuration:
+  - Release
+
+build_script:
+  - '"C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\VsDevCmd.bat"'
+  #Do this heere so we can be absolutely sure it's set right:
+  - 'set include=C:\Libraries\boost_1_59_0;%include%'
+  - 'set lib=c:\libraries\boost_1_59_0\lib32-msvc-14.0;%lib%'
+  - mkdir build
+  - cd build
+  - 'cmake .. -G "NMake Makefiles"'
+  - cmake --build . --config Release

@@ -1,5 +1,8 @@
 #speex_resampler_cpp#
 
+[![Windows Build status](https://ci.appveyor.com/api/projects/status/p578wmxkon1exhym?svg=true)](https://ci.appveyor.com/project/camlorn/speex-resampler-cpp)
+[![Linux Build Status](https://travis-ci.org/camlorn/speex_resampler_cpp.svg?branch=master)](https://travis-ci.org/camlorn/speex_resampler_cpp)
+
 This is a wrapper over the Speex resampler, hard-coded to expect and output floating point audio.
 In addition, a function exists to resample static buffers of audio data.
 

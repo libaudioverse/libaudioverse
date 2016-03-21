@@ -64,8 +64,20 @@ WasapiOutputDevice::WasapiOutputDevice(std::function<void(float*, int)> callback
 		logDebug("Requested mix format is not supported.  Attempt to use IEEE float failed. Error: %i", (int)res);
 		throw AudioIOError("Wasapi: could not initialize with float audio..");
 	}
+	REFERENCE_TIME default_period, min_period;
+	res = APARTMENTCALL(client->GetDevicePeriod, &default_period, &min_period);
+	if(IS_ERROR(res)) {
+		logDebug("Couldn't query device periods.  Error %i", res);
+		throw AudioIOError("WASAPI: couldn't query device period.");
+	}
+	period = default_period;
+	period_in_secs = (default_period*100.0)/1e9; //it's in 100 nanosecond units.
+	logDebug("WASAPI: shared mode period is %f seconds", period_in_secs);
 	//We ask for 100 MS of latency to play with.
-	REFERENCE_TIME latencyNanoseconds = 100000000;
+	if(maxLatency < 0.1) maxLatency = 0.1;
+	//And we maybe bump it up some more if it's less than twice the period in seconds.
+	if(maxLatency < period_in_secs*2) maxLatency = period_in_secs*2;
+	REFERENCE_TIME latencyNanoseconds = 1000000000*maxLatency;
 	res = APARTMENTCALL(client->Initialize, AUDCLNT_SHAREMODE_SHARED, 0, latencyNanoseconds/100, 0, (WAVEFORMATEX*)&(this->format), NULL);
 	if(res != S_OK) {
 		logDebug("Call to IAudioClient::initialize failed. COM error %i.", (int)res);
@@ -78,11 +90,15 @@ WasapiOutputDevice::WasapiOutputDevice(std::function<void(float*, int)> callback
 		logDebug("Attempt to get buffer size failed with error %i", (int)res);
 		throw AudioIOError("Couldn't get Wasapi buffer size.");
 	}
+	wasapi_buffer_size = bufferSize;
 	int outputSr = this->format.Format.nSamplesPerSec;
-	if(minLatency < wasapi_chunk_length/(float)outputSr) minLatency = wasapi_chunk_length/(float)outputSr;
+	//We need to be a bit more than a period or we will fail.
+	//maxLatency is always at least 2 periods.
+	if(minLatency < period_in_secs*1.01) minLatency = period_in_secs*1.01;
 	if(maxLatency > bufferSize/(float)outputSr) maxLatency = bufferSize/(float)outputSr;
 	//Clamp starting latency.
-	startLatency = std::min(std::max(startLatency, minLatency), maxLatency);
+	if(startLatency < minLatency) startLatency=  minLatency;
+	if(startLatency > maxLatency) startLatency = maxLatency;
 	logDebug("minLatency=%f, startLatency=%f, maxLatency=%f, bufferSize=%i, output_sr=%i", minLatency, startLatency, maxLatency, (int)bufferSize, outputSr);
 	latency_predictor = new LatencyPredictor(30, minLatency, startLatency, maxLatency);
 	init(callback, inputFrames, inputChannels, inputSr, this->format.Format.nChannels, outputSr);
@@ -120,7 +136,7 @@ void WasapiOutputDevice::wasapiMixingThreadFunction() {
 	client->GetService(IID_IAudioRenderClient, (void**)&renderClient_raw);
 	auto renderClient = wrapComPointer(renderClient_raw);
 	//We use double buffering, as processing can take a long time.
-	//MSDN warns us not to not do intensive processing between GetBuffer and ReleaseBuffer.
+	//MSDN warns us not to do intensive processing between GetBuffer and ReleaseBuffer.
 	float* workspace = new float[output_channels*bufferSize]();
 	BYTE* audioBuffer = nullptr;
 	sample_format_converter->write(bufferSize-padding, workspace);
@@ -130,15 +146,14 @@ void WasapiOutputDevice::wasapiMixingThreadFunction() {
 	//The buffer is filled, so we begin processing.
 	client->Start();
 	logDebug("Wasapi mixing thread: audio client is started.  Mixing audio.");
-	//From here, it's thankfully much simpler.  Every time we have at least output_frames worth of empty buffer, we fill it.
 	bool workspaceContainsChunk = false;
 	while(should_continue.test_and_set()) {
 		//Get the number of frames we want before continuing.
 		double targetLatency = latency_predictor->predictLatency();
 		int targetLatencyFrames = (int)(output_sr*targetLatency);
-		//We do this to make sure that we always write something.
-		//Predicted latency can go too high for us to write a  chunk.
-		int targetPadding = std::min(bufferSize-wasapi_chunk_length, bufferSize-targetLatencyFrames);
+		//Predicted latency can go too high for us to write anything, so clamp it at the buffer size less half a period.
+		int targetLatencyFramesMax = (int)(wasapi_buffer_size-period_in_secs*output_sr*0.5);
+		int targetPadding = std::min(targetLatencyFrames, targetLatencyFramesMax);
 		client->GetCurrentPadding(&padding);
 		//Wait until we have enough data.
 		if(padding > targetPadding) {
