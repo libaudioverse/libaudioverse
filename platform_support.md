@@ -92,7 +92,7 @@ If you are going to be building Libaudioverse frequently, you may want a faster 
 
 If you got this far, you're done and don't need to run the above stuff ever again.  Also you're set up for C++ development on Windows.
 
-Clone the Libaudioverse repository or otherwise obtain the Libaudioverse source code (git is not mentioned above; you don't need it because you can just download a zip from GitHub).  Open your developer command prompt to the directory to which you extracted the source code.  Then run the following commands:
+Clone the Libaudioverse repository or otherwise obtain the Libaudioverse source code (git is not mentioned above; you don't need it because you can just download a zip from GitHub).  Open your developer command prompt to the directory to which you extracted the source code.  Possibly run your `cppshell.bat`.  Then run the following commands:
 
 ```
 mkdir build

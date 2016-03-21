@@ -29,7 +29,7 @@ here is an overview of the offered nodes:
 - You can record audio with the recorder, or intercept audio anywhere in the graph of nodes with the graph listener.
 - Finally, if none of these meet your needs, it is possible to create your own node via the custom node.
 
-NOTE: This is pre-alpha and currently only supports Windows.  Ports to Linux and Mac are planned.
+NOTE: This is pre-alpha and supports Windows and Linux.  Mac is planned.
 
 ##Documentation and Examples##
 
@@ -48,66 +48,24 @@ These sets of examples aim to be equivalent and to demonstrate most critical fea
 This library is easy.
 In many cases, the examples will be enough to get you started.
 
-##Binaries and Support##
+##Getting Help##
 
-Libaudioverse's CI server currently uploads snapshots of the master branch containing everything you need to get started on Windows.  You can get it [here](http://camlorn.net/releases/libaudioverse/libaudioverse_master.zip).
-For Python, you may obtain a more stable release with `pip install libaudioverse`.
 
-There is a Google Group [here](https://groups.google.com/a/camlorn.net/forum/#!forum/libaudioverse).
+Libaudioverse has [a Google Group](https://groups.google.com/a/camlorn.net/forum/#!forum/libaudioverse).
 You can subscribe directly and without a Gmail address via e-mailing an empty e-mail to `libaudioverse+subscribe@camlorn.net` and clicking the link in the confirmation e-mail sent to you.
-I prefer questions to come via this avenue, as it results in your answers being Googlable in future.
+I prefer questions to come via this avenue, as it results in your answers being searchable in future.
 If you need to contact me in real-time, you can do so via the Libaudioverse IRC channel: `#libaudioverse` on chat.freenode.net.
 
 Please report bugs and make feature requests using the GitHub issue tracker; this saves me time for issues which I cannot fix immediately.
 
 ##Building##
 
-Currently Libaudioverse only builds on Windows.  Libaudioverse itself will build with minor changes on other platforms, but the build scripts don't know how to handle it and Libaudioverse is currently missing audio backends.  If you are on Linux or Mac, watch this space; it will build on your platform before 1.0 is released.
-
-You will need to build Libaudioverse from the GitHub repository.  Packaging it as a collection of C files that compile via the package manager for your language is all but impossible.
-If Libaudioverse is available via a package manager for your language, then binaries should be available and uploaded for all supported platforms.
-
-
-You need the following:
-
-- Boost.  I test with 1.59.0, but other versions may work.
-- Python 3.5. If you are on Windows, the launcher must be working.
-- CMake 3.3 or later.
-- The python packages PyYAML, Pypandoc, Jinja2, pycparser, enum34, numpy, and scipy.
-- A working installation of pandoc.
-- A C++11 capable compiler.  For Windows, this must be Visual Studio 2015 or later.
-
-NOTE: Visual Studio 2015 does not include the C++ components by default.
-You need to be sure to do a custom install and get at least the C/C++ compiler and all of the Windows headers.
-
-The build process is the normal build process for CMake.
-You must build the library as an out-of-source build in a directory called build.
-All CMake generators should work.
-
-For generators without multiple build types, the default configuration of a newly created build directory is Release.
-On Windows, I suggest using `nmake` from a Visual Studio 2015 developer command prompt; if you choose to use Visual Studio project files, make sure to change your build configuration to release.
-
-If you are not using binaries provided by me and need to build Libaudioverse frequently, my generator of choice is `NMake Makefiles JOMM`.
-Jom is a parallel version of NMake and may be obtained from [here](https://wiki.qt.io/Jom).
-Unlike MSBuild, Jom is much less verbose.
-
-Here is an example set of commands, assuming you have all components and Jom.
-If you are using a different generator, you will need to change the last one.
-
-~~~
-mkdir build
-cd build
-CMake -G "NMake Makefiles JOM" ..
-jom
-~~~
-
-To generate the manual, you will additionally need  asciidoctor.
-Execute the documentation target to generate `build/documentation/libaudioverse_manual.html`, which contains what currently exists of the manual.
+See the [info on supported platforms and build instructions](platform_support.md).
 
 ##Bindings##
 
-At the moment, Python and C are the only supported languages.  The above build process will generate Python bindings in build/bindings/python which may be installed in the usual manner.
+At the moment, Python and C are the only supported languages.  You can get the Python bindings via `pip` on Windows, but Linux currently requires building Libaudioverse yourself.  As more languages become available, Libaudioverse  will attempt to upload binaries to package managers.  The goal is to minimize the number of use cases that require building Libaudioverse.
 
-Libaudioverse's approach to bindings is such that it is possible to add more languages in short order.  If you are seriously considering using Libaudioverse in a specific language, I wish to talk to you.  The addition of a new language is mostly a one-time process, after which the bindings literally maintain themselves.
+Libaudioverse's approach to bindings is such that it is possible to add more languages in short order.  If you are seriously considering using Libaudioverse in a specific language, I wish to talk to you.  The addition of a new language is mostly a one-time process, after which the bindings literally maintain themselves.  Which language I add next is primarily based on interest.
 
 Note: Your language must support C callbacks, at least 2 levels of pointer indirection and thread primitives in order to be successfully bound to Libaudioverse. The only language I am currently aware of that fails to implement these three things is Angelscript in the BGT scripting environment.
