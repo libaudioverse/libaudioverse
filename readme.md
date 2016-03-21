@@ -2,6 +2,7 @@ Libaudioverse
 ==============
 
 [![Windows Build status](https://ci.appveyor.com/api/projects/status/wmoa6isbe8fdmg2c?svg=true)](https://ci.appveyor.com/project/camlorn/libaudioverse)
+[![Linux Build Status](https://travis-ci.org/camlorn/libaudioverse.svg?branch=master)](https://travis-ci.org/camlor
 
 [GitHub](http://github.com/camlorn/libaudioverse)
 
