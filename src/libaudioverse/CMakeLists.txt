@@ -177,7 +177,7 @@ file(APPEND "${CMAKE_BINARY_DIR}/compiler_flags.txt" "${CMAKE_SHARED_LINKER_FLAG
 #Docs.
 if(${LIBAUDIOVERSE_DEVMODE})
 ADD_CUSTOM_TARGET(libaudioverse_docs
-COMMAND ${PYTHON_COMMAND} "\"${CMAKE_SOURCE_DIR}/scripts/build_docs.py\""
+COMMAND ${PYTHON_COMMAND} ${PYTHON_ARGS} "\"${CMAKE_SOURCE_DIR}/scripts/build_docs.py\""
 )
 else()
 ADD_CUSTOM_TARGET(libaudioverse_docs ALL
