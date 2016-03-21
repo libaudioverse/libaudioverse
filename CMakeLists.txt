@@ -20,6 +20,7 @@ set(PYTHON_COMMAND python3)
 else()
 set(PYTHON_COMMAND python)
 endif()
+message("Python command is ${PYTHON_COMMAND} with args ${PYTHON_ARGS}")
 
 include_directories("${CMAKE_SOURCE_DIR}/include")
 
