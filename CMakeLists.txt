@@ -9,8 +9,10 @@ endif()
 
 project(Libaudioverse)
 
+if("$ENV{APPVEYOR}")
+set(PYTHON_COMMAND "c:\\python35\\python")
 #Are we using the Windows Python launcher?
-if(${WIN32})
+elseif(${WIN32})
 set(PYTHON_COMMAND "py")
 set(PYTHON_ARGS "-3")
 elseif(UNIX)

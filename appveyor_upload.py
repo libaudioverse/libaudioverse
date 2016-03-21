@@ -1,4 +1,3 @@
-import paramiko
 import os
 import os.path
 import glob
