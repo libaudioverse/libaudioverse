@@ -20,8 +20,8 @@ os.rename(wh, nwh)
 #Call twine.
 if os.getenv("PYPI_PASSWORD") is not None:
     print("Found Pypi password.  Uploading to Pypi.")
-    subprocess.call(["py", "-3", "-m", "twine", "upload",
+    subprocess.check_output(" ".join([r"c:\python35\python", "-m", "twine", "upload",
     "--config-file", "pypirc.cfg",
     "-u", "camlorn",
     "-p", os.getenv("PYPI_PASSWORD"),
-    nwh], shell=True)
+    nwh]), shell=True)
