@@ -17,6 +17,8 @@ matrix:
         - C_COMPILER = gcc-4.9
 
 before_install:
+  #This comes from travis CI issue 5326.
+  - export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g")
   - sudo apt-get update -qq
   - sudo apt-get install -y libasound2-dev libboost-all-dev python3-numpy python3-scipy libsndfile1-dev libffi-dev pandoc python3-pip python3-yaml
   - sudo python3 -m pip install pycparser jinja2 pypandoc
