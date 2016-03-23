@@ -9,6 +9,7 @@ constants_by_enum:Same as constants, but grouped by the enumeration and placed i
 important_enums: The enums which metadata marks as important in some way.
 metadata: The parsed yaml document itself as a dict.
 git_revision: The SHA of the git commit we're building with, if we can get it.
+version: The version. Set to "development" for non-releases (only set to something else in CI).
 compiler_c_flags: Flags used with .c files
 compiler_cxx_flags: Flags used with C++ files.
 linker_flags: Flags for the linker.
@@ -26,6 +27,8 @@ import collections
 import yaml
 from . import metadata_handler
 import copy
+import os
+import re
 
 all_info_cache=None
 
@@ -70,6 +73,16 @@ def get_git_revision():
         #The most notable is that the user might not have git.
         revision = "could not be determined"
     return revision
+
+def get_version():
+    version = os.getenv("APPVEYOR_REPO_TAG_NAME")
+    if not version:
+        return "development"
+    version = re.match("(test)*version-(.+)", version)
+    if not version:
+        return "development"
+    version = version.group(2)
+    return version
 
 def get_flags():
     lines = []
@@ -220,6 +233,7 @@ def get_all_info():
 
     all_info['important_enums'] = important_enums
     all_info['git_revision'] = get_git_revision()
+    all_info['version'] = get_version()
     all_info['root_dir'] = get_root_directory()
     all_info.update(get_flags()) #get the compiler and linker flags, etc.
     all_info_cache =all_info

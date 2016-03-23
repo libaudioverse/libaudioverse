@@ -9,9 +9,6 @@ endif()
 
 project(Libaudioverse)
 
-#We grab the version writer first because other stuff randomly depends on it.
-include("cmake_include/version_writer.txt")
-
 if("$ENV{APPVEYOR}")
 set(PYTHON_COMMAND "c:\\python35\\python")
 #Are we using the Windows Python launcher?

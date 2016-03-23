@@ -83,7 +83,7 @@ def make_python(info):
         'libaudioverse/_lav.py' : env.get_template('libaudioverse/_lav.py.t').render(context).encode('utf8'),
         'libaudioverse/_libaudioverse.py' : env.get_template('libaudioverse/_libaudioverse.py.t').render(context).encode('utf8'),
         'libaudioverse/__init__.py': env.get_template('libaudioverse/__init__.py.t').render(context).encode('utf8'),
-        'setup.py': open(os.path.join(source_dir, 'setup.py'), 'rb').read(),
+        'setup.py.t': env.get_template('setup.py.t').render(context).encode('utf8'),
         'setup.cfg': open(os.path.join(source_dir, 'setup.cfg'), 'rb').read(),
         'README.rst': pypandoc.convert(os.path.join(info['root_dir'], 'readme.md'), 'rst').encode("utf8"),
         'dll_location': 'libaudioverse',
