@@ -2,6 +2,7 @@ import os
 import os.path
 import glob
 import subprocess
+import sys
 
 tag = os.getenv("APPVEYOR_REPO_TAG_NAME")
 if not tag or not tag.startswith("release-"):
