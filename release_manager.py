@@ -13,7 +13,7 @@ if not match:
     printf("Not a release. Skipping release processing.")
     sys.exit(0)
 
-version = match.group(2)s
+version = match.group(2)
 is_test = match.group(1)
 
 #Convert to a boolean for clarity.
