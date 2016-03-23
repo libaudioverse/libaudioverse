@@ -3,14 +3,30 @@ import os.path
 import glob
 import subprocess
 import sys
+import re
 
 tag = os.getenv("APPVEYOR_REPO_TAG_NAME")
-if not tag or not tag.startswith("release-"):
-    print("Not a release. Skipping release processing")
+if not tag:
+    tag = "" #hack to avoid repeating a message.
+match = re.match("(test)*version-(.+)")
+if not match:
+    printf("Not a release. Skipping release processing.")
     sys.exit(0)
 
-version = tag[len("release-"):]
+version = match.group(2)s
+is_test = match.group(1)
+
+#Convert to a boolean for clarity.
+if len(is_test):
+    is_test = True
+else:
+    is_test = False
+
+
 print("Release version is: ", version)
+if is_test:
+    print("This is a test release.")
+    sys.exit(0)
 
 print("Attempting to rename wheel for Pypi upload.")
 #We know exactly where the wheel lives.
