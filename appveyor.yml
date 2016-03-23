@@ -1,4 +1,4 @@
-version: 0.8.dev{build}
+version:  build{build}
 
 branches:
   only:
