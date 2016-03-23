@@ -31,6 +31,11 @@ if is_test:
     print("This is a test release.")
     sys.exit(0)
 
+if is_test:
+    pypi_repo = "pypitest"
+else:
+    pypi_repo = "pypi"
+
 print("Attempting to rename wheel for Pypi upload.")
 #We know exactly where the wheel lives.
 path = r"c:\projects\libaudioverse\build\bindings\python\dist\*any.whl"
@@ -50,6 +55,7 @@ if os.getenv("PYPI_PASSWORD") is not None:
     print("Found Pypi password.  Uploading to Pypi.")
     subprocess.check_output(" ".join([r"c:\python35\python", "-m", "twine", "upload",
     "--config-file", "pypirc.cfg",
+    "-r", pypi_repo,
     "-u", "camlorn",
     "-p", os.getenv("PYPI_PASSWORD"),
     nwh]), shell=True)
