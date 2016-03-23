@@ -10852,6 +10852,86 @@ This is the least expensive of the Libaudioverse equalizers, and is sufficient f
 This section concerns itself only with those enumerations that are important by themselves.</p>
 </div>
 <div class="sect2">
+<h3 id="enum-Lav_DISTANCE_MODELS">Lav_DISTANCE_MODELS</h3>
+<div class="paragraph">
+<p>used in the 3D components of this library.
+Indicates how sound should become quieter as objects move away from the listener.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Members</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_DELEGATE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Delegate to another node, if we can.  Otherwise, fall back to <code>Lav_DISTANCE_MODEL_LINEAR</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_LINEAR</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sound falls off as <code>1-(distance/maxDistance)</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_EXPONENTIAL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sounds fall off as <code>1/distance</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_INVERSE_SQUARE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sounds fall off as <code>1/min(distance, maxDistance)^2</code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="enum-Lav_PANNING_STRATEGIES">Lav_PANNING_STRATEGIES</h3>
+<div class="paragraph">
+<p>Indicates a strategy to use for panning.
+This is mostly for the <a href="#node-Lav_OBJTYPE_MULTIPANNER_NODE">multipanner node</a> and the 3D components of this library.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Members</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_DELEGATE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Delegate the decision. Used for 3D sources.  If there is nowhere to delegate to, assumes <code>Lav_PANNING_STRATEGY_STEREO</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_HRTF</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates HRTF panning.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_STEREO</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates stereo panning.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_SURROUND40</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates 4.0 surround sound (quadraphonic) panning.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_SURROUND51</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates 5.1 surround sound panning.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_SURROUND71</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates 7.1 surround sound panning.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
 <h3 id="enum-Lav_NODE_STATES">Lav_NODE_STATES</h3>
 <div class="paragraph">
 <p>used to indicate the state of a node.
@@ -10879,6 +10959,72 @@ This is the value of the node&#8217;s state property and determins how the node 
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NODESTATE_ALWAYS_PLAYING</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">This node advances always.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="enum-Lav_LOGGING_LEVELS">Lav_LOGGING_LEVELS</h3>
+<div class="paragraph">
+<p>Possible levels for logging.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Members</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_CRITICAL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Logs critical messages such as failures to initialize and error conditions.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_INFO</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Logs informative messages.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_DEBUG</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Logs everything possible.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_OFF</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No log messages will be generated.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="enum-Lav_FDN_FILTER_TYPES">Lav_FDN_FILTER_TYPES</h3>
+<div class="paragraph">
+<p>Possible filter types for a feedback delay network&#8217;s feedback path.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Members</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_FDN_FILTER_TYPE_DISABLED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Don&#8217;t insert filters on the feedback path.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_FDN_FILTER_TYPE_LOWPASS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Insert lowpass filters on the FDN&#8217;s feedback path.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_FDN_FILTER_TYPE_HIGHPASS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Insert highpass filters on the FDN&#8217;s feedback path.</p></td>
 </tr>
 </tbody>
 </table>
@@ -10983,10 +11129,9 @@ This is the value of the node&#8217;s state property and determins how the node 
 </table>
 </div>
 <div class="sect2">
-<h3 id="enum-Lav_DISTANCE_MODELS">Lav_DISTANCE_MODELS</h3>
+<h3 id="enum-Lav_BIQUAD_TYPES">Lav_BIQUAD_TYPES</h3>
 <div class="paragraph">
-<p>used in the 3D components of this library.
-Indicates how sound should become quieter as objects move away from the listener.</p>
+<p>Indicates a biquad filter type, used with the <a href="#node-Lav_OBJTYPE_BIQUAD_NODE">biquad filter node</a> and in a few other places.</p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Members</caption>
@@ -11000,29 +11145,48 @@ Indicates how sound should become quieter as objects move away from the listener
 <td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_DELEGATE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Delegate to another node, if we can.  Otherwise, fall back to <code>Lav_DISTANCE_MODEL_LINEAR</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_LOWPASS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates a lowpass filter.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_LINEAR</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Sound falls off as <code>1-(distance/maxDistance)</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_HIGHPASS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates a highpass filter.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_EXPONENTIAL</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Sounds fall off as <code>1/distance</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_BANDPASS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates a bandpass filter.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_INVERSE_SQUARE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Sounds fall off as <code>1/min(distance, maxDistance)^2</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_NOTCH</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates a notch filter.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_ALLPASS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates an allpass filter.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_PEAKING</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates a peaking filter.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_LOWSHELF</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates a lowshelf filter.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_HIGHSHELF</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates a highshelf filter.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_IDENTITY</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This filter does nothing.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="sect2">
-<h3 id="enum-Lav_PANNING_STRATEGIES">Lav_PANNING_STRATEGIES</h3>
+<h3 id="enum-Lav_CHANNEL_INTERPRETATIONS">Lav_CHANNEL_INTERPRETATIONS</h3>
 <div class="paragraph">
-<p>Indicates a strategy to use for panning.
-This is mostly for the <a href="#node-Lav_OBJTYPE_MULTIPANNER_NODE">multipanner node</a> and the 3D components of this library.</p>
+<p>Specifies how to treat inputs to this node for upmixing and downmixing.</p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Members</caption>
@@ -11036,59 +11200,12 @@ This is mostly for the <a href="#node-Lav_OBJTYPE_MULTIPANNER_NODE">multipanner 
 <td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_DELEGATE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Delegate the decision. Used for 3D sources.  If there is nowhere to delegate to, assumes <code>Lav_PANNING_STRATEGY_STEREO</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_CHANNEL_INTERPRETATION_DISCRETE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If channel counts mismatch, don&#8217;t apply mixing matrices. Either drop or fill with zeros as appropriate.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_HRTF</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates HRTF panning.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_STEREO</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates stereo panning.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_SURROUND40</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates 4.0 surround sound (quadraphonic) panning.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_SURROUND51</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates 5.1 surround sound panning.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_SURROUND71</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates 7.1 surround sound panning.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="enum-Lav_FDN_FILTER_TYPES">Lav_FDN_FILTER_TYPES</h3>
-<div class="paragraph">
-<p>Possible filter types for a feedback delay network&#8217;s feedback path.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Members</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_FDN_FILTER_TYPE_DISABLED</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Don&#8217;t insert filters on the feedback path.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_FDN_FILTER_TYPE_LOWPASS</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Insert lowpass filters on the FDN&#8217;s feedback path.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_FDN_FILTER_TYPE_HIGHPASS</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Insert highpass filters on the FDN&#8217;s feedback path.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_CHANNEL_INTERPRETATION_SPEAKERS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Apply mixing matrices if needed.</p></td>
 </tr>
 </tbody>
 </table>
@@ -11149,123 +11266,6 @@ This is mostly for the <a href="#node-Lav_OBJTYPE_MULTIPANNER_NODE">multipanner 
 </table>
 </div>
 <div class="sect2">
-<h3 id="enum-Lav_LOGGING_LEVELS">Lav_LOGGING_LEVELS</h3>
-<div class="paragraph">
-<p>Possible levels for logging.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Members</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_CRITICAL</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Logs critical messages such as failures to initialize and error conditions.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_INFO</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Logs informative messages.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_DEBUG</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Logs everything possible.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_OFF</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">No log messages will be generated.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="enum-Lav_CHANNEL_INTERPRETATIONS">Lav_CHANNEL_INTERPRETATIONS</h3>
-<div class="paragraph">
-<p>Specifies how to treat inputs to this node for upmixing and downmixing.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Members</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_CHANNEL_INTERPRETATION_DISCRETE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">If channel counts mismatch, don&#8217;t apply mixing matrices. Either drop or fill with zeros as appropriate.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_CHANNEL_INTERPRETATION_SPEAKERS</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Apply mixing matrices if needed.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="enum-Lav_BIQUAD_TYPES">Lav_BIQUAD_TYPES</h3>
-<div class="paragraph">
-<p>Indicates a biquad filter type, used with the <a href="#node-Lav_OBJTYPE_BIQUAD_NODE">biquad filter node</a> and in a few other places.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Members</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_LOWPASS</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates a lowpass filter.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_HIGHPASS</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates a highpass filter.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_BANDPASS</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates a bandpass filter.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_NOTCH</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates a notch filter.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_ALLPASS</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates an allpass filter.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_PEAKING</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates a peaking filter.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_LOWSHELF</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates a lowshelf filter.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_HIGHSHELF</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates a highshelf filter.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_IDENTITY</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">This filter does nothing.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
 <h3 id="enum-Lav_NOISE_TYPES">Lav_NOISE_TYPES</h3>
 <div class="paragraph">
 <p>Specifies types of noise.</p>
@@ -11301,7 +11301,7 @@ This is mostly for the <a href="#node-Lav_OBJTYPE_MULTIPANNER_NODE">multipanner 
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-03-23 01:58:48 Greenwich Standard Time
+Last updated 2016-03-23 02:05:34 Greenwich Standard Time
 </div>
 </div>
 <script type="text/x-mathjax-config">
