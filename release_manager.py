@@ -6,6 +6,7 @@ import sys
 import re
 
 tag = os.getenv("APPVEYOR_REPO_TAG_NAME")
+
 if not tag:
     tag = "" #hack to avoid repeating a message.
 

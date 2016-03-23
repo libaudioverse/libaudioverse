@@ -74,8 +74,10 @@ build_script:
   - jom
   #Go back, so that after_build works.
   - cd ..
+  - echo Tag is %APPVEYOR_REPO_TAG_NAME%
 
 after_build:
+  - echo Tag is %APPVEYOR_REPO_TAG_NAME%
   #Docs
   - echo Deploying docs.
   - cd tmp
