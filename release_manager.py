@@ -3,6 +3,11 @@ import os.path
 import glob
 import subprocess
 
+tag = os.getenv("APPVEYOR_REPO_TAG_NAME")
+if not tag or not tag.startswith("release-"):
+    print("Not a release.")
+    sys.exit(0)
+
 print("Attempting to rename wheel for Pypi upload.")
 #We know exactly where the wheel lives.
 path = r"c:\projects\libaudioverse\build\bindings\python\dist\*any.whl"
