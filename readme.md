@@ -2,6 +2,7 @@ Libaudioverse
 ==============
 
 [![Windows Build status](https://ci.appveyor.com/api/projects/status/wmoa6isbe8fdmg2c?svg=true)](https://ci.appveyor.com/project/camlorn/libaudioverse)
+
 [![Linux Build Status](https://travis-ci.org/camlorn/libaudioverse.svg?branch=master)](https://travis-ci.org/camlorn/libaudioverse)
 
 [GitHub](http://github.com/camlorn/libaudioverse)
@@ -50,7 +51,6 @@ In many cases, the examples will be enough to get you started.
 
 ##Getting Help##
 
-
 Libaudioverse has [a Google Group](https://groups.google.com/a/camlorn.net/forum/#!forum/libaudioverse).
 You can subscribe directly and without a Gmail address via e-mailing an empty e-mail to `libaudioverse+subscribe@camlorn.net` and clicking the link in the confirmation e-mail sent to you.
 I prefer questions to come via this avenue, as it results in your answers being searchable in future.
@@ -60,7 +60,7 @@ Please report bugs and make feature requests using the GitHub issue tracker; thi
 
 ##Building##
 
-See the [info on supported platforms and build instructions](platform_support.md).
+See the [info on supported platforms and build instructions](http://github.com/camlorn/libaudioverse/tree/master/platform_support.md).
 
 ##Bindings##
 
