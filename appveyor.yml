@@ -56,7 +56,6 @@ install:
   - cd lib
   - appveyor DownloadFile http://camlorn.net/appveyor/libsndfile32/libsndfile-1.lib
   - cd ..
-  - appveyor DownloadFile http://camlorn.net/appveyor/pandoc.exe
   - appveyor DownloadFile http://camlorn.net/appveyor/jom.exe
   - cd ..
   - set path=c:\projects\libaudioverse\tmp;%path%
