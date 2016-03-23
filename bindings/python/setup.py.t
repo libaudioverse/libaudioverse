@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 from glob import glob
 
 
-__version__ = '0.8.0'
+__version__ = '{{version}}'
 
 setup(
     name = 'libaudioverse',
