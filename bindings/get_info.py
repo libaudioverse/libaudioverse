@@ -78,10 +78,11 @@ def get_version():
     version = os.getenv("APPVEYOR_REPO_TAG_NAME")
     if not version:
         return "development"
-    version = re.match("(test)*version-(.+)", version)
+    version = re.match("(test)*release-(.+)", version)
     if not version:
         return "development"
     version = version.group(2)
+    print("deb:", version)
     return version
 
 def get_flags():
