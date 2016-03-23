@@ -1,6 +1,5 @@
 from setuptools import setup, find_packages
 from glob import glob
-import pypandoc
 import os
 
 if os.getenv("APPVEYOR_BUILD_VERSION") is not None:
@@ -16,7 +15,7 @@ setup(
     author_email = "camlorn@camlorn.net",
     url = "http://github.com/camlorn/libaudioverse",
     description = "A library for 3D, environmental audio, and synthesis.",
-    long_description = pypandoc.convert('readme.md', 'rst'),
+    long_description = open('readme.rst').read(),
     package_dir = {'libaudioverse': 'libaudioverse'},
     packages = find_packages(),
     package_data = {'libaudioverse':

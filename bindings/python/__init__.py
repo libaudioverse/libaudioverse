@@ -8,6 +8,7 @@ import os.path
 import subprocess
 import sys
 import platform
+import pypandoc
 
 ctypes_map = {
 'int' : 'ctypes.c_int',
@@ -84,7 +85,7 @@ def make_python(info):
         'libaudioverse/__init__.py': env.get_template('libaudioverse/__init__.py.t').render(context),
         'setup.py': open(os.path.join(source_dir, 'setup.py')).read(),
         'setup.cfg': open(os.path.join(source_dir, 'setup.cfg')).read(),
-        'readme.md': open(os.path.join(info['root_dir'], 'readme.md')).read(),
+        'readme.rst': pypandoc.convert(os.path.join(info['root_dir'], 'readme.md'), 'rst'),
         'dll_location': 'libaudioverse',
         'libsndfile_location': 'libaudioverse',
         'additional_directories': [
