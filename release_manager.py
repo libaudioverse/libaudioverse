@@ -20,7 +20,7 @@ version = match.group(2)
 is_test = match.group(1)
 
 #Convert to a boolean for clarity.
-if len(is_test):
+if is_test:
     is_test = True
 else:
     is_test = False
