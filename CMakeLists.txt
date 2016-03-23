@@ -70,8 +70,3 @@ ADD_CUSTOM_TARGET(libaudioverse_bindings ALL
 COMMAND ${PYTHON_COMMAND} ${PYTHON_ARGS} "\"${CMAKE_CURRENT_SOURCE_DIR}/scripts/build_bindings.py\""
 DEPENDS libaudioverse
 )
-
-#Bring  in cpack.
-set(CPACK_GENERATOR ZIP)
-set(CPACK_PACKAGE_FILE_NAME libaudioverse_master)
-include(CPack)
