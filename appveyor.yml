@@ -92,4 +92,4 @@ after_build:
   - cd ../..
   #And then Pypi, etc.
   - echo Uploading Windows build
-  - 'c:\python35\python appveyor_upload.py'
+  - 'c:\python35\python release_manager.py'
