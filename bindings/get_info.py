@@ -82,7 +82,6 @@ def get_version():
     if not version:
         return "development"
     version = version.group(2)
-    print("deb:", version)
     return version
 
 def get_flags():
