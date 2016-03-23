@@ -6,8 +6,11 @@ import sys
 
 tag = os.getenv("APPVEYOR_REPO_TAG_NAME")
 if not tag or not tag.startswith("release-"):
-    print("Not a release.")
+    print("Not a release. Skipping release processing")
     sys.exit(0)
+
+version = tag[len("release-"):]
+print("Release version is: ", version)
 
 print("Attempting to rename wheel for Pypi upload.")
 #We know exactly where the wheel lives.
