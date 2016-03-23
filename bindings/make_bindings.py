@@ -27,7 +27,7 @@ def write_files(files, source_dir, dest_dir):
         dir = os.path.split(fullpath)[0]
         if not os.path.exists(dir):
             os.makedirs(dir)
-        with open(fullpath, 'w') as f:
+        with open(fullpath, 'wb') as f:
             f.write(contents)
     #handle the dll's copying.
     if platform.system() == 'Windows':

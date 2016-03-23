@@ -80,12 +80,12 @@ def make_python(info):
     env.filters.update(transformers.get_jinja2_filters(info))
     env.filters['ctypes_string'] = ctypes_string
     return {
-        'libaudioverse/_lav.py' : env.get_template('libaudioverse/_lav.py.t').render(context),
-        'libaudioverse/_libaudioverse.py' : env.get_template('libaudioverse/_libaudioverse.py.t').render(context),
-        'libaudioverse/__init__.py': env.get_template('libaudioverse/__init__.py.t').render(context),
-        'setup.py': open(os.path.join(source_dir, 'setup.py')).read(),
-        'setup.cfg': open(os.path.join(source_dir, 'setup.cfg')).read(),
-        'README.rst': pypandoc.convert(os.path.join(info['root_dir'], 'readme.md'), 'rst'),
+        'libaudioverse/_lav.py' : env.get_template('libaudioverse/_lav.py.t').render(context).encode('utf8'),
+        'libaudioverse/_libaudioverse.py' : env.get_template('libaudioverse/_libaudioverse.py.t').render(context).encode('utf8'),
+        'libaudioverse/__init__.py': env.get_template('libaudioverse/__init__.py.t').render(context).encode('utf8'),
+        'setup.py': open(os.path.join(source_dir, 'setup.py'), 'rb').read(),
+        'setup.cfg': open(os.path.join(source_dir, 'setup.cfg'), 'rb').read(),
+        'README.rst': pypandoc.convert(os.path.join(info['root_dir'], 'readme.md'), 'rst').encode("utf8"),
         'dll_location': 'libaudioverse',
         'libsndfile_location': 'libaudioverse',
         'additional_directories': [
