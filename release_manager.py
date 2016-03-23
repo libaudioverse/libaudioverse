@@ -29,7 +29,7 @@ else:
 print("Release version is: ", version)
 if is_test:
     print("This is a test release.")
-    sys.exit(0)
+
 
 if is_test:
     pypi_repo = "pypitest"
