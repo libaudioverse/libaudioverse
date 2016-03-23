@@ -9,9 +9,10 @@ tag = os.getenv("APPVEYOR_REPO_TAG_NAME")
 if not tag:
     tag = "" #hack to avoid repeating a message.
 
-match = re.match("(test)*version-(.+)", tag)
+match = re.match("(test)*release-(.+)", tag)
+
 if not match:
-    printf("Not a release. Skipping release processing.")
+    print("Not a release. Skipping release processing.")
     sys.exit(0)
 
 version = match.group(2)
