@@ -32,6 +32,12 @@ here is an overview of the offered nodes:
 
 NOTE: This is pre-alpha and supports Windows and Linux.  Mac is planned.
 
+##Licensing##
+
+Libaudioverse is dual-licernsed under the [Mozilla Public License 2.0](https://www.mozilla.org/en-US/MPL/2.0/) and [the Gnu General Public License, Version 3 or Later](http://www.gnu.org/licenses/gpl-3.0.en.html).
+This means that you may use this code under the terms of either license.
+Specific information on copyright canb be found in the file `LICENSE`, a copy of the Mozilla Public License version 2.0 in the file `license.mpl`, and a copy of the Gnu General Public License version 3 in `license.gpl`.
+
 ##Documentation and Examples##
 
 There are two sources of Libaudioverse documentation.
