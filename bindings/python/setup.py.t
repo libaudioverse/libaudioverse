@@ -22,6 +22,7 @@ setup(
         'Intended Audience :: Developers',
         'Programming Language :: Python',
         'License :: OSI Approved :: GNU General Public License (GPL)',
+        'License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)',
         'Topic :: Software Development :: Libraries'
     ],
     zip_safe = False,
