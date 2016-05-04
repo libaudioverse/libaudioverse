@@ -25,7 +25,7 @@ int main() {
 	LavHandle node;
 	ERRCHECK(Lav_initialize());
 	ERRCHECK(Lav_createSimulation(44100, 8192, &simulation));
-	ERRCHECK(Lav_simulationSetOutputDevice(simulation, -1, 2, 0.0, 0.1, 0.2));
+	ERRCHECK(Lav_simulationSetOutputDevice(simulation, "default", 2));
 	ERRCHECK(Lav_createSineNode(simulation, &node));
 	ERRCHECK(Lav_nodeSetFloatProperty(node, Lav_OSCILLATOR_FREQUENCY, 0));
 	ERRCHECK(Lav_nodeConnectSimulation(node, 0));

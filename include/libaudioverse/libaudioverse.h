@@ -57,6 +57,7 @@ enum Lav_ERRORS {
 	Lav_ERROR_INVALID_HANDLE,
 	Lav_ERROR_RANGE, //out of range function parameter.
 	Lav_ERROR_CANNOT_INIT_AUDIO, //We couldn't initialize the audio library or open a device
+	Lav_ERROR_NO_SUCH_DEVICE,
 	Lav_ERROR_FILE, //error to do with files.
 	Lav_ERROR_FILE_NOT_FOUND, //specifically, we couldn't find a file.
 
@@ -196,29 +197,9 @@ This exists only for bindings.  If you use this in your C program, you may have 
 typedef void (*LavHandleDestroyedCallback)(LavHandle which);
 Lav_PUBLIC_FUNCTION LavError Lav_setHandleDestroyedCallback(LavHandleDestroyedCallback cb);
 
-//devices...
-/**
-Index -1 is special.  Any attempts to query about index -1 will fail.
-Opening a device on index -1 requests that the default system audio device be used.  In addition, however, index -1 will follow the default system audio device when the backend supports it.
-
-For audio output devices, valid channel counts are as follows:
-1- mono
-2- stereo
-6- 5.1 surround
-8- 7.1 surround
-
-Any channel count that is not one of the above produces undefined behavior, should that channel count be used with the audio backend.
-
-Channel orders for the output node are as follows:
-1- mono
-2- left, right
-6- front left, front right, front center, lfe, back left, back right
-8-front left, front right, center, lfe, back left, back right, side left, side right
-
-Internal mixing matrices will handle conversions to and from other formats to the output format. It is suggested that the user is queried for the preferred format, as not all supported APIs are capable of determining system defaults appropriately.  In the event that a backend cannot determine a default, it will suggest 2-channel stereo; this provides a good default for most applications and will be upconverted as needed.
-*/
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetCount(unsigned int* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetName(unsigned int index, char** destination);
+Lav_PUBLIC_FUNCTION LavError Lav_deviceGetIdentifierString(unsigned int index, char** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetChannels(unsigned int index, unsigned int* destination);
 
 /**Create the simulation.*/
@@ -229,7 +210,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlock(LavHandle simulationHandle, 
 Lav_PUBLIC_FUNCTION LavError Lav_simulationGetSr(LavHandle simulationHandle, int* destination);
 
 /**Set or clear the output device.*/
-Lav_PUBLIC_FUNCTION LavError Lav_simulationSetOutputDevice(LavHandle simulationHandle, int index, int channels, float minLatency, float startLatency, float maxLatency);
+Lav_PUBLIC_FUNCTION LavError Lav_simulationSetOutputDevice(LavHandle simulationHandle, const char* device, int channels);
 Lav_PUBLIC_FUNCTION LavError Lav_simulationClearOutputDevice(LavHandle simulationHandle);
 
 /**Lock/unlock the simulation.*/

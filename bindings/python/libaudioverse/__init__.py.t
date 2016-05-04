@@ -34,6 +34,7 @@ class {{name|without_lav|underscores_to_camelcase(True)}}(enum.IntEnum):
 {%for i, j in constants.items()%}
     {{i|strip_prefix(constants_prefix)|lower}} = {{j}}
     {%if name in metadata['enumerations']%}"""{{metadata['enumerations'][name]['members'][i]}}"""{%endif%}
+
 {%endfor%}
 {%endfor%}
 
@@ -146,22 +147,22 @@ class _CallbackWrapper(object):
 class DeviceInfo(object):
     r"""Represents info on a audio device.
     
-    Channels is the number of channels for the device.  Name is a unicode string containing a human-readable name.  Index should be used with Simulation.set_output_device.
+    Channels is the number of channels for the device.  Name is a unicode string containing a human-readable name.  Identifier should be used with Simulation.set_output_device.
     
     The caveat from the Libaudioverse manual should be  summarized here:
     channels is not reliable, and your application should default to stereo while providing the user the option to change it."""
 
-    def __init__(self, channels, name, index):
+    def __init__(self, channels, identifier, name):
         self.channels = channels
         self.name = name
-        self.index = index
+        self.identifier = identifier
 
 def enumerate_devices():
     r"""Returns a list of DeviceInfo representing the devices on the system."""
     max_index = _lav.device_get_count()
     infos = []
     for i in six.moves.range(max_index):
-        info = DeviceInfo(index = i,
+        info = DeviceInfo(identifier = _lav.device_get_identifier_string(i),
         channels = _lav.device_get_channels(i),
         name = _lav.device_get_name(i))
         infos.append(info)
@@ -207,11 +208,11 @@ For full details of this class, see the Libaudioverse manual."""
             self.handle = handle
             self._lock = self._state['lock']
 
-    def set_output_device(self, index, channels=2, min_latency = 0.0, start_latency = 0.1, max_latency = 0.2):
+    def set_output_device(self, identifier = "default", channels=2):
         r"""Sets the output device.
         Use -1 for default system audio. 0 and greater are specific audio devices.
-        To enumerate output devices, use enumerate_output_devices."""
-        _lav.simulation_set_output_device(self, index, channels, min_latency, start_latency, max_latency)
+        To enumerate devices, use enumerate_devices."""
+        _lav.simulation_set_output_device(self, identifier, channels)
 
     def clear_output_device(self):
         r"""Clears the output device, stopping audio and allowing use of get_block again."""

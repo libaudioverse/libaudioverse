@@ -5,7 +5,7 @@ import time
 
 libaudioverse.initialize()
 sim = libaudioverse.Simulation()
-sim.set_output_device(-1)
+sim.set_output_device()
 print "Enter a file path."
 path = raw_input()
 path = os.path.abspath(path)

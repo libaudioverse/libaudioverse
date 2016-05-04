@@ -59,7 +59,6 @@ def reverse_handle(handle):
 {%macro autopointerize(arglist)%}
 {%for arg in arglist%}
 {%if arg.type.base == 'LavHandle'%}
-    #Drill down up to twice, otherwise assume we passed in something safe.
     {{arg.name}} = getattr({{arg.name}}, 'handle', {{arg.name}})
     {{arg.name}} = getattr({{arg.name}}, 'handle', {{arg.name}})
 {%elif arg.type.indirection == 1 and arg.type.base == 'char'%}
@@ -78,8 +77,8 @@ def reverse_handle(handle):
                 {{arg.name}} = {{arg.name}}_new
         else:
             {{arg.name}} = ctypes.cast(ctypes.create_string_buffer({{arg.name}}, len({{arg.name}})), {{arg.type|ctypes_string}})
-{%endif%}
-{%endfor%}
+{%endif-%}
+{%endfor-%}
 {%endmacro%}
 
 {%for func_name, func_info in functions.items()%}
@@ -88,13 +87,13 @@ def reverse_handle(handle):
 {%set output_arg_names = func_info.output_args|map(attribute='name')|list%}
 {%if func_info.output_args|length == 0%}
 def {{friendly_name}}({{input_arg_names|join(', ')}}):
-{{autopointerize(func_info.input_args)}}
+{%if func_info.input_args|length%}{{autopointerize(func_info.input_args)}}{%endif%}
     err = _libaudioverse.{{func_name}}({{input_arg_names|join(', ')}})
     if err != _libaudioverse.Lav_ERROR_NONE:
         raise make_error_from_code(err)
 {%else%}
 def {{friendly_name}}({{input_arg_names|join(', ')}}):
-{{autopointerize(func_info.input_args)}}
+{%if func_info.input_args|length%}{{autopointerize(func_info.input_args)}}{%endif%}
 {%for i in func_info.output_args%}
     {{i.name}} = {{i.type|ctypes_string(1, '_libaudioverse.')}}()
 {%endfor%}
@@ -105,13 +104,14 @@ def {{friendly_name}}({{input_arg_names|join(', ')}}):
     return {%for i in func_info.output_args -%}
 {%- if i.type.base=='LavHandle' and i.type.indirection == 1 -%}
     reverse_handle({{i.name}}.value)
-{%-elif i.type.base == 'char' and i.type.indirection == 2-%}{#Recall that the types show all of these with an extra level of pointer indirection.#}
-    {{i.name}}.value.decode('utf8') #All strings are contractually UTF8 when returned to us.
+{%-elif i.type.base == 'char' and i.type.indirection == 2-%}
+    {{i.name}}.value.decode('utf8')
 {%- else -%}
     getattr({{i.name}}, 'value', {{i.name}})
 {%-endif-%}
 {%-if not loop.last%}, {%endif-%}
 {%-endfor-%}
 {%endif%}
+
 
 {%endfor%}

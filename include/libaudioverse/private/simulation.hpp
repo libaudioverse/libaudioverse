@@ -62,7 +62,7 @@ class Simulation: public Job {
 
 	//associate with the specified device index.
 	//This must absolutely absolutely absolutely be called without the lock, it's threadsafe.
-	void setOutputDevice(int index, int channels, float minLatency, float startLatency, float maxLatency);
+	void setOutputDevice(int index, int channels);
 	void clearOutputDevice();
 
 	//Tasks that need to run in the background.

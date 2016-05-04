@@ -5,12 +5,12 @@
 import libaudioverse
 import wave
 import time
-import Queue
+import queue
 import struct
 
 libaudioverse.initialize()
 sim = libaudioverse.Simulation()
-sim.set_output_device(-1)
+sim.set_output_device()
 w1 = libaudioverse.SineNode(sim)
 w2 = libaudioverse.SineNode(sim)
 listener = libaudioverse.GraphListenerNode(sim, 2)
@@ -24,19 +24,19 @@ w1.frequency.value = 300
 w2.frequency.value = 305
 
 #the queue and callback for recording.
-audio_queue = Queue.Queue()
+audio_queue = queue.Queue()
 def callback(obj, frames, channels, buffer):
     #Copying is not optional. The memory belongs to libaudioverse.
-    audio_queue.put([buffer[i] for i in xrange(channels*frames)])
+    audio_queue.put([buffer[i] for i in range(channels*frames)])
 
 listener.set_listening_callback(callback)
 
-print "beginning synthesis and playing for 5 seconds..."
+print("beginning synthesis and playing for 5 seconds...")
 listener.connect_simulation(0)
 time.sleep(5.0)
 libaudioverse.shutdown()
 
-print "Writing audio data to out.wav in the current directory:"
+print("Writing audio data to out.wav in the current directory:")
 f = wave.open("out.wav", "w")
 f.setnchannels(2)
 f.setframerate(44100)
@@ -47,7 +47,7 @@ try:
         frame = [int(i*32767) for i in frame] #python wants integer samples, Libaudioverse gives float.
         frame_string = struct.pack(str(len(frame))+"h", *frame)
         f.writeframes(frame_string)
-except Queue.Empty:
+except queue.Empty:
         pass
 f.close()
 

@@ -111,7 +111,7 @@ void Simulation::doMaintenance() {
 	killDeadWeakPointers(will_tick_nodes);
 }
 
-void Simulation::setOutputDevice(int index, int channels, float minLatency, float startLatency, float maxLatency) {
+void Simulation::setOutputDevice(int index, int channels) {
 	if(index < -1) ERROR(Lav_ERROR_RANGE, "Index -1 is default; all other negative numbers are invalid.");
 	if(output_device) {
 		output_device->stop();
@@ -131,7 +131,7 @@ void Simulation::setOutputDevice(int index, int channels, float minLatency, floa
 		}
 	};
 	try {
-		output_device =factory->createDevice(cb, index, channels, getSr(), getBlockSize(), minLatency, startLatency, maxLatency);
+		output_device =factory->createDevice(cb, index, channels, getSr(), getBlockSize(), 0.0, 0.1, 0.2);
 		if(output_device == nullptr) ERROR(Lav_ERROR_CANNOT_INIT_AUDIO, "Device could not be created.");
 	}
 	catch(std::exception &e) {
@@ -269,11 +269,26 @@ Lav_PUBLIC_FUNCTION LavError Lav_simulationGetSr(LavHandle simulationHandle, int
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_simulationSetOutputDevice(LavHandle simulationHandle, int index, int channels, float minLatency, float startLatency, float maxLatency) {
+Lav_PUBLIC_FUNCTION LavError Lav_simulationSetOutputDevice(LavHandle simulationHandle, const char* device, int channels) {
 	PUB_BEGIN
 	auto sim = incomingObject<Simulation>(simulationHandle);
-	//This is threadsafe and needs to be entered properly so it can make sure we dont' edadlock in audio_io.
-	sim->setOutputDevice(index, channels, minLatency, startLatency, maxLatency);
+	int index;
+	auto device_string = std::string(device);
+	if(device_string == "default") {
+		index = -1;
+	}
+	else {
+		size_t processed;
+		try {
+			index = std::stoi(device_string, &processed, 10);
+		}
+		catch(...) {
+			ERROR(Lav_ERROR_NO_SUCH_DEVICE, "No such device.");
+		}
+		if(processed == 0) {ERROR(Lav_ERROR_NO_SUCH_DEVICE, "Identifier string is invalid.");}
+	}
+	//This is threadsafe and needs to be entered properly so it can make sure we dont' deadlock in audio_io.
+	sim->setOutputDevice(index, channels);
 	PUB_END
 }
 

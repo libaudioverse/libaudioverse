@@ -2,7 +2,7 @@ import libaudioverse
 import threading
 libaudioverse.initialize()
 sim = libaudioverse.Simulation()
-sim.set_output_device(-1)
+sim.set_output_device()
 
 s1 = libaudioverse.SineNode(sim)
 s1.frequency = 100
@@ -25,9 +25,9 @@ crossfade_sem = threading.Semaphore(value = 0)
 def done(*args):
     crossfade_sem.release()
 
-fader.finished_event = done
+fader.set_finished_callback(done)
 
-for i in xrange(5):
+for i in range(5):
     fader.crossfade(duration = 0.5, input = 1)
     crossfade_sem.acquire()
     fader.crossfade(duration = 0.5, input = 2)

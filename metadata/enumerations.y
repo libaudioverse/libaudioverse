@@ -13,6 +13,7 @@ enumerations:
       Lav_ERROR_INVALID_HANDLE: A value passed in as a handle is not currently a handle which is valid.
       Lav_ERROR_RANGE: A function parameter is not within a valid range.  This could be setting property values outside their range, accessing inputs and outputs that do not exist, or any of a variety of other range error conditions.
       Lav_ERROR_CANNOT_INIT_AUDIO:  The audio subsystem could not be initialized.
+      Lav_ERROR_NO_SUCH_DEVICE: Attempt to use an I/O device that doesn't exist.  In addition to being caused by your code, this can happen if the user unplugs the device.
       Lav_ERROR_FILE: Represents a miscelaneous file error.
       Lav_ERROR_FILE_NOT_FOUND: Libaudioverse could not find a specified file.
       Lav_ERROR_HRTF_INVALID: An attempt to use an invalid HRTF database.

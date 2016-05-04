@@ -76,6 +76,19 @@ Lav_PUBLIC_FUNCTION LavError Lav_deviceGetName(unsigned int index, char** destin
 	PUB_END
 }
 
+Lav_PUBLIC_FUNCTION LavError Lav_deviceGetIdentifierString(unsigned int index, char** destination) {
+	PUB_BEGIN
+	auto n = (*audio_output_factory)->getOutputNames();
+	if(index >= n.size()) ERROR(Lav_ERROR_RANGE, "Invalid device index.");
+	auto s = std::to_string(index);
+	char* outgoingStr = new char[s.size()+1];
+	std::copy(s.c_str(), s.c_str()+s.size(), outgoingStr);
+	outgoingStr[s.size()] = '\0';
+	std::shared_ptr<char> outgoing(outgoingStr, [](char* what){delete[] what;});
+	*destination = outgoingPointer<char>(outgoing);
+	PUB_END
+}
+
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetChannels(unsigned int index, unsigned int* destination) {
 	PUB_BEGIN
 	auto c = (*audio_output_factory)->getOutputMaxChannels();

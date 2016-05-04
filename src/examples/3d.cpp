@@ -31,7 +31,7 @@ int main(int argc, char** args) {
 	LavHandle node, world, source;
 	ERRCHECK(Lav_initialize());
 	ERRCHECK(Lav_createSimulation(44100, 1024, &simulation));
-	ERRCHECK(Lav_simulationSetOutputDevice(simulation, -1, 2, 0.0, 0.1, 0.2));
+	ERRCHECK(Lav_simulationSetOutputDevice(simulation, "default", 2));
 	ERRCHECK(Lav_createEnvironmentNode(simulation, hrtfFile, &world));
 	ERRCHECK(Lav_createBufferNode(simulation, &node));
 	LavHandle buffer;
