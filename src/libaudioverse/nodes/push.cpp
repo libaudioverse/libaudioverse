@@ -25,6 +25,8 @@ PushNode::PushNode(std::shared_ptr<Simulation> sim, unsigned int inputSr, unsign
 	workspace = allocArray<float>(push_channels*simulation->getBlockSize());
 	push_buffer = allocArray<float>(push_frames*channels);
 	appendOutputConnection(0, channels);
+	underrun_callback = std::make_shared<Callback<void()>>();
+	low_callback = std::make_shared<Callback<void()>>();
 }
 
 std::shared_ptr<Node> createPushNode(std::shared_ptr<Simulation> simulation, unsigned int inputSr, unsigned int channels) {
