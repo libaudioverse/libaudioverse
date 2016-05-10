@@ -19,8 +19,8 @@ def out_callback(obj):
     p.feed(len(stereo), stereo)
 
 p.threshold.value = 0.1
-p.audio_event = audio_callback
-p.out_event = out_callback
+p.set_low_callback(audio_callback)
+p.set_underrun_callback(out_callback)
 
 p.connect_simulation(0)
 
