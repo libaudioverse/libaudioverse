@@ -395,26 +395,33 @@ class BooleanProperty(LibaudioverseProperty):
         return bool(self._getter(self._handle, self._slot))
 
 class IntProperty(LibaudioverseProperty):
-    r"""Proxy to an integer or enumeration property."""
+    r"""Proxy to an integer property."""
 
-    def __init__(self, handle, slot, enum = None):
-        super(IntProperty, self).__init__(handle = handle, slot = slot, getter = None, setter = None)
-        self.enum = enum
+    def __init__(self, handle, slot):
+        super(IntProperty, self).__init__(handle = handle, slot = slot, getter = _lav.node_get_int_property, setter = _lav.node_set_int_property)
+
+class EnumProperty(LibaudioverseProperty):
+    r"""Proxy to an integer property taking an enum.
+
+This class is like IntProperty, but it will error if you try to yuse the wrong enum or a regular integer constant.
+In the C API, the distinction between these classes does not exist: both use Lav_nodeGetIntProperty and Lav_nodeSetIntProperty."""
+
+    def __init__(self, handle, slot, enum):
+        super(EnumProperty, self).__init__(handle = handle, slot = slot, getter = None, setter = None)
+        self._enum = enum
 
     @property
     def value(self):
-        v = _lav.node_get_int_property(self._handle, self._slot)
-        if self.enum:
-            v = self.enum(v)
-        return v
+        return self._enum(_lav.node_get_int_property(self._handle, self._slot))
 
     @value.setter
     def value(self, val):
-        if isinstance(val, enum.IntEnum):
-            if not isinstance(val, self.enum):
-                raise ValueError('Attemptn to use wrong enum to set property. Expected instance of {}'.format(self.enum.__class__))
-            val = val.value
-        _lav.node_set_int_property(self._handle, self._slot, val)
+        if not isinstance(val, self._enum):
+            raise TypeError("Value must be a {} member.".format(self._enum.__name__))
+        _lav.node_set_int_property(self._handle, self._slot, int(val))
+
+    def __repr__(self):
+        return "<{} {}.{}>".format(self.__class__.__name__, self._enum.__name__, self.value.name)
 
 class AutomatedProperty(LibaudioverseProperty):
     r"""A property that supports automation and node connection."""
