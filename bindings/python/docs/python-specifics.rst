@@ -6,7 +6,7 @@ The following are brief notes on Python-specific binding features and how the Li
 Comparing Objects
 --------------------
 
-Libaudioverse objects are thin proxies over handles, with their global state stored elsewhre in the Libaudioverse module.
+Libaudioverse objects are thin proxies over handles, with their global state stored elsewhere in the Libaudioverse module.
 Consequently, you need to use `==`, not `is`.
 `is` will work sometimes, but no guarantee is made that two node objects in different variables are the same proxy instance.
 
@@ -14,9 +14,20 @@ Properties
 --------------------
 
 Properties are bound as Python properties, set up so that you can simply set them as normal: `sine.frequency = 32.5`.
-At the moment, however, using properties on the right hand side of `=` requires appending `.value`: `sine.frequency.value * 2`.
-Furthermore, using operators such as `*=` must be performed as `sine.frequency.value *= 5`.
-This restriction (and this section of the documentation) will disappear at some point in the near future, once properties properly overload the arithmetic operators.
+In addition, the objects representing properties overload all operators expected for their types.
+
+There is only one subtlety with properties.
+Code like `sine.frequency` does not return the value of the frequency property.
+Instead, it returns a class specific to the type of the property and which keeps the underlying Libaudioverse node alive.
+If you need to store the value of the property for an long period of time, use `sine.frequency.value`.
+As a concrete example of where this distinction can be important, if you make a list of the frequencies of 100 sine nodes without appending `.value`, you can manipulate the properties but will be keeping 100 sine nodes alive.
+
+Some old code uses the `.value` suffix for all operations on the right-hand side of assignment, as well as on the left-hand side of compound assignment operators.
+For example, `sine.frequency = sine.frequency.value + 2` or `sine.frequency.value += 2`.
+This usage is deprecated and mentioned here only because some older examples and programs still use it.
+
+Numeric properties behave like regular numbers in all other ways.
+If you find a way in which they don't, it's a bug.
 
 Callbacks
 --------------------
