@@ -4,9 +4,9 @@ import ctypes.util
 import os.path
 import os
 import sys
-import platform
 
-if platform.system() == 'Windows':
+#It is important that we don't use the platform module because it does not exist inside NVDA.
+if sys.platform == 'win32':
     #this is a windows hack.
     #we want it to find out libsndfile before the system one in frozen executables, so we do this.
     #If it fails, we fall back to the system.
