@@ -187,6 +187,9 @@ class _HandleComparer(object):
         #We need to return the handle itself.  The box could be unique.
         return self.handle.handle
 
+    def _to_handle(self):
+        return self.handle.handle
+
 class Simulation(_HandleComparer):
     r"""Represents a running simulation.  All libaudioverse nodes must be passed a simulation at creation time and cannot migrate between them.  Furthermore, it is an error to try to connect objects from different simulations.
 

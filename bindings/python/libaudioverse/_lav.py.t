@@ -53,14 +53,16 @@ class _HandleBox(object):
             deleter(self.handle)
         self.handle = None
 
+    def _to_handle(self):
+        return self.handle
+
 def reverse_handle(handle):
     return _HandleBox(handle)
 
 {%macro autopointerize(arglist)%}
 {%for arg in arglist%}
 {%if arg.type.base == 'LavHandle'%}
-    {{arg.name}} = getattr({{arg.name}}, 'handle', {{arg.name}})
-    {{arg.name}} = getattr({{arg.name}}, 'handle', {{arg.name}})
+    {{arg.name}} = {{arg.name}}._to_handle()
 {%elif arg.type.indirection == 1 and arg.type.base == 'char'%}
     {{arg.name}} = {{arg.name}}.encode('utf8') #All strings are contractually UTF8 when entering Libaudioverse.
 {%elif arg.type.indirection == 1%}
