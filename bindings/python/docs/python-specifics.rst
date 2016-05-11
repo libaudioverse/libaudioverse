@@ -14,20 +14,21 @@ Properties
 --------------------
 
 Properties are bound as Python properties, set up so that you can simply set them as normal: `sine.frequency = 32.5`.
-In addition, the objects representing properties overload all operators expected for their types.
-
-There is only one subtlety with properties.
-Code like `sine.frequency` does not return the value of the frequency property.
-Instead, it returns a class specific to the type of the property and which keeps the underlying Libaudioverse node alive.
-If you need to store the value of the property for an long period of time, use `sine.frequency.value`.
-As a concrete example of where this distinction can be important, if you make a list of the frequencies of 100 sine nodes without appending `.value`, you can manipulate the properties but will be keeping 100 sine nodes alive.
+In addition, the objects representing numeric properties overload all operators expected for their types.
+The `value` attribute also exists on all properties.
+It is most useful to get the value of other property types (namely string and integer properties set from enums).
 
 Some old code uses the `.value` suffix for all operations on the right-hand side of assignment, as well as on the left-hand side of compound assignment operators.
 For example, `sine.frequency = sine.frequency.value + 2` or `sine.frequency.value += 2`.
-This usage is deprecated and mentioned here only because some older examples and programs still use it.
+This is no longer necessary because numeric properties now behave like numbers.
 
-Numeric properties behave like regular numbers in all other ways.
-If you find a way in which they don't, it's a bug.
+Note the following important points:
+
+- Properties do not implement `__hash__` because there is no sensible definition that can satisfy all cases.
+
+- Storing the property proxy object keeps the node it came from alive.  If you need to store values of properties, it is much more efficient to extract the value.  `x = sine.frequency` keeps the sine node alive at least until `x` dies, but `x = sine.frequency.value` doesn't.
+
+- If you store a property object, changing it (i.e. assignment, `*=`, calling `reset`) will affect the node.
 
 Callbacks
 --------------------
