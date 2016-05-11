@@ -15,6 +15,9 @@ import logging
 import six.moves
 import glob
 import os.path
+import numbers
+import math
+import operator
 
 def find_datafiles():
     import platform
@@ -351,6 +354,98 @@ _types_to_classes[ObjectTypes.buffer] = Buffer
 
 #the following classes implement properties:
 
+{%set binary_operators = [
+"add", "sub", "mul", "floordiv",
+"mod", "divmod", "div", "truediv"]%}
+
+{%set binary_operators_int = [
+"lshift", "rshift", "and", "xor",
+"or"]%}
+
+{%set unary_operators = ["neg", "pos", "abs"]%}
+
+{%set unary_operators_int = ["invert"]%}
+
+{%set special_functions = ["complex", "long", "int", "float"]%}
+
+{%set comparison_operators = ["eq", "lt", "gt", "ne", "le", "ge"]%}
+
+{%set keywords = ["and", "or"]%}
+
+def _extract_value(v):
+    if isinstance(v, LibaudioverseProperty):
+        return v.value
+    return v
+
+{%macro define_operators(binary, unary, special)%}
+{%for op in binary%}
+{%if op in keywords%}
+{%set opfunc = op+"_"%}
+{%else%}
+{%set opfunc = op%}
+{%endif%}
+
+    def __{{op}}__(self, other):
+        other = _extract_value(other)
+        return operator.{{opfunc}}(self.value, other)
+
+    def __r{{op}}__(self, other):
+        other = _extract_value(other)
+        return operator.{{opfunc}}(other, self.value)
+
+    def __i{{op}}__(self, other):
+        other = _extract_value(other)
+        self.value = operator.{{opfunc}}(self.value, other)
+        return self
+{%endfor%}
+
+{%for op in unary%}
+    def __{{op}}__(self):
+        return operator.{{op}}(self.value)
+{%endfor%}
+
+    def __pow__(self, other, modulus = None):
+        other = _extract_value(other)
+        if modulus:
+            modulus = _extract_value(modulus)
+        if modulus:
+            return pow(self.value, other, modulus)
+        else:
+            return pow(self.value, other)
+
+    def __ipow__(self, other, modulus = None):
+        self.value = self.__pow__(other, modulus)
+        return self
+
+    def __rpow__(self, other):
+        return self.__pow__(other, self.value)
+
+{%for op in special%}
+    def __{{op}}__(self):
+        return {{op}}(self.value)
+{%endfor%}
+
+{%for comp in comparison_operators%}
+    def __{{comp}}__(self, other):
+        return operator.{{comp}}(self.value, _extract_value(other))
+{%endfor%}
+
+    def __ceil__(self):
+        return math.ceil(self.value)
+
+    def __floor__(self):
+        return math.floor(self.value)
+
+    def __round__(self, n = None):
+        if n:
+            return round(self.value, n)
+        else:
+            return round(self.value)
+
+    def __trunc__(self):
+        return math.trunc(self.value)
+{%endmacro%}
+
 class LibaudioverseProperty(object):
     r"""Proxy to Libaudioverse properties.
     
@@ -394,11 +489,20 @@ class BooleanProperty(LibaudioverseProperty):
     def value(self):
         return bool(self._getter(self._handle, self._slot))
 
-class IntProperty(LibaudioverseProperty):
+
+class IntProperty(LibaudioverseProperty, numbers.Integral):
     r"""Proxy to an integer property."""
 
     def __init__(self, handle, slot):
         super(IntProperty, self).__init__(handle = handle, slot = slot, getter = _lav.node_get_int_property, setter = _lav.node_set_int_property)
+
+{{define_operators(binary_operators+binary_operators_int, unary_operators+unary_operators_int, special_functions)}}
+
+    def __oct__(self):
+        return oct(sselv.value)
+
+    def __hex__(self):
+        return hex(self.value)
 
 class EnumProperty(LibaudioverseProperty):
     r"""Proxy to an integer property taking an enum.
@@ -455,17 +559,23 @@ class AutomatedProperty(LibaudioverseProperty):
         Wraps Lav_automationCancelAutomators."""
         _lav.automation_cancel_automators(self._handle, self._slot, time)
 
-class FloatProperty(AutomatedProperty):
+
+class FloatProperty(AutomatedProperty, numbers.Real):
     r"""Proxy to a float property."""
 
     def __init__(self, handle, slot):
         super(FloatProperty, self).__init__(handle = handle, slot = slot, getter = _lav.node_get_float_property, setter = _lav.node_set_float_property)
 
-class DoubleProperty(LibaudioverseProperty):
+{{define_operators(binary_operators, unary_operators, special_functions)}}
+
+
+class DoubleProperty(LibaudioverseProperty, numbers.Real):
     r"""Proxy to a double property."""
 
     def __init__(self, handle, slot):
         super(DoubleProperty, self).__init__(handle = handle, slot = slot, getter = _lav.node_get_double_property, setter = _lav.node_set_double_property)
+
+{{define_operators(binary_operators, unary_operators, special_functions)}}
 
 class StringProperty(LibaudioverseProperty):
     r"""Proxy to a string property."""
