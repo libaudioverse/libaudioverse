@@ -451,11 +451,12 @@ class LibaudioverseProperty(object):
     
     All properties support resetting and type query."""
 
-    def __init__(self, handle, slot, getter, setter):
+    def __init__(self, handle, slot, getter, setter, converter = lambda x: x):
         self._handle = handle
         self._slot = slot
         self._getter=getter
         self._setter = setter
+        self._converter = converter
 
     @property
     def value(self):
@@ -463,7 +464,7 @@ class LibaudioverseProperty(object):
 
     @value.setter
     def value(self, val):
-        return self._setter(self._handle, self._slot, val)
+        return self._setter(self._handle, self._slot, self._converter(val))
 
     def reset(self):
         _lav.node_reset_property(self._handle, self._slot)
@@ -483,7 +484,7 @@ class BooleanProperty(LibaudioverseProperty):
     This class adds extra marshalling to make sure that boolean properties show up as booleans on the Python side, as the C API does not distinguish between boolean properties and int properties with range [0, 1]."""
     
     def __init__(self, handle, slot):
-        super(BooleanProperty, self).__init__(handle = handle, slot = slot, getter =_lav.node_get_int_property, setter = _lav.node_set_int_property)
+        super(BooleanProperty, self).__init__(handle = handle, slot = slot, getter =_lav.node_get_int_property, setter = _lav.node_set_int_property, converter = bool)
 
     @LibaudioverseProperty.value.getter
     def value(self):
@@ -494,7 +495,7 @@ class IntProperty(LibaudioverseProperty, numbers.Integral):
     r"""Proxy to an integer property."""
 
     def __init__(self, handle, slot):
-        super(IntProperty, self).__init__(handle = handle, slot = slot, getter = _lav.node_get_int_property, setter = _lav.node_set_int_property)
+        super(IntProperty, self).__init__(handle = handle, slot = slot, getter = _lav.node_get_int_property, setter = _lav.node_set_int_property, converter = int)
 
 {{define_operators(binary_operators+binary_operators_int, unary_operators+unary_operators_int, special_functions)}}
 
@@ -564,7 +565,7 @@ class FloatProperty(AutomatedProperty, numbers.Real):
     r"""Proxy to a float property."""
 
     def __init__(self, handle, slot):
-        super(FloatProperty, self).__init__(handle = handle, slot = slot, getter = _lav.node_get_float_property, setter = _lav.node_set_float_property)
+        super(FloatProperty, self).__init__(handle = handle, slot = slot, getter = _lav.node_get_float_property, setter = _lav.node_set_float_property, converter = float)
 
 {{define_operators(binary_operators, unary_operators, special_functions)}}
 
@@ -573,7 +574,7 @@ class DoubleProperty(LibaudioverseProperty, numbers.Real):
     r"""Proxy to a double property."""
 
     def __init__(self, handle, slot):
-        super(DoubleProperty, self).__init__(handle = handle, slot = slot, getter = _lav.node_get_double_property, setter = _lav.node_set_double_property)
+        super(DoubleProperty, self).__init__(handle = handle, slot = slot, getter = _lav.node_get_double_property, setter = _lav.node_set_double_property, converter = float)
 
 {{define_operators(binary_operators, unary_operators, special_functions)}}
 
