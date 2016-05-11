@@ -69,13 +69,14 @@ inline void BufferPlayer::process(int channels, float** outputs) {
 		frame += block_size;
 	}
 	else {
+		int computed_samples = 0;
 		//We do the looping check first so we can break out if we have issues.
 		for(int i =0; i < block_size; i++) {
 			if(frame >= buffer_length) { //past end.
 				ended_count ++;
 				if(is_looping == false) {
 					ended = true;
-					return;
+					break;
 				}
 				//Otherwise we loop.
 				frame= 0;
@@ -94,6 +95,11 @@ inline void BufferPlayer::process(int channels, float** outputs) {
 			offset+=rate;
 			frame += (int)floor(offset);
 			offset = offset-floor(offset);
+			computed_samples += 1;
+		}
+		//We have to zero the rest out.
+		for(int ch = 0; ch < buffer_channels; ch++) {
+			for(int i = computed_samples; i < block_size; i++) intermediate_destination[ch][i] = 0.0;
 		}
 	}
 	//Remix to the destination.
