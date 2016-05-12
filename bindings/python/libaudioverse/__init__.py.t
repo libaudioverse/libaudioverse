@@ -503,7 +503,7 @@ class IntProperty(LibaudioverseProperty, numbers.Integral):
 {{define_operators(binary_operators+binary_operators_int, unary_operators+unary_operators_int, special_functions)}}
 
     def __oct__(self):
-        return oct(sselv.value)
+        return oct(self.value)
 
     def __hex__(self):
         return hex(self.value)
