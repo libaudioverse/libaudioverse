@@ -540,7 +540,7 @@ class AutomatedProperty(LibaudioverseProperty):
         The property's value will change to the specified value by the specified time, starting at the end of the previous automator
         
         This function wraps Lav_automationLinearRampToValue."""
-        _lav.automation_linear_ramp_to_value(self._handle, self._slot, time, value)
+        _lav.automation_linear_ramp_to_value(self._handle, self._slot, float(time), float(value))
 
     def envelope(self, time, duration, values):
         r"""Run an envelope.
@@ -555,13 +555,13 @@ class AutomatedProperty(LibaudioverseProperty):
         r"""Sets the property's value to a specific value at a specific time.
         
         Wraps Lav_automationSet."""
-        _lav.automation_set(self._handle, self._slot, time, value)
+        _lav.automation_set(self._handle, self._slot, float(time), float(value))
 
     def cancel_automators(self, time):
         r"""Cancel all automators scheduled to start after time.
         
         Wraps Lav_automationCancelAutomators."""
-        _lav.automation_cancel_automators(self._handle, self._slot, time)
+        _lav.automation_cancel_automators(self._handle, self._slot, float(time))
 
 
 class FloatProperty(AutomatedProperty, numbers.Real):
