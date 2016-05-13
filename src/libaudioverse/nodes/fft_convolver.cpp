@@ -10,7 +10,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/nodes/fft_convolver.hpp>
 #include <libaudioverse/private/node.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/memory.hpp>
@@ -22,17 +22,17 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-FftConvolverNode::FftConvolverNode(std::shared_ptr<Simulation> simulation, int channels): Node(Lav_OBJTYPE_FFT_CONVOLVER_NODE, simulation, channels, channels) {
+FftConvolverNode::FftConvolverNode(std::shared_ptr<Server> server, int channels): Node(Lav_OBJTYPE_FFT_CONVOLVER_NODE, server, channels, channels) {
 	if(channels < 1) ERROR(Lav_ERROR_RANGE, "Channels must be greater than 0.");
 	appendInputConnection(0, channels);
 	this->channels=channels;
 	appendOutputConnection(0, channels);
 	convolvers=new FftConvolver*[channels]();
-	for(int i= 0; i < channels; i++) convolvers[i] = new FftConvolver(simulation->getBlockSize());
+	for(int i= 0; i < channels; i++) convolvers[i] = new FftConvolver(server->getBlockSize());
 }
 
-std::shared_ptr<Node> createFftConvolverNode(std::shared_ptr<Simulation> simulation, int channels) {
-	return standardNodeCreation<FftConvolverNode>(simulation, channels);
+std::shared_ptr<Node> createFftConvolverNode(std::shared_ptr<Server> server, int channels) {
+	return standardNodeCreation<FftConvolverNode>(server, channels);
 }
 
 FftConvolverNode::~FftConvolverNode() {
@@ -68,7 +68,7 @@ void FftConvolverNode::setResponseFromFile(std::string path, int fileChannel, in
 	//Resample if needed.
 	float* resampledTmp;
 	int resampledTmpLength;
-	staticResamplerKernel(reader.getSr(), simulation->getSr(), 1, reader.getFrameCount(), tmp, &resampledTmpLength, &resampledTmp);
+	staticResamplerKernel(reader.getSr(), server->getSr(), 1, reader.getFrameCount(), tmp, &resampledTmpLength, &resampledTmp);
 	//Finally, set the specified convolver.
 	setResponse(convolverChannel, resampledTmpLength, resampledTmp);
 	freeArray(tmp);
@@ -77,11 +77,11 @@ void FftConvolverNode::setResponseFromFile(std::string path, int fileChannel, in
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createFftConvolverNode(LavHandle simulationHandle, int channels, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createFftConvolverNode(LavHandle serverHandle, int channels, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
-	auto retval = createFftConvolverNode(simulation, channels);
+	auto server = incomingObject<Server>(serverHandle);
+	LOCK(*server);
+	auto retval = createFftConvolverNode(server, channels);
 	*destination = outgoingObject<Node>(retval);
 	PUB_END
 }

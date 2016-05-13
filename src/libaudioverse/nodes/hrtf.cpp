@@ -8,7 +8,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/nodes/hrtf.hpp>
 #include <libaudioverse/implementations/hrtf_panner.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
@@ -20,14 +20,14 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-HrtfNode::HrtfNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf): Node(Lav_OBJTYPE_HRTF_NODE, simulation, 1, 2),
-panner(simulation->getBlockSize(), simulation->getSr(), hrtf) {
+HrtfNode::HrtfNode(std::shared_ptr<Server> server, std::shared_ptr<HrtfData> hrtf): Node(Lav_OBJTYPE_HRTF_NODE, server, 1, 2),
+panner(server->getBlockSize(), server->getSr(), hrtf) {
 	appendInputConnection(0, 1);
 	appendOutputConnection(0, 2);
 }
 
-std::shared_ptr<Node>createHrtfNode(std::shared_ptr<Simulation>simulation, std::shared_ptr<HrtfData> hrtf) {
-	return standardNodeCreation<HrtfNode>(simulation, hrtf);
+std::shared_ptr<Node>createHrtfNode(std::shared_ptr<Server>server, std::shared_ptr<HrtfData> hrtf) {
+	return standardNodeCreation<HrtfNode>(server, hrtf);
 }
 
 void HrtfNode::process() {
@@ -43,12 +43,12 @@ void HrtfNode::reset() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createHrtfNode(LavHandle simulationHandle, const char* hrtfPath, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createHrtfNode(LavHandle serverHandle, const char* hrtfPath, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
-	auto hrtf = createHrtfFromString(hrtfPath, simulation->getSr());
-	auto retval = createHrtfNode(simulation, hrtf);
+	auto server = incomingObject<Server>(serverHandle);
+	LOCK(*server);
+	auto hrtf = createHrtfFromString(hrtfPath, server->getSr());
+	auto retval = createHrtfNode(server, hrtf);
 	*destination = outgoingObject<Node>(retval);
 	PUB_END
 }

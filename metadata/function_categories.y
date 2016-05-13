@@ -4,11 +4,11 @@ function_categories:
     doc_description: |
       The following functions are the most important functions of Libaudioverse.
       Writing an app without them is impossible.
-  - name: simulations
-    doc_name: Simulation Functions
+  - name: servers
+    doc_name: Server Functions
     doc_description: |
-      The following functions relate to and control the simulation.
-  - name: devices
+      The following functions relate to and control the server.
+      - name: devices
     doc_name: Device Enumeration
     doc_description: |
       The following functions are for queryng informationa bout audio devices.

@@ -6,7 +6,7 @@ A copy of both licenses may be found in license.gpl and license.mpl at the root 
 If these files are unavailable to you, see either http://www.gnu.org/licenses/ (GPL V3 or later) or https://www.mozilla.org/en-US/MPL/2.0/ (MPL 2.0).*/
 #include <libaudioverse/private/dspmath.hpp>
 #include <libaudioverse/implementations/file_streamer.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/kernels.hpp>
 #include <speex_resampler_cpp.hpp>
 #include <algorithm>

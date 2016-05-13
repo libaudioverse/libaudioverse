@@ -10,21 +10,21 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/nodes/hard_limiter.hpp>
 #include <libaudioverse/private/node.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/memory.hpp>
 #include <memory>
 
 namespace libaudioverse_implementation {
 
-HardLimiterNode::HardLimiterNode(std::shared_ptr<Simulation> simulation, int channels): Node(Lav_OBJTYPE_HARD_LIMITER_NODE, simulation, channels, channels) {
+HardLimiterNode::HardLimiterNode(std::shared_ptr<Server> server, int channels): Node(Lav_OBJTYPE_HARD_LIMITER_NODE, server, channels, channels) {
 	appendInputConnection(0, channels);
 	appendOutputConnection(0, channels);
 	setShouldZeroOutputBuffers(false);
 }
 
-std::shared_ptr<Node>createHardLimiterNode(std::shared_ptr<Simulation> simulation, int channels) {
-	return standardNodeCreation<HardLimiterNode>(simulation, channels);
+std::shared_ptr<Node>createHardLimiterNode(std::shared_ptr<Server> server, int channels) {
+	return standardNodeCreation<HardLimiterNode>(server, channels);
 }
 
 void HardLimiterNode::process() {
@@ -45,11 +45,11 @@ void HardLimiterNode::process() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterNode(LavHandle simulationHandle, int channels, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createHardLimiterNode(LavHandle serverHandle, int channels, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation =incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
-	auto retval = createHardLimiterNode(simulation, channels);
+	auto server =incomingObject<Server>(serverHandle);
+	LOCK(*server);
+	auto retval = createHardLimiterNode(server, channels);
 	*destination = outgoingObject<Node>(retval);
 	PUB_END
 }

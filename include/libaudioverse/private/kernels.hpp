@@ -12,7 +12,7 @@ namespace libaudioverse_implementation {
 
 Should the output count be less than channels, uninterleaving will only use the first outputCount channels.
 Should the input count be less than channels, interleaving will assume zero for all remaining channels.
-These two cases are rare and mainly exist to enable code reuse for getting blocks out of the simulation itself.*/
+These two cases are rare and mainly exist to enable code reuse for getting blocks out of the server itself.*/
 void uninterleaveSamples(unsigned int channels, unsigned int frames, float* samples, unsigned int outputCount, float** outputs);
 void interleaveSamples(unsigned int channels, unsigned int frames, unsigned int inputCount, float** inputs, float* output);
 

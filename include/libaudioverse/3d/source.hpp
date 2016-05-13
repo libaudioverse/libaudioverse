@@ -22,7 +22,7 @@ class HrtfData;
 
 class SourceNode: public Node {
 	public:
-	SourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentNode> environment);
+	SourceNode(std::shared_ptr<Server> server, std::shared_ptr<EnvironmentNode> environment);
 	~SourceNode();
 	void reset() override;
 	void feedEffect(int which);
@@ -44,5 +44,5 @@ class SourceNode: public Node {
 	std::map<int, AmplitudePanner*> fed_effects;
 };
 
-std::shared_ptr<SourceNode> createSourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentNode> environment);
+std::shared_ptr<SourceNode> createSourceNode(std::shared_ptr<Server> server, std::shared_ptr<EnvironmentNode> environment);
 }

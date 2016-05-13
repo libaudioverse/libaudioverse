@@ -31,12 +31,12 @@ class Planner;
 class ThreadTerminationException {
 };
 
-class Simulation: public Job {
+class Server: public Job {
 	public:
-	Simulation(unsigned int sr, unsigned int blockSize, unsigned int mixahead);
+	Server(unsigned int sr, unsigned int blockSize, unsigned int mixahead);
 	//needed because the InputConnection needs us to use shared_from_this.
 	void completeInitialization();
-	~Simulation();
+	~Server();
 	void getBlock(float* out, unsigned int channels, bool mayApplyMixingMatrix = true);
 	std::shared_ptr<InputConnection> getFinalOutputConnection();
 
@@ -80,7 +80,7 @@ class Simulation: public Job {
 	//called when connections are formed or lost, or when a node is deleted.
 	void invalidatePlan();
 	
-	//Get the time. This is relative to whenever the simulation was created, and advances with getBlock.
+	//Get the time. This is relative to whenever the server was created, and advances with getBlock.
 	double getCurrentTime();
 	
 	//Schedule something to run in a while, inside the audio thread.
@@ -140,7 +140,7 @@ class Simulation: public Job {
 	int threads = 1;
 	
 	template<typename JobT, typename CallableT, typename... ArgsT>
-	friend void simulationVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&... args);
+	friend void serverVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&... args);
 };
 
 }

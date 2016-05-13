@@ -9,7 +9,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/private/automators.hpp>
 #include <libaudioverse/private/buffer.hpp>
 #include <libaudioverse/private/node.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/connections.hpp>
 #include <stdlib.h>
 #include <string.h>
@@ -27,17 +27,17 @@ Property::~Property() {
 
 void Property::associateNode(Node* node) {
 	this->node = node;
-	block_size=node->getSimulation()->getBlockSize();
-	sr = node->getSimulation()->getSr();
+	block_size=node->getServer()->getBlockSize();
+	sr = node->getServer()->getSr();
 	if(type==Lav_PROPERTYTYPE_FLOAT || type == Lav_PROPERTYTYPE_DOUBLE) {
 		value_buffer= allocArray<double>(block_size);
 		node_buffer = allocArray<float>(block_size);
-		incoming_nodes=std::make_shared<InputConnection>(node->getSimulation(), nullptr, 0, 1);
+		incoming_nodes=std::make_shared<InputConnection>(node->getServer(), nullptr, 0, 1);
 	}
 }
 
-void Property::associateSimulation(std::shared_ptr<Simulation> simulation) {
-	this->simulation = simulation;
+void Property::associateServer(std::shared_ptr<Server> server) {
+	this->server = server;
 }
 
 void Property::reset(bool avoidCallbacks) {
@@ -80,7 +80,7 @@ void Property::setTag(int t) {
 }
 
 double Property::getSr() {
-	return node->getSimulation()->getSr();
+	return node->getServer()->getSr();
 }
 
 double Property::getTime() {
@@ -176,7 +176,7 @@ int Property::getIntValue() {
 void Property::setIntValue(int v, bool avoidCallbacks) {
 	RC(v, ival);
 	value.ival = v;
-	last_modified=simulation->getTickCount();
+	last_modified=server->getTickCount();
 	if(avoidCallbacks == false) firePostChangedCallback();
 }	
 
@@ -211,7 +211,7 @@ void Property::setFloatValue(float v, bool avoidCallbacks, bool avoidAutomatorCl
 	RC(v, fval);
 	if(avoidAutomatorClear == false) automators.clear();
 	value.fval = v;
-	last_modified=simulation->getTickCount();
+	last_modified=server->getTickCount();
 	if(avoidCallbacks == false) firePostChangedCallback();
 }
 
@@ -245,7 +245,7 @@ void Property::setDoubleValue(double v, bool avoidCallbacks, bool avoidAutomator
 	RC(v, dval);
 	if(avoidAutomatorClear == false) automators.clear();
 	value.dval = v;
-	last_modified =simulation->getTickCount();
+	last_modified =server->getTickCount();
 	if(avoidCallbacks == false) firePostChangedCallback();
 }
 
@@ -276,7 +276,7 @@ const float* Property::getFloat3Default() {
 
 void Property::setFloat3Value(const float* const v, bool avoidCallbacks) {
 	memcpy(value.f3val, v, sizeof(float)*3);
-	last_modified = simulation->getTickCount();
+	last_modified = server->getTickCount();
 	if(avoidCallbacks == false) firePostChangedCallback();
 }
 
@@ -284,7 +284,7 @@ void Property::setFloat3Value(float v1, float v2, float v3, bool avoidCallbacks)
 	value.f3val[0] = v1;
 	value.f3val[1] = v2;
 	value.f3val[2] = v3;
-	last_modified=simulation->getTickCount();
+	last_modified=server->getTickCount();
 	if(avoidCallbacks == false) firePostChangedCallback();
 }
 
@@ -308,7 +308,7 @@ const float* Property::getFloat6Default() {
 
 void Property::setFloat6Value(const float* const v, bool avoidCallbacks) {
 	memcpy(&value.f6val, v, sizeof(float)*6);
-	last_modified = simulation->getTickCount();
+	last_modified = server->getTickCount();
 	if(avoidCallbacks == false) firePostChangedCallback();
 }
 
@@ -319,7 +319,7 @@ void Property::setFloat6Value(float v1, float v2, float v3, float v4, float v5, 
 	value.f6val[3] = v4;
 	value.f6val[4] = v5;
 	value.f6val[5] = v6;
-	last_modified =simulation->getTickCount();
+	last_modified =server->getTickCount();
 	if(avoidCallbacks == false) firePostChangedCallback();
 }
 
@@ -372,7 +372,7 @@ void Property::writeFloatArray(unsigned int start, unsigned int stop, float* val
 	for(unsigned int i = start; i < stop; i++) {
 		farray_value[i] = values[i];
 	}
-	last_modified=simulation->getTickCount();
+	last_modified=server->getTickCount();
 	if(avoidCallbacks == false) firePostChangedCallback();
 }
 
@@ -386,7 +386,7 @@ void Property::replaceFloatArray(unsigned int length, float* values, bool avoidC
 	}
 	farray_value.resize(length);
 	std::copy(values, values+length, farray_value.begin());
-	last_modified=simulation->getTickCount();
+	last_modified=server->getTickCount();
 	if(avoidCallbacks == false) firePostChangedCallback();
 }
 
@@ -420,7 +420,7 @@ void Property::writeIntArray(unsigned int start, unsigned int stop, int* values,
 	for(unsigned int i = start; i < stop; i++) {
 		iarray_value[i] = values[i];
 	}
-	last_modified = simulation->getTickCount();
+	last_modified = server->getTickCount();
 	if(avoidCallbacks == false) firePostChangedCallback();
 }
 
@@ -434,7 +434,7 @@ void Property::replaceIntArray(unsigned int length, int* values, bool avoidCallb
 	}
 	iarray_value.resize(length);
 	std::copy(values, values+length, iarray_value.begin());
-	last_modified=simulation->getTickCount();
+	last_modified=server->getTickCount();
 	if(avoidCallbacks == false) firePostChangedCallback();
 }
 
@@ -461,7 +461,7 @@ const char* Property::getStringValue() {
 
 void Property::setStringValue(const char* s, bool avoidCallbacks) {
 	string_value = s;
-	last_modified=simulation->getTickCount();
+	last_modified=server->getTickCount();
 	if(avoidCallbacks == false) firePostChangedCallback();
 }
 
@@ -481,7 +481,7 @@ void Property::setBufferValue(std::shared_ptr<Buffer> b, bool avoidCallbacks) {
 	if(buffer_value) buffer_value->decrementUseCount();
 	buffer_value=b;
 	if(b) b->incrementUseCount();
-	last_modified = simulation->getTickCount();
+	last_modified = server->getTickCount();
 	if(avoidCallbacks == false) firePostChangedCallback();
 }
 
@@ -497,7 +497,7 @@ void Property::enableARate() {
 void Property::tick() {
 	if(last_modified > last_ticked) was_modified=true;
 	else was_modified=false;
-	last_ticked=simulation->getTickCount();
+	last_ticked=server->getTickCount();
 	if(type !=Lav_PROPERTYTYPE_FLOAT && type != Lav_PROPERTYTYPE_DOUBLE) return; //nothing to do for other types.
 	//we don't know for sure if we want this yet, so reset it.
 	should_use_value_buffer = false;

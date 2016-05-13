@@ -12,11 +12,11 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-class Simulation;
+class Server;
 
 class NestedAllpassNetworkNode: public Node {
 	public:
-	NestedAllpassNetworkNode(std::shared_ptr<Simulation> sim, int channels);
+	NestedAllpassNetworkNode(std::shared_ptr<Server> sim, int channels);
 	void process() override;
 	void reset() override;
 	void beginNesting(int delay, float coefficient);
@@ -29,5 +29,5 @@ class NestedAllpassNetworkNode: public Node {
 	MultichannelFilterBank<NestedAllpassNetwork> bank;
 };
 
-std::shared_ptr<Node> createNestedAllpassNetworkNode(std::shared_ptr<Simulation> simulation, int channels);
+std::shared_ptr<Node> createNestedAllpassNetworkNode(std::shared_ptr<Server> server, int channels);
 }

@@ -150,43 +150,43 @@ functions:
       It is not possible for Libaudioverse to detect this case.
     params:
       index: The index of the audio device.
-  Lav_createSimulation:
-    category: simulations
+  Lav_createServer:
+    category: servers
     doc_description: |
-      Creates a  simulation.
-      The new simulation has no associated audio device.
-      To make it output, use `Lav_simulationSetOutputDevice`.
+      Creates a  server.
+      The new server has no associated audio device.
+      To make it output, use `Lav_serverSetOutputDevice`.
     params:
-      sr: The sampling rate of the new simulation.
-      blockSize: The block size of the new simulation.
-  Lav_simulationGetBlockSize:
-    category: simulations
+      sr: The sampling rate of the new server.
+      blockSize: The block size of the new server.
+  Lav_serverGetBlockSize:
+    category: servers
     doc_description: |
-      Query the block size of the specified simulation.
-  Lav_simulationGetBlock:
-    category: simulations
+      Query the block size of the specified server.
+  Lav_serverGetBlock:
+    category: servers
     doc_description: |
-      Gets a block of audio from the simulation and advances its time.
-      You must allocate enough space to hold exactly one block of audio: the simulation's block size times the number of channels requested floating point values.
+      Gets a block of audio from the server and advances its time.
+      You must allocate enough space to hold exactly one block of audio: the server's block size times the number of channels requested floating point values.
       Note that mixing this function with other output methods invokes undefined behavior.
     params:
-      simulationHandle: The handle of the simulation to read a block from.
-      channels: The number of channels we want. The simulations' output will be upmixed or downmixed as appropriate.
-      mayApplyMixingMatrix: If 0, drop any additional channels in the simulation's output and set any  missing channels in the simulation's output to 0. Otherwise, if we can, apply a mixing matrix.
+      serverHandle: The handle of the server to read a block from.
+      channels: The number of channels we want. The servers' output will be upmixed or downmixed as appropriate.
+      mayApplyMixingMatrix: If 0, drop any additional channels in the server's output and set any  missing channels in the server's output to 0. Otherwise, if we can, apply a mixing matrix.
       buffer: The memory to which to write the result.
-  Lav_simulationGetSr:
-    category: simulations
+  Lav_serverGetSr:
+    category: servers
     doc_description: |
-      Query the simulation's sampling rate.
-  Lav_simulationSetOutputDevice:
-    category: simulations
+      Query the server's sampling rate.
+  Lav_serverSetOutputDevice:
+    category: servers
     doc_description: |
-      Set the output device of the simulation.
+      Set the output device of the server.
       -1 is the system default.  0 and above are specific audio devices, matching the indices returned by the enumeration functions.
       
-      Note that it is possible to change the output device of a simulation even after it has been set.
+      Note that it is possible to change the output device of a server even after it has been set.
       
-      After the output device has been set, calls to `Lav_simulationGetBlock` will error.
+      After the output device has been set, calls to `Lav_serverGetBlock` will error.
       
       The parameters {{"minLatency"|param}}, {{"startLatency"|param}}, and {{"maxLatency"|param}} are hints as to the latency you wish to have.
       The audio backends attempt to optimize themselves according to the CPU load of your application and other factors.
@@ -196,56 +196,56 @@ functions:
       This should usually be somewhat high, as applications often begin by creating a large number of objects.
       The audio backends will reduce latency as rapidly as is safe.
     params:
-      index: The output device  the simulation is to play on.
+      index: The output device  the server is to play on.
       channels: The number of channels we wish to output.
       minLatency: The minimum latency your application can tolerate. 0.0 is a good value in most cases.
       startLatency: A hint as to the latency the audio backend should start with. 0.05 is a suggested default.
       maxLatency: The maximum latency your application can tolerate. 0.1 or even 0.2 is a suggested default.
-  Lav_simulationClearOutputDevice:
-    category: simulations
+  Lav_serverClearOutputDevice:
+    category: servers
     doc_description: |
-      Clear a simulation's output device.
+      Clear a server's output device.
       
       This is no-op if no output device has been set.
       
-      After a call to this function, it is again safe to use `Lav_simulationGetBlock`.
-  Lav_simulationLock:
-    category: simulations
+      After a call to this function, it is again safe to use `Lav_serverGetBlock`.
+  Lav_serverLock:
+    category: servers
     doc_description: |
-      All operations between a call to this function and a call to {{"Lav_simulationUnlock"|function}} will happen together, with no blocks mixed between them.
-      This is equivalent to assuming that the simulation is a lock, with  all of the required caution that implies.
-      No other thread will be able to access this simulation or objects created from it until {{"Lav_simulationUnlock"|function}} is called.
-      If you do not call {{"Lav_simulationUnlock"|function}} in a timely manner, then audio will stop until you do.
+      All operations between a call to this function and a call to {{"Lav_serverUnlock"|function}} will happen together, with no blocks mixed between them.
+      This is equivalent to assuming that the server is a lock, with  all of the required caution that implies.
+      No other thread will be able to access this server or objects created from it until {{"Lav_serverUnlock"|function}} is called.
+      If you do not call {{"Lav_serverUnlock"|function}} in a timely manner, then audio will stop until you do.
       
-      Pairs of {{"Lav_simulationLock"|function}} and {{"Lav_simulationUnlock"|function}} nest safely.
-  Lav_simulationUnlock:
-    category: simulations
+      Pairs of {{"Lav_serverLock"|function}} and {{"Lav_serverUnlock"|function}} nest safely.
+  Lav_serverUnlock:
+    category: servers
     doc_description: |
-      Release the internal lock of a simulation, allowing normal operation to resume.
-      This is to be used after a call to {{"Lav_simulationLock"|function}} and on the same thread as that call; calling it in any other circumstance or on any other thread invokes undefined behavior.
+      Release the internal lock of a server, allowing normal operation to resume.
+      This is to be used after a call to {{"Lav_serverLock"|function}} and on the same thread as that call; calling it in any other circumstance or on any other thread invokes undefined behavior.
       
-      Pairs of {{"Lav_simulationLock"|function}} and {{"Lav_simulationUnlock"|function}} nest safely.
-  Lav_simulationSetBlockCallback:
-    category: simulations
+      Pairs of {{"Lav_serverLock"|function}} and {{"Lav_serverUnlock"|function}} nest safely.
+  Lav_serverSetBlockCallback:
+    category: servers
     doc_description: |
       Set a callback to be called just before every block and in the audio thread.
       This callback can and should access the Libaudioverse API:
       the point of it is that you can use it to perform tasks where missing even one block would be problematic, i.e. very precise scheduling of events.
       
       This  callback can even block, though this will slow down audio mixing and may cause glitchy audio.
-      The one thing you should never do in this callback is access anything belonging to another simulation, as this can cause deadlock.
+      The one thing you should never do in this callback is access anything belonging to another server, as this can cause deadlock.
       
-      The callback receives two parameters: the simulation to which it is associated and the time in simulation time that corresponds to the beginning of the block about to be mixed.
+      The callback receives two parameters: the server to which it is associated and the time in server time that corresponds to the beginning of the block about to be mixed.
     params:
       callback: The callback to use.
       userdata: An extra parameter that will be passed to the callback.
-  Lav_simulationWriteFile:
-    category: simulations
+  Lav_serverWriteFile:
+    category: servers
     doc_description: |
-      Write the simulation's output to the specified file.
+      Write the server's output to the specified file.
       
-      This function advances the simulation as though {{"Lav_simulationGetBlock"|function}} were called multiple times, the number of times determined by {{"duration"|param}}.
-      As a consequence, it is not possible to use this function while the simulation is outputting.
+      This function advances the server as though {{"Lav_serverGetBlock"|function}} were called multiple times, the number of times determined by {{"duration"|param}}.
+      As a consequence, it is not possible to use this function while the server is outputting.
       
       The file format is determined from the path.
       Recognized extensions include ".wav" and ".ogg", which are guaranteed to work on all systems.
@@ -254,23 +254,23 @@ functions:
       path: The path to the audio file to be written.
       channels: The number of channels in the resulting file.
       duration: Duration of the resulting file, in seconds.
-      mayApplyMixingMatrix: 1 if applying a mixing matrix should be attempted, 0 if extra channels should be treated as 0 or dropped.  This is the same behavior as with {{"Lav_simulationGetBlock"|function}}.
-  Lav_simulationSetThreads:
-    category: simulations
+      mayApplyMixingMatrix: 1 if applying a mixing matrix should be attempted, 0 if extra channels should be treated as 0 or dropped.  This is the same behavior as with {{"Lav_serverGetBlock"|function}}.
+  Lav_serverSetThreads:
+    category: servers
     doc_description: |
-      Set the number of threads that the simulation is allowed to use.
+      Set the number of threads that the server is allowed to use.
       
       The value of the threads parameter may be from 1 to infinity.
-      When set to 1, processing happens in the thread who calls {{"Lav_simulationGetBlock"|function}}.
-      All other values sleep the thread calling {{"Lav_simulationGetBlock"|function}} and perform processing in background threads.
+      When set to 1, processing happens in the thread who calls {{"Lav_serverGetBlock"|function}}.
+      All other values sleep the thread calling {{"Lav_serverGetBlock"|function}} and perform processing in background threads.
     params:
       threads: The number of threads to use for processing.  Must be at least 1.  Typical values include 1 and 1 less than the available cores.
-  Lav_simulationGetThreads:
-    category: simulations
+  Lav_serverGetThreads:
+    category: servers
     doc_description: |
-      Get the number of threads that the simulation is currently using.
-  Lav_simulationCallIn:
-    category: simulations
+      Get the number of threads that the server is currently using.
+  Lav_serverCallIn:
+    category: servers
     doc_description: |
       Schedule a function to run in the future.
       
@@ -279,7 +279,7 @@ functions:
       If called outside the audio thread, it can call the Libaudioverse API and will not block audio.
       This is the same as node callbacks.
       
-      Time advances for simulations if and only if they are processing audio for some purpose; this callback is called in audio time, as it were.
+      Time advances for servers if and only if they are processing audio for some purpose; this callback is called in audio time, as it were.
       The precision of the callback is limited by the block size.
       Smaller block sizes will call callbacks more precisely.
     params:
@@ -291,17 +291,17 @@ functions:
     category: buffers
     doc_description: |
       Create an empty buffer.
-  Lav_bufferGetSimulation:
+  Lav_bufferGetServer:
     category: buffers
     doc_description: |
-      Get the handle of the simulation used to create this buffer.
+      Get the handle of the server used to create this buffer.
     params:
       bufferHandle: The handle of the buffer.
   Lav_bufferLoadFromFile:
     category: buffers
     doc_description:
       Loads data into this buffer from a file.
-      The file will be resampled to the sampling rate of the simulation.
+      The file will be resampled to the sampling rate of the server.
       This will happen synchronously.
     params:
       bufferHandle: The buffer into which to load data.
@@ -335,14 +335,14 @@ functions:
     doc_description: |
       Get the length of the specified buffer in samples.
       
-      The sample rate of a buffer is the sample rate of the simulation for which that buffer was created.
+      The sample rate of a buffer is the sample rate of the server for which that buffer was created.
       This function is primarily useful for estimating ram usage in caching structures.
     params:
       bufferHandle: The buffer whose length is to be queried.
   Lav_nodeGetSimulation:
     category: nodes
     doc_description: |
-      Get the simulation that a node belongs to.
+      Get the server that a node belongs to.
   Lav_nodeConnect:
     category: nodes
     doc_description: |
@@ -357,7 +357,7 @@ functions:
   Lav_nodeConnectSimulation:
     category: nodes
     doc_description: |
-      Connect the specified output of the specified node to the simulation's input.
+      Connect the specified output of the specified node to the server's input.
     params:
       output: The index of the output to connect.
   Lav_nodeConnectProperty:

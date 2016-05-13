@@ -7,7 +7,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/nodes/ringmod.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
@@ -17,15 +17,15 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-RingmodNode::RingmodNode(std::shared_ptr<Simulation> sim): Node(Lav_OBJTYPE_RINGMOD_NODE, sim, 2, 1) {
+RingmodNode::RingmodNode(std::shared_ptr<Server> s): Node(Lav_OBJTYPE_RINGMOD_NODE, s, 2, 1) {
 	appendInputConnection(0, 1);
 	appendInputConnection(1, 1);
 	appendOutputConnection(0, 1);
 	setShouldZeroOutputBuffers(false);
 }
 
-std::shared_ptr<Node> createRingmodNode(std::shared_ptr<Simulation> simulation) {
-	return standardNodeCreation<RingmodNode>(simulation);
+std::shared_ptr<Node> createRingmodNode(std::shared_ptr<Server> server) {
+	return standardNodeCreation<RingmodNode>(server);
 }
 
 void RingmodNode::process() {
@@ -34,11 +34,11 @@ void RingmodNode::process() {
 
 //begin public api.
 
-Lav_PUBLIC_FUNCTION LavError Lav_createRingmodNode(LavHandle simulationHandle, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createRingmodNode(LavHandle serverHandle, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
-	*destination = outgoingObject<Node>(createRingmodNode(simulation));
+	auto server = incomingObject<Server>(serverHandle);
+	LOCK(*server);
+	*destination = outgoingObject<Node>(createRingmodNode(server));
 	PUB_END
 }
 

@@ -7,7 +7,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/nodes/filtered_delay.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
@@ -19,11 +19,11 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-FilteredDelayNode::FilteredDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, unsigned int channels): Node(Lav_OBJTYPE_FILTERED_DELAY_NODE, simulation, channels, channels) {
+FilteredDelayNode::FilteredDelayNode(std::shared_ptr<Server> server, float maxDelay, unsigned int channels): Node(Lav_OBJTYPE_FILTERED_DELAY_NODE, server, channels, channels) {
 	if(channels <= 0) ERROR(Lav_ERROR_RANGE, "Channels must be greater than 0.");
 	this->channels = channels;
 	lines = new CrossfadingDelayLine*[channels];
-	for(unsigned int i = 0; i < channels; i++) lines[i] = new CrossfadingDelayLine(maxDelay, simulation->getSr());
+	for(unsigned int i = 0; i < channels; i++) lines[i] = new CrossfadingDelayLine(maxDelay, server->getSr());
 	getProperty(Lav_FILTERED_DELAY_DELAY).setFloatRange(0.0f, maxDelay);
 	//finally, set the read-only max delay.
 	getProperty(Lav_FILTERED_DELAY_DELAY_MAX).setFloatValue(maxDelay);
@@ -31,12 +31,12 @@ FilteredDelayNode::FilteredDelayNode(std::shared_ptr<Simulation> simulation, flo
 	appendOutputConnection(0, channels);
 	//This node was made by merging delay and biquad, everything below here is biquad:
 	biquads = new BiquadFilter*[channels]();
-	for(int i= 0; i < channels; i++) biquads[i] = new BiquadFilter(simulation->getSr());
+	for(int i= 0; i < channels; i++) biquads[i] = new BiquadFilter(server->getSr());
 	prev_type = getProperty(Lav_BIQUAD_FILTER_TYPE).getIntValue();
 }
 
-std::shared_ptr<Node> createFilteredDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, unsigned int channels) {
-	return standardNodeCreation<FilteredDelayNode>(simulation, maxDelay, channels);
+std::shared_ptr<Node> createFilteredDelayNode(std::shared_ptr<Server> server, float maxDelay, unsigned int channels) {
+	return standardNodeCreation<FilteredDelayNode>(server, maxDelay, channels);
 }
 
 FilteredDelayNode::~FilteredDelayNode() {
@@ -60,7 +60,7 @@ void FilteredDelayNode::delayChanged() {
 //Modified from the biquad node.
 void FilteredDelayNode::reconfigureBiquads() {
 	int type = getProperty(Lav_FILTERED_DELAY_FILTER_TYPE).getIntValue();
-	float sr = simulation->getSr();
+	float sr = server->getSr();
 	float frequency = getProperty(Lav_FILTERED_DELAY_FREQUENCY).getFloatValue();
 	float q = getProperty(Lav_FILTERED_DELAY_Q).getFloatValue();
 	float dbgain= getProperty(Lav_FILTERED_DELAY_DBGAIN).getFloatValue();
@@ -107,11 +107,11 @@ void FilteredDelayNode::reset() {
 }
 
 //begin public api
-Lav_PUBLIC_FUNCTION LavError Lav_createFilteredDelayNode(LavHandle simulationHandle, float maxDelay, unsigned int channels, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createFilteredDelayNode(LavHandle serverHandle, float maxDelay, unsigned int channels, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation =incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
-	auto d = createFilteredDelayNode(simulation, maxDelay, channels);
+	auto server =incomingObject<Server>(serverHandle);
+	LOCK(*server);
+	auto d = createFilteredDelayNode(server, maxDelay, channels);
 	*destination = outgoingObject(d);
 	PUB_END
 }

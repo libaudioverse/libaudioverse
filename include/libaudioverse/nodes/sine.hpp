@@ -11,15 +11,15 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-class Simulation;
+class Server;
 
 class SineNode: public Node {
 	public:
-	SineNode(std::shared_ptr<Simulation> simulation);
+	SineNode(std::shared_ptr<Server> server);
 	virtual void process();
 	virtual void reset() override;
 	SinOsc oscillator;
 };
 
-std::shared_ptr<Node> createSineNode(std::shared_ptr<Simulation> simulation);
+std::shared_ptr<Node> createSineNode(std::shared_ptr<Server> server);
 }

@@ -10,7 +10,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/nodes/buffer.hpp>
 #include <libaudioverse/private/node.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/dspmath.hpp>
 #include <libaudioverse/private/macros.hpp>
@@ -23,15 +23,15 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-BufferNode::BufferNode(std::shared_ptr<Simulation> simulation): Node(Lav_OBJTYPE_BUFFER_NODE, simulation, 0, 1),
-player(simulation->getBlockSize(), simulation->getSr()) {
+BufferNode::BufferNode(std::shared_ptr<Server> server): Node(Lav_OBJTYPE_BUFFER_NODE, server, 0, 1),
+player(server->getBlockSize(), server->getSr()) {
 	appendOutputConnection(0, 1);
 	getProperty(Lav_BUFFER_BUFFER).setPostChangedCallback([&] () {bufferChanged();});
 	end_callback = std::make_shared<Callback<void()>>();
 }
 
-std::shared_ptr<Node> createBufferNode(std::shared_ptr<Simulation> simulation) {
-	return standardNodeCreation<BufferNode>(simulation);
+std::shared_ptr<Node> createBufferNode(std::shared_ptr<Server> server) {
+	return standardNodeCreation<BufferNode>(server);
 }
 
 void BufferNode::bufferChanged() {
@@ -67,17 +67,17 @@ void BufferNode::process() {
 	player.process(buff->getChannels(), &output_buffers[0]);
 	getProperty(Lav_BUFFER_POSITION).setDoubleValue(player.getPosition());
 	for(int i = player.getEndedCount(); i > prevEndedCount; i--) {
-		simulation->enqueueTask([=] () {(*end_callback)();});
+		server->enqueueTask([=] () {(*end_callback)();});
 	}
 	getProperty(Lav_BUFFER_ENDED_COUNT).setIntValue(player.getEndedCount());
 }
 
 //begin public api
-Lav_PUBLIC_FUNCTION LavError Lav_createBufferNode(LavHandle simulationHandle, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createBufferNode(LavHandle serverHandle, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
-	auto retval = createBufferNode(simulation);
+	auto server = incomingObject<Server>(serverHandle);
+	LOCK(*server);
+	auto retval = createBufferNode(server);
 	*destination = outgoingObject<Node>(retval);
 	PUB_END
 }

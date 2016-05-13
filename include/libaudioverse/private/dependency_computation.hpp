@@ -6,7 +6,7 @@ A copy of both licenses may be found in license.gpl and license.mpl at the root 
 If these files are unavailable to you, see either http://www.gnu.org/licenses/ (GPL V3 or later) or https://www.mozilla.org/en-US/MPL/2.0/ (MPL 2.0).*/
 #pragma once
 #include "node.hpp"
-#include "simulation.hpp"
+#include "server.hpp"
 #include "helper_templates.hpp"
 #include "../3d/environment.hpp"
 #include "../3d/source.hpp"
@@ -22,7 +22,7 @@ To create a node that overrides its dependency management, add a template here a
 Be sure to order the final template from most to least specific.*/
 
 template<typename  JobT, typename CallableT, typename... ArgsT>
-inline void simulationVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&... args) {
+inline void serverVisitDependencies(JobT&& start, CallableT&& callable, ArgsT&&... args) {
 	start->final_output_connection->visitInputs(callable, args...);
 	filterWeakPointers(start->always_playing_nodes, [](std::shared_ptr<Node> &n, CallableT &callable, ArgsT&&... args2) {
 		auto j = std::static_pointer_cast<Job>(n);
@@ -59,7 +59,7 @@ inline void environmentVisitDependencies(JobT&& start, CallableT&& callable, Arg
 
 template<typename JobT, typename CallableT, typename... ArgsT>
 inline void visitDependencies(JobT &&start, CallableT&& callable, ArgsT&&... args) {
-	TRY(Simulation, simulationVisitDependencies)
+	TRY(Server, serverVisitDependencies)
 	TRY(EnvironmentNode, environmentVisitDependencies)
 	TRY(Node, nodeVisitDependencies)
 }

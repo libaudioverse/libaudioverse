@@ -7,7 +7,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/nodes/nested_allpass_network.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
@@ -18,16 +18,16 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-NestedAllpassNetworkNode::NestedAllpassNetworkNode(std::shared_ptr<Simulation> sim, int channels): Node(Lav_OBJTYPE_NESTED_ALLPASS_NETWORK_NODE, sim, channels, channels),
-bank(simulation->getSr()) {
+NestedAllpassNetworkNode::NestedAllpassNetworkNode(std::shared_ptr<Server> s, int channels): Node(Lav_OBJTYPE_NESTED_ALLPASS_NETWORK_NODE, s, channels, channels),
+bank(server->getSr()) {
 	if(channels < 1) ERROR(Lav_ERROR_RANGE, "Cannot filter 0 or fewer channels.");
 	appendInputConnection(0, channels);
 	appendOutputConnection(0, channels);
 	bank.setChannelCount(channels);
 }
 
-std::shared_ptr<Node> createNestedAllpassNetworkNode(std::shared_ptr<Simulation> simulation, int channels) {
-	return standardNodeCreation<NestedAllpassNetworkNode>(simulation, channels);
+std::shared_ptr<Node> createNestedAllpassNetworkNode(std::shared_ptr<Server> server, int channels) {
+	return standardNodeCreation<NestedAllpassNetworkNode>(server, channels);
 }
 
 void NestedAllpassNetworkNode::process() {
@@ -68,11 +68,11 @@ void NestedAllpassNetworkNode::compile() {
 
 //begin public api.
 
-Lav_PUBLIC_FUNCTION LavError Lav_createNestedAllpassNetworkNode(LavHandle simulationHandle, int channels, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createNestedAllpassNetworkNode(LavHandle serverHandle, int channels, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
-	auto retval= createNestedAllpassNetworkNode(simulation, channels);
+	auto server = incomingObject<Server>(serverHandle);
+	LOCK(*server);
+	auto retval= createNestedAllpassNetworkNode(server, channels);
 	*destination =outgoingObject<Node>(retval);
 	PUB_END
 }

@@ -7,7 +7,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/nodes/graph_listener.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
@@ -18,16 +18,16 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-GraphListenerNode::GraphListenerNode(std::shared_ptr<Simulation> sim, unsigned int channels): Node(Lav_OBJTYPE_GRAPH_LISTENER_NODE, sim, channels, channels) {
-	outgoing_buffer = allocArray<float>(channels*sim->getBlockSize());
+GraphListenerNode::GraphListenerNode(std::shared_ptr<Server> s, unsigned int channels): Node(Lav_OBJTYPE_GRAPH_LISTENER_NODE, s, channels, channels) {
+	outgoing_buffer = allocArray<float>(channels*s->getBlockSize());
 	this->channels = channels;
 	appendInputConnection(0, channels);
 	appendOutputConnection(0, channels);
 	setShouldZeroOutputBuffers(false);
 }
 
-std::shared_ptr<Node> createGraphListenerNode(std::shared_ptr<Simulation> simulation, unsigned int channels) {
-	return standardNodeCreation<GraphListenerNode>(simulation, channels);
+std::shared_ptr<Node> createGraphListenerNode(std::shared_ptr<Server> server, unsigned int channels) {
+	return standardNodeCreation<GraphListenerNode>(server, channels);
 }
 
 GraphListenerNode::~GraphListenerNode() {
@@ -48,11 +48,11 @@ void GraphListenerNode::process() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createGraphListenerNode(LavHandle simulationHandle, unsigned int channels, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createGraphListenerNode(LavHandle serverHandle, unsigned int channels, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
-	*destination = outgoingObject<Node>(createGraphListenerNode(simulation, channels));
+	auto server = incomingObject<Server>(serverHandle);
+	LOCK(*server);
+	*destination = outgoingObject<Node>(createGraphListenerNode(server, channels));
 	PUB_END
 }
 

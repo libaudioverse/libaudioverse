@@ -9,20 +9,20 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/nodes/additive_saw.hpp>
 #include <libaudioverse/implementations/additive_saw.hpp>
 #include <libaudioverse/private/node.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <memory>
 
 namespace libaudioverse_implementation {
 
-AdditiveSawNode::AdditiveSawNode(std::shared_ptr<Simulation> simulation): Node(Lav_OBJTYPE_ADDITIVE_SAW_NODE, simulation, 0, 1), oscillator(simulation->getSr()) {
+AdditiveSawNode::AdditiveSawNode(std::shared_ptr<Server> server): Node(Lav_OBJTYPE_ADDITIVE_SAW_NODE, server, 0, 1), oscillator(server->getSr()) {
 	appendOutputConnection(0, 1);
 	setShouldZeroOutputBuffers(false);
 }
 
-std::shared_ptr<Node> createAdditiveSawNode(std::shared_ptr<Simulation> simulation) {
-	return standardNodeCreation<AdditiveSawNode>(simulation);
+std::shared_ptr<Node> createAdditiveSawNode(std::shared_ptr<Server> server) {
+	return standardNodeCreation<AdditiveSawNode>(server);
 }
 
 void AdditiveSawNode::process() {
@@ -51,11 +51,11 @@ void AdditiveSawNode::reset() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createAdditiveSawNode(LavHandle simulationHandle, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createAdditiveSawNode(LavHandle serverHandle, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
-	auto retval = createAdditiveSawNode(simulation);
+	auto server = incomingObject<Server>(serverHandle);
+	LOCK(*server);
+	auto retval = createAdditiveSawNode(server);
 	*destination = outgoingObject<Node>(retval);
 	PUB_END
 }

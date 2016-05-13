@@ -6,7 +6,7 @@ A copy of both licenses may be found in license.gpl and license.mpl at the root 
 If these files are unavailable to you, see either http://www.gnu.org/licenses/ (GPL V3 or later) or https://www.mozilla.org/en-US/MPL/2.0/ (MPL 2.0).*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
@@ -16,7 +16,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-CrossfaderNode::CrossfaderNode(std::shared_ptr<Simulation> sim, int channels, int inputs): Node(Lav_OBJTYPE_CROSSFADER_NODE, sim, channels*inputs, channels)  {
+CrossfaderNode::CrossfaderNode(std::shared_ptr<Server> s, int channels, int inputs): Node(Lav_OBJTYPE_CROSSFADER_NODE, s, channels*inputs, channels)  {
 	if(inputs < 1) ERROR(Lav_ERROR_RANGE, "It doesn't make sense to have a crossfader with less than 2 inputs.");
 	if(channels < 1) ERROR(Lav_ERROR_RANGE, "It doesn't make sense to have a crossfader with no channels.");
 	for(int i = 0; i < inputs; i++) {
@@ -33,8 +33,8 @@ CrossfaderNode::CrossfaderNode(std::shared_ptr<Simulation> sim, int channels, in
 	setShouldZeroOutputBuffers(false);
 }
 
-std::shared_ptr<Node> createCrossfaderNode(std::shared_ptr<Simulation> simulation, int channels, int inputs) {
-	return standardNodeCreation<CrossfaderNode>(simulation, channels, inputs);
+std::shared_ptr<Node> createCrossfaderNode(std::shared_ptr<Server> server, int channels, int inputs) {
+	return standardNodeCreation<CrossfaderNode>(server, channels, inputs);
 }
 
 void CrossfaderNode::crossfade(float duration, int input) {
@@ -49,7 +49,7 @@ void CrossfaderNode::crossfade(float duration, int input) {
 	getProperty(Lav_CROSSFADER_IS_CROSSFADING).setIntValue(1);
 	getProperty(Lav_CROSSFADER_TARGET_INPUT).setIntValue(input);
 	target = input;
-	delta = 1.0/(simulation->getSr()*duration);
+	delta = 1.0/(server->getSr()*duration);
 	crossfading = true;
 }
 
@@ -60,7 +60,7 @@ void CrossfaderNode::finishCrossfade() {
 	current_weight = 1.0f;
 	target_weight = 0.0f;
 	crossfading = false;
-	simulation->enqueueTask([=] () {(*finished_callback)();});
+	server->enqueueTask([=] () {(*finished_callback)();});
 }
 
 void CrossfaderNode::process() {
@@ -84,11 +84,11 @@ void CrossfaderNode::process() {
 
 //begin public api.
 
-Lav_PUBLIC_FUNCTION LavError Lav_createCrossfaderNode(LavHandle simulationHandle, int channels, int inputs, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createCrossfaderNode(LavHandle serverHandle, int channels, int inputs, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
-	auto retval= createCrossfaderNode(simulation, channels, inputs);
+	auto server = incomingObject<Server>(serverHandle);
+	LOCK(*server);
+	auto retval= createCrossfaderNode(server, channels, inputs);
 	*destination =outgoingObject<Node>(retval);
 	PUB_END
 }

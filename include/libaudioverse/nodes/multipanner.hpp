@@ -11,12 +11,12 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-class Simulation;
+class Server;
 class HrtfData;
 
 class MultipannerNode: public Node {
 	public:
-	MultipannerNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf);
+	MultipannerNode(std::shared_ptr<Server> server, std::shared_ptr<HrtfData> hrtf);
 	void strategyChanged();
 	void process() override;
 	void reset() override;
@@ -24,5 +24,5 @@ class MultipannerNode: public Node {
 	Multipanner panner;
 };
 
-std::shared_ptr<Node> createMultipannerNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf);
+std::shared_ptr<Node> createMultipannerNode(std::shared_ptr<Server> server, std::shared_ptr<HrtfData> hrtf);
 }

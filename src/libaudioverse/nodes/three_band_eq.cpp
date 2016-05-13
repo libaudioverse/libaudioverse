@@ -8,7 +8,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/nodes/three_band_eq.hpp>
 #include <libaudioverse/private/node.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/implementations/biquad.hpp>
 #include <libaudioverse/private/macros.hpp>
@@ -20,23 +20,23 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-ThreeBandEqNode::ThreeBandEqNode(std::shared_ptr<Simulation> simulation, int channels): Node(Lav_OBJTYPE_THREE_BAND_EQ_NODE, simulation, channels, channels),
-midband_peaks(simulation->getSr()),
-highband_shelves(simulation->getSr()) {
+ThreeBandEqNode::ThreeBandEqNode(std::shared_ptr<Server> server, int channels): Node(Lav_OBJTYPE_THREE_BAND_EQ_NODE, server, channels, channels),
+midband_peaks(server->getSr()),
+highband_shelves(server->getSr()) {
 	if(channels <= 0) ERROR(Lav_ERROR_RANGE, "Channels must be greater 0.");
 	appendInputConnection(0, channels);
 	appendOutputConnection(0, channels);
 	midband_peaks.setChannelCount(channels);
 	highband_shelves.setChannelCount(channels);
 	//Set ranges of the nyqiuist properties.
-	getProperty(Lav_THREE_BAND_EQ_HIGHBAND_FREQUENCY).setFloatRange(0.0, simulation->getSr()/2.0);
-	getProperty(Lav_THREE_BAND_EQ_LOWBAND_FREQUENCY).setFloatRange(0.0, simulation->getSr()/2.0);
+	getProperty(Lav_THREE_BAND_EQ_HIGHBAND_FREQUENCY).setFloatRange(0.0, server->getSr()/2.0);
+	getProperty(Lav_THREE_BAND_EQ_LOWBAND_FREQUENCY).setFloatRange(0.0, server->getSr()/2.0);
 	recompute();
 	setShouldZeroOutputBuffers(false);
 }
 
-std::shared_ptr<Node> createThreeBandEqNode(std::shared_ptr<Simulation> simulation, int channels) {
-	return standardNodeCreation<ThreeBandEqNode>(simulation, channels);
+std::shared_ptr<Node> createThreeBandEqNode(std::shared_ptr<Server> server, int channels) {
+	return standardNodeCreation<ThreeBandEqNode>(server, channels);
 }
 
 void ThreeBandEqNode::recompute() {
@@ -80,11 +80,11 @@ void ThreeBandEqNode::reset() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createThreeBandEqNode(LavHandle simulationHandle, int channels, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createThreeBandEqNode(LavHandle serverHandle, int channels, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
-	auto retval = createThreeBandEqNode(simulation, channels);
+	auto server = incomingObject<Server>(serverHandle);
+	LOCK(*server);
+	auto retval = createThreeBandEqNode(server, channels);
 	*destination = outgoingObject<Node>(retval);
 	PUB_END
 }

@@ -16,7 +16,7 @@ namespace libaudioverse_implementation {
 
 class SourceNode;
 class HrtfData;
-class Simulation;
+class Server;
 class Buffer;
 
 /**Configuration of an effect send.*/
@@ -45,7 +45,7 @@ Sources write directly to special buffers in the environment, which are then cop
 
 class EnvironmentNode: public Node {
 	public:
-	EnvironmentNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf);
+	EnvironmentNode(std::shared_ptr<Server> server, std::shared_ptr<HrtfData> hrtf);
 	~EnvironmentNode();
 	void registerSourceForUpdates(std::shared_ptr<SourceNode> source, bool useEffectSends = true);
 	//Maybe change our output channels.
@@ -78,5 +78,5 @@ class EnvironmentNode: public Node {
 	int play_async_source_cache_limit = 30; //How many we're willing to cache.
 };
 
-std::shared_ptr<EnvironmentNode> createEnvironmentNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf);
+std::shared_ptr<EnvironmentNode> createEnvironmentNode(std::shared_ptr<Server> server, std::shared_ptr<HrtfData> hrtf);
 }

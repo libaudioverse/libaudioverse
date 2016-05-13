@@ -30,17 +30,17 @@ int main(int argc, char** args) {
 	}
 	char* path = args[1];
 	LavHandle node;
-	LavHandle simulation;
+	LavHandle server;
 	ERRCHECK(Lav_initialize());
-	ERRCHECK(Lav_createSimulation(44100, 1024, &simulation));
-	ERRCHECK(Lav_simulationSetOutputDevice(simulation, "default", 2));
-	ERRCHECK(Lav_createBufferNode(simulation, &node));
+	ERRCHECK(Lav_createSimulation(44100, 1024, &server));
+	ERRCHECK(Lav_serverSetOutputDevice(server, "default", 2));
+	ERRCHECK(Lav_createBufferNode(server, &node));
 	LavHandle buffer;
-	ERRCHECK(Lav_createBuffer(simulation, &buffer));
+	ERRCHECK(Lav_createBuffer(server, &buffer));
 	ERRCHECK(Lav_bufferLoadFromFile(buffer, path));
 	ERRCHECK(Lav_nodeSetBufferProperty(node, Lav_BUFFER_BUFFER, buffer));
 	LavHandle limit;
-	ERRCHECK(Lav_createHardLimiterNode(simulation, 2, &limit));
+	ERRCHECK(Lav_createHardLimiterNode(server, 2, &limit));
 	ERRCHECK(Lav_nodeConnect(node, 0, limit, 0));
 	ERRCHECK(Lav_bufferNodeSetEndCallback(node, endOfBufferCallback, nullptr));
 	ERRCHECK(Lav_nodeConnectSimulation(limit, 0));

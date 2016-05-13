@@ -5,7 +5,7 @@ You may use this code under the terms of either license at your option.
 A copy of both licenses may be found in license.gpl and license.mpl at the root of this repository.
 If these files are unavailable to you, see either http://www.gnu.org/licenses/ (GPL V3 or later) or https://www.mozilla.org/en-US/MPL/2.0/ (MPL 2.0).*/
 #include <libaudioverse/libaudioverse.h>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/connections.hpp>
 #include <libaudioverse/private/macros.hpp>
@@ -29,31 +29,31 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-Simulation::Simulation(unsigned int sr, unsigned int blockSize, unsigned int mixahead): Job(Lav_OBJTYPE_SIMULATION) {
+Server::Server(unsigned int sr, unsigned int blockSize, unsigned int mixahead): Job(Lav_OBJTYPE_SERVER) {
 	if(blockSize%4 || blockSize== 0) ERROR(Lav_ERROR_RANGE, "Block size must be a nonzero multiple of 4."); //only afe to have this be a multiple of four.
 	this->sr = (float)sr;
 	this->block_size = blockSize;
 	this->mixahead = mixahead;
 	//fire up the background thread.
-	backgroundTaskThread = powercores::safeStartThread(&Simulation::backgroundTaskThreadFunction, this);
+	backgroundTaskThread = powercores::safeStartThread(&Server::backgroundTaskThreadFunction, this);
 	planner = new Planner();
 	//Get thread count.
 	int defaultThreadCount = std::thread::hardware_concurrency();
 	if(defaultThreadCount == 0) {
-		logInfo("Simulation: threading implementation does not support querying hardware concurrency.");
+		logInfo("Server: threading implementation does not support querying hardware concurrency.");
 		defaultThreadCount = 1;
 	}
-	if(defaultThreadCount > 1) logInfo("Simulation: enabling concurrency with %i threads.", defaultThreadCount);
-	else logInfo("Simulation: not enabling concurrency.  CPU only supports one thread.");
+	if(defaultThreadCount > 1) logInfo("Server: enabling concurrency with %i threads.", defaultThreadCount);
+	else logInfo("Server: not enabling concurrency.  CPU only supports one thread.");
 	setThreads(defaultThreadCount);
 	start();
 }
 
-void Simulation::completeInitialization() {
-	final_output_connection =std::make_shared<InputConnection>(std::static_pointer_cast<Simulation>(this->shared_from_this()), nullptr, 0, 0);
+void Server::completeInitialization() {
+	final_output_connection =std::make_shared<InputConnection>(std::static_pointer_cast<Server>(this->shared_from_this()), nullptr, 0, 0);
 }
 
-Simulation::~Simulation() {
+Server::~Server() {
 	//enqueue a task which will stop the background thread.
 	enqueueTask([]() {throw ThreadTerminationException();});
 	backgroundTaskThread.join();
@@ -61,7 +61,7 @@ Simulation::~Simulation() {
 }
 
 //Yes, this uses goto. Yes, goto is evil. We need a single point of exit.
-void Simulation::getBlock(float* out, unsigned int channels, bool mayApplyMixingMatrix) {
+void Server::getBlock(float* out, unsigned int channels, bool mayApplyMixingMatrix) {
 	if(out == nullptr || channels == 0) {
 		memset(out, 0, sizeof(float)*channels*block_size);
 		goto end;
@@ -106,12 +106,12 @@ void Simulation::getBlock(float* out, unsigned int channels, bool mayApplyMixing
 	}, getCurrentTime());
 }
 
-void Simulation::doMaintenance() {
+void Server::doMaintenance() {
 	killDeadWeakPointers(nodes);
 	killDeadWeakPointers(will_tick_nodes);
 }
 
-void Simulation::setOutputDevice(int index, int channels) {
+void Server::setOutputDevice(int index, int channels) {
 	if(index < -1) ERROR(Lav_ERROR_RANGE, "Index -1 is default; all other negative numbers are invalid.");
 	if(output_device) {
 		output_device->stop();
@@ -119,14 +119,14 @@ void Simulation::setOutputDevice(int index, int channels) {
 	std::lock_guard<std::recursive_mutex> g(mutex);
 	auto &factory = getOutputDeviceFactory();
 	if(factory == nullptr) ERROR(Lav_ERROR_CANNOT_INIT_AUDIO, "Failed to get output device factory.");
-	auto sptr = std::static_pointer_cast<Simulation>(shared_from_this());
-	std::weak_ptr<Simulation> wptr(sptr);
+	auto sptr = std::static_pointer_cast<Server>(shared_from_this());
+	std::weak_ptr<Server> wptr(sptr);
 	int blockSize=getBlockSize();
 	auto cb =[wptr, blockSize](float* buffer, int channels)->void {
 		auto strong =wptr.lock();
 		if(strong==nullptr) memset(buffer, 0, sizeof(float)*blockSize*channels);
 		else {
-			std::lock_guard<Simulation> guard(*strong);
+			std::lock_guard<Server> guard(*strong);
 			strong->getBlock(buffer, channels);
 		}
 	};
@@ -139,50 +139,50 @@ void Simulation::setOutputDevice(int index, int channels) {
 	}
 }
 
-void Simulation::clearOutputDevice() {
+void Server::clearOutputDevice() {
 	output_device=nullptr;
 }
 
-std::shared_ptr<InputConnection> Simulation::getFinalOutputConnection() {
+std::shared_ptr<InputConnection> Server::getFinalOutputConnection() {
 	return final_output_connection;
 }
 
-LavError Simulation::start() {
+LavError Server::start() {
 	is_started = 1;
 	return Lav_ERROR_NONE;
 }
 
-LavError Simulation::stop() {
+LavError Server::stop() {
 	is_started = 0;
 	return Lav_ERROR_NONE;
 }
 
-void Simulation::associateNode(std::shared_ptr<Node> node) {
+void Server::associateNode(std::shared_ptr<Node> node) {
 	nodes.insert(std::weak_ptr<Node>(node));
 }
 
-void Simulation::registerNodeForWillTick(std::shared_ptr<Node> node) {
+void Server::registerNodeForWillTick(std::shared_ptr<Node> node) {
 	will_tick_nodes.insert(node);
 }
 
-void Simulation::registerNodeForAlwaysPlaying(std::shared_ptr<Node> which) {
+void Server::registerNodeForAlwaysPlaying(std::shared_ptr<Node> which) {
 	always_playing_nodes.insert(which);
 }
 
-void Simulation::unregisterNodeForAlwaysPlaying(std::shared_ptr<Node> which) {
+void Server::unregisterNodeForAlwaysPlaying(std::shared_ptr<Node> which) {
 	always_playing_nodes.erase(which);
 }
 
-void Simulation::registerNodeForMaintenance(std::shared_ptr<Node> which) {
+void Server::registerNodeForMaintenance(std::shared_ptr<Node> which) {
 	maintenance_nodes.insert(which);
 }
 
-void Simulation::enqueueTask(std::function<void(void)> cb) {
+void Server::enqueueTask(std::function<void(void)> cb) {
 	tasks.enqueue(cb);
 }
 
 //Default callback implementation.
-void Simulation::backgroundTaskThreadFunction() {
+void Server::backgroundTaskThreadFunction() {
 	try {
 		for(;;) {
 			auto task = tasks.dequeue();
@@ -194,13 +194,13 @@ void Simulation::backgroundTaskThreadFunction() {
 	}
 }
 
-void Simulation::setBlockCallback(LavTimeCallback callback, void* userdata) {
+void Server::setBlockCallback(LavTimeCallback callback, void* userdata) {
 	block_callback = callback;
 	block_callback_set_time = getCurrentTime();
 	block_callback_userdata=userdata;
 }
 
-void Simulation::writeFile(std::string path, int channels, double duration, bool mayApplyMixingMatrix) {
+void Server::writeFile(std::string path, int channels, double duration, bool mayApplyMixingMatrix) {
 	int blocks = (duration*getSr()/block_size)+1;
 	auto file = FileWriter();
 	file.open(path.c_str(), sr, channels);
@@ -215,63 +215,63 @@ void Simulation::writeFile(std::string path, int channels, double duration, bool
 	file.close();
 }
 
-void Simulation::setThreads(int n) {
+void Server::setThreads(int n) {
 	threads = n;
 }
 
-int Simulation::getThreads() {
+int Server::getThreads() {
 	return threads;
 }
 
-void Simulation::invalidatePlan() {
+void Server::invalidatePlan() {
 	planner->invalidatePlan();
 }
 
-double Simulation::getCurrentTime() {
+double Server::getCurrentTime() {
 	return time;
 }
 
-void Simulation::scheduleCall(double when, std::function<void(void)> func) {
+void Server::scheduleCall(double when, std::function<void(void)> func) {
 	scheduled_callbacks.insert(std::make_pair(getCurrentTime()+when, func));
 }
 
 //begin public API
 
-Lav_PUBLIC_FUNCTION LavError Lav_createSimulation(unsigned int sr, unsigned int blockSize, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createServer(unsigned int sr, unsigned int blockSize, LavHandle* destination) {
 	PUB_BEGIN
-	auto shared = std::make_shared<Simulation>(sr, blockSize, 0);
+	auto shared = std::make_shared<Server>(sr, blockSize, 0);
 	shared->completeInitialization();
 	*destination = outgoingObject(shared);
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlock(LavHandle simulationHandle, unsigned int channels, int mayApplyMixingMatrix, float* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_serverGetBlock(LavHandle serverHandle, unsigned int channels, int mayApplyMixingMatrix, float* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
-	simulation->getBlock(destination, channels, mayApplyMixingMatrix != 0);
+	auto server = incomingObject<Server>(serverHandle);
+	LOCK(*server);
+	server->getBlock(destination, channels, mayApplyMixingMatrix != 0);
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_simulationGetBlockSize(LavHandle simulationHandle, int* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_serverGetBlockSize(LavHandle serverHandle, int* destination) {
 	PUB_BEGIN
-	auto simulation =incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
-	*destination = simulation->getBlockSize();
+	auto server =incomingObject<Server>(serverHandle);
+	LOCK(*server);
+	*destination = server->getBlockSize();
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_simulationGetSr(LavHandle simulationHandle, int* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_serverGetSr(LavHandle serverHandle, int* destination) {
 	PUB_BEGIN
-	auto simulation =incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
-	*destination = (int)simulation->getSr();
+	auto server =incomingObject<Server>(serverHandle);
+	LOCK(*server);
+	*destination = (int)server->getSr();
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_simulationSetOutputDevice(LavHandle simulationHandle, const char* device, int channels) {
+Lav_PUBLIC_FUNCTION LavError Lav_serverSetOutputDevice(LavHandle serverHandle, const char* device, int channels) {
 	PUB_BEGIN
-	auto sim = incomingObject<Simulation>(simulationHandle);
+	auto s = incomingObject<Server>(serverHandle);
 	int index;
 	auto device_string = std::string(device);
 	if(device_string == "default") {
@@ -288,67 +288,67 @@ Lav_PUBLIC_FUNCTION LavError Lav_simulationSetOutputDevice(LavHandle simulationH
 		if(processed == 0) {ERROR(Lav_ERROR_NO_SUCH_DEVICE, "Identifier string is invalid.");}
 	}
 	//This is threadsafe and needs to be entered properly so it can make sure we dont' deadlock in audio_io.
-	sim->setOutputDevice(index, channels);
+	s->setOutputDevice(index, channels);
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_simulationClearOutputDevice(LavHandle simulationHandle) {
+Lav_PUBLIC_FUNCTION LavError Lav_serverClearOutputDevice(LavHandle serverHandle) {
 	PUB_BEGIN
-	auto sim = incomingObject<Simulation>(simulationHandle);
-	LOCK(*sim);
-	sim->clearOutputDevice();
+	auto s = incomingObject<Server>(serverHandle);
+	LOCK(*s);
+	s->clearOutputDevice();
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_simulationLock(LavHandle simulationHandle) {
+Lav_PUBLIC_FUNCTION LavError Lav_serverLock(LavHandle serverHandle) {
 	PUB_BEGIN
-	auto simulation = incomingObject<Simulation>(simulationHandle);
-	simulation->lock();
+	auto server = incomingObject<Server>(serverHandle);
+	server->lock();
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_simulationUnlock(LavHandle simulationHandle) {
+Lav_PUBLIC_FUNCTION LavError Lav_serverUnlock(LavHandle serverHandle) {
 	PUB_BEGIN
-	auto simulation = incomingObject<Simulation>(simulationHandle);
-	simulation->unlock();
+	auto server = incomingObject<Server>(serverHandle);
+	server->unlock();
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_simulationSetBlockCallback(LavHandle handle, LavTimeCallback callback, void* userdata) {
+Lav_PUBLIC_FUNCTION LavError Lav_serverSetBlockCallback(LavHandle handle, LavTimeCallback callback, void* userdata) {
 	PUB_BEGIN
-	incomingObject<Simulation>(handle)->setBlockCallback(callback, userdata);
+	incomingObject<Server>(handle)->setBlockCallback(callback, userdata);
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_simulationWriteFile(LavHandle simulationHandle, const char* path, int channels, double duration, int mayApplyMixingMatrix) {
+Lav_PUBLIC_FUNCTION LavError Lav_serverWriteFile(LavHandle serverHandle, const char* path, int channels, double duration, int mayApplyMixingMatrix) {
 	PUB_BEGIN
-	auto sim = incomingObject<Simulation>(simulationHandle);
-	LOCK(*sim);
-	sim->writeFile(path, channels, duration, mayApplyMixingMatrix);
+	auto s = incomingObject<Server>(serverHandle);
+	LOCK(*s);
+	s->writeFile(path, channels, duration, mayApplyMixingMatrix);
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_simulationSetThreads(LavHandle simulationHandle, int threads) {
+Lav_PUBLIC_FUNCTION LavError Lav_serverSetThreads(LavHandle serverHandle, int threads) {
 	PUB_BEGIN
-	if(threads < 1) ERROR(Lav_ERROR_RANGE, "Cannot run simulation with less than one thread.");
-	auto sim = incomingObject<Simulation>(simulationHandle);
-	LOCK(*sim);
-	sim->setThreads(threads);
+	if(threads < 1) ERROR(Lav_ERROR_RANGE, "Cannot run server with less than one thread.");
+	auto s = incomingObject<Server>(serverHandle);
+	LOCK(*s);
+	s->setThreads(threads);
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_simulationGetThreads(LavHandle simulationHandle, int* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_serverGetThreads(LavHandle serverHandle, int* destination) {
 	PUB_BEGIN
-	auto sim = incomingObject<Simulation>(simulationHandle);
-	LOCK(*sim);
-	*destination = sim->getThreads();
+	auto s = incomingObject<Server>(serverHandle);
+	LOCK(*s);
+	*destination = s->getThreads();
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_simulationCallIn(LavHandle simulationHandle, double when, int inAudioThread, LavTimeCallback cb, void* userdata) {
+Lav_PUBLIC_FUNCTION LavError Lav_serverCallIn(LavHandle serverHandle, double when, int inAudioThread, LavTimeCallback cb, void* userdata) {
 	PUB_BEGIN
-	auto sim = incomingObject<Simulation>(simulationHandle);
-	std::weak_ptr<Simulation> simWeak = sim;
+	auto s = incomingObject<Server>(serverHandle);
+	std::weak_ptr<Server> simWeak = s;
 	auto wrapped_callback = [simWeak, userdata, cb] () {
 		auto simStrong = simWeak.lock();
 		//This should always be a valid weak pointer, but we check here just in case.
@@ -357,9 +357,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_simulationCallIn(LavHandle simulationHandle, do
 			cb(outgoingObject(simStrong), t, userdata);
 		}
 	};
-	LOCK(*sim);
-	if(inAudioThread) sim->scheduleCallInAudioThread(when, wrapped_callback);
-	else sim->scheduleCallOutsideAudioThread(when, wrapped_callback);
+	LOCK(*s);
+	if(inAudioThread) s->scheduleCallInAudioThread(when, wrapped_callback);
+	else s->scheduleCallOutsideAudioThread(when, wrapped_callback);
 	PUB_END
 }
 

@@ -10,12 +10,12 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <memory>
 namespace libaudioverse_implementation {
 
-class Simulation;
+class Server;
 class Node;
 
 class CrossfaderNode: public Node {
 	public:
-	CrossfaderNode(std::shared_ptr<Simulation> sim, int channels, int inputs);
+	CrossfaderNode(std::shared_ptr<Server> sim, int channels, int inputs);
 	void crossfade(float duration, int input);
 	//Immediately finish the current crossfade.
 	void finishCrossfade();
@@ -28,6 +28,6 @@ class CrossfaderNode: public Node {
 	bool crossfading = false;
 };
 
-std::shared_ptr<Node> createCrossfaderNode(std::shared_ptr<Simulation> simulation, int channels, int inputs);
+std::shared_ptr<Node> createCrossfaderNode(std::shared_ptr<Server> server, int channels, int inputs);
 
 }

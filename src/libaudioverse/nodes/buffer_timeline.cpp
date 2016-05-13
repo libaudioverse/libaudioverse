@@ -10,7 +10,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/nodes/buffer_timeline.hpp>
 #include <libaudioverse/private/node.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/memory.hpp>
@@ -23,15 +23,15 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-BufferTimelineNode::BufferTimelineNode(std::shared_ptr<Simulation> simulation, int channels): Node(Lav_OBJTYPE_BUFFER_TIMELINE_NODE, simulation, 0, channels) {
+BufferTimelineNode::BufferTimelineNode(std::shared_ptr<Server> server, int channels): Node(Lav_OBJTYPE_BUFFER_TIMELINE_NODE, server, 0, channels) {
 	if(channels <= 0) ERROR(Lav_ERROR_RANGE, "Channels must be greater than 0.");
 	appendOutputConnection(0, channels);
 	output_channels= channels;
-	for(int i = 0; i < channels; i++) workspace.push_back(allocArray<float>(simulation->getBlockSize()));
+	for(int i = 0; i < channels; i++) workspace.push_back(allocArray<float>(server->getBlockSize()));
 }
 
-std::shared_ptr<Node> createBufferTimelineNode(std::shared_ptr<Simulation> simulation, int channels) {
-	return standardNodeCreation<BufferTimelineNode>(simulation, channels);
+std::shared_ptr<Node> createBufferTimelineNode(std::shared_ptr<Server> server, int channels) {
+	return standardNodeCreation<BufferTimelineNode>(server, channels);
 }
 
 BufferTimelineNode::~BufferTimelineNode() {
@@ -51,13 +51,13 @@ void BufferTimelineNode::process() {
 		for(int i = 0; i < output_channels; i++) additionKernel(block_size, workspace[i], output_buffers[i], output_buffers[i]);
 		return true;
 	});
-	time+=block_size/simulation->getSr();
+	time+=block_size/server->getSr();
 }
 
 void BufferTimelineNode::scheduleBuffer(double time, float delta, std::shared_ptr<Buffer> buffer) {
 	time+=this->time; //time is relative to the node's internal time.
 	//The buffer player handles the buffer's use count.
-	auto player = new BufferPlayer(simulation->getBlockSize(), simulation->getSr());
+	auto player = new BufferPlayer(server->getBlockSize(), server->getSr());
 	player->setBuffer(buffer);
 	player->setRate(delta);
 	scheduled_buffers.insert(decltype(scheduled_buffers)::value_type(time, player));
@@ -70,12 +70,12 @@ void BufferTimelineNode::reset() {
 
 //begin public API.
 
-Lav_PUBLIC_FUNCTION LavError Lav_createBufferTimelineNode(LavHandle simulationHandle, int channels, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createBufferTimelineNode(LavHandle serverHandle, int channels, LavHandle* destination) {
 	PUB_BEGIN
-	auto sim = incomingObject<Simulation>(simulationHandle);
-	LOCK(*sim);
+	auto s = incomingObject<Server>(serverHandle);
+	LOCK(*s);
 	if(channels == 0) ERROR(Lav_ERROR_RANGE);
-	auto n =createBufferTimelineNode(sim, channels);
+	auto n =createBufferTimelineNode(s, channels);
 	*destination = outgoingObject(n);
 	PUB_END
 }

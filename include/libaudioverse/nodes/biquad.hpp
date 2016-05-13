@@ -12,11 +12,11 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-class Simulation;
+class Server;
 
 class BiquadNode: public Node {
 	public:
-	BiquadNode(std::shared_ptr<Simulation> sim, unsigned int channels);
+	BiquadNode(std::shared_ptr<Server> sim, unsigned int channels);
 	void process();
 	void reconfigure();
 	void reset() override;
@@ -25,6 +25,6 @@ class BiquadNode: public Node {
 	int prev_type;
 };
 
-std::shared_ptr<Node> createBiquadNode(std::shared_ptr<Simulation> simulation, unsigned int channels);
+std::shared_ptr<Node> createBiquadNode(std::shared_ptr<Server> server, unsigned int channels);
 
 }

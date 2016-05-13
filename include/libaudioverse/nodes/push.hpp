@@ -13,11 +13,11 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-class Simulation;
+class Server;
 
 class PushNode: public Node {
 	public:
-	PushNode(std::shared_ptr<Simulation> sim, unsigned int inputSr, unsigned int channels);
+	PushNode(std::shared_ptr<Server> sim, unsigned int inputSr, unsigned int channels);
 	~PushNode();
 	void process();
 	void feed(unsigned int length, float* buffer);
@@ -33,5 +33,5 @@ class PushNode: public Node {
 	bool fired_underrun_callback = false;
 };
 
-std::shared_ptr<Node> createPushNode(std::shared_ptr<Simulation> simulation, unsigned int inputSr, unsigned int channels);
+std::shared_ptr<Node> createPushNode(std::shared_ptr<Server> server, unsigned int inputSr, unsigned int channels);
 }

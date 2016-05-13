@@ -31,7 +31,7 @@ union PropertyValue {
 #define RC(val, fld) if((val > maximum_value.fld || val < minimum_value.fld) && read_only == false) ERROR(Lav_ERROR_RANGE, "Property value out of range.")
 
 class Buffer;
-class Simulation;
+class Server;
 class Node;
 class Automator;
 class InputConnection;
@@ -43,7 +43,7 @@ class Property {
 	explicit Property(int property_type);
 	~Property();
 	void associateNode(Node* node);
-	void associateSimulation(std::shared_ptr<Simulation> simulation);
+	void associateServer(std::shared_ptr<Server> server);
 
 	void reset(bool avoidCallbacks = false);
 	int getType();
@@ -177,7 +177,7 @@ class Property {
 	bool read_only = false;
 	bool has_dynamic_range = false;
 	Node* node = nullptr;
-	std::shared_ptr<Simulation> simulation;
+	std::shared_ptr<Server> server;
 
 	//These are for automation and node connections:
 	bool allows_arate = false;
@@ -191,7 +191,7 @@ class Property {
 	std::shared_ptr<InputConnection> incoming_nodes = nullptr; //The nodes connected to this property. Pointer to break an include cycle.
 	
 	//Allows protecting against duplicate ticks.
-	int last_ticked=-1; //simulation starts at zero.
+	int last_ticked=-1; //server starts at zero.
 	int last_modified = 0; //so we can detect writes. We are first written on tick 0.
 	bool was_modified = false; //If we were modified since the last time we ticked.
 	

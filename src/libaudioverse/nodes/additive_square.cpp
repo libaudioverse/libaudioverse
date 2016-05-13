@@ -9,20 +9,20 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/nodes/additive_square.hpp>
 #include <libaudioverse/implementations/additive_square.hpp>
 #include <libaudioverse/private/node.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <memory>
 
 namespace libaudioverse_implementation {
 
-AdditiveSquareNode::AdditiveSquareNode(std::shared_ptr<Simulation> simulation): Node(Lav_OBJTYPE_ADDITIVE_SQUARE_NODE, simulation, 0, 1), oscillator(simulation->getSr()) {
+AdditiveSquareNode::AdditiveSquareNode(std::shared_ptr<Server> server): Node(Lav_OBJTYPE_ADDITIVE_SQUARE_NODE, server, 0, 1), oscillator(server->getSr()) {
 	appendOutputConnection(0, 1);
 	setShouldZeroOutputBuffers(false);
 }
 
-std::shared_ptr<Node> createAdditiveSquareNode(std::shared_ptr<Simulation> simulation) {
-	return standardNodeCreation<AdditiveSquareNode>(simulation);
+std::shared_ptr<Node> createAdditiveSquareNode(std::shared_ptr<Server> server) {
+	return standardNodeCreation<AdditiveSquareNode>(server);
 }
 
 void AdditiveSquareNode::process() {
@@ -51,11 +51,11 @@ void AdditiveSquareNode::reset() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createAdditiveSquareNode(LavHandle simulationHandle, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createAdditiveSquareNode(LavHandle serverHandle, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
-	auto retval = createAdditiveSquareNode(simulation);
+	auto server = incomingObject<Server>(serverHandle);
+	LOCK(*server);
+	auto retval = createAdditiveSquareNode(server);
 	*destination = outgoingObject<Node>(retval);
 	PUB_END
 }

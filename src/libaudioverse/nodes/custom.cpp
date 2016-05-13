@@ -7,7 +7,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/nodes/custom.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
@@ -17,13 +17,13 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-CustomNode::CustomNode(std::shared_ptr<Simulation> sim, unsigned int inputs, unsigned int channelsPerInput, unsigned int outputs, unsigned int channelsPerOutput): Node(Lav_OBJTYPE_CUSTOM_NODE, sim, inputs*channelsPerInput, outputs*channelsPerOutput) {
+CustomNode::CustomNode(std::shared_ptr<Server> s, unsigned int inputs, unsigned int channelsPerInput, unsigned int outputs, unsigned int channelsPerOutput): Node(Lav_OBJTYPE_CUSTOM_NODE, s, inputs*channelsPerInput, outputs*channelsPerOutput) {
 	for(unsigned int i= 0; i < inputs; i++) appendInputConnection(i*channelsPerInput, channelsPerInput);
 	for(int i= 0; i < outputs; i++) appendOutputConnection(i*channelsPerOutput, channelsPerOutput);
 }
 
-std::shared_ptr<Node> createCustomNode(std::shared_ptr<Simulation> simulation, unsigned int inputs, unsigned int channelsPerInput, unsigned int outputs,  unsigned int channelsPerOutput) {
-	return standardNodeCreation<CustomNode>(simulation, inputs, channelsPerInput, outputs, channelsPerOutput);
+std::shared_ptr<Node> createCustomNode(std::shared_ptr<Server> server, unsigned int inputs, unsigned int channelsPerInput, unsigned int outputs,  unsigned int channelsPerOutput) {
+	return standardNodeCreation<CustomNode>(server, inputs, channelsPerInput, outputs, channelsPerOutput);
 }
 
 void CustomNode::process() {
@@ -37,11 +37,11 @@ void CustomNode::process() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createCustomNode(LavHandle simulationHandle, unsigned int inputs, unsigned int channelsPerInput, unsigned int outputs, unsigned int channelsPerOutput, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createCustomNode(LavHandle serverHandle, unsigned int inputs, unsigned int channelsPerInput, unsigned int outputs, unsigned int channelsPerOutput, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation=incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
-	*destination = outgoingObject<Node>(createCustomNode(simulation, inputs, channelsPerInput, outputs, channelsPerOutput));
+	auto server=incomingObject<Server>(serverHandle);
+	LOCK(*server);
+	*destination = outgoingObject<Node>(createCustomNode(server, inputs, channelsPerInput, outputs, channelsPerOutput));
 	PUB_END
 }
 

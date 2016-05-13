@@ -9,7 +9,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include "properties.hpp"
 #include "memory.hpp"
 #include "connections.hpp"
-#include "simulation.hpp"
+#include "server.hpp"
 #include <map>
 #include <memory>
 #include <vector>
@@ -33,7 +33,7 @@ class PropertyBackrefComparer {
 /**Things all Libaudioverse nodes have.*/
 class Node: public Job {
 	public:
-	Node(int type, std::shared_ptr<Simulation> simulation, unsigned int numInputBuffers, unsigned int numOutputBuffers);
+	Node(int type, std::shared_ptr<Server> server, unsigned int numInputBuffers, unsigned int numOutputBuffers);
 	virtual ~Node();
 
 	virtual int getOutputBufferCount();
@@ -60,8 +60,8 @@ class Node: public Job {
 
 	//make a connection from an output of this node to an input of another.
 	virtual void connect(int output, std::shared_ptr<Node> toNode, int input);
-	//make a connection from an output of this node to the simulation.
-	virtual void connectSimulation(int which);
+	//make a connection from an output of this node to the server.
+	virtual void connectServer(int which);
 	//Connects an output to a property.
 	virtual void connectProperty(int output, std::shared_ptr<Node> node, int slot);
 	//called on an output, this function terminates all connections for which it is involved.
@@ -88,11 +88,11 @@ class Node: public Job {
 	//Does some cleanup and the like.
 	//This is also an override point for subclasses that may need to do cleanup periodically in order to remain performant; in that case, they *must* call the base. Or else.
 	virtual void doMaintenance();
-	//Called after the simulation is locked but before ticking, in some arbetrary order. We must be registered for this.
+	//Called after the server is locked but before ticking, in some arbetrary order. We must be registered for this.
 	//It is safe to change connections here.
 	virtual void willTick();
 	
-	std::shared_ptr<Simulation> getSimulation();
+	std::shared_ptr<Server> getServer();
 	Property& getProperty(int slot, bool allowForwarding = true);
 
 	//Property forwarding support.
@@ -125,7 +125,7 @@ class Node: public Job {
 	//Various optimizations that subclasses can enable.
 	void setShouldZeroOutputBuffers(bool v);
 	protected:
-	std::shared_ptr<Simulation> simulation = nullptr;
+	std::shared_ptr<Server> server = nullptr;
 	std::map<int, Property> properties;
 	//the tuple is of (node, property).
 	std::map<int, std::tuple<std::weak_ptr<Node>, int>> forwarded_properties;
@@ -140,7 +140,7 @@ class Node: public Job {
 	int num_input_buffers = 0, num_output_buffers = 0, block_size = 0;
 	//used to make no-op state changes free.
 	int prev_state = Lav_NODESTATE_PLAYING;
-	int last_processed = -1; //-1 so that it's not equal to the simulation's tick counter, which starts at 0.
+	int last_processed = -1; //-1 so that it's not equal to the server's tick counter, which starts at 0.
 
 	//we are never allowed to copy.
 	Node(const Node&) = delete;
@@ -155,9 +155,9 @@ class Node: public Job {
 /**This is the creation template for a node.
 Every createXXX function uses this template.*/
 template<typename NodeT, typename... ArgsT>
-std::shared_ptr<NodeT> standardNodeCreation(std::shared_ptr<Simulation> simulation, ArgsT... args) {
-	std::shared_ptr<NodeT> ret(new NodeT(simulation, std::forward<ArgsT>(args)...), ObjectDeleter(simulation));
-	simulation->associateNode(ret);
+std::shared_ptr<NodeT> standardNodeCreation(std::shared_ptr<Server> server, ArgsT... args) {
+	std::shared_ptr<NodeT> ret(new NodeT(server, std::forward<ArgsT>(args)...), ObjectDeleter(server));
+	server->associateNode(ret);
 	return ret;
 }
 

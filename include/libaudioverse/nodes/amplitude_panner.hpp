@@ -13,12 +13,12 @@ namespace libaudioverse_implementation {
 
 class AmplitudePannerNode: public Node {
 	public:
-	AmplitudePannerNode(std::shared_ptr<Simulation> simulation);
+	AmplitudePannerNode(std::shared_ptr<Server> server);
 	virtual void process() override;
 	void recomputeChannelMap();
 	void configureStandardChannelMap(int channels);
 	AmplitudePanner panner;
 };
 
-std::shared_ptr<Node>createAmplitudePannerNode(std::shared_ptr<Simulation> simulation);
+std::shared_ptr<Node>createAmplitudePannerNode(std::shared_ptr<Server> server);
 }

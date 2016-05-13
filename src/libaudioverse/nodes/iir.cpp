@@ -9,7 +9,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/nodes/iir.hpp>
 #include <libaudioverse/private/node.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/memory.hpp>
@@ -17,11 +17,11 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-IirNode::IirNode(std::shared_ptr<Simulation> simulation, int channels): Node(Lav_OBJTYPE_IIR_NODE, simulation, channels, channels) {
+IirNode::IirNode(std::shared_ptr<Server> server, int channels): Node(Lav_OBJTYPE_IIR_NODE, server, channels, channels) {
 	if(channels <= 0) ERROR(Lav_ERROR_RANGE, "Channels must be greater than 0.");
 	this->channels=channels;
 	filters=new IIRFilter*[channels]();
-	for(int i= 0; i < channels; i++) filters[i] = new IIRFilter(simulation->getSr());
+	for(int i= 0; i < channels; i++) filters[i] = new IIRFilter(server->getSr());
 	double defaultNumerator[] = {1.0};
 	double defaultDenominator[] = {1.0, 0.0}; //identity filter.
 	setCoefficients(1, defaultNumerator, 2, defaultDenominator, 1);
@@ -30,8 +30,8 @@ IirNode::IirNode(std::shared_ptr<Simulation> simulation, int channels): Node(Lav
 	setShouldZeroOutputBuffers(false);
 }
 
-std::shared_ptr<Node> createIirNode(std::shared_ptr<Simulation> simulation, int channels) {
-	return standardNodeCreation<IirNode>(simulation, channels);
+std::shared_ptr<Node> createIirNode(std::shared_ptr<Server> server, int channels) {
+	return standardNodeCreation<IirNode>(server, channels);
 }
 
 IirNode::~IirNode() {
@@ -55,11 +55,11 @@ void IirNode::setCoefficients(int numeratorLength, double* numerator, int denomi
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createIirNode(LavHandle simulationHandle, int channels, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createIirNode(LavHandle serverHandle, int channels, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
-	auto retval = createIirNode(simulation, channels);
+	auto server = incomingObject<Server>(serverHandle);
+	LOCK(*server);
+	auto retval = createIirNode(server, channels);
 	*destination = outgoingObject<Node>(retval);
 	PUB_END
 }

@@ -33,17 +33,17 @@ int main(int argc, char** args) {
 		printf("Cannot work with %d channels", channels);
 		return 1;
 	}
-	LavHandle simulation;
+	LavHandle server;
 	LavHandle bufferNode, panNode, limit;
 	ERRCHECK(Lav_initialize());
-	ERRCHECK(Lav_createSimulation(44100, 1024, &simulation));
-	ERRCHECK(Lav_simulationSetOutputDevice(simulation, "default", channels));
-	ERRCHECK(Lav_createBufferNode(simulation, &bufferNode));
+	ERRCHECK(Lav_createSimulation(44100, 1024, &server));
+	ERRCHECK(Lav_serverSetOutputDevice(server, "default", channels));
+	ERRCHECK(Lav_createBufferNode(server, &bufferNode));
 	LavHandle buffer;
-	ERRCHECK(Lav_createBuffer(simulation, &buffer));
+	ERRCHECK(Lav_createBuffer(server, &buffer));
 	ERRCHECK(Lav_bufferLoadFromFile(buffer, args[1]));
 	ERRCHECK(Lav_nodeSetBufferProperty(bufferNode, Lav_BUFFER_BUFFER, buffer));
-	ERRCHECK(Lav_createMultipannerNode(simulation, "default", &panNode));
+	ERRCHECK(Lav_createMultipannerNode(server, "default", &panNode));
 	int pantype =Lav_PANNING_STRATEGY_STEREO;
 	switch(channels) {
 		case 6: pantype =Lav_PANNING_STRATEGY_SURROUND51; break;
@@ -51,7 +51,7 @@ int main(int argc, char** args) {
 	}
 	ERRCHECK(Lav_nodeSetIntProperty(panNode, Lav_PANNER_STRATEGY, pantype));
 	ERRCHECK(Lav_nodeConnect(bufferNode, 0, panNode, 0));
-	ERRCHECK(Lav_createHardLimiterNode(simulation, channels, &limit));
+	ERRCHECK(Lav_createHardLimiterNode(server, channels, &limit));
 	ERRCHECK(Lav_nodeConnect(panNode, 0, limit, 0));
 	ERRCHECK(Lav_nodeConnectSimulation(limit, 0));
 	int shouldContinue = 1;

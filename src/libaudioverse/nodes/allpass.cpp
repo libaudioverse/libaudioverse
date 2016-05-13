@@ -7,7 +7,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/nodes/allpass.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
@@ -19,9 +19,9 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-AllpassNode::AllpassNode(std::shared_ptr<Simulation> sim, int channels, int maxDelay): Node(Lav_OBJTYPE_ALLPASS_NODE, sim, channels, channels),
+AllpassNode::AllpassNode(std::shared_ptr<Server> s, int channels, int maxDelay): Node(Lav_OBJTYPE_ALLPASS_NODE, s, channels, channels),
 //The +1 here deals with any floating point inaccuracies.
-bank((maxDelay+1)/simulation->getSr(), simulation->getSr()) {
+bank((maxDelay+1)/server->getSr(), server->getSr()) {
 	if(channels < 1) ERROR(Lav_ERROR_RANGE, "Cannot filter 0 or fewer channels.");
 	if(maxDelay < 1) ERROR(Lav_ERROR_RANGE, "You need to allow for at least 1 sample of delay.");
 	getProperty(Lav_ALLPASS_DELAY_SAMPLES_MAX).setIntValue(maxDelay);
@@ -31,8 +31,8 @@ bank((maxDelay+1)/simulation->getSr(), simulation->getSr()) {
 	bank.setChannelCount(channels);
 }
 
-std::shared_ptr<Node> createAllpassNode(std::shared_ptr<Simulation> simulation, int channels, int maxDelay) {
-	return standardNodeCreation<AllpassNode>(simulation, channels, maxDelay);
+std::shared_ptr<Node> createAllpassNode(std::shared_ptr<Server> server, int channels, int maxDelay) {
+	return standardNodeCreation<AllpassNode>(server, channels, maxDelay);
 }
 
 void AllpassNode::reconfigureCoefficient() {
@@ -63,11 +63,11 @@ void AllpassNode::reset() {
 
 //begin public api.
 
-Lav_PUBLIC_FUNCTION LavError Lav_createAllpassNode(LavHandle simulationHandle, int channels, int maxDelay, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createAllpassNode(LavHandle serverHandle, int channels, int maxDelay, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
-	auto retval= createAllpassNode(simulation, channels, maxDelay);
+	auto server = incomingObject<Server>(serverHandle);
+	LOCK(*server);
+	auto retval= createAllpassNode(server, channels, maxDelay);
 	*destination =outgoingObject<Node>(retval);
 	PUB_END
 }

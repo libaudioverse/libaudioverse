@@ -18,7 +18,7 @@ class OnePoleFilter;
 //Internal code should use the methods, which do not keep the properties updated but avoid lots of overhead.
 class FeedbackDelayNetworkNode: public Node {
 	public:
-	FeedbackDelayNetworkNode(std::shared_ptr<Simulation> simulation, float maxDelay, int lines);
+	FeedbackDelayNetworkNode(std::shared_ptr<Server> server, float maxDelay, int lines);
 	~FeedbackDelayNetworkNode();
 	void process();
 	void setMatrix(float* values);
@@ -35,5 +35,5 @@ class FeedbackDelayNetworkNode: public Node {
 	OnePoleFilter** filters = nullptr;
 };
 
-std::shared_ptr<Node> createFeedbackDelayNetworkNode(std::shared_ptr<Simulation> simulation, float maxDelay, int channels);
+std::shared_ptr<Node> createFeedbackDelayNetworkNode(std::shared_ptr<Server> server, float maxDelay, int channels);
 }

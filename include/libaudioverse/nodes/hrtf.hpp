@@ -10,18 +10,18 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <memory>
 
 namespace libaudioverse_implementation {
-class Simulation;
+class Server;
 class HrtfData;
 class FftConvolver;
 
 class HrtfNode: public Node {
 	public:
-	HrtfNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf);
+	HrtfNode(std::shared_ptr<Server> server, std::shared_ptr<HrtfData> hrtf);
 	virtual void process() override;
 	void reset();
 	private:
 	HrtfPanner panner;
 };
 
-std::shared_ptr<Node>createHrtfNode(std::shared_ptr<Simulation>simulation, std::shared_ptr<HrtfData> hrtf);
+std::shared_ptr<Node>createHrtfNode(std::shared_ptr<Server>server, std::shared_ptr<HrtfData> hrtf);
 }

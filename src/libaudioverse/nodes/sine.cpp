@@ -8,7 +8,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/nodes/sine.hpp>
 #include <libaudioverse/private/node.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/memory.hpp>
@@ -17,13 +17,13 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-SineNode::SineNode(std::shared_ptr<Simulation> simulation): Node(Lav_OBJTYPE_SINE_NODE, simulation, 0, 1), oscillator(simulation->getSr()) {
+SineNode::SineNode(std::shared_ptr<Server> server): Node(Lav_OBJTYPE_SINE_NODE, server, 0, 1), oscillator(server->getSr()) {
 	appendOutputConnection(0, 1);
 	setShouldZeroOutputBuffers(false);
 }
 
-std::shared_ptr<Node> createSineNode(std::shared_ptr<Simulation> simulation) {
-	return standardNodeCreation<SineNode>(simulation);
+std::shared_ptr<Node> createSineNode(std::shared_ptr<Server> server) {
+	return standardNodeCreation<SineNode>(server);
 }
 
 void SineNode::process() {
@@ -51,11 +51,11 @@ void SineNode::reset() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavHandle simulationHandle, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createSineNode(LavHandle serverHandle, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
-	auto retval = createSineNode(simulation);
+	auto server = incomingObject<Server>(serverHandle);
+	LOCK(*server);
+	auto retval = createSineNode(server);
 	*destination = outgoingObject<Node>(retval);
 	PUB_END
 }

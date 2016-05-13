@@ -10,12 +10,12 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-class Simulation;
+class Server;
 class CrossfadingDelayLine;
 
 class CrossfadingDelayNode: public Node {
 	public:
-	CrossfadingDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, int channels);
+	CrossfadingDelayNode(std::shared_ptr<Server> server, float maxDelay, int channels);
 	~CrossfadingDelayNode();
 	void process();
 	protected:
@@ -26,5 +26,5 @@ class CrossfadingDelayNode: public Node {
 	int channels;
 };
 
-std::shared_ptr<Node> createCrossfadingDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, unsigned int channels);
+std::shared_ptr<Node> createCrossfadingDelayNode(std::shared_ptr<Server> server, float maxDelay, unsigned int channels);
 }

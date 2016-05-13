@@ -8,7 +8,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/nodes/noise.hpp>
 #include <libaudioverse/private/node.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/memory.hpp>
@@ -19,10 +19,10 @@ namespace libaudioverse_implementation {
 
 //we give the random number generator a fixed seed for debugging purposes.
 //Normal distribution with standard deviation 0.25, more than 99% of values are less than 1.
-NoiseNode::NoiseNode(std::shared_ptr<Simulation> simulation): Node(Lav_OBJTYPE_NOISE_NODE, simulation, 0, 1),
+NoiseNode::NoiseNode(std::shared_ptr<Server> server): Node(Lav_OBJTYPE_NOISE_NODE, server, 0, 1),
 random_number_generator(1234), normal_distribution(0.0f, 0.25f),
-pinkifier(simulation->getSr()),
-brownifier(simulation->getSr()) {
+pinkifier(server->getSr()),
+brownifier(server->getSr()) {
 	/**We have to configure the pinkifier.
 This was originally taken from Spectral Audio processing by JOS.*/
 	//zeros
@@ -45,8 +45,8 @@ This was originally taken from Spectral Audio processing by JOS.*/
 	setShouldZeroOutputBuffers(false);
 }
 
-std::shared_ptr<Node> createNoiseNode(std::shared_ptr<Simulation> simulation) {
-	return standardNodeCreation<NoiseNode>(simulation);
+std::shared_ptr<Node> createNoiseNode(std::shared_ptr<Server> server) {
+	return standardNodeCreation<NoiseNode>(server);
 }
 
 void NoiseNode::white() {
@@ -94,11 +94,11 @@ void NoiseNode::process() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createNoiseNode(LavHandle simulationHandle, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createNoiseNode(LavHandle serverHandle, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation =incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
-	auto retval = createNoiseNode(simulation);
+	auto server =incomingObject<Server>(serverHandle);
+	LOCK(*server);
+	auto retval = createNoiseNode(server);
 	*destination = outgoingObject<Node>(retval);
 	PUB_END
 }

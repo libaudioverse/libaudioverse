@@ -13,11 +13,11 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-class Simulation;
+class Server;
 
 class AllpassNode: public Node {
 	public:
-	AllpassNode(std::shared_ptr<Simulation> sim, int channels, int maxDelay);
+	AllpassNode(std::shared_ptr<Server> sim, int channels, int maxDelay);
 	void reconfigureCoefficient();
 	void reconfigureDelay();
 	void reconfigureInterpolationTime();
@@ -26,6 +26,6 @@ class AllpassNode: public Node {
 	MultichannelFilterBank<AllpassFilter<CrossfadingDelayLine>> bank;
 };
 
-std::shared_ptr<Node> createAllpassNode(std::shared_ptr<Simulation> simulation, int channels, int maxDelay);
+std::shared_ptr<Node> createAllpassNode(std::shared_ptr<Server> server, int channels, int maxDelay);
 
 }

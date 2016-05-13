@@ -11,13 +11,13 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-class Simulation;
+class Server;
 class Buffer;
 class BufferPlayer;
 
 class BufferTimelineNode: public Node {
 	public:
-	BufferTimelineNode(std::shared_ptr<Simulation> simulation, int channels);
+	BufferTimelineNode(std::shared_ptr<Server> server, int channels);
 	~BufferTimelineNode();
 	void process() override;
 	void scheduleBuffer(double time, float delta, std::shared_ptr<Buffer> buffer);
@@ -29,5 +29,5 @@ class BufferTimelineNode: public Node {
 	int output_channels = 0;
 };
 
-std::shared_ptr<Node> createBufferTimelineNode(std::shared_ptr<Simulation> simulation, int channels);
+std::shared_ptr<Node> createBufferTimelineNode(std::shared_ptr<Server> server, int channels);
 }

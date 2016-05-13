@@ -7,7 +7,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/nodes/fdn_reverb.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
@@ -45,12 +45,12 @@ const float min_delay_multiplier = 0.3, delay_multiplier_variation = 1.4;
 //This value was determined through experimentation, such that the modulationn depth property maps to something reasonable at 1 with the default modulation frequency.
 float modulation_duration = 0.01f;
 
-FdnReverbNode::FdnReverbNode(std::shared_ptr<Simulation> sim): Node(Lav_OBJTYPE_FDN_REVERB_NODE, sim, 4, 4) {
+FdnReverbNode::FdnReverbNode(std::shared_ptr<Server> s): Node(Lav_OBJTYPE_FDN_REVERB_NODE, s, 4, 4) {
 	std::fill(feedback_gains, feedback_gains+8, 0.0f);
 	delay_lines = new InterpolatedDelayLine*[8];
 	delay_line_modulators = new InterpolatedRandomGenerator*[8];
 	lowpass_filters = new OnePoleFilter*[8]();
-	double sr = simulation->getSr();
+	double sr = server->getSr();
 	int seeds[8];
 	std::seed_seq seq{1, 2, 3, 4, 5, 6, 7, 8};
 	seq.generate(seeds, seeds+8);
@@ -65,8 +65,8 @@ FdnReverbNode::FdnReverbNode(std::shared_ptr<Simulation> sim): Node(Lav_OBJTYPE_
 	setShouldZeroOutputBuffers(false);
 }
 
-std::shared_ptr<Node> createFdnReverbNode(std::shared_ptr<Simulation> simulation) {
-	return standardNodeCreation<FdnReverbNode>(simulation);
+std::shared_ptr<Node> createFdnReverbNode(std::shared_ptr<Server> server) {
+	return standardNodeCreation<FdnReverbNode>(server);
 }
 
 FdnReverbNode::~FdnReverbNode() {
@@ -155,11 +155,11 @@ void FdnReverbNode::reconfigureModel() {
 
 //begin public api.
 
-Lav_PUBLIC_FUNCTION LavError Lav_createFdnReverbNode(LavHandle simulationHandle, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createFdnReverbNode(LavHandle serverHandle, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
-	auto retval= createFdnReverbNode(simulation);
+	auto server = incomingObject<Server>(serverHandle);
+	LOCK(*server);
+	auto retval= createFdnReverbNode(server);
 	*destination =outgoingObject<Node>(retval);
 	PUB_END
 }

@@ -10,13 +10,13 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-class Simulation;
+class Server;
 class CrossfadingDelayLine;
 class BiquadFilter;
 
 class FilteredDelayNode: public Node {
 	public:
-	FilteredDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, unsigned int channels);
+	FilteredDelayNode(std::shared_ptr<Server> server, float maxDelay, unsigned int channels);
 	~FilteredDelayNode();
 	void process();
 	void reset() override;
@@ -31,5 +31,5 @@ class FilteredDelayNode: public Node {
 	int channels;
 };
 
-std::shared_ptr<Node> createFilteredDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, unsigned int channels);
+std::shared_ptr<Node> createFilteredDelayNode(std::shared_ptr<Server> server, float maxDelay, unsigned int channels);
 }

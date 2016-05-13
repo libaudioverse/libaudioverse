@@ -8,7 +8,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/private/file.hpp>
 #include <libaudioverse/private/buffer.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/kernels.hpp>
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/error.hpp>
@@ -19,20 +19,20 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-Buffer::Buffer(std::shared_ptr<Simulation> simulation): ExternalObject(Lav_OBJTYPE_BUFFER) {
-	this->simulation = simulation;
+Buffer::Buffer(std::shared_ptr<Server> server): ExternalObject(Lav_OBJTYPE_BUFFER) {
+	this->server = server;
 }
 
-std::shared_ptr<Buffer> createBuffer(std::shared_ptr<Simulation>simulation) {
-	return std::shared_ptr<Buffer>(new Buffer(simulation), ObjectDeleter(simulation));
+std::shared_ptr<Buffer> createBuffer(std::shared_ptr<Server>server) {
+	return std::shared_ptr<Buffer>(new Buffer(server), ObjectDeleter(server));
 }
 
 Buffer::~Buffer() {
 	if(data) delete[] data;
 }
 
-std::shared_ptr<Simulation> Buffer::getSimulation() {
-	return simulation;
+std::shared_ptr<Server> Buffer::getServer() {
+	return server;
 }
 
 int Buffer::getLength() {
@@ -40,7 +40,7 @@ int Buffer::getLength() {
 }
 
 double Buffer::getDuration() {
-	return frames / simulation->getSr();
+	return frames / server->getSr();
 }
 
 int Buffer::getChannels() {
@@ -48,12 +48,12 @@ int Buffer::getChannels() {
 }
 
 void Buffer::loadFromArray(int sr, int channels, int frames, float* inputData) {
-	int simulationSr= (int)simulation->getSr();
+	int serverSr= (int)server->getSr();
 	if(data) {
 		delete[] data;
 		data = nullptr;
 	}
-	staticResamplerKernel(sr, simulationSr, channels, frames, inputData, &(this->frames), &data);
+	staticResamplerKernel(sr, serverSr, channels, frames, inputData, &(this->frames), &data);
 	if(data==nullptr) ERROR(Lav_ERROR_MEMORY);
 	this->channels = channels;
 	if(this->channels == 1) return; //It's already uninterleaved.
@@ -85,11 +85,11 @@ void Buffer::normalize() {
 }
 
 void Buffer::lock() {
-	simulation->lock();
+	server->lock();
 }
 
 void Buffer::unlock() {
-	simulation->unlock();
+	server->unlock();
 }
 
 void Buffer::incrementUseCount() {
@@ -108,18 +108,18 @@ void Buffer::throwIfInUse() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createBuffer(LavHandle simulationHandle, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createBuffer(LavHandle serverHandle, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
-	*destination = outgoingObject(createBuffer(simulation));
+	auto server = incomingObject<Server>(serverHandle);
+	LOCK(*server);
+	*destination = outgoingObject(createBuffer(server));
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_bufferGetSimulation(LavHandle handle, LavHandle* destination) {
 	PUB_BEGIN
 	auto b= incomingObject<Buffer>(handle);
-	*destination = outgoingObject(b->getSimulation());
+	*destination = outgoingObject(b->getServer());
 	PUB_END
 }
 

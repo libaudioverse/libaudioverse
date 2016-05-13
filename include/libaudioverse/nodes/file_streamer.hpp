@@ -14,17 +14,17 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-class Simulation;
+class Server;
 
 class FileStreamerNode: public Node {
 	public:
-	FileStreamerNode(std::shared_ptr<Simulation> simulation, std::string path);
+	FileStreamerNode(std::shared_ptr<Server> server, std::string path);
 	void positionChanged();
 	virtual void process() override;
 	FileStreamer streamer;
 	std::shared_ptr<Callback<void()>> end_callback;
 };
 
-std::shared_ptr<Node> createFileStreamerNode(std::shared_ptr<Simulation> simulation, std::string path);
+std::shared_ptr<Node> createFileStreamerNode(std::shared_ptr<Server> server, std::string path);
 
 }

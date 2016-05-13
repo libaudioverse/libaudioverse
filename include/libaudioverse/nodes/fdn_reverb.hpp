@@ -9,14 +9,14 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <memory>
 
 namespace libaudioverse_implementation {
-class Simulation;
+class Server;
 class InterpolatedDelayLine;
 class OnePoleFilter;
 class InterpolatedRandomGenerator;
 
 class FdnReverbNode: public Node {
 	public:
-	FdnReverbNode(std::shared_ptr<Simulation> sim);
+	FdnReverbNode(std::shared_ptr<Server> sim);
 	~FdnReverbNode();
 	void process();
 	void modulateLines();
@@ -33,5 +33,5 @@ class FdnReverbNode: public Node {
 	float modulation_depth = 0.0f; //equal to the property times the modulation duration from above.
 };
 
-std::shared_ptr<Node> createFdnReverbNode(std::shared_ptr<Simulation> simulation);
+std::shared_ptr<Node> createFdnReverbNode(std::shared_ptr<Server> server);
 }

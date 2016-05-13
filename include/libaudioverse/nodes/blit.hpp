@@ -11,15 +11,15 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-class Simulation;
+class Server;
 
 class BlitNode: public Node {
 	public:
-	BlitNode(std::shared_ptr<Simulation> simulation);
+	BlitNode(std::shared_ptr<Server> server);
 	virtual void process();
 	virtual void reset() override;
 	Blit oscillator;
 };
 
-std::shared_ptr<Node> createBlitNode(std::shared_ptr<Simulation> simulation);
+std::shared_ptr<Node> createBlitNode(std::shared_ptr<Server> server);
 }

@@ -9,20 +9,20 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/nodes/additive_triangle.hpp>
 #include <libaudioverse/implementations/additive_square.hpp>
 #include <libaudioverse/private/node.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <memory>
 
 namespace libaudioverse_implementation {
 
-AdditiveTriangleNode::AdditiveTriangleNode(std::shared_ptr<Simulation> simulation): Node(Lav_OBJTYPE_ADDITIVE_TRIANGLE_NODE, simulation, 0, 1), oscillator(simulation->getSr()) {
+AdditiveTriangleNode::AdditiveTriangleNode(std::shared_ptr<Server> server): Node(Lav_OBJTYPE_ADDITIVE_TRIANGLE_NODE, server, 0, 1), oscillator(server->getSr()) {
 	appendOutputConnection(0, 1);
 	setShouldZeroOutputBuffers(false);
 }
 
-std::shared_ptr<Node> createAdditiveTriangleNode(std::shared_ptr<Simulation> simulation) {
-	return standardNodeCreation<AdditiveTriangleNode>(simulation);
+std::shared_ptr<Node> createAdditiveTriangleNode(std::shared_ptr<Server> server) {
+	return standardNodeCreation<AdditiveTriangleNode>(server);
 }
 
 void AdditiveTriangleNode::process() {
@@ -51,11 +51,11 @@ void AdditiveTriangleNode::reset() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createAdditiveTriangleNode(LavHandle simulationHandle, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createAdditiveTriangleNode(LavHandle serverHandle, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
-	auto retval = createAdditiveTriangleNode(simulation);
+	auto server = incomingObject<Server>(serverHandle);
+	LOCK(*server);
+	auto retval = createAdditiveTriangleNode(server);
 	*destination = outgoingObject<Node>(retval);
 	PUB_END
 }

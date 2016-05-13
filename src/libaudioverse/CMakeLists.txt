@@ -40,7 +40,7 @@ buffer.cpp
 properties.cpp
 initialization.cpp
 memory.cpp
-simulation.cpp
+server.cpp
 logging.cpp
 planner.cpp
 error.cpp

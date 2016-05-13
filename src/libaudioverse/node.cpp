@@ -12,7 +12,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/connections.hpp>
 #include <libaudioverse/private/properties.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/metadata.hpp>
 #include <libaudioverse/private/kernels.hpp>
@@ -59,22 +59,22 @@ bool PropertyBackrefComparer::operator() (const std::tuple<std::weak_ptr<Node>, 
 	else return std::get<1>(a) < std::get<1>(b);
 }
 
-Node::Node(int type, std::shared_ptr<Simulation> simulation, unsigned int numInputBuffers, unsigned int numOutputBuffers): Job(type) {
-	this->simulation= simulation;
+Node::Node(int type, std::shared_ptr<Server> server, unsigned int numInputBuffers, unsigned int numOutputBuffers): Job(type) {
+	this->server= server;
 	//request properties from the metadata module.
 	properties = makePropertyTable(type);
 	//Associate properties to this node:
 	for(auto i: properties) {
 		auto &prop = properties[i.first];
 		prop.associateNode(this);
-		prop.associateSimulation(simulation);
+		prop.associateServer(server);
 	}
 
 	//allocations can be done simply by redirecting through resize after our initialization step.
 	resize(numInputBuffers, numOutputBuffers);
 	
 	//Block sizes never change:
-	block_size = simulation->getBlockSize();
+	block_size = server->getBlockSize();
 	
 	//We must invalidate the plan when people touch the state property.
 	getProperty(Lav_NODE_STATE).setPostChangedCallback([&] () {stateChanged();});
@@ -87,7 +87,7 @@ Node::~Node() {
 	for(auto i: input_buffers) {
 		if(i) freeArray(i);
 	}
-	simulation->invalidatePlan();
+	server->invalidatePlan();
 }
 
 void Node::tickProperties() {
@@ -97,7 +97,7 @@ void Node::tickProperties() {
 }
 
 void Node::tick() {
-	last_processed = simulation->getTickCount();
+	last_processed = server->getTickCount();
 	bool paused = getState() == Lav_NODESTATE_PAUSED;
 	if(paused) return;
 	//If we're paused, then OutputConnectiona dds zeros.
@@ -173,7 +173,7 @@ void Node::zeroInputBuffers() {
 	int inputBufferCount=getInputBufferCount();
 	float** inputBuffers=getInputBufferArray();
 	for(int i = 0; i < inputBufferCount; i++) {
-		memset(inputBuffers[i], 0, sizeof(float)*simulation->getBlockSize());
+		memset(inputBuffers[i], 0, sizeof(float)*server->getBlockSize());
 	}
 }
 
@@ -190,10 +190,10 @@ void Node::setState(int newState) {
 
 void Node::stateChanged() {
 	if(getState() == prev_state) return;
-	simulation->invalidatePlan();
-	if(prev_state == Lav_NODESTATE_ALWAYS_PLAYING) simulation->unregisterNodeForAlwaysPlaying(std::static_pointer_cast<Node>(shared_from_this()));
+	server->invalidatePlan();
+	if(prev_state == Lav_NODESTATE_ALWAYS_PLAYING) server->unregisterNodeForAlwaysPlaying(std::static_pointer_cast<Node>(shared_from_this()));
 	prev_state = getProperty(Lav_NODE_STATE).getIntValue();
-	if(prev_state == Lav_NODESTATE_ALWAYS_PLAYING) simulation->registerNodeForAlwaysPlaying(std::static_pointer_cast<Node>(shared_from_this()));
+	if(prev_state == Lav_NODESTATE_ALWAYS_PLAYING) server->registerNodeForAlwaysPlaying(std::static_pointer_cast<Node>(shared_from_this()));
 }
 
 int Node::getOutputBufferCount() {
@@ -234,11 +234,11 @@ std::shared_ptr<OutputConnection> Node::getOutputConnection(int which) {
 }
 
 void Node::appendInputConnection(int start, int count) {
-	input_connections.emplace_back(new InputConnection(simulation, this, start, count));
+	input_connections.emplace_back(new InputConnection(server, this, start, count));
 }
 
 void Node::appendOutputConnection(int start, int count) {
-	output_connections.emplace_back(new OutputConnection(simulation, this, start, count));
+	output_connections.emplace_back(new OutputConnection(server, this, start, count));
 }
 
 void Node::connect(int output, std::shared_ptr<Node> toNode, int input) {
@@ -246,14 +246,14 @@ void Node::connect(int output, std::shared_ptr<Node> toNode, int input) {
 	auto outputConnection =getOutputConnection(output);
 	auto inputConnection = toNode->getInputConnection(input);
 	makeConnection(outputConnection, inputConnection);
-	simulation->invalidatePlan();
+	server->invalidatePlan();
 }
 
-void Node::connectSimulation(int which) {
+void Node::connectServer(int which) {
 	auto outputConnection=getOutputConnection(which);
-	auto inputConnection = simulation->getFinalOutputConnection();
+	auto inputConnection = server->getFinalOutputConnection();
 	makeConnection(outputConnection, inputConnection);
-	simulation->invalidatePlan();
+	server->invalidatePlan();
 }
 
 void Node::connectProperty(int output, std::shared_ptr<Node> node, int slot) {
@@ -263,7 +263,7 @@ void Node::connectProperty(int output, std::shared_ptr<Node> node, int slot) {
 	if(conn ==nullptr) ERROR(Lav_ERROR_CANNOT_CONNECT_TO_PROPERTY, "Property does not support connections.");
 	auto outputConn =getOutputConnection(output);
 	makeConnection(outputConn, conn);
-	simulation->invalidatePlan();
+	server->invalidatePlan();
 }
 
 void Node::disconnect(int output, std::shared_ptr<Node> node, int input) {
@@ -273,7 +273,7 @@ void Node::disconnect(int output, std::shared_ptr<Node> node, int input) {
 		auto other = node->getInputConnection(input);
 		breakConnection(o, other);
 	}
-	simulation->invalidatePlan();
+	server->invalidatePlan();
 }
 
 void Node::isolate() {
@@ -281,8 +281,8 @@ void Node::isolate() {
 	for(int i = 0; i < oc; i++) disconnect(i);
 }
 
-std::shared_ptr<Simulation> Node::getSimulation() {
-	return simulation;
+std::shared_ptr<Server> Node::getServer() {
+	return server;
 }
 
 Property& Node::getProperty(int slot, bool allowForwarding) {
@@ -299,7 +299,7 @@ Property& Node::getProperty(int slot, bool allowForwarding) {
 void Node::forwardProperty(int ourProperty, std::shared_ptr<Node> toNode, int toProperty) {
 	forwarded_properties[ourProperty] = std::make_tuple(toNode, toProperty);
 	toNode->addPropertyBackref(toProperty, std::static_pointer_cast<Node>(shared_from_this()), ourProperty);
-	simulation->invalidatePlan();
+	server->invalidatePlan();
 }
 
 void Node::stopForwardingProperty(int ourProperty) {
@@ -312,7 +312,7 @@ void Node::stopForwardingProperty(int ourProperty) {
 		}
 	}
 	else ERROR(Lav_ERROR_INTERNAL, "Backref does not exist.");
-	simulation->invalidatePlan();
+	server->invalidatePlan();
 }
 
 void Node::addPropertyBackref(int ourProperty, std::shared_ptr<Node> toNode, int toProperty) {
@@ -339,11 +339,11 @@ void Node::visitPropertyBackrefs(int which, std::function<void(Property&)> pred)
 }
 
 void Node::lock() {
-	simulation->lock();
+	server->lock();
 }
 
 void Node::unlock() {
-	simulation->unlock();
+	server->unlock();
 }
 
 void Node::reset() {
@@ -354,7 +354,7 @@ void Node::resize(int newInputCount, int newOutputCount) {
 	int oldInputCount = input_buffers.size();
 	for(int i = oldInputCount-1; i >= newInputCount; i--) if(input_buffers[i]) freeArray(input_buffers[i]);
 	input_buffers.resize(newInputCount, nullptr);
-	for(int i = oldInputCount; i < newInputCount; i++) input_buffers[i] = allocArray<float>(simulation->getBlockSize());
+	for(int i = oldInputCount; i < newInputCount; i++) input_buffers[i] = allocArray<float>(server->getBlockSize());
 
 	int oldOutputCount = output_buffers.size();
 	if(newOutputCount < oldOutputCount) { //we need to free some arrays.
@@ -367,7 +367,7 @@ void Node::resize(int newInputCount, int newOutputCount) {
 	output_buffers.resize(newOutputCount, nullptr);
 	if(newOutputCount > oldOutputCount) { //we need to allocate some more arrays.
 		for(auto i = oldOutputCount; i < newOutputCount; i++) {
-			output_buffers[i] = allocArray<float>(simulation->getBlockSize());
+			output_buffers[i] = allocArray<float>(server->getBlockSize());
 		}
 	}
 }
@@ -386,10 +386,10 @@ void Node::setShouldZeroOutputBuffers(bool v) {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetSimulation(LavHandle handle, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetServer(LavHandle handle, LavHandle* destination) {
 	PUB_BEGIN
 auto n = incomingObject<Node>(handle);
-	*destination = outgoingObject(n->getSimulation());
+	*destination = outgoingObject(n->getServer());
 	PUB_END
 }
 
@@ -402,11 +402,11 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeConnect(LavHandle nodeHandle, int output, L
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeConnectSimulation(LavHandle nodeHandle, int output) {
+Lav_PUBLIC_FUNCTION LavError Lav_nodeConnectServer(LavHandle nodeHandle, int output) {
 	PUB_BEGIN
 	auto node = incomingObject<Node>(nodeHandle);
 	LOCK(*node);
-	node->connectSimulation(output);
+	node->connectServer(output);
 	PUB_END
 }
 
@@ -462,7 +462,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeReset(LavHandle nodeHandle) {
 }
 
 //this is properties.
-//this is here because properties do not "know" about objects and only objects have properties; also, it made properties.cpp have to "know" about simulations and objects.
+//this is here because properties do not "know" about objects and only objects have properties; also, it made properties.cpp have to "know" about servers and objects.
 
 //this works for getters and setters to lock the object and set a variable prop to be a pointer-like thing to a property.
 #define PROP_PREAMBLE(n, s, t) auto node_ptr = incomingObject<Node>(n);\
@@ -762,7 +762,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeSetBufferProperty(LavHandle nodeHandle, int
 	PUB_BEGIN
 	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_BUFFER);
 	auto buff=incomingObject<Buffer>(bufferHandle, true);
-	if(buff && buff->getSimulation() != node_ptr->getSimulation()) ERROR(Lav_ERROR_CANNOT_CROSS_SIMULATIONS, "Buffer is not from the same simulation as the node.");
+	if(buff && buff->getServer() != node_ptr->getServer()) ERROR(Lav_ERROR_CANNOT_CROSS_SERVERS, "Buffer is not from the same server as the node.");
 	prop.setBufferValue(buff);
 	PUB_END
 }

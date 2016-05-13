@@ -10,12 +10,12 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-class Simulation;
+class Server;
 class FftConvolver;
 
 class FftConvolverNode: public Node {
 	public:
-	FftConvolverNode(std::shared_ptr<Simulation> simulation, int channels);
+	FftConvolverNode(std::shared_ptr<Server> server, int channels);
 	~FftConvolverNode();
 	virtual void process();
 	void setResponse(int channel, int length, float* response);
@@ -24,5 +24,5 @@ class FftConvolverNode: public Node {
 	FftConvolver **convolvers;
 };
 
-std::shared_ptr<Node> createFftConvolverNode(std::shared_ptr<Simulation> simulation, int channels);
+std::shared_ptr<Node> createFftConvolverNode(std::shared_ptr<Server> server, int channels);
 }

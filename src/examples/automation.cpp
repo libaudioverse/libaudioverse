@@ -21,12 +21,12 @@ if((x) != Lav_ERROR_NONE) {\
 } while(0)\
 
 int main() {
-	LavHandle simulation;
+	LavHandle server;
 	LavHandle node;
 	ERRCHECK(Lav_initialize());
-	ERRCHECK(Lav_createSimulation(44100, 8192, &simulation));
-	ERRCHECK(Lav_simulationSetOutputDevice(simulation, "default", 2));
-	ERRCHECK(Lav_createSineNode(simulation, &node));
+	ERRCHECK(Lav_createSimulation(44100, 8192, &server));
+	ERRCHECK(Lav_serverSetOutputDevice(server, "default", 2));
+	ERRCHECK(Lav_createSineNode(server, &node));
 	ERRCHECK(Lav_nodeSetFloatProperty(node, Lav_OSCILLATOR_FREQUENCY, 0));
 	ERRCHECK(Lav_nodeConnectSimulation(node, 0));
 	ERRCHECK(Lav_automationLinearRampToValue(node, Lav_NODE_MUL, 8.0, 0.05));

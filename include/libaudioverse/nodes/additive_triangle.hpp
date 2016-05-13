@@ -11,15 +11,15 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-class Simulation;
+class Server;
 
 class AdditiveTriangleNode: public Node {
 	public:
-	AdditiveTriangleNode(std::shared_ptr<Simulation> simulation);
+	AdditiveTriangleNode(std::shared_ptr<Server> server);
 	virtual void process() override;
 	virtual void reset() override;
 	AdditiveTriangle oscillator;
 };
 
-std::shared_ptr<Node> createAdditiveTriangleNode(std::shared_ptr<Simulation> simulation);
+std::shared_ptr<Node> createAdditiveTriangleNode(std::shared_ptr<Server> server);
 }

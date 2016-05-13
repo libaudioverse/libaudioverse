@@ -12,7 +12,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/private/connections.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/properties.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/kernels.hpp>
 #include <libaudioverse/private/helper_templates.hpp>
@@ -23,11 +23,11 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-OutputConnection::OutputConnection(std::shared_ptr<Simulation> simulation, Node* node, int start, int count) {
+OutputConnection::OutputConnection(std::shared_ptr<Server> server, Node* node, int start, int count) {
 	this->node= node;
 	this->start =start;
 	this->count = count;
-	this->block_size = simulation->getBlockSize();
+	this->block_size = server->getBlockSize();
 }
 
 void OutputConnection::add(int inputBufferCount, float** inputBuffers, bool shouldApplyMixingMatrix) {
@@ -80,17 +80,17 @@ std::vector<Node*> OutputConnection::getConnectedNodes() {
 	std::vector<Node*> retval;
 	filterWeakPointers(connected_to, [&](std::shared_ptr<InputConnection> &conn) {
 		auto n = conn->getNode();
-		//The simulation uses an input connection without a node, so we need to protect against this case.
+		//The server uses an input connection without a node, so we need to protect against this case.
 		if(n) retval.push_back(n);
 	});
 	return retval;
 }
 
-InputConnection::InputConnection(std::shared_ptr<Simulation> simulation, Node* node, int start, int count) {
+InputConnection::InputConnection(std::shared_ptr<Server> server, Node* node, int start, int count) {
 	this->node= node;
 	this->start=start;
 	this->count = count;
-	this->block_size = simulation->getBlockSize();
+	this->block_size = server->getBlockSize();
 }
 
 void InputConnection::add(bool shouldApplyMixingMatrix) {

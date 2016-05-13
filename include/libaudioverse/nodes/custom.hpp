@@ -11,15 +11,15 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-class Simulation;
+class Server;
 
 class CustomNode: public Node {
 	public:
-	CustomNode(std::shared_ptr<Simulation> sim, unsigned int inputs, unsigned int channelsPerInput, unsigned int outputs, unsigned int channelsPerOutput);
+	CustomNode(std::shared_ptr<Server> sim, unsigned int inputs, unsigned int channelsPerInput, unsigned int outputs, unsigned int channelsPerOutput);
 	void process();
 	LavCustomNodeProcessingCallback callback = nullptr;
 	void* callback_userdata = nullptr;
 };
 
-std::shared_ptr<Node> createCustomNode(std::shared_ptr<Simulation> simulation, unsigned int inputs, unsigned int channelsPerInput, unsigned int outputs,  unsigned int channelsPerOutput);
+std::shared_ptr<Node> createCustomNode(std::shared_ptr<Server> server, unsigned int inputs, unsigned int channelsPerInput, unsigned int outputs,  unsigned int channelsPerOutput);
 }

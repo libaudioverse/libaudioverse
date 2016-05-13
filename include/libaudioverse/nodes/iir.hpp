@@ -10,12 +10,12 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-class Simulation;
+class Server;
 class IIRFilter;
 
 class IirNode: public Node {
 	public:
-	IirNode(std::shared_ptr<Simulation> simulation, int channels);
+	IirNode(std::shared_ptr<Server> server, int channels);
 	~IirNode();
 	virtual void process();
 	void setCoefficients(int numeratorLength, double* numerator, int denominatorLength, double* denominator, int shouldClearHistory);
@@ -23,5 +23,5 @@ class IirNode: public Node {
 	int channels;
 };
 
-std::shared_ptr<Node> createIirNode(std::shared_ptr<Simulation> simulation, int channels);
+std::shared_ptr<Node> createIirNode(std::shared_ptr<Server> server, int channels);
 }

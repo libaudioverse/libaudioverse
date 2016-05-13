@@ -10,13 +10,13 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-class Simulation;
+class Server;
 
 class HardLimiterNode: public Node {
 	public:
-	HardLimiterNode(std::shared_ptr<Simulation> simulation, int channels);
+	HardLimiterNode(std::shared_ptr<Server> server, int channels);
 	virtual void process();
 };
 
-std::shared_ptr<Node>createHardLimiterNode(std::shared_ptr<Simulation> simulation, int channels);
+std::shared_ptr<Node>createHardLimiterNode(std::shared_ptr<Server> server, int channels);
 }

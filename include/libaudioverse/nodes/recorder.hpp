@@ -15,11 +15,11 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-class Simulation;
+class Server;
 
 class RecorderNode: public Node {
 	public:
-	RecorderNode(std::shared_ptr<Simulation> simulation, int channels);
+	RecorderNode(std::shared_ptr<Server> server, int channels);
 	~RecorderNode();
 	void recordingThreadFunction();
 	virtual void process() override;
@@ -37,5 +37,5 @@ class RecorderNode: public Node {
 	bool recording = false;
 };
 
-std::shared_ptr<Node> createRecorderNode(std::shared_ptr<Simulation> simulation, int channels);
+std::shared_ptr<Node> createRecorderNode(std::shared_ptr<Server> server, int channels);
 }

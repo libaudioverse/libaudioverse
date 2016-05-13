@@ -15,7 +15,7 @@ namespace libaudioverse_implementation {
 /**Note.  We can't use floats. There's some instability with the accumulator model that was here before that shows up as audible artifacts.*/
 class ThreeBandEqNode: public Node {
 	public:
-	ThreeBandEqNode(std::shared_ptr<Simulation> simulation, int channels);
+	ThreeBandEqNode(std::shared_ptr<Server> server, int channels);
 	void recompute();
 	virtual void process() override;
 	virtual void reset() override;
@@ -23,5 +23,5 @@ class ThreeBandEqNode: public Node {
 	MultichannelFilterBank<BiquadFilter> midband_peaks, highband_shelves;
 };
 
-std::shared_ptr<Node> createThreeBandEqNode(std::shared_ptr<Simulation> simulation, int channels);
+std::shared_ptr<Node> createThreeBandEqNode(std::shared_ptr<Server> server, int channels);
 }

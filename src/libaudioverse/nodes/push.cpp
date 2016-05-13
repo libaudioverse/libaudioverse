@@ -7,7 +7,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/nodes/push.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
@@ -17,20 +17,20 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-PushNode::PushNode(std::shared_ptr<Simulation> sim, unsigned int inputSr, unsigned int channels): Node(Lav_OBJTYPE_PUSH_NODE, sim, 0, channels) {
+PushNode::PushNode(std::shared_ptr<Server> s, unsigned int inputSr, unsigned int channels): Node(Lav_OBJTYPE_PUSH_NODE, s, 0, channels) {
 	if(channels == 0) ERROR(Lav_ERROR_RANGE, "Channels must be greater than 0.");
 	input_sr = inputSr;
-	resampler = speex_resampler_cpp::createResampler(push_frames, channels, inputSr, (int)sim->getSr());
+	resampler = speex_resampler_cpp::createResampler(push_frames, channels, inputSr, (int)s->getSr());
 	this->push_channels = channels;
-	workspace = allocArray<float>(push_channels*simulation->getBlockSize());
+	workspace = allocArray<float>(push_channels*server->getBlockSize());
 	push_buffer = allocArray<float>(push_frames*channels);
 	appendOutputConnection(0, channels);
 	underrun_callback = std::make_shared<Callback<void()>>();
 	low_callback = std::make_shared<Callback<void()>>();
 }
 
-std::shared_ptr<Node> createPushNode(std::shared_ptr<Simulation> simulation, unsigned int inputSr, unsigned int channels) {
-	return standardNodeCreation<PushNode>(simulation, inputSr, channels);
+std::shared_ptr<Node> createPushNode(std::shared_ptr<Server> server, unsigned int inputSr, unsigned int channels) {
+	return standardNodeCreation<PushNode>(server, inputSr, channels);
 }
 
 PushNode::~PushNode() {
@@ -40,14 +40,14 @@ PushNode::~PushNode() {
 
 void PushNode::process() {
 	memset(workspace, 0, sizeof(float)*push_channels*block_size);
-	unsigned int got = resampler->write(workspace, simulation->getBlockSize());
-	if(got < simulation->getBlockSize()) {
+	unsigned int got = resampler->write(workspace, server->getBlockSize());
+	if(got < server->getBlockSize()) {
 		resampler->read(push_buffer);
 		memset(push_buffer, 0, sizeof(float)*push_channels*push_frames);
 		push_offset = 0;
-		resampler->write(workspace+got*push_channels, simulation->getBlockSize()-got);
+		resampler->write(workspace+got*push_channels, server->getBlockSize()-got);
 		if(fired_underrun_callback == false) {
-			simulation->enqueueTask([=] () {(*underrun_callback)();});
+			server->enqueueTask([=] () {(*underrun_callback)();});
 			fired_underrun_callback = true;
 		}
 	}
@@ -57,9 +57,9 @@ void PushNode::process() {
 		output_buffers[output][position] = workspace[i];
 	}
 	float threshold = getProperty(Lav_PUSH_THRESHOLD).getFloatValue();
-	float remaining = resampler->estimateAvailableFrames()/(float)simulation->getSr();
+	float remaining = resampler->estimateAvailableFrames()/(float)server->getSr();
 	if(remaining < threshold && fired_underrun_callback == false) {
-		simulation->enqueueTask([=] () {(*low_callback)();});
+		server->enqueueTask([=] () {(*low_callback)();});
 	}
 }
 
@@ -82,11 +82,11 @@ void PushNode::feed(unsigned int length, float* buffer) {
 
 //begin public api.
 
-Lav_PUBLIC_FUNCTION LavError Lav_createPushNode(LavHandle simulationHandle, unsigned int sr, unsigned int channels, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createPushNode(LavHandle serverHandle, unsigned int sr, unsigned int channels, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation =incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
-	*destination = outgoingObject<Node>(createPushNode(simulation, sr, channels));
+	auto server =incomingObject<Server>(serverHandle);
+	LOCK(*server);
+	*destination = outgoingObject<Node>(createPushNode(server, sr, channels));
 	PUB_END
 }
 

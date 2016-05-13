@@ -8,7 +8,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/nodes/file_streamer.hpp>
 #include <libaudioverse/private/node.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/memory.hpp>
@@ -19,16 +19,16 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-FileStreamerNode::FileStreamerNode(std::shared_ptr<Simulation> simulation, std::string path): Node(Lav_OBJTYPE_FILE_STREAMER_NODE, simulation, 0, 1),
-streamer(path, simulation->getBlockSize(), simulation->getSr()) {
+FileStreamerNode::FileStreamerNode(std::shared_ptr<Server> server, std::string path): Node(Lav_OBJTYPE_FILE_STREAMER_NODE, server, 0, 1),
+streamer(path, server->getBlockSize(), server->getSr()) {
 	resize(0, streamer.getChannels());
 	appendOutputConnection(0, streamer.getChannels());
 	getProperty(Lav_FILE_STREAMER_POSITION).setDoubleRange(0.0, streamer.getDuration());
 	end_callback = std::make_shared<Callback<void()>>();
 }
 
-std::shared_ptr<Node> createFileStreamerNode(std::shared_ptr<Simulation> simulation, std::string path) {
-	return standardNodeCreation<FileStreamerNode>(simulation, path);
+std::shared_ptr<Node> createFileStreamerNode(std::shared_ptr<Server> server, std::string path) {
+	return standardNodeCreation<FileStreamerNode>(server, path);
 }
 
 void FileStreamerNode::process() {
@@ -38,17 +38,17 @@ void FileStreamerNode::process() {
 	getProperty(Lav_FILE_STREAMER_POSITION).setDoubleValue(streamer.getPosition());
 	if(streamer.getEnded()) {
 		getProperty(Lav_FILE_STREAMER_ENDED).setIntValue(1);
-		simulation->enqueueTask([=] () {(*end_callback)();});
+		server->enqueueTask([=] () {(*end_callback)();});
 	}
 	else getProperty(Lav_FILE_STREAMER_ENDED).setIntValue(0);
 }
 
 //begin public api
-Lav_PUBLIC_FUNCTION LavError Lav_createFileStreamerNode(LavHandle simulationHandle, const char* path, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createFileStreamerNode(LavHandle serverHandle, const char* path, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
-	auto retval = createFileStreamerNode(simulation, std::string(path));
+	auto server = incomingObject<Server>(serverHandle);
+	LOCK(*server);
+	auto retval = createFileStreamerNode(server, std::string(path));
 	*destination = outgoingObject<Node>(retval);
 	PUB_END
 }

@@ -10,13 +10,13 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-class Simulation;
+class Server;
 
 class RingmodNode: public Node {
 	public:
-	RingmodNode(std::shared_ptr<Simulation> sim);
+	RingmodNode(std::shared_ptr<Server> sim);
 	void process();
 };
 
-std::shared_ptr<Node> createRingmodNode(std::shared_ptr<Simulation> simulation);
+std::shared_ptr<Node> createRingmodNode(std::shared_ptr<Server> server);
 }

@@ -27,7 +27,7 @@ This also implements Lav_free, which works the same for all pointers, and the ob
 */
 
 class ExternalObject;//declared in this header below the globals.
-class Simulation;
+class Server;
 
 extern std::map<void*, std::shared_ptr<void>> *external_ptrs;
 extern std::map<int, std::shared_ptr<ExternalObject>> *external_handles;
@@ -144,7 +144,7 @@ void freeArray(void* ptr);
 bool isAligned(const void* ptr);
 
 //custom deleter for smart pointer that guarantees thread safety.
-std::function<void(ExternalObject*)> ObjectDeleter(std::shared_ptr<Simulation> simulation);
+std::function<void(ExternalObject*)> ObjectDeleter(std::shared_ptr<Server> server);
 
 
 }

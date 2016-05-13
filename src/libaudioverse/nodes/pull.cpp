@@ -7,7 +7,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/nodes/pull.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
@@ -17,18 +17,18 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-PullNode::PullNode(std::shared_ptr<Simulation> sim, unsigned int inputSr, unsigned int channels): Node(Lav_OBJTYPE_PULL_NODE, sim, 0, channels) {
+PullNode::PullNode(std::shared_ptr<Server> s, unsigned int inputSr, unsigned int channels): Node(Lav_OBJTYPE_PULL_NODE, s, 0, channels) {
 	this->channels = channels;
 	input_sr = inputSr;
-	resampler = speex_resampler_cpp::createResampler(sim->getBlockSize(), channels, inputSr, (int)sim->getSr());
+	resampler = speex_resampler_cpp::createResampler(s->getBlockSize(), channels, inputSr, (int)s->getSr());
 	this->channels = channels;
-	incoming_buffer = allocArray<float>(channels*simulation->getBlockSize());
-	resampled_buffer = allocArray<float>(channels*sim->getBlockSize());
+	incoming_buffer = allocArray<float>(channels*server->getBlockSize());
+	resampled_buffer = allocArray<float>(channels*s->getBlockSize());
 	appendOutputConnection(0, channels);
 }
 
-std::shared_ptr<Node> createPullNode(std::shared_ptr<Simulation> simulation, unsigned int inputSr, unsigned int channels) {
-	return standardNodeCreation<PullNode>(simulation, inputSr, channels);
+std::shared_ptr<Node> createPullNode(std::shared_ptr<Server> server, unsigned int inputSr, unsigned int channels) {
+	return standardNodeCreation<PullNode>(server, inputSr, channels);
 }
 
 PullNode::~PullNode() {
@@ -59,11 +59,11 @@ void PullNode::process() {
 
 //begin public api.
 
-Lav_PUBLIC_FUNCTION LavError Lav_createPullNode(LavHandle simulationHandle, unsigned int sr, unsigned int channels, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createPullNode(LavHandle serverHandle, unsigned int sr, unsigned int channels, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
-	*destination = outgoingObject<Node>(createPullNode(simulation, sr, channels));
+	auto server = incomingObject<Server>(serverHandle);
+	LOCK(*server);
+	*destination = outgoingObject<Node>(createPullNode(server, sr, channels));
 	PUB_END
 }
 

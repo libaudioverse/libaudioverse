@@ -9,7 +9,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/nodes/recorder.hpp>
 #include <libaudioverse/private/node.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/memory.hpp>
@@ -25,18 +25,18 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-RecorderNode::RecorderNode(std::shared_ptr<Simulation> simulation, int channels): Node(Lav_OBJTYPE_RECORDER_NODE, simulation, channels, channels) {
+RecorderNode::RecorderNode(std::shared_ptr<Server> server, int channels): Node(Lav_OBJTYPE_RECORDER_NODE, server, channels, channels) {
 	appendInputConnection(0, channels);
 	appendOutputConnection(0, channels);
 	this->channels = channels;
-	buffer_size=simulation->getBlockSize()*channels;
+	buffer_size=server->getBlockSize()*channels;
 	//allocate a few buffers.
 	for(int i=0; i < 5; i++) available_buffers.enqueue(allocArray<float>(buffer_size));
 }
 
-std::shared_ptr<Node> createRecorderNode(std::shared_ptr<Simulation> simulation, int channels) {
-	auto ret = standardNodeCreation<RecorderNode>(simulation, channels);
-	simulation->registerNodeForMaintenance(ret);
+std::shared_ptr<Node> createRecorderNode(std::shared_ptr<Server> server, int channels) {
+	auto ret = standardNodeCreation<RecorderNode>(server, channels);
+	server->registerNodeForMaintenance(ret);
 	return ret;
 }
 
@@ -84,7 +84,7 @@ void RecorderNode::doMaintenance() {
 
 void RecorderNode::startRecording(std::string path) {
 	if(recording) stopRecording();
-	recording_to.open(path.c_str(), simulation->getSr(), channels);
+	recording_to.open(path.c_str(), server->getSr(), channels);
 	recording = true;
 	should_keep_recording.test_and_set(); //so the thread doesn't immediately stop.
 	recording_thread= powercores::safeStartThread(&RecorderNode::recordingThreadFunction, this);
@@ -101,11 +101,11 @@ void RecorderNode::stopRecording() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createRecorderNode(LavHandle simulationHandle, int channels, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createRecorderNode(LavHandle serverHandle, int channels, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
-	auto retval = createRecorderNode(simulation, channels);
+	auto server = incomingObject<Server>(serverHandle);
+	LOCK(*server);
+	auto retval = createRecorderNode(server, channels);
 	*destination = outgoingObject<Node>(retval);
 	PUB_END
 }

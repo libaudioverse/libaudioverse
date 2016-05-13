@@ -11,15 +11,15 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-class Simulation;
+class Server;
 
 class AdditiveSawNode: public Node {
 	public:
-	AdditiveSawNode(std::shared_ptr<Simulation> simulation);
+	AdditiveSawNode(std::shared_ptr<Server> server);
 	virtual void process() override;
 	virtual void reset() override;
 	AdditiveSaw oscillator;
 };
 
-std::shared_ptr<Node> createAdditiveSawNode(std::shared_ptr<Simulation> simulation);
+std::shared_ptr<Node> createAdditiveSawNode(std::shared_ptr<Server> server);
 }

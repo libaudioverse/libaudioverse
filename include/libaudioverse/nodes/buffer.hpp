@@ -14,11 +14,11 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 namespace libaudioverse_implementation {
 
 
-class Simulation;
+class Server;
 
 class BufferNode: public Node {
 	public:
-	BufferNode(std::shared_ptr<Simulation> simulation);
+	BufferNode(std::shared_ptr<Server> server);
 	void setBuffer(std::shared_ptr<Buffer> buff);
 	void positionChanged();
 	void bufferChanged();
@@ -27,6 +27,6 @@ class BufferNode: public Node {
 	std::shared_ptr<Callback<void()>> end_callback;
 };
 
-std::shared_ptr<Node> createBufferNode(std::shared_ptr<Simulation> simulation);
+std::shared_ptr<Node> createBufferNode(std::shared_ptr<Server> server);
 
 }

@@ -10,12 +10,12 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-class Simulation;
+class Server;
 class LeakyIntegrator;
 
 class LeakyIntegratorNode: public Node {
 	public:
-	LeakyIntegratorNode(std::shared_ptr<Simulation> simulation, int channels);
+	LeakyIntegratorNode(std::shared_ptr<Server> server, int channels);
 	~LeakyIntegratorNode();
 	virtual void process();
 	virtual void reset() override;
@@ -23,5 +23,5 @@ class LeakyIntegratorNode: public Node {
 	int channels = 0;
 };
 
-std::shared_ptr<Node> createLeakyIntegratorNode(std::shared_ptr<Simulation> simulation, int channels);
+std::shared_ptr<Node> createLeakyIntegratorNode(std::shared_ptr<Server> server, int channels);
 }

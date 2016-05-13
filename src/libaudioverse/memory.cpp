@@ -9,7 +9,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/private/error.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/node.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -46,18 +46,18 @@ void initializeMemoryModule() {
 void shutdownMemoryModule() {
 	std::lock_guard<std::recursive_mutex> l(*memory_lock);
 	//We're about to shut down, but sometimes there are cycles.
-	//The most notable case of this is nodes connected to the simulation: the simulation holds them and they hold the simulation.
+	//The most notable case of this is nodes connected to the server: the server holds them and they hold the server.
 	//In order to help prevent bugs, we therefore isolate all nodes that we can reach.
-	//In addition, simulations hold devices which may be in the middle of processing.
-	//In this case, the simulation needs to be isolated here--if we don't, we can abandon its pointer while it's still running.
+	//In addition, servers hold devices which may be in the middle of processing.
+	//In this case, the server needs to be isolated here--if we don't, we can abandon its pointer while it's still running.
 	//This additionally results in a running thread that we never join.
 	for(auto &i: *weak_external_handles) {
-		auto s = i.second.lock();
-		auto n = std::dynamic_pointer_cast<Node>(s);
-		auto sim = std::dynamic_pointer_cast<Simulation>(s);
+		auto obj = i.second.lock();
+		auto n = std::dynamic_pointer_cast<Node>(obj);
+		auto s = std::dynamic_pointer_cast<Server>(obj);
 		if(n) n->isolate();
-		else if(sim) {
-			sim->clearOutputDevice();
+		else if(s) {
+			s->clearOutputDevice();
 		}
 	}
 	delete external_handles;
@@ -109,23 +109,23 @@ bool isAligned(const void* ptr) {
 	#endif
 }
 
-std::function<void(ExternalObject*)> ObjectDeleter(std::shared_ptr<Simulation> simulation) {
+std::function<void(ExternalObject*)> ObjectDeleter(std::shared_ptr<Server> server) {
 	return [=](ExternalObject* obj) mutable {
 		//We have to make sure to call the callback outside the lock.
 		//To that end, we gather information as follows, and then queue it.
 		bool isExternal;
 		int handle;
-		LOCK(*simulation);
+		LOCK(*server);
 		isExternal = obj->is_external_object;
 		handle = obj->external_object_handle;
 		//WARNING: this line can call this deleter recursively, if obj contains the final shared pointer to another ExternalObject.
 		delete obj;
-		//Because of the recursion, shell out to the simulation's task thread.
-		if(isExternal && handle_destroyed_callback) simulation->enqueueTask([handle] () {handle_destroyed_callback(handle);});
-		//The simulation holds weak_ptrs to nodes.
+		//Because of the recursion, shell out to the server's task thread.
+		if(isExternal && handle_destroyed_callback) server->enqueueTask([handle] () {handle_destroyed_callback(handle);});
+		//The server holds weak_ptrs to nodes.
 		//weak_ptrs hold references to this deleter.
 		//Therefore there is a cycle.
-		simulation = nullptr;
+		server = nullptr;
 	};
 }
 

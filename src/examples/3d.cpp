@@ -27,19 +27,19 @@ int main(int argc, char** args) {
 		return 1;
 	}
 	char *soundFile = args[1], *hrtfFile = args[2];
-	LavHandle simulation = 0;
+	LavHandle server = 0;
 	LavHandle node, world, source;
 	ERRCHECK(Lav_initialize());
-	ERRCHECK(Lav_createSimulation(44100, 1024, &simulation));
-	ERRCHECK(Lav_simulationSetOutputDevice(simulation, "default", 2));
-	ERRCHECK(Lav_createEnvironmentNode(simulation, hrtfFile, &world));
-	ERRCHECK(Lav_createBufferNode(simulation, &node));
+	ERRCHECK(Lav_createSimulation(44100, 1024, &server));
+	ERRCHECK(Lav_serverSetOutputDevice(server, "default", 2));
+	ERRCHECK(Lav_createEnvironmentNode(server, hrtfFile, &world));
+	ERRCHECK(Lav_createBufferNode(server, &node));
 	LavHandle buffer;
-	ERRCHECK(Lav_createBuffer(simulation, &buffer));
+	ERRCHECK(Lav_createBuffer(server, &buffer));
 	ERRCHECK(Lav_bufferLoadFromFile(buffer, soundFile));
 	ERRCHECK(Lav_nodeSetBufferProperty(node, Lav_BUFFER_BUFFER, buffer));
 	ERRCHECK(Lav_nodeSetIntProperty(world, Lav_ENVIRONMENT_PANNING_STRATEGY, Lav_PANNING_STRATEGY_HRTF));
-	ERRCHECK(Lav_createSourceNode(simulation, world, &source));
+	ERRCHECK(Lav_createSourceNode(server, world, &source));
 	ERRCHECK(Lav_nodeConnect(node, 0, source, 0));
 	const int resolution = 1000, length = 3000; //length in ms.
 	const float width = 30.0;

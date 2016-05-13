@@ -7,7 +7,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/nodes/biquad.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
@@ -19,8 +19,8 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-BiquadNode::BiquadNode(std::shared_ptr<Simulation> sim, unsigned int channels): Node(Lav_OBJTYPE_BIQUAD_NODE, sim, channels, channels),
-bank(simulation->getSr()) {
+BiquadNode::BiquadNode(std::shared_ptr<Server> s, unsigned int channels): Node(Lav_OBJTYPE_BIQUAD_NODE, s, channels, channels),
+bank(server->getSr()) {
 	if(channels < 1) ERROR(Lav_ERROR_RANGE, "Cannot filter 0 or fewer channels.");
 	bank.setChannelCount(channels);
 	prev_type = getProperty(Lav_BIQUAD_FILTER_TYPE).getIntValue();
@@ -29,13 +29,13 @@ bank(simulation->getSr()) {
 	setShouldZeroOutputBuffers(false);
 }
 
-std::shared_ptr<Node> createBiquadNode(std::shared_ptr<Simulation> simulation, unsigned int channels) {
-	return standardNodeCreation<BiquadNode>(simulation, channels);
+std::shared_ptr<Node> createBiquadNode(std::shared_ptr<Server> server, unsigned int channels) {
+	return standardNodeCreation<BiquadNode>(server, channels);
 }
 
 void BiquadNode::reconfigure() {
 	int type = getProperty(Lav_BIQUAD_FILTER_TYPE).getIntValue();
-	float sr = simulation->getSr();
+	float sr = server->getSr();
 	float frequency = getProperty(Lav_BIQUAD_FREQUENCY).getFloatValue();
 	float q = getProperty(Lav_BIQUAD_Q).getFloatValue();
 	float dbgain= getProperty(Lav_BIQUAD_DBGAIN).getFloatValue();
@@ -53,11 +53,11 @@ void BiquadNode::reset() {
 	bank.reset();
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_createBiquadNode(LavHandle simulationHandle, unsigned int channels, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createBiquadNode(LavHandle serverHandle, unsigned int channels, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation =incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
-	*destination = outgoingObject<Node>(createBiquadNode(simulation, channels));
+	auto server =incomingObject<Server>(serverHandle);
+	LOCK(*server);
+	*destination = outgoingObject<Node>(createBiquadNode(server, channels));
 	PUB_END
 }
 

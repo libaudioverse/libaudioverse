@@ -7,7 +7,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 /**Initialize libaudioverse.*/
 #include <libaudioverse/libaudioverse.h>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/metadata.hpp>
 #include <libaudioverse/private/memory.hpp>

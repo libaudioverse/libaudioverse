@@ -10,12 +10,12 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-class Simulation;
+class Server;
 class DoppleringDelayLine;
 
 class DoppleringDelayNode: public Node {
 	public:
-	DoppleringDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, int channels);
+	DoppleringDelayNode(std::shared_ptr<Server> server, float maxDelay, int channels);
 	~DoppleringDelayNode();
 	void process();
 	protected:
@@ -27,5 +27,5 @@ class DoppleringDelayNode: public Node {
 	int channels;
 };
 
-std::shared_ptr<Node> createDoppleringDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, int channels);
+std::shared_ptr<Node> createDoppleringDelayNode(std::shared_ptr<Server> server, float maxDelay, int channels);
 }

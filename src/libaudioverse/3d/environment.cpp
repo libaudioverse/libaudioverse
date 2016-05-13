@@ -10,7 +10,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/nodes/buffer.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/hrtf.hpp>
 #include <libaudioverse/private/buffer.hpp>
@@ -29,12 +29,12 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-EnvironmentNode::EnvironmentNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf): Node(Lav_OBJTYPE_ENVIRONMENT_NODE, simulation, 0, 8)  {
+EnvironmentNode::EnvironmentNode(std::shared_ptr<Server> server, std::shared_ptr<HrtfData> hrtf): Node(Lav_OBJTYPE_ENVIRONMENT_NODE, server, 0, 8)  {
 	this->hrtf = hrtf;
 	int channels = getProperty(Lav_ENVIRONMENT_OUTPUT_CHANNELS).getIntValue();
 	appendOutputConnection(0, channels);
 	//Allocate the 8 internal buffers.
-	for(int i = 0; i < 8; i++) source_buffers.push_back(allocArray<float>(simulation->getBlockSize()));
+	for(int i = 0; i < 8; i++) source_buffers.push_back(allocArray<float>(server->getBlockSize()));
 	environment_info.world_to_listener_transform = glm::lookAt(
 		glm::vec3(0.0f, 0.0f, 0.0f),
 		glm::vec3(0.0f, 0.0f, -1.0f),
@@ -42,9 +42,9 @@ EnvironmentNode::EnvironmentNode(std::shared_ptr<Simulation> simulation, std::sh
 	setShouldZeroOutputBuffers(false);
 }
 
-std::shared_ptr<EnvironmentNode> createEnvironmentNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf) {
-	auto ret = standardNodeCreation<EnvironmentNode>(simulation, hrtf);
-	simulation->registerNodeForWillTick(ret);
+std::shared_ptr<EnvironmentNode> createEnvironmentNode(std::shared_ptr<Server> server, std::shared_ptr<HrtfData> hrtf) {
+	auto ret = standardNodeCreation<EnvironmentNode>(server, hrtf);
+	server->registerNodeForWillTick(ret);
 	return ret;
 }
 
@@ -107,7 +107,7 @@ void EnvironmentNode::registerSourceForUpdates(std::shared_ptr<SourceNode> sourc
 		}
 	}
 	//Sources count as dependencies, so we need to invalidate.
-	simulation->invalidatePlan();
+	server->invalidatePlan();
 }
 
 void EnvironmentNode::playAsync(std::shared_ptr<Buffer> buffer, float x, float y, float z, bool isDry) {
@@ -116,8 +116,8 @@ void EnvironmentNode::playAsync(std::shared_ptr<Buffer> buffer, float x, float y
 	std::shared_ptr<SourceNode> s;
 	bool fromCache = false;
 	if(play_async_source_cache.empty()) {
-		s = std::static_pointer_cast<SourceNode>(createSourceNode(simulation, e));
-		b = createBufferNode(simulation);
+		s = std::static_pointer_cast<SourceNode>(createSourceNode(server, e));
+		b = createBufferNode(server);
 	}
 	else {
 		std::tie(b, s) = play_async_source_cache.back();
@@ -140,16 +140,16 @@ void EnvironmentNode::playAsync(std::shared_ptr<Buffer> buffer, float x, float y
 		}
 	}
 	if(fromCache) s->setState(Lav_NODESTATE_PLAYING);
-	auto simulation = this->simulation;
+	auto server = this->server;
 	//We've just done a bunch of stuff that invalidates the plan, so maybe we can squeeze in a bit more.
 	//If we update the source, it might cull.  We can then reset it to avoid HRTF crossfading.
 	s->update(environment_info);
 	s->reset(); //Avoid crossfading the hrtf.	
 	//This needs rewriting on whatever we replace events with.
-	/*b->getEvent(Lav_BUFFER_END_EVENT).setHandler([b, e, s, simulation] (std::shared_ptr<Node> unused1, void* unused2) mutable {
+	/*b->getEvent(Lav_BUFFER_END_EVENT).setHandler([b, e, s, server] (std::shared_ptr<Node> unused1, void* unused2) mutable {
 		//Recall that events do not hold locks when fired.
-		//So lock the simulation.
-		LOCK(*simulation);
+		//So lock the server.
+		LOCK(*server);
 		if(e->play_async_source_cache.size() < e->play_async_source_cache_limit) {
 			//Sleep the source, clear the buffer.
 			s->setState(Lav_NODESTATE_PAUSED);
@@ -184,7 +184,7 @@ int EnvironmentNode::addEffectSend(int channels, bool isReverb, bool connectByDe
 	int newSize = oldSize+send.channels;
 	resize(0, newSize);
 	appendOutputConnection(oldSize, send.channels);
-	for(int i = 0; i < send.channels; i++) source_buffers.push_back(allocArray<float>(simulation->getBlockSize()));
+	for(int i = 0; i < send.channels; i++) source_buffers.push_back(allocArray<float>(server->getBlockSize()));
 	int index = effect_sends.size();
 	effect_sends.push_back(send);
 	for(auto &i: sources) {
@@ -205,12 +205,12 @@ int EnvironmentNode::getEffectSendCount() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createEnvironmentNode(LavHandle simulationHandle, const char*hrtfPath, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createEnvironmentNode(LavHandle serverHandle, const char*hrtfPath, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
-	auto hrtf = createHrtfFromString(hrtfPath, simulation->getSr());
-	auto retval = createEnvironmentNode(simulation, hrtf);
+	auto server = incomingObject<Server>(serverHandle);
+	LOCK(*server);
+	auto hrtf = createHrtfFromString(hrtfPath, server->getSr());
+	auto retval = createEnvironmentNode(server, hrtf);
 	*destination = outgoingObject<Node>(retval);
 	PUB_END
 }

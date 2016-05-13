@@ -37,7 +37,7 @@ if((x) != Lav_ERROR_NONE) {\
 std::make_tuple(\
 name,\
 times,\
-[] (LavHandle sim, int count) {\
+[] (LavHandle s, int count) {\
 LavHandle h;\
 std::vector<LavHandle> v;\
 for(int i=0; i < count; i++) {\
@@ -48,38 +48,38 @@ return v;\
 }\
 )
 
-LavError createCrossfader(LavHandle& sim, LavHandle& h) {
-	ERRCHECK(Lav_createCrossfaderNode(sim, 2, 2, &h));
+LavError createCrossfader(LavHandle& s, LavHandle& h) {
+	ERRCHECK(Lav_createCrossfaderNode(s, 2, 2, &h));
 	ERRCHECK(Lav_crossfaderNodeCrossfade(h, 2.0, 1));
 	return Lav_ERROR_NONE;
 }
 
-LavError createBuffer(LavHandle sim, LavHandle& h) {
-	ERRCHECK(Lav_createBufferNode(sim, &h));
+LavError createBuffer(LavHandle s, LavHandle& h) {
+	ERRCHECK(Lav_createBufferNode(s, &h));
 	LavHandle b;
-	ERRCHECK(Lav_createBuffer(sim, &b));
+	ERRCHECK(Lav_createBuffer(s, &b));
 	ERRCHECK(Lav_bufferLoadFromArray(b, 44100, 4, BUFFER_SIZE/4, buffer));
 	ERRCHECK(Lav_nodeSetBufferProperty(h, Lav_BUFFER_BUFFER, b));
 	return Lav_ERROR_NONE;
 }
 
 std::tuple<std::string, int, std::function<std::vector<LavHandle>(LavHandle, int)>> to_profile[] = {
-ENTRY("sine", 1000, Lav_createSineNode(sim, &h)),
-ENTRY("Blit", 1000, Lav_createBlitNode(sim, &h)),
-ENTRY("4-channel buffer", 100, createBuffer(sim, h)),
-ENTRY("crossfading delay line", 1000, Lav_createCrossfadingDelayNode(sim, 0.1, 1, &h)),
-ENTRY("biquad", 1000, Lav_createBiquadNode(sim, 1, &h)),
-ENTRY("One-pole filter", 1000, Lav_createOnePoleFilterNode(sim, 1, &h)),
-ENTRY("2-channel 2-input crossfader", 500, createCrossfader(sim, h)),
-ENTRY("amplitude panner", 1000, Lav_createAmplitudePannerNode(sim, &h)),
-ENTRY("HRTF panner", 30, Lav_createHrtfNode(sim, "default", &h)),
-ENTRY("hard limiter", 1000, Lav_createHardLimiterNode(sim, 2, &h)),
-ENTRY("channel splitter", 1000, Lav_createChannelSplitterNode(sim, 10, &h)),
-ENTRY("channel merger", 1000, Lav_createChannelMergerNode(sim, 10, &h)),
-ENTRY("noise", 100, Lav_createNoiseNode(sim, &h)),
-ENTRY("ringmod", 1000, Lav_createRingmodNode(sim, &h)),
-ENTRY("16x16 FDN", 1, Lav_createFeedbackDelayNetworkNode(sim, 1.0f, 16, &h)),
-ENTRY("32x32 FDN", 1, Lav_createFeedbackDelayNetworkNode(sim, 1.0f, 32, &h)),
+ENTRY("sine", 1000, Lav_createSineNode(s, &h)),
+ENTRY("Blit", 1000, Lav_createBlitNode(s, &h)),
+ENTRY("4-channel buffer", 100, createBuffer(s, h)),
+ENTRY("crossfading delay line", 1000, Lav_createCrossfadingDelayNode(s, 0.1, 1, &h)),
+ENTRY("biquad", 1000, Lav_createBiquadNode(s, 1, &h)),
+ENTRY("One-pole filter", 1000, Lav_createOnePoleFilterNode(s, 1, &h)),
+ENTRY("2-channel 2-input crossfader", 500, createCrossfader(s, h)),
+ENTRY("amplitude panner", 1000, Lav_createAmplitudePannerNode(s, &h)),
+ENTRY("HRTF panner", 30, Lav_createHrtfNode(s, "default", &h)),
+ENTRY("hard limiter", 1000, Lav_createHardLimiterNode(s, 2, &h)),
+ENTRY("channel splitter", 1000, Lav_createChannelSplitterNode(s, 10, &h)),
+ENTRY("channel merger", 1000, Lav_createChannelMergerNode(s, 10, &h)),
+ENTRY("noise", 100, Lav_createNoiseNode(s, &h)),
+ENTRY("ringmod", 1000, Lav_createRingmodNode(s, &h)),
+ENTRY("16x16 FDN", 1, Lav_createFeedbackDelayNetworkNode(s, 1.0f, 16, &h)),
+ENTRY("32x32 FDN", 1, Lav_createFeedbackDelayNetworkNode(s, 1.0f, 32, &h)),
 };
 int to_profile_size=sizeof(to_profile)/sizeof(to_profile[0]);
 
@@ -97,18 +97,18 @@ int main(int argc, char** args) {
 	for(int i = 0; i < to_profile_size; i++) {
 		auto &info = to_profile[i];
 		printf("Estimate for %s nodes: ", std::get<0>(info).c_str());
-		LavHandle sim;
-		ERRCHECK(Lav_createSimulation(SR, BLOCK_SIZE, &sim));
-		ERRCHECK(Lav_simulationSetThreads(sim, threads));
+		LavHandle s;
+		ERRCHECK(Lav_createSimulation(SR, BLOCK_SIZE, &s));
+		ERRCHECK(Lav_serverSetThreads(s, threads));
 		int times=std::get<1>(info);
 		//If it's not at least threads, make it threads.
 		if(times < threads) times = threads;
-		auto handles=std::get<2>(info)(sim, times);
+		auto handles=std::get<2>(info)(s, times);
 		for(auto h: handles) {
 			ERRCHECK(Lav_nodeConnectSimulation(h, 0));
 		}
 		float dur=timeit([&] () {
-			ERRCHECK(Lav_simulationGetBlock(sim, 2, 1, storage));
+			ERRCHECK(Lav_serverGetBlock(s, 2, 1, storage));
 		}, ITERATIONS);
 		dur /= ITERATIONS;
 		float estimate = (BLOCK_SIZE/(float)SR)/dur*times;
@@ -117,6 +117,6 @@ int main(int argc, char** args) {
 			ERRCHECK(Lav_nodeDisconnect(h, 0, 0, 0));
 			ERRCHECK(Lav_handleDecRef(h));
 		}
-		ERRCHECK(Lav_handleDecRef(sim));
+		ERRCHECK(Lav_handleDecRef(s));
 	}
 }

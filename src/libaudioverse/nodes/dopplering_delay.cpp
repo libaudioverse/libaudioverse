@@ -7,7 +7,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/nodes/dopplering_delay.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
@@ -17,19 +17,19 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-DoppleringDelayNode::DoppleringDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, int channels): Node(Lav_OBJTYPE_DOPPLERING_DELAY_NODE, simulation, channels, channels) {
+DoppleringDelayNode::DoppleringDelayNode(std::shared_ptr<Server> server, float maxDelay, int channels): Node(Lav_OBJTYPE_DOPPLERING_DELAY_NODE, server, channels, channels) {
 	if(channels <= 0) ERROR(Lav_ERROR_RANGE, "lineCount must be greater than 0.");
 	this->channels = channels;
 	lines = new DoppleringDelayLine*[channels]();
-	for(unsigned int i = 0; i < channels; i++) lines[i] = new DoppleringDelayLine(maxDelay, simulation->getSr());
+	for(unsigned int i = 0; i < channels; i++) lines[i] = new DoppleringDelayLine(maxDelay, server->getSr());
 	getProperty(Lav_DELAY_DELAY).setFloatRange(0.0f, maxDelay);
 	getProperty(Lav_DELAY_DELAY_MAX).setFloatValue(maxDelay);
 	appendInputConnection(0, channels);
 	appendOutputConnection(0, channels);
 }
 
-std::shared_ptr<Node> createDoppleringDelayNode(std::shared_ptr<Simulation> simulation, float maxDelay, int channels) {
-	return standardNodeCreation<DoppleringDelayNode>(simulation, maxDelay, channels);
+std::shared_ptr<Node> createDoppleringDelayNode(std::shared_ptr<Server> server, float maxDelay, int channels) {
+	return standardNodeCreation<DoppleringDelayNode>(server, maxDelay, channels);
 }
 
 DoppleringDelayNode::~DoppleringDelayNode() {
@@ -57,11 +57,11 @@ void DoppleringDelayNode::process() {
 }
 
 //begin public api
-Lav_PUBLIC_FUNCTION LavError Lav_createDoppleringDelayNode(LavHandle simulationHandle, float maxDelay, int channels, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createDoppleringDelayNode(LavHandle serverHandle, float maxDelay, int channels, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation =incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
-	auto d = createDoppleringDelayNode(simulation, maxDelay, channels);
+	auto server =incomingObject<Server>(serverHandle);
+	LOCK(*server);
+	auto d = createDoppleringDelayNode(server, maxDelay, channels);
 	*destination = outgoingObject(d);
 	PUB_END
 }

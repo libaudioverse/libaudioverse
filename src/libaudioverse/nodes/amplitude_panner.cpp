@@ -6,7 +6,7 @@ A copy of both licenses may be found in license.gpl and license.mpl at the root 
 If these files are unavailable to you, see either http://www.gnu.org/licenses/ (GPL V3 or later) or https://www.mozilla.org/en-US/MPL/2.0/ (MPL 2.0).*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
@@ -19,16 +19,16 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-AmplitudePannerNode::AmplitudePannerNode(std::shared_ptr<Simulation> simulation): Node(Lav_OBJTYPE_AMPLITUDE_PANNER_NODE, simulation, 1, 0),
-panner(simulation->getBlockSize(), simulation->getSr()) {
+AmplitudePannerNode::AmplitudePannerNode(std::shared_ptr<Server> server): Node(Lav_OBJTYPE_AMPLITUDE_PANNER_NODE, server, 1, 0),
+panner(server->getBlockSize(), server->getSr()) {
 	appendInputConnection(0, 1);
 	appendOutputConnection(0, 0);
 	auto cb = [&](){recomputeChannelMap();};
 	getProperty(Lav_PANNER_CHANNEL_MAP).setPostChangedCallback(cb);
 }
 
-std::shared_ptr<Node>createAmplitudePannerNode(std::shared_ptr<Simulation> simulation) {
-	auto retval = standardNodeCreation<AmplitudePannerNode>(simulation);
+std::shared_ptr<Node>createAmplitudePannerNode(std::shared_ptr<Server> server) {
+	auto retval = standardNodeCreation<AmplitudePannerNode>(server);
 	//needed because the inputs/outputs logic needs shared_from_this to be working.
 	retval->recomputeChannelMap();
 	return retval;
@@ -67,11 +67,11 @@ void AmplitudePannerNode::configureStandardChannelMap(int channels) {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createAmplitudePannerNode(LavHandle simulationHandle, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createAmplitudePannerNode(LavHandle serverHandle, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
-	auto retval = createAmplitudePannerNode(simulation);
+	auto server = incomingObject<Server>(serverHandle);
+	LOCK(*server);
+	auto retval = createAmplitudePannerNode(server);
 	*destination = outgoingObject(retval);
 	PUB_END
 }

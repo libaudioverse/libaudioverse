@@ -8,7 +8,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/nodes/one_pole_filter.hpp>
 #include <libaudioverse/implementations/one_pole_filter.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
@@ -18,19 +18,19 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-OnePoleFilterNode::OnePoleFilterNode(std::shared_ptr<Simulation> sim, int channels): Node(Lav_OBJTYPE_ONE_POLE_FILTER_NODE, sim, channels, channels),
-bank(simulation->getSr()) {
+OnePoleFilterNode::OnePoleFilterNode(std::shared_ptr<Server> s, int channels): Node(Lav_OBJTYPE_ONE_POLE_FILTER_NODE, s, channels, channels),
+bank(server->getSr()) {
 	if(channels < 1) ERROR(Lav_ERROR_RANGE, "Cannot filter 0 or fewer channels.");
 	bank.setChannelCount(channels);
-	getProperty(Lav_ONE_POLE_FILTER_FREQUENCY).setFloatRange(0, simulation->getSr()/2.0);
+	getProperty(Lav_ONE_POLE_FILTER_FREQUENCY).setFloatRange(0, server->getSr()/2.0);
 	reconfigureFilters();
 	appendInputConnection(0, channels);
 	appendOutputConnection(0, channels);
 	setShouldZeroOutputBuffers(false);
 }
 
-std::shared_ptr<Node> createOnePoleFilterNode(std::shared_ptr<Simulation> simulation, int channels) {
-	return standardNodeCreation<OnePoleFilterNode>(simulation, channels);
+std::shared_ptr<Node> createOnePoleFilterNode(std::shared_ptr<Server> server, int channels) {
+	return standardNodeCreation<OnePoleFilterNode>(server, channels);
 }
 
 void OnePoleFilterNode::reconfigureFilters() {
@@ -51,11 +51,11 @@ void OnePoleFilterNode::process() {
 
 //begin public api.
 
-Lav_PUBLIC_FUNCTION LavError Lav_createOnePoleFilterNode(LavHandle simulationHandle, int channels, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createOnePoleFilterNode(LavHandle serverHandle, int channels, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
-	auto retval= createOnePoleFilterNode(simulation, channels);
+	auto server = incomingObject<Server>(serverHandle);
+	LOCK(*server);
+	auto retval= createOnePoleFilterNode(server, channels);
 	*destination =outgoingObject<Node>(retval);
 	PUB_END
 }

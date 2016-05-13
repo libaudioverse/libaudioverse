@@ -11,11 +11,11 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-class Simulation;
+class Server;
 
 class GraphListenerNode: public Node {
 	public:
-	GraphListenerNode(std::shared_ptr<Simulation> sim, unsigned int channels);
+	GraphListenerNode(std::shared_ptr<Server> sim, unsigned int channels);
 	~GraphListenerNode();
 	void process();
 	LavGraphListenerNodeListeningCallback callback = nullptr;
@@ -24,5 +24,5 @@ class GraphListenerNode: public Node {
 	unsigned int channels = 0;
 };
 
-std::shared_ptr<Node> createGraphListenerNode(std::shared_ptr<Simulation> simulation, unsigned int channels);
+std::shared_ptr<Node> createGraphListenerNode(std::shared_ptr<Server> server, unsigned int channels);
 }

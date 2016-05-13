@@ -12,7 +12,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 namespace libaudioverse_implementation {
 
 class Node;
-class Simulation;
+class Server;
 
 //we need weak pointers to this in OutputConnection.
 class InputConnection;
@@ -21,7 +21,7 @@ class OutputConnection {
 	public:
 	//start: index of the output buffer at which this connection begins.
 	//count: the number of adjacent output buffers to which this connection applies.
-	OutputConnection(std::shared_ptr<Simulation> simulation, Node* node, int start, int count);
+	OutputConnection(std::shared_ptr<Server> server, Node* node, int start, int count);
 	void add(int inputBufferCount, float** inputBuffers, bool shouldApplyMixingMatrix);
 	void reconfigure(int newStart, int newCount);
 	void clear();
@@ -38,12 +38,12 @@ class OutputConnection {
 };
 
 /**Unlike output connections, input connections may have a null node, so long as the nodeless functions are used.
-this is to prevent needing to make special case code for simulations.
+this is to prevent needing to make special case code for server.
 
 Input connections keep nodes alive.*/
 class InputConnection {
 	public:
-	InputConnection(std::shared_ptr<Simulation> simulation, Node* node, int start, int count);
+	InputConnection(std::shared_ptr<Server> server, Node* node, int start, int count);
 	void add(bool applyMixingMatrix); //calls out to the output connections this owns, no further parameters are needed.
 	void addNodeless(float** inputs, bool shouldApplyMixingMatrix);
 	void reconfigure(int start, int count);

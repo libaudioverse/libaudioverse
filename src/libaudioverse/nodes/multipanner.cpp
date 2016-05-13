@@ -8,7 +8,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/libaudioverse_properties.h>
 #include <libaudioverse/implementations/multipanner.hpp>
 #include <libaudioverse/nodes/multipanner.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
@@ -21,17 +21,17 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 namespace libaudioverse_implementation {
 
 //We always have 8 channels for simplicity.
-MultipannerNode::MultipannerNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf): Node(Lav_OBJTYPE_MULTIPANNER_NODE, simulation, 1, 8),
-panner(simulation->getBlockSize(), simulation->getSr(), hrtf) {
+MultipannerNode::MultipannerNode(std::shared_ptr<Server> server, std::shared_ptr<HrtfData> hrtf): Node(Lav_OBJTYPE_MULTIPANNER_NODE, server, 1, 8),
+panner(server->getBlockSize(), server->getSr(), hrtf) {
 	appendInputConnection(0, 1);
 	appendOutputConnection(0, 2);
 	strategyChanged();
 }
 
-std::shared_ptr<Node> createMultipannerNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<HrtfData> hrtf) {
-	auto retval = standardNodeCreation<MultipannerNode>(simulation, hrtf);
+std::shared_ptr<Node> createMultipannerNode(std::shared_ptr<Server> server, std::shared_ptr<HrtfData> hrtf) {
+	auto retval = standardNodeCreation<MultipannerNode>(server, hrtf);
 	retval->strategyChanged();
-	simulation->registerNodeForWillTick(retval);
+	server->registerNodeForWillTick(retval);
 	return retval;
 }
 
@@ -70,12 +70,12 @@ void MultipannerNode::reset() {
 
 //begin public api
 
-Lav_PUBLIC_FUNCTION LavError Lav_createMultipannerNode(LavHandle simulationHandle, char* hrtfPath, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createMultipannerNode(LavHandle serverHandle, char* hrtfPath, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
-	auto hrtf = createHrtfFromString(hrtfPath, simulation->getSr());
-	*destination = outgoingObject<Node>(createMultipannerNode(simulation, hrtf));
+	auto server = incomingObject<Server>(serverHandle);
+	LOCK(*server);
+	auto hrtf = createHrtfFromString(hrtfPath, server->getSr());
+	*destination = outgoingObject<Node>(createMultipannerNode(server, hrtf));
 	PUB_END
 }
 

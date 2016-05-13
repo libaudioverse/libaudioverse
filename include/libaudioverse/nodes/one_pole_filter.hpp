@@ -12,15 +12,15 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-class Simulation;
+class Server;
 
 class OnePoleFilterNode: public Node {
 	public:
-	OnePoleFilterNode(std::shared_ptr<Simulation> sim, int channels);
+	OnePoleFilterNode(std::shared_ptr<Server> sim, int channels);
 	void process() override;
 	void reconfigureFilters();
 	MultichannelFilterBank<OnePoleFilter> bank;
 };
 
-std::shared_ptr<Node> createOnePoleFilterNode(std::shared_ptr<Simulation> simulation, int channels);
+std::shared_ptr<Node> createOnePoleFilterNode(std::shared_ptr<Server> server, int channels);
 }

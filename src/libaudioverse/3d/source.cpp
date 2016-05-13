@@ -14,7 +14,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/constants.hpp>
 #include <libaudioverse/private/data.hpp>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/workspace.hpp>
 #include <libaudioverse/private/kernels.hpp>
@@ -37,13 +37,13 @@ namespace libaudioverse_implementation {
 //primarily this is occlusion.
 thread_local Workspace<float> source_workspace;
 
-SourceNode::SourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentNode> environment): Node(Lav_OBJTYPE_SOURCE_NODE, simulation, 1, 0),
-hrtf_panner(simulation->getBlockSize(), simulation->getSr(), environment->getHrtf()),
-stereo_panner(simulation->getBlockSize(), simulation->getSr()),
-surround40_panner(simulation->getBlockSize(), simulation->getSr()),
-surround51_panner(simulation->getBlockSize(), simulation->getSr()),
-surround71_panner(simulation->getBlockSize(), simulation->getSr()),
-occlusion_filter(simulation->getSr()),
+SourceNode::SourceNode(std::shared_ptr<Server> server, std::shared_ptr<EnvironmentNode> environment): Node(Lav_OBJTYPE_SOURCE_NODE, server, 1, 0),
+hrtf_panner(server->getBlockSize(), server->getSr(), environment->getHrtf()),
+stereo_panner(server->getBlockSize(), server->getSr()),
+surround40_panner(server->getBlockSize(), server->getSr()),
+surround51_panner(server->getBlockSize(), server->getSr()),
+surround71_panner(server->getBlockSize(), server->getSr()),
+occlusion_filter(server->getSr()),
 hrtf_data(environment->getHrtf()) {
 	this->environment = environment;
 	handleOcclusion(); //Make sure we initialize as unoccluded.	
@@ -61,8 +61,8 @@ hrtf_data(environment->getHrtf()) {
 SourceNode::~SourceNode() {
 }
 
-std::shared_ptr<SourceNode> createSourceNode(std::shared_ptr<Simulation> simulation, std::shared_ptr<EnvironmentNode> environment) {
-	auto ret = standardNodeCreation<SourceNode>(simulation, environment);
+std::shared_ptr<SourceNode> createSourceNode(std::shared_ptr<Server> server, std::shared_ptr<EnvironmentNode> environment) {
+	auto ret = standardNodeCreation<SourceNode>(server, environment);
 	environment->registerSourceForUpdates(ret);
 	return ret;
 }
@@ -243,11 +243,11 @@ void 	SourceNode::handleOcclusion() {
 
 //Begin public API.
 
-Lav_PUBLIC_FUNCTION LavError Lav_createSourceNode(LavHandle simulationHandle, LavHandle environmentHandle, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createSourceNode(LavHandle serverHandle, LavHandle environmentHandle, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation = incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
-	auto retval = createSourceNode(simulation, incomingObject<EnvironmentNode>(environmentHandle));
+	auto server = incomingObject<Server>(serverHandle);
+	LOCK(*server);
+	auto retval = createSourceNode(server, incomingObject<EnvironmentNode>(environmentHandle));
 	*destination = outgoingObject<Node>(retval);
 	PUB_END
 }

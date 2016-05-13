@@ -14,7 +14,7 @@ namespace libaudioverse_implementation {
 
 class NoiseNode: public Node {
 	public:
-	NoiseNode(std::shared_ptr<Simulation> simulation);
+	NoiseNode(std::shared_ptr<Server> server);
 	virtual void process();
 	void white();
 	void pink();
@@ -26,5 +26,5 @@ class NoiseNode: public Node {
 	float pink_max = 0.0f, brown_max = 0.0f; //used for normalizing noise.
 };
 
-std::shared_ptr<Node> createNoiseNode(std::shared_ptr<Simulation> simulation);
+std::shared_ptr<Node> createNoiseNode(std::shared_ptr<Server> server);
 }

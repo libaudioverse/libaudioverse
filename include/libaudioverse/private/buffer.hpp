@@ -11,17 +11,17 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 
 namespace libaudioverse_implementation {
-class Simulation;
+class Server;
 
 class Buffer: public ExternalObject {
 	public:
-	Buffer(std::shared_ptr<Simulation> simulation);
+	Buffer(std::shared_ptr<Server> server);
 	~Buffer();
-	std::shared_ptr<Simulation> getSimulation();
+	std::shared_ptr<Server> getServer();
 	int getLength();
 	double getDuration();
 	int getChannels();
-	//This can be used outside the lock; the only thing it does is read simulation's sr value which can never change by definition.
+	//This can be used outside the lock; the only thing it does is read server's sr value which can never change by definition.
 	void loadFromArray(int sr, int channels, int frames, float* inputData);
 	//The following two functions do not check if the requested frame is past the end for efficiency.
 	//It is possible the compiler would optimize this, but running  in debug mode is already really painful and the trade-off here is worth it.
@@ -47,10 +47,10 @@ class Buffer: public ExternalObject {
 	int frames = 0;
 	int sr = 0;
 	float* data = nullptr;
-	std::shared_ptr<Simulation> simulation;
+	std::shared_ptr<Server> server;
 	std::atomic<int> use_count{0};
 };
 
-std::shared_ptr<Buffer> createBuffer(std::shared_ptr<Simulation>simulation);
+std::shared_ptr<Buffer> createBuffer(std::shared_ptr<Server>server);
 
 }

@@ -6,7 +6,7 @@ A copy of both licenses may be found in license.gpl and license.mpl at the root 
 If these files are unavailable to you, see either http://www.gnu.org/licenses/ (GPL V3 or later) or https://www.mozilla.org/en-US/MPL/2.0/ (MPL 2.0).*/
 #include <libaudioverse/libaudioverse.h>
 #include <libaudioverse/libaudioverse_properties.h>
-#include <libaudioverse/private/simulation.hpp>
+#include <libaudioverse/private/server.hpp>
 #include <libaudioverse/private/node.hpp>
 #include <libaudioverse/private/properties.hpp>
 #include <libaudioverse/private/macros.hpp>
@@ -21,11 +21,11 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-FeedbackDelayNetworkNode::FeedbackDelayNetworkNode(std::shared_ptr<Simulation> simulation, float maxDelay, int channels):
-Node(Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK_NODE, simulation, channels, channels) {
+FeedbackDelayNetworkNode::FeedbackDelayNetworkNode(std::shared_ptr<Server> server, float maxDelay, int channels):
+Node(Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK_NODE, server, channels, channels) {
 	max_delay = maxDelay;
 	this->channels = channels;
-	network = new FeedbackDelayNetwork<InterpolatedDelayLine>(channels, maxDelay, simulation->getSr());
+	network = new FeedbackDelayNetwork<InterpolatedDelayLine>(channels, maxDelay, server->getSr());
 	last_output = allocArray<float>(channels);
 	next_input=allocArray<float>(channels);
 	gains = allocArray<float>(channels);
@@ -38,7 +38,7 @@ Node(Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK_NODE, simulation, channels, channels) {
 
 	//Allocate and configure the filters.
 	filters = new OnePoleFilter*[channels];
-	for(int i = 0; i < channels; i++) filters[i] = new OnePoleFilter(simulation->getSr());
+	for(int i = 0; i < channels; i++) filters[i] = new OnePoleFilter(server->getSr());
 	std::vector<float> defaultHolder(channels, 0.0f);
 	//Set up the properties.
 	getProperty(Lav_FDN_DELAYS).setArrayLengthRange(channels, channels);
@@ -78,8 +78,8 @@ FeedbackDelayNetworkNode::~FeedbackDelayNetworkNode() {
 	freeArray(gains);
 }
 
-std::shared_ptr<Node> createFeedbackDelayNetworkNode(std::shared_ptr<Simulation> simulation, float maxDelay, int channels) {
-	return standardNodeCreation<FeedbackDelayNetworkNode>(simulation, maxDelay, channels);
+std::shared_ptr<Node> createFeedbackDelayNetworkNode(std::shared_ptr<Server> server, float maxDelay, int channels) {
+	return standardNodeCreation<FeedbackDelayNetworkNode>(server, maxDelay, channels);
 }
 
 void FeedbackDelayNetworkNode::process() {
@@ -137,12 +137,12 @@ void FeedbackDelayNetworkNode::configureFilters(int* types, float* frequencies) 
 
 //begin public api.
 
-Lav_PUBLIC_FUNCTION LavError Lav_createFeedbackDelayNetworkNode(LavHandle simulationHandle, float maxDelay, int channels, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_createFeedbackDelayNetworkNode(LavHandle serverHandle, float maxDelay, int channels, LavHandle* destination) {
 	PUB_BEGIN
-	auto simulation =incomingObject<Simulation>(simulationHandle);
-	LOCK(*simulation);
+	auto server =incomingObject<Server>(serverHandle);
+	LOCK(*server);
 	*destination = outgoingObject<Node>(createFeedbackDelayNetworkNode(
-	simulation, maxDelay, channels));
+	server, maxDelay, channels));
 	PUB_END
 }
 
