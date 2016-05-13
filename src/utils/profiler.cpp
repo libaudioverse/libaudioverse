@@ -98,14 +98,14 @@ int main(int argc, char** args) {
 		auto &info = to_profile[i];
 		printf("Estimate for %s nodes: ", std::get<0>(info).c_str());
 		LavHandle s;
-		ERRCHECK(Lav_createSimulation(SR, BLOCK_SIZE, &s));
+		ERRCHECK(Lav_createServer(SR, BLOCK_SIZE, &s));
 		ERRCHECK(Lav_serverSetThreads(s, threads));
 		int times=std::get<1>(info);
 		//If it's not at least threads, make it threads.
 		if(times < threads) times = threads;
 		auto handles=std::get<2>(info)(s, times);
 		for(auto h: handles) {
-			ERRCHECK(Lav_nodeConnectSimulation(h, 0));
+			ERRCHECK(Lav_nodeConnectServer(h, 0));
 		}
 		float dur=timeit([&] () {
 			ERRCHECK(Lav_serverGetBlock(s, 2, 1, storage));

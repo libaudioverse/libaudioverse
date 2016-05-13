@@ -49,12 +49,12 @@ int main(int argc, char** args) {
 		}
 	}
 	//some setup: create a world and a server.
-	ERRCHECK(Lav_createSimulation(44100, BLOCK_SIZE, &server));
+	ERRCHECK(Lav_createServer(44100, BLOCK_SIZE, &server));
 	ERRCHECK(Lav_serverSetThreads(server, threads));
 	ERRCHECK(Lav_createEnvironmentNode(server, args[1], &world));
 	ERRCHECK(Lav_nodeSetIntProperty(world, Lav_ENVIRONMENT_PANNING_STRATEGY, Lav_PANNING_STRATEGY_HRTF));
 	ERRCHECK(Lav_createSineNode(server, &sineObj));
-	ERRCHECK(Lav_nodeConnectSimulation(world, 0));
+	ERRCHECK(Lav_nodeConnectServer(world, 0));
 	printf("Running %u times with %u sources on %i threads\n", NUM_TIMES, NUM_SOURCES, threads);
 	sources.resize(NUM_SOURCES, 0);
 	//anywhere there's a null pointer, replace it with a source.
