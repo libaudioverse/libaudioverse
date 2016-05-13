@@ -102,7 +102,6 @@ nodes/buffer_timeline.cpp
 nodes/convolver.cpp
 nodes/crossfader.cpp
 nodes/crossfading_delay.cpp
-nodes/custom.cpp
 nodes/dc_blocker.cpp
 nodes/dopplering_delay.cpp
 nodes/fdn_reverb.cpp
@@ -118,7 +117,6 @@ nodes/hrtf.cpp
 nodes/iir.cpp
 nodes/leaky_integrator.cpp
 nodes/multipanner.cpp
-nodes/nested_allpass_network.cpp
 nodes/noise.cpp
 nodes/one_pole_filter.cpp
 nodes/pull.cpp

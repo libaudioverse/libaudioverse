@@ -108,7 +108,6 @@ enum Lav_OBJECT_TYPES {
 	Lav_OBJTYPE_BIQUAD_NODE,
 	Lav_OBJTYPE_PULL_NODE,
 	Lav_OBJTYPE_GRAPH_LISTENER_NODE,
-	Lav_OBJTYPE_CUSTOM_NODE,
 	Lav_OBJTYPE_RINGMOD_NODE,
 	Lav_OBJTYPE_MULTIPANNER_NODE,
 	Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK_NODE,
@@ -132,7 +131,6 @@ enum Lav_OBJECT_TYPES {
 	Lav_OBJTYPE_ONE_POLE_FILTER_NODE,
 	Lav_OBJTYPE_FIRST_ORDER_FILTER_NODE,
 	Lav_OBJTYPE_ALLPASS_NODE,
-	Lav_OBJTYPE_NESTED_ALLPASS_NETWORK_NODE,
 	Lav_OBJTYPE_FDN_REVERB_NODE,
 	Lav_OBJTYPE_BLIT_NODE,
 	Lav_OBJTYPE_DC_BLOCKER_NODE,
@@ -322,10 +320,6 @@ typedef void (*LavGraphListenerNodeListeningCallback)(LavHandle nodeHandle, unsi
 Lav_PUBLIC_FUNCTION LavError Lav_createGraphListenerNode(LavHandle serverHandle, unsigned int channels, LavHandle* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_graphListenerNodeSetListeningCallback(LavHandle nodeHandle, LavGraphListenerNodeListeningCallback callback, void* userdata);
 
-typedef void (*LavCustomNodeProcessingCallback)(LavHandle nodeHandle, unsigned int frames, unsigned int numInputs, float** inputs, unsigned int numOutputs, float** outputs, void* userdata);
-Lav_PUBLIC_FUNCTION LavError Lav_createCustomNode(LavHandle serverHandle, unsigned int inputs, unsigned int channelsPerInput, unsigned int outputs, unsigned int channelsPerOutput, LavHandle* destination);
-Lav_PUBLIC_FUNCTION LavError Lav_customNodeSetProcessingCallback(LavHandle nodeHandle, LavCustomNodeProcessingCallback callback, void* userdata);
-
 Lav_PUBLIC_FUNCTION LavError Lav_createRingmodNode(LavHandle serverHandle, LavHandle* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createFeedbackDelayNetworkNode(LavHandle serverHandle, float maxDelay, int channels, LavHandle* destination);
 
@@ -367,15 +361,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_firstOrderFilterNodeConfigureHighpass(LavHandle
 Lav_PUBLIC_FUNCTION LavError Lav_firstOrderFilterNodeConfigureAllpass(LavHandle nodeHandle, float frequency);
 
 Lav_PUBLIC_FUNCTION LavError Lav_createAllpassNode(LavHandle serverHandle, int channels, int maxDelay, LavHandle* destination);
-
-Lav_PUBLIC_FUNCTION LavError Lav_createNestedAllpassNetworkNode(LavHandle serverHandle, int channels, LavHandle* destination);
-Lav_PUBLIC_FUNCTION LavError Lav_nestedAllpassNetworkNodeBeginNesting(LavHandle nodeHandle, int delay, float coefficient);
-Lav_PUBLIC_FUNCTION LavError Lav_nestedAllpassNetworkNodeEndNesting(LavHandle nodeHandle);
-Lav_PUBLIC_FUNCTION LavError Lav_nestedAllpassNetworkNodeAppendAllpass(LavHandle nodeHandle, int delay, float coefficient);
-Lav_PUBLIC_FUNCTION LavError Lav_nestedAllpassNetworkNodeAppendOnePole(LavHandle nodeHandle, float frequency, int isHighpass);
-Lav_PUBLIC_FUNCTION LavError Lav_nestedAllpassNetworkNodeAppendBiquad(LavHandle nodeHandle, int type, double frequency, double dbGain, double q);
-Lav_PUBLIC_FUNCTION LavError Lav_nestedAllpassNetworkNodeAppendReader(LavHandle nodeHandle, float mul);
-Lav_PUBLIC_FUNCTION LavError Lav_nestedAllpassNetworkNodeCompile(LavHandle nodeHandle);
 
 Lav_PUBLIC_FUNCTION LavError Lav_createFdnReverbNode(LavHandle serverHandle, LavHandle* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_createBlitNode(LavHandle serverHandle, LavHandle* destination);
