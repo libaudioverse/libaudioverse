@@ -30,7 +30,7 @@ int main(int argc, char** args) {
 	LavHandle server = 0;
 	LavHandle node, world, source;
 	ERRCHECK(Lav_initialize());
-	ERRCHECK(Lav_createSimulation(44100, 1024, &server));
+	ERRCHECK(Lav_createServer(44100, 1024, &server));
 	ERRCHECK(Lav_serverSetOutputDevice(server, "default", 2));
 	ERRCHECK(Lav_createEnvironmentNode(server, hrtfFile, &world));
 	ERRCHECK(Lav_createBufferNode(server, &node));
@@ -43,7 +43,7 @@ int main(int argc, char** args) {
 	ERRCHECK(Lav_nodeConnect(node, 0, source, 0));
 	const int resolution = 1000, length = 3000; //length in ms.
 	const float width = 30.0;
-	ERRCHECK(Lav_nodeConnectSimulation(world, 0));
+	ERRCHECK(Lav_nodeConnectServer(world, 0));
 	//do a square over and over.
 	while(1) {
 		for(int i = 0; i < resolution; i++) {

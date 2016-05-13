@@ -36,7 +36,7 @@ int main(int argc, char** args) {
 	LavHandle server;
 	LavHandle bufferNode, panNode, limit;
 	ERRCHECK(Lav_initialize());
-	ERRCHECK(Lav_createSimulation(44100, 1024, &server));
+	ERRCHECK(Lav_createServer(44100, 1024, &server));
 	ERRCHECK(Lav_serverSetOutputDevice(server, "default", channels));
 	ERRCHECK(Lav_createBufferNode(server, &bufferNode));
 	LavHandle buffer;
@@ -53,7 +53,7 @@ int main(int argc, char** args) {
 	ERRCHECK(Lav_nodeConnect(bufferNode, 0, panNode, 0));
 	ERRCHECK(Lav_createHardLimiterNode(server, channels, &limit));
 	ERRCHECK(Lav_nodeConnect(panNode, 0, limit, 0));
-	ERRCHECK(Lav_nodeConnectSimulation(limit, 0));
+	ERRCHECK(Lav_nodeConnectServer(limit, 0));
 	int shouldContinue = 1;
 	printf("Enter pairs of numbers separated by whitespace, where the first is azimuth (anything) and the second\n"
 "is elevation (-90 to 90).\n"

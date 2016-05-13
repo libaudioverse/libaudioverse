@@ -24,11 +24,11 @@ int main() {
 	LavHandle server;
 	LavHandle node;
 	ERRCHECK(Lav_initialize());
-	ERRCHECK(Lav_createSimulation(44100, 8192, &server));
+	ERRCHECK(Lav_createServer(44100, 8192, &server));
 	ERRCHECK(Lav_serverSetOutputDevice(server, "default", 2));
 	ERRCHECK(Lav_createSineNode(server, &node));
 	ERRCHECK(Lav_nodeSetFloatProperty(node, Lav_OSCILLATOR_FREQUENCY, 0));
-	ERRCHECK(Lav_nodeConnectSimulation(node, 0));
+	ERRCHECK(Lav_nodeConnectServer(node, 0));
 	ERRCHECK(Lav_automationLinearRampToValue(node, Lav_NODE_MUL, 8.0, 0.05));
 	ERRCHECK(Lav_automationLinearRampToValue(node, Lav_OSCILLATOR_FREQUENCY, 2.0, 500.0));
 	ERRCHECK(Lav_automationLinearRampToValue(node, Lav_OSCILLATOR_FREQUENCY, 4.0, 300.0));

@@ -233,10 +233,10 @@ Lav_PUBLIC_FUNCTION LavError Lav_bufferNormalize(LavHandle bufferHandle);
 Lav_PUBLIC_FUNCTION LavError Lav_bufferGetDuration(LavHandle bufferHandle, float* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_bufferGetLengthInSamples(LavHandle bufferHandle, int* destination);
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetSimulation(LavHandle nodeHandle, LavHandle* destination);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeGetServer(LavHandle nodeHandle, LavHandle* destination);
 
 Lav_PUBLIC_FUNCTION LavError Lav_nodeConnect(LavHandle nodeHandle, int output, LavHandle destHandle, int input);
-Lav_PUBLIC_FUNCTION LavError Lav_nodeConnectSimulation(LavHandle nodeHandle, int output);
+Lav_PUBLIC_FUNCTION LavError Lav_nodeConnectServer(LavHandle nodeHandle, int output);
 Lav_PUBLIC_FUNCTION LavError Lav_nodeConnectProperty(LavHandle nodeHandle, int output, LavHandle otherHandle, int slot);
 Lav_PUBLIC_FUNCTION LavError Lav_nodeDisconnect(LavHandle nodeHandle, int output, LavHandle otherHandle, int input);
 Lav_PUBLIC_FUNCTION LavError Lav_nodeIsolate(LavHandle nodeHandle);

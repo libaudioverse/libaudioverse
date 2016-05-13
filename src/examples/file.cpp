@@ -32,7 +32,7 @@ int main(int argc, char** args) {
 	LavHandle node;
 	LavHandle server;
 	ERRCHECK(Lav_initialize());
-	ERRCHECK(Lav_createSimulation(44100, 1024, &server));
+	ERRCHECK(Lav_createServer(44100, 1024, &server));
 	ERRCHECK(Lav_serverSetOutputDevice(server, "default", 2));
 	ERRCHECK(Lav_createBufferNode(server, &node));
 	LavHandle buffer;
@@ -43,7 +43,7 @@ int main(int argc, char** args) {
 	ERRCHECK(Lav_createHardLimiterNode(server, 2, &limit));
 	ERRCHECK(Lav_nodeConnect(node, 0, limit, 0));
 	ERRCHECK(Lav_bufferNodeSetEndCallback(node, endOfBufferCallback, nullptr));
-	ERRCHECK(Lav_nodeConnectSimulation(limit, 0));
+	ERRCHECK(Lav_nodeConnectServer(limit, 0));
 	//enter the transducer loop.
 	char command[1024];
 	printf("Commands: q(q)uit, (s)eek, (v)olume, (p)itch bend\n");

@@ -339,7 +339,7 @@ functions:
       This function is primarily useful for estimating ram usage in caching structures.
     params:
       bufferHandle: The buffer whose length is to be queried.
-  Lav_nodeGetSimulation:
+  Lav_nodeGetServer:
     category: nodes
     doc_description: |
       Get the server that a node belongs to.
@@ -354,7 +354,7 @@ functions:
       output: The index of the output to connect.
       destHandle: The node to whose input we are connecting.
       input: The input to which to connect.
-  Lav_nodeConnectSimulation:
+  Lav_nodeConnectServer:
     category: nodes
     doc_description: |
       Connect the specified output of the specified node to the server's input.
