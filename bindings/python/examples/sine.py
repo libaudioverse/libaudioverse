@@ -5,14 +5,15 @@ import time
 libaudioverse.initialize()
 
 #make a device using the default (always stereo) output.
-sim = libaudioverse.Simulation()
-sim.set_output_device()
+server = libaudioverse.Server()
+server.set_output_device()
+
 #make a sine node.
-sine_node = libaudioverse.SineNode(sim)
+sine_node = libaudioverse.SineNode(server)
 
-sine_node.frequency.value = 440
+sine_node.frequency = 440
 
-sine_node.connect_simulation(0)
+sine_node.connect_server(0)
 
 time.sleep(5.0)
 

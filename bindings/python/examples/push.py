@@ -8,9 +8,10 @@ stereo = [i for l in zip(l, r) for i in l]*20
 
 libaudioverse.initialize()
 
-sim = libaudioverse.Simulation()
-sim.set_output_device()
-p = libaudioverse.PushNode(sim, 48000, 2)
+server = libaudioverse.Server()
+server.set_output_device()
+
+p = libaudioverse.PushNode(server, sr = 48000, channels = 2)
 
 def audio_callback(obj):
     p.feed(len(stereo), stereo)
@@ -18,11 +19,11 @@ def audio_callback(obj):
 def out_callback(obj):
     p.feed(len(stereo), stereo)
 
-p.threshold.value = 0.1
+p.threshold = 0.1
 p.set_low_callback(audio_callback)
 p.set_underrun_callback(out_callback)
 
-p.connect_simulation(0)
+p.connect_server(0)
 
 time.sleep(10.0)
 libaudioverse.shutdown()

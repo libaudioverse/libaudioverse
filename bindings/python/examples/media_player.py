@@ -3,24 +3,25 @@ import libaudioverse
 import os.path
 libaudioverse.initialize()
 
-sim = libaudioverse.Simulation()
-sim.set_output_device()
-print """Command line Media player.
-Please enter the path to a file in a format supported by Libsndfile: typically wave or ogg."""
-filepath = raw_input()
+server = libaudioverse.Server()
+server.set_output_device()
+
+print("""Command line Media player.
+Please enter the path to a file in a format supported by Libsndfile: typically wave or ogg.""")
+filepath = input()
 filepath = os.path.abspath(filepath)
-filenode = libaudioverse.BufferNode(sim)
-buffer = libaudioverse.Buffer(sim)
+filenode = libaudioverse.BufferNode(server)
+buffer = libaudioverse.Buffer(server)
 buffer.load_from_file(filepath)
 filenode.buffer = buffer
 
 #callback for when the file finishes.
 def finished(obj):
-    print "Finished playing."
+    print("Finished playing.")
 
-filenode.end_event = finished
+filenode.set_end_callback(finished)
 
-filenode.connect_simulation(0)
+filenode.connect_server(0)
 
 commands = """Commands:
 play
@@ -30,25 +31,25 @@ seek <seconds>
 quit
 """
 
-print commands
+print(commands)
 
 while True:
     try:
-        command = raw_input().split(" ")
+        command = input().split(" ")
         if command[0] == 'quit':
             break
         elif command[0] == 'play':
-            filenode.state.value = libaudioverse.NodeStates.playing
+            filenode.state = libaudioverse.NodeStates.playing
         elif command[0] == 'pause':
-            filenode.state.value = libaudioverse.NodeStates.paused
+            filenode.state = libaudioverse.NodeStates.paused
         elif command[0] == 'seek':
             to = float(command[1])
-            filenode.position.value = to
+            filenode.position = to
         elif command[0] == 'rate':
             to = float(command[1])
-            filenode.rate.value = to
+            filenode.rate = to
     except Exception as e:
-        print "Libaudioverse error.  Unrecognized command, or invalid syntax."
-        print commands
+        print("Libaudioverse error.  Unrecognized command, or invalid syntax.")
+        print(commands)
 
 libaudioverse.shutdown()

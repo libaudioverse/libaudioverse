@@ -17,7 +17,7 @@ enumerations:
       Lav_ERROR_FILE: Represents a miscelaneous file error.
       Lav_ERROR_FILE_NOT_FOUND: Libaudioverse could not find a specified file.
       Lav_ERROR_HRTF_INVALID: An attempt to use an invalid HRTF database.
-      Lav_ERROR_CANNOT_CROSS_SIMULATIONS: An attempt was made to relate two objects from different simulations. This could be assigning to buffer properties, connecting nodes, or any other such condition.
+      Lav_ERROR_CANNOT_CROSS_SERVERS: An attempt was made to relate two objects from different servers. This could be assigning to buffer properties, connecting nodes, or any other such condition.
       Lav_ERROR_CAUSES_CYCLE: The requested operation would cause a cycle in the graph of nodes that need processing.
       Lav_ERROR_PROPERTY_IS_READ_ONLY: Attempt to set a read-only property.
       Lav_ERROR_OVERLAPPING_AUTOMATORS: An attempt to schedule an automator within the duration of another.

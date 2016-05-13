@@ -68,7 +68,7 @@ def _resurrect(handle):
 def _handle_destroyed(handle):
     with _object_states_lock:
         if handle in _object_states:
-            #If we gc here and the user is using the simulation as a context manager, then
+            #If we gc here and the user is using the server as a context manager, then
             #We block until they finish.
             #If they do anything that needs the lock we're holding, lock inversion.
             #This variable holds the dict until after the function ends.
@@ -150,7 +150,7 @@ class _CallbackWrapper(object):
 class DeviceInfo(object):
     r"""Represents info on a audio device.
     
-    Channels is the number of channels for the device.  Name is a unicode string containing a human-readable name.  Identifier should be used with Simulation.set_output_device.
+    Channels is the number of channels for the device.  Name is a unicode string containing a human-readable name.  Identifier should be used with Server.set_output_device.
     
     The caveat from the Libaudioverse manual should be  summarized here:
     channels is not reliable, and your application should default to stereo while providing the user the option to change it."""
@@ -190,16 +190,15 @@ class _HandleComparer(object):
     def _to_handle(self):
         return self.handle.handle
 
-class Simulation(_HandleComparer):
-    r"""Represents a running simulation.  All libaudioverse nodes must be passed a simulation at creation time and cannot migrate between them.  Furthermore, it is an error to try to connect objects from different simulations.
+class Server(_HandleComparer):
+    r"""Represents a server.  All libaudioverse nodes must be passed a server at creation time as the first argument to their constructor and cannot migrate between them.  Furthermore, it is an error to try to connect objects from different servers.
 
 Instances of this class are context managers.  Using the with statement on an instance of this class invoke's Libaudioverse's atomic block support.
 
 For full details of this class, see the Libaudioverse manual."""
 
     def __init__(self, sample_rate = 44100, block_size = 1024):
-        r"""Creates a simulation."""
-        handle = _lav.create_simulation(sample_rate, block_size)
+        handle = _lav.create_server(sample_rate, block_size)
         self.init_with_handle(handle)
         _weak_handle_lookup[self.handle] = self
 
@@ -218,50 +217,50 @@ For full details of this class, see the Libaudioverse manual."""
         r"""Sets the output device.
         Use -1 for default system audio. 0 and greater are specific audio devices.
         To enumerate devices, use enumerate_devices."""
-        _lav.simulation_set_output_device(self, identifier, channels)
+        _lav.server_set_output_device(self, identifier, channels)
 
     def clear_output_device(self):
         r"""Clears the output device, stopping audio and allowing use of get_block again."""
-        _lav.simulation_clear_output_device(self)
+        _lav.server_clear_output_device(self)
 
     def get_block(self, channels, may_apply_mixing_matrix = True):
         r"""Returns a block of data.
         
-        This function wraps Lav_getBlock.  Note that calling this on a simulation configured to output audio is an error.
+        This function wraps Lav_getBlock.  Note that calling this on a server configured to output audio is an error.
         
         If may_apply_mixing_matrix is True, audio will be automatically converted to the output channel type.  If it is false, channels are either dropped or padded with zeros."""
         with self._lock:
-            length = _lav.simulation_get_block_size(self.handle)*channels
+            length = _lav.server_get_block_size(self.handle)*channels
             buff = (ctypes.c_float*length)()
             #circumvent automatic conversion of iterables.
             buff_ptr = ctypes.POINTER(ctypes.c_float)()
             buff_ptr.contents = buff
-            _lav.simulation_get_block(self.handle, channels, may_apply_mixing_matrix, buff_ptr)
+            _lav.server_get_block(self.handle, channels, may_apply_mixing_matrix, buff_ptr)
             return list(buff)
 
     #context manager support.
     def __enter__(self):
-        r"""Lock the simulation."""
-        _lav.simulation_lock(self.handle)
+        r"""Lock the server."""
+        _lav.server_lock(self.handle)
 
     def __exit__(self, type, value, traceback):
-        r"""Unlock the simulation."""
-        _lav.simulation_unlock(self.handle)
+        r"""Unlock the server."""
+        _lav.server_unlock(self.handle)
 
     def set_block_callback(self, callback, additional_args=None, additional_kwargs=None):
         r"""Set a callback to be called every block.
         
-        This callback is called as though inside a with block, and takes two positional argguments: the simulation and the simulations' time.
+        This callback is called as though inside a with block, and takes two positional argguments: the server and the servers' time.
         
-        Wraps lav_simulationSetBlockCallback."""
+        Wraps lav_serverSetBlockCallback."""
         with self._lock:
             if callback is not None:
                 wrapper = _CallbackWrapper(self, callback, additional_args, additional_kwargs)
                 ctypes_callback=_libaudioverse.LavTimeCallback(wrapper)
-                _lav.simulation_set_block_callback(self, ctypes_callback, None)
+                _lav.server_set_block_callback(self, ctypes_callback, None)
                 self._state['block_callback'] = (callback, wrapper, ctypes_callback)
             else:
-                _lav.simulation_set_block_callback(self, None)
+                _lav.server_set_block_callback(self, None)
                 self._state['block_callback'] = None
 
     def get_block_callback(self):
@@ -274,32 +273,32 @@ For full details of this class, see the Libaudioverse manual."""
         
         If in_audio_thread is false, it is safe to call the Libaudioverse API.
         
-        Wraps Lav_simulationCallIn."""
+        Wraps Lav_serverCallIn."""
         with self._lock:
             wrapped = _CallbackWrapper(self, callback, extra_args, extra_kwargs, self._state['scheduled_callbacks'])
             ct = _libaudioverse.LavTimeCallback(wrapped)
             wrapped.ctypes = ct #Ugly, but works and everything else was worse than this at time of writing.
-            _lav.simulation_call_in(self.handle, when, in_audio_thread, ct, None)
+            _lav.server_call_in(self.handle, when, in_audio_thread, ct, None)
             self._state['scheduled_callbacks'].add(wrapped)
 
     def write_file(self, path, channels, duration, may_apply_mixing_matrix=True):
         r"""Write blocks of data to a file.
         
-        This function wraps Lav_simulationWriteFile."""
-        _lav.simulation_write_file(self, path, channels, duration, may_apply_mixing_matrix)
+        This function wraps Lav_serverWriteFile."""
+        _lav.server_write_file(self, path, channels, duration, may_apply_mixing_matrix)
 
     @property
     def threads(self):
-        r"""The number of threads the simulation is using for processing.
+        r"""The number of threads the server is using for processing.
         
-        This wraps Lav_simulationGetThreads and Lav_simulationSetThreads."""
-        return _lav.simulation_get_threads(self)
+        This wraps Lav_serverGetThreads and Lav_serverSetThreads."""
+        return _lav.server_get_threads(self)
         
     @threads.setter
     def threads(self, value):
-        _lav.simulation_set_threads(self, value)
+        _lav.server_set_threads(self, value)
 
-_types_to_classes[ObjectTypes.simulation] = Simulation
+_types_to_classes[ObjectTypes.server] = Server
 
 #Buffer objects.
 class Buffer(_HandleComparer):
@@ -307,8 +306,8 @@ class Buffer(_HandleComparer):
 
 Use load_from_file to read a file or load_from_array to load an iterable."""
 
-    def __init__(self, simulation):
-        handle=_lav.create_buffer(simulation)
+    def __init__(self, server):
+        handle=_lav.create_buffer(server)
         self.init_with_handle(handle)
         _weak_handle_lookup[self.handle] = self
 
@@ -317,7 +316,7 @@ Use load_from_file to read a file or load_from_array to load an iterable."""
             if handle.handle not in _object_states:
                 _object_states[handle.handle] = dict()
                 _object_states[handle.handle]['lock'] = threading.Lock()
-                _object_states[handle.handle]['simulation'] = _resurrect(_lav.buffer_get_simulation(handle))
+                _object_states[handle.handle]['server'] = _resurrect(_lav.buffer_get_server(handle))
             self._state=_object_states[handle.handle]
             self._lock = self._state['lock']
             self.handle = handle
@@ -698,7 +697,7 @@ class GenericNode(_HandleComparer):
             if handle.handle not in _object_states:
                 _object_states[handle.handle] = dict()
                 self._state = _object_states[handle.handle]
-                self._state['simulation'] = _resurrect(_lav.node_get_simulation(self.handle))
+                self._state['server'] = _resurrect(_lav.node_get_server(self.handle))
                 self._state['callbacks'] = dict()
                 self._state['input_connection_count'] =_lav.node_get_input_connection_count(self)
                 self._state['output_connection_count'] = _lav.node_get_output_connection_count(self)
@@ -727,11 +726,11 @@ class GenericNode(_HandleComparer):
         So long as some node which this node is connected to is alive, this node will also be alive."""
         _lav.node_connect(self, output, node, input)
 
-    def connect_simulation(self, output):
-        r"""Connect the specified output of this node to  this node's simulation.
+    def connect_server(self, output):
+        r"""Connect the specified output of this node to  this node's server.
         
-        Nodes which are connected to the simulation are kept alive as long as they are connected to the simulation."""
-        _lav.node_connect_simulation(self, output)
+        Nodes which are connected to the server are kept alive as long as they are connected to the server."""
+        _lav.node_connect_server(self, output)
 
     def connect_property(self, output, property):
         r"""Connect an output of this node to an automatable property.

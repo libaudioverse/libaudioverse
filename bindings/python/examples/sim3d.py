@@ -1,24 +1,26 @@
 #demonstrates how to use the 3d simulation.
 import libaudioverse
 import collections
+
 libaudioverse.initialize()
 
-sim = libaudioverse.Simulation()
-sim.set_output_device()
-world = libaudioverse.EnvironmentNode(sim, "default")
+server = libaudioverse.Server()
+server.set_output_device()
+
+world = libaudioverse.EnvironmentNode(server, "default")
 world.panning_strategy = libaudioverse.PanningStrategies.hrtf
-source = libaudioverse.SourceNode(sim, world)
+source = libaudioverse.SourceNode(server, world)
 print("Enter a path to a sound file.")
 filepath = input()
-n = libaudioverse.BufferNode(sim)
-b = libaudioverse.Buffer(sim)
+n = libaudioverse.BufferNode(server)
+b = libaudioverse.Buffer(server)
 b.load_from_file(filepath)
 n.buffer = b
 n.connect(0, source, 0)
 
-n.looping.value = True
+n.looping = True
 
-world.connect_simulation(0)
+world.connect_server(0)
 
 print("""Enter python expressions that evaluate to 3-tuples (x, y, z).
 Positive x is to your right, positive y is above you, and positive z is behind you.

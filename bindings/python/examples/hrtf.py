@@ -4,26 +4,28 @@ import os.path
 import time
 
 libaudioverse.initialize()
-sim = libaudioverse.Simulation()
-sim.set_output_device()
-print "Enter a file path."
-path = raw_input()
+
+server = libaudioverse.Server()
+server.set_output_device()
+
+print("Enter a file path.")
+path = input()
 path = os.path.abspath(path)
-fnode = libaudioverse.BufferNode(sim)
-buffer=libaudioverse.Buffer(sim)
+fnode = libaudioverse.BufferNode(server)
+buffer=libaudioverse.Buffer(server)
 buffer.load_from_file(path)
 fnode.buffer = buffer
 fnode.looping.value = True
-panner = libaudioverse.HrtfNode(sim, "default")
+panner = libaudioverse.HrtfNode(server, "default")
 fnode.connect(0, panner, 0)
-panner.connect_simulation(0)
+panner.connect_server(0)
 
-print """Beginning evaluation.
+print("""Beginning evaluation.
 Enter any python expression that returns a tuple of numbers.  The first is azimuth and the second is elevation.  Azimuth may be anything, but elevation must be on the range -90 to 90.
 Enter quit to quit.
-"""
+""")
 while True:
-    command = raw_input()
+    command = input()
     if command == 'quit':
         break
     az, elev = eval(command)

@@ -116,7 +116,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createBuffer(LavHandle serverHandle, LavHandle*
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_bufferGetSimulation(LavHandle handle, LavHandle* destination) {
+Lav_PUBLIC_FUNCTION LavError Lav_bufferGetServer(LavHandle handle, LavHandle* destination) {
 	PUB_BEGIN
 	auto b= incomingObject<Buffer>(handle);
 	*destination = outgoingObject(b->getServer());
