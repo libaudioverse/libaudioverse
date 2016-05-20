@@ -1,9 +1,5 @@
 version:  build{build}
 
-branches:
-  only:
-    - master
-
 environment:
   LIBSNDFILE_LOCATION: 'c:\projects\libaudioverse\tmp'
   DEPLOYMENT_HOST: camlorn.net

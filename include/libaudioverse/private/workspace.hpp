@@ -14,11 +14,13 @@ namespace libaudioverse_implementation {
 
 The intent of this class is to be used with thread_local, to make some objects that need scratch space use less ram.
 I.e.:
-thread_local Workspace<flaot> ws;
+thread_local Workspace<float> ws;
 And then, inside a function (and only inside a function):
 float*ptr = ws.get(aSize);
 
 The workspace grows to fit and is destroyed with the thread. Do not use this for large chunks of ram.
+
+By default, the workspace zeros the buffer before returning it.
 */
 
 template<typename T>
@@ -28,12 +30,13 @@ class Workspace {
 		if(ptr) freeArray(ptr);
 	}
 	
-	T* get(std::size_t size) {
+	T* get(std::size_t size, bool zeroFirst = true) {
 		if(size > this->size) {
 			if(ptr) freeArray(ptr);
 			ptr = allocArray<T>(size);
 			this->size = size;
 		}
+		if(zeroFirst) memset(ptr, 0, sizeof(T)*size);
 		return ptr;
 	}
 	
