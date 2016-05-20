@@ -57,7 +57,7 @@ In many cases, the examples will be enough to get you started.
 
 ##Getting Help##
 
-Libaudioverse has [a Google Group](https://groups.google.com/a/camlorn.net/forum/#!forum/libaudioverse).
+Libaudioverse has [a Google Group](https://groups.google.com/a/camlorn.net/d/forum/libaudioverse).
 You can subscribe directly and without a Gmail address via e-mailing an empty e-mail to `libaudioverse+subscribe@camlorn.net` and clicking the link in the confirmation e-mail sent to you.
 I prefer questions to come via this avenue, as it results in your answers being searchable in future.
 If you need to contact me in real-time, you can do so via the Libaudioverse IRC channel: `#libaudioverse` on chat.freenode.net.
