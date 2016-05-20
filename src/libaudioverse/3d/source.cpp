@@ -171,12 +171,10 @@ void SourceNode::update(EnvironmentInfo &env) {
 
 void SourceNode::process() {
 	if(culled) return; //nothing to do.
-	//The panners always skip channels 2 and 3, so 7.1 only needs 6 pointers. Plus 1 for the occlusion.
-	//We put these together because this increases cache locality.
-	float* ws = source_workspace.get(block_size*7);
+	//8 for up to 7.1 panning, then one more for occlusion.
+	float* ws = source_workspace.get(block_size*9);
 	float* occluded = ws;
-	//The two nullptrs are never, ever used by panners. Ever.
-	float* panBuffers[] = {ws+block_size, ws+2*block_size, nullptr, nullptr, ws+3*block_size, ws+4*block_size, ws+5*block_size, ws+6*block_size};
+	float* panBuffers[] = {ws+block_size, ws+2*block_size, ws+3*block_size, ws+4*block_size, ws+5*block_size, ws+6*block_size, ws+7*block_size, ws+8*block_size};
 	for(int i = 0; i < block_size; i++) occluded[i] = occlusion_filter.tick(input_buffers[0][i]);
 
 	int channels = 0;
@@ -212,7 +210,7 @@ void SourceNode::process() {
 		if(send.channels == 1) multiplicationAdditionKernel(block_size, g, occluded, environment->source_buffers[send.start], environment->source_buffers[send.start]);
 		else {
 			p->pan(occluded, panBuffers);
-			for(int i = 0; i < send.channels; i++) if(panBuffers[i]) multiplicationAdditionKernel(block_size, g, panBuffers[i], environment->source_buffers[send.start+i], environment->source_buffers[send.start+i]);
+			for(int i = 0; i < send.channels; i++) multiplicationAdditionKernel(block_size, g, panBuffers[i], environment->source_buffers[send.start+i], environment->source_buffers[send.start+i]);
 		}
 	}
 }
