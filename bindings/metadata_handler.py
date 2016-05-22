@@ -16,7 +16,7 @@ def cleanup_function(all_info, name, d):
         if p.name not in d['params']:
             if p.name == "destination":
                 d['params'][p.name] = "Holds the result of a call to this function."
-            elif p.name == "simulationHandle":
+            elif p.name == "serverHandle":
                 d['params'][p.name] = "The simulation to manipulate."
             elif p.name == "propertyIndex":
                 d['params'][p.name] = "The property to manipulate."

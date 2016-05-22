@@ -182,25 +182,14 @@ functions:
     category: servers
     doc_description: |
       Set the output device of the server.
-      -1 is the system default.  0 and above are specific audio devices, matching the indices returned by the enumeration functions.
+      Use the literal string "default" for the default audio device.
       
       Note that it is possible to change the output device of a server even after it has been set.
       
       After the output device has been set, calls to `Lav_serverGetBlock` will error.
-      
-      The parameters {{"minLatency"|param}}, {{"startLatency"|param}}, and {{"maxLatency"|param}} are hints as to the latency you wish to have.
-      The audio backends attempt to optimize themselves according to the CPU load of your application and other factors.
-      These parameters control this optimization.
-      If your application can suddenly and frequently cause CPU usage to spike, set {{"minLatency"|param}} to something greater than 0.
-      The {{"startLatency"|param}} parameter is the latency at which the audio backend will start audio.
-      This should usually be somewhat high, as applications often begin by creating a large number of objects.
-      The audio backends will reduce latency as rapidly as is safe.
     params:
-      index: The output device  the server is to play on.
+      device: The output device  the server is to play on.
       channels: The number of channels we wish to output.
-      minLatency: The minimum latency your application can tolerate. 0.0 is a good value in most cases.
-      startLatency: A hint as to the latency the audio backend should start with. 0.05 is a suggested default.
-      maxLatency: The maximum latency your application can tolerate. 0.1 or even 0.2 is a suggested default.
   Lav_serverClearOutputDevice:
     category: servers
     doc_description: |

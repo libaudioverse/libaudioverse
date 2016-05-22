@@ -8,7 +8,7 @@ function_categories:
     doc_name: Server Functions
     doc_description: |
       The following functions relate to and control the server.
-      - name: devices
+  - name: devices
     doc_name: Device Enumeration
     doc_description: |
       The following functions are for queryng informationa bout audio devices.
