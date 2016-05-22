@@ -21,7 +21,7 @@ def finished(obj):
 
 filenode.set_end_callback(finished)
 
-filenode.connect_server(0)
+filenode.connect(0, filenode.server)
 
 commands = """Commands:
 play

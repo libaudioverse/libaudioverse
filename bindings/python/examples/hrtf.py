@@ -18,7 +18,7 @@ fnode.buffer = buffer
 fnode.looping.value = True
 panner = libaudioverse.HrtfNode(server, "default")
 fnode.connect(0, panner, 0)
-panner.connect_server(0)
+panner.connect(0, panner.server)
 
 print("""Beginning evaluation.
 Enter any python expression that returns a tuple of numbers.  The first is azimuth and the second is elevation.  Azimuth may be anything, but elevation must be on the range -90 to 90.

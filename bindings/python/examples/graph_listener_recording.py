@@ -34,7 +34,7 @@ def callback(obj, frames, channels, buffer):
 listener.set_listening_callback(callback)
 
 print("beginning synthesis and playing for 5 seconds...")
-listener.connect_server(0)
+listener.connect(0, listener.server)
 
 time.sleep(5.0)
 

@@ -719,28 +719,34 @@ class GenericNode(_HandleComparer):
         r"""Get the names of all properties on this node."""
         return self._state['properties'].keys()
 
-    def connect(self, output, node, input):
-        r"""Connect the specified output of this node to the specified input of another node.
-        
-        Nodes are kept alive if another node's input is connected to one of their outputs.
-        So long as some node which this node is connected to is alive, this node will also be alive."""
-        _lav.node_connect(self, output, node, input)
+    @property
+    def server(self):
+        """Get the server."""
+        return self._state['server']
 
-    def connect_server(self, output):
-        r"""Connect the specified output of this node to  this node's server.
+    def connect(self, *args):
+        r"""Form a connection between this node and another object.
         
-        Nodes which are connected to the server are kept alive as long as they are connected to the server."""
-        _lav.node_connect_server(self, output)
-
-    def connect_property(self, output, property):
-        r"""Connect an output of this node to an automatable property.
+        This function has 3 valid signatures:
         
-        Example: n.connect_property(0, mySineNode.frequency).
+        node.connect(output, other_node, input): Connect output to the specified input of other_node.
+        node.connect(output, property): Connect the specified output to the specified property on another node.  The property must be a float or double property.
+        node.connect(output, server): Connect the specified output to the server.
         
-        As usual, this connection keeps this node alive as long as the destination is also alive."""
-        other = property._handle
-        slot = property._slot
-        _lav.node_connect_property(self, output, other, slot)
+        Any node which is connected directly or indirectly to the server will remain alive even if your program lets go of it.
+        For more details on the subject of node lifetimes, see the Libaudioverse manual.
+        """
+        if len(args) == 3:
+            _lav.node_connect(self, args[0], args[1], args[2])
+        elif len(args) == 2 and isinstance(args[1], Server):
+            _lav.node_connect_server(self, args[0])
+        elif len(args) == 2 and isinstance(args[1], AutomatedProperty):
+            property = args[1]
+            other = property._handle
+            slot = property._slot
+            _lav.node_connect_property(self, args[0], other, slot)
+        else:
+            raise ValueError("Couldn't understand arguments. See docstring for details on allowed combinations.")
 
     def disconnect(self, output, node = None, input = 0):
         r"""Disconnect from other nodes.

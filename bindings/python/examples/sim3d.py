@@ -20,7 +20,7 @@ n.connect(0, source, 0)
 
 n.looping = True
 
-world.connect_server(0)
+world.connect(0, world.server)
 
 print("""Enter python expressions that evaluate to 3-tuples (x, y, z).
 Positive x is to your right, positive y is above you, and positive z is behind you.

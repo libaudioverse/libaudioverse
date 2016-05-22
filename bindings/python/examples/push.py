@@ -23,7 +23,7 @@ p.threshold = 0.1
 p.set_low_callback(audio_callback)
 p.set_underrun_callback(out_callback)
 
-p.connect_server(0)
+p.connect(0, p.server)
 
 time.sleep(10.0)
 libaudioverse.shutdown()

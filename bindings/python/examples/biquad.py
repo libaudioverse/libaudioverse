@@ -16,7 +16,7 @@ buffer.load_from_file(filepath)
 filenode.buffer = buffer
 bq = libaudioverse.BiquadNode(server, 2)
 filenode.connect(0, bq, 0)
-bq.connect_server(0)
+bq.connect(0, bq.server)
 
 print("Sweeping lowpass from 0.0 hz to 10000 hz over", time_per_demo, "seconds:")
 resolution = 10

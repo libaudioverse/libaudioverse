@@ -17,7 +17,7 @@ s1.connect(0, fader, 0)
 s2.connect(0, fader, 1)
 s3.connect(0, fader, 2)
 
-fader.connect_server(0)
+fader.connect(0, fader.server)
 
 #Let's crossfade back and fortha cross all the inputs repeatedly.
 
