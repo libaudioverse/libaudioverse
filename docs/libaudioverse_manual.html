@@ -1066,11 +1066,11 @@ Creating all other Libaudioverse objects requires a simulation to first be creat
 <p>The two most crutial pieces of information needed for the simulation are the block size and sample rate.
 The latter is self-explanatory.
 The block size is the number of samples to process at once, and must be a multiple of 4.
-Simulations are created with <a href="#function-Lav_createSimulation">Lav_createSimulation</a>.</p>
+Simulations are created with <a href="#function-Lav_createSimulation">[function-Lav_createSimulation]</a>.</p>
 </div>
 <div class="paragraph">
 <p>By default, Libaudioverse will use one thread per core on the current system for audio mixing.
-This may be changed via <a href="#function-Lav_simulationSetThreads">Lav_simulationSetThreads</a>.</p>
+This may be changed via <a href="#function-Lav_simulationSetThreads">[function-Lav_simulationSetThreads]</a>.</p>
 </div>
 <div class="paragraph">
 <p>Simulations handle audio output and hold state, provided via dependency injection to created objects.
@@ -1086,17 +1086,17 @@ In all cases, Libaudioverse applies the audio upmixing and downmixing algorithms
 None of the following three methods of receiving audio should be mixed; doing so results in undefined behavior.</p>
 </div>
 <div class="paragraph">
-<p><a href="#function-Lav_simulationGetBlock">Lav_simulationGetBlock</a>  fills a buffer allocated by the calling application with a block of audio data.</p>
+<p><a href="#function-Lav_simulationGetBlock">[function-Lav_simulationGetBlock]</a>  fills a buffer allocated by the calling application with a block of audio data.</p>
 </div>
 <div class="paragraph">
-<p><a href="#function-Lav_simulationWriteFile">Lav_simulationWriteFile</a> drives the simulation for the specified duration, synthesizing as fast as possible and writing to the specified file.
+<p><a href="#function-Lav_simulationWriteFile">[function-Lav_simulationWriteFile]</a> drives the simulation for the specified duration, synthesizing as fast as possible and writing to the specified file.
 The file format is determined from the extension of the provided path.
 The supported file formats are not currently documented as this is in flux, but you are guaranteed to have at least .wav and .ogg.</p>
 </div>
 <div class="paragraph">
-<p>The final option is to call <a href="#function-Lav_simulationSetOutputDevice">Lav_simulationSetOutputDevice</a>.
+<p>The final option is to call <a href="#function-Lav_simulationSetOutputDevice">[function-Lav_simulationSetOutputDevice]</a>.
 This links the simulation to a specific audio device.
-<a href="#function-Lav_simulationSetOutputDevice">Lav_simulationSetOutputDevice</a> takes a number of parameters, discussed in detail below.</p>
+<a href="#function-Lav_simulationSetOutputDevice">[function-Lav_simulationSetOutputDevice]</a> takes a number of parameters, discussed in detail below.</p>
 </div>
 <div class="paragraph">
 <p>Libaudioverse represents specific audio devices with positive indices starting at 0.
@@ -1113,7 +1113,7 @@ Libaudioverse continually estimates how much time it is taking to prepare blocks
 If the application begins using more CPU, then latency will rise in order to give Libaudioverse more headroom when mixing blocks; if it begins using less, latency will fall.</p>
 </div>
 <div class="paragraph">
-<p>Multiple calls to <a href="#function-Lav_simulationSetOutputDevice">Lav_simulationSetOutputDevice</a> are allowed, though playback may not be gapless.</p>
+<p>Multiple calls to <a href="#function-Lav_simulationSetOutputDevice">[function-Lav_simulationSetOutputDevice]</a> are allowed, though playback may not be gapless.</p>
 </div>
 <div class="admonitionblock important">
 <table>
@@ -1148,16 +1148,16 @@ If the operation in question can be done in one function call, hearing partial r
 <p>Perform the operations on a set of disconnected nodes before connecting them.</p>
 </li>
 <li>
-<p>use <a href="#function-Lav_simulationLock">Lav_simulationLock</a> and <a href="#function-Lav_simulationUnlock">Lav_simulationUnlock</a>.  Note that, as these function names imply, simulations function as mutexes; lock inversion and other concerns can apply in multithreaded scenarios.</p>
+<p>use <a href="#function-Lav_simulationLock">[function-Lav_simulationLock]</a> and <a href="#function-Lav_simulationUnlock">[function-Lav_simulationUnlock]</a>.  Note that, as these function names imply, simulations function as mutexes; lock inversion and other concerns can apply in multithreaded scenarios.</p>
 </li>
 <li>
-<p>Set a per-block callback which Libaudioverse will call just before mixing every block.  This can be done with <a href="#function-Lav_simulationSetBlockCallback">Lav_simulationSetBlockCallback</a>.</p>
+<p>Set a per-block callback which Libaudioverse will call just before mixing every block.  This can be done with <a href="#function-Lav_simulationSetBlockCallback">[function-Lav_simulationSetBlockCallback]</a>.</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>Most games will want to use <a href="#function-Lav_simulationLock">Lav_simulationLock</a> before beginning their per-frame audio update, and <a href="#function-Lav_simulationUnlock">Lav_simulationUnlock</a> afterwords.
-Failure to call <a href="#function-Lav_simulationUnlock">Lav_simulationUnlock</a> in a timely manner will cause audio glitching; failure to call it at all will cause silence and freeze Libaudioverse&#8217;s background threads.</p>
+<p>Most games will want to use <a href="#function-Lav_simulationLock">[function-Lav_simulationLock]</a> before beginning their per-frame audio update, and <a href="#function-Lav_simulationUnlock">[function-Lav_simulationUnlock]</a> afterwords.
+Failure to call <a href="#function-Lav_simulationUnlock">[function-Lav_simulationUnlock]</a> in a timely manner will cause audio glitching; failure to call it at all will cause silence and freeze Libaudioverse&#8217;s background threads.</p>
 </div>
 <div class="paragraph">
 <p>The per-block callback is for advanced synthesis applications which need a stronger guarantee: not only is the operation happening completely before the next block, it is running every block.
@@ -1195,7 +1195,7 @@ Libaudioverse makes the opinionated decision that connections are made from outp
 </div>
 <div class="paragraph">
 <p>The two functions relevant to node-to-node connections are <a href="#function-Lav_nodeConnect">Lav_nodeConnect</a> and <a href="#function-Lav_nodeDisconnect">Lav_nodeDisconnect</a>.
-Connecting nodes to the simulation is accomplished with <a href="#function-Lav_nodeConnectSimulation">Lav_nodeConnectSimulation</a>.
+Connecting nodes to the simulation is accomplished with <a href="#function-Lav_nodeConnectSimulation">[function-Lav_nodeConnectSimulation]</a>.
 <a href="#function-Lav_nodeConnectProperty">Lav_nodeConnectProperty</a> will be discussed later.</p>
 </div>
 <div class="paragraph">
@@ -1303,7 +1303,7 @@ When this is the case, the enum is documented.</p>
 </div>
 <div class="paragraph">
 <p>Float3 and float6 properties are packed vectors primarily used for the 3D components.
-The purpose of float3 and float6 properties are to provide a fast path for orientations and positions, and to reduce need for <a href="#function-Lav_simulationLock">Lav_simulationLock</a> and <a href="#function-Lav_simulationUnlock">Lav_simulationUnlock</a>.</p>
+The purpose of float3 and float6 properties are to provide a fast path for orientations and positions, and to reduce need for <a href="#function-Lav_simulationLock">[function-Lav_simulationLock]</a> and <a href="#function-Lav_simulationUnlock">[function-Lav_simulationUnlock]</a>.</p>
 </div>
 <div class="paragraph">
 <p>There are three standard properties on all nodes.  They are as follows, with more complete documentation <a href="#node-Lav_OBJTYPE_GENERIC_NODE">here</a>:</p>
@@ -2103,19 +2103,19 @@ Libaudioverse cannot be safely reinitialized.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_simulation_functions">Simulation Functions</h4>
+<h4 id="_server_functions">Server Functions</h4>
 <div class="paragraph">
-<p>The following functions relate to and control the simulation.</p>
+<p>The following functions relate to and control the server.</p>
 </div>
 <div class="sect4">
-<h5 id="function-Lav_createSimulation">Lav_createSimulation</h5>
+<h5 id="function-Lav_createServer">Lav_createServer</h5>
 <div class="paragraph">
-<p>Prototype: <code>LavError Lav_createSimulation(unsigned int sr, unsigned int blockSize, LavHandle* destination)</code></p>
+<p>Prototype: <code>LavError Lav_createServer(unsigned int sr, unsigned int blockSize, LavHandle* destination)</code></p>
 </div>
 <div class="paragraph">
-<p>Creates a  simulation.
-The new simulation has no associated audio device.
-To make it output, use <code>Lav_simulationSetOutputDevice</code>.</p>
+<p>Creates a  server.
+The new server has no associated audio device.
+To make it output, use <code>Lav_serverSetOutputDevice</code>.</p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Parameters</caption>
@@ -2133,12 +2133,12 @@ To make it output, use <code>Lav_simulationSetOutputDevice</code>.</p>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>unsigned int</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">sr</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The sampling rate of the new simulation.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The sampling rate of the new server.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>unsigned int</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">blockSize</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The block size of the new simulation.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The block size of the new server.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle*</code></p></td>
@@ -2149,9 +2149,9 @@ To make it output, use <code>Lav_simulationSetOutputDevice</code>.</p>
 </table>
 </div>
 <div class="sect4">
-<h5 id="function-Lav_simulationCallIn">Lav_simulationCallIn</h5>
+<h5 id="function-Lav_serverCallIn">Lav_serverCallIn</h5>
 <div class="paragraph">
-<p>Prototype: <code>LavError Lav_simulationCallIn(LavHandle simulationHandle, double when, int inAudioThread, LavTimeCallback cb, void* userdata)</code></p>
+<p>Prototype: <code>LavError Lav_serverCallIn(LavHandle serverHandle, double when, int inAudioThread, LavTimeCallback cb, void* userdata)</code></p>
 </div>
 <div class="paragraph">
 <p>Schedule a function to run in the future.</p>
@@ -2163,7 +2163,7 @@ If called outside the audio thread, it can call the Libaudioverse API and will n
 This is the same as node callbacks.</p>
 </div>
 <div class="paragraph">
-<p>Time advances for simulations if and only if they are processing audio for some purpose; this callback is called in audio time, as it were.
+<p>Time advances for servers if and only if they are processing audio for some purpose; this callback is called in audio time, as it were.
 The precision of the callback is limited by the block size.
 Smaller block sizes will call callbacks more precisely.</p>
 </div>
@@ -2182,7 +2182,7 @@ Smaller block sizes will call callbacks more precisely.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">simulationHandle</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">serverHandle</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The simulation to manipulate.</p></td>
 </tr>
 <tr>
@@ -2226,18 +2226,18 @@ Smaller block sizes will call callbacks more precisely.</p>
 </table>
 </div>
 <div class="sect4">
-<h5 id="function-Lav_simulationClearOutputDevice">Lav_simulationClearOutputDevice</h5>
+<h5 id="function-Lav_serverClearOutputDevice">Lav_serverClearOutputDevice</h5>
 <div class="paragraph">
-<p>Prototype: <code>LavError Lav_simulationClearOutputDevice(LavHandle simulationHandle)</code></p>
+<p>Prototype: <code>LavError Lav_serverClearOutputDevice(LavHandle serverHandle)</code></p>
 </div>
 <div class="paragraph">
-<p>Clear a simulation&#8217;s output device.</p>
+<p>Clear a server&#8217;s output device.</p>
 </div>
 <div class="paragraph">
 <p>This is no-op if no output device has been set.</p>
 </div>
 <div class="paragraph">
-<p>After a call to this function, it is again safe to use <code>Lav_simulationGetBlock</code>.</p>
+<p>After a call to this function, it is again safe to use <code>Lav_serverGetBlock</code>.</p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Parameters</caption>
@@ -2254,20 +2254,20 @@ Smaller block sizes will call callbacks more precisely.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">simulationHandle</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">serverHandle</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The simulation to manipulate.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="sect4">
-<h5 id="function-Lav_simulationGetBlock">Lav_simulationGetBlock</h5>
+<h5 id="function-Lav_serverGetBlock">Lav_serverGetBlock</h5>
 <div class="paragraph">
-<p>Prototype: <code>LavError Lav_simulationGetBlock(LavHandle simulationHandle, unsigned int channels, int mayApplyMixingMatrix, float* buffer)</code></p>
+<p>Prototype: <code>LavError Lav_serverGetBlock(LavHandle serverHandle, unsigned int channels, int mayApplyMixingMatrix, float* buffer)</code></p>
 </div>
 <div class="paragraph">
-<p>Gets a block of audio from the simulation and advances its time.
-You must allocate enough space to hold exactly one block of audio: the simulation&#8217;s block size times the number of channels requested floating point values.
+<p>Gets a block of audio from the server and advances its time.
+You must allocate enough space to hold exactly one block of audio: the server&#8217;s block size times the number of channels requested floating point values.
 Note that mixing this function with other output methods invokes undefined behavior.</p>
 </div>
 <table class="tableblock frame-all grid-all spread">
@@ -2285,18 +2285,18 @@ Note that mixing this function with other output methods invokes undefined behav
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">simulationHandle</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The handle of the simulation to read a block from.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">serverHandle</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The handle of the server to read a block from.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>unsigned int</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">channels</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The number of channels we want. The simulations' output will be upmixed or downmixed as appropriate.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The number of channels we want. The servers' output will be upmixed or downmixed as appropriate.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>int</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">mayApplyMixingMatrix</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">If 0, drop any additional channels in the simulation&#8217;s output and set any  missing channels in the simulation&#8217;s output to 0. Otherwise, if we can, apply a mixing matrix.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If 0, drop any additional channels in the server&#8217;s output and set any  missing channels in the server&#8217;s output to 0. Otherwise, if we can, apply a mixing matrix.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>float*</code></p></td>
@@ -2307,12 +2307,12 @@ Note that mixing this function with other output methods invokes undefined behav
 </table>
 </div>
 <div class="sect4">
-<h5 id="function-Lav_simulationGetBlockSize">Lav_simulationGetBlockSize</h5>
+<h5 id="function-Lav_serverGetBlockSize">Lav_serverGetBlockSize</h5>
 <div class="paragraph">
-<p>Prototype: <code>LavError Lav_simulationGetBlockSize(LavHandle simulationHandle, int* destination)</code></p>
+<p>Prototype: <code>LavError Lav_serverGetBlockSize(LavHandle serverHandle, int* destination)</code></p>
 </div>
 <div class="paragraph">
-<p>Query the block size of the specified simulation.</p>
+<p>Query the block size of the specified server.</p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Parameters</caption>
@@ -2329,7 +2329,7 @@ Note that mixing this function with other output methods invokes undefined behav
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">simulationHandle</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">serverHandle</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The simulation to manipulate.</p></td>
 </tr>
 <tr>
@@ -2341,12 +2341,12 @@ Note that mixing this function with other output methods invokes undefined behav
 </table>
 </div>
 <div class="sect4">
-<h5 id="function-Lav_simulationGetSr">Lav_simulationGetSr</h5>
+<h5 id="function-Lav_serverGetSr">Lav_serverGetSr</h5>
 <div class="paragraph">
-<p>Prototype: <code>LavError Lav_simulationGetSr(LavHandle simulationHandle, int* destination)</code></p>
+<p>Prototype: <code>LavError Lav_serverGetSr(LavHandle serverHandle, int* destination)</code></p>
 </div>
 <div class="paragraph">
-<p>Query the simulation&#8217;s sampling rate.</p>
+<p>Query the server&#8217;s sampling rate.</p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Parameters</caption>
@@ -2363,7 +2363,7 @@ Note that mixing this function with other output methods invokes undefined behav
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">simulationHandle</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">serverHandle</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The simulation to manipulate.</p></td>
 </tr>
 <tr>
@@ -2375,12 +2375,12 @@ Note that mixing this function with other output methods invokes undefined behav
 </table>
 </div>
 <div class="sect4">
-<h5 id="function-Lav_simulationGetThreads">Lav_simulationGetThreads</h5>
+<h5 id="function-Lav_serverGetThreads">Lav_serverGetThreads</h5>
 <div class="paragraph">
-<p>Prototype: <code>LavError Lav_simulationGetThreads(LavHandle simulationHandle, int* destination)</code></p>
+<p>Prototype: <code>LavError Lav_serverGetThreads(LavHandle serverHandle, int* destination)</code></p>
 </div>
 <div class="paragraph">
-<p>Get the number of threads that the simulation is currently using.</p>
+<p>Get the number of threads that the server is currently using.</p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Parameters</caption>
@@ -2397,7 +2397,7 @@ Note that mixing this function with other output methods invokes undefined behav
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">simulationHandle</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">serverHandle</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The simulation to manipulate.</p></td>
 </tr>
 <tr>
@@ -2409,18 +2409,18 @@ Note that mixing this function with other output methods invokes undefined behav
 </table>
 </div>
 <div class="sect4">
-<h5 id="function-Lav_simulationLock">Lav_simulationLock</h5>
+<h5 id="function-Lav_serverLock">Lav_serverLock</h5>
 <div class="paragraph">
-<p>Prototype: <code>LavError Lav_simulationLock(LavHandle simulationHandle)</code></p>
+<p>Prototype: <code>LavError Lav_serverLock(LavHandle serverHandle)</code></p>
 </div>
 <div class="paragraph">
-<p>All operations between a call to this function and a call to Lav_simulationUnlock will happen together, with no blocks mixed between them.
-This is equivalent to assuming that the simulation is a lock, with  all of the required caution that implies.
-No other thread will be able to access this simulation or objects created from it until Lav_simulationUnlock is called.
-If you do not call Lav_simulationUnlock in a timely manner, then audio will stop until you do.</p>
+<p>All operations between a call to this function and a call to Lav_serverUnlock will happen together, with no blocks mixed between them.
+This is equivalent to assuming that the server is a lock, with  all of the required caution that implies.
+No other thread will be able to access this server or objects created from it until Lav_serverUnlock is called.
+If you do not call Lav_serverUnlock in a timely manner, then audio will stop until you do.</p>
 </div>
 <div class="paragraph">
-<p>Pairs of Lav_simulationLock and Lav_simulationUnlock nest safely.</p>
+<p>Pairs of Lav_serverLock and Lav_serverUnlock nest safely.</p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Parameters</caption>
@@ -2437,16 +2437,16 @@ If you do not call Lav_simulationUnlock in a timely manner, then audio will stop
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">simulationHandle</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">serverHandle</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The simulation to manipulate.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="sect4">
-<h5 id="function-Lav_simulationSetBlockCallback">Lav_simulationSetBlockCallback</h5>
+<h5 id="function-Lav_serverSetBlockCallback">Lav_serverSetBlockCallback</h5>
 <div class="paragraph">
-<p>Prototype: <code>LavError Lav_simulationSetBlockCallback(LavHandle simulationHandle, LavTimeCallback callback, void* userdata)</code></p>
+<p>Prototype: <code>LavError Lav_serverSetBlockCallback(LavHandle serverHandle, LavTimeCallback callback, void* userdata)</code></p>
 </div>
 <div class="paragraph">
 <p>Set a callback to be called just before every block and in the audio thread.
@@ -2455,10 +2455,10 @@ the point of it is that you can use it to perform tasks where missing even one b
 </div>
 <div class="paragraph">
 <p>This  callback can even block, though this will slow down audio mixing and may cause glitchy audio.
-The one thing you should never do in this callback is access anything belonging to another simulation, as this can cause deadlock.</p>
+The one thing you should never do in this callback is access anything belonging to another server, as this can cause deadlock.</p>
 </div>
 <div class="paragraph">
-<p>The callback receives two parameters: the simulation to which it is associated and the time in simulation time that corresponds to the beginning of the block about to be mixed.</p>
+<p>The callback receives two parameters: the server to which it is associated and the time in server time that corresponds to the beginning of the block about to be mixed.</p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Parameters</caption>
@@ -2475,7 +2475,7 @@ The one thing you should never do in this callback is access anything belonging 
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">simulationHandle</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">serverHandle</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The simulation to manipulate.</p></td>
 </tr>
 <tr>
@@ -2509,28 +2509,19 @@ The one thing you should never do in this callback is access anything belonging 
 </table>
 </div>
 <div class="sect4">
-<h5 id="function-Lav_simulationSetOutputDevice">Lav_simulationSetOutputDevice</h5>
+<h5 id="function-Lav_serverSetOutputDevice">Lav_serverSetOutputDevice</h5>
 <div class="paragraph">
-<p>Prototype: <code>LavError Lav_simulationSetOutputDevice(LavHandle simulationHandle, int index, int channels, float minLatency, float startLatency, float maxLatency)</code></p>
+<p>Prototype: <code>LavError Lav_serverSetOutputDevice(LavHandle serverHandle, const char* device, int channels)</code></p>
 </div>
 <div class="paragraph">
-<p>Set the output device of the simulation.
--1 is the system default.  0 and above are specific audio devices, matching the indices returned by the enumeration functions.</p>
+<p>Set the output device of the server.
+Use the literal string "default" for the default audio device.</p>
 </div>
 <div class="paragraph">
-<p>Note that it is possible to change the output device of a simulation even after it has been set.</p>
+<p>Note that it is possible to change the output device of a server even after it has been set.</p>
 </div>
 <div class="paragraph">
-<p>After the output device has been set, calls to <code>Lav_simulationGetBlock</code> will error.</p>
-</div>
-<div class="paragraph">
-<p>The parameters minLatency, startLatency, and maxLatency are hints as to the latency you wish to have.
-The audio backends attempt to optimize themselves according to the CPU load of your application and other factors.
-These parameters control this optimization.
-If your application can suddenly and frequently cause CPU usage to spike, set minLatency to something greater than 0.
-The startLatency parameter is the latency at which the audio backend will start audio.
-This should usually be somewhat high, as applications often begin by creating a large number of objects.
-The audio backends will reduce latency as rapidly as is safe.</p>
+<p>After the output device has been set, calls to <code>Lav_serverGetBlock</code> will error.</p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Parameters</caption>
@@ -2547,49 +2538,34 @@ The audio backends will reduce latency as rapidly as is safe.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">simulationHandle</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">serverHandle</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The simulation to manipulate.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>int</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">index</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The output device  the simulation is to play on.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>const char*</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">device</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The output device  the server is to play on.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>int</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">channels</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The number of channels we wish to output.</p></td>
 </tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">minLatency</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The minimum latency your application can tolerate. 0.0 is a good value in most cases.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">startLatency</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A hint as to the latency the audio backend should start with. 0.05 is a suggested default.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">maxLatency</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The maximum latency your application can tolerate. 0.1 or even 0.2 is a suggested default.</p></td>
-</tr>
 </tbody>
 </table>
 </div>
 <div class="sect4">
-<h5 id="function-Lav_simulationSetThreads">Lav_simulationSetThreads</h5>
+<h5 id="function-Lav_serverSetThreads">Lav_serverSetThreads</h5>
 <div class="paragraph">
-<p>Prototype: <code>LavError Lav_simulationSetThreads(LavHandle simulationHandle, int threads)</code></p>
+<p>Prototype: <code>LavError Lav_serverSetThreads(LavHandle serverHandle, int threads)</code></p>
 </div>
 <div class="paragraph">
-<p>Set the number of threads that the simulation is allowed to use.</p>
+<p>Set the number of threads that the server is allowed to use.</p>
 </div>
 <div class="paragraph">
 <p>The value of the threads parameter may be from 1 to infinity.
-When set to 1, processing happens in the thread who calls Lav_simulationGetBlock.
-All other values sleep the thread calling Lav_simulationGetBlock and perform processing in background threads.</p>
+When set to 1, processing happens in the thread who calls Lav_serverGetBlock.
+All other values sleep the thread calling Lav_serverGetBlock and perform processing in background threads.</p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Parameters</caption>
@@ -2606,7 +2582,7 @@ All other values sleep the thread calling Lav_simulationGetBlock and perform pro
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">simulationHandle</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">serverHandle</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The simulation to manipulate.</p></td>
 </tr>
 <tr>
@@ -2618,16 +2594,16 @@ All other values sleep the thread calling Lav_simulationGetBlock and perform pro
 </table>
 </div>
 <div class="sect4">
-<h5 id="function-Lav_simulationUnlock">Lav_simulationUnlock</h5>
+<h5 id="function-Lav_serverUnlock">Lav_serverUnlock</h5>
 <div class="paragraph">
-<p>Prototype: <code>LavError Lav_simulationUnlock(LavHandle simulationHandle)</code></p>
+<p>Prototype: <code>LavError Lav_serverUnlock(LavHandle serverHandle)</code></p>
 </div>
 <div class="paragraph">
-<p>Release the internal lock of a simulation, allowing normal operation to resume.
-This is to be used after a call to Lav_simulationLock and on the same thread as that call; calling it in any other circumstance or on any other thread invokes undefined behavior.</p>
+<p>Release the internal lock of a server, allowing normal operation to resume.
+This is to be used after a call to Lav_serverLock and on the same thread as that call; calling it in any other circumstance or on any other thread invokes undefined behavior.</p>
 </div>
 <div class="paragraph">
-<p>Pairs of Lav_simulationLock and Lav_simulationUnlock nest safely.</p>
+<p>Pairs of Lav_serverLock and Lav_serverUnlock nest safely.</p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Parameters</caption>
@@ -2644,23 +2620,23 @@ This is to be used after a call to Lav_simulationLock and on the same thread as 
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">simulationHandle</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">serverHandle</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The simulation to manipulate.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="sect4">
-<h5 id="function-Lav_simulationWriteFile">Lav_simulationWriteFile</h5>
+<h5 id="function-Lav_serverWriteFile">Lav_serverWriteFile</h5>
 <div class="paragraph">
-<p>Prototype: <code>LavError Lav_simulationWriteFile(LavHandle simulationHandle, const char* path, int channels, double duration, int mayApplyMixingMatrix)</code></p>
+<p>Prototype: <code>LavError Lav_serverWriteFile(LavHandle serverHandle, const char* path, int channels, double duration, int mayApplyMixingMatrix)</code></p>
 </div>
 <div class="paragraph">
-<p>Write the simulation&#8217;s output to the specified file.</p>
+<p>Write the server&#8217;s output to the specified file.</p>
 </div>
 <div class="paragraph">
-<p>This function advances the simulation as though Lav_simulationGetBlock were called multiple times, the number of times determined by duration.
-As a consequence, it is not possible to use this function while the simulation is outputting.</p>
+<p>This function advances the server as though Lav_serverGetBlock were called multiple times, the number of times determined by duration.
+As a consequence, it is not possible to use this function while the server is outputting.</p>
 </div>
 <div class="paragraph">
 <p>The file format is determined from the path.
@@ -2682,7 +2658,7 @@ In all cases, reasonable defaults are used for those settings which are specific
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">simulationHandle</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">serverHandle</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The simulation to manipulate.</p></td>
 </tr>
 <tr>
@@ -2703,7 +2679,7 @@ In all cases, reasonable defaults are used for those settings which are specific
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>int</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">mayApplyMixingMatrix</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1 if applying a mixing matrix should be attempted, 0 if extra channels should be treated as 0 or dropped.  This is the same behavior as with Lav_simulationGetBlock.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1 if applying a mixing matrix should be attempted, 0 if extra channels should be treated as 0 or dropped.  This is the same behavior as with Lav_serverGetBlock.</p></td>
 </tr>
 </tbody>
 </table>
@@ -2919,12 +2895,12 @@ It is not possible for Libaudioverse to detect this case.</p>
 </table>
 </div>
 <div class="sect4">
-<h5 id="function-Lav_nodeConnectSimulation">Lav_nodeConnectSimulation</h5>
+<h5 id="function-Lav_nodeConnectServer">Lav_nodeConnectServer</h5>
 <div class="paragraph">
-<p>Prototype: <code>LavError Lav_nodeConnectSimulation(LavHandle nodeHandle, int output)</code></p>
+<p>Prototype: <code>LavError Lav_nodeConnectServer(LavHandle nodeHandle, int output)</code></p>
 </div>
 <div class="paragraph">
-<p>Connect the specified output of the specified node to the simulation&#8217;s input.</p>
+<p>Connect the specified output of the specified node to the server&#8217;s input.</p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Parameters</caption>
@@ -3603,12 +3579,12 @@ Properties with dynamic ranges change their ranges at specified times, as docume
 </table>
 </div>
 <div class="sect4">
-<h5 id="function-Lav_nodeGetSimulation">Lav_nodeGetSimulation</h5>
+<h5 id="function-Lav_nodeGetServer">Lav_nodeGetServer</h5>
 <div class="paragraph">
-<p>Prototype: <code>LavError Lav_nodeGetSimulation(LavHandle nodeHandle, LavHandle* destination)</code></p>
+<p>Prototype: <code>LavError Lav_nodeGetServer(LavHandle nodeHandle, LavHandle* destination)</code></p>
 </div>
 <div class="paragraph">
-<p>Get the simulation that a node belongs to.</p>
+<p>Get the server that a node belongs to.</p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Parameters</caption>
@@ -4601,7 +4577,7 @@ At the scheduled time of this automator, the envelope will begin being performed
 <p>Get the length of the specified buffer in samples.</p>
 </div>
 <div class="paragraph">
-<p>The sample rate of a buffer is the sample rate of the simulation for which that buffer was created.
+<p>The sample rate of a buffer is the sample rate of the server for which that buffer was created.
 This function is primarily useful for estimating ram usage in caching structures.</p>
 </div>
 <table class="tableblock frame-all grid-all spread">
@@ -4631,12 +4607,12 @@ This function is primarily useful for estimating ram usage in caching structures
 </table>
 </div>
 <div class="sect4">
-<h5 id="function-Lav_bufferGetSimulation">Lav_bufferGetSimulation</h5>
+<h5 id="function-Lav_bufferGetServer">Lav_bufferGetServer</h5>
 <div class="paragraph">
-<p>Prototype: <code>LavError Lav_bufferGetSimulation(LavHandle bufferHandle, LavHandle* destination)</code></p>
+<p>Prototype: <code>LavError Lav_bufferGetServer(LavHandle bufferHandle, LavHandle* destination)</code></p>
 </div>
 <div class="paragraph">
-<p>Get the handle of the simulation used to create this buffer.</p>
+<p>Get the handle of the server used to create this buffer.</p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Parameters</caption>
@@ -4719,7 +4695,7 @@ This function is primarily useful for estimating ram usage in caching structures
 <p>Prototype: <code>LavError Lav_bufferLoadFromFile(LavHandle bufferHandle, const char* path)</code></p>
 </div>
 <div class="paragraph">
-<p>Loads data into this buffer from a file. The file will be resampled to the sampling rate of the simulation. This will happen synchronously.</p>
+<p>Loads data into this buffer from a file. The file will be resampled to the sampling rate of the server. This will happen synchronously.</p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Parameters</caption>
@@ -4781,7 +4757,7 @@ The effect is to make sounds as loud as possible without clipping or otherwise d
 <div class="sect4">
 <h5 id="function-Lav_createBuffer">Lav_createBuffer</h5>
 <div class="paragraph">
-<p>Prototype: <code>LavError Lav_createBuffer(LavHandle simulationHandle, LavHandle* destination)</code></p>
+<p>Prototype: <code>LavError Lav_createBuffer(LavHandle serverHandle, LavHandle* destination)</code></p>
 </div>
 <div class="paragraph">
 <p>Create an empty buffer.</p>
@@ -4801,7 +4777,7 @@ The effect is to make sounds as loud as possible without clipping or otherwise d
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">simulationHandle</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">serverHandle</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The simulation to manipulate.</p></td>
 </tr>
 <tr>
@@ -4956,7 +4932,7 @@ The default is usually what you want.</p>
 <p>C Type Identifier: <code>Lav_OBJTYPE_ADDITIVE_SAW_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createAdditiveSawNode(LavHandle simulationHandle, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createAdditiveSawNode(LavHandle serverHandle, LavHandle* destination)</code></p>
 </div>
 <div class="paragraph">
 <p>This node has no inputs.</p>
@@ -5099,7 +5075,7 @@ This is measured in periods, not in radians.</p>
 <p>C Type Identifier: <code>Lav_OBJTYPE_ADDITIVE_SQUARE_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createAdditiveSquareNode(LavHandle simulationHandle, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createAdditiveSquareNode(LavHandle serverHandle, LavHandle* destination)</code></p>
 </div>
 <div class="paragraph">
 <p>This node has no inputs.</p>
@@ -5241,7 +5217,7 @@ This is measured in periods, not in radians.</p>
 <p>C Type Identifier: <code>Lav_OBJTYPE_ADDITIVE_TRIANGLE_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createAdditiveTriangleNode(LavHandle simulationHandle, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createAdditiveTriangleNode(LavHandle serverHandle, LavHandle* destination)</code></p>
 </div>
 <div class="paragraph">
 <p>This node has no inputs.</p>
@@ -5384,7 +5360,7 @@ This is measured in periods, not in radians.</p>
 <p>C Type Identifier: <code>Lav_OBJTYPE_ALLPASS_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createAllpassNode(LavHandle simulationHandle, int channels, int maxDelay, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createAllpassNode(LavHandle serverHandle, int channels, int maxDelay, LavHandle* destination)</code></p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Inputs</caption>
@@ -5529,7 +5505,7 @@ Note that for this node, it is impossible to get rid of the crossfade completely
 <p>C Type Identifier: <code>Lav_OBJTYPE_AMPLITUDE_PANNER_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createAmplitudePannerNode(LavHandle simulationHandle, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createAmplitudePannerNode(LavHandle serverHandle, LavHandle* destination)</code></p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Inputs</caption>
@@ -5715,7 +5691,7 @@ The possible standard configurations are found in the <a href="#enum-Lav_PANNING
 <p>C Type Identifier: <code>Lav_OBJTYPE_BIQUAD_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createBiquadNode(LavHandle simulationHandle, unsigned int channels, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createBiquadNode(LavHandle serverHandle, unsigned int channels, LavHandle* destination)</code></p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Inputs</caption>
@@ -5872,7 +5848,7 @@ It is found here:
 <p>C Type Identifier: <code>Lav_OBJTYPE_BLIT_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createBlitNode(LavHandle simulationHandle, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createBlitNode(LavHandle serverHandle, LavHandle* destination)</code></p>
 </div>
 <div class="paragraph">
 <p>This node has no inputs.</p>
@@ -6019,7 +5995,7 @@ The default is true.</p>
 <p>C Type Identifier: <code>Lav_OBJTYPE_BUFFER_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createBufferNode(LavHandle simulationHandle, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createBufferNode(LavHandle serverHandle, LavHandle* destination)</code></p>
 </div>
 <div class="paragraph">
 <p>This node has no inputs.</p>
@@ -6199,7 +6175,7 @@ Values less than 1.0 cause a decrease in pitch and values greater than 1.0 cause
 <p>C Type Identifier: <code>Lav_OBJTYPE_BUFFER_TIMELINE_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createBufferTimelineNode(LavHandle simulationHandle, int channels, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createBufferTimelineNode(LavHandle serverHandle, int channels, LavHandle* destination)</code></p>
 </div>
 <div class="paragraph">
 <p>This node has no inputs.</p>
@@ -6287,7 +6263,7 @@ The time is relative to now.</p>
 <p>C Type Identifier: <code>Lav_OBJTYPE_CHANNEL_MERGER_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createChannelMergerNode(LavHandle simulationHandle, int channels, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createChannelMergerNode(LavHandle serverHandle, int channels, LavHandle* destination)</code></p>
 </div>
 <div class="paragraph">
 <p>The number of inputs to this node depends on parameters to its constructor.</p>
@@ -6325,7 +6301,7 @@ modify the channels individually, and then merge them with this node.</p>
 <p>C Type Identifier: <code>Lav_OBJTYPE_CHANNEL_SPLITTER_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createChannelSplitterNode(LavHandle simulationHandle, int channels, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createChannelSplitterNode(LavHandle serverHandle, int channels, LavHandle* destination)</code></p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Inputs</caption>
@@ -6363,7 +6339,7 @@ modify the channels individually, and then merge them with a <a href="#node-Lav_
 <p>C Type Identifier: <code>Lav_OBJTYPE_CONVOLVER_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createConvolverNode(LavHandle simulationHandle, int channels, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createConvolverNode(LavHandle serverHandle, int channels, LavHandle* destination)</code></p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Inputs</caption>
@@ -6439,7 +6415,7 @@ modify the channels individually, and then merge them with a <a href="#node-Lav_
 <p>C Type Identifier: <code>Lav_OBJTYPE_CROSSFADER_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createCrossfaderNode(LavHandle simulationHandle, int channels, int inputs, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createCrossfaderNode(LavHandle serverHandle, int channels, int inputs, LavHandle* destination)</code></p>
 </div>
 <div class="paragraph">
 <p>The number of inputs to this node depends on parameters to its constructor.</p>
@@ -6637,7 +6613,7 @@ Crossfades of duration 0 do not fire the finished event.</p>
 <p>C Type Identifier: <code>Lav_OBJTYPE_CROSSFADING_DELAY_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createCrossfadingDelayNode(LavHandle simulationHandle, float maxDelay, int channels, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createCrossfadingDelayNode(LavHandle serverHandle, float maxDelay, int channels, LavHandle* destination)</code></p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Inputs</caption>
@@ -6774,99 +6750,12 @@ Note that for this node, it is impossible to get rid of the crossfade completely
 </div>
 </div>
 <div class="sect2">
-<h3 id="node-Lav_OBJTYPE_CUSTOM_NODE">Custom Node</h3>
-<div class="paragraph">
-<p>C Type Identifier: <code>Lav_OBJTYPE_CUSTOM_NODE</code></p>
-</div>
-<div class="paragraph">
-<p>Constructor: <code>LavError Lav_createCustomNode(LavHandle simulationHandle, unsigned int inputs, unsigned int channelsPerInput, unsigned int outputs, unsigned int channelsPerOutput, LavHandle* destination)</code></p>
-</div>
-<div class="paragraph">
-<p>The number of inputs to this node depends on parameters to its constructor.</p>
-</div>
-<div class="paragraph">
-<p>The number of outputs from this node depends on parameters to its constructor.</p>
-</div>
-<div class="paragraph">
-<p>This node&#8217;s processing depends solely on a user-defined callback.
-It has a specific number of inputs and outputs which are aggregated into individual channels.
-The callback is then called for every block of audio.
-If implementing a custom node, it is required that you handle all communication yourself.</p>
-</div>
-<div class="sect3">
-<h4 id="_callbacks_3">Callbacks</h4>
-<div class="sect4">
-<h5 id="_processing">processing</h5>
-<div class="paragraph">
-<p>Setter: LavError Lav_customNodeSetProcessingCallback(LavHandle nodeHandle, LavCustomNodeProcessingCallback callback, void* userdata)</p>
-</div>
-<div class="paragraph">
-<p>Callback Prototype: void (LavHandle nodeHandle, unsigned int frames, unsigned int numInputs, float** inputs, unsigned int numOutputs, float** outputs, void* userdata)</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Callback Parameters</caption>
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">nodeHandle</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The node which called this callback.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>unsigned int</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">frames</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The number of frames to process.  This should always be the block size of the associated simulation.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>unsigned int</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">numInputs</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The number of inputs of the node.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float**</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">inputs</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">An array of buffers representing the input audio.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>unsigned int</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">numOutputs</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The number of outputs of the node.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float**</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">outputs</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">An array of buffers representing the audio output.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>void*</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">userdata</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The userdata parameter as passed to the setter for this callback.</p></td>
-</tr>
-</tbody>
-</table>
-<div class="paragraph">
-<p>Called to process audio.
-If implementing a custom node, the custom node behaves as identity until this callback is set.</p>
-</div>
-</div>
-</div>
-</div>
-<div class="sect2">
 <h3 id="node-Lav_OBJTYPE_DC_BLOCKER_NODE">Dc Blocker Node</h3>
 <div class="paragraph">
 <p>C Type Identifier: <code>Lav_OBJTYPE_DC_BLOCKER_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createDcBlockerNode(LavHandle simulationHandle, int channels, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createDcBlockerNode(LavHandle serverHandle, int channels, LavHandle* destination)</code></p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Inputs</caption>
@@ -6921,7 +6810,7 @@ For any sampling rate, this node is the best first-order section for DC removal 
 <p>C Type Identifier: <code>Lav_OBJTYPE_DOPPLERING_DELAY_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createDoppleringDelayNode(LavHandle simulationHandle, float maxDelay, int channels, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createDoppleringDelayNode(LavHandle serverHandle, float maxDelay, int channels, LavHandle* destination)</code></p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Inputs</caption>
@@ -7043,7 +6932,7 @@ Note that for this node, it is impossible to get rid of the crossfade completely
 <p>C Type Identifier: <code>Lav_OBJTYPE_ENVIRONMENT_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createEnvironmentNode(LavHandle simulationHandle, const char* hrtfPath, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createEnvironmentNode(LavHandle serverHandle, const char* hrtfPath, LavHandle* destination)</code></p>
 </div>
 <div class="paragraph">
 <p>This node has no inputs.</p>
@@ -7423,7 +7312,7 @@ When the buffer finishes playing, the source is automatically disposed of.</p>
 <p>C Type Identifier: <code>Lav_OBJTYPE_FDN_REVERB_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createFdnReverbNode(LavHandle simulationHandle, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createFdnReverbNode(LavHandle serverHandle, LavHandle* destination)</code></p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Inputs</caption>
@@ -7592,7 +7481,7 @@ Extremely low values sound "grainy"; extremely high values tend to resonate.</p>
 <p>C Type Identifier: <code>Lav_OBJTYPE_FEEDBACK_DELAY_NETWORK_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createFeedbackDelayNetworkNode(LavHandle simulationHandle, float maxDelay, int channels, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createFeedbackDelayNetworkNode(LavHandle serverHandle, float maxDelay, int channels, LavHandle* destination)</code></p>
 </div>
 <div class="paragraph">
 <p>The inputs of this node are described below.</p>
@@ -7738,7 +7627,7 @@ The array for this property allows any floating point values, and must be exactl
 <p>C Type Identifier: <code>Lav_OBJTYPE_FFT_CONVOLVER_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createFftConvolverNode(LavHandle simulationHandle, int channels, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createFftConvolverNode(LavHandle serverHandle, int channels, LavHandle* destination)</code></p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Inputs</caption>
@@ -7892,7 +7781,7 @@ This node is capable of handling impulses longer than a second, a case for which
 <p>C Type Identifier: <code>Lav_OBJTYPE_FILE_STREAMER_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createFileStreamerNode(LavHandle simulationHandle, const char* path, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createFileStreamerNode(LavHandle serverHandle, const char* path, LavHandle* destination)</code></p>
 </div>
 <div class="paragraph">
 <p>This node has no inputs.</p>
@@ -7992,7 +7881,7 @@ Note that this property may be slightly inaccurate because this node has to pass
 </div>
 </div>
 <div class="sect3">
-<h4 id="_callbacks_4">Callbacks</h4>
+<h4 id="_callbacks_3">Callbacks</h4>
 <div class="sect4">
 <h5 id="_end_2">end</h5>
 <div class="paragraph">
@@ -8039,7 +7928,7 @@ When called, ended will be set to true,.</p>
 <p>C Type Identifier: <code>Lav_OBJTYPE_FILTERED_DELAY_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createFilteredDelayNode(LavHandle simulationHandle, float maxDelay, unsigned int channels, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createFilteredDelayNode(LavHandle serverHandle, float maxDelay, unsigned int channels, LavHandle* destination)</code></p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Inputs</caption>
@@ -8282,7 +8171,7 @@ It is found here:
 <p>C Type Identifier: <code>Lav_OBJTYPE_FIRST_ORDER_FILTER_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createFirstOrderFilterNode(LavHandle simulationHandle, int channels, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createFirstOrderFilterNode(LavHandle serverHandle, int channels, LavHandle* destination)</code></p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Inputs</caption>
@@ -8502,7 +8391,7 @@ This is equivalent to the <a href="#node-Lav_OBJTYPE_ONE_POLE_FILTER_NODE">One-P
 <p>C Type Identifier: <code>Lav_OBJTYPE_GAIN_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createGainNode(LavHandle simulationHandle, int channels, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createGainNode(LavHandle serverHandle, int channels, LavHandle* destination)</code></p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Inputs</caption>
@@ -8556,7 +8445,7 @@ One possible use is as a simple mixer: point all the nodes to be mixed at the in
 <p>C Type Identifier: <code>Lav_OBJTYPE_GRAPH_LISTENER_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createGraphListenerNode(LavHandle simulationHandle, unsigned int channels, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createGraphListenerNode(LavHandle serverHandle, unsigned int channels, LavHandle* destination)</code></p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Inputs</caption>
@@ -8604,7 +8493,7 @@ The callback is passed pointers to the audio data passing through this node for 
 The effect is that this node allows observing audio passing through any location in the audio graph.</p>
 </div>
 <div class="sect3">
-<h4 id="_callbacks_5">Callbacks</h4>
+<h4 id="_callbacks_4">Callbacks</h4>
 <div class="sect4">
 <h5 id="_listening">listening</h5>
 <div class="paragraph">
@@ -8666,7 +8555,7 @@ This callback is called inside the audio threads; do not block.</p>
 <p>C Type Identifier: <code>Lav_OBJTYPE_HARD_LIMITER_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createHardLimiterNode(LavHandle simulationHandle, int channels, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createHardLimiterNode(LavHandle serverHandle, int channels, LavHandle* destination)</code></p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Inputs</caption>
@@ -8720,7 +8609,7 @@ Note that the 3D API handles hard limiting appropriately, and you do not need to
 <p>C Type Identifier: <code>Lav_OBJTYPE_HRTF_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createHrtfNode(LavHandle simulationHandle, const char* hrtfPath, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createHrtfNode(LavHandle serverHandle, const char* hrtfPath, LavHandle* destination)</code></p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Inputs</caption>
@@ -8842,7 +8731,7 @@ Unlike other panner types, the audio artifacts produced by disabling crossfading
 <p>C Type Identifier: <code>Lav_OBJTYPE_IIR_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createIirNode(LavHandle simulationHandle, int channels, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createIirNode(LavHandle serverHandle, int channels, LavHandle* destination)</code></p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Inputs</caption>
@@ -8953,7 +8842,7 @@ To configure this node, use the function Lav_iirNodeSetCoefficients.</p>
 <p>C Type Identifier: <code>Lav_OBJTYPE_LEAKY_INTEGRATOR_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createLeakyIntegratorNode(LavHandle simulationHandle, int channels, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createLeakyIntegratorNode(LavHandle serverHandle, int channels, LavHandle* destination)</code></p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Inputs</caption>
@@ -9035,7 +8924,7 @@ If you feed this node a signal that is zero, it will slowly decrease the output 
 <p>C Type Identifier: <code>Lav_OBJTYPE_MULTIPANNER_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createMultipannerNode(LavHandle simulationHandle, char* hrtfPath, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createMultipannerNode(LavHandle serverHandle, char* hrtfPath, LavHandle* destination)</code></p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Inputs</caption>
@@ -9174,359 +9063,12 @@ For something more nontraditional, use an amplitude panner.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="node-Lav_OBJTYPE_NESTED_ALLPASS_NETWORK_NODE">Nested Allpass Network Node</h3>
-<div class="paragraph">
-<p>C Type Identifier: <code>Lav_OBJTYPE_NESTED_ALLPASS_NETWORK_NODE</code></p>
-</div>
-<div class="paragraph">
-<p>Constructor: <code>LavError Lav_createNestedAllpassNetworkNode(LavHandle simulationHandle, int channels, LavHandle* destination)</code></p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Inputs</caption>
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Index</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Channels</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The number of channels for this input depends on parameters to this node&#8217;s constructor.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The signal to filter.</p></td>
-</tr>
-</tbody>
-</table>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Outputs</caption>
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Index</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Channels</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The number of channels for this output depends on parameters to this node&#8217;s constructor.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The filtered signal.</p></td>
-</tr>
-</tbody>
-</table>
-<div class="paragraph">
-<p>This node is deprecated.
-A more capable node along the same lines is planned, at which point this one will disappear.</p>
-</div>
-<div class="paragraph">
-<p>This node implements nested first-order allpass filters.</p>
-</div>
-<div class="paragraph">
-<p>In order to specify how this nesting works, one must call the various control functions.
-This node&#8217;s operation is somewhat analogous to old-style OpenGL programming: there is an implicit context that is manipulated via calling functions, as opposed to a set of properties to be set.</p>
-</div>
-<div class="paragraph">
-<p>Filters may be appended in series.
-At any time, however, it is possible to append a nested allpass filter.
-When a nested allpass filter is appended, any new filters are appended to the end of the nested allpass&#8217;s delay line; call the function Lav_nestedAllpassNodeEndNesting to end nesting and return to the previous level.
-Multiple levels of nesting are supported.</p>
-</div>
-<div class="paragraph">
-<p>In order to read this node&#8217;s output, be sure to call Lav_nestedAllpassNetworkNodeAppendReader; any audio that heads through this special no-op filter will be read and placed in this node&#8217;s output buffers.</p>
-</div>
-<div class="paragraph">
-<p>In order to finalize the construction of a network, call Lav_nestedAllpassNetworkNodeCompile.
-This function takes all previously issued commands, wraps them up, and uses them to replace the current network.
-After a call to this function, all subsequent commands are building a new network whose changes will not  be heard until this function is called.</p>
-</div>
-<div class="paragraph">
-<p>The default configuration of this node is silence.  To return to this configuration at any time, call Lav_nestedAllpassNetworkNodeCompile without issuing any commands first.</p>
-</div>
-<div class="paragraph">
-<p>Note that this node is extremely slow as compared to other Libaudioverse nodes.
-The primary use of this node is for experimentation purposes and the development of faster Libaudioverse nodes.</p>
-</div>
-<div class="sect3">
-<h4 id="_extra_functions_8">Extra Functions</h4>
-<div class="sect4">
-<h5 id="function-Lav_nestedAllpassNetworkNodeAppendAllpass">append_allpass</h5>
-<div class="paragraph">
-<p>Prototype: <code>LavError Lav_nestedAllpassNetworkNodeAppendAllpass(LavHandle nodeHandle, int delay, float coefficient)</code></p>
-</div>
-<div class="paragraph">
-<p>Append an ordinary first-order allpass at the current nesting level.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Parameters</caption>
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">nodeHandle</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The node to manipulate.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>int</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">delay</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The delay of the allpass in samples.  Must be at least 1.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">coefficient</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The coefficient of the allpass.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect4">
-<h5 id="function-Lav_nestedAllpassNetworkNodeAppendBiquad">append_biquad</h5>
-<div class="paragraph">
-<p>Prototype: <code>LavError Lav_nestedAllpassNetworkNodeAppendBiquad(LavHandle nodeHandle, int type, double frequency, double dbGain, double q)</code></p>
-</div>
-<div class="paragraph">
-<p>Append a biquad filter.
-This is the same as the <a href="#node-Lav_OBJTYPE_BIQUAD_NODE">biquad filter node</a>.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Parameters</caption>
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">nodeHandle</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The node to manipulate.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>int</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">type</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A value from the <a href="#enum-Lav_BIQUAD_TYPES">Lav_BIQUAD_TYPES</a> enum.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">frequency</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The frequency of interest.  The meaning is determined from the filter type.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">dbGain</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Used for some filter types, namely highshelf, lowshelf, and notch.  values are in DB.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>double</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">q</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The q of the filter.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect4">
-<h5 id="function-Lav_nestedAllpassNetworkNodeAppendOnePole">append_one_pole</h5>
-<div class="paragraph">
-<p>Prototype: <code>LavError Lav_nestedAllpassNetworkNodeAppendOnePole(LavHandle nodeHandle, float frequency, int isHighpass)</code></p>
-</div>
-<div class="paragraph">
-<p>Appenda  one-pole filter.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Parameters</caption>
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">nodeHandle</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The node to manipulate.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">frequency</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The <code>-3 DB</code> frequency.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>int</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">isHighpass</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0 for lowpass, 1 for highpass.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect4">
-<h5 id="function-Lav_nestedAllpassNetworkNodeAppendReader">append_reader</h5>
-<div class="paragraph">
-<p>Prototype: <code>LavError Lav_nestedAllpassNetworkNodeAppendReader(LavHandle nodeHandle, float mul)</code></p>
-</div>
-<div class="paragraph">
-<p>The output will include audio from wherever this is appended.
-You need to call this function at least once, or your configured filter will be silent.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Parameters</caption>
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">nodeHandle</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The node to manipulate.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">mul</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The volume of the reader.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect4">
-<h5 id="function-Lav_nestedAllpassNetworkNodeBeginNesting">begin_nesting</h5>
-<div class="paragraph">
-<p>Prototype: <code>LavError Lav_nestedAllpassNetworkNodeBeginNesting(LavHandle nodeHandle, int delay, float coefficient)</code></p>
-</div>
-<div class="paragraph">
-<p>Append a first-order direct form II allpass to the current network, and move our focus inside it.
-All appended filters will be appended to the allpass&#8217;s internal delay line until such time as you call Lav_nestedAllpassNetworkNodeEndNesting.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Parameters</caption>
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">nodeHandle</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The node to manipulate.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>int</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">delay</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The delay of the newly created allpass in samples.  This must be at least 1.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>float</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">coefficient</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The coefficient of the new allpass.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect4">
-<h5 id="function-Lav_nestedAllpassNetworkNodeCompile">compile</h5>
-<div class="paragraph">
-<p>Prototype: <code>LavError Lav_nestedAllpassNetworkNodeCompile(LavHandle nodeHandle)</code></p>
-</div>
-<div class="paragraph">
-<p>Compile the current set of commands, replace the currently running filter with the new one, and clear the current set of commands.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Parameters</caption>
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">nodeHandle</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The node to manipulate.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect4">
-<h5 id="function-Lav_nestedAllpassNetworkNodeEndNesting">end_nesting</h5>
-<div class="paragraph">
-<p>Prototype: <code>LavError Lav_nestedAllpassNetworkNodeEndNesting(LavHandle nodeHandle)</code></p>
-</div>
-<div class="paragraph">
-<p>End the current nesting.
-This moves the focus to the end of the allpass filter which we are currently nesting inside of.
-Behavior is undefined if this function is called without an enclosing allpass filter, but will probably crash the application.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Parameters</caption>
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">nodeHandle</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The node to manipulate.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-<div class="sect2">
 <h3 id="node-Lav_OBJTYPE_NOISE_NODE">Noise Generator Node</h3>
 <div class="paragraph">
 <p>C Type Identifier: <code>Lav_OBJTYPE_NOISE_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createNoiseNode(LavHandle simulationHandle, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createNoiseNode(LavHandle serverHandle, LavHandle* destination)</code></p>
 </div>
 <div class="paragraph">
 <p>This node has no inputs.</p>
@@ -9605,7 +9147,7 @@ Turning it on is sometimes helpful and sometimes not.</p>
 <p>C Type Identifier: <code>Lav_OBJTYPE_ONE_POLE_FILTER_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createOnePoleFilterNode(LavHandle simulationHandle, int channels, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createOnePoleFilterNode(LavHandle serverHandle, int channels, LavHandle* destination)</code></p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Inputs</caption>
@@ -9717,7 +9259,7 @@ If said property is true, the filter becomes a highpass.</p>
 <p>C Type Identifier: <code>Lav_OBJTYPE_PULL_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createPullNode(LavHandle simulationHandle, unsigned int sr, unsigned int channels, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createPullNode(LavHandle serverHandle, unsigned int sr, unsigned int channels, LavHandle* destination)</code></p>
 </div>
 <div class="paragraph">
 <p>This node has no inputs.</p>
@@ -9747,7 +9289,7 @@ If said property is true, the filter becomes a highpass.</p>
 The purpose of this node is to inject audio from an external source that Libaudioverse does not support, for example a custom network protocol.</p>
 </div>
 <div class="sect3">
-<h4 id="_callbacks_6">Callbacks</h4>
+<h4 id="_callbacks_5">Callbacks</h4>
 <div class="sect4">
 <h5 id="_audio">audio</h5>
 <div class="paragraph">
@@ -9808,7 +9350,7 @@ The purpose of this node is to inject audio from an external source that Libaudi
 <p>C Type Identifier: <code>Lav_OBJTYPE_PUSH_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createPushNode(LavHandle simulationHandle, unsigned int sr, unsigned int channels, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createPushNode(LavHandle serverHandle, unsigned int sr, unsigned int channels, LavHandle* destination)</code></p>
 </div>
 <div class="paragraph">
 <p>This node has no inputs.</p>
@@ -9865,7 +9407,7 @@ ability to cover for missing frames, you need a pull node.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_callbacks_7">Callbacks</h4>
+<h4 id="_callbacks_6">Callbacks</h4>
 <div class="sect4">
 <h5 id="_low">low</h5>
 <div class="paragraph">
@@ -9942,7 +9484,7 @@ ability to cover for missing frames, you need a pull node.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_extra_functions_9">Extra Functions</h4>
+<h4 id="_extra_functions_8">Extra Functions</h4>
 <div class="sect4">
 <h5 id="function-Lav_pushNodeFeed">feed</h5>
 <div class="paragraph">
@@ -9990,7 +9532,7 @@ ability to cover for missing frames, you need a pull node.</p>
 <p>C Type Identifier: <code>Lav_OBJTYPE_RECORDER_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createRecorderNode(LavHandle simulationHandle, int channels, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createRecorderNode(LavHandle serverHandle, int channels, LavHandle* destination)</code></p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Inputs</caption>
@@ -10047,7 +9589,7 @@ If you don&#8217;t, no recording will take place.</p>
 Failure to do so may lead to any of a number of surprising results.</p>
 </div>
 <div class="sect3">
-<h4 id="_extra_functions_10">Extra Functions</h4>
+<h4 id="_extra_functions_9">Extra Functions</h4>
 <div class="sect4">
 <h5 id="function-Lav_recorderNodeStartRecording">start_recording</h5>
 <div class="paragraph">
@@ -10126,7 +9668,7 @@ Failure to do so may lead to any of a number of undesirable problems.</p>
 <p>C Type Identifier: <code>Lav_OBJTYPE_RINGMOD_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createRingmodNode(LavHandle simulationHandle, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createRingmodNode(LavHandle serverHandle, LavHandle* destination)</code></p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Inputs</caption>
@@ -10184,7 +9726,7 @@ The two inputs will be converted to mono and then multiplied, before being sent 
 <p>C Type Identifier: <code>Lav_OBJTYPE_SINE_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createSineNode(LavHandle simulationHandle, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createSineNode(LavHandle serverHandle, LavHandle* destination)</code></p>
 </div>
 <div class="paragraph">
 <p>This node has no inputs.</p>
@@ -10289,7 +9831,7 @@ This is measured in periods, not in radians.</p>
 <p>C Type Identifier: <code>Lav_OBJTYPE_SOURCE_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createSourceNode(LavHandle simulationHandle, LavHandle environmentHandle, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createSourceNode(LavHandle serverHandle, LavHandle environmentHandle, LavHandle* destination)</code></p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Inputs</caption>
@@ -10594,7 +10136,7 @@ Size currently has no other effect.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_extra_functions_11">Extra Functions</h4>
+<h4 id="_extra_functions_10">Extra Functions</h4>
 <div class="sect4">
 <h5 id="function-Lav_sourceNodeFeedEffect">feed_effect</h5>
 <div class="paragraph">
@@ -10671,7 +10213,7 @@ Size currently has no other effect.</p>
 <p>C Type Identifier: <code>Lav_OBJTYPE_THREE_BAND_EQ_NODE</code></p>
 </div>
 <div class="paragraph">
-<p>Constructor: <code>LavError Lav_createThreeBandEqNode(LavHandle simulationHandle, int channels, LavHandle* destination)</code></p>
+<p>Constructor: <code>LavError Lav_createThreeBandEqNode(LavHandle serverHandle, int channels, LavHandle* destination)</code></p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Inputs</caption>
@@ -10852,105 +10394,6 @@ This is the least expensive of the Libaudioverse equalizers, and is sufficient f
 This section concerns itself only with those enumerations that are important by themselves.</p>
 </div>
 <div class="sect2">
-<h3 id="enum-Lav_ERRORS">Lav_ERRORS</h3>
-<div class="paragraph">
-<p>All functions in this library return one of the following enum values, indicating their error condition.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Members</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_NONE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">No error occured.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_UNKNOWN</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Something went wrong.  This error indicates that we couldn&#8217;t figure out what.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_TYPE_MISMATCH</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates an attempt to manipulate a property through a function that does not work with that property&#8217;s type.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_INVALID_PROPERTY</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">An attempt to access a property which does not exist on the specified node.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_NULL_POINTER</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">You passed a null pointer into Libaudioverse in a context where null pointers are not allowed.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_MEMORY</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Libaudioverse triedd to allocate a pointer, but could not.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_INVALID_POINTER</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Attempt to free a pointer that Libaudioverse doesn&#8217;t know about.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_INVALID_HANDLE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A value passed in as a handle is not currently a handle which is valid.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_RANGE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A function parameter is not within a valid range.  This could be setting property values outside their range, accessing inputs and outputs that do not exist, or any of a variety of other range error conditions.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_CANNOT_INIT_AUDIO</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The audio subsystem could not be initialized.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_FILE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Represents a miscelaneous file error.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_FILE_NOT_FOUND</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Libaudioverse could not find a specified file.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_HRTF_INVALID</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">An attempt to use an invalid HRTF database.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_CANNOT_CROSS_SIMULATIONS</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">An attempt was made to relate two objects from different simulations. This could be assigning to buffer properties, connecting nodes, or any other such condition.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_CAUSES_CYCLE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The requested operation would cause a cycle in the graph of nodes that need processing.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_PROPERTY_IS_READ_ONLY</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Attempt to set a read-only property.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_OVERLAPPING_AUTOMATORS</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">An attempt to schedule an automator within the duration of another.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_CANNOT_CONNECT_TO_PROPERTY</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Attempt to connect a node to a property which cannot be automated.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_BUFFER_IN_USE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates an attempt to modify a buffer while something is reading its data.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_INTERNAL</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">If you see this error, it&#8217;s a bug.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
 <h3 id="enum-Lav_FDN_FILTER_TYPES">Lav_FDN_FILTER_TYPES</h3>
 <div class="paragraph">
 <p>Possible filter types for a feedback delay network&#8217;s feedback path.</p>
@@ -10977,41 +10420,6 @@ This section concerns itself only with those enumerations that are important by 
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Lav_FDN_FILTER_TYPE_HIGHPASS</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Insert highpass filters on the FDN&#8217;s feedback path.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="enum-Lav_LOGGING_LEVELS">Lav_LOGGING_LEVELS</h3>
-<div class="paragraph">
-<p>Possible levels for logging.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Members</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_CRITICAL</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Logs critical messages such as failures to initialize and error conditions.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_INFO</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Logs informative messages.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_DEBUG</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Logs everything possible.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_OFF</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">No log messages will be generated.</p></td>
 </tr>
 </tbody>
 </table>
@@ -11103,118 +10511,6 @@ This section concerns itself only with those enumerations that are important by 
 </table>
 </div>
 <div class="sect2">
-<h3 id="enum-Lav_NODE_STATES">Lav_NODE_STATES</h3>
-<div class="paragraph">
-<p>used to indicate the state of a node.
-This is the value of the node&#8217;s state property and determins how the node is processed.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Members</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NODESTATE_PAUSED</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">This node is paused.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NODESTATE_PLAYING</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">This node advances if other nodes need audio from it.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NODESTATE_ALWAYS_PLAYING</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">This node advances always.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="enum-Lav_PANNING_STRATEGIES">Lav_PANNING_STRATEGIES</h3>
-<div class="paragraph">
-<p>Indicates a strategy to use for panning.
-This is mostly for the <a href="#node-Lav_OBJTYPE_MULTIPANNER_NODE">multipanner node</a> and the 3D components of this library.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Members</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_DELEGATE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Delegate the decision. Used for 3D sources.  If there is nowhere to delegate to, assumes <code>Lav_PANNING_STRATEGY_STEREO</code>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_HRTF</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates HRTF panning.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_STEREO</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates stereo panning.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_SURROUND40</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates 4.0 surround sound (quadraphonic) panning.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_SURROUND51</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates 5.1 surround sound panning.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_SURROUND71</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates 7.1 surround sound panning.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="enum-Lav_DISTANCE_MODELS">Lav_DISTANCE_MODELS</h3>
-<div class="paragraph">
-<p>used in the 3D components of this library.
-Indicates how sound should become quieter as objects move away from the listener.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Members</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_DELEGATE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Delegate to another node, if we can.  Otherwise, fall back to <code>Lav_DISTANCE_MODEL_LINEAR</code>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_LINEAR</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Sound falls off as <code>1-(distance/maxDistance)</code>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_EXPONENTIAL</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Sounds fall off as <code>1/distance</code>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_INVERSE_SQUARE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Sounds fall off as <code>1/min(distance, maxDistance)^2</code>.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
 <h3 id="enum-Lav_PROPERTY_TYPES">Lav_PROPERTY_TYPES</h3>
 <div class="paragraph">
 <p>Indicates the type of a property.</p>
@@ -11296,12 +10592,262 @@ Indicates how sound should become quieter as objects move away from the listener
 </tbody>
 </table>
 </div>
+<div class="sect2">
+<h3 id="enum-Lav_LOGGING_LEVELS">Lav_LOGGING_LEVELS</h3>
+<div class="paragraph">
+<p>Possible levels for logging.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Members</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_CRITICAL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Logs critical messages such as failures to initialize and error conditions.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_INFO</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Logs informative messages.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_DEBUG</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Logs everything possible.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_OFF</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No log messages will be generated.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="enum-Lav_DISTANCE_MODELS">Lav_DISTANCE_MODELS</h3>
+<div class="paragraph">
+<p>used in the 3D components of this library.
+Indicates how sound should become quieter as objects move away from the listener.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Members</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_DELEGATE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Delegate to another node, if we can.  Otherwise, fall back to <code>Lav_DISTANCE_MODEL_LINEAR</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_LINEAR</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sound falls off as <code>1-(distance/maxDistance)</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_EXPONENTIAL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sounds fall off as <code>1/distance</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_INVERSE_SQUARE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sounds fall off as <code>1/min(distance, maxDistance)^2</code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="enum-Lav_ERRORS">Lav_ERRORS</h3>
+<div class="paragraph">
+<p>All functions in this library return one of the following enum values, indicating their error condition.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Members</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_NONE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No error occured.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_UNKNOWN</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Something went wrong.  This error indicates that we couldn&#8217;t figure out what.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_TYPE_MISMATCH</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates an attempt to manipulate a property through a function that does not work with that property&#8217;s type.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_INVALID_PROPERTY</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An attempt to access a property which does not exist on the specified node.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_NULL_POINTER</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">You passed a null pointer into Libaudioverse in a context where null pointers are not allowed.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_MEMORY</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Libaudioverse triedd to allocate a pointer, but could not.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_INVALID_POINTER</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Attempt to free a pointer that Libaudioverse doesn&#8217;t know about.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_INVALID_HANDLE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A value passed in as a handle is not currently a handle which is valid.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_RANGE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A function parameter is not within a valid range.  This could be setting property values outside their range, accessing inputs and outputs that do not exist, or any of a variety of other range error conditions.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_CANNOT_INIT_AUDIO</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The audio subsystem could not be initialized.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_NO_SUCH_DEVICE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Attempt to use an I/O device that doesn&#8217;t exist.  In addition to being caused by your code, this can happen if the user unplugs the device.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_FILE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Represents a miscelaneous file error.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_FILE_NOT_FOUND</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Libaudioverse could not find a specified file.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_HRTF_INVALID</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An attempt to use an invalid HRTF database.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_CANNOT_CROSS_SERVERS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An attempt was made to relate two objects from different servers. This could be assigning to buffer properties, connecting nodes, or any other such condition.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_CAUSES_CYCLE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The requested operation would cause a cycle in the graph of nodes that need processing.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_PROPERTY_IS_READ_ONLY</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Attempt to set a read-only property.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_OVERLAPPING_AUTOMATORS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An attempt to schedule an automator within the duration of another.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_CANNOT_CONNECT_TO_PROPERTY</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Attempt to connect a node to a property which cannot be automated.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_BUFFER_IN_USE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates an attempt to modify a buffer while something is reading its data.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_ERROR_INTERNAL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If you see this error, it&#8217;s a bug.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="enum-Lav_PANNING_STRATEGIES">Lav_PANNING_STRATEGIES</h3>
+<div class="paragraph">
+<p>Indicates a strategy to use for panning.
+This is mostly for the <a href="#node-Lav_OBJTYPE_MULTIPANNER_NODE">multipanner node</a> and the 3D components of this library.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Members</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_DELEGATE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Delegate the decision. Used for 3D sources.  If there is nowhere to delegate to, assumes <code>Lav_PANNING_STRATEGY_STEREO</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_HRTF</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates HRTF panning.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_STEREO</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates stereo panning.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_SURROUND40</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates 4.0 surround sound (quadraphonic) panning.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_SURROUND51</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates 5.1 surround sound panning.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_SURROUND71</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates 7.1 surround sound panning.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="enum-Lav_NODE_STATES">Lav_NODE_STATES</h3>
+<div class="paragraph">
+<p>used to indicate the state of a node.
+This is the value of the node&#8217;s state property and determins how the node is processed.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Members</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NODESTATE_PAUSED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This node is paused.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NODESTATE_PLAYING</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This node advances if other nodes need audio from it.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NODESTATE_ALWAYS_PLAYING</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This node advances always.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-05-20 21:20:41 Greenwich Standard Time
+Last updated 2016-05-22 20:25:14 Greenwich Standard Time
 </div>
 </div>
 <script type="text/x-mathjax-config">
