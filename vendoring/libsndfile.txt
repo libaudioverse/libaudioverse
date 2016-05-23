@@ -1,6 +1,11 @@
 if(${MSVC})
-set(LIBSNDFILE_LOCATION "C:/Program Files (x86)/Mega-Nerd/libsndfile" CACHE STRING "The location of Libsndfile. Effects only Windows.")
+if(${CMAKE_CL_64})
+SET(PFILES "Program Files")
+else()
+SET(PFILES "Program Files (x86)")
+endif()
 
+SET(LIBSNDFILE_LOCATION "C:/${PFILES}/Mega-Nerd/libsndfile" CACHE STRING "The location of Libsndfile. Effects only Windows.")
 SET(LIBSNDFILE_INCLUDE_DIR "${LIBSNDFILE_LOCATION}/include")
 SET(LIBSNDFILE_LIBRARY_DIR "${LIBSNDFILE_LOCATION}/lib")
 SET(LIBSNDFILE_BINARY_DIR "${LIBSNDFILE_LOCATION}/bin")

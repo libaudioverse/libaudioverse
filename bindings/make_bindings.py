@@ -6,12 +6,6 @@ import shutil
 import copy
 import platform
 
-if os.name == 'nt':
-    libsndfile_prefix = os.getenv("LIBSNDFILE_LOCATION", r"C:\Program Files (x86)\Mega-Nerd\libsndfile")
-    libsndfile_path = os.path.join(libsndfile_prefix, "bin")
-else:
-    libsndfile_path = None
-
 generators = {
 'python' : make_python,
 }
@@ -37,11 +31,10 @@ def write_files(files, source_dir, dest_dir):
             os.makedirs(path)
         shutil.copy(os.path.join(get_info.get_root_directory(), 'build', 'libaudioverse.dll'), os.path.join(path, 'libaudioverse.dll'))
         #copy libsndfile
-        if libsndfile_path is not None:
-            path = os.path.join(dest_dir, files.get('libsndfile_location', ''))
-            if not os.path.exists(path):
-                os.makedirs(path)
-            shutil.copy(os.path.join(libsndfile_path, 'libsndfile-1.dll'), os.path.join(path, 'libsndfile-1.dll'))
+        path = os.path.join(dest_dir, files.get('libsndfile_location', ''))
+        if not os.path.exists(path):
+            os.makedirs(path)
+        shutil.copy(os.path.join(get_info.get_root_directory(), "build", 'libsndfile-1.dll'), os.path.join(path, 'libsndfile-1.dll'))
     #copy additional directories
     for i in files.get('additional_directories', []):
         shutil.copytree(os.path.join(source_dir, i), os.path.join(dest_dir, i))
