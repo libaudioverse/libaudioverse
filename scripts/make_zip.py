@@ -1,6 +1,11 @@
 import os.path
 import distutils.util
 import zipfile
+import platform
+
+if platform.system() != "Windows":
+    print("Not Windows. Cannot currently generate zip.")
+    sys.exit(0)
 
 
 root_dir = os.path.split(os.path.split(os.path.abspath(__file__))[0])[0]
