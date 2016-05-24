@@ -11,6 +11,7 @@ import platform
 import pypandoc
 import glob
 import distutils.util
+from .releasing import *
 
 ctypes_map = {
 'int' : 'ctypes.c_int',

@@ -74,8 +74,11 @@ def get_git_revision():
         revision = "could not be determined"
     return revision
 
+def get_tag():
+    return os.getenv("APPVEYOR_REPO_TAG_NAME")
+
 def get_version():
-    version = os.getenv("APPVEYOR_REPO_TAG_NAME")
+    version = get_tag()
     if not version:
         return "development"
     version = re.match("(test)*release-(.+)", version)
@@ -83,6 +86,12 @@ def get_version():
         return "development"
     version = version.group(2)
     return version
+
+def is_test_release():
+    return get_tag() is not None and get_tag().startswith("testrelease-")
+
+def is_release():
+    return is_test_release() or (get_tag() is not None and get_tag().startswith("release-"))
 
 def get_flags():
     lines = []

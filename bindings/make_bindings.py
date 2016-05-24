@@ -7,7 +7,7 @@ import copy
 import platform
 
 generators = {
-'python' : (python.make_python, python.artifacts),
+'python' : (python.make_python, python.artifacts, python.release),
 }
 
 def write_files(files, source_dir, dest_dir):
@@ -45,7 +45,7 @@ def make_bindings():
     all_info = get_info.get_all_info()
     artifacts = []
     for name, funcs in generators.items():
-        generator, artifacts = funcs
+        generator, artifacts, release = funcs
         #we copy so that the generators can modify data as they need.
         files = generator(copy.deepcopy(all_info))
         source_dir = os.path.join(get_info.get_root_directory(), 'bindings', name)
@@ -59,3 +59,6 @@ def make_bindings():
             name = os.path.split(i)[1]
             dest = os.path.join(get_info.get_root_directory(), "build", "artifacts", name)
             shutil.copy(i, os.path.join(get_info.get_root_directory(), "build", "artifacts", name))
+        if get_info.is_release():
+            print("Releasing", name)
+            release(dest_dir)
