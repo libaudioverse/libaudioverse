@@ -104,3 +104,12 @@ after_build:
 
 artifacts:
   - path: 'build\artifacts\*'
+
+#GitHub deployment.
+deploy:
+  provider: GitHub
+  description: Libaudioverse release.
+  auth_token:
+    secure: FrzZP1OqCF4loe2RCRD4CQo3gRpDAJh0iE5y4/2YU9AJuXoCv138slux3gVMIMdH
+  on:
+    appveyor_repo_tag: true
