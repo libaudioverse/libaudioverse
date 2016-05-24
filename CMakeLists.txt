@@ -10,7 +10,7 @@ endif()
 project(Libaudioverse)
 
 if("$ENV{APPVEYOR}")
-set(PYTHON_COMMAND "c:\\python35\\python")
+set(PYTHON_COMMAND "$ENV{PYTHON_COMMAND}")
 #Are we using the Windows Python launcher?
 #If so, we rely on PY_VERSION being set by the user. This is unfortunate, but there doesn't seem to be a better way.
 elseif(${WIN32})
