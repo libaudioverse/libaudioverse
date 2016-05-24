@@ -25,5 +25,5 @@ def release(dir):
             os.path.join(dir, "dist", "*.whl")]), shell=True, stdin = sys.stdin, stderr = subprocess.STDOUT)
         except subprocess.CalledProcessError as e:
             print("Error:")
-            print(e.output)
+            print(e.output.decode("utf8"))
             sys.exit(1)
