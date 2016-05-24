@@ -101,3 +101,6 @@ after_build:
   #And then Pypi, etc.
   - echo Uploading Windows build
   - '%PYTHON_COMMAND% release_manager.py'
+
+artifacts:
+  - path: 'build\artifacts\*'

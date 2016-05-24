@@ -9,6 +9,8 @@ import subprocess
 import sys
 import platform
 import pypandoc
+import glob
+import distutils.util
 
 ctypes_map = {
 'int' : 'ctypes.c_int',
@@ -59,8 +61,28 @@ def post_generate(dir):
         sys.stdout.flush()
         subprocess.call(command + ["setup.py", "bdist_wheel", "--universal"], shell=True)
         subprocess.call(command + ["setup.py", "build_sphinx"], shell = True  )
+        print("Attempting to rename wheel for Pypi upload.")
+        #We know exactly where the wheel lives.
+        path = r"dist\*any.whl"
+        #Get its name.
+        possibles=glob.glob(path)
+        if len(possibles) == 0:
+            raise ValueError("No wheels found. This should never happen.")
+        if len(possibles) > 1:
+            raise ValueError("Multiple wheels found. This should never happen.")
+        #Otherwise, it's the first one.
+        wh = possibles[0]
+        #From pep 425
+        platform_tag = distutils.util.get_platform().replace(".", "_").replace("-", "_")
+        nwh = wh[:-len("any.whl")]+"{}.whl".format(platform_tag)
+        #Okay. Rename it.
+        os.rename(wh, nwh)
     else:
         print("Python bindings: Running on a non-windows platform. Skipping wheel and docs generation.")
+
+def artifacts(dir):
+    """List of artifacts. These files will be copied to an artifacts directory. Putting directories here is not allowed."""
+    return [os.path.join(dir, i) for i in glob.glob("dist/*.whl")]
 
 def make_python(info):
     #get our directory.

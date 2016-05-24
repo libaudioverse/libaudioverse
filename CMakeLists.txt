@@ -70,3 +70,8 @@ ADD_CUSTOM_TARGET(libaudioverse_bindings ALL
 COMMAND ${PYTHON_COMMAND} ${PYTHON_ARGS} "\"${CMAKE_CURRENT_SOURCE_DIR}/scripts/build_bindings.py\""
 DEPENDS libaudioverse
 )
+
+ADD_CUSTOM_TARGET(libaudioverse_cfiles ALL
+COMMAND ${PYTHON_COMMAND} ${PYTHON_ARGS} "\"${CMAKE_CURRENT_SOURCE_DIR}/scripts/make_zip.py\""
+DEPENDS libaudioverse
+)

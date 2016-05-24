@@ -194,3 +194,9 @@ install(FILES
 "${CMAKE_SOURCE_DIR}/include/libaudioverse/libaudioverse_properties.h"
 "${CMAKE_SOURCE_DIR}/include/libaudioverse/libaudioverse3d.h"
 DESTINATION include/libaudioverse)
+
+if(${WIN32})
+install(FILES
+"${CMAKE_BINARY_DIR}/libsndfile-1.dll"
+DESTINATION lib)
+endif()

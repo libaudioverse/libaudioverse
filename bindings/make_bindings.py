@@ -1,5 +1,5 @@
 from . import get_info
-from .python import make_python
+from . import python
 import os.path
 import os
 import shutil
@@ -7,7 +7,7 @@ import copy
 import platform
 
 generators = {
-'python' : make_python,
+'python' : (python.make_python, python.artifacts),
 }
 
 def write_files(files, source_dir, dest_dir):
@@ -40,10 +40,14 @@ def write_files(files, source_dir, dest_dir):
         shutil.copytree(os.path.join(source_dir, i), os.path.join(dest_dir, i))
 
 def make_bindings():
+    if not os.path.exists(os.path.join(get_info.get_root_directory(), "build", "artifacts")):
+        os.makedirs(os.path.join(get_info.get_root_directory(), "build", "artifacts"))
     all_info = get_info.get_all_info()
-    for name, func in generators.items():
+    artifacts = []
+    for name, funcs in generators.items():
+        generator, artifacts = funcs
         #we copy so that the generators can modify data as they need.
-        files = func(copy.deepcopy(all_info))
+        files = generator(copy.deepcopy(all_info))
         source_dir = os.path.join(get_info.get_root_directory(), 'bindings', name)
         dest_dir = os.path.join(get_info.get_root_directory(), 'build', 'bindings', name)
         write_files(files, source_dir, dest_dir)
@@ -51,3 +55,7 @@ def make_bindings():
         #This is always called from the directory the bindings were put in.
         os.chdir(dest_dir)
         files.get('post_generate', lambda x: None)(dest_dir)
+        for i in artifacts(dest_dir):
+            name = os.path.split(i)[1]
+            dest = os.path.join(get_info.get_root_directory(), "build", "artifacts", name)
+            shutil.copy(i, os.path.join(get_info.get_root_directory(), "build", "artifacts", name))
