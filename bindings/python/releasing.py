@@ -16,9 +16,14 @@ def release(dir):
     #Call twine.
     if os.getenv("PYPI_PASSWORD") is not None:
         print("Found Pypi password.  Uploading to Pypi.")
-        subprocess.check_output(" ".join([r"c:\python35\python", "-m", "twine", "upload",
-        "--config-file", os.path.join(get_info.get_root_directory(), "pypirc.cfg"),
-        "-r", pypi_repo,
-        "-u", "camlorn",
-        "-p", os.getenv("PYPI_PASSWORD"),
-        os.path.join(dir, "dist", "*.whl")]), shell=True, stdin = sys.stdin, stderr = sys.stderr)
+        try:
+            subprocess.check_output(" ".join([r"c:\python35\python", "-m", "twine", "upload",
+            "--config-file", os.path.join(get_info.get_root_directory(), "pypirc.cfg"),
+            "-r", pypi_repo,
+            "-u", "camlorn",
+            "-p", os.getenv("PYPI_PASSWORD"),
+            os.path.join(dir, "dist", "*.whl")]), shell=True, stdin = sys.stdin, stderr = subprocess.stdout)
+        except subprocess.CalledProcessError as e:
+            print("Error:")
+            print(e.output)
+            sys.exit(1)
