@@ -47,7 +47,16 @@ if len(possibles) > 1:
     raise ValueError("Multiple wheels found. Cannot upload to Pypi. Aborting CI.")
 #Otherwise, it's the first one.
 wh = possibles[0]
-nwh = wh[:-len("any.whl")]+"win32.whl"
+arch = os.getenv("ARCHITECTURE")
+if arch == "x86":
+    platform_tag = "win32"
+elif arch == "amd64":
+    platform_tag = "win_amd64"
+else:
+    print("Couldn't determine platform tag.")
+    sys.exit(1)
+
+nwh = wh[:-len("any.whl")]+"{}.whl".format(platform_tag)
 #Okay. Rename it.
 os.rename(wh, nwh)
 #Call twine.

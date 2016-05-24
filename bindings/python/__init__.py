@@ -50,7 +50,7 @@ def post_generate(dir):
     """Make a wheel and build docs if running in Windows."""
     if platform.system() == 'Windows':
         if os.getenv('APPVEYOR') is not None:
-            command = [r"c:\python35\python.exe"]
+            command = [os.getenv("PYTHON_COMMAND")]
             print("In Appveyor. Using", command)
         else:
             command = ["py", "-3"]
