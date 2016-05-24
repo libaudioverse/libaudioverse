@@ -35,15 +35,11 @@ configuration:
 
 
 install:
-  #Store our git credentials.
+  #Store our git credentials. This comes from Appveyor docs.
   - ps: Add-Content "$env:USERPROFILE\.git-credentials" "https://$($env:GIT_ACCESS_TOKEN):x-oauth-basic@github.com`n"
-  - '%PYTHON_COMMAND% -m pip install -U setuptools sphinx'
+  - '%PYTHON_COMMAND% -m pip install -U pip setuptools'
   #Bring in jinja2, pycparser, etc. Paramiko needs pycrypto.
   - '%PYTHON_COMMAND% -m pip install jinja2 pycparser pyyaml wheel twine pypandoc sphinx %NUMPY_URL% %SCIPY_URL%'
-  - '%PYTHON_COMMAND% -m pip install %NUMPY_URL%'
-  - '%PYTHON_COMMAND% -m pip install http://camlorn.net/appveyor/scipy-0.16.1-cp35-none-win32.whl'
-  #Minimum stuff for setup.py to build the wheel and docs in a 32-bit Python.
-  - '%PYTHON_COMMAND% -m pip install -U setuptools sphinx pypandoc wheel'
   #This next one gets a bit interesting: we need to download and silently install libsndfile.
   - mkdir tmp
   - cd tmp
@@ -67,7 +63,7 @@ install:
 
 
 build_script:
-  - '""C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat"" %ARCHITECTURE%'
+  - '"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" %ARCHITECTURE%'
   #Do this heere so we can be absolutely sure it's set right:
   - 'set include=C:\Libraries\boost_1_59_0;%include%'
   - 'set lib=c:\libraries\boost_1_59_0\lib32-msvc-14.0;%lib%'
