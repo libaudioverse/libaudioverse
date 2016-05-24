@@ -16,7 +16,7 @@ environment:
       NUMPY_URL: http://camlorn.net/appveyor/numpy-1.10.1+mkl-cp35-none-win32.whl
       SCIPY_URL: http://camlorn.net/appveyor/scipy-0.16.1-cp35-none-win32.whl
       PYTHON_COMMAND: 'c:\python35\python'
-  - ARCHITECTURE: amd64
+    - ARCHITECTURE: amd64
       LIBSNDFILE_URL: http://camlorn.net/appveyor/libsndfile64
       NUMPY_URL: http://camlorn.net/appveyor/numpy-1.10.4+mkl-cp35-cp35m-win_amd64.whl
       SCIPY_URL: http://camlorn.net/appveyor/scipy-0.17.1-cp35-cp35m-win_amd64.whl
