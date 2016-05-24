@@ -22,7 +22,7 @@ def release(dir):
             "-r", pypi_repo,
             "-u", "camlorn",
             "-p", os.getenv("PYPI_PASSWORD"),
-            os.path.join(dir, "dist", "*.whl")]), shell=True, stdin = sys.stdin, stderr = subprocess.stdout)
+            os.path.join(dir, "dist", "*.whl")]), shell=True, stdin = sys.stdin, stderr = subprocess.STDOUT)
         except subprocess.CalledProcessError as e:
             print("Error:")
             print(e.output)
