@@ -21,4 +21,4 @@ def release(dir):
         "-r", pypi_repo,
         "-u", "camlorn",
         "-p", os.getenv("PYPI_PASSWORD"),
-        os.path.join(dir, "dest", "*.whl")]), shell=True, stdin = sys.stdin, stdout = sys.stdout, stderr = sys.stderr)
+        os.path.join(dir, "dest", "*.whl")]), shell=True, stdin = sys.stdin, stderr = sys.stderr)
