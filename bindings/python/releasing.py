@@ -17,7 +17,7 @@ def release(dir):
     if os.getenv("PYPI_PASSWORD") is not None:
         print("Found Pypi password.  Uploading to Pypi.")
         try:
-            subprocess.check_output(" ".join([r"c:\python35\python", "-m", "twine", "upload",
+            subprocess.check_output(" ".join([os.getenv("PYTHON_COMMAND"), "-m", "twine", "upload",
             "--config-file", os.path.join(get_info.get_root_directory(), "pypirc.cfg"),
             "-r", pypi_repo,
             "-u", "camlorn",
