@@ -2,6 +2,7 @@ import os.path
 import distutils.util
 import zipfile
 import platform
+import sys
 
 if platform.system() != "Windows":
     print("Not Windows. Cannot currently generate zip.")
