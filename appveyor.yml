@@ -47,7 +47,7 @@ install:
   - ps: Add-Content "$env:USERPROFILE\.git-credentials" "https://$($env:GIT_ACCESS_TOKEN):x-oauth-basic@github.com`n"
   - '%PYTHON_COMMAND% -m pip install -U pip setuptools'
   #Bring in jinja2, pycparser, etc. Paramiko needs pycrypto.
-  - '%PYTHON_COMMAND% -m pip install jinja2 pycparser pyyaml wheel twine pypandoc sphinx %NUMPY_URL% %SCIPY_URL%'
+  - '%PYTHON_COMMAND% -m pip install jinja2 pycparser pyyaml wheel twine pypandoc sphinx sphinx_rtd_theme %NUMPY_URL% %SCIPY_URL%'
   #This next one gets a bit interesting: we need to download and silently install libsndfile.
   - mkdir tmp
   - cd tmp
