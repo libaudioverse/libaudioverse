@@ -7,7 +7,7 @@ environment:
   DEPLOYMENT_PASSWORD:
     secure: N+y3x+7kivMfuMDkYVN7CQ==
   PYPI_PASSWORD:
-    secure: QCiljp1jjjC1d8WyllDTJg==
+    secure: d2vKp79d1l2GRgzol+HVMG3GOsl0Rnq5qkZhKkLslR4=
   GIT_ACCESS_TOKEN:
     secure: FrzZP1OqCF4loe2RCRD4CQo3gRpDAJh0iE5y4/2YU9AJuXoCv138slux3gVMIMdH
   BOOST_INCLUDE_PATH: 'C:\Libraries\boost_1_59_0'
