@@ -9,8 +9,7 @@ Each subsection starts with some Python  code and follows it with an explanation
 The translation to the C API should be fairly straightforward.
 In the cases where it is not, this manual will make an effort to tell you what you need to use.
 
-Note that the following examples work with Python 3.
-Changes for Python 2 are minimal.
+Note that the following examples are written against Python 3, but the needed changes for Python 2 are minimal.
 
 === Playing a Sine Wave
 
@@ -22,17 +21,19 @@ import time
 
 libaudioverse.initialize()
 
-#Create a simulation using the defaults.
-simulation = libaudioverse.Simulation()
+#Create a server using the defaults.
+server = libaudioverse.Server()
 
 #A sine node synthesizes a sine wave:
-sine = libaudioverse.SineNode(simulation)
+sine = libaudioverse.SineNode(server)
 
-#In order to output, we connect to the simulation.
-sine.connect_simulation(output = 0)
+#In order to output, we connect to the server.
+#See below for notes on the C API.
+sine.connect(0, server)
+#or sine.connect(0, sine.server)
 
-#The simulation will play once it has been told to use a specific output device.
-simulation.set_output_device(-1)
+#The  server will play once it has been told to use a specific output device.
+simulation.set_output_device("default")
 
 time.sleep(5.0)
 libaudioverse.shutdown()
@@ -43,37 +44,70 @@ The default frequency for a sine node is 440 HZ.
 
 The first and last lines are simple initialization, and every program needs them.
 Failure to initialize Libaudioverse will lead to errors, as will attempting to access Libaudioverse objects after shutdown.
-For exploration, it is generally safe not to call `shutdown`.
-This is typical practice when calling `python -i` to test a script interactively, as is done in other sections of this overview.
+For exploration in a REPL, it is generally safe not to call `shutdown`.
 Failure to call `shutdown` will crash rarely, but it is still very important to have it in production code as this can and will happen.
 
-Nodes are referred to by their class names (`SineNode`), their C enumerations (`Lav_OBJTYPE_SINE_NODE`) or an English description derived from their name, depending on the context.
+Nodes are referred to by their class names (`SineNode`), their C enumerations (`Lav_OBJTYPE_SINE_NODE`) or an English description derived from their name, depending on the context in this manual.
 For the most part, nodes either synthesize, process, or analyze audio.
-Almost all nodes have outputs, numbered starting at 0.
-Each output carries 1 or more channels of audio.
-In this case, we take the output of the sine node and connect it to the simulation.
-Any output connected to the simulation is audible at the speakers.
+
+Almost all nodes have inputs and outputs, numbered starting at 0.
+Each output carries 1 or more channels of audio and each input accepts one or more channels of audio.
+<<nodes,The node reference>>documents the meanings of each input and output, as well as how many channels they have.
+With a few rare exceptions, nodes have at most one of each.
+
+When we call the connect function (<<function-Lav_nodeConnect,Lav_nodeConnect>> in the C API), we are telling Libaudioverse where to send the output.
+Though not shown here, it is possible to connect an output to multiple inputs at the same time.
 
 When you connect outputs to destinations with different channel counts, Libaudioverse will automatically do the necessary conversions to make everything work.
 There is a detailed description of this algorithm <<technical-connections,elsewhere in this manual>>, but for the most part you need only know that Libaudioverse  understands and automatically converts between mono, stereo, 4.0, 5.1, and 7.1 without input on your part.
 
-When requesting output devices, the default audio device is always -1.
-In addition, Libaudioverse will attempt to change audio devices if the  default changes.
-Specific audio devices are numbered starting at 0.
+Libaudioverse identifies output devices with strings.
+The special string "default" specifies the system's default audio device.
+If it can, Libaudioverse will attempt to follow changes in the default audio device, as is expected on platforms like Windows.
 
-=== Properties on oscillators
+Servers hold global state such as the current output device.
+There are other ways to get audio from a server, but the one shown here is `server.set_output_device`.
+This call (<<function-Lav_serverSetOutputDevice,Lav_serverSetOutputDevice>> in C)sets the output device.
+If you want to change it later, you can simply call it again.
 
-This program sweeps a sine wave from 0 HZ to 10000 HZ while making it quieter.
+This example demonstrates one of the two special types of connection.
+The line `sine.connect(0, server)` connects output 0 of the sine node to the server.
+Libaudioverse overloads the connect function in any language which supports function overloading.
+because C doesn't, the C bindings expose this functionality as <<function-Lav_nodeConnectServer,Lav_nodeConnectServer>>.
+
+Finally, it is worth discussing when nodes advance a block.
+Libaudioverse processes audio in blocks.
+The size of these blocks is set when you create the server.
+With the default settings, the duration of each block is about 23 milliseconds.
+The rules are simple, and mostly do what you want:
+
+- The server advances if it's connected to an audio device or if you ask it for a block of audio.
+
+- A node never advances if its state is set to paused. This will be discussed later in this overview and is used to pause playing files, for example.
+
+- A node always advances if its state is set to always playing.  This is not discussed much in this overview because it is something that you almost never need to do.
+
+- A node advances if it has an output connected directly to the server.
+
+- A node advances if it has an output connected to any node which is advancing.
+
+- In all other cases save one exception (see <<overview-3d,the section on 3D audio>>), a node never advances.
+
+While this looks complicated, you can for the most part ignore it.
+If you build a chain of effects and the last effect is connected to the server, then it works exactly as you expect it will.
+
+=== Automating Properties
 
 ....
 import libaudioverse
 import time
 
 libaudioverse.initialize()
-s=libaudioverse.Simulation()
+
+s=libaudioverse.Server()
 n = libaudioverse.SineNode(s)
 n.frequency = 0
-n.connect_simulation(0)
+n.connect(0, n.server)
 s.set_output_device(-1)
 
 #Recall that Python omits the last value.
@@ -97,47 +131,77 @@ Every oscillator has `frequency`, `phase`, and `frequency_multiplier`.
 `Frequency` is always in hertz, and `phase` is on the range 0 to 1.
 `Frequency_multiplier` is an additional multiplier applied to the frequency of the oscillator, and is useful when building instruments; moving up and down by an octave on the musical scale is a doubling or halving of the frequency.
 
+In the C API, properties are specified by numeric identifiers and set with functions like <<function-Lav_nodeSetIntProperty,Lav_nodeSetIntProperty>> or <<function-Lav_nodeSetFloatProperty,Lav_nodeSetFloatProperty>>.
+The identifiers for the properties used in the above example are `Lav_NODE_MUL`, `Lav_NODE_ADD`, and `Lav_SINE_FREQUENCY`.
+Other properties follow a similar nomenclature.
+
 === Buffers and Playing Files
 
-The following loops a file until enter is pressed.
+The following loops a file.
+It understands three commands: play, pause, and quit.
 
 ....
 import libaudioverse
 
 libaudioverse.initialize()
 
-simulation = libaudioverse.Simulation()
+server = libaudioverse.Server()
 
 print("Enter a path to a sound file.")
 path = input()
 
-buffer=libaudioverse.Buffer(simulation)
+buffer=libaudioverse.Buffer(server)
 buffer.load_from_file(path)
-buffer_player=libaudioverse.BufferNode(simulation)
+
+buffer_player=libaudioverse.BufferNode(server)
 buffer_player.buffer = buffer
 buffer_player.looping = True
-buffer_player.connect_simulation(0)
+buffer_player.connect(0, server)
 
-simulation.set_output_device(-1)
+server.set_output_device("default")
 
-print("Press enter to exit.")
-input()
+while True:
+    print("Play, pause, or quit?")
+    command = input()
+    if command == "play":
+        buffer_player.state = libaudioverse.NodeStates.playing
+    elif command == "pause":
+        buffer_player.state = libaudioverse.NodeStates.paused
+    elif command == "quit":
+        break
+
 libaudioverse.shutdown()
 ....
 
 A buffer represents a chunk of decoded, resampled audio.
 They can be loaded from a number of sources, but by far the most common is from a file.
 
-Buffer nodes play the specified buffer, and have four properties of interest: `position`, `looping`, `rate`, and `end_count`.
-`Position` is the current position of the buffer in seconds, `looping` controls if we loop, and `end_count` counts the number of times it has reached the end.
-`End_count` exists so that you can play buffers synchronously or otherwise tell when they have ended without the coding complexity of using callbacks,  described later.
-Note that callbacks will be more efficient for this purpose, as `end_count` requires spin waiting.
-`Rate` controls the playback rate of the buffer.  1.0 is normal speed, 2.0 is twice as fast, etc.
+Buffer nodes play the specified buffer, and have some properties of interest:
+
+- `buffer` is the buffer itself.
+
+- `position` is the position of the audio, in seconds.
+
+- `rate` is the playback rate of the buffer. 1.0 is identity. 2.0 is twice as fast and 0.5 is half as fast.
+
+- `looping` causes the buffer to loop, if true.
+
+- `ended_count` increments every time the buffer ends.  You can reset it by writing to it.
 
 As mentioned above, buffers store uncompressed, decoded audio data as float32, resampled to match the sampling rate of their simulation.
 This means they are quite large.
 Caching buffers is therefore very highly recommended, as 1 second of mono audio will take 176KB and a minute of stereo audio will take about 21 MB.
 You cannot share buffers between simulations, but you can easily share them between buffer nodes.
+
+Finally, this section introduces the above-mentioned node state.
+A node's state is set through the `state` property, identified in C as `Lav_NODE_STATE`.
+Nodes have 3 states:
+
+1. Playing or `Lav_NODESTATE_PLAYING` in C: this node advances if it is directly or indirectly connected to the simulation. The default.
+
+2. Paused or `Lav_NODESTATE_PAUSED`: this node never advances no matter what, and any nodes that would have advanced because of a connection to it won't either.
+
+3. Always playing or `Lav_NODESTATE_ALWAYS_PLAYING`: This node always advances and any nodes connected to it always advance as well.  You will probably never use this one, but it's there for some advanced apps.
 
 === Panning
 
@@ -148,7 +212,7 @@ import libaudioverse
 import time
 
 libaudioverse.initialize()
-s=libaudioverse.Simulation()
+s=libaudioverse.Server()
 
 buffer_player  = libaudioverse.BufferNode(s)
 buffer = libaudioverse.Buffer(s)
@@ -168,12 +232,12 @@ The second parameter to the multipanner constructor is the path to an HRTF file.
 As a special case, Libaudioverse recognizes the string "default" in all contexts in which an HRTF path is required.
 This is an instruction to use the  dataset embedded in the Libaudioverse assemlby, and will be what most applications want.
 
+At this time, the default HRTF only works well if you use the default sample rate of the server: 44100 HZ.
+making Libaudioverse resample HRTF datasets is on the to-do list however, so you can expect this to improve.
+
 The multipanner is an example of a node with an input.
 Inputs are also numbered starting at 0, and accept a specific number of audio channels.
 In this case, the multipanner has only one mono input.
-If the channel count of the outputs connected to the input is different, Libaudioverse will perform its in-built conversion algorithms.
-Multiple outputs may be connected to the same input.
-In this case, the input will add all of the outputs, suitably converted to match the input's channel count.
 
 The three properties of interest on a multipanner are `azimuth`, `elevation`, and `strategy`.
 All panners have the first two, but `strategy` is unique to the multipanner.
@@ -187,6 +251,7 @@ Unlike `azimuth`, elevation does not wrap, and is  only audible when using the H
 Finally, `strategy` controls the panning strategy to use.
 You may see the allowed values by inspecting the <<enum-Lav_PANNING_STRATEGIES,Lav_PANNING_STRATEGIES>> enumeration, bound in Python as `libaudioverse.PanningStrategies.hrtf`, `libaudioverse.PanningStrategies.stereo`, etc.
 
+[[overview-3d]]
 === Higher-level 3D components
 
 This example sets up a source and an environment with HRTF enabled.
@@ -196,21 +261,23 @@ As with the above example, copy it to a file and run with `python -i`.
 import libaudioverse
 libaudioverse.initialize()
 
-s=libaudioverse.Simulation()
-n=libaudioverse.BufferNode(s)
+s=libaudioverse.Server()
+
 b=libaudioverse.Buffer(s)
 b.load_from_file("sound.wav")
+
+n=libaudioverse.BufferNode(s)
 n.buffer = b
 
 e = libaudioverse.EnvironmentNode(s, "default")
-e.default_panning_strategy = libaudioverse.PanningStrategies.hrtf
+e.panning_strategy = libaudioverse.PanningStrategies.hrtf
 e.output_channels = 2
-e.connect_simulation(0)
+e.connect(0, s)
 
 o=libaudioverse.SourceNode(s, e)
 n.connect(0, o, 0)
 
-s.set_output_device(-1)
+s.set_output_device("default")
 ....
 
 The 3D components of Libaudioverse primarily involve two objects: an environment and a source node.
@@ -222,7 +289,9 @@ A source takes the environment from which it is to be created as the second para
 All audio sent through sources is panned, aggregated, and sent through output 0 of the source's environment.
 
 It is important to note that unlike other nodes, sources are always connected to the environment with which they were created.
-Also unlike other nodes, this connection is implicit and weak.
+This is the exception mentioned in the advancement rules above.
+
+Unlike other nodes, this connection is implicit and weak.
 In the usual case, keeping a node alive will recursively keep all nodes connected to its inputs alive as well.
 Sources break this rule.
 As a consequence, you need to be sure to keep sources alive for as long as they are needed.
@@ -237,6 +306,7 @@ An environment has two properties of note, `position` and `orientation`.
 
 `Position` is the position of the listener, and `orientation` the listener's orientation.
 `Position` is represented as a float3, that is a vector of x, y, and z.
+
 Without changing the orientation, the default coordinate system is as follows: positive x is right, positive y is up, and negative z is forward.
 This was chosen to match OpenGL and OpenAL.
 
@@ -252,11 +322,13 @@ The first, `(0, 1, 0, 0, 0, 1)` orients the coordinate system such that positive
 This is useful for side-scrollers or other applications that do not involve turning.
 
 The second is provided as a reference for those who do not know trigonometry, you can import math and use `(math.sin(theta), math.cos(theta), 0, 0, 0, 1)` to represent orientations as radians clockwise from north.
+In this coordinate system, positive X is right and positive Y is north.
 If you need to use degrees, note that `theta = degrees*math.pi/180.0`.
 
 There are two immediately interesting properties on sources.
 The first is `position`, the same as the environment's position but for sources.
 The coordinate system of a source depends greatly on how you calculate the orientation of the listener, but using either or both of the above-suggested values will allow you to make east positive x and north positive y.
+
 The other is `occlusion`, a value from 0 to 1.
 This property controls an occlusion model, such that 0 is unoccluded and 1 is fully occluded.
 Libaudioverse is unfortunately incapable of calculating occlusion for you, as this depends greatly on how you represent your level maps.
@@ -265,16 +337,20 @@ If you periodically update the `occlusion` property on all sources, however, Lib
 There are many other properties on sources controlling the distance model and panning technique, but this section is quite long enough as-is.
 You will want to be sure to read <<node-Lav_OBJTYPE_ENVIRONMENT_NODE,the Environment Node documentation>> and <<node-Lav_OBJTYPE_SOURCE_NODE,the Source Node documentation>>.
 
-Finally, we must discuss `output_channels` and `default_panning_strategy`.
+Finally, we must discuss `output_channels` and `panning_strategy`.
+
 For technical reasons beyond the control of Libaudioverse, it is not possible to properly detect the type of audio device the user is using.
 For this reason, the environment defaults to normal, stereo panning.
 This is safe on basically every setup imaginable.
 
 Every source has a `panning_strategy` property which can be used to change it for that source.
-The purpose of `default_panning_strategy` on the environment is to specify what the `panning_strategy` value needs to be for new sources.
-Setting it before creating any sources allows you to quickly and conveniently enable HRTF or surround sound support.
+By default, however, this is set to `PanningStrategies.delegate` (`Lav_PANNING_STRATEGY_DELEGATE`).
+This special value behaves as stereo panning in any case save the 3D components.
+In the context of a source, it tells the source to get its panning strategy from the environment by looking at the environment's `panning_strategy` property.
+By default, all sources delegate.
+this means that you can change the panning strategy of all sources by reconfiguring the environment.
 
-Unfortunately, it is possible for sources to have different panning strategies.
+Unfortunately, it is possible for sources to have different panning strategies from one another.
 This is somewhat intensional, as you might choose to use stereo on less-important sources and HRTF on more-important ones in order to save CPU processing power.
 
 But it leads to a difficult-to-resolve ambiguity.
@@ -293,18 +369,20 @@ As with the proceeding examples, run it with `python -i`.
 reverb = libaudioverse.FdnReverbNode(s)
 send = e.add_effect_send(channels = 4, is_reverb = True, connect_by_default = True)
 e.connect(send, reverb, 0)
-reverb.connect_simulation(0)
+reverb.connect(0, s)
 ....
 
 This example sets up an effect send, an additional output on the environment which is intended to be routed through effects.
-Sources also pan a copy of their audio through the effect sends, using any strategy but HRTF as determined by the channel count.
-Since we exclude HRTF, there is no ambiguity and a separate parameter would be redundant.
+Sources also pan a copy of their audio through the effect sends, using any strategy but HRTF as determined implicitly by the channel count of the send
+To be more specific: 1 channel is mono, 2 is stereo, 4 is 4.0, 6 is 5.1, and 8 is 7.1.
+All other values are disallowed.
 
 In this example we specify that all sources created and any created in future should be connected to the effect send, that it is for reverb, and that it has 4 channels.
 Any attempt to create an effect send for reverb without using 4 channels will error.
 Unlike non-reverb sends, effect sends for reverb pan their audio differently, such that the reverb fades in with distance.
 
 `create_effect_send` returns the index of the newly created output, which we then feed through an FDN reverb and then to the simulation.
+
 FDN reverbs are very simple reverberators.
 The two most important properties are `density` and `t60`.
 `Density` ranges from 0 to 1, specifying how close together the reflections are.
@@ -314,10 +392,16 @@ You can think of `t60` as roughly analogous to the reverb's duration.
 FDN reverbs also contain configurable lowpass filters, and the ability to modulate the delay lines.
 See the <<node-Lav_OBJTYPE_FDN_REVERB_NODE,documentation>> for more.
 
+NOTE: While FDN reverbs support delay line modulation, this does not currently work well and will be fixed post-0.9.
+
 You have as many effect sends as you want, limited only by computation capacity.
 Sources have functions to connect and disconnect themselves from effect sends in a fully configurable manner, and you can feel free to make your own custom effects, as well as the ones demonstrated here.
 
 === Using Automators
+
+NOTE: The following API needs to either be extended or thrown out.
+It is not yet clear which will occur.
+This is not an immediate concern, and the following API will exist in its current form until something better is in place and sufficient notice of any compatibility issues is given in accordance with Libaudioverse's compatibility policy.
 
 This sets up a siren-like effect and then turns off the sine node.
 
@@ -326,7 +410,7 @@ import time
 import libaudioverse
 libaudioverse.initialize()
 
-s=libaudioverse.Simulation()
+s=libaudioverse.Server()
 n=libaudioverse.SineNode(s)
 
 n.frequency = 300
@@ -340,7 +424,7 @@ n.mul.set(5.1, 1.0)
 n.mul.linear_ramp_to_value(5.2, 0.0)
 
 n.connect_simulation(0)
-s.set_output_device(-1)
+s.set_output_device("default")
 time.sleep(8.0)
 
 libaudioverse.shutdown()
@@ -351,7 +435,7 @@ Libaudioverse processes audio in blocks, submitting each block to the sound card
 During the processing of a block, no API call can have effect.
 The problem with this setup is that there is no way to allow user code to be called more rapidly than once per block.
 Worse yet, being called exactly once per block requires extra work and degrades performance.
-Automators exist to allow smoothe property modifications despite this downside.
+Automators exist to allow smoothe property modifications despite this limitation.
 
 The linear ramp is an automator which begins moving the value of the property to the specified value.
 The first argument is the time at which the property must reach the target value erelative to the current time, and the second the value which must be reached.
@@ -386,14 +470,19 @@ Since both `mul` and `frequency` are a-rate, the above example will not become c
 
 === Connecting Nodes to Properties
 
+NOTE: the above notice about the automation API needing a redesign does not apply to this section.
+The following functionality will always be available.
+
 This example sets up ring modulation.
 As with other examples, you will want to run it interactively; this one is worth experimenting with.
 
 ....
 import libaudioverse
+import time
+
 libaudioverse.initialize()
 
-s = libaudioverse.Simulation()
+s = libaudioverse.Server()
 n1, n2 = libaudioverse.SineNode(s), libaudioverse.SineNode(s)
 
 n2.mul = 0.0
@@ -401,14 +490,17 @@ n2.mul = 0.0
 n1.frequency = 100
 n2.frequency=400
 
-n1.connect_property(0, n2.mul)
-n2.connect_simulation(0)
-s.set_output_device(-1)
+n1.connect(0, n2.mul)
+n2.connect(0, s)
+s.set_output_device("default")
+
+time.sleep(10.0)
 ....
 
-The above example shows how to connect  the output of a node to a property.
+The above example shows how to connect  the output of a node to a property, the third type of connection supported by Libaudioverse.
+In C, this is mapped to <<function-Lav_nodeConnectProperty,Lav_nodeConnectProperty>>.
 This works only with float and double properties.
-Attempting to do it to any other property type will cause an error.
+Attempting to do it to any other property type will produce an error.
 
 As with automators, this type of control can be sample-perfect on a-rate properties.
 Unlike automators, connected nodes act as offsets to whatever the property would be without the node.
