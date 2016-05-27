@@ -472,8 +472,7 @@ The translation to the C API should be fairly straightforward.
 In the cases where it is not, this manual will make an effort to tell you what you need to use.</p>
 </div>
 <div class="paragraph">
-<p>Note that the following examples work with Python 3.
-Changes for Python 2 are minimal.</p>
+<p>Note that the following examples are written against Python 3, but the needed changes for Python 2 are minimal.</p>
 </div>
 <div class="sect2">
 <h3 id="_playing_a_sine_wave">Playing a Sine Wave</h3>
@@ -487,17 +486,19 @@ import time
 
 libaudioverse.initialize()
 
-#Create a simulation using the defaults.
-simulation = libaudioverse.Simulation()
+#Create a server using the defaults.
+server = libaudioverse.Server()
 
 #A sine node synthesizes a sine wave:
-sine = libaudioverse.SineNode(simulation)
+sine = libaudioverse.SineNode(server)
 
-#In order to output, we connect to the simulation.
-sine.connect_simulation(output = 0)
+#In order to output, we connect to the server.
+#See below for notes on the C API.
+sine.connect(0, server)
+#or sine.connect(0, sine.server)
 
-#The simulation will play once it has been told to use a specific output device.
-simulation.set_output_device(-1)
+#The  server will play once it has been told to use a specific output device.
+simulation.set_output_device("default")
 
 time.sleep(5.0)
 libaudioverse.shutdown()</pre>
@@ -510,43 +511,91 @@ The default frequency for a sine node is 440 HZ.</p>
 <div class="paragraph">
 <p>The first and last lines are simple initialization, and every program needs them.
 Failure to initialize Libaudioverse will lead to errors, as will attempting to access Libaudioverse objects after shutdown.
-For exploration, it is generally safe not to call <code>shutdown</code>.
-This is typical practice when calling <code>python -i</code> to test a script interactively, as is done in other sections of this overview.
+For exploration in a REPL, it is generally safe not to call <code>shutdown</code>.
 Failure to call <code>shutdown</code> will crash rarely, but it is still very important to have it in production code as this can and will happen.</p>
 </div>
 <div class="paragraph">
-<p>Nodes are referred to by their class names (<code>SineNode</code>), their C enumerations (<code>Lav_OBJTYPE_SINE_NODE</code>) or an English description derived from their name, depending on the context.
-For the most part, nodes either synthesize, process, or analyze audio.
-Almost all nodes have outputs, numbered starting at 0.
-Each output carries 1 or more channels of audio.
-In this case, we take the output of the sine node and connect it to the simulation.
-Any output connected to the simulation is audible at the speakers.</p>
+<p>Nodes are referred to by their class names (<code>SineNode</code>), their C enumerations (<code>Lav_OBJTYPE_SINE_NODE</code>) or an English description derived from their name, depending on the context in this manual.
+For the most part, nodes either synthesize, process, or analyze audio.</p>
+</div>
+<div class="paragraph">
+<p>Almost all nodes have inputs and outputs, numbered starting at 0.
+Each output carries 1 or more channels of audio and each input accepts one or more channels of audio.
+<a href="#nodes">The node reference</a>documents the meanings of each input and output, as well as how many channels they have.
+With a few rare exceptions, nodes have at most one of each.</p>
+</div>
+<div class="paragraph">
+<p>When we call the connect function (<a href="#function-Lav_nodeConnect">Lav_nodeConnect</a> in the C API), we are telling Libaudioverse where to send the output.
+Though not shown here, it is possible to connect an output to multiple inputs at the same time.</p>
 </div>
 <div class="paragraph">
 <p>When you connect outputs to destinations with different channel counts, Libaudioverse will automatically do the necessary conversions to make everything work.
 There is a detailed description of this algorithm <a href="#technical-connections">elsewhere in this manual</a>, but for the most part you need only know that Libaudioverse  understands and automatically converts between mono, stereo, 4.0, 5.1, and 7.1 without input on your part.</p>
 </div>
 <div class="paragraph">
-<p>When requesting output devices, the default audio device is always -1.
-In addition, Libaudioverse will attempt to change audio devices if the  default changes.
-Specific audio devices are numbered starting at 0.</p>
+<p>Libaudioverse identifies output devices with strings.
+The special string "default" specifies the system&#8217;s default audio device.
+If it can, Libaudioverse will attempt to follow changes in the default audio device, as is expected on platforms like Windows.</p>
+</div>
+<div class="paragraph">
+<p>Servers hold global state such as the current output device.
+There are other ways to get audio from a server, but the one shown here is <code>server.set_output_device</code>.
+This call (<a href="#function-Lav_serverSetOutputDevice">Lav_serverSetOutputDevice</a> in C)sets the output device.
+If you want to change it later, you can simply call it again.</p>
+</div>
+<div class="paragraph">
+<p>This example demonstrates one of the two special types of connection.
+The line <code>sine.connect(0, server)</code> connects output 0 of the sine node to the server.
+Libaudioverse overloads the connect function in any language which supports function overloading.
+because C doesn&#8217;t, the C bindings expose this functionality as <a href="#function-Lav_nodeConnectServer">Lav_nodeConnectServer</a>.</p>
+</div>
+<div class="paragraph">
+<p>Finally, it is worth discussing when nodes advance a block.
+Libaudioverse processes audio in blocks.
+The size of these blocks is set when you create the server.
+With the default settings, the duration of each block is about 23 milliseconds.
+The rules are simple, and mostly do what you want:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The server advances if it&#8217;s connected to an audio device or if you ask it for a block of audio.</p>
+</li>
+<li>
+<p>A node never advances if its state is set to paused. This will be discussed later in this overview and is used to pause playing files, for example.</p>
+</li>
+<li>
+<p>A node always advances if its state is set to always playing.  This is not discussed much in this overview because it is something that you almost never need to do.</p>
+</li>
+<li>
+<p>A node advances if it has an output connected directly to the server.</p>
+</li>
+<li>
+<p>A node advances if it has an output connected to any node which is advancing.</p>
+</li>
+<li>
+<p>In all other cases save one exception (see <a href="#overview-3d">the section on 3D audio</a>), a node never advances.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>While this looks complicated, you can for the most part ignore it.
+If you build a chain of effects and the last effect is connected to the server, then it works exactly as you expect it will.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_properties_on_oscillators">Properties on oscillators</h3>
-<div class="paragraph">
-<p>This program sweeps a sine wave from 0 HZ to 10000 HZ while making it quieter.</p>
-</div>
+<h3 id="_automating_properties">Automating Properties</h3>
 <div class="literalblock">
 <div class="content">
 <pre>import libaudioverse
 import time
 
 libaudioverse.initialize()
-s=libaudioverse.Simulation()
+
+s=libaudioverse.Server()
 n = libaudioverse.SineNode(s)
 n.frequency = 0
-n.connect_simulation(0)
+n.connect(0, n.server)
 s.set_output_device(-1)
 
 #Recall that Python omits the last value.
@@ -573,11 +622,17 @@ Every oscillator has <code>frequency</code>, <code>phase</code>, and <code>frequ
 <code>Frequency</code> is always in hertz, and <code>phase</code> is on the range 0 to 1.
 <code>Frequency_multiplier</code> is an additional multiplier applied to the frequency of the oscillator, and is useful when building instruments; moving up and down by an octave on the musical scale is a doubling or halving of the frequency.</p>
 </div>
+<div class="paragraph">
+<p>In the C API, properties are specified by numeric identifiers and set with functions like <a href="#function-Lav_nodeSetIntProperty">Lav_nodeSetIntProperty</a> or <a href="#function-Lav_nodeSetFloatProperty">Lav_nodeSetFloatProperty</a>.
+The identifiers for the properties used in the above example are <code>Lav_NODE_MUL</code>, <code>Lav_NODE_ADD</code>, and <code>Lav_SINE_FREQUENCY</code>.
+Other properties follow a similar nomenclature.</p>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_buffers_and_playing_files">Buffers and Playing Files</h3>
 <div class="paragraph">
-<p>The following loops a file until enter is pressed.</p>
+<p>The following loops a file.
+It understands three commands: play, pause, and quit.</p>
 </div>
 <div class="literalblock">
 <div class="content">
@@ -585,22 +640,31 @@ Every oscillator has <code>frequency</code>, <code>phase</code>, and <code>frequ
 
 libaudioverse.initialize()
 
-simulation = libaudioverse.Simulation()
+server = libaudioverse.Server()
 
 print("Enter a path to a sound file.")
 path = input()
 
-buffer=libaudioverse.Buffer(simulation)
+buffer=libaudioverse.Buffer(server)
 buffer.load_from_file(path)
-buffer_player=libaudioverse.BufferNode(simulation)
+
+buffer_player=libaudioverse.BufferNode(server)
 buffer_player.buffer = buffer
 buffer_player.looping = True
-buffer_player.connect_simulation(0)
+buffer_player.connect(0, server)
 
-simulation.set_output_device(-1)
+server.set_output_device("default")
 
-print("Press enter to exit.")
-input()
+while True:
+    print("Play, pause, or quit?")
+    command = input()
+    if command == "play":
+        buffer_player.state = libaudioverse.NodeStates.playing
+    elif command == "pause":
+        buffer_player.state = libaudioverse.NodeStates.paused
+    elif command == "quit":
+        break
+
 libaudioverse.shutdown()</pre>
 </div>
 </div>
@@ -609,17 +673,50 @@ libaudioverse.shutdown()</pre>
 They can be loaded from a number of sources, but by far the most common is from a file.</p>
 </div>
 <div class="paragraph">
-<p>Buffer nodes play the specified buffer, and have four properties of interest: <code>position</code>, <code>looping</code>, <code>rate</code>, and <code>end_count</code>.
-<code>Position</code> is the current position of the buffer in seconds, <code>looping</code> controls if we loop, and <code>end_count</code> counts the number of times it has reached the end.
-<code>End_count</code> exists so that you can play buffers synchronously or otherwise tell when they have ended without the coding complexity of using callbacks,  described later.
-Note that callbacks will be more efficient for this purpose, as <code>end_count</code> requires spin waiting.
-<code>Rate</code> controls the playback rate of the buffer.  1.0 is normal speed, 2.0 is twice as fast, etc.</p>
+<p>Buffer nodes play the specified buffer, and have some properties of interest:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>buffer</code> is the buffer itself.</p>
+</li>
+<li>
+<p><code>position</code> is the position of the audio, in seconds.</p>
+</li>
+<li>
+<p><code>rate</code> is the playback rate of the buffer. 1.0 is identity. 2.0 is twice as fast and 0.5 is half as fast.</p>
+</li>
+<li>
+<p><code>looping</code> causes the buffer to loop, if true.</p>
+</li>
+<li>
+<p><code>ended_count</code> increments every time the buffer ends.  You can reset it by writing to it.</p>
+</li>
+</ul>
 </div>
 <div class="paragraph">
 <p>As mentioned above, buffers store uncompressed, decoded audio data as float32, resampled to match the sampling rate of their simulation.
 This means they are quite large.
 Caching buffers is therefore very highly recommended, as 1 second of mono audio will take 176KB and a minute of stereo audio will take about 21 MB.
 You cannot share buffers between simulations, but you can easily share them between buffer nodes.</p>
+</div>
+<div class="paragraph">
+<p>Finally, this section introduces the above-mentioned node state.
+A node&#8217;s state is set through the <code>state</code> property, identified in C as <code>Lav_NODE_STATE</code>.
+Nodes have 3 states:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Playing or <code>Lav_NODESTATE_PLAYING</code> in C: this node advances if it is directly or indirectly connected to the simulation. The default.</p>
+</li>
+<li>
+<p>Paused or <code>Lav_NODESTATE_PAUSED</code>: this node never advances no matter what, and any nodes that would have advanced because of a connection to it won&#8217;t either.</p>
+</li>
+<li>
+<p>Always playing or <code>Lav_NODESTATE_ALWAYS_PLAYING</code>: This node always advances and any nodes connected to it always advance as well.  You will probably never use this one, but it&#8217;s there for some advanced apps.</p>
+</li>
+</ol>
 </div>
 </div>
 <div class="sect2">
@@ -633,7 +730,7 @@ You cannot share buffers between simulations, but you can easily share them betw
 import time
 
 libaudioverse.initialize()
-s=libaudioverse.Simulation()
+s=libaudioverse.Server()
 
 buffer_player  = libaudioverse.BufferNode(s)
 buffer = libaudioverse.Buffer(s)
@@ -656,12 +753,13 @@ As a special case, Libaudioverse recognizes the string "default" in all contexts
 This is an instruction to use the  dataset embedded in the Libaudioverse assemlby, and will be what most applications want.</p>
 </div>
 <div class="paragraph">
+<p>At this time, the default HRTF only works well if you use the default sample rate of the server: 44100 HZ.
+making Libaudioverse resample HRTF datasets is on the to-do list however, so you can expect this to improve.</p>
+</div>
+<div class="paragraph">
 <p>The multipanner is an example of a node with an input.
 Inputs are also numbered starting at 0, and accept a specific number of audio channels.
-In this case, the multipanner has only one mono input.
-If the channel count of the outputs connected to the input is different, Libaudioverse will perform its in-built conversion algorithms.
-Multiple outputs may be connected to the same input.
-In this case, the input will add all of the outputs, suitably converted to match the input&#8217;s channel count.</p>
+In this case, the multipanner has only one mono input.</p>
 </div>
 <div class="paragraph">
 <p>The three properties of interest on a multipanner are <code>azimuth</code>, <code>elevation</code>, and <code>strategy</code>.
@@ -681,7 +779,7 @@ You may see the allowed values by inspecting the <a href="#enum-Lav_PANNING_STRA
 </div>
 </div>
 <div class="sect2">
-<h3 id="_higher_level_3d_components">Higher-level 3D components</h3>
+<h3 id="overview-3d">Higher-level 3D components</h3>
 <div class="paragraph">
 <p>This example sets up a source and an environment with HRTF enabled.
 As with the above example, copy it to a file and run with <code>python -i</code>.</p>
@@ -691,21 +789,23 @@ As with the above example, copy it to a file and run with <code>python -i</code>
 <pre>import libaudioverse
 libaudioverse.initialize()
 
-s=libaudioverse.Simulation()
-n=libaudioverse.BufferNode(s)
+s=libaudioverse.Server()
+
 b=libaudioverse.Buffer(s)
 b.load_from_file("sound.wav")
+
+n=libaudioverse.BufferNode(s)
 n.buffer = b
 
 e = libaudioverse.EnvironmentNode(s, "default")
-e.default_panning_strategy = libaudioverse.PanningStrategies.hrtf
+e.panning_strategy = libaudioverse.PanningStrategies.hrtf
 e.output_channels = 2
-e.connect_simulation(0)
+e.connect(0, s)
 
 o=libaudioverse.SourceNode(s, e)
 n.connect(0, o, 0)
 
-s.set_output_device(-1)</pre>
+s.set_output_device("default")</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -721,7 +821,10 @@ All audio sent through sources is panned, aggregated, and sent through output 0 
 </div>
 <div class="paragraph">
 <p>It is important to note that unlike other nodes, sources are always connected to the environment with which they were created.
-Also unlike other nodes, this connection is implicit and weak.
+This is the exception mentioned in the advancement rules above.</p>
+</div>
+<div class="paragraph">
+<p>Unlike other nodes, this connection is implicit and weak.
 In the usual case, keeping a node alive will recursively keep all nodes connected to its inputs alive as well.
 Sources break this rule.
 As a consequence, you need to be sure to keep sources alive for as long as they are needed.
@@ -738,8 +841,10 @@ In Python, these are represented as 3-tuples and 6-tuples; changing only one com
 </div>
 <div class="paragraph">
 <p><code>Position</code> is the position of the listener, and <code>orientation</code> the listener&#8217;s orientation.
-<code>Position</code> is represented as a float3, that is a vector of x, y, and z.
-Without changing the orientation, the default coordinate system is as follows: positive x is right, positive y is up, and negative z is forward.
+<code>Position</code> is represented as a float3, that is a vector of x, y, and z.</p>
+</div>
+<div class="paragraph">
+<p>Without changing the orientation, the default coordinate system is as follows: positive x is right, positive y is up, and negative z is forward.
 This was chosen to match OpenGL and OpenAL.</p>
 </div>
 <div class="paragraph">
@@ -758,13 +863,16 @@ This is useful for side-scrollers or other applications that do not involve turn
 </div>
 <div class="paragraph">
 <p>The second is provided as a reference for those who do not know trigonometry, you can import math and use <code>(math.sin(theta), math.cos(theta), 0, 0, 0, 1)</code> to represent orientations as radians clockwise from north.
+In this coordinate system, positive X is right and positive Y is north.
 If you need to use degrees, note that <code>theta = degrees*math.pi/180.0</code>.</p>
 </div>
 <div class="paragraph">
 <p>There are two immediately interesting properties on sources.
 The first is <code>position</code>, the same as the environment&#8217;s position but for sources.
-The coordinate system of a source depends greatly on how you calculate the orientation of the listener, but using either or both of the above-suggested values will allow you to make east positive x and north positive y.
-The other is <code>occlusion</code>, a value from 0 to 1.
+The coordinate system of a source depends greatly on how you calculate the orientation of the listener, but using either or both of the above-suggested values will allow you to make east positive x and north positive y.</p>
+</div>
+<div class="paragraph">
+<p>The other is <code>occlusion</code>, a value from 0 to 1.
 This property controls an occlusion model, such that 0 is unoccluded and 1 is fully occluded.
 Libaudioverse is unfortunately incapable of calculating occlusion for you, as this depends greatly on how you represent your level maps.
 If you periodically update the <code>occlusion</code> property on all sources, however, Libaudioverse is more than happy to synthesize it.</p>
@@ -774,18 +882,23 @@ If you periodically update the <code>occlusion</code> property on all sources, h
 You will want to be sure to read <a href="#node-Lav_OBJTYPE_ENVIRONMENT_NODE">the Environment Node documentation</a> and <a href="#node-Lav_OBJTYPE_SOURCE_NODE">the Source Node documentation</a>.</p>
 </div>
 <div class="paragraph">
-<p>Finally, we must discuss <code>output_channels</code> and <code>default_panning_strategy</code>.
-For technical reasons beyond the control of Libaudioverse, it is not possible to properly detect the type of audio device the user is using.
+<p>Finally, we must discuss <code>output_channels</code> and <code>panning_strategy</code>.</p>
+</div>
+<div class="paragraph">
+<p>For technical reasons beyond the control of Libaudioverse, it is not possible to properly detect the type of audio device the user is using.
 For this reason, the environment defaults to normal, stereo panning.
 This is safe on basically every setup imaginable.</p>
 </div>
 <div class="paragraph">
 <p>Every source has a <code>panning_strategy</code> property which can be used to change it for that source.
-The purpose of <code>default_panning_strategy</code> on the environment is to specify what the <code>panning_strategy</code> value needs to be for new sources.
-Setting it before creating any sources allows you to quickly and conveniently enable HRTF or surround sound support.</p>
+By default, however, this is set to <code>PanningStrategies.delegate</code> (<code>Lav_PANNING_STRATEGY_DELEGATE</code>).
+This special value behaves as stereo panning in any case save the 3D components.
+In the context of a source, it tells the source to get its panning strategy from the environment by looking at the environment&#8217;s <code>panning_strategy</code> property.
+By default, all sources delegate.
+this means that you can change the panning strategy of all sources by reconfiguring the environment.</p>
 </div>
 <div class="paragraph">
-<p>Unfortunately, it is possible for sources to have different panning strategies.
+<p>Unfortunately, it is possible for sources to have different panning strategies from one another.
 This is somewhat intensional, as you might choose to use stereo on less-important sources and HRTF on more-important ones in order to save CPU processing power.</p>
 </div>
 <div class="paragraph">
@@ -809,13 +922,14 @@ As with the proceeding examples, run it with <code>python -i</code>.</p>
 <pre>reverb = libaudioverse.FdnReverbNode(s)
 send = e.add_effect_send(channels = 4, is_reverb = True, connect_by_default = True)
 e.connect(send, reverb, 0)
-reverb.connect_simulation(0)</pre>
+reverb.connect(0, s)</pre>
 </div>
 </div>
 <div class="paragraph">
 <p>This example sets up an effect send, an additional output on the environment which is intended to be routed through effects.
-Sources also pan a copy of their audio through the effect sends, using any strategy but HRTF as determined by the channel count.
-Since we exclude HRTF, there is no ambiguity and a separate parameter would be redundant.</p>
+Sources also pan a copy of their audio through the effect sends, using any strategy but HRTF as determined implicitly by the channel count of the send
+To be more specific: 1 channel is mono, 2 is stereo, 4 is 4.0, 6 is 5.1, and 8 is 7.1.
+All other values are disallowed.</p>
 </div>
 <div class="paragraph">
 <p>In this example we specify that all sources created and any created in future should be connected to the effect send, that it is for reverb, and that it has 4 channels.
@@ -823,8 +937,10 @@ Any attempt to create an effect send for reverb without using 4 channels will er
 Unlike non-reverb sends, effect sends for reverb pan their audio differently, such that the reverb fades in with distance.</p>
 </div>
 <div class="paragraph">
-<p><code>create_effect_send</code> returns the index of the newly created output, which we then feed through an FDN reverb and then to the simulation.
-FDN reverbs are very simple reverberators.
+<p><code>create_effect_send</code> returns the index of the newly created output, which we then feed through an FDN reverb and then to the simulation.</p>
+</div>
+<div class="paragraph">
+<p>FDN reverbs are very simple reverberators.
 The two most important properties are <code>density</code> and <code>t60</code>.
 <code>Density</code> ranges from 0 to 1, specifying how close together the reflections are.
 <code>T60</code> is the time it will take for the reverb to decay by 60 decibals, assuming that you play and then stop some input.
@@ -834,6 +950,18 @@ You can think of <code>t60</code> as roughly analogous to the reverb&#8217;s dur
 <p>FDN reverbs also contain configurable lowpass filters, and the ability to modulate the delay lines.
 See the <a href="#node-Lav_OBJTYPE_FDN_REVERB_NODE">documentation</a> for more.</p>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+While FDN reverbs support delay line modulation, this does not currently work well and will be fixed post-0.9.
+</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
 <p>You have as many effect sends as you want, limited only by computation capacity.
 Sources have functions to connect and disconnect themselves from effect sends in a fully configurable manner, and you can feel free to make your own custom effects, as well as the ones demonstrated here.</p>
@@ -841,6 +969,20 @@ Sources have functions to connect and disconnect themselves from effect sends in
 </div>
 <div class="sect2">
 <h3 id="_using_automators">Using Automators</h3>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+The following API needs to either be extended or thrown out.
+It is not yet clear which will occur.
+This is not an immediate concern, and the following API will exist in its current form until something better is in place and sufficient notice of any compatibility issues is given in accordance with Libaudioverse&#8217;s compatibility policy.
+</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
 <p>This sets up a siren-like effect and then turns off the sine node.</p>
 </div>
@@ -850,7 +992,7 @@ Sources have functions to connect and disconnect themselves from effect sends in
 import libaudioverse
 libaudioverse.initialize()
 
-s=libaudioverse.Simulation()
+s=libaudioverse.Server()
 n=libaudioverse.SineNode(s)
 
 n.frequency = 300
@@ -864,7 +1006,7 @@ n.mul.set(5.1, 1.0)
 n.mul.linear_ramp_to_value(5.2, 0.0)
 
 n.connect_simulation(0)
-s.set_output_device(-1)
+s.set_output_device("default")
 time.sleep(8.0)
 
 libaudioverse.shutdown()</pre>
@@ -876,7 +1018,7 @@ Libaudioverse processes audio in blocks, submitting each block to the sound card
 During the processing of a block, no API call can have effect.
 The problem with this setup is that there is no way to allow user code to be called more rapidly than once per block.
 Worse yet, being called exactly once per block requires extra work and degrades performance.
-Automators exist to allow smoothe property modifications despite this downside.</p>
+Automators exist to allow smoothe property modifications despite this limitation.</p>
 </div>
 <div class="paragraph">
 <p>The linear ramp is an automator which begins moving the value of the property to the specified value.
@@ -920,6 +1062,19 @@ Since both <code>mul</code> and <code>frequency</code> are a-rate, the above exa
 </div>
 <div class="sect2">
 <h3 id="_connecting_nodes_to_properties">Connecting Nodes to Properties</h3>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+the above notice about the automation API needing a redesign does not apply to this section.
+The following functionality will always be available.
+</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
 <p>This example sets up ring modulation.
 As with other examples, you will want to run it interactively; this one is worth experimenting with.</p>
@@ -927,9 +1082,11 @@ As with other examples, you will want to run it interactively; this one is worth
 <div class="literalblock">
 <div class="content">
 <pre>import libaudioverse
+import time
+
 libaudioverse.initialize()
 
-s = libaudioverse.Simulation()
+s = libaudioverse.Server()
 n1, n2 = libaudioverse.SineNode(s), libaudioverse.SineNode(s)
 
 n2.mul = 0.0
@@ -937,15 +1094,18 @@ n2.mul = 0.0
 n1.frequency = 100
 n2.frequency=400
 
-n1.connect_property(0, n2.mul)
-n2.connect_simulation(0)
-s.set_output_device(-1)</pre>
+n1.connect(0, n2.mul)
+n2.connect(0, s)
+s.set_output_device("default")
+
+time.sleep(10.0)</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The above example shows how to connect  the output of a node to a property.
+<p>The above example shows how to connect  the output of a node to a property, the third type of connection supported by Libaudioverse.
+In C, this is mapped to <a href="#function-Lav_nodeConnectProperty">Lav_nodeConnectProperty</a>.
 This works only with float and double properties.
-Attempting to do it to any other property type will cause an error.</p>
+Attempting to do it to any other property type will produce an error.</p>
 </div>
 <div class="paragraph">
 <p>As with automators, this type of control can be sample-perfect on a-rate properties.
@@ -973,12 +1133,12 @@ For a gentler and much more hands-on introduction, see the <a href="#overview">o
 <div class="sect2">
 <h3 id="technical-introduction">Introduction</h3>
 <div class="paragraph">
-<p>Libaudioverse is composed primarily of three object types: <a href="#technical-simulation">the simulation</a>, <a href="#technical-buffers">buffers</a>, and <a href="#technical-nodes">nodes</a>.</p>
+<p>Libaudioverse is composed primarily of three object types: <a href="#technical-server">the server</a>, <a href="#technical-buffers">buffers</a>, and <a href="#technical-nodes">nodes</a>.</p>
 </div>
 <div class="paragraph">
-<p>The simulation is the main entry point, and is required for creating any other Libaudioverse object.
-All objects save for simulations are themselves associated with simulations.
-This association cannot be changed, and errors result if one attempts to use objects in ways that would cross the boundary.</p>
+<p>The server is the main entry point, and is required for creating any other Libaudioverse object.
+All objects save for servers are themselves associated with servers.
+Attempts to combine objects from different servers are always errors.</p>
 </div>
 <div class="paragraph">
 <p>Buffers represent chunks of decoded audio data, and can be loaded from a variety of sources.
@@ -998,45 +1158,91 @@ When done using the library, call <a href="#function-Lav_shutdown">Lav_shutdown<
 Failure to do so may lead to crashes, depending on what is or is not created.
 It is not safe to assume that Libaudioverse will properly clean itself up at process exit without a call to <a href="#function-Lav_shutdown">Lav_shutdown</a>, though failing to do so is common in exploratory situations for languages which provide a REPL.</p>
 </div>
+<div class="paragraph">
+<p>You may initialize the library more than once: subsequent initializations do nothing.
+You must deinitialize the library exactly as many times as it has been initialized, no more.</p>
+</div>
 </div>
 <div class="sect2">
 <h3 id="tecchnical-object_lifetime">Pointer Ownership and Object Lifetime</h3>
 <div class="sect3">
-<h4 id="_pointer_ownership">Pointer Ownership</h4>
+<h4 id="_a_note_for_users_of_languages_with_automatic_memory_management">A Note for Users of Languages with Automatic Memory Management</h4>
 <div class="paragraph">
-<p>When Libaudioverse returns a buffer of memory, it always allocates a copy.
-The calling application is responsible for freeing this buffer, always through <a href="#function-Lav_free">Lav_free</a>.
-Use of <code>free</code> from the standard library on these pointers will crash.</p>
+<p>The following sections are very complicated, but languages whichcan be integrated with Libaudioverse&#8217;s freeing logic handle all of it for you.
+Unless you are in C or another language where you must manually manage memory, all you need to know is that the following are strong references:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Given some node <code>a</code> and some other node <code>b</code>, the call <code>a.connect(some_output, b, some_input)</code> creates a strong reference from <code>b</code> to <code>a</code>.  The connection remains alive until <code>b</code> is collected or you explicitly kill it.</p>
+</li>
+<li>
+<p>Connecting to properties creates a strong reference in the same manner as above.  So does connecting to the server.</p>
+</li>
+<li>
+<p>The  server is alive as long as something created from it is alive.</p>
+</li>
+</ul>
 </div>
 <div class="paragraph">
-<p>When <a href="#function-Lav_shutdown">Lav_shutdown</a> is called, all pointers that libaudioverse allocated are immediately freed.</p>
+<p>Finally, deinitialization of the library kills all the objects on the library&#8217;s side.
+You should never use anything after deinitializing the library.</p>
+</div>
+<div class="paragraph">
+<p>Everything related to pointer ownership and keeping pointers alive is handled deep inside the bindings to such languages.
+You need not concern yourself with it.
+Any language with concerns along these lines will clearly mention them in the documentation for that language.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_pointer_ownership">Pointer Ownership</h4>
+<div class="paragraph">
+<p>When Libaudioverse returns a buffer of memory, it almost always allocates a copy.
+Exceptions to this rule will be clearly documented.</p>
+</div>
+<div class="paragraph">
+<p>The calling application is responsible for freeing this buffer, always through <a href="#function-Lav_free">Lav_free</a>.
+Use of <code>free</code> from the standard library on these pointers will cause memory leaks at best.</p>
+</div>
+<div class="paragraph">
+<p>When <a href="#function-Lav_shutdown">Lav_shutdown</a> is called, all pointers that libaudioverse allocated are immediately freed.
+Calling this function after the library is deinitialized does nothing.</p>
 </div>
 </div>
 <div class="sect3">
 <h4 id="_object_lifetime">Object Lifetime</h4>
 <div class="paragraph">
-<p>There are three functions dealing with handle management: <a href="#function-Lav_handleIncRef">Lav_handleIncRef</a>, <a href="#function-Lav_handleDecRef">Lav_handleDecRef</a>, and <a href="#function-Lav_handleGetAndClearFirstAccess">Lav_handleGetAndClearFirstAccess</a>.</p>
+<p>Libaudioverse objects ar publicly exposed through reference-counted handles.
+There are three functions dealing with handle management: <a href="#function-Lav_handleIncRef">Lav_handleIncRef</a>, <a href="#function-Lav_handleDecRef">Lav_handleDecRef</a>, and <a href="#function-Lav_handleGetAndClearFirstAccess">Lav_handleGetAndClearFirstAccess</a>.
+As above, calling these functions after library shutdown does nothing.</p>
+</div>
+<div class="paragraph">
+<p>In order to be as fast as possible and to block as little as possible, Libaudioverse defers deletions to the end of the current block.
+This means that any pending callbacks for a deleted handle may still fire, depending on when and how they were called.
+Even if you think a handle should no longer exist, you should be prepared to see it again.</p>
+</div>
+<div class="paragraph">
+<p>In order to be sane and avoid crashes, Libaudioverse creates strong references internally.
+Examples include connections (from the input of the target to the output of the source) and setting buffer properties.
+The rest of this section explains how this logic works.</p>
 </div>
 <div class="paragraph">
 <p>A handle is either external or internal.
 Handles are external if and only if their reference count is greater than or equal to 1.
+The most common method of getting an external handle is to create an object.
+When a handle first transitions from the internal to external state, its reference count is always set to one.
 The function <a href="#function-Lav_handleGetAndClearFirstAccess">Lav_handleGetAndClearFirstAccess</a> indicates whether a handle has just transitioned from the internal to external states, clearing an internal flag.
-On first access, a handle&#8217;s reference count is always one.
-This function exists primarily to assist bindings in knowing when they need to increment the handle&#8217;s reference count.</p>
+This function exists primarily to assist bindings in knowing when they need to increment the handle&#8217;s reference count.
+When a handle&#8217;s reference count goes to 0, it is not immediately deleted but instead becomes internal once more.</p>
 </div>
 <div class="paragraph">
-<p>When a handle&#8217;s reference count goes to 0, it is not immediately deleted.
-It merely becomes internral once more.
-It is possible to see the handle once more externally, for example by querying the buffer node&#8217;s buffer property.
-In this case, <a href="#function-Lav_handleGetAndClearFirstAccess">Lav_handleGetAndClearFirstAccess</a> will again return true and clear the flag.</p>
-</div>
-<div class="paragraph">
-<p>There are special rules for the 3 most common Libaudioverse object types.  They are as follows:</p>
+<p>Relationships between Libaudioverse objects will also keep handles alive by forming invisible and internal strong references.
+The following are the common cases in which this occurs:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>A simulation is alive so long as any object created using the simulation is still alive.</p>
+<p>A server is alive so long as any object created using the server is still alive.</p>
 </li>
 <li>
 <p>A node is alive so long as it has an output connected to another node that is also still alive.</p>
@@ -1057,63 +1263,58 @@ The handle destroyed callback must do its best to not block whenever possible, a
 </div>
 </div>
 <div class="sect2">
-<h3 id="technical-simulation">The Simulation</h3>
+<h3 id="technical-server">The Server</h3>
 <div class="paragraph">
-<p>The simulation is the main entry point to Libaudioverse.
-Creating all other Libaudioverse objects requires a simulation to first be created.</p>
+<p>The server is the main entry point to Libaudioverse.</p>
 </div>
 <div class="paragraph">
-<p>The two most crutial pieces of information needed for the simulation are the block size and sample rate.
+<p>The two most crutial pieces of information needed for the server are the block size and sample rate.
 The latter is self-explanatory.
 The block size is the number of samples to process at once, and must be a multiple of 4.
-Simulations are created with <a href="#function-Lav_createSimulation">[function-Lav_createSimulation]</a>.</p>
+Servers are created with <a href="#function-Lav_createServer">Lav_createServer</a>.
+The strongly suggested defaults for these parameters are 1024 and 44100 respectively.
+These are sufficient and performant for most applications.</p>
 </div>
 <div class="paragraph">
 <p>By default, Libaudioverse will use one thread per core on the current system for audio mixing.
-This may be changed via <a href="#function-Lav_simulationSetThreads">[function-Lav_simulationSetThreads]</a>.</p>
+This may be changed via <a href="#function-Lav_serverSetThreads">Lav_serverSetThreads</a>.</p>
 </div>
 <div class="paragraph">
-<p>Simulations handle audio output and hold state, provided via dependency injection to created objects.
-All Libaudioverse objects are associated with exactly one simulation in a permanent manner.
-Any attempt to cross the boundary between two simulations will result in an error.
-As an example, this can happen if an application attempts to connect nodes from two different simulations.</p>
+<p>Servers handle audio output and hold state, provided via dependency injection to created objects.
+All Libaudioverse objects are associated with exactly one server in a permanent manner.
+Any attempt to use a pair of objjects from different servers together will error.</p>
 </div>
 <div class="sect3">
 <h4 id="technical-audio_output">Audio Output</h4>
 <div class="paragraph">
-<p>Simulations are the final destination for audio, and output may be retrieved in 3 ways.
+<p>Servers are the final destination for audio, and output may be retrieved in 3 ways.
 In all cases, Libaudioverse applies the audio upmixing and downmixing algorithms as specified <a href="#technical-connections">here</a> to reach the required channel count.
 None of the following three methods of receiving audio should be mixed; doing so results in undefined behavior.</p>
 </div>
 <div class="paragraph">
-<p><a href="#function-Lav_simulationGetBlock">[function-Lav_simulationGetBlock]</a>  fills a buffer allocated by the calling application with a block of audio data.</p>
+<p><a href="#function-Lav_serverGetBlock">Lav_serverGetBlock</a>  fills a buffer allocated by the calling application with a block of audio data.</p>
 </div>
 <div class="paragraph">
-<p><a href="#function-Lav_simulationWriteFile">[function-Lav_simulationWriteFile]</a> drives the simulation for the specified duration, synthesizing as fast as possible and writing to the specified file.
+<p><a href="#function-Lav_serverWriteFile">Lav_serverWriteFile</a> drives the server for the specified duration, synthesizing as fast as possible and writing to the specified file.
 The file format is determined from the extension of the provided path.
 The supported file formats are not currently documented as this is in flux, but you are guaranteed to have at least .wav and .ogg.</p>
 </div>
 <div class="paragraph">
-<p>The final option is to call <a href="#function-Lav_simulationSetOutputDevice">[function-Lav_simulationSetOutputDevice]</a>.
-This links the simulation to a specific audio device.
-<a href="#function-Lav_simulationSetOutputDevice">[function-Lav_simulationSetOutputDevice]</a> takes a number of parameters, discussed in detail below.</p>
+<p>The final option is to call <a href="#function-Lav_serverSetOutputDevice">Lav_serverSetOutputDevice</a>.
+This links the server to a specific audio device.</p>
 </div>
 <div class="paragraph">
-<p>Libaudioverse represents specific audio devices with positive indices starting at 0.
-The default audio device is -1.
-Furthermore, using the audio device -1 will attempt to follow the user&#8217;s default audio device, even if it should change while Libaudioverse is outputting audio.
-This feature is not always possible and depends on the platform in use.</p>
+<p>Libaudioverse represents specific audio devices with string identifiers.
+These strings should be considered opaque.  They should never be stored.
+In future, Libaudioverse will make a best effort to allow you to put them in configuration files, but this functionality is not currently implemented.
+The format of these strings is subject to change.</p>
 </div>
 <div class="paragraph">
-<p>The minimum, maximum, and starting latencies are hints to Libaudioverse as to the latency characteristics of the calling application.
-They may not be respected.
-Minimum latency should almost always be 0.0 and maximum should almost always be 0.1 or higher.
-The starting latency depends on the application, but 0.05 is usually a good value.
-Libaudioverse continually estimates how much time it is taking to prepare blocks, adjusting the latency between the minimum and maximum.
-If the application begins using more CPU, then latency will rise in order to give Libaudioverse more headroom when mixing blocks; if it begins using less, latency will fall.</p>
+<p>The default audio device is the string "default".
+Where it can, Libaudioverse will attempt to follow any changes in the default audio device.</p>
 </div>
 <div class="paragraph">
-<p>Multiple calls to <a href="#function-Lav_simulationSetOutputDevice">[function-Lav_simulationSetOutputDevice]</a> are allowed, though playback may not be gapless.</p>
+<p>Multiple calls to <a href="#function-Lav_serverSetOutputDevice">Lav_serverSetOutputDevice</a> are allowed, though playback may not be gapless.</p>
 </div>
 <div class="admonitionblock important">
 <table>
@@ -1133,7 +1334,7 @@ Always trust the user; if it is important for your application to know if it is 
 </div>
 </div>
 <div class="sect3">
-<h4 id="technical-atomicity">Atomicity</h4>
+<h4 id="technical-atomicity">Atomicity and Batching Calls</h4>
 <div class="paragraph">
 <p>Libaudioverse outputs audio in blocks.
 When outputting to an audio device, any operation which may be completed with one function call will either be completely audible or not audible on the next block.
@@ -1148,27 +1349,28 @@ If the operation in question can be done in one function call, hearing partial r
 <p>Perform the operations on a set of disconnected nodes before connecting them.</p>
 </li>
 <li>
-<p>use <a href="#function-Lav_simulationLock">[function-Lav_simulationLock]</a> and <a href="#function-Lav_simulationUnlock">[function-Lav_simulationUnlock]</a>.  Note that, as these function names imply, simulations function as mutexes; lock inversion and other concerns can apply in multithreaded scenarios.</p>
+<p>use <a href="#function-Lav_serverLock">Lav_serverLock</a> and <a href="#function-Lav_serverUnlock">Lav_serverUnlock</a>.  Note that, as these function names imply, servers function as mutexes; lock inversion and other concerns can apply in multithreaded scenarios.</p>
 </li>
 <li>
-<p>Set a per-block callback which Libaudioverse will call just before mixing every block.  This can be done with <a href="#function-Lav_simulationSetBlockCallback">[function-Lav_simulationSetBlockCallback]</a>.</p>
+<p>Set a per-block callback which Libaudioverse will call just before mixing every block.  This can be done with <a href="#function-Lav_serverSetBlockCallback">Lav_serverSetBlockCallback</a>.</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>Most games will want to use <a href="#function-Lav_simulationLock">[function-Lav_simulationLock]</a> before beginning their per-frame audio update, and <a href="#function-Lav_simulationUnlock">[function-Lav_simulationUnlock]</a> afterwords.
-Failure to call <a href="#function-Lav_simulationUnlock">[function-Lav_simulationUnlock]</a> in a timely manner will cause audio glitching; failure to call it at all will cause silence and freeze Libaudioverse&#8217;s background threads.</p>
+<p>Most applications will want to use <a href="#function-Lav_serverLock">Lav_serverLock</a> before beginning their per-frame audio update, and <a href="#function-Lav_serverUnlock">Lav_serverUnlock</a> afterwords.
+Failure to call <a href="#function-Lav_serverUnlock">Lav_serverUnlock</a> in a timely manner will cause audio glitching; failure to call it at all will cause silence and freeze Libaudioverse&#8217;s background threads.</p>
 </div>
 <div class="paragraph">
 <p>The per-block callback is for advanced synthesis applications which need a stronger guarantee: not only is the operation happening completely before the next block, it is running every block.
-Using the per-block callback for a game&#8217;s frame updates will lead to massively degraded performance on both sides.</p>
+Using the per-block callback for a game&#8217;s frame updates will lead to massively degraded performance.
+You should only use it when controlling nodes exactly every block is important.</p>
 </div>
 </div>
 </div>
 <div class="sect2">
 <h3 id="technical-buffers">Buffers</h3>
 <div class="paragraph">
-<p>Buffers store un-encoded float32 audio data at the sampling rate of the simulation.
+<p>Buffers store un-encoded float32 audio data at the sampling rate of the server.
 They can be loaded from files or arrays, and will resample the data exactly once when loaded.
 Buffers are most commonly used  with <a href="#node-Lav_OBJTYPE_BUFFER_NODE">buffer nodes</a>.</p>
 </div>
@@ -1184,7 +1386,7 @@ Modifying a buffer&#8217;s audio data while it is in use will result in an error
 <div class="paragraph">
 <p>Nodes represent audio transformation, genneration, and analysis.
 This section discusses nodes generally, including the audio conversion algorithms, properties, and connection logic,.
-To see what kinds of specific nodes are on offer, see the <a href="#nodes">Nodes section</a>.</p>
+To see what kinds of specific nodes are on offer, see the <a href="#nodes">Nodes reference</a>.</p>
 </div>
 <div class="sect3">
 <h4 id="technical-connections">Connections and Automatic Audio Channel Count Conversion</h4>
@@ -1195,8 +1397,10 @@ Libaudioverse makes the opinionated decision that connections are made from outp
 </div>
 <div class="paragraph">
 <p>The two functions relevant to node-to-node connections are <a href="#function-Lav_nodeConnect">Lav_nodeConnect</a> and <a href="#function-Lav_nodeDisconnect">Lav_nodeDisconnect</a>.
-Connecting nodes to the simulation is accomplished with <a href="#function-Lav_nodeConnectSimulation">[function-Lav_nodeConnectSimulation]</a>.
-<a href="#function-Lav_nodeConnectProperty">Lav_nodeConnectProperty</a> will be discussed later.</p>
+Connecting nodes to the server is accomplished with <a href="#function-Lav_nodeConnectServer">Lav_nodeConnectServer</a>.
+<a href="#function-Lav_nodeConnectProperty">Lav_nodeConnectProperty</a> will be discussed later.
+In languages with function overloading or sufficient flexibility to fake it, these three functions are often combined into one.
+Any connection that would cause a cycle (i.e. <code>a.connect(0, b, 0)</code> and <code>b.connect(0, a, 0)</code> in Python) will error.</p>
 </div>
 <div class="paragraph">
 <p>All inputs and outputs have a documented channel count.
@@ -1243,7 +1447,9 @@ Libaudioverse has intrinsic understanding of the following channel counts, and c
 </table>
 <div class="paragraph">
 <p>Where applicable, libaudioverse prefers to copy WebAudio&#8217;s conversion algorithms.
-This is used for everything save conversions involving 7.1, for which the WebAudio spec fails to specify anything.</p>
+This is used for everything save conversions involving 7.1.
+Regretfully, the WebAudio specification does not specify what to do in this case.
+To that end, Libaudioverse uses a custom algorithm that is subject to change.</p>
 </div>
 <div class="paragraph">
 <p>If an input or an output has a channel count not found in the above table, then one of three things happens:</p>
@@ -1262,13 +1468,18 @@ This is used for everything save conversions involving 7.1, for which the WebAud
 </ul>
 </div>
 <div class="paragraph">
-<p>Time advances for a node if one of the following two conditions is true.
-If the node&#8217;s state is paused, time does not advance for it under any circumstance, and it simply always outputs zero.</p>
+<p>Conceptually, nodes have a time that is specific to each node.
+This time does not actually exist and cannot be queried, but makes a good metaphorical mechanism for understanding how nodes advance.
+You can observe it somewhat directly by looking at the position property on a buffer node.</p>
+</div>
+<div class="paragraph">
+<p>If the node&#8217;s state is paused, time does not advance for it under any circumstance, and it simply always outputs zero.
+Time advances for a node if one of the following two conditions is true:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>You can grab one or more of the node&#8217;s outputs and somehow follow them via any path whatsoever through nodes which are playing or always playing to the simulation.</p>
+<p>You can grab one or more of the node&#8217;s outputs and somehow follow them via any path whatsoever through nodes which are playing or always playing to the server.</p>
 </li>
 <li>
 <p>The node&#8217;s state is always playing.</p>
@@ -1276,7 +1487,8 @@ If the node&#8217;s state is paused, time does not advance for it under any circ
 </ul>
 </div>
 <div class="paragraph">
-<p>Highly technical details on the audio algorithm are <a href="#technical-audio_algorithm">here</a>.</p>
+<p>If some node <code>a</code> has a connection to some node <code>b</code> from an output of <code>a</code> to an input of <code>b</code> then <code>a</code> will always execute before <code>b</code>.
+In addition, any callbacks that happen in the audio thread on <code>a</code> will happen before any such on <code>b</code>.</p>
 </div>
 </div>
 <div class="sect3">
@@ -1299,11 +1511,11 @@ They exist for bindings generation and documentation clarity.</p>
 </div>
 <div class="paragraph">
 <p>Some int properties must take their values from an enum.
-When this is the case, the enum is documented.</p>
+When this is the case, which enum is documented with the property.</p>
 </div>
 <div class="paragraph">
 <p>Float3 and float6 properties are packed vectors primarily used for the 3D components.
-The purpose of float3 and float6 properties are to provide a fast path for orientations and positions, and to reduce need for <a href="#function-Lav_simulationLock">[function-Lav_simulationLock]</a> and <a href="#function-Lav_simulationUnlock">[function-Lav_simulationUnlock]</a>.</p>
+The purpose of float3 and float6 properties are to provide a fast path for orientations and positions, and to reduce need for <a href="#function-Lav_serverLock">Lav_serverLock</a> and <a href="#function-Lav_serverUnlock">Lav_serverUnlock</a> with the 3D components of this library.</p>
 </div>
 <div class="paragraph">
 <p>There are three standard properties on all nodes.  They are as follows, with more complete documentation <a href="#node-Lav_OBJTYPE_GENERIC_NODE">here</a>:</p>
@@ -1392,9 +1604,9 @@ Using the Libaudioverse API in an incorrect manner from a callback which is call
 Said undefined behavior will be well down the road to outright crashing.</p>
 </div>
 <div class="paragraph">
-<p>The other place that callbacks can be called is on a background thread owned by the simulation.
+<p>The other place that callbacks can be called is on a background thread owned by the server.
 This will be clearly documented.
-This thread is created even if you opt to use <code>Lav_simulationGetBlock</code>.
+This thread is created even if you opt to use <code>Lav_serverGetBlock</code>.
 In this case, using the Libaudioverse API is safe.</p>
 </div>
 <div class="paragraph">
@@ -1407,109 +1619,6 @@ It should be noted that Libaudioverse sometimes uses the thread on which these c
 <div class="paragraph">
 <p>No guarantee is made that only one callback will execute at a time.
 All callbacks should be fully threadsafe.</p>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="technical-audio_processing_algorithm">Details on the Audio Processing Algorithm</h3>
-<div class="paragraph">
-<p>This section tells you everything you need or want to know about the audio processing algorithm.
-You probably don&#8217;t need to read it on a first or second or fiftieth read-through of the manual, but it&#8217;s here for those applications that need to squeeze every last iota of performance out of Libaudioverse.</p>
-</div>
-<div class="paragraph">
-<p>The algorithm is stated in many other places in this manual in a simpler form: if you can walk along the node in question&#8217;s outputs via any path that leads only through unpaused nodes to the simulation, then the node in question will process.</p>
-</div>
-<div class="sect3">
-<h4 id="_theoretical_pseudocode">Theoretical pseudocode</h4>
-<div class="paragraph">
-<p>This is not the algorithm in practice.  See below.</p>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>def process(start):
-    if start is paused:
-        return
-    for i in immediate_dependencies(start):
-        process(i)
-    start.execute()
-
-def immediate_dependencies(n):
-    dependencies = []
-    for i in n.inputs:
-        for j in i.connected_nodes:
-            dependencies.append(j)
-    for i in n.properties:
-        for j in i.connected_nodes:
-            dependencies.append(j)
-    return dependencies
-
-for i in simulation.connected_nodes:
-    process(i)
-for i in simulation.always_playing_nodes:
-    process(i)</pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_justification_and_working_with_the_algorithm">Justification and Working With the Algorithm</h4>
-<div class="paragraph">
-<p>This algorithm looks complicated, and it is.
-But it&#8217;s also necessary and helpful.</p>
-</div>
-<div class="paragraph">
-<p>The reason for the necessity is that we wish to interop with garbage collected languages.
-In such languages, no guarantee is made about freeing of resources.
-It would be possible to require everyone to call finalize on everything, but this quickly and often leads to a cascade of finalizations that removes any benefit from having a GC.
-With the above algorithm, it is sufficient to pause or disconnect only one node on the death of an enemy in a game, to provide a concrete example.
-Since nodes only process if needed, having tens or hundreds of objects that aren&#8217;t needed but haven&#8217;t been garbage collected yet does nothing to the CPU.</p>
-</div>
-<div class="paragraph">
-<p>There are two reasons for this complexity.</p>
-</div>
-<div class="paragraph">
-<p>First, in most cases, nothing is lost over the simpler process-everything algorithm, but you no longer need to worry about dispose methods.
-For most apps, pretending that everything is processed is a sufficient model to properly use Libaudioverse.
-You should certainly do so until it becomes a problem, because chances are that it never will.</p>
-</div>
-<div class="paragraph">
-<p>The second helpful feature of this algorithm is useful in synthesis applications.
-It is possible to set up complicated networks of objects and to load files and to do generally whatever else is required without having said objects advance.
-This was mentioned briefly in the section on <a href="#technical-atomicity">atomicity</a>.
-The upshot is that it allows one to configure 6 sine nodes or create 4 synchronized buffer nodes and load their data without having to worry about the concerns in the atomicity section.
-Until these nodes are connected, they don&#8217;t play.
-To that end, one can use a <a href="#node-Lav_OBJTYPE_GAIN_NODE">gain node</a>, route everything through it, and connect the gain node when done.
-The final connection plays, and all of the nodes can be paused (and not take CPU) simply by pausing the gain node.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_the_real_algorithm_and_optimizing_your_application">The Real Algorithm and Optimizing your Application</h4>
-<div class="paragraph">
-<p>In practice, Libaudioverse precalculates the order of execution of nodes in a somewhat expensive process called replanning.
-This is then cached until any operation which changes the order.
-After such an operation, the plan is recalcuated at the next block.</p>
-</div>
-<div class="paragraph">
-<p>This plan is stored as a tiered structure, where the tier of a node is the longest possible path from the node to the simulation.
-These tiers are then executed one after another in a thread pool with one thread per core by default.
-Nodes are assigned in a round-robin fashion to each thread until there are no more, and then the controller thread waits for the tier to finish executing before pushing on the next.
-If only one thread is in use, we instead fall back to a simpler algorithm that looks somewhat similar to the above pseudocode.</p>
-</div>
-<div class="paragraph">
-<p>This implies a few things for optimization purposes and makes the algorithm worth documenting.</p>
-</div>
-<div class="paragraph">
-<p>First, Libaudioverse will prefer broad, flat graphcs as opposed to long, straight chains.
-Getting expensive nodes to be in the same tier is beneficial, and adding extra, unneeded nodes that make some paths longer while not doing anything meaningful will degrade performance in the multithreaded case.</p>
-</div>
-<div class="paragraph">
-<p>Second, Libaudioverse can sometimes run better in the single-threaded case.
-If you have only a few nodes or cannot do anything but have only a couple nodes per tier, switching Libaudioverse to single-threaded mode may actually improve performance, as the planning and dispatch of nodes to threads has an overhead.</p>
-</div>
-<div class="paragraph">
-<p>Finally, try to group operations that invalidate the plan.
-Most notably this is connections and disconnections of outputs, but state changes also cause invalidation.
-If you&#8217;re planning to execute extremely large numbers of such operations, using <a href="#function-Lav_simulationLock">Lav_simulationLock</a> and <a href="#function-Lav_simulationUnlock">Lav_simulationUnlock</a> may be worthwhile.
-The replanning algorithm has a high complexity, and so applications with more nodes will benefit more from this particular optimization.</p>
 </div>
 </div>
 </div>
@@ -6054,14 +6163,19 @@ Setting this property will reset position.</p>
 <p>Type: int</p>
 </div>
 <div class="paragraph">
-<p>This property is read-only.</p>
+<p>Range: [0, 'MAX_INT']</p>
+</div>
+<div class="paragraph">
+<p>Default Value: 0</p>
+</div>
+<div class="paragraph">
+<p>Rate: k</p>
 </div>
 <div class="paragraph">
 <p>Increments every time the buffer reaches it&#8217;s end.
 If the buffer is not looping, this can be used to determine when the buffer is ended, without using the callback.
 if the buffer is configured to loop, the counter will count up every time the end of a loop is reached.
-Note that this property can technically wrap if your buffer node manages to end 2147483647 times.
-This should be impossible, save for the most long-running applications and shortest meaningful buffers.</p>
+You can write to this property to reset it.</p>
 </div>
 </div>
 <div class="sect4">
@@ -10394,6 +10508,352 @@ This is the least expensive of the Libaudioverse equalizers, and is sufficient f
 This section concerns itself only with those enumerations that are important by themselves.</p>
 </div>
 <div class="sect2">
+<h3 id="enum-Lav_FDN_FILTER_TYPES">Lav_FDN_FILTER_TYPES</h3>
+<div class="paragraph">
+<p>Possible filter types for a feedback delay network&#8217;s feedback path.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Members</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_FDN_FILTER_TYPE_DISABLED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Don&#8217;t insert filters on the feedback path.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_FDN_FILTER_TYPE_LOWPASS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Insert lowpass filters on the FDN&#8217;s feedback path.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_FDN_FILTER_TYPE_HIGHPASS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Insert highpass filters on the FDN&#8217;s feedback path.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="enum-Lav_LOGGING_LEVELS">Lav_LOGGING_LEVELS</h3>
+<div class="paragraph">
+<p>Possible levels for logging.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Members</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_CRITICAL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Logs critical messages such as failures to initialize and error conditions.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_INFO</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Logs informative messages.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_DEBUG</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Logs everything possible.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_OFF</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No log messages will be generated.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="enum-Lav_BIQUAD_TYPES">Lav_BIQUAD_TYPES</h3>
+<div class="paragraph">
+<p>Indicates a biquad filter type, used with the <a href="#node-Lav_OBJTYPE_BIQUAD_NODE">biquad filter node</a> and in a few other places.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Members</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_LOWPASS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates a lowpass filter.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_HIGHPASS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates a highpass filter.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_BANDPASS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates a bandpass filter.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_NOTCH</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates a notch filter.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_ALLPASS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates an allpass filter.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_PEAKING</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates a peaking filter.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_LOWSHELF</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates a lowshelf filter.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_HIGHSHELF</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates a highshelf filter.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_IDENTITY</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This filter does nothing.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="enum-Lav_NODE_STATES">Lav_NODE_STATES</h3>
+<div class="paragraph">
+<p>used to indicate the state of a node.
+This is the value of the node&#8217;s state property and determins how the node is processed.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Members</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NODESTATE_PAUSED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This node is paused.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NODESTATE_PLAYING</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This node advances if other nodes need audio from it.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NODESTATE_ALWAYS_PLAYING</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This node advances always.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="enum-Lav_PROPERTY_TYPES">Lav_PROPERTY_TYPES</h3>
+<div class="paragraph">
+<p>Indicates the type of a property.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Members</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_INT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Property holds a 32-bit integer.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_FLOAT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Property holds a 32-bit floating point value.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_DOUBLE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Property holds a 64-bit double.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_STRING</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Property holds a string.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_FLOAT3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Property holds a float3, a vector of 3 floats.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_FLOAT6</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Property holds a float6, a vector of 6 floats.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_FLOAT_ARRAY</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Property is an array of floats.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_INT_ARRAY</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Property is an array of ints.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_BUFFER</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Property holds a handle to a buffer.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="enum-Lav_PANNING_STRATEGIES">Lav_PANNING_STRATEGIES</h3>
+<div class="paragraph">
+<p>Indicates a strategy to use for panning.
+This is mostly for the <a href="#node-Lav_OBJTYPE_MULTIPANNER_NODE">multipanner node</a> and the 3D components of this library.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Members</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_DELEGATE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Delegate the decision. Used for 3D sources.  If there is nowhere to delegate to, assumes <code>Lav_PANNING_STRATEGY_STEREO</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_HRTF</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates HRTF panning.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_STEREO</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates stereo panning.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_SURROUND40</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates 4.0 surround sound (quadraphonic) panning.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_SURROUND51</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates 5.1 surround sound panning.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_SURROUND71</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates 7.1 surround sound panning.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="enum-Lav_DISTANCE_MODELS">Lav_DISTANCE_MODELS</h3>
+<div class="paragraph">
+<p>used in the 3D components of this library.
+Indicates how sound should become quieter as objects move away from the listener.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Members</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_DELEGATE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Delegate to another node, if we can.  Otherwise, fall back to <code>Lav_DISTANCE_MODEL_LINEAR</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_LINEAR</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sound falls off as <code>1-(distance/maxDistance)</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_EXPONENTIAL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sounds fall off as <code>1/distance</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_INVERSE_SQUARE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sounds fall off as <code>1/min(distance, maxDistance)^2</code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="enum-Lav_CHANNEL_INTERPRETATIONS">Lav_CHANNEL_INTERPRETATIONS</h3>
+<div class="paragraph">
+<p>Specifies how to treat inputs to this node for upmixing and downmixing.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Members</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_CHANNEL_INTERPRETATION_DISCRETE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If channel counts mismatch, don&#8217;t apply mixing matrices. Either drop or fill with zeros as appropriate.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_CHANNEL_INTERPRETATION_SPEAKERS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Apply mixing matrices if needed.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="enum-Lav_NOISE_TYPES">Lav_NOISE_TYPES</h3>
+<div class="paragraph">
+<p>Specifies types of noise.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Members</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NOISE_TYPE_WHITE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">gaussian white noise.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NOISE_TYPE_PINK</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Pink noise.  Pink noise falls off at 3 DB per octave.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NOISE_TYPE_BROWN</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Brown noise.  Brown noise decreases at 6 DB per octave.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
 <h3 id="enum-Lav_ERRORS">Lav_ERRORS</h3>
 <div class="paragraph">
 <p>All functions in this library return one of the following enum values, indicating their error condition.</p>
@@ -10496,358 +10956,12 @@ This section concerns itself only with those enumerations that are important by 
 </tbody>
 </table>
 </div>
-<div class="sect2">
-<h3 id="enum-Lav_FDN_FILTER_TYPES">Lav_FDN_FILTER_TYPES</h3>
-<div class="paragraph">
-<p>Possible filter types for a feedback delay network&#8217;s feedback path.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Members</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_FDN_FILTER_TYPE_DISABLED</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Don&#8217;t insert filters on the feedback path.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_FDN_FILTER_TYPE_LOWPASS</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Insert lowpass filters on the FDN&#8217;s feedback path.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_FDN_FILTER_TYPE_HIGHPASS</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Insert highpass filters on the FDN&#8217;s feedback path.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="enum-Lav_DISTANCE_MODELS">Lav_DISTANCE_MODELS</h3>
-<div class="paragraph">
-<p>used in the 3D components of this library.
-Indicates how sound should become quieter as objects move away from the listener.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Members</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_DELEGATE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Delegate to another node, if we can.  Otherwise, fall back to <code>Lav_DISTANCE_MODEL_LINEAR</code>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_LINEAR</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Sound falls off as <code>1-(distance/maxDistance)</code>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_EXPONENTIAL</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Sounds fall off as <code>1/distance</code>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_INVERSE_SQUARE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Sounds fall off as <code>1/min(distance, maxDistance)^2</code>.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="enum-Lav_NOISE_TYPES">Lav_NOISE_TYPES</h3>
-<div class="paragraph">
-<p>Specifies types of noise.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Members</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NOISE_TYPE_WHITE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">gaussian white noise.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NOISE_TYPE_PINK</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Pink noise.  Pink noise falls off at 3 DB per octave.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NOISE_TYPE_BROWN</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Brown noise.  Brown noise decreases at 6 DB per octave.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="enum-Lav_NODE_STATES">Lav_NODE_STATES</h3>
-<div class="paragraph">
-<p>used to indicate the state of a node.
-This is the value of the node&#8217;s state property and determins how the node is processed.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Members</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NODESTATE_PAUSED</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">This node is paused.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NODESTATE_PLAYING</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">This node advances if other nodes need audio from it.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_NODESTATE_ALWAYS_PLAYING</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">This node advances always.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="enum-Lav_BIQUAD_TYPES">Lav_BIQUAD_TYPES</h3>
-<div class="paragraph">
-<p>Indicates a biquad filter type, used with the <a href="#node-Lav_OBJTYPE_BIQUAD_NODE">biquad filter node</a> and in a few other places.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Members</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_LOWPASS</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates a lowpass filter.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_HIGHPASS</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates a highpass filter.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_BANDPASS</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates a bandpass filter.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_NOTCH</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates a notch filter.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_ALLPASS</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates an allpass filter.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_PEAKING</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates a peaking filter.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_LOWSHELF</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates a lowshelf filter.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_HIGHSHELF</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates a highshelf filter.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_BIQUAD_TYPE_IDENTITY</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">This filter does nothing.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="enum-Lav_PROPERTY_TYPES">Lav_PROPERTY_TYPES</h3>
-<div class="paragraph">
-<p>Indicates the type of a property.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Members</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_INT</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Property holds a 32-bit integer.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_FLOAT</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Property holds a 32-bit floating point value.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_DOUBLE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Property holds a 64-bit double.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_STRING</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Property holds a string.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_FLOAT3</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Property holds a float3, a vector of 3 floats.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_FLOAT6</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Property holds a float6, a vector of 6 floats.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_FLOAT_ARRAY</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Property is an array of floats.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_INT_ARRAY</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Property is an array of ints.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_BUFFER</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Property holds a handle to a buffer.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="enum-Lav_CHANNEL_INTERPRETATIONS">Lav_CHANNEL_INTERPRETATIONS</h3>
-<div class="paragraph">
-<p>Specifies how to treat inputs to this node for upmixing and downmixing.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Members</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_CHANNEL_INTERPRETATION_DISCRETE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">If channel counts mismatch, don&#8217;t apply mixing matrices. Either drop or fill with zeros as appropriate.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_CHANNEL_INTERPRETATION_SPEAKERS</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Apply mixing matrices if needed.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="enum-Lav_PANNING_STRATEGIES">Lav_PANNING_STRATEGIES</h3>
-<div class="paragraph">
-<p>Indicates a strategy to use for panning.
-This is mostly for the <a href="#node-Lav_OBJTYPE_MULTIPANNER_NODE">multipanner node</a> and the 3D components of this library.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Members</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_DELEGATE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Delegate the decision. Used for 3D sources.  If there is nowhere to delegate to, assumes <code>Lav_PANNING_STRATEGY_STEREO</code>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_HRTF</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates HRTF panning.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_STEREO</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates stereo panning.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_SURROUND40</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates 4.0 surround sound (quadraphonic) panning.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_SURROUND51</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates 5.1 surround sound panning.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_SURROUND71</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates 7.1 surround sound panning.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="enum-Lav_LOGGING_LEVELS">Lav_LOGGING_LEVELS</h3>
-<div class="paragraph">
-<p>Possible levels for logging.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Members</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Member</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_CRITICAL</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Logs critical messages such as failures to initialize and error conditions.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_INFO</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Logs informative messages.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_DEBUG</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Logs everything possible.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_LOGGING_LEVEL_OFF</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">No log messages will be generated.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-05-25 01:42:38 Greenwich Standard Time
+Last updated 2016-05-27 14:58:34 Greenwich Standard Time
 </div>
 </div>
 <script type="text/x-mathjax-config">
