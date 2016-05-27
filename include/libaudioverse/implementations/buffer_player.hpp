@@ -11,6 +11,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <memory>
 #include <vector>
 #include <algorithm>
+#include <limits>
 
 namespace libaudioverse_implementation {
 
@@ -31,7 +32,7 @@ class BufferPlayer {
 	double getRate();
 	//Increments every time the buffer ends.
 	int getEndedCount();
-	void resetEndedCount();
+	void setEndedCount(int c);
 	private:
 	std::shared_ptr<Buffer> buffer = nullptr;
 	int frame = 0;
@@ -73,7 +74,7 @@ inline void BufferPlayer::process(int channels, float** outputs) {
 		//We do the looping check first so we can break out if we have issues.
 		for(int i =0; i < block_size; i++) {
 			if(frame >= buffer_length) { //past end.
-				ended_count ++;
+				if(ended_count < std::numeric_limits<int>::max()) ended_count ++;
 				if(is_looping == false) {
 					ended = true;
 					break;
@@ -112,7 +113,7 @@ inline void BufferPlayer::setBuffer(std::shared_ptr<Buffer> b) {
 	if(b) b->incrementUseCount();
 	frame = 0;
 	offset = 0.0;
-	resetEndedCount();
+	setEndedCount(0);
 	if(b) ended = false;
 	else ended = true;
 	buffer_length = b ? b->getLength() : 0;
@@ -159,8 +160,8 @@ inline int BufferPlayer::getEndedCount() {
 	return ended_count;
 }
 
-inline void BufferPlayer::resetEndedCount() {
-	ended_count = 0;
+inline void BufferPlayer::setEndedCount(int c) {
+	ended_count = c;
 }
 
 }

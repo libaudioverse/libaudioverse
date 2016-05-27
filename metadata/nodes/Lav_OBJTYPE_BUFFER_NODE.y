@@ -32,14 +32,12 @@ properties:
     name: ended_count
     type: int
     default: 0
+    range: [0, MAX_INT]
     doc_description: |
       Increments every time the buffer reaches it's end.
       If the buffer is not looping, this can be used to determine when the buffer is ended, without using the callback.
       if the buffer is configured to loop, the counter will count up every time the end of a loop is reached.
       You can write to this property to reset it.
-      
-      Note that this property can technically wrap if your buffer node manages to end 2147483647 times.
-      This should be impossible, save for the most long-running applications and shortest meaningful buffers.
 callbacks:
   end:
     doc_description: |

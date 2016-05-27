@@ -59,10 +59,12 @@ void BufferNode::positionChanged() {
 
 void BufferNode::process() {
 	auto buff = getProperty(Lav_BUFFER_BUFFER).getBufferValue();
+	auto endedCount = getProperty(Lav_BUFFER_ENDED_COUNT).getIntValue();
 	if(buff == nullptr) return;
 	if(werePropertiesModified(this, Lav_BUFFER_POSITION)) player.setPosition(getProperty(Lav_BUFFER_POSITION).getDoubleValue());
 	if(werePropertiesModified(this, Lav_BUFFER_RATE)) player.setRate(getProperty(Lav_BUFFER_RATE).getDoubleValue());
 	if(werePropertiesModified(this, Lav_BUFFER_LOOPING)) player.setIsLooping(getProperty(Lav_BUFFER_LOOPING).getIntValue() != 0);
+	player.setEndedCount(endedCount);
 	int prevEndedCount = player.getEndedCount();
 	player.process(buff->getChannels(), &output_buffers[0]);
 	getProperty(Lav_BUFFER_POSITION).setDoubleValue(player.getPosition());
