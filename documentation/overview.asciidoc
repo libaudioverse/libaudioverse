@@ -33,7 +33,7 @@ sine.connect(0, server)
 #or sine.connect(0, sine.server)
 
 #The  server will play once it has been told to use a specific output device.
-simulation.set_output_device("default")
+server.set_output_device("default")
 
 time.sleep(5.0)
 libaudioverse.shutdown()
@@ -188,16 +188,16 @@ Buffer nodes play the specified buffer, and have some properties of interest:
 
 - `ended_count` increments every time the buffer ends.  You can reset it by writing to it.
 
-As mentioned above, buffers store uncompressed, decoded audio data as float32, resampled to match the sampling rate of their simulation.
+As mentioned above, buffers store uncompressed, decoded audio data as float32, resampled to match the sampling rate of their server.
 This means they are quite large.
 Caching buffers is therefore very highly recommended, as 1 second of mono audio will take 176KB and a minute of stereo audio will take about 21 MB.
-You cannot share buffers between simulations, but you can easily share them between buffer nodes.
+You cannot share buffers between servers, but you can easily share them between buffer nodes.
 
 Finally, this section introduces the above-mentioned node state.
 A node's state is set through the `state` property, identified in C as `Lav_NODE_STATE`.
 Nodes have 3 states:
 
-1. Playing or `Lav_NODESTATE_PLAYING` in C: this node advances if it is directly or indirectly connected to the simulation. The default.
+1. Playing or `Lav_NODESTATE_PLAYING` in C: this node advances if it is directly or indirectly connected to the server. The default.
 
 2. Paused or `Lav_NODESTATE_PAUSED`: this node never advances no matter what, and any nodes that would have advanced because of a connection to it won't either.
 
@@ -222,7 +222,7 @@ buffer_player.looping = True
 
 panner=libaudioverse.MultipannerNode(s, "default")
 buffer_player.connect(output = 0, node = panner, input = 0)
-panner.connect_simulation(0)
+panner.connect(0, s)
 s.set_output_device(-1)
 ....
 
@@ -381,7 +381,8 @@ In this example we specify that all sources created and any created in future sh
 Any attempt to create an effect send for reverb without using 4 channels will error.
 Unlike non-reverb sends, effect sends for reverb pan their audio differently, such that the reverb fades in with distance.
 
-`create_effect_send` returns the index of the newly created output, which we then feed through an FDN reverb and then to the simulation.
+`create_effect_send` returns the index of the newly created output, which we then feed through an FDN reverb and then to the server.
+In C, this function is <<function-Lav_environmentNodeCreateEffectSend>>.
 
 FDN reverbs are very simple reverberators.
 The two most important properties are `density` and `t60`.
@@ -423,7 +424,7 @@ n.frequency.linear_ramp_to_value(5.0, 600)
 n.mul.set(5.1, 1.0)
 n.mul.linear_ramp_to_value(5.2, 0.0)
 
-n.connect_simulation(0)
+n.connect(0, s)
 s.set_output_device("default")
 time.sleep(8.0)
 
