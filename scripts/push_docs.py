@@ -40,6 +40,7 @@ try:
     subprocess.check_output(['git', 'commit', '-m',
     "Update manual from Appveyor build {}".format(os.getenv("APPVEYOR_BUILD_NUMBER"))],
     shell = True, stderr = subprocess.STDOUT)
+    subprocess.check_output(["git", "push"], shell = True, stderr = subprocess.STDOUT)
 except subprocess.CalledProcessError as e:
     print("Couldn't complete documentation deploy due to error calling a command:")
     print(e.cmd)
