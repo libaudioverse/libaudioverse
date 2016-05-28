@@ -79,7 +79,7 @@ build_script:
   - cd build
   #Turn off devmode to make docs be part of all.
   - 'cmake .. -G "NMake Makefiles JOM" -DLIBAUDIOVERSE_DEVMODE:BOOL=OFF -DLIBSNDFILE_LOCATION:STRING="c:/projects/libaudioverse/tmp"'
-  - jom /j1
+  - jom /D /j1
   #Go back, so that after_build works.
   - cd ..
 
