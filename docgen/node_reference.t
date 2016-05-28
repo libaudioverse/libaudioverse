@@ -15,7 +15,7 @@ Extra functions do any number of things and are documented with the node that th
 
 To determine the number of inputs and outputs a node has, as well as their channel counts, check the general description of the node and the description of its constructor in that order.
 No node's output or input count can change after the node is created.
-A few nodes make the input and output channel counts change depending on properties.
+A few nodes change the input and output channel counts depending on properties.
 The most notable node of this type is the amplitude panner.
 
 {%for node_name in sorted_nodes%}
@@ -83,7 +83,7 @@ The outputs of this node are described below.
 {%if nodes[node_name]['has_properties']%}
 ==== Properties
 
-{%for propinfo in nodes[node_name]['properties'].items()%}
+{%for propinfo in nodes[node_name]['properties'].items()|sort%}
 
 ===== {{propinfo[1]['name']}}
 
@@ -117,7 +117,7 @@ This property is read-only.
 {%if node['has_callbacks']%}
 ==== Callbacks
 
-{%for name, info in node['callbacks'].items()%}
+{%for name, info in node['callbacks'].items()|sort%}
 ===== {{name}}
 Setter: {{functions[info['setter_name']]|function_to_string}}
 
@@ -133,7 +133,7 @@ Callback Prototype: pass:[{{info['callback_func']|function_to_string}}]
 {%if node['has_extra_functions']%}
 ==== Extra Functions
 
-{%for c_name, info in node['extra_functions'].items()%}
+{%for c_name, info in node['extra_functions'].items()|sort%}
 {{macros.render_function(c_name, info)}}
 
 {%endfor%}
