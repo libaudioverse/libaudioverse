@@ -35,6 +35,6 @@ if __name__ == '__main__':
     subprocess.call(["asciidoctor", os.path.join(dest_dir, 'libaudioverse_manual.asciidoc')], stderr= subprocess.STDOUT, shell = True)
 
     if not os.path.exists(os.path.join(repository_root, "build", "artifacts")):
-        os.makedirs(os.path.join(root_dir, "build", "artifacts"))
+        os.makedirs(os.path.join(repository_root, "build", "artifacts"))
     shutil.copy(os.path.join(repository_root, "build", "documentation", "libaudioverse_manual.html"),
     os.path.join(repository_root, "build", "artifacts"))
