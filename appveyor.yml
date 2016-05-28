@@ -89,9 +89,9 @@ after_build:
   - cd tmp
   - 'git clone https://github.com/camlorn/libaudioverse -b gh-pages --single-branch libaudioverse_docs'
   - 'cd libaudioverse_docs\docs'
-  - git rm -rf .
-  - 'cp ..\..\..\build\documentation\libaudioverse_manual.html libaudioverse_manual.html'
-  - 'xcopy /I /Q /E ..\..\..\build\bindings\python\docs\_build\html python'
+  - 'git rm -rf %APPVEYOR_REPO_BRANCH%'
+  - 'cp ..\..\..\build\documentation\libaudioverse_manual.html %APPVEYOR_REPO_BRANCH%\libaudioverse_manual.html'
+  - 'xcopy /I /Q /E ..\..\..\build\bindings\python\docs\_build\html %APPVEYOR_REPO_BRANCH%\python'
   #This either commits or doesn't, if it doesn't it's no loss.
   - git add -A .
   - cd ..
