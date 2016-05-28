@@ -56,7 +56,7 @@ def post_generate(dir):
             command = [os.getenv("PYTHON_COMMAND")]
             print("In Appveyor. Using", command)
         else:
-            command = ["py", "-3"]
+            command = ["py"]
             print("Not in Appveyor. Using", command)
         print("Building wheel and documentation for Python bindings.")
         sys.stdout.flush()
