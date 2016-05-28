@@ -25,7 +25,7 @@ try:
         os.makedirs("branches")
     os.chdir("branches")
     if os.path.exists(branch):
-        shutil.rmdir(branch)
+        shutil.rmtree(branch)
     os.makedirs(branch)
     os.chdir(branch)
     #Okay, and copy:
