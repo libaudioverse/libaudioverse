@@ -28,13 +28,13 @@ def find_datafiles():
 
 
 #Everything below here might need the important enums, namely Lav_OBJECT_TYPES:
-{%for name in important_enums%}
+{%for name in important_enums|sort%}
 {%set constants = constants_by_enum[name]%}
 {%set constants_prefix = common_prefix(constants.keys())%}
 class {{name|without_lav|underscores_to_camelcase(True)}}(enum.IntEnum):
     {%if name in metadata['enumerations']%}"""{{metadata['enumerations'][name]['doc_description']}}"""{%endif%}
 
-{%for i, j in constants.items()%}
+{%for i, j in constants.items()|sort%}
     {{i|strip_prefix(constants_prefix)|lower}} = {{j}}
     {%if name in metadata['enumerations']%}"""{{metadata['enumerations'][name]['members'][i]}}"""{%endif%}
 
@@ -89,7 +89,7 @@ class GenericError(Exception):
         self.message = _lav.error_get_message()
         super(GenericError, self).__init__("{} ({}:{})".format(self.message, self.file, self.line))
 
-{%for error_name in constants.keys()|prefix_filter("Lav_ERROR_")|remove_filter("Lav_ERROR_NONE")%}
+{%for error_name in constants.keys()|prefix_filter("Lav_ERROR_")|remove_filter("Lav_ERROR_NONE")|sort%}
 {%set friendly_name = error_name|strip_prefix("Lav_ERROR_")|lower|underscores_to_camelcase(True)%}
 class {{friendly_name}}Error(GenericError):
     r"""{{metadata['enumerations']["Lav_ERRORS"]['members'][error_name]}}"""
@@ -347,7 +347,6 @@ Use load_from_file to read a file or load_from_array to load an iterable."""
 
     def normalize(self):
         r"""Normalizes the buffer.
-        
         
         Wraps Lav_bufferNormalize."""
         _lav.buffer_normalize(self)
@@ -704,14 +703,14 @@ class GenericNode(_HandleComparer):
                 self._state['lock'] = threading.Lock()
                 self._state['properties'] = dict()
                 self._state['property_instances'] = dict()
-{%for enumerant, prop in metadata['nodes']['Lav_OBJTYPE_GENERIC_NODE']['properties'].items()%}
+{%for enumerant, prop in metadata['nodes']['Lav_OBJTYPE_GENERIC_NODE']['properties'].items()|sort%}
                 self._state['properties']["{{prop['name']}}"] = _libaudioverse.{{enumerant}}
 {%endfor%}
             else:
                 self._state=_object_states[handle.handle]
             self._lock = self._state['lock']
             self._property_instances = dict()
-{%for enumerant, prop in metadata['nodes']['Lav_OBJTYPE_GENERIC_NODE']['properties'].items()%}
+{%for enumerant, prop in metadata['nodes']['Lav_OBJTYPE_GENERIC_NODE']['properties'].items()|sort%}
 {{macros.make_property_instance(enumerant, prop)|indent(12, True)}}
 {%endfor%}
 
@@ -762,7 +761,7 @@ class GenericNode(_HandleComparer):
         r"""Disconnect all outputs."""
         _lav.node_isolate(self)
 
-{%for enumerant, prop in metadata['nodes']['Lav_OBJTYPE_GENERIC_NODE']['properties'].items()%}
+{%for enumerant, prop in metadata['nodes']['Lav_OBJTYPE_GENERIC_NODE']['properties'].items()|sort%}
 {{macros.implement_property(enumerant, prop)}}
 {%endfor%}
 
@@ -774,7 +773,7 @@ class GenericNode(_HandleComparer):
 
 _types_to_classes[ObjectTypes.generic_node] = GenericNode
 
-{%for node_name in constants.keys()|regexp_filter("Lav_OBJTYPE_\w+_NODE")|remove_filter("Lav_OBJTYPE_GENERIC_NODE")%}
+{%for node_name in constants.keys()|regexp_filter("Lav_OBJTYPE_\w+_NODE")|remove_filter("Lav_OBJTYPE_GENERIC_NODE")|sort%}
 {%set friendly_name = node_name|strip_prefix("Lav_OBJTYPE_")|strip_suffix("_NODE")|lower|underscores_to_camelcase(True)%}
 {%set constructor_name = "Lav_create" + friendly_name + "Node"%}
 {%set constructor_arg_names = functions[constructor_name].input_args|map(attribute='name')|map('camelcase_to_underscores')| map('strip_suffix', "_handle")| list-%}
@@ -800,12 +799,12 @@ class {{friendly_name}}Node(GenericNode):
 {%endfor%}
 {%endif%}
 
-{%for enumerant, prop in property_dict.items()%}
+{%for enumerant, prop in property_dict.items()|sort%}
 {{macros.implement_property(enumerant, prop)}}
 
 {%endfor%}
 
-{%for func_name, func_info in metadata['nodes'].get(node_name, dict()).get('extra_functions', dict()).items()%}
+{%for func_name, func_info in metadata['nodes'].get(node_name, dict()).get('extra_functions', dict()).items()|sort%}
 {%set friendly_func_name = func_info['name']%}
 {%set func = functions[func_name]%}
 {%set lav_func = func.name|without_lav|camelcase_to_underscores%}
@@ -816,7 +815,7 @@ class {{friendly_name}}Node(GenericNode):
 
 {%endfor%}
 
-{%for callback_name, callback_info in metadata['nodes'].get(node_name, dict()).get('callbacks', dict()).items()%}
+{%for callback_name, callback_info in metadata['nodes'].get(node_name, dict()).get('callbacks', dict()).items()|sort%}
 {%set libaudioverse_function_name = "_lav."+friendly_name|camelcase_to_underscores+"_node_set_"+callback_name+"_callback"%}
 {%set tmp = functions["Lav_"+friendly_name[0].lower()+friendly_name[1:]+"NodeSet"+callback_name|underscores_to_camelcase(True)+"Callback"]%}
 {%set ctypes_name = "_libaudioverse."+tmp.args[1].type.base%}

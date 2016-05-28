@@ -1,9 +1,11 @@
-#we have to have the root dir of the repository in sys.path.
+
+import os
 import os.path
 import sys
 import shutil
 import subprocess
 
+#we have to have the root dir of the repository in sys.path.
 repository_root = os.path.split(os.path.split(os.path.abspath(__file__))[0])[0]
 sys.path = [repository_root] + sys.path
 import docgen
@@ -31,3 +33,8 @@ if __name__ == '__main__':
         f.write(enum_docs)
 
     subprocess.call(["asciidoctor", os.path.join(dest_dir, 'libaudioverse_manual.asciidoc')], stderr= subprocess.STDOUT, shell = True)
+
+    if not os.path.exists(os.path.join(repository_root, "build", "artifacts")):
+        os.makedirs(os.path.join(root_dir, "build", "artifacts"))
+    shutil.copy(os.path.join(repository_root, "build", "documentation", "libaudioverse_manual.html"),
+    os.path.join(repository_root, "build", "artifacts"))
