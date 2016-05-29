@@ -42,12 +42,12 @@ Specific information on copyright canb be found in the file `LICENSE`, a copy of
 
 There are two sources of Libaudioverse documentation.
 
-The first is the [language-agnostic manual](http://camlorn.github.io/libaudioverse/docs/libaudioverse_manual.html), which discusses Libaudioverse from a general perspective.
+The first is the [language-agnostic manual](http://camlorn.github.io/libaudioverse/docs/branches/master/libaudioverse_manual.html), which discusses Libaudioverse from a general perspective.
 This manual contains the reference for the C API and an overview of Libaudioverse's core concepts.
 Most examples in this manual are in Python.
 
 The second source of documentation is the API reference for your language of choice.
-At the moment, this means [the Python API reference](http://camlorn.github.io/libaudioverse/docs/python/index.html).
+At the moment, this means [the Python API reference](http://camlorn.github.io/libaudioverse/docs/branches/master/python/index.html).
 The API references contain installation instructions and any notes specific to the language in question.
 
 Examples for all supported languages may be found in the [GitHub repository](http://github.com/camlorn/libaudioverse).
