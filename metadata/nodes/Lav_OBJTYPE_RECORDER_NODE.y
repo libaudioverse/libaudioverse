@@ -2,7 +2,7 @@ extra_functions:
   Lav_recorderNodeStartRecording:
     doc_description: |
       Begin recording to the specified files.
-      The sample rate is the same as that of the simulation.
+      The sample rate is the same as that of the server.
       The channel count is the same as this node was initialized with.
       The format of the file is determined from the extension: this function recognizes ".wav" and ".ogg" on all platforms.
     params:

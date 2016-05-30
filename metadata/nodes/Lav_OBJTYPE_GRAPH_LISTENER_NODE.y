@@ -4,7 +4,7 @@ callbacks:
       When set, audio is passed to this callback every block.
       This callback is called inside the audio threads; do not block.
     params:
-      frames: The number of frames of audio being made available to client code.  This should always be the same as the simulation's block size.
+      frames: The number of frames of audio being made available to client code.  This should always be the same as the server's block size.
       channels: The number of channels of audio being made available to client code.
       buffer: The data, stored in interleaved format.  The length of this buffer is {{"frames*channels"|codelit}}.
 inputs:
