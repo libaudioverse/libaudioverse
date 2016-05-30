@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>The Libaudioverse API &mdash; Libaudioverse build199 documentation</title>
+  <title>The Libaudioverse API &mdash; Libaudioverse build200 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="Libaudioverse build199 documentation" href="index.html"/>
+    <link rel="top" title="Libaudioverse build200 documentation" href="index.html"/>
         <link rel="prev" title="Python-specific Notes" href="python-specifics.html"/> 
 
   
@@ -416,7 +416,7 @@ If crossfading is enabled, moving the panner will slowly fade it to the new posi
 
 <dl class="class">
 <dt id="libaudioverse.AutomatedProperty">
-<em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">AutomatedProperty</code><span class="sig-paren">(</span><em>handle</em>, <em>slot</em>, <em>getter</em>, <em>setter</em>, <em>converter=&lt;function LibaudioverseProperty.&lt;lambda&gt; at 0x0000002318D98E18&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.AutomatedProperty" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">AutomatedProperty</code><span class="sig-paren">(</span><em>handle</em>, <em>slot</em>, <em>getter</em>, <em>setter</em>, <em>converter=&lt;function LibaudioverseProperty.&lt;lambda&gt; at 0x03FBD8E8&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.AutomatedProperty" title="Permalink to this definition">¶</a></dt>
 <dd><p>A property that supports automation and node connection.</p>
 <dl class="method">
 <dt id="libaudioverse.AutomatedProperty.cancel_automators">
@@ -683,7 +683,7 @@ This class adds extra marshalling to make sure that boolean properties show up a
 <dt id="libaudioverse.BufferNode">
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">BufferNode</code><span class="sig-paren">(</span><em>server</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.BufferNode" title="Permalink to this definition">¶</a></dt>
 <dd><p>This node plays a buffer.
-The output of this node will have as many channels as the buffer does, so connecting it directly to the simulation will have the desired effect.</p>
+The output of this node will have as many channels as the buffer does, so connecting it directly to the server will have the desired effect.</p>
 <dl class="attribute">
 <dt id="libaudioverse.BufferNode.buffer">
 <code class="descname">buffer</code><a class="headerlink" href="#libaudioverse.BufferNode.buffer" title="Permalink to this definition">¶</a></dt>
@@ -1743,7 +1743,7 @@ This callback is called inside the audio threads; do not block.</p>
 <dt id="libaudioverse.HardLimiterNode">
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">HardLimiterNode</code><span class="sig-paren">(</span><em>server</em>, <em>channels</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.HardLimiterNode" title="Permalink to this definition">¶</a></dt>
 <dd><p>The input to this node is hard limited: values less than -1.0 are set to -1.0 and values above 1.0 are set to 1.0.
-Use the hard limiter in order to prevent oddities with audio hardware; it should usually be the last piece in your pipeline before the simulation.
+Use the hard limiter in order to prevent oddities with audio hardware; it should usually be the last piece in your pipeline before the server.
 Note that the 3D API handles hard limiting appropriately, and you do not need to worry about this there.</p>
 </dd></dl>
 
@@ -1863,7 +1863,7 @@ If you feed this node a signal that is zero, it will slowly decrease the output 
 
 <dl class="class">
 <dt id="libaudioverse.LibaudioverseProperty">
-<em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">LibaudioverseProperty</code><span class="sig-paren">(</span><em>handle</em>, <em>slot</em>, <em>getter</em>, <em>setter</em>, <em>converter=&lt;function LibaudioverseProperty.&lt;lambda&gt; at 0x0000002318D98E18&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.LibaudioverseProperty" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">LibaudioverseProperty</code><span class="sig-paren">(</span><em>handle</em>, <em>slot</em>, <em>getter</em>, <em>setter</em>, <em>converter=&lt;function LibaudioverseProperty.&lt;lambda&gt; at 0x03FBD8E8&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.LibaudioverseProperty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Proxy to Libaudioverse properties.</p>
 <p>All properties support resetting and type query.</p>
 <dl class="attribute">
@@ -2293,7 +2293,7 @@ Failure to do so may lead to any of a number of surprising results.</p>
 <dt id="libaudioverse.RecorderNode.start_recording">
 <code class="descname">start_recording</code><span class="sig-paren">(</span><em>node</em>, <em>path</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.RecorderNode.start_recording" title="Permalink to this definition">¶</a></dt>
 <dd><p>Begin recording to the specified files.
-The sample rate is the same as that of the simulation.
+The sample rate is the same as that of the server.
 The channel count is the same as this node was initialized with.
 The format of the file is determined from the extension: this function recognizes &#8221;.wav&#8221; and &#8221;.ogg&#8221; on all platforms.</p>
 </dd></dl>
@@ -2708,7 +2708,7 @@ You must call it before the interpreter shuts down. Failure to do so will allow 
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'build199',
+            VERSION:'build200',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
