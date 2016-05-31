@@ -817,8 +817,8 @@ class {{friendly_name}}Node(GenericNode):
 
 {%for callback_name, callback_info in metadata['nodes'].get(node_name, dict()).get('callbacks', dict()).items()|sort%}
 {%set libaudioverse_function_name = "_lav."+friendly_name|camelcase_to_underscores+"_node_set_"+callback_name+"_callback"%}
-{%set tmp = functions["Lav_"+friendly_name[0].lower()+friendly_name[1:]+"NodeSet"+callback_name|underscores_to_camelcase(True)+"Callback"]%}
-{%set ctypes_name = "_libaudioverse."+tmp.args[1].type.base%}
+{%set setter_function = functions["Lav_"+friendly_name[0].lower()+friendly_name[1:]+"NodeSet"+callback_name|underscores_to_camelcase(True)+"Callback"]%}
+{%set ctypes_name = "_libaudioverse."+setter_function.args[1].type.base%}
     def get_{{callback_name}}_callback(self):
         r"""Get the {{callback_name}} callback.
         
@@ -832,7 +832,11 @@ class {{friendly_name}}Node(GenericNode):
 
     def set_{{callback_name}}_callback(self, callback, additional_args = None, additional_kwargs = None):
         r"""Set the {{callback_name}} callback.
-        
+
+Additional_args and additional_kwargs are passed to the callback in addition to any arguments from Libaudioverse.  Note that Libaudioverse always uses positional arguments.
+
+C callback signature: `{{typedefs[setter_function.args[1].type.base].base.to_c()}}`
+
 {{callback_info.get("doc_description", "No description available.")}}"""
         with self._lock:
             if callback is None:

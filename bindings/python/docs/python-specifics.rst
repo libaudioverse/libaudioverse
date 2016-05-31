@@ -33,17 +33,35 @@ Note the following important points:
 Callbacks
 --------------------
 
+As you read the following section, note that callbacks need to be fast.
+The following could be abstracted more, but not without significant performance penalties.
+this is the only functionality which requires you to deal directly with ctypes.
+
 Callbacks are bound as `node.set_XXX_callback` for setting and `node.get_XXX_callback` from getting.
 The getter will always return the same callable as passed to the setter.
 
-The signature of callbacks is specified in the reference.
-Python matches the C signature, save for the userdata argument.
-Instead, you can pass any number of extra arguments to the setter.
-Note that the first `n` positional arguments need to match what Libaudioverse expects, otherwise the C bindings will crash and burn inside the callback.
-
-Python holds a strong reference to the last set callback object until Libaudioverse deletes the handle.
+Python holds a strong reference to the last set callback object at least until Libaudioverse deletes the handle.
 You can therefore use any callable safely.
+Libaudioverse does not guarantee when the callable will be deleted, so it is possible for large objects to be kept alive.
 
+In the reference, nodes with callbacks document the funcctionality of the callback with the setter and show the full C signature.
+For example, the callback used with the graph listener is `void  (LavHandle  nodeHandle, unsigned int  frames, unsigned int  channels, float *   buffer, void *   userdata)`.
+Libaudioverse performs the following transformations for you:
+
+- Any arguments which are of type `LavHandle` are turned into appropriate instances of the appropriate classes.
+
+- If the last argument is a `void*` to userdata, it is not visible to you and is abstracted over by the bindings.
+
+- All other arguments are passed as-is using appropriate ctypes types.
+
+Arguments to the callback are always passed as the first `n` positional arguments.
+Setter functions also allow you to provide `additional_args` and `additional_kwargs` for convenience.
+These arguments are added *after*the arguments from Libaudioverse.
+
+If the callback returns `void`, you need to return None.
+Otherwise, you need to return something that can be converted to the appropriate ctypes type.
+Most callbacks do not expect you to return anything.
+It is more common to require you to write to a buffer of audio data.
 
 Atomicity and Simulation Locking
 ----------------------------------------
