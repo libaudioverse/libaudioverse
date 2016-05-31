@@ -837,7 +837,16 @@ Additional_args and additional_kwargs are passed to the callback in addition to 
 
 C callback signature: `{{typedefs[setter_function.args[1].type.base].base.to_c()}}`
 
-{{callback_info.get("doc_description", "No description available.")}}"""
+{{callback_info.get("doc_description", "No description available.")}}
+
+Callback parameters:
+
+{%for i in typedefs[setter_function.args[1].type.base].base.args%}
+{{i.name}}
+{{callback_info['params'][i.name]|indent(width = 2, indentfirst = True)}}
+
+{%endfor%}
+"""
         with self._lock:
             if callback is None:
                 #delete the key, clear the callback with Libaudioverse.
