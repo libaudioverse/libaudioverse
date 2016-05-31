@@ -779,8 +779,33 @@ _types_to_classes[ObjectTypes.generic_node] = GenericNode
 {%set constructor_arg_names = functions[constructor_name].input_args|map(attribute='name')|map('camelcase_to_underscores')| map('strip_suffix', "_handle")| list-%}
 {%set property_dict = metadata['nodes'].get(node_name, dict()).get('properties', dict())%}
 class {{friendly_name}}Node(GenericNode):
-    r"""{{metadata['nodes'][node_name].get('doc_description', "No descriptiona vailable.")}}"""
-    
+    r"""{{metadata['nodes'][node_name].get('doc_description', "No descriptiona vailable.")}}
+
+{%if not metadata['nodes'][node_name]['inputs']%}
+This node has no inputs.
+{%elif metadata['nodes'][node_name]['inputs'] == "constructor"%}
+The number of inputs to this node depends on parameters to its constructor.
+{%elif metadata['nodes'][node_name]['inputs'] == "described"%}
+The inputs of this node are described above.
+{%else%}
+Inputs:
+
+{{generate_input_table(metadata['nodes'][node_name])}}
+{%endif%}
+
+{%if not metadata['nodes'][node_name]['outputs']%}
+This node has no outputs. If you want it to advance, be sure to use `foo.state = nodeStates.always_playing`.
+{%elif metadata['nodes'][node_name]['outputs'] == "constructor"%}
+The number of outputs from this node depends on parameters to its constructor.
+{%elif metadata['nodes'][node_name]['outputs'] == "described"%}
+The  outputs from this node are described above.
+{%else%}
+Outputs:
+
+{{generate_output_table(metadata['nodes'][node_name])}}
+{%endif%}
+"""
+
     def __init__(self{%if constructor_arg_names|length > 0%}, {%endif%}{{constructor_arg_names|join(', ')}}):
         super({{friendly_name}}Node, self).__init__(_lav.{{constructor_name|without_lav|camelcase_to_underscores}}({{constructor_arg_names|join(', ')}}))
 
