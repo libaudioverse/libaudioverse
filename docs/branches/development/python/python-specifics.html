@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Python-specific Notes &mdash; Libaudioverse build200 documentation</title>
+  <title>Python-specific Notes &mdash; Libaudioverse build201 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="Libaudioverse build200 documentation" href="index.html"/>
+    <link rel="top" title="Libaudioverse build201 documentation" href="index.html"/>
         <link rel="next" title="The Libaudioverse API" href="api.html"/>
         <link rel="prev" title="Welcome to Libaudioverse’s documentation!" href="index.html"/> 
 
@@ -162,14 +162,29 @@ This is no longer necessary because numeric properties now behave like numbers.<
 </div>
 <div class="section" id="callbacks">
 <h2>Callbacks<a class="headerlink" href="#callbacks" title="Permalink to this headline">¶</a></h2>
+<p>As you read the following section, note that callbacks need to be fast.
+The following could be abstracted more, but not without significant performance penalties.
+this is the only functionality which requires you to deal directly with ctypes.</p>
 <p>Callbacks are bound as <cite>node.set_XXX_callback</cite> for setting and <cite>node.get_XXX_callback</cite> from getting.
 The getter will always return the same callable as passed to the setter.</p>
-<p>The signature of callbacks is specified in the reference.
-Python matches the C signature, save for the userdata argument.
-Instead, you can pass any number of extra arguments to the setter.
-Note that the first <cite>n</cite> positional arguments need to match what Libaudioverse expects, otherwise the C bindings will crash and burn inside the callback.</p>
-<p>Python holds a strong reference to the last set callback object until Libaudioverse deletes the handle.
-You can therefore use any callable safely.</p>
+<p>Python holds a strong reference to the last set callback object at least until Libaudioverse deletes the handle.
+You can therefore use any callable safely.
+Libaudioverse does not guarantee when the callable will be deleted, so it is possible for large objects to be kept alive.</p>
+<p>In the reference, nodes with callbacks document the funcctionality of the callback with the setter and show the full C signature.
+For example, the callback used with the graph listener is <cite>void  (LavHandle  nodeHandle, unsigned int  frames, unsigned int  channels, float *   buffer, void *   userdata)</cite>.
+Libaudioverse performs the following transformations for you:</p>
+<ul class="simple">
+<li>Any arguments which are of type <cite>LavHandle</cite> are turned into appropriate instances of the appropriate classes.</li>
+<li>If the last argument is a <cite>void*</cite> to userdata, it is not visible to you and is abstracted over by the bindings.</li>
+<li>All other arguments are passed as-is using appropriate ctypes types.</li>
+</ul>
+<p>Arguments to the callback are always passed as the first <cite>n</cite> positional arguments.
+Setter functions also allow you to provide <cite>additional_args</cite> and <cite>additional_kwargs</cite> for convenience.
+These arguments are added <a href="#id1"><span class="problematic" id="id2">*</span></a>after*the arguments from Libaudioverse.</p>
+<p>If the callback returns <cite>void</cite>, you need to return None.
+Otherwise, you need to return something that can be converted to the appropriate ctypes type.
+Most callbacks do not expect you to return anything.
+It is more common to require you to write to a buffer of audio data.</p>
 </div>
 <div class="section" id="atomicity-and-simulation-locking">
 <h2>Atomicity and Simulation Locking<a class="headerlink" href="#atomicity-and-simulation-locking" title="Permalink to this headline">¶</a></h2>
@@ -237,7 +252,7 @@ The members have their common prefix stripped and are then converted to lowercas
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'build200',
+            VERSION:'build201',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

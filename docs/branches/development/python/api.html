@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>The Libaudioverse API &mdash; Libaudioverse build200 documentation</title>
+  <title>The Libaudioverse API &mdash; Libaudioverse build201 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="Libaudioverse build200 documentation" href="index.html"/>
+    <link rel="top" title="Libaudioverse build201 documentation" href="index.html"/>
         <link rel="prev" title="Python-specific Notes" href="python-specifics.html"/> 
 
   
@@ -416,7 +416,7 @@ If crossfading is enabled, moving the panner will slowly fade it to the new posi
 
 <dl class="class">
 <dt id="libaudioverse.AutomatedProperty">
-<em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">AutomatedProperty</code><span class="sig-paren">(</span><em>handle</em>, <em>slot</em>, <em>getter</em>, <em>setter</em>, <em>converter=&lt;function LibaudioverseProperty.&lt;lambda&gt; at 0x0000003EADF59F28&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.AutomatedProperty" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">AutomatedProperty</code><span class="sig-paren">(</span><em>handle</em>, <em>slot</em>, <em>getter</em>, <em>setter</em>, <em>converter=&lt;function LibaudioverseProperty.&lt;lambda&gt; at 0x047658E8&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.AutomatedProperty" title="Permalink to this definition">¶</a></dt>
 <dd><p>A property that supports automation and node connection.</p>
 <dl class="method">
 <dt id="libaudioverse.AutomatedProperty.cancel_automators">
@@ -744,6 +744,8 @@ Values less than 1.0 cause a decrease in pitch and values greater than 1.0 cause
 <dt id="libaudioverse.BufferNode.set_end_callback">
 <code class="descname">set_end_callback</code><span class="sig-paren">(</span><em>callback</em>, <em>additional_args=None</em>, <em>additional_kwargs=None</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.BufferNode.set_end_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the end callback.</p>
+<p>Additional_args and additional_kwargs are passed to the callback in addition to any arguments from Libaudioverse.  Note that Libaudioverse always uses positional arguments.</p>
+<p>C callback signature: <cite>void  (LavHandle  nodeHandle, void *   userdata)</cite></p>
 <p>Called outside the audio threads every time the buffer reaches the end of the audio data.</p>
 </dd></dl>
 
@@ -897,6 +899,8 @@ True if we are crossfading, otherwise false.</p>
 <dt id="libaudioverse.CrossfaderNode.set_finished_callback">
 <code class="descname">set_finished_callback</code><span class="sig-paren">(</span><em>callback</em>, <em>additional_args=None</em>, <em>additional_kwargs=None</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.CrossfaderNode.set_finished_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the finished callback.</p>
+<p>Additional_args and additional_kwargs are passed to the callback in addition to any arguments from Libaudioverse.  Note that Libaudioverse always uses positional arguments.</p>
+<p>C callback signature: <cite>void  (LavHandle  nodeHandle, void *   userdata)</cite></p>
 <p>Called outside the audio thread when the currently scheduled crossfade finishes.</p>
 </dd></dl>
 
@@ -1425,6 +1429,8 @@ Note that this property may be slightly inaccurate because this node has to pass
 <dt id="libaudioverse.FileStreamerNode.set_end_callback">
 <code class="descname">set_end_callback</code><span class="sig-paren">(</span><em>callback</em>, <em>additional_args=None</em>, <em>additional_kwargs=None</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.FileStreamerNode.set_end_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the end callback.</p>
+<p>Additional_args and additional_kwargs are passed to the callback in addition to any arguments from Libaudioverse.  Note that Libaudioverse always uses positional arguments.</p>
+<p>C callback signature: <cite>void  (LavHandle  nodeHandle, void *   userdata)</cite></p>
 <p>Called outside the audio threads after the stream has both reached its end and gone silent.
 When called, ended will be set to true,.</p>
 </dd></dl>
@@ -1733,6 +1739,8 @@ The effect is that this node allows observing audio passing through any location
 <dt id="libaudioverse.GraphListenerNode.set_listening_callback">
 <code class="descname">set_listening_callback</code><span class="sig-paren">(</span><em>callback</em>, <em>additional_args=None</em>, <em>additional_kwargs=None</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.GraphListenerNode.set_listening_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the listening callback.</p>
+<p>Additional_args and additional_kwargs are passed to the callback in addition to any arguments from Libaudioverse.  Note that Libaudioverse always uses positional arguments.</p>
+<p>C callback signature: <cite>void  (LavHandle  nodeHandle, unsigned int  frames, unsigned int  channels, float *   buffer, void *   userdata)</cite></p>
 <p>When set, audio is passed to this callback every block.
 This callback is called inside the audio threads; do not block.</p>
 </dd></dl>
@@ -1863,7 +1871,7 @@ If you feed this node a signal that is zero, it will slowly decrease the output 
 
 <dl class="class">
 <dt id="libaudioverse.LibaudioverseProperty">
-<em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">LibaudioverseProperty</code><span class="sig-paren">(</span><em>handle</em>, <em>slot</em>, <em>getter</em>, <em>setter</em>, <em>converter=&lt;function LibaudioverseProperty.&lt;lambda&gt; at 0x0000003EADF59F28&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.LibaudioverseProperty" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">LibaudioverseProperty</code><span class="sig-paren">(</span><em>handle</em>, <em>slot</em>, <em>getter</em>, <em>setter</em>, <em>converter=&lt;function LibaudioverseProperty.&lt;lambda&gt; at 0x047658E8&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.LibaudioverseProperty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Proxy to Libaudioverse properties.</p>
 <p>All properties support resetting and type query.</p>
 <dl class="attribute">
@@ -2214,6 +2222,8 @@ The purpose of this node is to inject audio from an external source that Libaudi
 <dt id="libaudioverse.PullNode.set_audio_callback">
 <code class="descname">set_audio_callback</code><span class="sig-paren">(</span><em>callback</em>, <em>additional_args=None</em>, <em>additional_kwargs=None</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.PullNode.set_audio_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the audio callback.</p>
+<p>Additional_args and additional_kwargs are passed to the callback in addition to any arguments from Libaudioverse.  Note that Libaudioverse always uses positional arguments.</p>
+<p>C callback signature: <cite>void  (LavHandle  nodeHandle, int  frames, int  channels, float *   buffer, void *   userdata)</cite></p>
 <p>Called when the node needs more audio.</p>
 </dd></dl>
 
@@ -2251,6 +2261,8 @@ ability to cover for missing frames, you need a pull node.</p>
 <dt id="libaudioverse.PushNode.set_low_callback">
 <code class="descname">set_low_callback</code><span class="sig-paren">(</span><em>callback</em>, <em>additional_args=None</em>, <em>additional_kwargs=None</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.PushNode.set_low_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the low callback.</p>
+<p>Additional_args and additional_kwargs are passed to the callback in addition to any arguments from Libaudioverse.  Note that Libaudioverse always uses positional arguments.</p>
+<p>C callback signature: <cite>void  (LavHandle  nodeHandle, void *   userdata)</cite></p>
 <p>Called once per block and outside the audio thread when there is less than the specified threshold audio remaining.</p>
 </dd></dl>
 
@@ -2258,6 +2270,8 @@ ability to cover for missing frames, you need a pull node.</p>
 <dt id="libaudioverse.PushNode.set_underrun_callback">
 <code class="descname">set_underrun_callback</code><span class="sig-paren">(</span><em>callback</em>, <em>additional_args=None</em>, <em>additional_kwargs=None</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.PushNode.set_underrun_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the underrun callback.</p>
+<p>Additional_args and additional_kwargs are passed to the callback in addition to any arguments from Libaudioverse.  Note that Libaudioverse always uses positional arguments.</p>
+<p>C callback signature: <cite>void  (LavHandle  nodeHandle, void *   userdata)</cite></p>
 <p>Called exactly once and outside the audio thread when the node runs out of audio completely.</p>
 </dd></dl>
 
@@ -2708,7 +2722,7 @@ You must call it before the interpreter shuts down. Failure to do so will allow 
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'build200',
+            VERSION:'build201',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
