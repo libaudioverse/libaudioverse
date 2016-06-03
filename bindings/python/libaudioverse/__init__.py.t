@@ -779,8 +779,33 @@ _types_to_classes[ObjectTypes.generic_node] = GenericNode
 {%set constructor_arg_names = functions[constructor_name].input_args|map(attribute='name')|map('camelcase_to_underscores')| map('strip_suffix', "_handle")| list-%}
 {%set property_dict = metadata['nodes'].get(node_name, dict()).get('properties', dict())%}
 class {{friendly_name}}Node(GenericNode):
-    r"""{{metadata['nodes'][node_name].get('doc_description', "No descriptiona vailable.")}}"""
-    
+    r"""{{metadata['nodes'][node_name].get('doc_description', "No descriptiona vailable.")}}
+
+{%if not metadata['nodes'][node_name]['inputs']%}
+This node has no inputs.
+{%elif metadata['nodes'][node_name]['inputs'] == "constructor"%}
+The number of inputs to this node depends on parameters to its constructor.
+{%elif metadata['nodes'][node_name]['inputs'] == "described"%}
+The inputs of this node are described above.
+{%else%}
+Inputs:
+
+{{generate_input_table(metadata['nodes'][node_name])}}
+{%endif%}
+
+{%if not metadata['nodes'][node_name]['outputs']%}
+This node has no outputs. If you want it to advance, be sure to use `foo.state = nodeStates.always_playing`.
+{%elif metadata['nodes'][node_name]['outputs'] == "constructor"%}
+The number of outputs from this node depends on parameters to its constructor.
+{%elif metadata['nodes'][node_name]['outputs'] == "described"%}
+The  outputs from this node are described above.
+{%else%}
+Outputs:
+
+{{generate_output_table(metadata['nodes'][node_name])}}
+{%endif%}
+"""
+
     def __init__(self{%if constructor_arg_names|length > 0%}, {%endif%}{{constructor_arg_names|join(', ')}}):
         super({{friendly_name}}Node, self).__init__(_lav.{{constructor_name|without_lav|camelcase_to_underscores}}({{constructor_arg_names|join(', ')}}))
 
@@ -817,8 +842,8 @@ class {{friendly_name}}Node(GenericNode):
 
 {%for callback_name, callback_info in metadata['nodes'].get(node_name, dict()).get('callbacks', dict()).items()|sort%}
 {%set libaudioverse_function_name = "_lav."+friendly_name|camelcase_to_underscores+"_node_set_"+callback_name+"_callback"%}
-{%set tmp = functions["Lav_"+friendly_name[0].lower()+friendly_name[1:]+"NodeSet"+callback_name|underscores_to_camelcase(True)+"Callback"]%}
-{%set ctypes_name = "_libaudioverse."+tmp.args[1].type.base%}
+{%set setter_function = functions["Lav_"+friendly_name[0].lower()+friendly_name[1:]+"NodeSet"+callback_name|underscores_to_camelcase(True)+"Callback"]%}
+{%set ctypes_name = "_libaudioverse."+setter_function.args[1].type.base%}
     def get_{{callback_name}}_callback(self):
         r"""Get the {{callback_name}} callback.
         
@@ -832,8 +857,21 @@ class {{friendly_name}}Node(GenericNode):
 
     def set_{{callback_name}}_callback(self, callback, additional_args = None, additional_kwargs = None):
         r"""Set the {{callback_name}} callback.
-        
-{{callback_info.get("doc_description", "No description available.")}}"""
+
+Additional_args and additional_kwargs are passed to the callback in addition to any arguments from Libaudioverse.  Note that Libaudioverse always uses positional arguments.
+
+C callback signature: `{{typedefs[setter_function.args[1].type.base].base.to_c()}}`
+
+{{callback_info.get("doc_description", "No description available.")}}
+
+Callback parameters:
+
+{%for i in typedefs[setter_function.args[1].type.base].base.args%}
+{{i.name}}
+{{callback_info['params'][i.name]|indent(width = 2, indentfirst = True)}}
+
+{%endfor%}
+"""
         with self._lock:
             if callback is None:
                 #delete the key, clear the callback with Libaudioverse.

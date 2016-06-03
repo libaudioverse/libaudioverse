@@ -64,7 +64,6 @@ install:
   - cd lib
   - appveyor DownloadFile %LIBSNDFILE_URL%/libsndfile-1.lib
   - cd ..
-  - appveyor DownloadFile http://camlorn.net/appveyor/jom.exe
   - cd ..
   - set path=c:\projects\libaudioverse\tmp;%path%
   - gem install asciidoctor
@@ -78,8 +77,8 @@ build_script:
   - mkdir build
   - cd build
   #Turn off devmode to make docs be part of all.
-  - 'cmake .. -G "NMake Makefiles JOM" -DLIBAUDIOVERSE_DEVMODE:BOOL=OFF -DLIBSNDFILE_LOCATION:STRING="c:/projects/libaudioverse/tmp"'
-  - jom /D /j1
+  - 'cmake .. -G "NMake Makefiles" -DLIBAUDIOVERSE_DEVMODE:BOOL=OFF -DLIBSNDFILE_LOCATION:STRING="c:/projects/libaudioverse/tmp"'
+  - nmake
   #Go back, so that after_build works.
   - cd ..
 

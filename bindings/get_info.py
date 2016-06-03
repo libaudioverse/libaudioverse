@@ -33,17 +33,35 @@ import re
 all_info_cache=None
 
 #this is a helper class representing a type.
-#base is int, etc.
+#base is int, etc, as a string.
 #indirection is the number of *s. int* is 1, etc.
 #quals is a dict of indirection levels to qualifiers.
 class TypeInfo(object):
+
     def __init__(self, base, indirection, quals = dict(), typedef_from = None):
         self.base = base
         self.indirection = indirection
         self.quals = quals
 
+    def to_c(self):
+        """Get this type as a string in valid C syntax.
+        
+        Note: this doesn't really handle function pointers appropriately yet."""
+        result = ""
+        indirection = self.indirection
+        while indirection:
+            result += "* "
+            if indirection in self.quals:
+                result += " ".join(self.quals[indirection])+" "
+            indirection -= 1
+        if isinstance(self.base, str):
+            return self.base + " " + result
+        else:
+            return self.base.to_c() + " " + result
+
 #helper class for functions: return_type, args, name. Return_type and args should be TypeInfos.
 class FunctionInfo(object):
+
     def __init__(self, return_type, name, args):
         self.return_type = return_type
         self.name = name
@@ -51,11 +69,23 @@ class FunctionInfo(object):
         self.input_args = tuple([i for i in args if 'destination' not in i.name])
         self.output_args = tuple([i for i in args if 'destination' in i.name])
 
+    def to_c(self):
+        """Get this function as valid C syntax.
+        If name is None or the empty string,it is excluded."""
+        return_string = self.return_type.to_c()
+        args_strings = [i.to_c() for i in self.args]
+        return "{} {}({})".format(return_string, self.name if self.name else "", ", ".join(args_strings))
+
 #parameter.
 class ParameterInfo(object):
+
     def __init__(self, type, name):
         self.type = type
         self.name = name
+
+    def to_c(self):
+        """Get a string as valid C syntax."""
+        return self.type.to_c() + " " + self.name
 
 def get_root_directory():
     return os.path.split(os.path.split(os.path.abspath(__file__))[0])[0]

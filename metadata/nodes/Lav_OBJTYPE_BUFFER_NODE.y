@@ -48,4 +48,4 @@ outputs:
 doc_name: buffer
 doc_description: |
   This node plays a buffer.
-  The output of this node will have as many channels as the buffer does, so connecting it directly to the simulation will have the desired effect.
+  The output of this node will have as many channels as the buffer does, so connecting it directly to the server will have the desired effect.

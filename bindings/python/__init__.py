@@ -81,6 +81,64 @@ def post_generate(dir):
     else:
         print("Python bindings: Running on a non-windows platform. Skipping wheel and docs generation.")
 
+def make_table(table):
+    """table must be a list of lists. The first sublist is the headers and the rest are the rows.
+    
+    This function is not currently capable of handling tables with multiple lines in any column."""
+    lengths = [0]*len(table[0])
+    for row in table:
+        for index, column in enumerate(row):
+            lengths[index] = max(len(column), lengths[index])
+    output_rows = []
+    for row in table:
+        new_row = []
+        for i, column in enumerate(row):
+            needed_spaces = lengths[i]-len(column)
+            new_row.append(column+" "*needed_spaces)
+        output_rows.append(new_row)
+    two_spaces = "  "
+    equals_row = two_spaces.join(["="*i for i in lengths])
+    output_table_list = [equals_row, two_spaces.join(output_rows[0]), equals_row]
+    for i in output_rows[1:]:
+        output_table_list.append(two_spaces.join(i))
+    output_table_list.append(equals_row)
+    return "\n".join(output_table_list)
+
+def generate_input_table(node_info):
+    """node_info is a dict containing the info for the node in question from the yaml."""
+    headers = ["index", "channels", "description"]
+    rows = [headers]
+    for index, input in enumerate(node_info['inputs']):
+        channels = input[0]
+        if channels == "dynamic":
+            channels = input[1]
+            description = input[2]
+        elif channels == "constructor":
+            channels = "Depends on arguments to this node's constructor."
+            description = input[1]
+        else:
+            description = input[1]
+        rows.append([str(index), str(channels), str(description)])
+    return make_table(rows)
+
+#This is indeed almost identical to generate_input_table, but unifying them is more trouble than it's worth.
+def generate_output_table(node_info):
+    """node_info is a dict containing the info for the node in question from the yaml."""
+    headers = ["index", "channels", "description"]
+    rows = [headers]
+    for index, output in enumerate(node_info['outputs']):
+        channels = output[0]
+        if channels == "dynamic":
+            channels = output[1]
+            description = output[2]
+        elif channels == "constructor":
+            channels = "Depends on arguments to this node's constructor."
+            description = output[1]
+        else:
+            description = output[1]
+        rows.append([str(index), str(channels), str(description)])
+    return make_table(rows)
+
 def artifacts(dir):
     """List of artifacts. These files will be copied to an artifacts directory. Putting directories here is not allowed."""
     return [os.path.join(dir, i) for i in glob.glob("dist/*.whl")]
@@ -99,6 +157,8 @@ def make_python(info):
     context.update(info)
     context.update(transformers.get_jinja2_functions(info))
     context['ctypes_string_func'] = ctypes_string #ugly workaround for what appears to be a bug in jinja2.
+    context['generate_input_table'] = generate_input_table
+    context['generate_output_table'] = generate_output_table
     env = jinja2.Environment(loader = jinja2.PackageLoader(__package__, ""), undefined = jinja2.StrictUndefined, trim_blocks = True)
     env.filters.update(transformers.get_jinja2_filters(info))
     env.filters['ctypes_string'] = ctypes_string
