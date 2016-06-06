@@ -62,7 +62,10 @@ def reverse_handle(handle):
 {%macro autopointerize(arglist)%}
 {%for arg in arglist%}
 {%if arg.type.base == 'LavHandle'%}
-    {{arg.name}} = {{arg.name}}._to_handle()
+    if {{arg.name}} is not None:
+        {{arg.name}} = {{arg.name}}._to_handle()
+    else:
+        {{arg.name}} = 0
 {%elif arg.type.indirection == 1 and arg.type.base == 'char'%}
     {{arg.name}} = {{arg.name}}.encode('utf8') #All strings are contractually UTF8 when entering Libaudioverse.
 {%elif arg.type.indirection == 1%}

@@ -747,15 +747,22 @@ class GenericNode(_HandleComparer):
         else:
             raise ValueError("Couldn't understand arguments. See docstring for details on allowed combinations.")
 
-    def disconnect(self, output, node = None, input = 0):
+    def disconnect(self, *args):
         r"""Disconnect from other nodes.
         
-        If node is None, all connections involving output are cleared.
+        Eventually, this function will support all signatures of connect.  At the moment, we support:
         
-        if node is not None, then we are disconnecting from a specific node and input combination."""
-        if node is None:
-            node = 0 #Force this translation.
-        _lav.node_disconnect(self, output, node, input)
+        node.disconnect(output): disconnect all connections involving the specified output.
+        node.disconnect(output, other, input): Disconnect the specific connection made with node.connect(output, other, input).
+        
+        This function does not allow key word arguments for the same reason connect doesn't.
+"""
+        if len(args) == 1:
+            _lav.node_disconnect(self, args[0], None, 0)
+        elif len(args) == 3:
+            _lav.node_disconnect(self, args[0], args[1], args[2])
+        else:
+            raise ValueError("You must pass 1 or 3 arguments. See the docstring for details.")
 
     def isolate(self):
         r"""Disconnect all outputs."""
