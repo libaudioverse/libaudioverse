@@ -106,8 +106,8 @@ Working out the design of the feature can happen organically as part of the disc
 
 Note: If you are not willing to sign the CAA, stop.  I will not accept code from users who  are not willing to signed the CAA.
 
-To submit code, you should fork this repository and create a branch for the changes youa re making.
-Putting your code on the development branch will make part of the pull request proces harder.
+To submit code, you should fork this repository and create a branch for the changes you are making.
+Putting your code on the development branch will make part of the pull request process harder.
 If you can't come up with a good branch name, I suggest `issue-xxx` where `xxx` is the issue's number.
 
 This project has no style guide, so try to keep your code looking like code around it.
@@ -122,7 +122,7 @@ Libaudioverse already depends on a lot of stuff that it can't vendor.
 Every new non-vendored dependency must be added to all CI configurations and makes building on Windows harder.
 
 If you add new functions, you need to add them to `metadata/functions.y`.  The rest of the file serves as an example of how to do it.
-new constants need to go in `metadata/enumerations.y` and must never be defined outside enums.
+New constants need to go in `metadata/enumerations.y` and must never be defined outside enums.
 If you add a significant feature, you need to also add something to the manual found in `docs/`.
 
 ###Adding a Node###
@@ -139,7 +139,7 @@ You need the following to have a working node that adds itself to all bindings:
 
 - A file `include/nodes/my.hpp` containing:
 
-  -The class `MyNode`, which must inherit from `Node` in `include/libaudioverse/private/node.hpp`.
+  - The class `MyNode`, which must inherit from `Node` in `include/libaudioverse/private/node.hpp`.
 
   - A function `createMyNode` returning `std::shared_ptr<MyNode>`.
 
@@ -149,7 +149,7 @@ You need the following to have a working node that adds itself to all bindings:
 
   - the implementation of `createMyNode`.
 
-  - The implementation of the `MyNode` class.  This class must override `process` for 99% of cases.
+  - The implementation of the `MyNode` class.  This class must override `process` in 99% of cases.  If you don't, the node doesn't do anything.
 
 Finally, add `Lav_createMyNode` to `libaudioverse.h` at the end.
 Build the project.
