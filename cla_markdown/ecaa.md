@@ -1,5 +1,5 @@
-Libaudioverse Individual Contributor Assignment Agreement
-=========================================================
+Libaudioverse Entity Contributor Assignment Agreement
+=====================================================
 
 Thank you for your interest in contributing to Libaudioverse ("We" or
 "Us").
@@ -15,7 +15,16 @@ Us.
 1. Definitions
 --------------
 
-"You" means the individual who Submits a Contribution to Us.
+"You" means any Legal Entity on behalf of whom a Contribution has been
+received by Us. "Legal Entity" means an entity which is not a natural
+person. "Affiliates" means other Legal Entities that control, are
+controlled by, or under common control with that Legal Entity. For the
+purposes of this definition, "control" means (i) the power, direct or
+indirect, to cause the direction or management of such Legal Entity,
+whether by contract or otherwise, (ii) ownership of fifty percent (50%)
+or more of the outstanding shares or securities which vote to elect the
+management or other persons who direct such Legal Entity or (iii)
+beneficial ownership of such entity.
 
 "Contribution" means any work of authorship that is Submitted by You to
 Us in which You own or assert ownership of the Copyright. If You do not
@@ -23,9 +32,9 @@ own the Copyright in the entire work of authorship, please follow the
 instructions in http://github.com/camlorn/libaudioverse/contributing.md.
 
 "Copyright" means all rights protecting works of authorship owned or
-controlled by You, including copyright, moral and neighboring rights, as
-appropriate, for the full term of their existence including any
-extensions by You.
+controlled by You or Your Affiliates, including copyright, moral and
+neighboring rights, as appropriate, for the full term of their existence
+including any extensions by You.
 
 "Material" means the work of authorship which is made available by Us to
 third parties. When this Agreement covers more than one software
@@ -52,12 +61,12 @@ You first Submit a Contribution to Us, whichever is earlier.
 
 ### 2.1 Copyright Assignment
 
-\(a) At the time the Contribution is Submitted, You assign to Us all
+a) At the time the Contribution is Submitted, You assign to Us all
 right, title, and interest worldwide in all Copyright covering the
 Contribution; provided that this transfer is conditioned upon compliance
 with Section 2.3.
 
-\(b) To the extent that any of the rights in Section 2.1(a) cannot be
+b) To the extent that any of the rights in Section 2.1(a) cannot be
 assigned by You to Us, You grant to Us a perpetual, worldwide,
 exclusive, royalty-free, transferable, irrevocable license under such
 non-assigned rights, with rights to sublicense through multiple tiers of
@@ -66,14 +75,14 @@ limited to, the right to reproduce, modify, display, perform and
 distribute the Contribution; provided that this license is conditioned
 upon compliance with Section 2.3.
 
-\(c) To the extent that any of the rights in Section 2.1(a) can neither
+c) To the extent that any of the rights in Section 2.1(a) can neither
 be assigned nor licensed by You to Us, You irrevocably waive and agree
 never to assert such rights against Us, any of our successors in
 interest, or any of our licensees, either direct or indirect; provided
 that this agreement not to assert is conditioned upon compliance with
 Section 2.3.
 
-\(d) Upon such transfer of rights to Us, to the maximum extent possible,
+d) Upon such transfer of rights to Us, to the maximum extent possible,
 We immediately grant to You a perpetual, worldwide, non-exclusive,
 royalty-free, transferable, irrevocable license under such rights
 covering the Contribution, with rights to sublicense through multiple
@@ -87,16 +96,16 @@ any rights to the Material.
 ### 2.2 Patent License
 
 For patent claims including, without limitation, method, process, and
-apparatus claims which You own, control or have the right to grant, now
-or in the future, You grant to Us a perpetual, worldwide, non-exclusive,
-transferable, royalty-free, irrevocable patent license, with the right
-to sublicense these rights to multiple tiers of sublicensees, to make,
-have made, use, sell, offer for sale, import and otherwise transfer the
-Contribution and the Contribution in combination with the Material (and
-portions of such combination). This license is granted only to the
-extent that the exercise of the licensed rights infringes such patent
-claims; and provided that this license is conditioned upon compliance
-with Section 2.3.
+apparatus claims which You or Your Affiliates own, control or have the
+right to grant, now or in the future, You grant to Us a perpetual,
+worldwide, non-exclusive, transferable, royalty-free, irrevocable patent
+license, with the right to sublicense these rights to multiple tiers of
+sublicensees, to make, have made, use, sell, offer for sale, import and
+otherwise transfer the Contribution and the Contribution in combination
+with the Material (and portions of such combination). This license is
+granted only to the extent that the exercise of the licensed rights
+infringes such patent claims; and provided that this license is
+conditioned upon compliance with Section 2.3.
 
 ### 2.3 Outbound License
 
@@ -128,19 +137,15 @@ by You.
 
 You confirm that:
 
-\(a) You have the legal authority to enter into this Agreement.
+a) You have the legal authority to enter into this Agreement.
 
-\(b) You own the Copyright and patent claims covering the Contribution
-which are required to grant the rights under Section 2.
+b) You or Your Affiliates own the Copyright and patent claims covering
+the Contribution which are required to grant the rights under Section 2.
 
-\(c) The grant of rights under Section 2 does not violate any grant of
-rights which You have made to third parties, including Your employer. If
-You are an employee, You have had Your employer approve this Agreement
-or sign the Entity version of this document. If You are less than
-eighteen years old, please have Your parents or guardian sign the
-Agreement.
+c) The grant of rights under Section 2 does not violate any grant of
+rights which You or Your Affiliates have made to third parties.
 
-\(d) You have followed the instructions in
+d) You have followed the instructions in
 http://github.com/camlorn/libaudioverse/contributing.md, if You do not
 own the Copyright in the entire work of authorship Submitted.
 
@@ -203,6 +208,7 @@ or any limited remedy to the maximum extent possible under law.
 You\
 \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\
 Name: \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\
+Title: \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\
 Address: \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\
 \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\
 
@@ -213,4 +219,4 @@ Title: \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\
 Address: \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\
 \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\
 
-Harmony (HA-CAA-I-ANY) Version 1.0
+Harmony (HA-CAA-E-ANY) Version 1.0
