@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>The Libaudioverse API &mdash; Libaudioverse build198 documentation</title>
+  <title>The Libaudioverse API &mdash; Libaudioverse build215 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="Libaudioverse build198 documentation" href="index.html"/>
+    <link rel="top" title="Libaudioverse build215 documentation" href="index.html"/>
         <link rel="prev" title="Python-specific Notes" href="python-specifics.html"/> 
 
   
@@ -142,6 +142,27 @@ Sweeping this oscillator will perform poorly if you do not set the harmonics to 
 Of the additive oscillators, the sawtooth wave is the worst in this respect.
 For this reason, it is probably not suitable as a control signal.
 This is not fixable using additive synthesis and is a frequency dependent effect.</p>
+<p>This node has no inputs.</p>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="21%" />
+<col width="33%" />
+<col width="46%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>1</td>
+<td>A saw wave.</td>
+</tr>
+</tbody>
+</table>
 <dl class="attribute">
 <dt id="libaudioverse.AdditiveSawNode.frequency">
 <code class="descname">frequency</code><a class="headerlink" href="#libaudioverse.AdditiveSawNode.frequency" title="Permalink to this definition">¶</a></dt>
@@ -196,6 +217,27 @@ Sweeping this oscillator will perform poorly if you do not set the harmonics to 
 <p>This oscillator is slightly under the range -1 to 1.
 For this reason, it is probably not suitable as a control signal.
 This is not fixable using additive synthesis and is a frequency dependent effect.</p>
+<p>This node has no inputs.</p>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="19%" />
+<col width="30%" />
+<col width="52%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>1</td>
+<td>A square wave.</td>
+</tr>
+</tbody>
+</table>
 <dl class="attribute">
 <dt id="libaudioverse.AdditiveSquareNode.frequency">
 <code class="descname">frequency</code><a class="headerlink" href="#libaudioverse.AdditiveSquareNode.frequency" title="Permalink to this definition">¶</a></dt>
@@ -251,6 +293,27 @@ Sweeping this oscillator will perform poorly if you do not set the harmonics to 
 Calibration scripts show that the worst case is -0.9 to 0.9, with the error increasing as frequency increases.
 For this reason, it is probably not suitable as a control signal.
 This is not fixable using additive synthesis and is a frequency dependent effect.</p>
+<p>This node has no inputs.</p>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="17%" />
+<col width="28%" />
+<col width="55%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>1</td>
+<td>A triangle wave.</td>
+</tr>
+</tbody>
+</table>
 <dl class="attribute">
 <dt id="libaudioverse.AdditiveTriangleNode.frequency">
 <code class="descname">frequency</code><a class="headerlink" href="#libaudioverse.AdditiveTriangleNode.frequency" title="Permalink to this definition">¶</a></dt>
@@ -300,6 +363,46 @@ This is measured in periods, not in radians.</p>
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">AllpassNode</code><span class="sig-paren">(</span><em>server</em>, <em>channels</em>, <em>max_delay</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.AllpassNode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Implements a first-order allpass filter whose transfer function is <span class="math">\(\frac{c+Z^{-d} }{1 + cZ^{-d} }\)</span> where <code class="docutils literal"><span class="pre">c</span></code> is the coefficient and <code class="docutils literal"><span class="pre">d</span></code> the delay in samples.</p>
 <p>This filter is useful in various reverb designs.</p>
+<p>Inputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="65%" />
+<col width="28%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The signal to filter.</td>
+</tr>
+</tbody>
+</table>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="66%" />
+<col width="27%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The filtered signal.</td>
+</tr>
+</tbody>
+</table>
 <dl class="attribute">
 <dt id="libaudioverse.AllpassNode.coefficient">
 <code class="descname">coefficient</code><a class="headerlink" href="#libaudioverse.AllpassNode.coefficient" title="Permalink to this definition">¶</a></dt>
@@ -348,6 +451,46 @@ Note that for this node, it is impossible to get rid of the crossfade completely
 Additionally, it understands surround sound speaker layouts and allows for the assignment of custom speaker mappings.
 The default configuration provides a stereo panner that can be used without any additional steps.
 The additional function Lav_amplitudePannerNodeConfigureStandardChannelMap can set the panner to output for a variety of standard configurations, so be sure to see its documentation.</p>
+<p>Inputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="17%" />
+<col width="27%" />
+<col width="57%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>1</td>
+<td>The signal to pan</td>
+</tr>
+</tbody>
+</table>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="6%" />
+<col width="55%" />
+<col width="39%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on a number of properties on this node.</td>
+<td>The result of panning the signal.</td>
+</tr>
+</tbody>
+</table>
 <dl class="attribute">
 <dt id="libaudioverse.AmplitudePannerNode.azimuth">
 <code class="descname">azimuth</code><a class="headerlink" href="#libaudioverse.AmplitudePannerNode.azimuth" title="Permalink to this definition">¶</a></dt>
@@ -416,7 +559,7 @@ If crossfading is enabled, moving the panner will slowly fade it to the new posi
 
 <dl class="class">
 <dt id="libaudioverse.AutomatedProperty">
-<em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">AutomatedProperty</code><span class="sig-paren">(</span><em>handle</em>, <em>slot</em>, <em>getter</em>, <em>setter</em>, <em>converter=&lt;function LibaudioverseProperty.&lt;lambda&gt; at 0x0000000D8A841E18&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.AutomatedProperty" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">AutomatedProperty</code><span class="sig-paren">(</span><em>handle</em>, <em>slot</em>, <em>getter</em>, <em>setter</em>, <em>converter=&lt;function LibaudioverseProperty.&lt;lambda&gt; at 0x04BA3B70&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.AutomatedProperty" title="Permalink to this definition">¶</a></dt>
 <dd><p>A property that supports automation and node connection.</p>
 <dl class="method">
 <dt id="libaudioverse.AutomatedProperty.cancel_automators">
@@ -458,6 +601,46 @@ This node is capable of implementing almost every filter needed for basic audio 
 For the specific equations used, see the Audio EQ Cookbook.
 It may be found at:
 <a class="reference external" href="http://www.musicdsp.org/files/Audio-EQ-Cookbook.txt">http://www.musicdsp.org/files/Audio-EQ-Cookbook.txt</a></p>
+<p>Inputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="64%" />
+<col width="29%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The signal to process.</td>
+</tr>
+</tbody>
+</table>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="5%" />
+<col width="47%" />
+<col width="49%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The result of processing the audio via the filter.</td>
+</tr>
+</tbody>
+</table>
 <dl class="attribute">
 <dt id="libaudioverse.BiquadNode.dbgain">
 <code class="descname">dbgain</code><a class="headerlink" href="#libaudioverse.BiquadNode.dbgain" title="Permalink to this definition">¶</a></dt>
@@ -572,6 +755,27 @@ It is found here:
 <dt id="libaudioverse.BlitNode">
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">BlitNode</code><span class="sig-paren">(</span><em>server</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.BlitNode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates bandlimited impulse trains.  These sound like a buzz, but have important applications in the  alias-free synthesis of analog waveforms.</p>
+<p>This node has no inputs.</p>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="12%" />
+<col width="20%" />
+<col width="68%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>1</td>
+<td>A bandlimited impulse train.</td>
+</tr>
+</tbody>
+</table>
 <dl class="attribute">
 <dt id="libaudioverse.BlitNode.frequency">
 <code class="descname">frequency</code><a class="headerlink" href="#libaudioverse.BlitNode.frequency" title="Permalink to this definition">¶</a></dt>
@@ -683,7 +887,28 @@ This class adds extra marshalling to make sure that boolean properties show up a
 <dt id="libaudioverse.BufferNode">
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">BufferNode</code><span class="sig-paren">(</span><em>server</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.BufferNode" title="Permalink to this definition">¶</a></dt>
 <dd><p>This node plays a buffer.
-The output of this node will have as many channels as the buffer does, so connecting it directly to the simulation will have the desired effect.</p>
+The output of this node will have as many channels as the buffer does, so connecting it directly to the server will have the desired effect.</p>
+<p>This node has no inputs.</p>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="6%" />
+<col width="47%" />
+<col width="47%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on the currently playing buffer.</td>
+<td>The output from the buffer being played.</td>
+</tr>
+</tbody>
+</table>
 <dl class="attribute">
 <dt id="libaudioverse.BufferNode.buffer">
 <code class="descname">buffer</code><a class="headerlink" href="#libaudioverse.BufferNode.buffer" title="Permalink to this definition">¶</a></dt>
@@ -744,7 +969,16 @@ Values less than 1.0 cause a decrease in pitch and values greater than 1.0 cause
 <dt id="libaudioverse.BufferNode.set_end_callback">
 <code class="descname">set_end_callback</code><span class="sig-paren">(</span><em>callback</em>, <em>additional_args=None</em>, <em>additional_kwargs=None</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.BufferNode.set_end_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the end callback.</p>
+<p>Additional_args and additional_kwargs are passed to the callback in addition to any arguments from Libaudioverse.  Note that Libaudioverse always uses positional arguments.</p>
+<p>C callback signature: <cite>void  (LavHandle  nodeHandle, void *   userdata)</cite></p>
 <p>Called outside the audio threads every time the buffer reaches the end of the audio data.</p>
+<p>Callback parameters:</p>
+<dl class="docutils">
+<dt>nodeHandle</dt>
+<dd>The node which called this callback.</dd>
+<dt>userdata</dt>
+<dd>The userdata parameter as passed to the setter for this callback.</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -763,6 +997,27 @@ Values less than 1.0 cause a decrease in pitch and values greater than 1.0 cause
 <p>This node provides the ability to schedule buffers to play at any specific time in the future.
 This node supports pitch bending scheduled buffers.
 There is no limit to the number of buffers which may be scheduled at any given time, and polyphony is supported.</p>
+<p>This node has no inputs.</p>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="6%" />
+<col width="57%" />
+<col width="37%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The sum of all playing buffers.</td>
+</tr>
+</tbody>
+</table>
 <dl class="method">
 <dt id="libaudioverse.BufferTimelineNode.schedule_buffer">
 <code class="descname">schedule_buffer</code><span class="sig-paren">(</span><em>node</em>, <em>buffer</em>, <em>time</em>, <em>pitch_bend</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.BufferTimelineNode.schedule_buffer" title="Permalink to this definition">¶</a></dt>
@@ -821,6 +1076,27 @@ The time is relative to now.</p>
 This node, coupled with the <a class="reference internal" href="#libaudioverse.ChannelSplitterNode" title="libaudioverse.ChannelSplitterNode"><code class="xref py py-class docutils literal"><span class="pre">ChannelSplitterNode</span></code></a> , allows advanced applications to manipulate the individual audio channels directly.
 The usual workflow is as follows: feed the output of a node through a <a class="reference internal" href="#libaudioverse.ChannelSplitterNode" title="libaudioverse.ChannelSplitterNode"><code class="xref py py-class docutils literal"><span class="pre">ChannelSplitterNode</span></code></a>,
 modify the channels individually, and then merge them with this node.</p>
+<p>The number of inputs to this node depends on parameters to its constructor.</p>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="5%" />
+<col width="51%" />
+<col width="44%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The result of merging the input channels.</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="class">
@@ -830,6 +1106,27 @@ modify the channels individually, and then merge them with this node.</p>
 This node, coupled with the <a class="reference internal" href="#libaudioverse.ChannelMergerNode" title="libaudioverse.ChannelMergerNode"><code class="xref py py-class docutils literal"><span class="pre">ChannelMergerNode</span></code></a>, allows advanced applications to manipulate the individual audio channels directly.
 The usual workflow is as follows: feed the output of a node through this node,
 modify the channels individually, and then merge them with a <a class="reference internal" href="#libaudioverse.ChannelMergerNode" title="libaudioverse.ChannelMergerNode"><code class="xref py py-class docutils literal"><span class="pre">ChannelMergerNode</span></code></a>.</p>
+<p>Inputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="5%" />
+<col width="49%" />
+<col width="45%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The signal to split into component channels.</td>
+</tr>
+</tbody>
+</table>
+<p>The number of outputs from this node depends on parameters to its constructor.</p>
 </dd></dl>
 
 <dl class="class">
@@ -837,6 +1134,46 @@ modify the channels individually, and then merge them with a <a class="reference
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">ConvolverNode</code><span class="sig-paren">(</span><em>server</em>, <em>channels</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.ConvolverNode" title="Permalink to this definition">¶</a></dt>
 <dd><p>A simple convolver.</p>
 <p>This implements convolution directly, without use of the FFT.</p>
+<p>Inputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="6%" />
+<col width="60%" />
+<col width="34%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The signal to be convolved.</td>
+</tr>
+</tbody>
+</table>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="65%" />
+<col width="28%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The convolved signal.</td>
+</tr>
+</tbody>
+</table>
 <dl class="attribute">
 <dt id="libaudioverse.ConvolverNode.impulse_response">
 <code class="descname">impulse_response</code><a class="headerlink" href="#libaudioverse.ConvolverNode.impulse_response" title="Permalink to this definition">¶</a></dt>
@@ -858,6 +1195,27 @@ This particular case is optimized, and special support is implemented via allowi
 <p>This crossfader has a configurable number of inputs.
 All inputs and the single output have the same channel count.
 These are both configurable via parameters to the constructor.</p>
+<p>The number of inputs to this node depends on parameters to its constructor.</p>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="6%" />
+<col width="62%" />
+<col width="32%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on the channel count given to the constructor.</td>
+<td>The output of the crossfade.</td>
+</tr>
+</tbody>
+</table>
 <dl class="method">
 <dt id="libaudioverse.CrossfaderNode.crossfade">
 <code class="descname">crossfade</code><span class="sig-paren">(</span><em>node</em>, <em>duration</em>, <em>input</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.CrossfaderNode.crossfade" title="Permalink to this definition">¶</a></dt>
@@ -897,7 +1255,16 @@ True if we are crossfading, otherwise false.</p>
 <dt id="libaudioverse.CrossfaderNode.set_finished_callback">
 <code class="descname">set_finished_callback</code><span class="sig-paren">(</span><em>callback</em>, <em>additional_args=None</em>, <em>additional_kwargs=None</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.CrossfaderNode.set_finished_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the finished callback.</p>
+<p>Additional_args and additional_kwargs are passed to the callback in addition to any arguments from Libaudioverse.  Note that Libaudioverse always uses positional arguments.</p>
+<p>C callback signature: <cite>void  (LavHandle  nodeHandle, void *   userdata)</cite></p>
 <p>Called outside the audio thread when the currently scheduled crossfade finishes.</p>
+<p>Callback parameters:</p>
+<dl class="docutils">
+<dt>nodeHandle</dt>
+<dd>The node which called this callback.</dd>
+<dt>userdata</dt>
+<dd>The userdata parameter as passed to the setter for this callback.</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -916,6 +1283,46 @@ True if we are crossfading, otherwise false.</p>
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">CrossfadingDelayNode</code><span class="sig-paren">(</span><em>server</em>, <em>max_delay</em>, <em>channels</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.CrossfadingDelayNode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Implements a crossfading delay line.
 Delay lines have uses in echo and reverb, as well as many more esoteric effects.</p>
+<p>Inputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="66%" />
+<col width="27%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The signal to delay.</td>
+</tr>
+</tbody>
+</table>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="67%" />
+<col width="26%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The delayed signal.</td>
+</tr>
+</tbody>
+</table>
 <dl class="attribute">
 <dt id="libaudioverse.CrossfadingDelayNode.delay">
 <code class="descname">delay</code><a class="headerlink" href="#libaudioverse.CrossfadingDelayNode.delay" title="Permalink to this definition">¶</a></dt>
@@ -966,6 +1373,46 @@ Note that for this node, it is impossible to get rid of the crossfade completely
 This is a first-order filter, the best possible within numerical limits.
 It consists of a zero at DC, and a pole as close to DC as we can put it.
 For any sampling rate, this node is the best first-order section for DC removal possible.</p>
+<p>Inputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="64%" />
+<col width="29%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>A signal with some DC.</td>
+</tr>
+</tbody>
+</table>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="5%" />
+<col width="44%" />
+<col width="51%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The same signal with DC cut using a first-order filter.</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="class">
@@ -1013,6 +1460,46 @@ Indicates how sound should become quieter as objects move away from the listener
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">DoppleringDelayNode</code><span class="sig-paren">(</span><em>server</em>, <em>max_delay</em>, <em>channels</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.DoppleringDelayNode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Implements a dopplering delay line, an interpolated delay line that intensionally bends pitch when the delay changes.
 Delay lines have uses in echo and reverb, as well as many more esoteric effects.</p>
+<p>Inputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="66%" />
+<col width="27%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The signal to delay.</td>
+</tr>
+</tbody>
+</table>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="67%" />
+<col width="26%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The delayed signal.</td>
+</tr>
+</tbody>
+</table>
 <dl class="attribute">
 <dt id="libaudioverse.DoppleringDelayNode.delay">
 <code class="descname">delay</code><a class="headerlink" href="#libaudioverse.DoppleringDelayNode.delay" title="Permalink to this definition">¶</a></dt>
@@ -1068,6 +1555,27 @@ Environment nodes hold the information needed to pan sources, as well as acting 
 <p>Note that the various properties for default values do not affect already created sources.
 It is best to configure these first.
 Any functionality to change a property on all sources needs to be implemented by the app, and is not offered by Libaudioverse.</p>
+<p>This node has no inputs.</p>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="6%" />
+<col width="51%" />
+<col width="42%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on the output_channels property.</td>
+<td>The output of the 3D environment.</td>
+</tr>
+</tbody>
+</table>
 <dl class="method">
 <dt id="libaudioverse.EnvironmentNode.add_effect_send">
 <code class="descname">add_effect_send</code><span class="sig-paren">(</span><em>node</em>, <em>channels</em>, <em>is_reverb</em>, <em>connect_by_default</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.EnvironmentNode.add_effect_send" title="Permalink to this definition">¶</a></dt>
@@ -1225,6 +1733,46 @@ When the buffer finishes playing, the source is automatically disposed of.</p>
 <p>This reverb takes as its input and outputs ats its output quadraphonic audio.
 Panning effects will still be observed at the output with some bias.
 If a stereo signal is fed into the reverb and the reverb is likewise connected to a stereo output, the input signal&#8217;s volume will effectively be halved.</p>
+<p>Inputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="12%" />
+<col width="19%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>4</td>
+<td>The signal to apply reverb to.</td>
+</tr>
+</tbody>
+</table>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="11%" />
+<col width="18%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>4</td>
+<td>The signal with reverb applied.</td>
+</tr>
+</tbody>
+</table>
 <dl class="attribute">
 <dt id="libaudioverse.FdnReverbNode.cutoff_frequency">
 <code class="descname">cutoff_frequency</code><a class="headerlink" href="#libaudioverse.FdnReverbNode.cutoff_frequency" title="Permalink to this definition">¶</a></dt>
@@ -1284,6 +1832,8 @@ This is possibly the single-most complicated node in Libaudioverse, and full doc
 Unless you know  what a  feedback delay network is and have a specific reason for using one, this node will probably not help you.</p>
 <p>This node has <cite>n</cite> inputs and outputs, where <cite>n</cite> is the <cite>lines</cite> parameter to the constructor.
 Each input and output pair represent the input and output of a specific delay line, respectively.</p>
+<p>The inputs of this node are described above.</p>
+<p>The  outputs from this node are described above.</p>
 <dl class="attribute">
 <dt id="libaudioverse.FeedbackDelayNetworkNode.delays">
 <code class="descname">delays</code><a class="headerlink" href="#libaudioverse.FeedbackDelayNetworkNode.delays" title="Permalink to this definition">¶</a></dt>
@@ -1349,6 +1899,46 @@ It is slower than the <a class="reference internal" href="#libaudioverse.Convolv
 <p>The difference between this node and the <a class="reference internal" href="#libaudioverse.ConvolverNode" title="libaudioverse.ConvolverNode"><code class="xref py py-class docutils literal"><span class="pre">ConvolverNode</span></code></a> is the complexity of the algorithm.
 This node is capable of handling impulses longer than a second, a case for which the <a class="reference internal" href="#libaudioverse.ConvolverNode" title="libaudioverse.ConvolverNode"><code class="xref py py-class docutils literal"><span class="pre">ConvolverNode</span></code></a> will fail to run in realtime.</p>
 <p>Furthermore, as the most common operation for this node is reverb, it is possible to set each channel&#8217;s response separately.</p>
+<p>Inputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="6%" />
+<col width="60%" />
+<col width="34%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The signal to be convolved.</td>
+</tr>
+</tbody>
+</table>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="65%" />
+<col width="28%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The convolved signal.</td>
+</tr>
+</tbody>
+</table>
 <dl class="method">
 <dt id="libaudioverse.FftConvolverNode.set_response">
 <code class="descname">set_response</code><span class="sig-paren">(</span><em>node</em>, <em>channel</em>, <em>length</em>, <em>response</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.FftConvolverNode.set_response" title="Permalink to this definition">¶</a></dt>
@@ -1384,6 +1974,27 @@ It will likely remain for backward compatibility.
 Libaudioverse plans to eventually offer a more generic streaming node that also supports web addresses; such a node will have a completely different, less buffer-like interface.</p>
 <p>In order to stream a file, it must be passed through a resampler.
 Consequentlty, the position property is slightly inaccurate and the ended property and callback are slightly delayed.</p>
+<p>This node has no inputs.</p>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="40%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on the file.</td>
+<td>The output of the stream.</td>
+</tr>
+</tbody>
+</table>
 <dl class="attribute">
 <dt id="libaudioverse.FileStreamerNode.ended">
 <code class="descname">ended</code><a class="headerlink" href="#libaudioverse.FileStreamerNode.ended" title="Permalink to this definition">¶</a></dt>
@@ -1425,8 +2036,17 @@ Note that this property may be slightly inaccurate because this node has to pass
 <dt id="libaudioverse.FileStreamerNode.set_end_callback">
 <code class="descname">set_end_callback</code><span class="sig-paren">(</span><em>callback</em>, <em>additional_args=None</em>, <em>additional_kwargs=None</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.FileStreamerNode.set_end_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the end callback.</p>
+<p>Additional_args and additional_kwargs are passed to the callback in addition to any arguments from Libaudioverse.  Note that Libaudioverse always uses positional arguments.</p>
+<p>C callback signature: <cite>void  (LavHandle  nodeHandle, void *   userdata)</cite></p>
 <p>Called outside the audio threads after the stream has both reached its end and gone silent.
 When called, ended will be set to true,.</p>
+<p>Callback parameters:</p>
+<dl class="docutils">
+<dt>nodeHandle</dt>
+<dd>The node which called this callback.</dd>
+<dt>userdata</dt>
+<dd>The userdata parameter as passed to the setter for this callback.</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -1438,6 +2058,46 @@ When called, ended will be set to true,.</p>
 The output of the delay line is filtered.
 The difference between this node and a delay line and filter pair is that this node will use the filtered output for the feedback.</p>
 <p>This node is equivalent to the delay line in the Karplus-strong algorithm.</p>
+<p>Inputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="64%" />
+<col width="29%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The signal to process.</td>
+</tr>
+</tbody>
+</table>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="4%" />
+<col width="41%" />
+<col width="55%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The result of processing the audio via the filter and delay line.</td>
+</tr>
+</tbody>
+</table>
 <dl class="attribute">
 <dt id="libaudioverse.FilteredDelayNode.dbgain">
 <code class="descname">dbgain</code><a class="headerlink" href="#libaudioverse.FilteredDelayNode.dbgain" title="Permalink to this definition">¶</a></dt>
@@ -1538,6 +2198,46 @@ Most applications will want  a <a class="reference internal" href="#libaudiovers
 Instead, the position of the pole and the zero on the real axis are individually controllable with a-rate properties.
 Some helper functions exist to position them for common configurations, but other filter types do most of it better.
 The major advantage for this filter type is that it is incredibly inexpensive as compared to the <a class="reference internal" href="#libaudioverse.IirNode" title="libaudioverse.IirNode"><code class="xref py py-class docutils literal"><span class="pre">IirNode</span></code></a> and supports automation of the pole and zero&#8217;s position.</p>
+<p>Inputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="65%" />
+<col width="28%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The signal to filter.</td>
+</tr>
+</tbody>
+</table>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="66%" />
+<col width="27%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The filtered signal.</td>
+</tr>
+</tbody>
+</table>
 <dl class="method">
 <dt id="libaudioverse.FirstOrderFilterNode.configure_allpass">
 <code class="descname">configure_allpass</code><span class="sig-paren">(</span><em>node</em>, <em>frequency</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.FirstOrderFilterNode.configure_allpass" title="Permalink to this definition">¶</a></dt>
@@ -1612,6 +2312,46 @@ For a stable filter, the value of this property should usually between -1 and 1.
 <dd><p>This node is essentially in instantiated generic node, offering only the functionality therein.
 Its purpose is to allow changing the gain or adding offset to a large collection of nodes.
 One possible use is as a simple mixer: point all the nodes to be mixed at the input, set mul, and then point the output at the destination for the mixed audio.</p>
+<p>Inputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="5%" />
+<col width="52%" />
+<col width="42%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The signal whose gain is to be changed.</td>
+</tr>
+</tbody>
+</table>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="6%" />
+<col width="56%" />
+<col width="38%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The signal with its gain changed.</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="exception">
@@ -1661,10 +2401,12 @@ For more details on the subject of node lifetimes, see the Libaudioverse manual.
 
 <dl class="method">
 <dt id="libaudioverse.GenericNode.disconnect">
-<code class="descname">disconnect</code><span class="sig-paren">(</span><em>output</em>, <em>node=None</em>, <em>input=0</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.GenericNode.disconnect" title="Permalink to this definition">¶</a></dt>
+<code class="descname">disconnect</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.GenericNode.disconnect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Disconnect from other nodes.</p>
-<p>If node is None, all connections involving output are cleared.</p>
-<p>if node is not None, then we are disconnecting from a specific node and input combination.</p>
+<p>Eventually, this function will support all signatures of connect.  At the moment, we support:</p>
+<p>node.disconnect(output): disconnect all connections involving the specified output.
+node.disconnect(output, other, input): Disconnect the specific connection made with node.connect(output, other, input).</p>
+<p>This function does not allow key word arguments for the same reason connect doesn&#8217;t.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1722,6 +2464,46 @@ The default is usually what you want.</p>
 <dd><p>This node defines a callback which is called every block.
 The callback is passed pointers to the audio data passing through this node for the current block.
 The effect is that this node allows observing audio passing through any location in the audio graph.</p>
+<p>Inputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="5%" />
+<col width="43%" />
+<col width="52%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The audio which will be passed to the associated callback.</td>
+</tr>
+</tbody>
+</table>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="4%" />
+<col width="42%" />
+<col width="54%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The same audio as connected to the input without modification.</td>
+</tr>
+</tbody>
+</table>
 <dl class="method">
 <dt id="libaudioverse.GraphListenerNode.get_listening_callback">
 <code class="descname">get_listening_callback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.GraphListenerNode.get_listening_callback" title="Permalink to this definition">¶</a></dt>
@@ -1733,8 +2515,23 @@ The effect is that this node allows observing audio passing through any location
 <dt id="libaudioverse.GraphListenerNode.set_listening_callback">
 <code class="descname">set_listening_callback</code><span class="sig-paren">(</span><em>callback</em>, <em>additional_args=None</em>, <em>additional_kwargs=None</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.GraphListenerNode.set_listening_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the listening callback.</p>
+<p>Additional_args and additional_kwargs are passed to the callback in addition to any arguments from Libaudioverse.  Note that Libaudioverse always uses positional arguments.</p>
+<p>C callback signature: <cite>void  (LavHandle  nodeHandle, unsigned int  frames, unsigned int  channels, float *   buffer, void *   userdata)</cite></p>
 <p>When set, audio is passed to this callback every block.
 This callback is called inside the audio threads; do not block.</p>
+<p>Callback parameters:</p>
+<dl class="docutils">
+<dt>nodeHandle</dt>
+<dd>The node which called this callback.</dd>
+<dt>frames</dt>
+<dd>The number of frames of audio being made available to client code.  This should always be the same as the server&#8217;s block size.</dd>
+<dt>channels</dt>
+<dd>The number of channels of audio being made available to client code.</dd>
+<dt>buffer</dt>
+<dd>The data, stored in interleaved format.  The length of this buffer is <code class="docutils literal"><span class="pre">frames*channels</span></code>.</dd>
+<dt>userdata</dt>
+<dd>The userdata parameter as passed to the setter for this callback.</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -1743,8 +2540,48 @@ This callback is called inside the audio threads; do not block.</p>
 <dt id="libaudioverse.HardLimiterNode">
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">HardLimiterNode</code><span class="sig-paren">(</span><em>server</em>, <em>channels</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.HardLimiterNode" title="Permalink to this definition">¶</a></dt>
 <dd><p>The input to this node is hard limited: values less than -1.0 are set to -1.0 and values above 1.0 are set to 1.0.
-Use the hard limiter in order to prevent oddities with audio hardware; it should usually be the last piece in your pipeline before the simulation.
+Use the hard limiter in order to prevent oddities with audio hardware; it should usually be the last piece in your pipeline before the server.
 Note that the 3D API handles hard limiting appropriately, and you do not need to worry about this there.</p>
+<p>Inputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="67%" />
+<col width="26%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The signal to limit</td>
+</tr>
+</tbody>
+</table>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="4%" />
+<col width="37%" />
+<col width="59%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The limited signal: no sample shall have an absolute value greater than 1.0.</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="exception">
@@ -1759,6 +2596,46 @@ Note that the 3D API handles hard limiting appropriately, and you do not need to
 <dd><p>This node implements an HRTF panner.
 You can use either Libaudioverse&#8217;s internal HRTF (The Diffuse MIT Kemar Dataset) by passing &#8220;default&#8221; as the HRTf file name,
 or an HRTF of your own.</p>
+<p>Inputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="16%" />
+<col width="26%" />
+<col width="58%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>1</td>
+<td>The signal to pan.</td>
+</tr>
+</tbody>
+</table>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="11%" />
+<col width="17%" />
+<col width="72%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>2</td>
+<td>The signal with the HRTF applied.</td>
+</tr>
+</tbody>
+</table>
 <dl class="attribute">
 <dt id="libaudioverse.HrtfNode.azimuth">
 <code class="descname">azimuth</code><a class="headerlink" href="#libaudioverse.HrtfNode.azimuth" title="Permalink to this definition">¶</a></dt>
@@ -1798,6 +2675,46 @@ Unlike other panner types, the audio artifacts produced by disabling crossfading
 <dd><p>Implements arbetrary IIR filters.
 The only restriction on the filter is that the first element of the denominator must be nonzero.
 To configure this node, use the function Lav_iirNodeSetCoefficients.</p>
+<p>Inputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="65%" />
+<col width="28%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The signal to filter.</td>
+</tr>
+</tbody>
+</table>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="5%" />
+<col width="52%" />
+<col width="42%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The signal with the IIR filter applied.</td>
+</tr>
+</tbody>
+</table>
 <dl class="method">
 <dt id="libaudioverse.IirNode.set_coefficients">
 <code class="descname">set_coefficients</code><span class="sig-paren">(</span><em>node</em>, <em>numerator_length</em>, <em>numerator</em>, <em>denominator_length</em>, <em>denominator</em>, <em>should_clear_history</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.IirNode.set_coefficients" title="Permalink to this definition">¶</a></dt>
@@ -1849,6 +2766,46 @@ To configure this node, use the function Lav_iirNodeSetCoefficients.</p>
 Leaky integrators integrate their input signals, while leaking over time.
 Introducing the leak allows for avoiding DC offset problems.
 If you feed this node a signal that is zero, it will slowly decrease the output in accordance with the Lav_LEAKY_INTEGRATOR_LEAKYNESS property.</p>
+<p>Inputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="64%" />
+<col width="29%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>A signal to integrate.</td>
+</tr>
+</tbody>
+</table>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="6%" />
+<col width="60%" />
+<col width="34%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The integral of the signal.</td>
+</tr>
+</tbody>
+</table>
 <dl class="attribute">
 <dt id="libaudioverse.LeakyIntegratorNode.leakyness">
 <code class="descname">leakyness</code><a class="headerlink" href="#libaudioverse.LeakyIntegratorNode.leakyness" title="Permalink to this definition">¶</a></dt>
@@ -1863,7 +2820,7 @@ If you feed this node a signal that is zero, it will slowly decrease the output 
 
 <dl class="class">
 <dt id="libaudioverse.LibaudioverseProperty">
-<em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">LibaudioverseProperty</code><span class="sig-paren">(</span><em>handle</em>, <em>slot</em>, <em>getter</em>, <em>setter</em>, <em>converter=&lt;function LibaudioverseProperty.&lt;lambda&gt; at 0x0000000D8A841E18&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.LibaudioverseProperty" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">LibaudioverseProperty</code><span class="sig-paren">(</span><em>handle</em>, <em>slot</em>, <em>getter</em>, <em>setter</em>, <em>converter=&lt;function LibaudioverseProperty.&lt;lambda&gt; at 0x04BA3B70&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.LibaudioverseProperty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Proxy to Libaudioverse properties.</p>
 <p>All properties support resetting and type query.</p>
 <dl class="attribute">
@@ -1916,6 +2873,46 @@ If you feed this node a signal that is zero, it will slowly decrease the output 
 <dd><p>A panner which can have the algorithm it uses changed at runtime.
 The use for multipanners is for applications in which we may wish to change the speaker configuration at runtime.
 Capabilities include switching from HRTF to stereo and back, a useful property for games wherein the user might or might not be using headphones.</p>
+<p>Inputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="16%" />
+<col width="26%" />
+<col width="58%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>1</td>
+<td>The signal to pan.</td>
+</tr>
+</tbody>
+</table>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="4%" />
+<col width="40%" />
+<col width="56%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on the currently set panning strategy.</td>
+<td>The signal, panned according to the configured panning strategy.</td>
+</tr>
+</tbody>
+</table>
 <dl class="attribute">
 <dt id="libaudioverse.MultipannerNode.azimuth">
 <code class="descname">azimuth</code><a class="headerlink" href="#libaudioverse.MultipannerNode.azimuth" title="Permalink to this definition">¶</a></dt>
@@ -1994,6 +2991,27 @@ This is the value of the node&#8217;s state property and determins how the node 
 <dt id="libaudioverse.NoiseNode">
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">NoiseNode</code><span class="sig-paren">(</span><em>server</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.NoiseNode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates any of a variety of types of noise.</p>
+<p>This node has no inputs.</p>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="11%" />
+<col width="17%" />
+<col width="72%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>1</td>
+<td>The noise generated by this node.</td>
+</tr>
+</tbody>
+</table>
 <dl class="attribute">
 <dt id="libaudioverse.NoiseNode.noise_type">
 <code class="descname">noise_type</code><a class="headerlink" href="#libaudioverse.NoiseNode.noise_type" title="Permalink to this definition">¶</a></dt>
@@ -2062,6 +3080,46 @@ The produced filter rolls off at about 6 DB per octave.</p>
 The type of the filter is controlled via the <code class="docutils literal"><span class="pre">is_highpass</span></code> property.
 If said property is true, the filter becomes a highpass.</p>
 <p>Note that this filter can be swept with a-rate accuracy.</p>
+<p>Inputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="65%" />
+<col width="28%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The signal to filter.</td>
+</tr>
+</tbody>
+</table>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="66%" />
+<col width="27%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The filtered signal.</td>
+</tr>
+</tbody>
+</table>
 <dl class="attribute">
 <dt id="libaudioverse.OnePoleFilterNode.frequency">
 <code class="descname">frequency</code><a class="headerlink" href="#libaudioverse.OnePoleFilterNode.frequency" title="Permalink to this definition">¶</a></dt>
@@ -2203,6 +3261,27 @@ This is mostly for the <a class="reference internal" href="#libaudioverse.Multip
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">PullNode</code><span class="sig-paren">(</span><em>server</em>, <em>sr</em>, <em>channels</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.PullNode" title="Permalink to this definition">¶</a></dt>
 <dd><p>This node calls the audio callback whenever it needs more audio.
 The purpose of this node is to inject audio from an external source that Libaudioverse does not support, for example a custom network protocol.</p>
+<p>This node has no inputs.</p>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="5%" />
+<col width="53%" />
+<col width="42%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The result of the configured callback.</td>
+</tr>
+</tbody>
+</table>
 <dl class="method">
 <dt id="libaudioverse.PullNode.get_audio_callback">
 <code class="descname">get_audio_callback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.PullNode.get_audio_callback" title="Permalink to this definition">¶</a></dt>
@@ -2214,7 +3293,22 @@ The purpose of this node is to inject audio from an external source that Libaudi
 <dt id="libaudioverse.PullNode.set_audio_callback">
 <code class="descname">set_audio_callback</code><span class="sig-paren">(</span><em>callback</em>, <em>additional_args=None</em>, <em>additional_kwargs=None</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.PullNode.set_audio_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the audio callback.</p>
+<p>Additional_args and additional_kwargs are passed to the callback in addition to any arguments from Libaudioverse.  Note that Libaudioverse always uses positional arguments.</p>
+<p>C callback signature: <cite>void  (LavHandle  nodeHandle, int  frames, int  channels, float *   buffer, void *   userdata)</cite></p>
 <p>Called when the node needs more audio.</p>
+<p>Callback parameters:</p>
+<dl class="docutils">
+<dt>nodeHandle</dt>
+<dd>The node which called this callback.</dd>
+<dt>frames</dt>
+<dd>The number of frames of audio needed.  This is not guaranteed to be the same on every call.</dd>
+<dt>channels</dt>
+<dd>The number of channels as set when the pull node is created.</dd>
+<dt>buffer</dt>
+<dd>The destination to which audio should be written.  This is a buffer that is <code class="docutils literal"><span class="pre">frames*channels</span></code> long.  Write interleaved audio data to it and do not assume that it is zeroed.</dd>
+<dt>userdata</dt>
+<dd>The userdata parameter as passed to the setter for this callback.</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -2227,6 +3321,27 @@ Audio is queued as it is pushed to this node and then played as fast as possible
 This node can be used to avoid writing a queue of audio yourself, as it essentially implements said functionality.
 If you need low latency audio or the ability to run something like the Opus encoder&#8217;s
 ability to cover for missing frames, you need a pull node.</p>
+<p>This node has no inputs.</p>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="5%" />
+<col width="49%" />
+<col width="46%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Either audio from the internal queue or zero.</td>
+</tr>
+</tbody>
+</table>
 <dl class="method">
 <dt id="libaudioverse.PushNode.feed">
 <code class="descname">feed</code><span class="sig-paren">(</span><em>node</em>, <em>length</em>, <em>frames</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.PushNode.feed" title="Permalink to this definition">¶</a></dt>
@@ -2251,14 +3366,32 @@ ability to cover for missing frames, you need a pull node.</p>
 <dt id="libaudioverse.PushNode.set_low_callback">
 <code class="descname">set_low_callback</code><span class="sig-paren">(</span><em>callback</em>, <em>additional_args=None</em>, <em>additional_kwargs=None</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.PushNode.set_low_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the low callback.</p>
+<p>Additional_args and additional_kwargs are passed to the callback in addition to any arguments from Libaudioverse.  Note that Libaudioverse always uses positional arguments.</p>
+<p>C callback signature: <cite>void  (LavHandle  nodeHandle, void *   userdata)</cite></p>
 <p>Called once per block and outside the audio thread when there is less than the specified threshold audio remaining.</p>
+<p>Callback parameters:</p>
+<dl class="docutils">
+<dt>nodeHandle</dt>
+<dd>The node which called this callback.</dd>
+<dt>userdata</dt>
+<dd>The userdata parameter as passed to the setter for this callback.</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="libaudioverse.PushNode.set_underrun_callback">
 <code class="descname">set_underrun_callback</code><span class="sig-paren">(</span><em>callback</em>, <em>additional_args=None</em>, <em>additional_kwargs=None</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.PushNode.set_underrun_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the underrun callback.</p>
+<p>Additional_args and additional_kwargs are passed to the callback in addition to any arguments from Libaudioverse.  Note that Libaudioverse always uses positional arguments.</p>
+<p>C callback signature: <cite>void  (LavHandle  nodeHandle, void *   userdata)</cite></p>
 <p>Called exactly once and outside the audio thread when the node runs out of audio completely.</p>
+<p>Callback parameters:</p>
+<dl class="docutils">
+<dt>nodeHandle</dt>
+<dd>The node which called this callback.</dd>
+<dt>userdata</dt>
+<dd>The userdata parameter as passed to the setter for this callback.</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -2289,11 +3422,51 @@ You should connect the output to something that will demand the recorder node&#8
 If you don&#8217;t, no recording will take place.</p>
 <p>Unlike most other nodes in Libaudioverse, it is important that you call Lav_recorderNodeStopRecording when done recording.
 Failure to do so may lead to any of a number of surprising results.</p>
+<p>Inputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="65%" />
+<col width="28%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The signal to record.</td>
+</tr>
+</tbody>
+</table>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="6%" />
+<col width="59%" />
+<col width="35%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The same as the input signal.</td>
+</tr>
+</tbody>
+</table>
 <dl class="method">
 <dt id="libaudioverse.RecorderNode.start_recording">
 <code class="descname">start_recording</code><span class="sig-paren">(</span><em>node</em>, <em>path</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.RecorderNode.start_recording" title="Permalink to this definition">¶</a></dt>
 <dd><p>Begin recording to the specified files.
-The sample rate is the same as that of the simulation.
+The sample rate is the same as that of the server.
 The channel count is the same as this node was initialized with.
 The format of the file is determined from the extension: this function recognizes &#8221;.wav&#8221; and &#8221;.ogg&#8221; on all platforms.</p>
 </dd></dl>
@@ -2313,6 +3486,50 @@ Failure to do so may lead to any of a number of undesirable problems.</p>
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">RingmodNode</code><span class="sig-paren">(</span><em>server</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.RingmodNode" title="Permalink to this definition">¶</a></dt>
 <dd><p>This node has two inputs and one output.
 The two inputs will be converted to mono and then multiplied, before being sent to the output.</p>
+<p>Inputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="16%" />
+<col width="26%" />
+<col width="58%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>1</td>
+<td>The first signal.</td>
+</tr>
+<tr class="row-odd"><td>1</td>
+<td>1</td>
+<td>The second signal.</td>
+</tr>
+</tbody>
+</table>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="11%" />
+<col width="81%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>1</td>
+<td>The result of multiplying the two input signals together.</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="class">
@@ -2385,6 +3602,27 @@ To enumerate devices, use enumerate_devices.</p>
 <dt id="libaudioverse.SineNode">
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">SineNode</code><span class="sig-paren">(</span><em>server</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.SineNode" title="Permalink to this definition">¶</a></dt>
 <dd><p>A simple sine oscillator.</p>
+<p>This node has no inputs.</p>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="32%" />
+<col width="48%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>1</td>
+<td>A sine wave.</td>
+</tr>
+</tbody>
+</table>
 <dl class="attribute">
 <dt id="libaudioverse.SineNode.frequency">
 <code class="descname">frequency</code><a class="headerlink" href="#libaudioverse.SineNode.frequency" title="Permalink to this definition">¶</a></dt>
@@ -2426,6 +3664,27 @@ Sources have no outputs.
 To hear a source, you must connect its environment to something instead.</p>
 <p>Since the source communicates with the environment through a nonstandard mechanism, environments do not keep their sources alive.
 If you are in a garbage collected language, failure to hold on to the source nodes will cause them to go silent.</p>
+<p>Inputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="16%" />
+<col width="75%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>1</td>
+<td>The audio to enter the 3D environment.</td>
+</tr>
+</tbody>
+</table>
+<p>This node has no outputs. If you want it to advance, be sure to use <cite>foo.state = nodeStates.always_playing</cite>.</p>
 <dl class="attribute">
 <dt id="libaudioverse.SourceNode.distance_model">
 <code class="descname">distance_model</code><a class="headerlink" href="#libaudioverse.SourceNode.distance_model" title="Permalink to this definition">¶</a></dt>
@@ -2579,6 +3838,46 @@ If the high band begins below the low band, behavior is undefined, but will almo
 Libaudioverse does not check for this case.</p>
 <p>The slopes that this node institutes are not perfect and cannot increase effectively beyond a certain point.
 This is the least expensive of the Libaudioverse equalizers, and is sufficient for many simpler applications.</p>
+<p>Inputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="63%" />
+<col width="30%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The signal to equalize.</td>
+</tr>
+</tbody>
+</table>
+<p>Outputs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="65%" />
+<col width="28%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">index</th>
+<th class="head">channels</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>The equalized signal.</td>
+</tr>
+</tbody>
+</table>
 <dl class="attribute">
 <dt id="libaudioverse.ThreeBandEqNode.highband_dbgain">
 <code class="descname">highband_dbgain</code><a class="headerlink" href="#libaudioverse.ThreeBandEqNode.highband_dbgain" title="Permalink to this definition">¶</a></dt>
@@ -2708,7 +4007,7 @@ You must call it before the interpreter shuts down. Failure to do so will allow 
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'build198',
+            VERSION:'build215',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

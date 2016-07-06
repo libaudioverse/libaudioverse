@@ -6132,7 +6132,7 @@ This is measured in periods, not in radians.</p>
 </table>
 <div class="paragraph">
 <p>This node plays a buffer.
-The output of this node will have as many channels as the buffer does, so connecting it directly to the simulation will have the desired effect.</p>
+The output of this node will have as many channels as the buffer does, so connecting it directly to the server will have the desired effect.</p>
 </div>
 <div class="sect3">
 <h4 id="_properties_9">Properties</h4>
@@ -8638,7 +8638,7 @@ The effect is that this node allows observing audio passing through any location
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>unsigned int</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">frames</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The number of frames of audio being made available to client code.  This should always be the same as the simulation&#8217;s block size.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The number of frames of audio being made available to client code.  This should always be the same as the server&#8217;s block size.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>unsigned int</code></p></td>
@@ -8714,7 +8714,7 @@ This callback is called inside the audio threads; do not block.</p>
 </table>
 <div class="paragraph">
 <p>The input to this node is hard limited: values less than -1.0 are set to -1.0 and values above 1.0 are set to 1.0.
-Use the hard limiter in order to prevent oddities with audio hardware; it should usually be the last piece in your pipeline before the simulation.
+Use the hard limiter in order to prevent oddities with audio hardware; it should usually be the last piece in your pipeline before the server.
 Note that the 3D API handles hard limiting appropriately, and you do not need to worry about this there.</p>
 </div>
 </div>
@@ -9712,7 +9712,7 @@ Failure to do so may lead to any of a number of surprising results.</p>
 </div>
 <div class="paragraph">
 <p>Begin recording to the specified files.
-The sample rate is the same as that of the simulation.
+The sample rate is the same as that of the server.
 The channel count is the same as this node was initialized with.
 The format of the file is determined from the extension: this function recognizes ".wav" and ".ogg" on all platforms.</p>
 </div>
@@ -10962,7 +10962,7 @@ This is mostly for the <a href="#node-Lav_OBJTYPE_MULTIPANNER_NODE">multipanner 
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-05-29 02:03:51 Greenwich Standard Time
+Last updated 2016-07-06 22:42:08 Greenwich Standard Time
 </div>
 </div>
 <script type="text/x-mathjax-config">
