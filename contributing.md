@@ -1,5 +1,7 @@
 #Contributing
 
+Note: This document is a draft. Parts of this process need legal review before I can accept contributions.
+
 Thank you for your interest in contributing to Libaudioverse.  Contributions are always welcome.
 
 please read this file in its entirety before coding.  If you don't, you may be wasting time.
