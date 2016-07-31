@@ -18,6 +18,8 @@ class SourceNode;
 class HrtfData;
 class Server;
 class Buffer;
+class BufferNode;
+
 
 /**Configuration of an effect send.*/
 class EffectSendConfiguration {
@@ -74,7 +76,7 @@ class EnvironmentNode: public Node {
 	template<typename JobT, typename CallableT, typename... ArgsT>
 	friend void environmentVisitDependencies(JobT&& start, CallableT &&callable, ArgsT&&... args);
 	//This is used to make play_async not invalidate the plan.
-	std::vector<std::tuple<std::shared_ptr<Node>, std::shared_ptr<SourceNode>>> play_async_source_cache;
+	std::vector<std::tuple<std::shared_ptr<BufferNode>, std::shared_ptr<SourceNode>>> play_async_source_cache;
 	int play_async_source_cache_limit = 30; //How many we're willing to cache.
 };
 

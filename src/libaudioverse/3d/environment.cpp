@@ -112,12 +112,12 @@ void EnvironmentNode::registerSourceForUpdates(std::shared_ptr<SourceNode> sourc
 
 void EnvironmentNode::playAsync(std::shared_ptr<Buffer> buffer, float x, float y, float z, bool isDry) {
 	auto e = std::static_pointer_cast<EnvironmentNode>(shared_from_this());
-	std::shared_ptr<Node> b;
+	std::shared_ptr<BufferNode> b;
 	std::shared_ptr<SourceNode> s;
 	bool fromCache = false;
 	if(play_async_source_cache.empty()) {
 		s = std::static_pointer_cast<SourceNode>(createSourceNode(server, e));
-		b = createBufferNode(server);
+		b = std::static_pointer_cast<BufferNode>(createBufferNode(server));
 	}
 	else {
 		std::tie(b, s) = play_async_source_cache.back();
@@ -128,7 +128,7 @@ void EnvironmentNode::playAsync(std::shared_ptr<Buffer> buffer, float x, float y
 	if(fromCache == false) b->connect(0, s, 0);
 	b->getProperty(Lav_BUFFER_POSITION).setDoubleValue(0.0);
 	s->getProperty(Lav_3D_POSITION).setFloat3Value(x, y, z);
-		if(isDry) {
+	if(isDry) {
 		for(int i = 0; i < effect_sends.size(); i++) {
 			s->stopFeedingEffect(i);
 		}
@@ -145,8 +145,7 @@ void EnvironmentNode::playAsync(std::shared_ptr<Buffer> buffer, float x, float y
 	//If we update the source, it might cull.  We can then reset it to avoid HRTF crossfading.
 	s->update(environment_info);
 	s->reset(); //Avoid crossfading the hrtf.	
-	//This needs rewriting on whatever we replace events with.
-	/*b->getEvent(Lav_BUFFER_END_EVENT).setHandler([b, e, s, server] (std::shared_ptr<Node> unused1, void* unused2) mutable {
+	b->end_callback->setCallback([b, e, s, server] () mutable {
 		//Recall that events do not hold locks when fired.
 		//So lock the server.
 		LOCK(*server);
@@ -166,7 +165,7 @@ void EnvironmentNode::playAsync(std::shared_ptr<Buffer> buffer, float x, float y
 		b.reset();
 		s.reset();
 		e.reset();
-	});*/
+	});
 }
 
 int EnvironmentNode::addEffectSend(int channels, bool isReverb, bool connectByDefault) {
