@@ -48,9 +48,10 @@ install:
   - '%PYTHON_COMMAND% -m pip install -U pip setuptools'
   #Bring in jinja2, pycparser, etc. Paramiko needs pycrypto.
   - '%PYTHON_COMMAND% -m pip install jinja2 pycparser pyyaml wheel twine pypandoc sphinx sphinx_rtd_theme %NUMPY_URL% %SCIPY_URL%'
-  #This next one gets a bit interesting: we need to download and silently install libsndfile.
   - mkdir tmp
   - cd tmp
+  - echo Downloading Pandoc
+  - appveyor DownloadFile http://camlorn.net/appveyor/pandoc.exe
   - echo Downloading Libsndfile.
   - mkdir bin
   - cd bin
