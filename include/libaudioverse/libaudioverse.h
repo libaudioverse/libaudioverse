@@ -227,6 +227,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_createBuffer(LavHandle serverHandle, LavHandle*
 Lav_PUBLIC_FUNCTION LavError Lav_bufferGetServer(LavHandle bufferHandle, LavHandle* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_bufferLoadFromFile(LavHandle bufferHandle, const char* path);
 Lav_PUBLIC_FUNCTION LavError Lav_bufferLoadFromArray(LavHandle bufferHandle, int sr, int channels, int frames, float* data);
+Lav_PUBLIC_FUNCTION LavError Lav_bufferDecodeFromArray(LavHandle bufferHandle, char* data, int datalen);
 Lav_PUBLIC_FUNCTION LavError Lav_bufferNormalize(LavHandle bufferHandle);
 Lav_PUBLIC_FUNCTION LavError Lav_bufferGetDuration(LavHandle bufferHandle, float* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_bufferGetLengthInSamples(LavHandle bufferHandle, int* destination);

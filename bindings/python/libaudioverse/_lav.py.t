@@ -67,14 +67,18 @@ def reverse_handle(handle):
     else:
         {{arg.name}} = 0
 {%elif arg.type.indirection == 1 and arg.type.base == 'char'%}
-    {{arg.name}} = {{arg.name}}.encode('utf8') #All strings are contractually UTF8 when entering Libaudioverse.
+    if isinstance({{arg.name}}, six.text_type):
+        {{arg.name}} = {{arg.name}}.encode('utf8') #All strings are contractually UTF8 when entering Libaudioverse.
 {%elif arg.type.indirection == 1%}
     if isinstance({{arg.name}}, collections.Sized):
         if not (isinstance({{arg.name}}, six.binary_type) or isinstance({{arg.name}}, six.text_type)):
             {{arg.name}}_t = {{arg.type|ctypes_string(1)}}*len({{arg.name}})
             #Try to use the buffer interfaces, if we can.
             try:
-                {{arg.name}} = {{arg.name}}_t.from_buffer({{arg.name}})
+                try:
+                    {{arg.name}} = {{arg.name}}_t.from_buffer({{arg.name}})
+                except TypeError:
+                    {{arg.name}} = {{arg.name}}_t.from_buffer_copy({{arg.name}})
             except TypeError:
                 {{arg.name}}_new = {{arg.name}}_t()
                 for i, j in enumerate({{arg.name}}):

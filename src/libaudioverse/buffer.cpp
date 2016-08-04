@@ -123,19 +123,23 @@ Lav_PUBLIC_FUNCTION LavError Lav_bufferGetServer(LavHandle handle, LavHandle* de
 	PUB_END
 }
 
+void loadFromFileReader(Buffer& buff, FileReader& fr) {
+	float* data = allocArray<float>(fr.getSampleCount());
+	fr.readAll(data);
+	{
+		LOCK(buff);
+		buff.throwIfInUse();
+		buff.loadFromArray(fr.getSr(), fr.getChannelCount(), fr.getSampleCount()/fr.getChannelCount(), data);
+	}
+	freeArray(data);
+}
+
 Lav_PUBLIC_FUNCTION LavError Lav_bufferLoadFromFile(LavHandle bufferHandle, const char* path) {
 	PUB_BEGIN
 	auto buff =incomingObject<Buffer>(bufferHandle);
 	FileReader f{};
 	f.open(path);
-	float* data = allocArray<float>(f.getSampleCount());
-	f.readAll(data);
-	{
-		LOCK(*buff);
-		buff->throwIfInUse();
-		buff->loadFromArray(f.getSr(), f.getChannelCount(), f.getSampleCount()/f.getChannelCount(), data);
-	}
-	freeArray(data);
+	loadFromFileReader(*buff, f);
 	PUB_END
 }
 
@@ -145,6 +149,15 @@ Lav_PUBLIC_FUNCTION LavError Lav_bufferLoadFromArray(LavHandle bufferHandle, int
 	LOCK(*buff);
 	buff->throwIfInUse();
 	buff->loadFromArray(sr, channels, frames, data);
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_bufferDecodeFromArray(LavHandle bufferHandle, char* data, int datalen) {
+	PUB_BEGIN
+	FileReader fr{};
+	auto buff = incomingObject<Buffer>(bufferHandle);
+	fr.openFromBuffer(data, datalen);
+	loadFromFileReader(*buff, fr);
 	PUB_END
 }
 

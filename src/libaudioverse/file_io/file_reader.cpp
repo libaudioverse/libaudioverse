@@ -16,6 +16,8 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/private/macros.hpp>
 #include <libaudioverse/private/utf8.hpp>
 #include <inttypes.h>
+#include <cstddef>
+
 
 namespace libaudioverse_implementation {
 
@@ -37,11 +39,24 @@ void FileReader::open(const char* path) {
 	}
 }
 
+void FileReader::openFromBuffer(char* buffer, int64_t len) {
+	if(buffer == nullptr) ERROR(Lav_ERROR_RANGE, "Buffer must not be null.");
+	if(len <= 0) ERROR(Lav_ERROR_RANGE, "Length of buffer must be positive.");
+	buffer_wrapper = new LibsndfileBufferWrapper(buffer, len);
+	buffer_wrapper->open(SFM_READ, &handle, &info);
+	if(handle == nullptr) {
+		delete buffer_wrapper;
+		ERROR(Lav_ERROR_FILE, "Buffer could not be decoded.");
+	}
+}
+
+
 void FileReader::close() {
 	if(handle != NULL)  {
 		sf_close(handle);
 		handle = NULL;
 		info = {0};
+		if(buffer_wrapper) {delete buffer_wrapper;}
 	} else {
 		ERROR(Lav_ERROR_FILE, "Attempt to close file without opening first.");
 	}

@@ -333,6 +333,12 @@ Use load_from_file to read a file or load_from_array to load an iterable."""
         Wraps Lav_bufferLoadFromArray."""
         _lav.buffer_load_from_array(self, sr, channels, frames, data)
 
+    def decode_from_array(self, array):
+        r"""Takes an encoded array of audio data and decodes it.
+
+Wraps Lav_bufferDecodeFromArray.  Array must be a string, bytes, or iterable of bytes.  DO not give unicode to this function.  Objects which do not support the ctypes buffer interface will process unusably slowly."""
+        _lav.buffer_decode_from_array(self, array, len(array))
+
     def get_duration(self):
         r"""Get the duration of the buffer in seconds.
         
