@@ -115,7 +115,7 @@ int SourceNode::computeDistanceModel(EnvironmentInfo& env) {
 	return dm;
 }
 
-void SourceNode::update(EnvironmentInfo &env) {
+void SourceNode::update(EnvironmentInfo env) {
 	//first, extract the vector of our position.
 	const float* pos = getProperty(Lav_3D_POSITION).getFloat3Value();
 	bool isHeadRelative = getProperty(Lav_SOURCE_HEAD_RELATIVE).getIntValue() == 1;
