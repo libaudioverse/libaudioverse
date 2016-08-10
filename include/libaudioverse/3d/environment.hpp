@@ -6,6 +6,8 @@ A copy of both licenses may be found in license.gpl and license.mpl at the root 
 If these files are unavailable to you, see either http://www.gnu.org/licenses/ (GPL V3 or later) or https://www.mozilla.org/en-US/MPL/2.0/ (MPL 2.0).*/
 #pragma once
 #include "../libaudioverse.h"
+#include "../libaudioverse3d.h"
+#include "../libaudioverse_properties.h"
 #include <vector>
 #include <set>
 #include <memory>
@@ -31,13 +33,23 @@ class EffectSendConfiguration {
 };
 
 /**This holds info on listener positions, defaults, etc.
-Anything a source needs for updating, basically.*/
+Anything a source needs for updating, basically.
+
+Sources update this struct as needed if they are not delegating to the environment, then use it for processing.
+Otherwise, sources just use the values herein.
+
+The following initialization values dont matter, but we want the struct to be valid anyway.*/
 class EnvironmentInfo {
 	public:
 	glm::mat4 world_to_listener_transform;
 	//These avoid tons of property lookups.
 	//Each lookup on the environment is a shared_ptr indirection and a dictionary lookup.
-	int distance_model, panning_strategy;
+	int panning_strategy = Lav_PANNING_STRATEGY_HRTF;
+	bool panning_strategy_changed = false;
+	int distance_model = Lav_DISTANCE_MODEL_LINEAR;
+	bool distance_model_changed = false;
+	float min_distance = 0.0, max_distance = 0.0, size = 0.0;
+	float reverb_distance = 0.0;
 };
 
 /**The sorce and environment model does not use the standard node and implementation separation.
