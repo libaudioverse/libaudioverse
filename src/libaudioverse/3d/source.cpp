@@ -48,9 +48,9 @@ hrtf_data(environment->getHrtf()) {
 	this->environment = environment;
 	handleOcclusion(); //Make sure we initialize as unoccluded.	
 	//we have to read off these defaults manually, and it must always be the last thing in the constructor.
-	getProperty(Lav_SOURCE_MAX_DISTANCE).setFloatValue(environment->getProperty(Lav_ENVIRONMENT_DEFAULT_MAX_DISTANCE).getFloatValue());
+	getProperty(Lav_SOURCE_MAX_DISTANCE).setFloatValue(environment->getProperty(Lav_ENVIRONMENT_MAX_DISTANCE).getFloatValue());
 	getProperty(Lav_SOURCE_SIZE).setFloatValue(environment->getProperty(Lav_ENVIRONMENT_DEFAULT_SIZE).getFloatValue());
-	getProperty(Lav_SOURCE_REVERB_DISTANCE).setFloatValue(environment->getProperty(Lav_ENVIRONMENT_DEFAULT_REVERB_DISTANCE).getFloatValue());
+	getProperty(Lav_SOURCE_REVERB_DISTANCE).setFloatValue(environment->getProperty(Lav_ENVIRONMENT_REVERB_DISTANCE).getFloatValue());
 	appendInputConnection(0, 1);
 	stereo_panner.readMap(2, standard_panning_map_stereo);
 	surround40_panner.readMap(4, standard_panning_map_surround40);

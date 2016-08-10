@@ -85,9 +85,10 @@ void EnvironmentNode::willTick() {
 	environment_info.distance_model = getProperty(Lav_ENVIRONMENT_DISTANCE_MODEL).getIntValue();
 	if(environment_info.distance_model == Lav_DISTANCE_MODEL_DELEGATE) environment_info.distance_model = Lav_DISTANCE_MODEL_LINEAR;
 	environment_info.distance_model_changed = werePropertiesModified(this, Lav_ENVIRONMENT_DISTANCE_MODEL);
-	environment_info.max_distance = getProperty(Lav_ENVIRONMENT_DEFAULT_MAX_DISTANCE).getFloatValue();
-	environment_info.reverb_distance = getProperty(Lav_ENVIRONMENT_DEFAULT_REVERB_DISTANCE).getFloatValue();
-	environment_info.size = getProperty(Lav_ENVIRONMENT_DEFAULT_SIZE).getFloatValue();
+	environment_info.max_distance = getProperty(Lav_ENVIRONMENT_MAX_DISTANCE).getFloatValue();
+	environment_info.reverb_distance = getProperty(Lav_ENVIRONMENT_REVERB_DISTANCE).getFloatValue();
+	environment_info.min_reverb_level = getProperty(Lav_ENVIRONMENT_MIN_REVERB_LEVEL).getFloatValue();
+	environment_info.max_reverb_level = getProperty(Lav_ENVIRONMENT_MAX_REVERB_LEVEL).getFloatValue();
 	//give the new environment to the sources.
 	//this is a set of weak pointers.
 	filterWeakPointers(sources, [&](std::shared_ptr<SourceNode> &s) {

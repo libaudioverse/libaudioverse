@@ -30,23 +30,21 @@ properties:
     type: int
     value_enum: Lav_DISTANCE_MODELS
     doc_description: |
-      The distance model for any source configured to delegate to the environment.
-      Sources are configured to delegate to the environment by default.
-      
       Distance models control how quickly sources get quieter as they move away from the listener.
       
-      Note that it is possible to set this property to {{"Lav_DISTANCE_MODEL_DELEGATE"|codelit}}.
-      Due to internal limitations, this does not generate an error.
-      Instead, this case is equivalent to a linear distance model.
-      Do not rely on this behavior.  The internal ilimitations preventing this will be lifted in future.
-  Lav_ENVIRONMENT_DEFAULT_MAX_DISTANCE:
-    name: default_max_distance
+      By default, sources are configured to delegate to the environment when looking for values to use for the distance model parameters.
+      This behavior may be changed by setting {{"Lav_SOURCE_CONTROL_DISTANCE_MODEL"|codelit}} to true.
+  Lav_ENVIRONMENT_MAX_DISTANCE:
+    name: max_distance
     range: [0.0, INFINITY]
     type: float
     default: 50.0
     doc_description: |
-      The default max distance for new sources.
-      The max distance of a source is the maximum distance at which that source will be audible.
+      The maximum distance at which a source is audible.
+      Consider this property to be in meters.
+      
+      By default, sources are configured to delegate to the environment when looking for values to use for the distance model parameters.
+      This behavior may be changed by setting {{"Lav_SOURCE_CONTROL_DISTANCE_MODEL"|codelit}} to true.
   Lav_ENVIRONMENT_DEFAULT_SIZE:
     name: default_size
     type: float
@@ -65,9 +63,7 @@ properties:
       The panning strategy for any source configured to delegate to the environment.
       All new sources delegate to the environment by default.
       
-      Note that it is possible to set this property to the delgate panning strategy.
-      Due to internal limitations, this case does not error but is instead equivalent to using stereo panning.
-      These limitations will be lifted in future; do not rely on this behavior.
+      If you want to change this property for a specific source, set {{"Lav_SOURCE_CONTROL_PANNING"|codelit}} on the source to true.
   Lav_ENVIRONMENT_OUTPUT_CHANNELS:
     name: output_channels
     type: int
@@ -80,15 +76,43 @@ properties:
       or where the app changes the panning strategies of sources after creation.
       
       Values besides 2, 4, 6, or 8 do not usually have much meaning.
-  Lav_ENVIRONMENT_DEFAULT_REVERB_DISTANCE:
+  Lav_ENVIRONMENT_REVERB_DISTANCE:
     name: default_reverb_distance
     type: float
     range: [0.0, INFINITY]
     default: 30.0
     doc_description: |
-      The default distance at which a source will be heard only in the reverb.
+      The distance at which a source will be heard only in the reverb.
       
-      See documentation on the {{"Lav_OBJTYPE_SOURCE_NODE"|node}} node.
+      See documentation on the {{"Lav_OBJTYPE_SOURCE_NODE"|node}} node for a specific explanation.
+      By default, sources get the value of this property from the environment.
+      To control this property on a per-source basis, set {{"Lav_SOURCE_CONTROL_REVERB"|codelit}} to true on the source.
+  Lav_ENVIRONMENT_MIN_REVERB_LEVEL:
+    name: min_reverb_level
+    type: float
+    range: [0.0, 1.0]
+    default: 0.15
+    doc_description: |
+      The minimum reverb level allowed.
+      
+      if a send is configured to be a reverb send, this is the minimum amount of audio that will be diverted to it.
+      
+      Behavior is undefined if this property is ever greater than the value of {{"Lav_ENVIRONMENT_MAX_REVERB_LEVEL"|property}}.
+      
+      By default, sources look to their environmlent for the value of this property.
+      If you wish to set it on a per-source basis, set {{"Lav_SOURCE_CONTROL_REVERB"|codelit}} to true on the source.
+  Lav_ENVIRONMENT_MAX_REVERB_LEVEL:
+    name: max_reverb_level
+    type: float
+    range: [0.0, 1.0]
+    default: 0.6
+    doc_description: |
+      The maximum amount of audio to be diverted to reverb sends, if any.
+      
+      Behavior is undefined if this property is ever less than {{"Lav_ENVIRONMENT_MIN_REVERB_LEVEL"|property}}.
+      
+      By default, sources look to their environmlent for the value of this property.
+      If you wish to set it on a per-source basis, set {{"Lav_SOURCE_CONTROL_REVERB"|codelit}} to true on the source.
 extra_functions:
   Lav_environmentNodePlayAsync:
     doc_description: |

@@ -48,8 +48,9 @@ class EnvironmentInfo {
 	bool panning_strategy_changed = false;
 	int distance_model = Lav_DISTANCE_MODEL_LINEAR;
 	bool distance_model_changed = false;
-	float min_distance = 0.0, max_distance = 0.0, size = 0.0;
+	float min_distance = 0.0, max_distance = 0.0;
 	float reverb_distance = 0.0;
+	float min_reverb_level = 0.0, max_reverb_level = 1.0;
 };
 
 /**The sorce and environment model does not use the standard node and implementation separation.
