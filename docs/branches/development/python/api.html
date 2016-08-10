@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>The Libaudioverse API &mdash; Libaudioverse build225 documentation</title>
+  <title>The Libaudioverse API &mdash; Libaudioverse build226 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="Libaudioverse build225 documentation" href="index.html"/>
+    <link rel="top" title="Libaudioverse build226 documentation" href="index.html"/>
         <link rel="prev" title="Python-specific Notes" href="python-specifics.html"/> 
 
   
@@ -559,7 +559,7 @@ If crossfading is enabled, moving the panner will slowly fade it to the new posi
 
 <dl class="class">
 <dt id="libaudioverse.AutomatedProperty">
-<em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">AutomatedProperty</code><span class="sig-paren">(</span><em>handle</em>, <em>slot</em>, <em>getter</em>, <em>setter</em>, <em>converter=&lt;function LibaudioverseProperty.&lt;lambda&gt; at 0x00000015F4C2E9D8&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.AutomatedProperty" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">AutomatedProperty</code><span class="sig-paren">(</span><em>handle</em>, <em>slot</em>, <em>getter</em>, <em>setter</em>, <em>converter=&lt;function LibaudioverseProperty.&lt;lambda&gt; at 0x03B5D930&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.AutomatedProperty" title="Permalink to this definition">¶</a></dt>
 <dd><p>A property that supports automation and node connection.</p>
 <dl class="method">
 <dt id="libaudioverse.AutomatedProperty.cancel_automators">
@@ -1601,23 +1601,15 @@ as sources move away from the listener, their dry path becomes less but the audi
 </dd></dl>
 
 <dl class="attribute">
-<dt id="libaudioverse.EnvironmentNode.default_max_distance">
-<code class="descname">default_max_distance</code><a class="headerlink" href="#libaudioverse.EnvironmentNode.default_max_distance" title="Permalink to this definition">¶</a></dt>
-<dd><p>Type: float</p>
-<p>Range: [0.0, INFINITY]</p>
-<p>Default value: 50.0</p>
-<p>The default max distance for new sources.
-The max distance of a source is the maximum distance at which that source will be audible.</p>
-</dd></dl>
-
-<dl class="attribute">
 <dt id="libaudioverse.EnvironmentNode.default_reverb_distance">
 <code class="descname">default_reverb_distance</code><a class="headerlink" href="#libaudioverse.EnvironmentNode.default_reverb_distance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Type: float</p>
 <p>Range: [0.0, INFINITY]</p>
 <p>Default value: 30.0</p>
-<p>The default distance at which a source will be heard only in the reverb.</p>
-<p>See documentation on the <a class="reference internal" href="#libaudioverse.SourceNode" title="libaudioverse.SourceNode"><code class="xref py py-class docutils literal"><span class="pre">SourceNode</span></code></a> node.</p>
+<p>The distance at which a source will be heard only in the reverb.</p>
+<p>See documentation on the <a class="reference internal" href="#libaudioverse.SourceNode" title="libaudioverse.SourceNode"><code class="xref py py-class docutils literal"><span class="pre">SourceNode</span></code></a> node for a specific explanation.
+By default, sources get the value of this property from the environment.
+To control this property on a per-source basis, set <code class="docutils literal"><span class="pre">Lav_SOURCE_CONTROL_REVERB</span></code> to true on the source.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -1637,13 +1629,46 @@ Size is used to determine the listener&#8217;s distance from a source.</p>
 <dd><p>Type: int</p>
 <p>Range: <a class="reference internal" href="#libaudioverse.DistanceModels" title="libaudioverse.DistanceModels"><code class="xref any py py-class docutils literal"><span class="pre">DistanceModels</span></code></a></p>
 <p>Default value: <a class="reference internal" href="#libaudioverse.DistanceModels.linear" title="libaudioverse.DistanceModels.linear"><code class="xref any py py-attr docutils literal"><span class="pre">DistanceModels.linear</span></code></a></p>
-<p>The distance model for any source configured to delegate to the environment.
-Sources are configured to delegate to the environment by default.</p>
 <p>Distance models control how quickly sources get quieter as they move away from the listener.</p>
-<p>Note that it is possible to set this property to <code class="docutils literal"><span class="pre">Lav_DISTANCE_MODEL_DELEGATE</span></code>.
-Due to internal limitations, this does not generate an error.
-Instead, this case is equivalent to a linear distance model.
-Do not rely on this behavior.  The internal ilimitations preventing this will be lifted in future.</p>
+<p>By default, sources are configured to delegate to the environment when looking for values to use for the distance model parameters.
+This behavior may be changed by setting <code class="docutils literal"><span class="pre">Lav_SOURCE_CONTROL_DISTANCE_MODEL</span></code> to true.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.EnvironmentNode.max_distance">
+<code class="descname">max_distance</code><a class="headerlink" href="#libaudioverse.EnvironmentNode.max_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Type: float</p>
+<p>Range: [0.0, INFINITY]</p>
+<p>Default value: 50.0</p>
+<p>The maximum distance at which a source is audible.
+Consider this property to be in meters.</p>
+<p>By default, sources are configured to delegate to the environment when looking for values to use for the distance model parameters.
+This behavior may be changed by setting <code class="docutils literal"><span class="pre">Lav_SOURCE_CONTROL_DISTANCE_MODEL</span></code> to true.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.EnvironmentNode.max_reverb_level">
+<code class="descname">max_reverb_level</code><a class="headerlink" href="#libaudioverse.EnvironmentNode.max_reverb_level" title="Permalink to this definition">¶</a></dt>
+<dd><p>Type: float</p>
+<p>Range: [0.0, 1.0]</p>
+<p>Default value: 0.6</p>
+<p>The maximum amount of audio to be diverted to reverb sends, if any.</p>
+<p>Behavior is undefined if this property is ever less than Lav_ENVIRONMENT_MIN_REVERB_LEVEL.</p>
+<p>By default, sources look to their environmlent for the value of this property.
+If you wish to set it on a per-source basis, set <code class="docutils literal"><span class="pre">Lav_SOURCE_CONTROL_REVERB</span></code> to true on the source.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.EnvironmentNode.min_reverb_level">
+<code class="descname">min_reverb_level</code><a class="headerlink" href="#libaudioverse.EnvironmentNode.min_reverb_level" title="Permalink to this definition">¶</a></dt>
+<dd><p>Type: float</p>
+<p>Range: [0.0, 1.0]</p>
+<p>Default value: 0.15</p>
+<p>The minimum reverb level allowed.</p>
+<p>if a send is configured to be a reverb send, this is the minimum amount of audio that will be diverted to it.</p>
+<p>Behavior is undefined if this property is ever greater than the value of Lav_ENVIRONMENT_MAX_REVERB_LEVEL.</p>
+<p>By default, sources look to their environmlent for the value of this property.
+If you wish to set it on a per-source basis, set <code class="docutils literal"><span class="pre">Lav_SOURCE_CONTROL_REVERB</span></code> to true on the source.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -1686,9 +1711,7 @@ or where the app changes the panning strategies of sources after creation.</p>
 <p>Default value: <a class="reference internal" href="#libaudioverse.PanningStrategies.stereo" title="libaudioverse.PanningStrategies.stereo"><code class="xref any py py-attr docutils literal"><span class="pre">PanningStrategies.stereo</span></code></a></p>
 <p>The panning strategy for any source configured to delegate to the environment.
 All new sources delegate to the environment by default.</p>
-<p>Note that it is possible to set this property to the delgate panning strategy.
-Due to internal limitations, this case does not error but is instead equivalent to using stereo panning.
-These limitations will be lifted in future; do not rely on this behavior.</p>
+<p>If you want to change this property for a specific source, set <code class="docutils literal"><span class="pre">Lav_SOURCE_CONTROL_PANNING</span></code> on the source to true.</p>
 </dd></dl>
 
 <dl class="method">
@@ -2827,7 +2850,7 @@ If you feed this node a signal that is zero, it will slowly decrease the output 
 
 <dl class="class">
 <dt id="libaudioverse.LibaudioverseProperty">
-<em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">LibaudioverseProperty</code><span class="sig-paren">(</span><em>handle</em>, <em>slot</em>, <em>getter</em>, <em>setter</em>, <em>converter=&lt;function LibaudioverseProperty.&lt;lambda&gt; at 0x00000015F4C2E9D8&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.LibaudioverseProperty" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">LibaudioverseProperty</code><span class="sig-paren">(</span><em>handle</em>, <em>slot</em>, <em>getter</em>, <em>setter</em>, <em>converter=&lt;function LibaudioverseProperty.&lt;lambda&gt; at 0x03B5D930&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.LibaudioverseProperty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Proxy to Libaudioverse properties.</p>
 <p>All properties support resetting and type query.</p>
 <dl class="attribute">
@@ -4014,7 +4037,7 @@ You must call it before the interpreter shuts down. Failure to do so will allow 
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'build225',
+            VERSION:'build226',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

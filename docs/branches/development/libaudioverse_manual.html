@@ -7135,52 +7135,6 @@ As usual, note that radians=degrees*PI/180.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_default_max_distance">default_max_distance</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_ENVIRONMENT_DEFAULT_MAX_DISTANCE</p>
-</div>
-<div class="paragraph">
-<p>Type: float</p>
-</div>
-<div class="paragraph">
-<p>Range: [0.0, 'INFINITY']</p>
-</div>
-<div class="paragraph">
-<p>Default Value: 50.0</p>
-</div>
-<div class="paragraph">
-<p>Rate: k</p>
-</div>
-<div class="paragraph">
-<p>The default max distance for new sources.
-The max distance of a source is the maximum distance at which that source will be audible.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_default_reverb_distance">default_reverb_distance</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_ENVIRONMENT_DEFAULT_REVERB_DISTANCE</p>
-</div>
-<div class="paragraph">
-<p>Type: float</p>
-</div>
-<div class="paragraph">
-<p>Range: [0.0, 'INFINITY']</p>
-</div>
-<div class="paragraph">
-<p>Default Value: 30.0</p>
-</div>
-<div class="paragraph">
-<p>Rate: k</p>
-</div>
-<div class="paragraph">
-<p>The default distance at which a source will be heard only in the reverb.</p>
-</div>
-<div class="paragraph">
-<p>See documentation on the <a href="#node-Lav_OBJTYPE_SOURCE_NODE">source node</a> node.</p>
-</div>
-</div>
-<div class="sect4">
 <h5 id="_default_size">default_size</h5>
 <div class="paragraph">
 <p>C Enumeration Value: Lav_ENVIRONMENT_DEFAULT_SIZE</p>
@@ -7221,17 +7175,96 @@ Size is used to determine the listener&#8217;s distance from a source.</p>
 <p>Rate: k</p>
 </div>
 <div class="paragraph">
-<p>The distance model for any source configured to delegate to the environment.
-Sources are configured to delegate to the environment by default.</p>
-</div>
-<div class="paragraph">
 <p>Distance models control how quickly sources get quieter as they move away from the listener.</p>
 </div>
 <div class="paragraph">
-<p>Note that it is possible to set this property to <code>Lav_DISTANCE_MODEL_DELEGATE</code>.
-Due to internal limitations, this does not generate an error.
-Instead, this case is equivalent to a linear distance model.
-Do not rely on this behavior.  The internal ilimitations preventing this will be lifted in future.</p>
+<p>By default, sources are configured to delegate to the environment when looking for values to use for the distance model parameters.
+This behavior may be changed by setting <code>Lav_SOURCE_CONTROL_DISTANCE_MODEL</code> to true.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_max_distance">max_distance</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_ENVIRONMENT_MAX_DISTANCE</p>
+</div>
+<div class="paragraph">
+<p>Type: float</p>
+</div>
+<div class="paragraph">
+<p>Range: [0.0, 'INFINITY']</p>
+</div>
+<div class="paragraph">
+<p>Default Value: 50.0</p>
+</div>
+<div class="paragraph">
+<p>Rate: k</p>
+</div>
+<div class="paragraph">
+<p>The maximum distance at which a source is audible.
+Consider this property to be in meters.</p>
+</div>
+<div class="paragraph">
+<p>By default, sources are configured to delegate to the environment when looking for values to use for the distance model parameters.
+This behavior may be changed by setting <code>Lav_SOURCE_CONTROL_DISTANCE_MODEL</code> to true.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_max_reverb_level">max_reverb_level</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_ENVIRONMENT_MAX_REVERB_LEVEL</p>
+</div>
+<div class="paragraph">
+<p>Type: float</p>
+</div>
+<div class="paragraph">
+<p>Range: [0.0, 1.0]</p>
+</div>
+<div class="paragraph">
+<p>Default Value: 0.6</p>
+</div>
+<div class="paragraph">
+<p>Rate: k</p>
+</div>
+<div class="paragraph">
+<p>The maximum amount of audio to be diverted to reverb sends, if any.</p>
+</div>
+<div class="paragraph">
+<p>Behavior is undefined if this property is ever less than Lav_ENVIRONMENT_MIN_REVERB_LEVEL.</p>
+</div>
+<div class="paragraph">
+<p>By default, sources look to their environmlent for the value of this property.
+If you wish to set it on a per-source basis, set <code>Lav_SOURCE_CONTROL_REVERB</code> to true on the source.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_min_reverb_level">min_reverb_level</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_ENVIRONMENT_MIN_REVERB_LEVEL</p>
+</div>
+<div class="paragraph">
+<p>Type: float</p>
+</div>
+<div class="paragraph">
+<p>Range: [0.0, 1.0]</p>
+</div>
+<div class="paragraph">
+<p>Default Value: 0.15</p>
+</div>
+<div class="paragraph">
+<p>Rate: k</p>
+</div>
+<div class="paragraph">
+<p>The minimum reverb level allowed.</p>
+</div>
+<div class="paragraph">
+<p>if a send is configured to be a reverb send, this is the minimum amount of audio that will be diverted to it.</p>
+</div>
+<div class="paragraph">
+<p>Behavior is undefined if this property is ever greater than the value of Lav_ENVIRONMENT_MAX_REVERB_LEVEL.</p>
+</div>
+<div class="paragraph">
+<p>By default, sources look to their environmlent for the value of this property.
+If you wish to set it on a per-source basis, set <code>Lav_SOURCE_CONTROL_REVERB</code> to true on the source.</p>
 </div>
 </div>
 <div class="sect4">
@@ -7283,9 +7316,33 @@ or where the app changes the panning strategies of sources after creation.</p>
 All new sources delegate to the environment by default.</p>
 </div>
 <div class="paragraph">
-<p>Note that it is possible to set this property to the delgate panning strategy.
-Due to internal limitations, this case does not error but is instead equivalent to using stereo panning.
-These limitations will be lifted in future; do not rely on this behavior.</p>
+<p>If you want to change this property for a specific source, set <code>Lav_SOURCE_CONTROL_PANNING</code> on the source to true.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_default_reverb_distance">default_reverb_distance</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_ENVIRONMENT_REVERB_DISTANCE</p>
+</div>
+<div class="paragraph">
+<p>Type: float</p>
+</div>
+<div class="paragraph">
+<p>Range: [0.0, 'INFINITY']</p>
+</div>
+<div class="paragraph">
+<p>Default Value: 30.0</p>
+</div>
+<div class="paragraph">
+<p>Rate: k</p>
+</div>
+<div class="paragraph">
+<p>The distance at which a source will be heard only in the reverb.</p>
+</div>
+<div class="paragraph">
+<p>See documentation on the <a href="#node-Lav_OBJTYPE_SOURCE_NODE">source node</a> node for a specific explanation.
+By default, sources get the value of this property from the environment.
+To control this property on a per-source basis, set <code>Lav_SOURCE_CONTROL_REVERB</code> to true on the source.</p>
 </div>
 </div>
 </div>
@@ -10073,7 +10130,7 @@ The orientation and position properties of an environment do not affect head rel
 </div>
 </div>
 <div class="sect4">
-<h5 id="_max_distance">max_distance</h5>
+<h5 id="_max_distance_2">max_distance</h5>
 <div class="paragraph">
 <p>C Enumeration Value: Lav_SOURCE_MAX_DISTANCE</p>
 </div>
@@ -10095,7 +10152,7 @@ This property&#8217;s default value is copied from the environment at source cre
 </div>
 </div>
 <div class="sect4">
-<h5 id="_max_reverb_level">max_reverb_level</h5>
+<h5 id="_max_reverb_level_2">max_reverb_level</h5>
 <div class="paragraph">
 <p>C Enumeration Value: Lav_SOURCE_MAX_REVERB_LEVEL</p>
 </div>
@@ -10119,7 +10176,7 @@ This property&#8217;s default value is copied from the environment at source cre
 </div>
 </div>
 <div class="sect4">
-<h5 id="_min_reverb_level">min_reverb_level</h5>
+<h5 id="_min_reverb_level_2">min_reverb_level</h5>
 <div class="paragraph">
 <p>C Enumeration Value: Lav_SOURCE_MIN_REVERB_LEVEL</p>
 </div>
@@ -10962,7 +11019,7 @@ This is mostly for the <a href="#node-Lav_OBJTYPE_MULTIPANNER_NODE">multipanner 
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-08-04 22:28:00 Coordinated Universal Time
+Last updated 2016-08-10 23:26:38 Coordinated Universal Time
 </div>
 </div>
 <script type="text/x-mathjax-config">
