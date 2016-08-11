@@ -23,7 +23,7 @@ properties:
     range: [0.0, INFINITY]
     doc_description: |
       The maximum distance from the listener at which the source will be audible.
-      This property's default value is copied from the environment at source creation.
+      By default, this property is updated from the environment on every audio update; set {{"Lav_SOURCE_CONTROL_DISTANCE_MODEL"|property}} to true to control it yourself.
   Lav_SOURCE_SIZE:
     name: size
     type: float
@@ -41,8 +41,7 @@ properties:
     value_enum: Lav_DISTANCE_MODELS
     doc_description: |
       The distance model determines how quickly sources get quieter as they move away from the listener.
-      
-      By default, this property is set to delegate, and sources consequently read from the environment.
+      By default, this property is updated from the environment on every audio update; set {{"Lav_SOURCE_CONTROL_DISTANCE_MODEL"|property}} to true to control it yourself.
   Lav_SOURCE_PANNING_STRATEGY:
     name: panning_strategy
     default: Lav_PANNING_STRATEGY_DELEGATE
@@ -50,7 +49,7 @@ properties:
     type: int
     doc_description: |
       The strategy for the internal multipanner.
-      By default, this delegates to the environment.
+      By default, this property is updated from the environment on every audio update; set {{"Lav_SOURCE_CONTROL_PANNING"|property}} to true to control it yourself.
   Lav_SOURCE_HEAD_RELATIVE:
     name: head_relative
     type: boolean
@@ -73,6 +72,8 @@ properties:
       
       For values greater than {{"Lav_SOURCE_MAX_DISTANCE"|property}}, the source will always be heard at least somewhat in the dry path.
       {{"Lav_SOURCE_DISTANCE_MODEL"|property}} controls how this crossfading takes place.
+      
+      By default, this property is updated from the environment on every audio update; set {{"Lav_SOURCE_CONTROL_REVERB"|property}} to true to control it yourself.
   Lav_SOURCE_MIN_REVERB_LEVEL:
     name: min_reverb_level
     type: float
@@ -84,6 +85,8 @@ properties:
       if a send is configured to be a reverb send, this is the minimum amount of audio that will be diverted to it.
       
       Behavior is undefined if this property is ever greater than the value you give to {{"Lav_SOURCE_MAX_REVERB_LEVEL"|property}}.
+      
+      By default, this property is updated from the environment on every audio update; set {{"Lav_SOURCE_CONTROL_REVERB"|property}} to true to control it yourself.
   Lav_SOURCE_MAX_REVERB_LEVEL:
     name: max_reverb_level
     type: float
@@ -93,6 +96,8 @@ properties:
       The maximum amount of audio to be diverted to reverb sends, if any.
       
       Behavior is undefined if this property is ever less than {{"Lav_SOURCE_MIN_REVERB_LEVEL"|property}}.
+      
+      By default, this property is updated from the environment on every audio update; set {{"Lav_SOURCE_CONTROL_REVERB"|property}} to true to control it yourself.
   Lav_SOURCE_OCCLUSION:
     type: float
     name: occlusion
@@ -105,8 +110,28 @@ properties:
       A value of 1.0 is a fully occluded source, which will be all but silent; a value of 0.0 has no effect.
       
       It is extremely difficult to map occlusion to a physical quantity.
-      In the real world, occlusion depends on mass, density, molecular structure, and a huge number of other factors.
-      Libaudioverse therefore chooses to use this scalar quantity and to attempt to do the right thing.
+      As a consequence, this property is unitless.
+  Lav_SOURCE_CONTROL_PANNING:
+    name: control_panning
+    type: boolean
+    default: 0
+    doc_description: |
+      In order to make working with sources easier for simple applications, some properties of source objects are copied from the environment  on every audio update.
+      This property is used to disable this behavior for properties related to panning.
+  Lav_SOURCE_CONTROL_DISTANCE_MODEL:
+    name: control_distance_model
+    type: boolean
+    default: 0
+    doc_description: |
+      In order to make working with sources easier for simple applications, some properties of source objects are copied from the environment  on every audio update.
+      This property is used to disable this behavior for properties related to the distance model.
+  Lav_SOURCE_CONTROL_REVERB:
+    name: control_reverb
+    type: boolean
+    default: 0
+    doc_description: |
+      In order to make working with sources easier for simple applications, some properties of source objects are copied from the environment  on every audio update.
+      This property is used to disable this behavior for properties related to reverb.
 extra_functions:
   Lav_sourceNodeFeedEffect:
     doc_description: |
