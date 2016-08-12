@@ -10,6 +10,7 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #define ERRCHECK(x) do {\
 if((x) != Lav_ERROR_NONE) {\
@@ -37,7 +38,12 @@ int main(int argc, char** args) {
 	ERRCHECK(Lav_createBufferNode(server, &node));
 	LavHandle buffer;
 	ERRCHECK(Lav_createBuffer(server, &buffer));
+	auto start = clock();
 	ERRCHECK(Lav_bufferLoadFromFile(buffer, path));
+	auto end = clock();
+	auto diff = end-start;
+	double durationMs = ((double)diff/CLOCKS_PER_SEC)*1000;
+	printf("File loaded in %F ms\n", durationMs);
 	ERRCHECK(Lav_nodeSetBufferProperty(node, Lav_BUFFER_BUFFER, buffer));
 	LavHandle limit;
 	ERRCHECK(Lav_createHardLimiterNode(server, 2, &limit));
