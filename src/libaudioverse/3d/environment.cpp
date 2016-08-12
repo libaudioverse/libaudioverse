@@ -35,10 +35,7 @@ EnvironmentNode::EnvironmentNode(std::shared_ptr<Server> server, std::shared_ptr
 	appendOutputConnection(0, channels);
 	//Allocate the 8 internal buffers.
 	for(int i = 0; i < 8; i++) source_buffers.push_back(allocArray<float>(server->getBlockSize()));
-	environment_info.world_to_listener_transform = glm::lookAt(
-		glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3(0.0f, 0.0f, -1.0f),
-		glm::vec3(0.0f, 1.0f, 0.0f));
+	updateEnvironmentInfo(true);
 	setShouldZeroOutputBuffers(false);
 }
 
@@ -57,7 +54,21 @@ void EnvironmentNode::willTick() {
 		int channels = getProperty(Lav_ENVIRONMENT_OUTPUT_CHANNELS).getIntValue();
 		getOutputConnection(0)->reconfigure(0, channels);
 	}
-	if(werePropertiesModified(this, Lav_3D_POSITION, Lav_3D_ORIENTATION)) {
+	updateEnvironmentInfo();
+	//give the new environment to the sources.
+	//this is a set of weak pointers.
+	filterWeakPointers(sources, [&](std::shared_ptr<SourceNode> &s) {
+		s->update(environment_info);
+	});
+	for(auto p: source_buffers) std::fill(p, p+block_size, 0.0f);
+}
+
+void EnvironmentNode::process() {
+	for(int i = 0; i < source_buffers.size(); i++) std::copy(source_buffers[i], source_buffers[i]+block_size, output_buffers[i]);
+}
+
+void EnvironmentNode::updateEnvironmentInfo(bool force) {
+	if(force || werePropertiesModified(this, Lav_3D_POSITION, Lav_3D_ORIENTATION)) {
 		//update the matrix.
 		//Important: look at the glsl constructors. Glm copies them, and there is nonintuitive stuff here.
 		const float* pos = getProperty(Lav_3D_POSITION).getFloat3Value();
@@ -81,24 +92,18 @@ void EnvironmentNode::willTick() {
 	}
 	environment_info.panning_strategy = getProperty(Lav_ENVIRONMENT_PANNING_STRATEGY).getIntValue();
 	if(environment_info.panning_strategy == Lav_PANNING_STRATEGY_DELEGATE) environment_info.panning_strategy = Lav_PANNING_STRATEGY_STEREO;
-	environment_info.panning_strategy_changed = werePropertiesModified(this, Lav_ENVIRONMENT_PANNING_STRATEGY);
+	environment_info.panning_strategy_changed = force || werePropertiesModified(this, Lav_ENVIRONMENT_PANNING_STRATEGY);
 	environment_info.distance_model = getProperty(Lav_ENVIRONMENT_DISTANCE_MODEL).getIntValue();
 	if(environment_info.distance_model == Lav_DISTANCE_MODEL_DELEGATE) environment_info.distance_model = Lav_DISTANCE_MODEL_LINEAR;
-	environment_info.distance_model_changed = werePropertiesModified(this, Lav_ENVIRONMENT_DISTANCE_MODEL);
+	environment_info.distance_model_changed = force || werePropertiesModified(this, Lav_ENVIRONMENT_DISTANCE_MODEL);
 	environment_info.max_distance = getProperty(Lav_ENVIRONMENT_MAX_DISTANCE).getFloatValue();
 	environment_info.reverb_distance = getProperty(Lav_ENVIRONMENT_REVERB_DISTANCE).getFloatValue();
 	environment_info.min_reverb_level = getProperty(Lav_ENVIRONMENT_MIN_REVERB_LEVEL).getFloatValue();
 	environment_info.max_reverb_level = getProperty(Lav_ENVIRONMENT_MAX_REVERB_LEVEL).getFloatValue();
-	//give the new environment to the sources.
-	//this is a set of weak pointers.
-	filterWeakPointers(sources, [&](std::shared_ptr<SourceNode> &s) {
-		s->update(environment_info);
-	});
-	for(auto p: source_buffers) std::fill(p, p+block_size, 0.0f);
 }
 
-void EnvironmentNode::process() {
-	for(int i = 0; i < source_buffers.size(); i++) std::copy(source_buffers[i], source_buffers[i]+block_size, output_buffers[i]);
+EnvironmentInfo EnvironmentNode::getEnvironmentInfo() {
+	return environment_info;
 }
 
 std::shared_ptr<HrtfData> EnvironmentNode::getHrtf() {

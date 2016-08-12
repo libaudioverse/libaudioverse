@@ -67,6 +67,10 @@ class EnvironmentNode: public Node {
 	//Also update sources, which might reconfigure themselves.
 	virtual void willTick() override;
 	virtual void process() override;
+	//Force overrides and short circuits the property modification checks, and is used by the constructor.
+	void updateEnvironmentInfo(bool force = false);
+	//A helper to get the environment struct.
+	EnvironmentInfo getEnvironmentInfo();
 	std::shared_ptr<HrtfData> getHrtf();
 	//Play buffer asynchronously at specified position, destroying the source when done.
 	void playAsync(std::shared_ptr<Buffer> buffer, float x, float y, float z, bool isDry = false);
