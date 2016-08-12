@@ -47,10 +47,8 @@ occlusion_filter(server->getSr()),
 hrtf_data(environment->getHrtf()) {
 	this->environment = environment;
 	handleOcclusion(); //Make sure we initialize as unoccluded.	
-	//we have to read off these defaults manually, and it must always be the last thing in the constructor.
-	getProperty(Lav_SOURCE_MAX_DISTANCE).setFloatValue(environment->getProperty(Lav_ENVIRONMENT_MAX_DISTANCE).getFloatValue());
 	getProperty(Lav_SOURCE_SIZE).setFloatValue(environment->getProperty(Lav_ENVIRONMENT_DEFAULT_SIZE).getFloatValue());
-	getProperty(Lav_SOURCE_REVERB_DISTANCE).setFloatValue(environment->getProperty(Lav_ENVIRONMENT_REVERB_DISTANCE).getFloatValue());
+	updatePropertiesFromEnvironmentInfo(this->environment->getEnvironmentInfo());
 	appendInputConnection(0, 1);
 	stereo_panner.readMap(2, standard_panning_map_stereo);
 	surround40_panner.readMap(4, standard_panning_map_surround40);
@@ -109,13 +107,10 @@ float calculateGainForDistanceModel(int model, float distance, float maxDistance
 	return retval;
 }
 
-int SourceNode::computeDistanceModel(EnvironmentInfo& env) {
-	int dm = getProperty(Lav_SOURCE_DISTANCE_MODEL).getIntValue();
-	if(dm == Lav_DISTANCE_MODEL_DELEGATE) dm = env.distance_model;
-	return dm;
-}
-
 void SourceNode::update(EnvironmentInfo env) {
+	//Pass the env through the two functions that modify it and set our properties.
+	updateEnvironmentInfoFromProperties(env);
+	updatePropertiesFromEnvironmentInfo(env);
 	//first, extract the vector of our position.
 	const float* pos = getProperty(Lav_3D_POSITION).getFloat3Value();
 	bool isHeadRelative = getProperty(Lav_SOURCE_HEAD_RELATIVE).getIntValue() == 1;
@@ -124,7 +119,7 @@ void SourceNode::update(EnvironmentInfo env) {
 	else npos = env.world_to_listener_transform*glm::vec4(pos[0], pos[1], pos[2], 1.0f);
 	//npos is now easy to work with.
 	float distance = glm::length(npos);
-	float maxDistance = getProperty(Lav_SOURCE_MAX_DISTANCE).getFloatValue();
+	float maxDistance = env.max_distance;
 	//Decide if we're culled. if we are, bale out now and mark us as such.
 	if(distance > maxDistance) {
 		culled = true;
@@ -139,13 +134,13 @@ void SourceNode::update(EnvironmentInfo env) {
 	//This would trigger an exception because elevation is a property with a range.
 	if(elevation > 90.0f) elevation = 90.0f;
 	if(elevation < -90.0f) elevation = -90.0f;
-	int distanceModel = computeDistanceModel(env);
+	int distanceModel = env.distance_model;
 	float referenceDistance = getProperty(Lav_SOURCE_SIZE).getFloatValue();
-	float reverbDistance = getProperty(Lav_SOURCE_REVERB_DISTANCE).getFloatValue();
+	float reverbDistance = env.reverb_distance;
 	dry_gain = calculateGainForDistanceModel(distanceModel, distance, maxDistance, referenceDistance);
 	float unscaledReverbMultiplier = 1.0f-calculateGainForDistanceModel(distanceModel, distance, reverbDistance, 0.0f);
-	float minReverbLevel = getProperty(Lav_SOURCE_MIN_REVERB_LEVEL).getFloatValue();
-	float maxReverbLevel = getProperty(Lav_SOURCE_MAX_REVERB_LEVEL).getFloatValue();
+	float minReverbLevel = env.min_reverb_level;
+	float maxReverbLevel = env.max_reverb_level;
 	float scaledReverbMultiplier = minReverbLevel+(maxReverbLevel-minReverbLevel)*unscaledReverbMultiplier;
 	reverb_gain = dry_gain*scaledReverbMultiplier;
 	int reverbCount = 0;
@@ -168,8 +163,7 @@ void SourceNode::update(EnvironmentInfo env) {
 	surround71_panner.setAzimuth(azimuth);
 	surround71_panner.setElevation(elevation);
 	handleOcclusion();
-	panning_strategy = getProperty(Lav_SOURCE_PANNING_STRATEGY).getIntValue();
-	if(panning_strategy == Lav_PANNING_STRATEGY_DELEGATE) panning_strategy = env.panning_strategy;
+	panning_strategy = env.panning_strategy;
 }
 
 void SourceNode::process() {
@@ -179,7 +173,6 @@ void SourceNode::process() {
 	float* occluded = ws;
 	float* panBuffers[] = {ws+block_size, ws+2*block_size, ws+3*block_size, ws+4*block_size, ws+5*block_size, ws+6*block_size, ws+7*block_size, ws+8*block_size};
 	for(int i = 0; i < block_size; i++) occluded[i] = occlusion_filter.tick(input_buffers[0][i]);
-
 	int channels = 0;
 	//The following could be replaced with a multipanner.
 	//if we did that, however, we'd have some extra, unavoidable copies.  So we don't.
@@ -237,6 +230,32 @@ void 	SourceNode::handleOcclusion() {
 	//Note: 0 must be furthest away from the origin, unlike frequency.
 	float scaledFrequency = frequencyScaleFactor*exp(1-occlusionPercent);
 	occlusion_filter.configure(Lav_BIQUAD_TYPE_HIGHSHELF, scaledFrequency, dbgain, 0.5);
+}
+
+void SourceNode::updateEnvironmentInfoFromProperties(EnvironmentInfo& env) {
+	if(getProperty(Lav_SOURCE_CONTROL_PANNING).getIntValue()) {
+		env.panning_strategy = getProperty(Lav_SOURCE_PANNING_STRATEGY).getIntValue();
+		env.panning_strategy_changed = werePropertiesModified(this, Lav_SOURCE_PANNING_STRATEGY);
+	}
+	if(getProperty(Lav_SOURCE_CONTROL_DISTANCE_MODEL).getIntValue()) {
+		env.distance_model = getProperty(Lav_SOURCE_DISTANCE_MODEL).getIntValue();
+		env.distance_model_changed = werePropertiesModified(this, Lav_SOURCE_DISTANCE_MODEL);
+		env.max_distance = getProperty(Lav_SOURCE_MAX_DISTANCE).getFloatValue();
+	}
+	if(getProperty(Lav_SOURCE_CONTROL_REVERB).getIntValue()) {
+		env.reverb_distance = getProperty(Lav_SOURCE_REVERB_DISTANCE).getFloatValue();
+		env.min_reverb_level = getProperty(Lav_SOURCE_MIN_REVERB_LEVEL).getFloatValue();
+		env.max_reverb_level = getProperty(Lav_SOURCE_MAX_REVERB_LEVEL).getFloatValue();
+	}
+}
+
+void SourceNode::updatePropertiesFromEnvironmentInfo(const EnvironmentInfo& env) {
+	getProperty(Lav_SOURCE_PANNING_STRATEGY).setIntValue(env.panning_strategy);
+	getProperty(Lav_SOURCE_DISTANCE_MODEL).setIntValue(env.distance_model);
+	getProperty(Lav_SOURCE_MAX_DISTANCE).setFloatValue(env.max_distance);
+	getProperty(Lav_SOURCE_REVERB_DISTANCE).setFloatValue(env.reverb_distance);
+	getProperty(Lav_SOURCE_MIN_REVERB_LEVEL).setFloatValue(env.min_reverb_level);
+	getProperty(Lav_SOURCE_MAX_REVERB_LEVEL).setFloatValue(env.max_reverb_level);
 }
 
 //Begin public API.
