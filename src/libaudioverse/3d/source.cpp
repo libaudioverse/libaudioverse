@@ -108,9 +108,8 @@ float calculateGainForDistanceModel(int model, float distance, float maxDistance
 }
 
 void SourceNode::update(EnvironmentInfo env) {
-	//Pass the env through the two functions that modify it and set our properties.
 	updateEnvironmentInfoFromProperties(env);
-	updatePropertiesFromEnvironmentInfo(env);
+
 	//first, extract the vector of our position.
 	const float* pos = getProperty(Lav_3D_POSITION).getFloat3Value();
 	bool isHeadRelative = getProperty(Lav_SOURCE_HEAD_RELATIVE).getIntValue() == 1;
@@ -258,6 +257,11 @@ void SourceNode::updatePropertiesFromEnvironmentInfo(const EnvironmentInfo& env)
 	getProperty(Lav_SOURCE_MAX_REVERB_LEVEL).setFloatValue(env.max_reverb_level);
 }
 
+void SourceNode::setPropertiesFromEnvironment() {
+	auto env = environment->getEnvironmentInfo();
+	updatePropertiesFromEnvironmentInfo(env);
+}
+
 //Begin public API.
 
 Lav_PUBLIC_FUNCTION LavError Lav_createSourceNode(LavHandle serverHandle, LavHandle environmentHandle, LavHandle* destination) {
@@ -284,6 +288,14 @@ Lav_PUBLIC_FUNCTION LavError Lav_sourceNodeStopFeedingEffect(LavHandle nodeHandl
 	LOCK(*s);
 	//Note that external indexes are 1-based.
 	s->stopFeedingEffect(effect-1);
+	PUB_END
+}
+
+Lav_PUBLIC_FUNCTION LavError Lav_sourceNodeSetPropertiesFromEnvironment(LavHandle nodeHandle) {
+	PUB_BEGIN
+	auto source = incomingObject<SourceNode>(nodeHandle);
+	LOCK(*source);
+	source->setPropertiesFromEnvironment();
 	PUB_END
 }
 

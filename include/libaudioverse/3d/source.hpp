@@ -30,6 +30,7 @@ class SourceNode: public Node {
 	void update(EnvironmentInfo env);
 	void updateEnvironmentInfoFromProperties(EnvironmentInfo& env);
 	void updatePropertiesFromEnvironmentInfo(const EnvironmentInfo& env);
+	void setPropertiesFromEnvironment();
 	virtual void process() override;
 	void handleStateUpdates(bool shouldCull);
 	void handleOcclusion();

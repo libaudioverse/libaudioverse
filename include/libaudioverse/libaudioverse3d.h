@@ -17,6 +17,8 @@ Lav_PUBLIC_FUNCTION LavError Lav_environmentNodeAddEffectSend(LavHandle nodeHand
 Lav_PUBLIC_FUNCTION LavError Lav_createSourceNode(LavHandle serverHandle, LavHandle environmentHandle, LavHandle* destination);
 Lav_PUBLIC_FUNCTION LavError Lav_sourceNodeFeedEffect(LavHandle nodeHandle, int effect);
 Lav_PUBLIC_FUNCTION LavError Lav_sourceNodeStopFeedingEffect(LavHandle nodeHandle, int effect);
+Lav_PUBLIC_FUNCTION LavError Lav_sourceNodeSetPropertiesFromEnvironment(LavHandle nodeHandle);
+
 
 enum Lav_3D_PROPERTIES {
 	Lav_3D_ORIENTATION = -1, //float6 consisting of an at followed by an up vector.
