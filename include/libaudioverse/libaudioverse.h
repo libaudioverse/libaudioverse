@@ -21,7 +21,11 @@ typedef void (*LavTimeCallback)(LavHandle handle, double time, void* userdata);
 
 /**Does whatever is appropriate on a given platform to expose a Libaudioverse function publically.*/
 #ifdef _MSC_VER
+#ifdef LIBAUDIOVERSE_IS_LIBRARY
 #define DLL_PUBLIC_ATTR __declspec(dllexport)
+#else
+#define DLL_PUBLIC_ATTR __declspec(dllimport)
+#endif
 #endif
 #ifdef __GNUC__
 #define DLL_PUBLIC_ATTR __attribute__ ((visibility ("default")))

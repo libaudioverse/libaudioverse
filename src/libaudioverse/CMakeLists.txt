@@ -147,6 +147,7 @@ audio_thread.cpp
 data/default_hrtf.cpp
 )
 
+target_compile_definitions(libaudioverse PRIVATE LIBAUDIOVERSE_IS_LIBRARY)
 TARGET_LINK_LIBRARIES(libaudioverse ${libaudioverse_required_libraries})
 
 #Depend on the generation of metadata.
