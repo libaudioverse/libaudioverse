@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>The Libaudioverse API &mdash; Libaudioverse build226 documentation</title>
+  <title>The Libaudioverse API &mdash; Libaudioverse build233 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="Libaudioverse build226 documentation" href="index.html"/>
+    <link rel="top" title="Libaudioverse build233 documentation" href="index.html"/>
         <link rel="prev" title="Python-specific Notes" href="python-specifics.html"/> 
 
   
@@ -559,7 +559,7 @@ If crossfading is enabled, moving the panner will slowly fade it to the new posi
 
 <dl class="class">
 <dt id="libaudioverse.AutomatedProperty">
-<em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">AutomatedProperty</code><span class="sig-paren">(</span><em>handle</em>, <em>slot</em>, <em>getter</em>, <em>setter</em>, <em>converter=&lt;function LibaudioverseProperty.&lt;lambda&gt; at 0x000000A0A524F620&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.AutomatedProperty" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">AutomatedProperty</code><span class="sig-paren">(</span><em>handle</em>, <em>slot</em>, <em>getter</em>, <em>setter</em>, <em>converter=&lt;function LibaudioverseProperty.&lt;lambda&gt; at 0x03D49A50&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.AutomatedProperty" title="Permalink to this definition">¶</a></dt>
 <dd><p>A property that supports automation and node connection.</p>
 <dl class="method">
 <dt id="libaudioverse.AutomatedProperty.cancel_automators">
@@ -1437,26 +1437,14 @@ channels is not reliable, and your application should default to stereo while pr
 <dd><p>used in the 3D components of this library.
 Indicates how sound should become quieter as objects move away from the listener.</p>
 <dl class="attribute">
-<dt id="libaudioverse.DistanceModels.delegate">
-<code class="descname">delegate</code><em class="property"> = &lt;DistanceModels.delegate: 0&gt;</em><a class="headerlink" href="#libaudioverse.DistanceModels.delegate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Delegate to another node, if we can.  Otherwise, fall back to <code class="docutils literal"><span class="pre">Lav_DISTANCE_MODEL_LINEAR</span></code>.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="libaudioverse.DistanceModels.exponential">
-<code class="descname">exponential</code><em class="property"> = &lt;DistanceModels.exponential: 2&gt;</em><a class="headerlink" href="#libaudioverse.DistanceModels.exponential" title="Permalink to this definition">¶</a></dt>
+<dt id="libaudioverse.DistanceModels.inverse">
+<code class="descname">inverse</code><em class="property"> = &lt;DistanceModels.inverse: 1&gt;</em><a class="headerlink" href="#libaudioverse.DistanceModels.inverse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sounds fall off as <code class="docutils literal"><span class="pre">1/distance</span></code>.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="libaudioverse.DistanceModels.inverse_square">
-<code class="descname">inverse_square</code><em class="property"> = &lt;DistanceModels.inverse_square: 3&gt;</em><a class="headerlink" href="#libaudioverse.DistanceModels.inverse_square" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sounds fall off as <code class="docutils literal"><span class="pre">1/min(distance,</span> <span class="pre">maxDistance)^2</span></code>.</p>
-</dd></dl>
-
-<dl class="attribute">
 <dt id="libaudioverse.DistanceModels.linear">
-<code class="descname">linear</code><em class="property"> = &lt;DistanceModels.linear: 1&gt;</em><a class="headerlink" href="#libaudioverse.DistanceModels.linear" title="Permalink to this definition">¶</a></dt>
+<code class="descname">linear</code><em class="property"> = &lt;DistanceModels.linear: 0&gt;</em><a class="headerlink" href="#libaudioverse.DistanceModels.linear" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sound falls off as <code class="docutils literal"><span class="pre">1-(distance/maxDistance)</span></code>.</p>
 </dd></dl>
 
@@ -2850,7 +2838,7 @@ If you feed this node a signal that is zero, it will slowly decrease the output 
 
 <dl class="class">
 <dt id="libaudioverse.LibaudioverseProperty">
-<em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">LibaudioverseProperty</code><span class="sig-paren">(</span><em>handle</em>, <em>slot</em>, <em>getter</em>, <em>setter</em>, <em>converter=&lt;function LibaudioverseProperty.&lt;lambda&gt; at 0x000000A0A524F620&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.LibaudioverseProperty" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">LibaudioverseProperty</code><span class="sig-paren">(</span><em>handle</em>, <em>slot</em>, <em>getter</em>, <em>setter</em>, <em>converter=&lt;function LibaudioverseProperty.&lt;lambda&gt; at 0x03D49A50&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.LibaudioverseProperty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Proxy to Libaudioverse properties.</p>
 <p>All properties support resetting and type query.</p>
 <dl class="attribute">
@@ -3183,38 +3171,32 @@ True if the filter is a highpass.</p>
 <dd><p>Indicates a strategy to use for panning.
 This is mostly for the <a class="reference internal" href="#libaudioverse.MultipannerNode" title="libaudioverse.MultipannerNode"><code class="xref py py-class docutils literal"><span class="pre">MultipannerNode</span></code></a> and the 3D components of this library.</p>
 <dl class="attribute">
-<dt id="libaudioverse.PanningStrategies.delegate">
-<code class="descname">delegate</code><em class="property"> = &lt;PanningStrategies.delegate: 0&gt;</em><a class="headerlink" href="#libaudioverse.PanningStrategies.delegate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Delegate the decision. Used for 3D sources.  If there is nowhere to delegate to, assumes <code class="docutils literal"><span class="pre">Lav_PANNING_STRATEGY_STEREO</span></code>.</p>
-</dd></dl>
-
-<dl class="attribute">
 <dt id="libaudioverse.PanningStrategies.hrtf">
-<code class="descname">hrtf</code><em class="property"> = &lt;PanningStrategies.hrtf: 1&gt;</em><a class="headerlink" href="#libaudioverse.PanningStrategies.hrtf" title="Permalink to this definition">¶</a></dt>
+<code class="descname">hrtf</code><em class="property"> = &lt;PanningStrategies.hrtf: 0&gt;</em><a class="headerlink" href="#libaudioverse.PanningStrategies.hrtf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Indicates HRTF panning.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.PanningStrategies.stereo">
-<code class="descname">stereo</code><em class="property"> = &lt;PanningStrategies.stereo: 2&gt;</em><a class="headerlink" href="#libaudioverse.PanningStrategies.stereo" title="Permalink to this definition">¶</a></dt>
+<code class="descname">stereo</code><em class="property"> = &lt;PanningStrategies.stereo: 1&gt;</em><a class="headerlink" href="#libaudioverse.PanningStrategies.stereo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Indicates stereo panning.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.PanningStrategies.surround40">
-<code class="descname">surround40</code><em class="property"> = &lt;PanningStrategies.surround40: 3&gt;</em><a class="headerlink" href="#libaudioverse.PanningStrategies.surround40" title="Permalink to this definition">¶</a></dt>
+<code class="descname">surround40</code><em class="property"> = &lt;PanningStrategies.surround40: 2&gt;</em><a class="headerlink" href="#libaudioverse.PanningStrategies.surround40" title="Permalink to this definition">¶</a></dt>
 <dd><p>Indicates 4.0 surround sound (quadraphonic) panning.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.PanningStrategies.surround51">
-<code class="descname">surround51</code><em class="property"> = &lt;PanningStrategies.surround51: 4&gt;</em><a class="headerlink" href="#libaudioverse.PanningStrategies.surround51" title="Permalink to this definition">¶</a></dt>
+<code class="descname">surround51</code><em class="property"> = &lt;PanningStrategies.surround51: 3&gt;</em><a class="headerlink" href="#libaudioverse.PanningStrategies.surround51" title="Permalink to this definition">¶</a></dt>
 <dd><p>Indicates 5.1 surround sound panning.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.PanningStrategies.surround71">
-<code class="descname">surround71</code><em class="property"> = &lt;PanningStrategies.surround71: 5&gt;</em><a class="headerlink" href="#libaudioverse.PanningStrategies.surround71" title="Permalink to this definition">¶</a></dt>
+<code class="descname">surround71</code><em class="property"> = &lt;PanningStrategies.surround71: 4&gt;</em><a class="headerlink" href="#libaudioverse.PanningStrategies.surround71" title="Permalink to this definition">¶</a></dt>
 <dd><p>Indicates 7.1 surround sound panning.</p>
 </dd></dl>
 
@@ -3716,13 +3698,41 @@ If you are in a garbage collected language, failure to hold on to the source nod
 </table>
 <p>This node has no outputs. If you want it to advance, be sure to use <cite>foo.state = nodeStates.always_playing</cite>.</p>
 <dl class="attribute">
+<dt id="libaudioverse.SourceNode.control_distance_model">
+<code class="descname">control_distance_model</code><a class="headerlink" href="#libaudioverse.SourceNode.control_distance_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Type: boolean</p>
+<p>Default value: False
+In order to make working with sources easier for simple applications, some properties of source objects are ignored in favor of values on the environment.
+This property is used to disable this behavior for properties related to the distance model.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.SourceNode.control_panning">
+<code class="descname">control_panning</code><a class="headerlink" href="#libaudioverse.SourceNode.control_panning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Type: boolean</p>
+<p>Default value: False
+In order to make working with sources easier for simple applications, some properties of source objects are ignored in favor of values on the environment.
+This property is used to disable this behavior for properties related to panning.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.SourceNode.control_reverb">
+<code class="descname">control_reverb</code><a class="headerlink" href="#libaudioverse.SourceNode.control_reverb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Type: boolean</p>
+<p>Default value: False
+In order to make working with sources easier for simple applications, some properties of source objects are ignored in favor of values on the environment.
+This property is used to disable this behavior for properties related to reverb.</p>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="libaudioverse.SourceNode.distance_model">
 <code class="descname">distance_model</code><a class="headerlink" href="#libaudioverse.SourceNode.distance_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Type: int</p>
 <p>Range: <a class="reference internal" href="#libaudioverse.DistanceModels" title="libaudioverse.DistanceModels"><code class="xref any py py-class docutils literal"><span class="pre">DistanceModels</span></code></a></p>
-<p>Default value: <a class="reference internal" href="#libaudioverse.DistanceModels.delegate" title="libaudioverse.DistanceModels.delegate"><code class="xref any py py-attr docutils literal"><span class="pre">DistanceModels.delegate</span></code></a></p>
-<p>The distance model determines how quickly sources get quieter as they move away from the listener.</p>
-<p>By default, this property is set to delegate, and sources consequently read from the environment.</p>
+<p>Default value: <a class="reference internal" href="#libaudioverse.DistanceModels.linear" title="libaudioverse.DistanceModels.linear"><code class="xref any py py-attr docutils literal"><span class="pre">DistanceModels.linear</span></code></a></p>
+<p>The distance model determines how quickly sources get quieter as they move away from the listener.
+The default value of this property is set from the corresponding property on the environment at source creation.
+By default, sources ignore this property in favor of the value provided by their environment.  Set Lav_SOURCE_CONTROL_DISTANCE_MODEL to true to control it yourself.</p>
 </dd></dl>
 
 <dl class="method">
@@ -3749,7 +3759,8 @@ The orientation and position properties of an environment do not affect head rel
 <p>Range: [0.0, INFINITY]</p>
 <p>Default value: 50.0</p>
 <p>The maximum distance from the listener at which the source will be audible.
-This property&#8217;s default value is copied from the environment at source creation.</p>
+The default value of this property is set from the corresponding property on the environment at source creation.
+By default, sources do not respect this property and use the corresponding value from their environment. Set Lav_SOURCE_CONTROL_DISTANCE_MODEL to true to control it yourself.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -3760,6 +3771,8 @@ This property&#8217;s default value is copied from the environment at source cre
 <p>Default value: 0.6</p>
 <p>The maximum amount of audio to be diverted to reverb sends, if any.</p>
 <p>Behavior is undefined if this property is ever less than Lav_SOURCE_MIN_REVERB_LEVEL.</p>
+<p>The default value of this property is set from the corresponding property on the environment at source creation.
+By default, this property is ignored in favor of the value provided by this source&#8217;s environment.  Set Lav_SOURCE_CONTROL_REVERB to true to control it yourself.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -3771,6 +3784,8 @@ This property&#8217;s default value is copied from the environment at source cre
 <p>The minimum reverb level allowed.</p>
 <p>if a send is configured to be a reverb send, this is the minimum amount of audio that will be diverted to it.</p>
 <p>Behavior is undefined if this property is ever greater than the value you give to Lav_SOURCE_MAX_REVERB_LEVEL.</p>
+<p>The default value of this property is set from the corresponding property on the environment at source creation.
+By default, this property is ignored in favor of the value provided by this source&#8217;s environment.  Set Lav_SOURCE_CONTROL_REVERB to true to control it yourself.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -3783,8 +3798,7 @@ This property&#8217;s default value is copied from the environment at source cre
 <p>This property controls internal filters of the source that make occluded objects sound muffled.
 A value of 1.0 is a fully occluded source, which will be all but silent; a value of 0.0 has no effect.</p>
 <p>It is extremely difficult to map occlusion to a physical quantity.
-In the real world, occlusion depends on mass, density, molecular structure, and a huge number of other factors.
-Libaudioverse therefore chooses to use this scalar quantity and to attempt to do the right thing.</p>
+As a consequence, this property is unitless.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -3805,9 +3819,10 @@ They are packed because, also like the listener, they must never be modified sep
 <code class="descname">panning_strategy</code><a class="headerlink" href="#libaudioverse.SourceNode.panning_strategy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Type: int</p>
 <p>Range: <a class="reference internal" href="#libaudioverse.PanningStrategies" title="libaudioverse.PanningStrategies"><code class="xref any py py-class docutils literal"><span class="pre">PanningStrategies</span></code></a></p>
-<p>Default value: <a class="reference internal" href="#libaudioverse.PanningStrategies.delegate" title="libaudioverse.PanningStrategies.delegate"><code class="xref any py py-attr docutils literal"><span class="pre">PanningStrategies.delegate</span></code></a></p>
+<p>Default value: <a class="reference internal" href="#libaudioverse.PanningStrategies.stereo" title="libaudioverse.PanningStrategies.stereo"><code class="xref any py py-attr docutils literal"><span class="pre">PanningStrategies.stereo</span></code></a></p>
 <p>The strategy for the internal multipanner.
-By default, this delegates to the environment.</p>
+The default value of this property is set from the corresponding property on the environment at source creation.
+By default, this property is ignored and sources use the value provided by their environment.  Set Lav_SOURCE_CONTROL_PANNING to true to control it yourself.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -3828,6 +3843,15 @@ By default, this delegates to the environment.</p>
 <p>If this source is not feeding any effect sends configured as reverbs, this property has no effect.</p>
 <p>For values greater than Lav_SOURCE_MAX_DISTANCE, the source will always be heard at least somewhat in the dry path.
 Lav_SOURCE_DISTANCE_MODEL controls how this crossfading takes place.</p>
+<p>The default value of this property is set from the corresponding property on the environment at source creation.
+By default, sources ignore this property in favor of the value provided by their environment.  Set Lav_SOURCE_CONTROL_REVERB to true to control it yourself.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="libaudioverse.SourceNode.set_properties_from_environment">
+<code class="descname">set_properties_from_environment</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.SourceNode.set_properties_from_environment" title="Permalink to this definition">¶</a></dt>
+<dd><p>A convenience function for working with properties on sources.
+When called, this function sets the values of all properties which have corresponding properties on the environment to the values from the environment.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -3840,6 +3864,7 @@ Lav_SOURCE_DISTANCE_MODEL controls how this crossfading takes place.</p>
 Sources are approximated as spheres.
 The size is used to determine the closest point on the source to the listener, and is the radius of this sphere.
 Size currently has no other effect.</p>
+<p>The default value of this property is set from the corresponding property on the environment at source creation.</p>
 </dd></dl>
 
 <dl class="method">
@@ -4037,7 +4062,7 @@ You must call it before the interpreter shuts down. Failure to do so will allow 
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'build226',
+            VERSION:'build233',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

@@ -7084,57 +7084,6 @@ Any functionality to change a property on all sources needs to be implemented by
 <div class="sect3">
 <h4 id="_properties_14">Properties</h4>
 <div class="sect4">
-<h5 id="_orientation">orientation</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_3D_ORIENTATION</p>
-</div>
-<div class="paragraph">
-<p>Type: float6</p>
-</div>
-<div class="paragraph">
-<p>Default Value: [0.0, 0.0, -1.0, 0.0, 1.0, 0.0]</p>
-</div>
-<div class="paragraph">
-<p>Rate: k</p>
-</div>
-<div class="paragraph">
-<p>The orientation of the listener.
-The first three elements are a vector representing the direction in which the listener is looking
-and the second 3 a vector representing the direction in which a rod pointing out of the top of the listener&#8217;s head would be pointing</p>
-</div>
-<div class="paragraph">
-<p>This property packs these vectors because they must never be modified separately.
-Additionally, they should both be unit vectors and must also be orthoganal.</p>
-</div>
-<div class="paragraph">
-<p>the default situates the listener such that positive x is right, positive y is up, and positive z is behind the listener.
-The setting (0, 1, 0, 0, 0, 1) will situate the listener such that
-positive x is right and positive y is forward.
-For those not familiar with trigonometry and who wish to consider positive x east and positivve y north, the following formula
-will turn the listener to face a scertain direction specified in radians clockwise of north:
-(sin(theta), cos(theta), 0, 0, 0, 1).
-As usual, note that radians=degrees*PI/180.</p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_position_2">position</h5>
-<div class="paragraph">
-<p>C Enumeration Value: Lav_3D_POSITION</p>
-</div>
-<div class="paragraph">
-<p>Type: float3</p>
-</div>
-<div class="paragraph">
-<p>Default Value: [0.0, 0.0, 0.0]</p>
-</div>
-<div class="paragraph">
-<p>Rate: k</p>
-</div>
-<div class="paragraph">
-<p>The position of the listener, in world coordinates.</p>
-</div>
-</div>
-<div class="sect4">
 <h5 id="_default_size">default_size</h5>
 <div class="paragraph">
 <p>C Enumeration Value: Lav_ENVIRONMENT_DEFAULT_SIZE</p>
@@ -7268,6 +7217,39 @@ If you wish to set it on a per-source basis, set <code>Lav_SOURCE_CONTROL_REVERB
 </div>
 </div>
 <div class="sect4">
+<h5 id="_orientation">orientation</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_ENVIRONMENT_ORIENTATION</p>
+</div>
+<div class="paragraph">
+<p>Type: float6</p>
+</div>
+<div class="paragraph">
+<p>Default Value: [0.0, 0.0, -1.0, 0.0, 1.0, 0.0]</p>
+</div>
+<div class="paragraph">
+<p>Rate: k</p>
+</div>
+<div class="paragraph">
+<p>The orientation of the listener.
+The first three elements are a vector representing the direction in which the listener is looking
+and the second 3 a vector representing the direction in which a rod pointing out of the top of the listener&#8217;s head would be pointing</p>
+</div>
+<div class="paragraph">
+<p>This property packs these vectors because they must never be modified separately.
+Additionally, they should both be unit vectors and must also be orthoganal.</p>
+</div>
+<div class="paragraph">
+<p>the default situates the listener such that positive x is right, positive y is up, and positive z is behind the listener.
+The setting (0, 1, 0, 0, 0, 1) will situate the listener such that
+positive x is right and positive y is forward.
+For those not familiar with trigonometry and who wish to consider positive x east and positivve y north, the following formula
+will turn the listener to face a scertain direction specified in radians clockwise of north:
+(sin(theta), cos(theta), 0, 0, 0, 1).
+As usual, note that radians=degrees*PI/180.</p>
+</div>
+</div>
+<div class="sect4">
 <h5 id="_output_channels">output_channels</h5>
 <div class="paragraph">
 <p>C Enumeration Value: Lav_ENVIRONMENT_OUTPUT_CHANNELS</p>
@@ -7317,6 +7299,24 @@ All new sources delegate to the environment by default.</p>
 </div>
 <div class="paragraph">
 <p>If you want to change this property for a specific source, set <code>Lav_SOURCE_CONTROL_PANNING</code> on the source to true.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_position_2">position</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_ENVIRONMENT_POSITION</p>
+</div>
+<div class="paragraph">
+<p>Type: float3</p>
+</div>
+<div class="paragraph">
+<p>Default Value: [0.0, 0.0, 0.0]</p>
+</div>
+<div class="paragraph">
+<p>Rate: k</p>
+</div>
+<div class="paragraph">
+<p>The position of the listener, in world coordinates.</p>
 </div>
 </div>
 <div class="sect4">
@@ -10042,44 +10042,60 @@ If you are in a garbage collected language, failure to hold on to the source nod
 <div class="sect3">
 <h4 id="_properties_27">Properties</h4>
 <div class="sect4">
-<h5 id="_orientation_2">orientation</h5>
+<h5 id="_control_distance_model">control_distance_model</h5>
 <div class="paragraph">
-<p>C Enumeration Value: Lav_3D_ORIENTATION</p>
+<p>C Enumeration Value: Lav_SOURCE_CONTROL_DISTANCE_MODEL</p>
 </div>
 <div class="paragraph">
-<p>Type: float6</p>
+<p>Type: boolean</p>
 </div>
 <div class="paragraph">
-<p>Default Value: [0.0, 0.0, -1.0, 0.0, 1.0, 0.0]</p>
+<p>Default Value: 0</p>
 </div>
 <div class="paragraph">
 <p>Rate: k</p>
 </div>
 <div class="paragraph">
-<p>The orientation of the source.
-This is not currently used.
-In future, it will be used for sound cones and filters on sources facing away.
-The interpretation is the same as that for the listener: the first 3 values are the direction of the front and the second 3 the direction of the top.
-Note that these must both be unit vectors and that they must be orthoganal.
-They are packed because, also like the listener, they must never be modified separately.</p>
+<p>In order to make working with sources easier for simple applications, some properties of source objects are ignored in favor of values on the environment.
+This property is used to disable this behavior for properties related to the distance model.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_position_4">position</h5>
+<h5 id="_control_panning">control_panning</h5>
 <div class="paragraph">
-<p>C Enumeration Value: Lav_3D_POSITION</p>
+<p>C Enumeration Value: Lav_SOURCE_CONTROL_PANNING</p>
 </div>
 <div class="paragraph">
-<p>Type: float3</p>
+<p>Type: boolean</p>
 </div>
 <div class="paragraph">
-<p>Default Value: [0.0, 0.0, 0.0]</p>
+<p>Default Value: 0</p>
 </div>
 <div class="paragraph">
 <p>Rate: k</p>
 </div>
 <div class="paragraph">
-<p>The position of the source in world coordinates.</p>
+<p>In order to make working with sources easier for simple applications, some properties of source objects are ignored in favor of values on the environment.
+This property is used to disable this behavior for properties related to panning.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_control_reverb">control_reverb</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_SOURCE_CONTROL_REVERB</p>
+</div>
+<div class="paragraph">
+<p>Type: boolean</p>
+</div>
+<div class="paragraph">
+<p>Default Value: 0</p>
+</div>
+<div class="paragraph">
+<p>Rate: k</p>
+</div>
+<div class="paragraph">
+<p>In order to make working with sources easier for simple applications, some properties of source objects are ignored in favor of values on the environment.
+This property is used to disable this behavior for properties related to reverb.</p>
 </div>
 </div>
 <div class="sect4">
@@ -10094,16 +10110,15 @@ They are packed because, also like the listener, they must never be modified sep
 <p>Range: A value from the <a href="#enum-Lav_DISTANCE_MODELS">Lav_DISTANCE_MODELS</a> enumeration.</p>
 </div>
 <div class="paragraph">
-<p>Default Value: Lav_DISTANCE_MODEL_DELEGATE</p>
+<p>Default Value: Lav_DISTANCE_MODEL_LINEAR</p>
 </div>
 <div class="paragraph">
 <p>Rate: k</p>
 </div>
 <div class="paragraph">
-<p>The distance model determines how quickly sources get quieter as they move away from the listener.</p>
-</div>
-<div class="paragraph">
-<p>By default, this property is set to delegate, and sources consequently read from the environment.</p>
+<p>The distance model determines how quickly sources get quieter as they move away from the listener.
+The default value of this property is set from the corresponding property on the environment at source creation.
+By default, sources ignore this property in favor of the value provided by their environment.  Set Lav_SOURCE_CONTROL_DISTANCE_MODEL to true to control it yourself.</p>
 </div>
 </div>
 <div class="sect4">
@@ -10148,7 +10163,8 @@ The orientation and position properties of an environment do not affect head rel
 </div>
 <div class="paragraph">
 <p>The maximum distance from the listener at which the source will be audible.
-This property&#8217;s default value is copied from the environment at source creation.</p>
+The default value of this property is set from the corresponding property on the environment at source creation.
+By default, sources do not respect this property and use the corresponding value from their environment. Set Lav_SOURCE_CONTROL_DISTANCE_MODEL to true to control it yourself.</p>
 </div>
 </div>
 <div class="sect4">
@@ -10173,6 +10189,10 @@ This property&#8217;s default value is copied from the environment at source cre
 </div>
 <div class="paragraph">
 <p>Behavior is undefined if this property is ever less than Lav_SOURCE_MIN_REVERB_LEVEL.</p>
+</div>
+<div class="paragraph">
+<p>The default value of this property is set from the corresponding property on the environment at source creation.
+By default, this property is ignored in favor of the value provided by this source&#8217;s environment.  Set Lav_SOURCE_CONTROL_REVERB to true to control it yourself.</p>
 </div>
 </div>
 <div class="sect4">
@@ -10201,6 +10221,10 @@ This property&#8217;s default value is copied from the environment at source cre
 <div class="paragraph">
 <p>Behavior is undefined if this property is ever greater than the value you give to Lav_SOURCE_MAX_REVERB_LEVEL.</p>
 </div>
+<div class="paragraph">
+<p>The default value of this property is set from the corresponding property on the environment at source creation.
+By default, this property is ignored in favor of the value provided by this source&#8217;s environment.  Set Lav_SOURCE_CONTROL_REVERB to true to control it yourself.</p>
+</div>
 </div>
 <div class="sect4">
 <h5 id="_occlusion">occlusion</h5>
@@ -10228,8 +10252,30 @@ A value of 1.0 is a fully occluded source, which will be all but silent; a value
 </div>
 <div class="paragraph">
 <p>It is extremely difficult to map occlusion to a physical quantity.
-In the real world, occlusion depends on mass, density, molecular structure, and a huge number of other factors.
-Libaudioverse therefore chooses to use this scalar quantity and to attempt to do the right thing.</p>
+As a consequence, this property is unitless.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_orientation_2">orientation</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_SOURCE_ORIENTATION</p>
+</div>
+<div class="paragraph">
+<p>Type: float6</p>
+</div>
+<div class="paragraph">
+<p>Default Value: [0.0, 0.0, -1.0, 0.0, 1.0, 0.0]</p>
+</div>
+<div class="paragraph">
+<p>Rate: k</p>
+</div>
+<div class="paragraph">
+<p>The orientation of the source.
+This is not currently used.
+In future, it will be used for sound cones and filters on sources facing away.
+The interpretation is the same as that for the listener: the first 3 values are the direction of the front and the second 3 the direction of the top.
+Note that these must both be unit vectors and that they must be orthoganal.
+They are packed because, also like the listener, they must never be modified separately.</p>
 </div>
 </div>
 <div class="sect4">
@@ -10244,14 +10290,33 @@ Libaudioverse therefore chooses to use this scalar quantity and to attempt to do
 <p>Range: A value from the <a href="#enum-Lav_PANNING_STRATEGIES">Lav_PANNING_STRATEGIES</a> enumeration.</p>
 </div>
 <div class="paragraph">
-<p>Default Value: Lav_PANNING_STRATEGY_DELEGATE</p>
+<p>Default Value: Lav_PANNING_STRATEGY_STEREO</p>
 </div>
 <div class="paragraph">
 <p>Rate: k</p>
 </div>
 <div class="paragraph">
 <p>The strategy for the internal multipanner.
-By default, this delegates to the environment.</p>
+The default value of this property is set from the corresponding property on the environment at source creation.
+By default, this property is ignored and sources use the value provided by their environment.  Set Lav_SOURCE_CONTROL_PANNING to true to control it yourself.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_position_4">position</h5>
+<div class="paragraph">
+<p>C Enumeration Value: Lav_SOURCE_POSITION</p>
+</div>
+<div class="paragraph">
+<p>Type: float3</p>
+</div>
+<div class="paragraph">
+<p>Default Value: [0.0, 0.0, 0.0]</p>
+</div>
+<div class="paragraph">
+<p>Rate: k</p>
+</div>
+<div class="paragraph">
+<p>The position of the source in world coordinates.</p>
 </div>
 </div>
 <div class="sect4">
@@ -10281,6 +10346,10 @@ By default, this delegates to the environment.</p>
 <p>For values greater than Lav_SOURCE_MAX_DISTANCE, the source will always be heard at least somewhat in the dry path.
 Lav_SOURCE_DISTANCE_MODEL controls how this crossfading takes place.</p>
 </div>
+<div class="paragraph">
+<p>The default value of this property is set from the corresponding property on the environment at source creation.
+By default, sources ignore this property in favor of the value provided by their environment.  Set Lav_SOURCE_CONTROL_REVERB to true to control it yourself.</p>
+</div>
 </div>
 <div class="sect4">
 <h5 id="_size">size</h5>
@@ -10304,6 +10373,9 @@ Lav_SOURCE_DISTANCE_MODEL controls how this crossfading takes place.</p>
 Sources are approximated as spheres.
 The size is used to determine the closest point on the source to the listener, and is the radius of this sphere.
 Size currently has no other effect.</p>
+</div>
+<div class="paragraph">
+<p>The default value of this property is set from the corresponding property on the environment at source creation.</p>
 </div>
 </div>
 </div>
@@ -10339,6 +10411,36 @@ Size currently has no other effect.</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>int</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">effect</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The index of the effect send to feed.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect4">
+<h5 id="function-Lav_sourceNodeSetPropertiesFromEnvironment">set_properties_from_environment</h5>
+<div class="paragraph">
+<p>Prototype: <code>LavError Lav_sourceNodeSetPropertiesFromEnvironment(LavHandle nodeHandle)</code></p>
+</div>
+<div class="paragraph">
+<p>A convenience function for working with properties on sources.
+When called, this function sets the values of all properties which have corresponding properties on the environment to the values from the environment.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Parameters</caption>
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">nodeHandle</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The node to manipulate.</p></td>
 </tr>
 </tbody>
 </table>
@@ -10665,16 +10767,8 @@ Indicates how sound should become quieter as objects move away from the listener
 <td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_DELEGATE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Delegate to another node, if we can.  Otherwise, fall back to <code>Lav_DISTANCE_MODEL_LINEAR</code>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_EXPONENTIAL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_INVERSE</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Sounds fall off as <code>1/distance</code>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_INVERSE_SQUARE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Sounds fall off as <code>1/min(distance, maxDistance)^2</code>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_LINEAR</p></td>
@@ -10933,10 +11027,6 @@ This is mostly for the <a href="#node-Lav_OBJTYPE_MULTIPANNER_NODE">multipanner 
 <td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_DELEGATE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Delegate the decision. Used for 3D sources.  If there is nowhere to delegate to, assumes <code>Lav_PANNING_STRATEGY_STEREO</code>.</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PANNING_STRATEGY_HRTF</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Indicates HRTF panning.</p></td>
 </tr>
@@ -11019,7 +11109,7 @@ This is mostly for the <a href="#node-Lav_OBJTYPE_MULTIPANNER_NODE">multipanner 
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-08-10 23:30:34 Coordinated Universal Time
+Last updated 2016-08-16 22:20:14 Coordinated Universal Time
 </div>
 </div>
 <script type="text/x-mathjax-config">
