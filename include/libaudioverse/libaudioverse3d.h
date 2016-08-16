@@ -20,11 +20,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_sourceNodeStopFeedingEffect(LavHandle nodeHandl
 Lav_PUBLIC_FUNCTION LavError Lav_sourceNodeSetPropertiesFromEnvironment(LavHandle nodeHandle);
 
 
-enum Lav_3D_PROPERTIES {
-	Lav_3D_ORIENTATION = -1, //float6 consisting of an at followed by an up vector.
-	Lav_3D_POSITION = -2, //float3, consisting of the position of the object.
-};
-
 //all environments have these properties.
 enum lav_STANDARD_ENVIRONMENT_PROPERTIES {
 	Lav_ENVIRONMENT_PANNING_STRATEGY = -8,
@@ -35,6 +30,8 @@ enum lav_STANDARD_ENVIRONMENT_PROPERTIES {
 	Lav_ENVIRONMENT_REVERB_DISTANCE = -15,
 	Lav_ENVIRONMENT_MIN_REVERB_LEVEL = -16,
 	Lav_ENVIRONMENT_MAX_REVERB_LEVEL = -17,
+	Lav_ENVIRONMENT_POSITION  = -18,
+	Lav_ENVIRONMENT_ORIENTATION = -18,
 };
 
 enum Lav_SOURCE_PROPERTIES {
@@ -50,6 +47,8 @@ enum Lav_SOURCE_PROPERTIES {
 	Lav_SOURCE_CONTROL_PANNING = -13,
 	Lav_SOURCE_CONTROL_DISTANCE_MODEL = -14,
 	Lav_SOURCE_CONTROL_REVERB = -15,
+	Lav_SOURCE_POSITION = -16,
+	Lav_SOURCE_ORIENTATION = -17,
 };
 
 enum Lav_DISTANCE_MODELS {

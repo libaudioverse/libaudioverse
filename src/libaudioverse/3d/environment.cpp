@@ -68,11 +68,11 @@ void EnvironmentNode::process() {
 }
 
 void EnvironmentNode::updateEnvironmentInfo(bool force) {
-	if(force || werePropertiesModified(this, Lav_3D_POSITION, Lav_3D_ORIENTATION)) {
+	if(force || werePropertiesModified(this, Lav_ENVIRONMENT_POSITION, Lav_ENVIRONMENT_ORIENTATION)) {
 		//update the matrix.
 		//Important: look at the glsl constructors. Glm copies them, and there is nonintuitive stuff here.
-		const float* pos = getProperty(Lav_3D_POSITION).getFloat3Value();
-		const float* atup = getProperty(Lav_3D_ORIENTATION).getFloat6Value();
+		const float* pos = getProperty(Lav_ENVIRONMENT_POSITION).getFloat3Value();
+		const float* atup = getProperty(Lav_ENVIRONMENT_ORIENTATION).getFloat6Value();
 		auto at = glm::vec3(atup[0], atup[1], atup[2]);
 		auto up = glm::vec3(atup[3], atup[4], atup[5]);
 		auto right = glm::cross(at, up);
@@ -138,7 +138,7 @@ void EnvironmentNode::playAsync(std::shared_ptr<Buffer> buffer, float x, float y
 	b->getProperty(Lav_BUFFER_BUFFER).setBufferValue(buffer);
 	if(fromCache == false) b->connect(0, s, 0);
 	b->getProperty(Lav_BUFFER_POSITION).setDoubleValue(0.0);
-	s->getProperty(Lav_3D_POSITION).setFloat3Value(x, y, z);
+	s->getProperty(Lav_ENVIRONMENT_POSITION).setFloat3Value(x, y, z);
 	if(isDry) {
 		for(int i = 0; i < effect_sends.size(); i++) {
 			s->stopFeedingEffect(i);

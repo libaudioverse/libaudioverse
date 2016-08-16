@@ -1,11 +1,11 @@
 properties:
-  Lav_3D_POSITION:
+  Lav_ENVIRONMENT_POSITION:
     name: position
     type: float3
     default: [0.0, 0.0, 0.0]
     doc_description: |
       The position of the listener, in world coordinates.
-  Lav_3D_ORIENTATION:
+  Lav_ENVIRONMENT_ORIENTATION:
     name: orientation
     type: float6
     default: [0.0, 0.0, -1.0, 0.0, 1.0, 0.0]

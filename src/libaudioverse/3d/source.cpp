@@ -111,7 +111,7 @@ void SourceNode::update(EnvironmentInfo env) {
 	updateEnvironmentInfoFromProperties(env);
 
 	//first, extract the vector of our position.
-	const float* pos = getProperty(Lav_3D_POSITION).getFloat3Value();
+	const float* pos = getProperty(Lav_SOURCE_POSITION).getFloat3Value();
 	bool isHeadRelative = getProperty(Lav_SOURCE_HEAD_RELATIVE).getIntValue() == 1;
 	glm::vec4 npos;
 	if(isHeadRelative) npos = glm::vec4(pos[0], pos[1], pos[2], 1.0);

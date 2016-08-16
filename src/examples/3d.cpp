@@ -47,19 +47,19 @@ int main(int argc, char** args) {
 	//do a square over and over.
 	while(1) {
 		for(int i = 0; i < resolution; i++) {
-			Lav_nodeSetFloat3Property(source, Lav_3D_POSITION, width*(i/(float)resolution)-width/2, 0, -width/2);
+			Lav_nodeSetFloat3Property(source, Lav_SOURCE_POSITION, width*(i/(float)resolution)-width/2, 0, -width/2);
 			std::this_thread::sleep_for(std::chrono::milliseconds(length/resolution));
 		}
 		for(int i = 0; i < resolution; i++) {
-			Lav_nodeSetFloat3Property(source, Lav_3D_POSITION, width/2, 0, (width*((float)i/resolution)-width/2) );
+			Lav_nodeSetFloat3Property(source, Lav_SOURCE_POSITION, width/2, 0, (width*((float)i/resolution)-width/2) );
 			std::this_thread::sleep_for(std::chrono::milliseconds(length/resolution));
 		}
 		for(int i = 0; i < resolution; i++) {
-			Lav_nodeSetFloat3Property(source, Lav_3D_POSITION, -(width*(i/(float)resolution)-width/2), 0, width/2);
+			Lav_nodeSetFloat3Property(source, Lav_SOURCE_POSITION, -(width*(i/(float)resolution)-width/2), 0, width/2);
 			std::this_thread::sleep_for(std::chrono::milliseconds(length/resolution));
 		}
 		for(int i = 0; i < resolution; i++) {
-			Lav_nodeSetFloat3Property(source, Lav_3D_POSITION, -width/2, 0, -(width*((float)i/resolution)-width/2));
+			Lav_nodeSetFloat3Property(source, Lav_SOURCE_POSITION, -width/2, 0, -(width*((float)i/resolution)-width/2));
 			std::this_thread::sleep_for(std::chrono::milliseconds(length/resolution));
 		}
 	}
