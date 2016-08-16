@@ -52,10 +52,8 @@ enum Lav_SOURCE_PROPERTIES {
 };
 
 enum Lav_DISTANCE_MODELS {
-	Lav_DISTANCE_MODEL_DELEGATE = 0, //Delegate to the environment.
-	Lav_DISTANCE_MODEL_LINEAR = 1, //sounds get quieter as 1-(distance/max_distance).
-	Lav_DISTANCE_MODEL_EXPONENTIAL = 2, //sounds get quieter as 1/distance.
-	Lav_DISTANCE_MODEL_INVERSE_SQUARE = 3, //sounds get quieter as 1/min(distance, max_distance)^2
+	Lav_DISTANCE_MODEL_LINEAR,
+	Lav_DISTANCE_MODEL_EXPONENTIAL,
 };
 
 #ifdef __cplusplus

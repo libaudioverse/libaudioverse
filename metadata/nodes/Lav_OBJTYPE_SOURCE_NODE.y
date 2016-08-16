@@ -40,7 +40,7 @@ properties:
   Lav_SOURCE_DISTANCE_MODEL:
     name: distance_model
     type: int
-    default: Lav_DISTANCE_MODEL_DELEGATE
+    default: Lav_DISTANCE_MODEL_LINEAR
     value_enum: Lav_DISTANCE_MODELS
     doc_description: |
       The distance model determines how quickly sources get quieter as they move away from the listener.
@@ -48,7 +48,7 @@ properties:
       By default, sources ignore this property in favor of the value provided by their environment.  Set {{"Lav_SOURCE_CONTROL_DISTANCE_MODEL"|property}} to true to control it yourself.
   Lav_SOURCE_PANNING_STRATEGY:
     name: panning_strategy
-    default: Lav_PANNING_STRATEGY_DELEGATE
+    default: Lav_PANNING_STRATEGY_STEREO
     value_enum: Lav_PANNING_STRATEGIES
     type: int
     doc_description: |

@@ -91,10 +91,8 @@ void EnvironmentNode::updateEnvironmentInfo(bool force) {
 		environment_info.world_to_listener_transform = m;
 	}
 	environment_info.panning_strategy = getProperty(Lav_ENVIRONMENT_PANNING_STRATEGY).getIntValue();
-	if(environment_info.panning_strategy == Lav_PANNING_STRATEGY_DELEGATE) environment_info.panning_strategy = Lav_PANNING_STRATEGY_STEREO;
 	environment_info.panning_strategy_changed = force || werePropertiesModified(this, Lav_ENVIRONMENT_PANNING_STRATEGY);
 	environment_info.distance_model = getProperty(Lav_ENVIRONMENT_DISTANCE_MODEL).getIntValue();
-	if(environment_info.distance_model == Lav_DISTANCE_MODEL_DELEGATE) environment_info.distance_model = Lav_DISTANCE_MODEL_LINEAR;
 	environment_info.distance_model_changed = force || werePropertiesModified(this, Lav_ENVIRONMENT_DISTANCE_MODEL);
 	environment_info.max_distance = getProperty(Lav_ENVIRONMENT_MAX_DISTANCE).getFloatValue();
 	environment_info.reverb_distance = getProperty(Lav_ENVIRONMENT_REVERB_DISTANCE).getFloatValue();

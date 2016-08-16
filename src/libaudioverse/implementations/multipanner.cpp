@@ -73,7 +73,6 @@ int Multipanner::getStrategy() {
 
 void Multipanner::setStrategy(int s) {
 	if(strategy == s) return; //no-op.
-	if(s == Lav_PANNING_STRATEGY_DELEGATE) s = Lav_PANNING_STRATEGY_STEREO;
 	if(s == Lav_PANNING_STRATEGY_HRTF) hrtf_panner.reset(); //hrtf panner is stateful.
 	//Note that amplitude panners are stateless, and we needn't reset them.
 	//unfortunately, we do need to reconfigure other things.
