@@ -82,8 +82,7 @@ enumerations:
       Indicates how sound should become quieter as objects move away from the listener.
     members:
       Lav_DISTANCE_MODEL_LINEAR: Sound falls off as {{"1-(distance/maxDistance)"|codelit}}.
-      Lav_DISTANCE_MODEL_EXPONENTIAL: Sounds fall off as {{"1/distance"|codelit}}.
-      Lav_DISTANCE_MODEL_INVERSE_SQUARE: Sounds fall off as {{"1/min(distance, maxDistance)^2"|codelit}}.
+      Lav_DISTANCE_MODEL_INVERSE: Sounds fall off as {{"1/distance"|codelit}}.
   Lav_FDN_FILTER_TYPES:
     doc_description: Possible filter types for a feedback delay network's feedback path.
     members:
