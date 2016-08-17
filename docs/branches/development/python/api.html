@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>The Libaudioverse API &mdash; Libaudioverse build234 documentation</title>
+  <title>The Libaudioverse API &mdash; Libaudioverse build238 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="Libaudioverse build234 documentation" href="index.html"/>
+    <link rel="top" title="Libaudioverse build238 documentation" href="index.html"/>
         <link rel="prev" title="Python-specific Notes" href="python-specifics.html"/> 
 
   
@@ -559,7 +559,7 @@ If crossfading is enabled, moving the panner will slowly fade it to the new posi
 
 <dl class="class">
 <dt id="libaudioverse.AutomatedProperty">
-<em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">AutomatedProperty</code><span class="sig-paren">(</span><em>handle</em>, <em>slot</em>, <em>getter</em>, <em>setter</em>, <em>converter=&lt;function LibaudioverseProperty.&lt;lambda&gt; at 0x000000B62AE8A6A8&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.AutomatedProperty" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">AutomatedProperty</code><span class="sig-paren">(</span><em>handle</em>, <em>slot</em>, <em>getter</em>, <em>setter</em>, <em>converter=&lt;function LibaudioverseProperty.&lt;lambda&gt; at 0x047E1A08&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.AutomatedProperty" title="Permalink to this definition">¶</a></dt>
 <dd><p>A property that supports automation and node connection.</p>
 <dl class="method">
 <dt id="libaudioverse.AutomatedProperty.cancel_automators">
@@ -1442,7 +1442,13 @@ Libaudioverse also computes a second value called <code class="docutils literal"
 <dl class="attribute">
 <dt id="libaudioverse.DistanceModels.inverse">
 <code class="descname">inverse</code><em class="property"> = &lt;DistanceModels.inverse: 1&gt;</em><a class="headerlink" href="#libaudioverse.DistanceModels.inverse" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sounds fall off as <code class="docutils literal"><span class="pre">1/(1+70*distancePercent)</span></code>.  The constant in this equation was determined experimentally.  This distance model emphasizes distance changes when sounds are close, but treats distance changes of further away sources more subtly.</p>
+<dd><p>Sounds fall off as <code class="docutils literal"><span class="pre">1/(1+315*distancePercent)</span></code>.  Just before <code class="docutils literal"><span class="pre">maxDistance</span></code>, the gain of the sound will be approximately -25 DB.  This distance model emphasizes distance changes when sounds are close, but treats distance changes of further away sources more subtly.  For full benefit of the effect of close sounds, this distance model must be used with fairly large values for <code class="docutils literal"><span class="pre">maxDistance</span></code>, usually around 300.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libaudioverse.DistanceModels.inverse_square">
+<code class="descname">inverse_square</code><em class="property"> = &lt;DistanceModels.inverse_square: 2&gt;</em><a class="headerlink" href="#libaudioverse.DistanceModels.inverse_square" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sounds fall off as <code class="docutils literal"><span class="pre">1.0/(1+315*distancePercent*distancePercent)</span></code>.  This is a standard inverse square law, modified such that the sound volume just before <code class="docutils literal"><span class="pre">maxDistance</span></code> is about -25 DB.  Of the available distance models, this is the closest to an accurate simulation of large, wide-open places such as fields and stadiums.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -1596,7 +1602,7 @@ as sources move away from the listener, their dry path becomes less but the audi
 <code class="descname">default_reverb_distance</code><a class="headerlink" href="#libaudioverse.EnvironmentNode.default_reverb_distance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Type: float</p>
 <p>Range: [0.0, INFINITY]</p>
-<p>Default value: 30.0</p>
+<p>Default value: 75.0</p>
 <p>The distance at which a source will be heard only in the reverb.</p>
 <p>See documentation on the <a class="reference internal" href="#libaudioverse.SourceNode" title="libaudioverse.SourceNode"><code class="xref py py-class docutils literal"><span class="pre">SourceNode</span></code></a> node for a specific explanation.
 By default, sources get the value of this property from the environment.
@@ -1630,7 +1636,7 @@ This behavior may be changed by setting <code class="docutils literal"><span cla
 <code class="descname">max_distance</code><a class="headerlink" href="#libaudioverse.EnvironmentNode.max_distance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Type: float</p>
 <p>Range: [0.0, INFINITY]</p>
-<p>Default value: 50.0</p>
+<p>Default value: 150.0</p>
 <p>The maximum distance at which a source is audible.
 Consider this property to be in meters.</p>
 <p>By default, sources are configured to delegate to the environment when looking for values to use for the distance model parameters.
@@ -2841,7 +2847,7 @@ If you feed this node a signal that is zero, it will slowly decrease the output 
 
 <dl class="class">
 <dt id="libaudioverse.LibaudioverseProperty">
-<em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">LibaudioverseProperty</code><span class="sig-paren">(</span><em>handle</em>, <em>slot</em>, <em>getter</em>, <em>setter</em>, <em>converter=&lt;function LibaudioverseProperty.&lt;lambda&gt; at 0x000000B62AE8A6A8&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.LibaudioverseProperty" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">LibaudioverseProperty</code><span class="sig-paren">(</span><em>handle</em>, <em>slot</em>, <em>getter</em>, <em>setter</em>, <em>converter=&lt;function LibaudioverseProperty.&lt;lambda&gt; at 0x047E1A08&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.LibaudioverseProperty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Proxy to Libaudioverse properties.</p>
 <p>All properties support resetting and type query.</p>
 <dl class="attribute">
@@ -3760,7 +3766,7 @@ The orientation and position properties of an environment do not affect head rel
 <code class="descname">max_distance</code><a class="headerlink" href="#libaudioverse.SourceNode.max_distance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Type: float</p>
 <p>Range: [0.0, INFINITY]</p>
-<p>Default value: 50.0</p>
+<p>Default value: 150.0</p>
 <p>The maximum distance from the listener at which the source will be audible.
 The default value of this property is set from the corresponding property on the environment at source creation.
 By default, sources do not respect this property and use the corresponding value from their environment. Set Lav_SOURCE_CONTROL_DISTANCE_MODEL to true to control it yourself.</p>
@@ -3841,7 +3847,7 @@ By default, this property is ignored and sources use the value provided by their
 <code class="descname">reverb_distance</code><a class="headerlink" href="#libaudioverse.SourceNode.reverb_distance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Type: float</p>
 <p>Range: [0.0, INFINITY]</p>
-<p>Default value: 30.0</p>
+<p>Default value: 75.0</p>
 <p>The distance at which the source will only be heard through the reverb effect sends.</p>
 <p>If this source is not feeding any effect sends configured as reverbs, this property has no effect.</p>
 <p>For values greater than Lav_SOURCE_MAX_DISTANCE, the source will always be heard at least somewhat in the dry path.
@@ -4065,7 +4071,7 @@ You must call it before the interpreter shuts down. Failure to do so will allow 
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'build234',
+            VERSION:'build238',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

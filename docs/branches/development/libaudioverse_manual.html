@@ -7143,7 +7143,7 @@ This behavior may be changed by setting <code>Lav_SOURCE_CONTROL_DISTANCE_MODEL<
 <p>Range: [0.0, 'INFINITY']</p>
 </div>
 <div class="paragraph">
-<p>Default Value: 50.0</p>
+<p>Default Value: 150.0</p>
 </div>
 <div class="paragraph">
 <p>Rate: k</p>
@@ -7331,7 +7331,7 @@ All new sources delegate to the environment by default.</p>
 <p>Range: [0.0, 'INFINITY']</p>
 </div>
 <div class="paragraph">
-<p>Default Value: 30.0</p>
+<p>Default Value: 75.0</p>
 </div>
 <div class="paragraph">
 <p>Rate: k</p>
@@ -10156,7 +10156,7 @@ The orientation and position properties of an environment do not affect head rel
 <p>Range: [0.0, 'INFINITY']</p>
 </div>
 <div class="paragraph">
-<p>Default Value: 50.0</p>
+<p>Default Value: 150.0</p>
 </div>
 <div class="paragraph">
 <p>Rate: k</p>
@@ -10331,7 +10331,7 @@ By default, this property is ignored and sources use the value provided by their
 <p>Range: [0.0, 'INFINITY']</p>
 </div>
 <div class="paragraph">
-<p>Default Value: 30.0</p>
+<p>Default Value: 75.0</p>
 </div>
 <div class="paragraph">
 <p>Rate: k</p>
@@ -10773,7 +10773,11 @@ Libaudioverse also computes a second value called <code>distancePercent</code>; 
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_INVERSE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Sounds fall off as <code>1/(1+70*distancePercent)</code>.  The constant in this equation was determined experimentally.  This distance model emphasizes distance changes when sounds are close, but treats distance changes of further away sources more subtly.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sounds fall off as <code>1/(1+315*distancePercent)</code>.  Just before <code>maxDistance</code>, the gain of the sound will be approximately -25 DB.  This distance model emphasizes distance changes when sounds are close, but treats distance changes of further away sources more subtly.  For full benefit of the effect of close sounds, this distance model must be used with fairly large values for <code>maxDistance</code>, usually around 300.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_INVERSE_SQUARE</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sounds fall off as <code>1.0/(1+315*distancePercent*distancePercent)</code>.  This is a standard inverse square law, modified such that the sound volume just before <code>maxDistance</code> is about -25 DB.  Of the available distance models, this is the closest to an accurate simulation of large, wide-open places such as fields and stadiums.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_LINEAR</p></td>
@@ -11114,7 +11118,7 @@ This is mostly for the <a href="#node-Lav_OBJTYPE_MULTIPANNER_NODE">multipanner 
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-08-17 00:39:59 Coordinated Universal Time
+Last updated 2016-08-17 12:35:40 Coordinated Universal Time
 </div>
 </div>
 <script type="text/x-mathjax-config">
