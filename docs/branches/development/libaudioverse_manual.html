@@ -10755,6 +10755,11 @@ This section concerns itself only with those enumerations that are important by 
 <p>used in the 3D components of this library.
 Indicates how sound should become quieter as objects move away from the listener.</p>
 </div>
+<div class="paragraph">
+<p>Libaudioverse computes the distance from the center of the source to the listener, then subtracts the size.
+In the following, <code>distance</code> refers to this distance.
+Libaudioverse also computes a second value called <code>distancePercent</code>; specifically, <code>distancePercent = distance/maxDistance</code>.</p>
+</div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Members</caption>
 <colgroup>
@@ -10768,11 +10773,11 @@ Indicates how sound should become quieter as objects move away from the listener
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_INVERSE</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Sounds fall off as <code>1/distance</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sounds fall off as <code>1/(1+70*distancePercent)</code>.  The constant in this equation was determined experimentally.  This distance model emphasizes distance changes when sounds are close, but treats distance changes of further away sources more subtly.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Lav_DISTANCE_MODEL_LINEAR</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Sound falls off as <code>1-(distance/maxDistance)</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sound falls off as <code>1-distancePercent</code>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -11109,7 +11114,7 @@ This is mostly for the <a href="#node-Lav_OBJTYPE_MULTIPANNER_NODE">multipanner 
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-08-16 22:24:25 Coordinated Universal Time
+Last updated 2016-08-17 00:36:15 Coordinated Universal Time
 </div>
 </div>
 <script type="text/x-mathjax-config">
