@@ -88,14 +88,14 @@ void SourceNode::reset() {
 }
 
 //helper function: calculates gains given distance models.
-float calculateGainForDistanceModel(int model, float distance, float maxDistance, float referenceDistance) {
-	double retval = 1.0f;
-	float adjustedDistance = std::max<float>(0.0f, distance-referenceDistance);
+double calculateGainForDistanceModel(int model, double distance, double maxDistance, double referenceDistance) {
+	double retval = 1.0;
+	double adjustedDistance = std::max<double>(0.0, distance-referenceDistance);
 	if(adjustedDistance > maxDistance) {
-		retval = 0.0f;
+		retval = 0.0;
 	}
 	else {
-		double distancePercent = (double)adjustedDistance/maxDistance;
+		double distancePercent = adjustedDistance/maxDistance;
 		switch(model) {
 			case Lav_DISTANCE_MODEL_LINEAR: retval = 1.0-distancePercent; break;
 			case Lav_DISTANCE_MODEL_INVERSE: retval = 1.0/(1+315*distancePercent); break;
@@ -105,12 +105,11 @@ float calculateGainForDistanceModel(int model, float distance, float maxDistance
 
 	//safety clamping.  Some of the equations above will go negative after max_distance.
 	if(retval < 0.0f) retval = 0.0f;
-	return (float)retval;
+	return retval;
 }
 
 void SourceNode::update(EnvironmentInfo env) {
 	updateEnvironmentInfoFromProperties(env);
-
 	//first, extract the vector of our position.
 	const float* pos = getProperty(Lav_SOURCE_POSITION).getFloat3Value();
 	bool isHeadRelative = getProperty(Lav_SOURCE_HEAD_RELATIVE).getIntValue() == 1;
@@ -118,7 +117,7 @@ void SourceNode::update(EnvironmentInfo env) {
 	if(isHeadRelative) npos = glm::vec4(pos[0], pos[1], pos[2], 1.0);
 	else npos = env.world_to_listener_transform*glm::vec4(pos[0], pos[1], pos[2], 1.0f);
 	//npos is now easy to work with.
-	float distance = glm::length(npos);
+	double distance = glm::length(npos);
 	float maxDistance = env.max_distance;
 	//Decide if we're culled. if we are, bale out now and mark us as such.
 	if(distance > maxDistance) {
@@ -137,8 +136,8 @@ void SourceNode::update(EnvironmentInfo env) {
 	int distanceModel = env.distance_model;
 	float referenceDistance = getProperty(Lav_SOURCE_SIZE).getFloatValue();
 	float reverbDistance = env.reverb_distance;
-	dry_gain = calculateGainForDistanceModel(distanceModel, distance, maxDistance, referenceDistance);
-	float unscaledReverbMultiplier = 1.0f-calculateGainForDistanceModel(distanceModel, distance, reverbDistance, 0.0f);
+	dry_gain = (float)calculateGainForDistanceModel(distanceModel, distance, maxDistance, referenceDistance);
+	float unscaledReverbMultiplier = 1.0f-(float)calculateGainForDistanceModel(distanceModel, distance, reverbDistance, 0.0f);
 	float minReverbLevel = env.min_reverb_level;
 	float maxReverbLevel = env.max_reverb_level;
 	float scaledReverbMultiplier = minReverbLevel+(maxReverbLevel-minReverbLevel)*unscaledReverbMultiplier;
