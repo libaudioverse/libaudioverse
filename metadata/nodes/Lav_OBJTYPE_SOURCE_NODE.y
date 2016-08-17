@@ -19,7 +19,7 @@ properties:
   Lav_SOURCE_MAX_DISTANCE:
     name: max_distance
     type: float
-    default: 50.0
+    default: 150.0
     range: [0.0, INFINITY]
     doc_description: |
       The maximum distance from the listener at which the source will be audible.
@@ -69,7 +69,7 @@ properties:
     name: reverb_distance
     type: float
     range: [0.0, INFINITY]
-    default: 30.0
+    default: 75.0
     doc_description: |
       The distance at which the source will only be heard through the reverb effect sends.
       

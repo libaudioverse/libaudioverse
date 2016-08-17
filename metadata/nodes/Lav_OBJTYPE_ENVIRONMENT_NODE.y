@@ -38,7 +38,7 @@ properties:
     name: max_distance
     range: [0.0, INFINITY]
     type: float
-    default: 50.0
+    default: 150.0
     doc_description: |
       The maximum distance at which a source is audible.
       Consider this property to be in meters.
@@ -80,7 +80,7 @@ properties:
     name: default_reverb_distance
     type: float
     range: [0.0, INFINITY]
-    default: 30.0
+    default: 75.0
     doc_description: |
       The distance at which a source will be heard only in the reverb.
       
