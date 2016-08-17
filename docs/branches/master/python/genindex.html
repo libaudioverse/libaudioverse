@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Index &mdash; Libaudioverse build223 documentation</title>
+  <title>Index &mdash; Libaudioverse build237 documentation</title>
   
 
   
@@ -31,7 +31,7 @@
   
 
   
-    <link rel="top" title="Libaudioverse build223 documentation" href="index.html"/> 
+    <link rel="top" title="Libaudioverse build237 documentation" href="index.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -336,12 +336,12 @@
   <dt><a href="api.html#libaudioverse.AllpassNode.coefficient">coefficient (libaudioverse.AllpassNode attribute)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="api.html#libaudioverse.FirstOrderFilterNode.configure_allpass">configure_allpass() (libaudioverse.FirstOrderFilterNode method)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="api.html#libaudioverse.FirstOrderFilterNode.configure_highpass">configure_highpass() (libaudioverse.FirstOrderFilterNode method)</a>
   </dt>
@@ -356,6 +356,18 @@
 
       
   <dt><a href="api.html#libaudioverse.GenericNode.connect">connect() (libaudioverse.GenericNode method)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#libaudioverse.SourceNode.control_distance_model">control_distance_model (libaudioverse.SourceNode attribute)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#libaudioverse.SourceNode.control_panning">control_panning (libaudioverse.SourceNode attribute)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#libaudioverse.SourceNode.control_reverb">control_reverb (libaudioverse.SourceNode attribute)</a>
   </dt>
 
       
@@ -412,10 +424,6 @@
 
       
   <dt><a href="api.html#libaudioverse.Buffer.decode_from_array">decode_from_array() (libaudioverse.Buffer method)</a>
-  </dt>
-
-      
-  <dt><a href="api.html#libaudioverse.EnvironmentNode.default_max_distance">default_max_distance (libaudioverse.EnvironmentNode attribute)</a>
   </dt>
 
       
@@ -476,16 +484,6 @@
   <dt><a href="api.html#libaudioverse.FeedbackDelayNetworkNode.delays">delays (libaudioverse.FeedbackDelayNetworkNode attribute)</a>
   </dt>
 
-      
-  <dt><a href="api.html#libaudioverse.DistanceModels.delegate">delegate (libaudioverse.DistanceModels attribute)</a>
-  </dt>
-
-      <dd><dl>
-        
-  <dt><a href="api.html#libaudioverse.PanningStrategies.delegate">(libaudioverse.PanningStrategies attribute)</a>
-  </dt>
-
-      </dl></dd>
       
   <dt><a href="api.html#libaudioverse.FdnReverbNode.density">density (libaudioverse.FdnReverbNode attribute)</a>
   </dt>
@@ -576,10 +574,6 @@
 
       
   <dt><a href="api.html#libaudioverse.EnvironmentNode">EnvironmentNode (class in libaudioverse)</a>
-  </dt>
-
-      
-  <dt><a href="api.html#libaudioverse.DistanceModels.exponential">exponential (libaudioverse.DistanceModels attribute)</a>
   </dt>
 
   </dl></td>
@@ -934,8 +928,6 @@
   <dt><a href="api.html#libaudioverse.InternalError">InternalError</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="api.html#libaudioverse.AllpassNode.interpolation_time">interpolation_time (libaudioverse.AllpassNode attribute)</a>
   </dt>
@@ -954,6 +946,8 @@
   </dt>
 
       </dl></dd>
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="api.html#libaudioverse.IntProperty">IntProperty (class in libaudioverse)</a>
   </dt>
@@ -968,6 +962,10 @@
 
       
   <dt><a href="api.html#libaudioverse.InvalidPropertyError">InvalidPropertyError</a>
+  </dt>
+
+      
+  <dt><a href="api.html#libaudioverse.DistanceModels.inverse">inverse (libaudioverse.DistanceModels attribute)</a>
   </dt>
 
       
@@ -1077,13 +1075,25 @@
   </dt>
 
       
-  <dt><a href="api.html#libaudioverse.SourceNode.max_distance">max_distance (libaudioverse.SourceNode attribute)</a>
+  <dt><a href="api.html#libaudioverse.EnvironmentNode.max_distance">max_distance (libaudioverse.EnvironmentNode attribute)</a>
   </dt>
 
+      <dd><dl>
+        
+  <dt><a href="api.html#libaudioverse.SourceNode.max_distance">(libaudioverse.SourceNode attribute)</a>
+  </dt>
+
+      </dl></dd>
       
-  <dt><a href="api.html#libaudioverse.SourceNode.max_reverb_level">max_reverb_level (libaudioverse.SourceNode attribute)</a>
+  <dt><a href="api.html#libaudioverse.EnvironmentNode.max_reverb_level">max_reverb_level (libaudioverse.EnvironmentNode attribute)</a>
   </dt>
 
+      <dd><dl>
+        
+  <dt><a href="api.html#libaudioverse.SourceNode.max_reverb_level">(libaudioverse.SourceNode attribute)</a>
+  </dt>
+
+      </dl></dd>
       
   <dt><a href="api.html#libaudioverse.MemoryError">MemoryError</a>
   </dt>
@@ -1095,9 +1105,15 @@
   </dt>
 
       
-  <dt><a href="api.html#libaudioverse.SourceNode.min_reverb_level">min_reverb_level (libaudioverse.SourceNode attribute)</a>
+  <dt><a href="api.html#libaudioverse.EnvironmentNode.min_reverb_level">min_reverb_level (libaudioverse.EnvironmentNode attribute)</a>
   </dt>
 
+      <dd><dl>
+        
+  <dt><a href="api.html#libaudioverse.SourceNode.min_reverb_level">(libaudioverse.SourceNode attribute)</a>
+  </dt>
+
+      </dl></dd>
       
   <dt><a href="api.html#libaudioverse.GenericNode.mul">mul (libaudioverse.GenericNode attribute)</a>
   </dt>
@@ -1403,6 +1419,10 @@
   </dt>
 
       
+  <dt><a href="api.html#libaudioverse.SourceNode.set_properties_from_environment">set_properties_from_environment() (libaudioverse.SourceNode method)</a>
+  </dt>
+
+      
   <dt><a href="api.html#libaudioverse.FftConvolverNode.set_response">set_response() (libaudioverse.FftConvolverNode method)</a>
   </dt>
 
@@ -1428,6 +1448,8 @@
   </dt>
 
       </dl></dd>
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="api.html#libaudioverse.BlitNode.should_normalize">should_normalize (libaudioverse.BlitNode attribute)</a>
   </dt>
@@ -1438,8 +1460,6 @@
   </dt>
 
       </dl></dd>
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="api.html#libaudioverse.shutdown">shutdown() (in module libaudioverse)</a>
   </dt>
@@ -1628,7 +1648,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'build223',
+            VERSION:'build237',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
