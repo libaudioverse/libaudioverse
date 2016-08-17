@@ -91,13 +91,14 @@ void SourceNode::reset() {
 float calculateGainForDistanceModel(int model, float distance, float maxDistance, float referenceDistance) {
 	float retval = 1.0f;
 	float adjustedDistance = std::max<float>(0.0f, distance-referenceDistance);
-		if(adjustedDistance > maxDistance) {
+	if(adjustedDistance > maxDistance) {
 		retval = 0.0f;
 	}
 	else {
+		float distancePercent = adjustedDistance/maxDistance;
 		switch(model) {
-			case Lav_DISTANCE_MODEL_LINEAR: retval = 1.0f-(adjustedDistance/maxDistance); break;
-			case Lav_DISTANCE_MODEL_INVERSE: retval = 1.0f/adjustedDistance; break;
+			case Lav_DISTANCE_MODEL_LINEAR: retval = 1.0f-distancePercent; break;
+			case Lav_DISTANCE_MODEL_INVERSE: retval = 1.0f/(1+70*distancePercent); break;
 		}
 	}
 

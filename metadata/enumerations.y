@@ -80,9 +80,13 @@ enumerations:
     doc_description: |
       used in the 3D components of this library.
       Indicates how sound should become quieter as objects move away from the listener.
+      
+      Libaudioverse computes the distance from the center of the source to the listener, then subtracts the size.
+      In the following, {{"distance"|codelit}} refers to this distance.
+      Libaudioverse also computes a second value called {{"distancePercent"|codelit}}; specifically, {{"distancePercent = distance/maxDistance"|codelit}}.
     members:
-      Lav_DISTANCE_MODEL_LINEAR: Sound falls off as {{"1-(distance/maxDistance)"|codelit}}.
-      Lav_DISTANCE_MODEL_INVERSE: Sounds fall off as {{"1/distance"|codelit}}.
+      Lav_DISTANCE_MODEL_LINEAR: Sound falls off as {{"1-distancePercent"|codelit}}.
+      Lav_DISTANCE_MODEL_INVERSE: Sounds fall off as {{"1/(1+70*distancePercent)"|codelit}}.  The constant in this equation was determined experimentally.  This distance model emphasizes distance changes when sounds are close, but treats distance changes of further away sources more subtly.
   Lav_FDN_FILTER_TYPES:
     doc_description: Possible filter types for a feedback delay network's feedback path.
     members:
