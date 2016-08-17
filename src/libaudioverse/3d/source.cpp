@@ -98,7 +98,7 @@ float calculateGainForDistanceModel(int model, float distance, float maxDistance
 		double distancePercent = (double)adjustedDistance/maxDistance;
 		switch(model) {
 			case Lav_DISTANCE_MODEL_LINEAR: retval = 1.0-distancePercent; break;
-			case Lav_DISTANCE_MODEL_INVERSE: retval = 1.0/(1+70*distancePercent); break;
+			case Lav_DISTANCE_MODEL_INVERSE: retval = 1.0/(1+315*distancePercent); break;
 			case Lav_DISTANCE_MODEL_INVERSE_SQUARE: retval = 1.0/(1+315*distancePercent*distancePercent); break;
 		}
 	}

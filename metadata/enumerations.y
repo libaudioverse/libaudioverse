@@ -86,7 +86,7 @@ enumerations:
       Libaudioverse also computes a second value called {{"distancePercent"|codelit}}; specifically, {{"distancePercent = distance/maxDistance"|codelit}}.
     members:
       Lav_DISTANCE_MODEL_LINEAR: Sound falls off as {{"1-distancePercent"|codelit}}.
-      Lav_DISTANCE_MODEL_INVERSE: Sounds fall off as {{"1/(1+70*distancePercent)"|codelit}}.  The constant in this equation was determined experimentally.  This distance model emphasizes distance changes when sounds are close, but treats distance changes of further away sources more subtly.
+      Lav_DISTANCE_MODEL_INVERSE: Sounds fall off as {{"1/(1+315*distancePercent)"|codelit}}.  Just before {{"maxDistance"|codelit}}, the gain of the sound will be approximately -25 DB.  This distance model emphasizes distance changes when sounds are close, but treats distance changes of further away sources more subtly.  For full benefit of the effect of close sounds, this distance model must be used with fairly large values for {{"maxDistance"|codelit}}, usually around 300.
       Lav_DISTANCE_MODEL_INVERSE_SQUARE: Sounds fall off as {{"1.0/(1+315*distancePercent*distancePercent)"|codelit}}.  This is a standard inverse square law, modified such that the sound volume just before {{"maxDistance"|codelit}} is about -25 DB.  Of the available distance models, this is the closest to an accurate simulation of large, wide-open places such as fields and stadiums.
   Lav_FDN_FILTER_TYPES:
     doc_description: Possible filter types for a feedback delay network's feedback path.
