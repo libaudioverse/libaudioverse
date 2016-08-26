@@ -91,6 +91,7 @@ WasapiOutputDevice::WasapiOutputDevice(std::function<void(float*, int)> callback
 		throw AudioIOError("Couldn't get Wasapi buffer size.");
 	}
 	wasapi_buffer_size = bufferSize;
+	logDebug("Wasapi buffer size: %i", wasapi_buffer_size);
 	int outputSr = this->format.Format.nSamplesPerSec;
 	//We need to be a bit more than a period or we will fail.
 	//maxLatency is always at least 2 periods.
@@ -157,7 +158,9 @@ void WasapiOutputDevice::wasapiMixingThreadFunction() {
 		client->GetCurrentPadding(&padding);
 		//Wait until we have enough data.
 		if(padding > targetPadding) {
-			std::this_thread::sleep_for(std::chrono::milliseconds((padding-targetPadding)*1000/output_sr));
+			int sleepFrames = (targetPadding-padding)/2;
+			int sleepMs = sleepFrames*1000/output_sr;
+			if(sleepMs > 0) std::this_thread::sleep_for(std::chrono::milliseconds(sleepMs));
 			continue;
 		}
 		latency_predictor->beginPass();
