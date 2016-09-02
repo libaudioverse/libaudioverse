@@ -59,12 +59,14 @@ std::unique_ptr<audio_io::OutputDeviceFactory> &getOutputDeviceFactory() {
 
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetCount(unsigned int* destination) {
 	PUB_BEGIN
+	INITCHECK;
 	*destination = (*audio_output_factory)->getOutputCount();
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetName(unsigned int index, char** destination) {
 	PUB_BEGIN
+	INITCHECK;
 	auto n = (*audio_output_factory)->getOutputNames();
 	if(index >= n.size()) ERROR(Lav_ERROR_RANGE, "Invalid device index.");
 	auto s = n[index];
@@ -78,6 +80,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_deviceGetName(unsigned int index, char** destin
 
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetIdentifierString(unsigned int index, char** destination) {
 	PUB_BEGIN
+	INITCHECK;
 	auto n = (*audio_output_factory)->getOutputNames();
 	if(index >= n.size()) ERROR(Lav_ERROR_RANGE, "Invalid device index.");
 	auto s = std::to_string(index);
@@ -91,6 +94,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_deviceGetIdentifierString(unsigned int index, c
 
 Lav_PUBLIC_FUNCTION LavError Lav_deviceGetChannels(unsigned int index, unsigned int* destination) {
 	PUB_BEGIN
+	INITCHECK;
 	auto c = (*audio_output_factory)->getOutputMaxChannels();
 	if(index >= c.size()) ERROR(Lav_ERROR_RANGE, "Invalid device index.");
 	*destination = c[index];

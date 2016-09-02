@@ -5,10 +5,12 @@ You may use this code under the terms of either license at your option.
 A copy of both licenses may be found in license.gpl and license.mpl at the root of this repository.
 If these files are unavailable to you, see either http://www.gnu.org/licenses/ (GPL V3 or later) or https://www.mozilla.org/en-US/MPL/2.0/ (MPL 2.0).*/
 #pragma once
-#include <mutex>
-#include <new>
 #include "../libaudioverse.h"
 #include "error.hpp" //needed by the standard catchblock macro, below.
+#include "initialization.hpp"
+#include <mutex>
+#include <new>
+#include <stdio.h>
 
 /**These are the most common macros.
 Also see logging.hpp, which has more.*/
@@ -38,5 +40,14 @@ return Lav_ERROR_NONE;
 
 //Either ERROR(code) or ERROR(code, message):
 #define ERROR(...) throw ErrorException(__VA_ARGS__, __FILE__, __LINE__)
+
+//Arrange to throw an error if we aren't initializerd.
+//This is used on a few functions which we know have to be called before anything else.
+//I.e. Since node creation needs a server, we need only check the server.
+#define INITCHECK do {\
+	if(isInitialized() == false) {\
+		ERROR(Lav_ERROR_NOT_INITIALIZED, "You cannot use this function before initializing the library");\
+	}\
+} while(0)
 
 #define STANDARD_PROPERTIES_BEGIN (-100)

@@ -5,6 +5,7 @@ enumerations:
     members:
       Lav_ERROR_NONE: No error occured.
       Lav_ERROR_UNKNOWN: Something went wrong.  This error indicates that we couldn't figure out what.
+      Lav_ERROR_NOT_INITIALIZED: Failure to call {{"Lav_initialized"|codelit}}.
       Lav_ERROR_TYPE_MISMATCH: Indicates an attempt to manipulate a property through a function that does not work with that property's type.
       Lav_ERROR_INVALID_PROPERTY: An attempt to access a property which does not exist on the specified node.
       Lav_ERROR_NULL_POINTER: You passed a null pointer into Libaudioverse in a context where null pointers are not allowed.

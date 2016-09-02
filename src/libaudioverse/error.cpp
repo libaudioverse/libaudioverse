@@ -11,32 +11,24 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 
 namespace libaudioverse_implementation {
 
-std::map<std::thread::id, ErrorException> *thread_local_errors = nullptr;
-
-void initializeErrorModule() {
-	thread_local_errors = new std::map<std::thread::id, ErrorException>();
-}
-
-void shutdownErrorModule() {
-	delete thread_local_errors;
-}
+std::map<std::thread::id, ErrorException> thread_local_errors;
 
 void recordError(ErrorException e) {
-	(*thread_local_errors)[std::this_thread::get_id()] = e;
+	thread_local_errors[std::this_thread::get_id()] = e;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_errorGetMessage(const char** destination) {
-	*destination = (*thread_local_errors)[std::this_thread::get_id()].message.c_str();
+	*destination = thread_local_errors[std::this_thread::get_id()].message.c_str();
 	return Lav_ERROR_NONE;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_errorGetFile(const char** destination) {
-	*destination = (*thread_local_errors)[std::this_thread::get_id()].file.c_str();
+	*destination = thread_local_errors[std::this_thread::get_id()].file.c_str();
 	return Lav_ERROR_NONE;
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_errorGetLine(int* destination) {
-	*destination = (*thread_local_errors)[std::this_thread::get_id()].line;
+	*destination = thread_local_errors[std::this_thread::get_id()].line;
 	return Lav_ERROR_NONE;
 }
 

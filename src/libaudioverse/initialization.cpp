@@ -14,6 +14,9 @@ If these files are unavailable to you, see either http://www.gnu.org/licenses/ (
 #include <libaudioverse/private/audio_devices.hpp>
 #include <libaudioverse/private/logging.hpp>
 #include <libaudioverse/private/hrtf.hpp>
+#include <libaudioverse/private/initialization.hpp>
+
+#include <atomic>
 
 namespace libaudioverse_implementation {
 
@@ -31,7 +34,6 @@ struct InitInfo {
 //Initialization stops at the first failed function and does not continue.
 InitInfo initializers[] = {
 	//Logging is implicit.
-	{"Error handling", initializeErrorModule},
 	{"Memory subsystem", initializeMemoryModule},
 	{"Audio backend", initializeDeviceFactory},
 	{"Metadata tables", initializeMetadata},
@@ -51,7 +53,6 @@ struct ShutdownInfo{
 //Termination never fails.
 //logging must always be last.
 ShutdownInfo shutdown_funcs[] = {
-	{"Error handling subsystem", shutdownErrorModule},
 	{"memory module", shutdownMemoryModule},
 	//Device factory needs to go near the end because it tries to log.
 	{"audio backend", shutdownDeviceFactory},
@@ -59,11 +60,13 @@ ShutdownInfo shutdown_funcs[] = {
 	{"logging", shutdownLogging},
 };
 
-unsigned int isInitialized = 0;
+std::atomic<int> initialization_count{0};
 
 Lav_PUBLIC_FUNCTION LavError Lav_initialize() {
 	PUB_BEGIN
-	if(isInitialized == 1) {
+	int ic = initialization_count.fetch_add(1)+1;
+	if(ic > 1) {
+		logDebug("Duplicate calls to initialization. This is call %i", ic+1);
 		return Lav_ERROR_NONE;
 	}
 	logDebug("Beginning initialization of Libaudioverse, revision %s", getGitRevision());
@@ -75,25 +78,30 @@ Lav_PUBLIC_FUNCTION LavError Lav_initialize() {
 		logDebug("Initializing %s.", initializers[i].name);
 		initializers[i].func();
 	}
-	isInitialized = 1;
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_shutdown() {
 	using namespace libaudioverse_implementation;
 	PUB_BEGIN
+	INITCHECK;
+	int ic = initialization_count.fetch_add(-1);
+	ic--;
+	if(ic) {
+		logDebug("Not shutting down. %i more calls to shutdown required.");
+		return Lav_ERROR_NONE;
+	}
 	logDebug("Beginning shutdown.");
 	for(int i = 0; i < sizeof(shutdown_funcs)/sizeof(shutdown_funcs[0]); i++) {
 		logDebug("Shutting down %s.", shutdown_funcs[i].name);
 		shutdown_funcs[i].func();
 	}
-	isInitialized = 0;
 	PUB_END
 }
 
 Lav_PUBLIC_FUNCTION LavError Lav_isInitialized(int* destination) {
 	PUB_BEGIN
-	*destination = isInitialized;
+	*destination = (int)(initialization_count.load() > 0);
 	PUB_END
 }
 

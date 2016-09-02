@@ -53,6 +53,7 @@ typedef void (*LavTimeCallback)(LavHandle handle, double time, void* userdata);
 enum Lav_ERRORS {
 	Lav_ERROR_NONE, //everything is OK.
 	Lav_ERROR_UNKNOWN, //We know something has gone wrong, but can't figure out what.
+	Lav_ERROR_NOT_INITIALIZED,
 	Lav_ERROR_TYPE_MISMATCH, //Tried to get/set something with the wrong type, i.e. properties.
 	Lav_ERROR_INVALID_PROPERTY, //one of the functions taking a slot got passed an invalid number.
 	Lav_ERROR_NULL_POINTER, //you passed a NULL pointer into something that shouldn't have it.

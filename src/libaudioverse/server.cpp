@@ -239,6 +239,7 @@ void Server::scheduleCall(double when, std::function<void(void)> func) {
 
 Lav_PUBLIC_FUNCTION LavError Lav_createServer(unsigned int sr, unsigned int blockSize, LavHandle* destination) {
 	PUB_BEGIN
+	INITCHECK;
 	auto shared = std::make_shared<Server>(sr, blockSize, 0);
 	shared->completeInitialization();
 	*destination = outgoingObject(shared);
