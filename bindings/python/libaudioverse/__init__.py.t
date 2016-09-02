@@ -18,6 +18,7 @@ import os.path
 import numbers
 import math
 import operator
+import contextlib
 
 def find_datafiles():
     import platform
@@ -131,6 +132,16 @@ def shutdown():
     global _initialized
     _initialized = False
     _lav.shutdown()
+
+@contextlib.contextmanager
+def InitializationManager():
+    """Use this with a with block to manage Libaudioverse initialization and shutdown.
+
+The advantage of this function is that Libaudioverse will shutdown properly in all cases that involve Python exceptions. While segfaulting the interpreter will not cause a shutdown, exceptions unrelated to Libaudioverse will.
+Since failure to call shutdown can cause crashes, this is the preferred method of initialization in production applications; it will prevent many types of crashes in your app from turning into Libaudioverse crashes."""
+    initialize()
+    yield
+    shutdown()
 
 class _CallbackWrapper(object):
 
