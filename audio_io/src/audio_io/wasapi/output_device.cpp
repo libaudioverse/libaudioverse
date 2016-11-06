@@ -158,7 +158,7 @@ void WasapiOutputDevice::wasapiMixingThreadFunction() {
 		client->GetCurrentPadding(&padding);
 		//Wait until we have enough data.
 		if(padding > targetPadding) {
-			int sleepFrames = (targetPadding-padding)/2;
+			int sleepFrames = (padding-targetPadding)/2;
 			int sleepMs = sleepFrames*1000/output_sr;
 			if(sleepMs > 0) std::this_thread::sleep_for(std::chrono::milliseconds(sleepMs));
 			continue;
