@@ -1,77 +1,51 @@
-#Contributing
-
-Note: This document is a draft. Parts of this process need legal review before I can accept contributions.
+# Contributing
 
 Thank you for your interest in contributing to Libaudioverse.  Contributions are always welcome.
 
-please read this file in its entirety before coding.  If you don't, you may be wasting time.
+Our goal is to accept your contribution with a minimum of wasted time on both sides.  To that end, please read this file in its entirety before coding.  The purpose of the following is to lay out our standards so that you can meet them as quickly as possible, as opposed to spending significant time on something only to be told that your changes are rejected.
 
-If you do not yet have a GitHub account, you should create one now.
-If you intend to code, you should also install Git.
-Providing assistance with these tasks is beyond the scope of this document.
+## Guidelines for Bug Reports
 
-##Issues
+When submitting a bug report, please include at least the following information: the platform you are on, the language you are accessing Libaudioverse from, whether you are using 32 bit or 64 bit Libaudioverse, and steps to reproduce the problem.
+If possible, please also include an executable test case.  The easier it is to run a program that demonstrates the bug, the faster it can be addressed.
+Audio recordings can be helpful, but are not always required.  If getting a recording is difficult, wait for it to be requested.
 
-All changes to Libaudioverse which are not trivial bug fixes must begin as an issue, opened against GitHub.
-Please do not use issues to ask for help with using Libaudioverse.
-Instead, [use the Google Group](https://groups.google.com/a/camlorn.net/d/forum/libaudioverse).
+## Guidelines for Code Contributions
 
-If your issue is a bug, please be sure to indicate which version of Libaudioverse you are using, which platform you are using it on, and from which language you are using it.
+before contributing code, please note the following:
 
-If you are requesting a feature, be aware that why is much more important than how.
-The best thing you can do to make a case for a feature is explain what can be done with it.
-Including use cases is extremely helpful.
-Proposing an initial design is not necessary.
-if you don't, we can work it out as part of the discussion.
+-  All contributions must be made against the development branch and submitted  as GitHub pull requests.
 
-##Pull Requests
+- I may refuse your pull request.  If what you want to do will take a significant amount of time, ask first.  Also see below for guidelines on proposing new features.
 
-to be accepted and merged, a pull request must meet the following requirements:
+-  Style is important.  This is a multi-language project without specific style guidelines, but trying to match the style of surrounding code is essential.
 
-- You must have signed the CAA and you must indicate that you have done so in every PR you submit. I will eventually automate this process.  See the next section for instructions on signing the CAA, including what to do if you are doing work on behalf of an employer.
+- Do not contribute bindings at this time.  The bindings generator is due for a complete rewrite to make it simpler and actually usable; coding against it will make this process more complicated.
 
-- Every commit in your PR must be identified with a GitHub user.  If any of them are not you, they must also sign the CAA.
+-  Code in this repository must be maintained by people who are not you.  To that end, we will review all pull requests with an eye to any potential problems.  Fixing such problems falls on you; your pull request will not be merged until you have.
 
-- A pull request must be made against the development branch.
+- Responsibility for rebasing on top of upstream changes and fixing merge conflicts falls on you; only conflict-free pull requests will be accepted
 
-- It must pass CI.  If this is impractical, you need to give a good reason why.
+- Pull requests will only be accepted if they pass continuous integration.
 
-- If your pull request has previous discussion, it should link the related issue or thread.
+- Finally, by submitting a pull request, you agree that your  contribution is compatible with and may be used under Libaudioverse's licensing terms, specifically that such code can be used under either or both the Gnu General Public License V3 or later and/or the Mozilla Public License 2.0.
 
-There are two ways to get me to close a pull request immediately:
+## Guidelines for New Features
 
-- If you or someone else who owns the work indicates that you are unwilling to sign the CAA.  I do not accept code from people who have not done so.
+It is all too easy for projects such as this to grow out of control, gaining a million features that no one uses.  To that end, adding new functionality should start with opening an issue proposing a design for the feature.  You are strongly encouraged not to begin coding the feature until receiving approval that the feature will be accepted.
 
-- if you are attempting to add a feature without previous discussion.
+The following are the criteria we consider when adding features to Libaudioverse.  Showing how your proposal meets them is a good way to argue for it:
 
-Once you open a pull request and it meets all the requirements, I will review the changes, pointing out any problems I find.
-Once anything that comes up is resolved, I will merge it and your code will be in Libaudioverse.
+- The functionality must not currently be possible.  Libaudioverse does not want to offer 5 ways to do everything.
 
-Libaudioverse does not currently have a style guide.
-If you are creating a binding, you should follow the default style of the language in question.
-For anything else, try to match the code around you.
-In terms of style, the most important thing is consistency.
+- The feature must not be an undue maintenance burden.  As  above, code in this repository is code we are committing to maintain with or without you.
 
-##The CAA
+- Someone must be willing to code it.  Asking for and getting approval for a feature is only the beginning.  The fastest way to get the feature is to be willing to write it yourself.
 
-Libaudioverse requires that all contributors submitting code or documentation changes sign a copyright assignment agreement (CAA).
-This  agreement gives me the power to use your contribution under any license, provided that I also make it available under the license you used when giving it to me.
-Note that the proceeding summary is not legally binding in any way.
-The only authoritative documents are the agreements themselves, either
-[the Individual Copyright Assignment Agreement (ICAA)](http://camlorn.github.io/libaudioverse/icla.pdf)
-or the
-[Entity Copyright Assignment Agreement (ECAA)](http://camlorn.github.io/libaudioverse/ecaa.pdf).
+- The functionality must be useful, in the sense that there must be consensus that people would use it if it existed.
 
-If you are an individual and are  not doing work on behalf of an employer, signing the CAA is done electronically through [this Google Form](https://docs.google.com/forms/d/1wqbJROb7SRhjdvtvNVuURsARdRGNzc_1uY2rd1abei0/viewform).
-You will be signing the ICAA.
-I only require you to do so once, though you will need to indicate that you have signed on all PRs you submit.
+- Finally, the functionality must not make future plans impossible.
 
-If you are doing work on behalf of an employer, you must indicate that this is the case on the PR and get your employer to sign the ECAA for you.
-The easiest way to do this is to have someone with the power to enter into legal agreements on behalf of your employer download and fill out the ECAA, e-mailing me a copy of the completed document at camlorn@camlorn.net.
-They should also include your GitHub username.
+It is anticipated that features will start with a design, be refigned into a final form, and then implemented.  If you implement a feature and deviate significantly from the original design (especially without justification), your pull request will not be merged until you either bring it in line with the design or provide a justification.  While this project does not have an RFC process, you should think along those lines.  We may adopt something more formal in future.
 
-Please be aware that being payed by your employer to work on Libaudioverse is not the only case in which the ECAA may be required.
-Using company resources, doing work on company time, or being employed by someone to work on software similar to Libaudioverse in any way are also examples of cases where your employer may be able to claim ownership of copyright.
-if you have any doubt whatsoever as to whether or not this is the case, please raise your concerns on the PR or contact me at camlorn@camlorn.net beforehand.
-
-Finally, I am willing to accept signed CAAs by mail, but you will need to e-mail me beforehand to work out the details.
+If you are implementing new functionality and it is going to take a significant amount of time, you are encouraged to open a pull request whose title starts with `[WIP]`.  This will allow anyone interested to observe your progress and potentially catch problems as they arise.
