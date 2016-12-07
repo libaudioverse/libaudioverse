@@ -17,3 +17,4 @@ venv/
 mit kemar dataset/
 #Python bytecode caches.
 __pyecache__
+out.txt
