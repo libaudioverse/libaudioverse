@@ -1,4 +1,5 @@
 #This file is kept in case I ever need to replace or revise the license headers again.
+# Note that running this file does not legally change license statuses in any way.
 import glob
 old_header = open("old_header.txt").read()
 new_header = open("new_header.txt").read()
