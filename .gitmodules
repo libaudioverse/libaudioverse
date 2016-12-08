@@ -3,13 +3,13 @@
 	url = https://github.com/g-truc/glm.git
 [submodule "audio_io"]
 	path = audio_io
-	url = https://github.com/camlorn/audio_io
+	url = https://github.com/libaudioverse/audio_io
 [submodule "powercores"]
 	path = powercores
-	url = https://github.com/camlorn/powercores
+	url = https://github.com/libaudioverse/powercores
 [submodule "logger_singleton"]
 	path = logger_singleton
-	url = https://github.com/camlorn/logger_singleton
+	url = https://github.com/libaudioverse/logger_singleton
 [submodule "speex_resampler_cpp"]
 	path = speex_resampler_cpp
-	url = https://github.com/camlorn/speex_resampler_cpp
+	url = https://github.com/libaudioverse/speex_resampler_cpp
