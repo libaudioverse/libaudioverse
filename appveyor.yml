@@ -45,6 +45,8 @@ configuration:
 install:
   #Store our git credentials. This comes from Appveyor docs.
   - ps: Add-Content "$env:USERPROFILE\.git-credentials" "https://$($env:GIT_ACCESS_TOKEN):x-oauth-basic@github.com`n"
+  # Apparently Appveyor doesn't download submodules by default.
+  - 'git submodule update --init --recursive'
   - '%PYTHON_COMMAND% -m pip install -U pip setuptools'
   #Bring in jinja2, pycparser, etc. Paramiko needs pycrypto.
   - '%PYTHON_COMMAND% -m pip install jinja2 pycparser pyyaml wheel twine pypandoc sphinx sphinx_rtd_theme %NUMPY_URL% %SCIPY_URL%'
