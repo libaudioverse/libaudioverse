@@ -5,7 +5,7 @@ Libaudioverse
 
 [![Linux Build Status](https://travis-ci.org/libaudioverse/libaudioverse.svg?branch=master)](https://travis-ci.org/camlorn/libaudioverse)
 
-[GitHub](http://github.com/camlorn/libaudioverse)
+[GitHub](http://github.com/libaudioverse/libaudioverse)
 
 ##Introduction##
 
