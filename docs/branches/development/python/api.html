@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>The Libaudioverse API &mdash; Libaudioverse build251 documentation</title>
+  <title>The Libaudioverse API &mdash; Libaudioverse build256 documentation</title>
   
 
   
@@ -33,7 +33,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="Libaudioverse build251 documentation" href="index.html"/>
+    <link rel="top" title="Libaudioverse build256 documentation" href="index.html"/>
         <link rel="prev" title="Python-specific Notes" href="python-specifics.html"/> 
 
   
@@ -120,7 +120,7 @@
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="_sources/api.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/api.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -562,7 +562,7 @@ If crossfading is enabled, moving the panner will slowly fade it to the new posi
 
 <dl class="class">
 <dt id="libaudioverse.AutomatedProperty">
-<em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">AutomatedProperty</code><span class="sig-paren">(</span><em>handle</em>, <em>slot</em>, <em>getter</em>, <em>setter</em>, <em>converter=&lt;function LibaudioverseProperty.&lt;lambda&gt; at 0x00000014DC8EA268&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.AutomatedProperty" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">AutomatedProperty</code><span class="sig-paren">(</span><em>handle</em>, <em>slot</em>, <em>getter</em>, <em>setter</em>, <em>converter=&lt;function LibaudioverseProperty.&lt;lambda&gt; at 0x044540C0&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.AutomatedProperty" title="Permalink to this definition">¶</a></dt>
 <dd><p>A property that supports automation and node connection.</p>
 <dl class="method">
 <dt id="libaudioverse.AutomatedProperty.cancel_automators">
@@ -700,55 +700,55 @@ It is found here:
 <dd><p>Indicates a biquad filter type, used with the <a class="reference internal" href="#libaudioverse.BiquadNode" title="libaudioverse.BiquadNode"><code class="xref py py-class docutils literal"><span class="pre">BiquadNode</span></code></a> and in a few other places.</p>
 <dl class="attribute">
 <dt id="libaudioverse.BiquadTypes.allpass">
-<code class="descname">allpass</code><em class="property"> = &lt;BiquadTypes.allpass: 4&gt;</em><a class="headerlink" href="#libaudioverse.BiquadTypes.allpass" title="Permalink to this definition">¶</a></dt>
+<code class="descname">allpass</code><em class="property"> = 4</em><a class="headerlink" href="#libaudioverse.BiquadTypes.allpass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Indicates an allpass filter.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.BiquadTypes.bandpass">
-<code class="descname">bandpass</code><em class="property"> = &lt;BiquadTypes.bandpass: 2&gt;</em><a class="headerlink" href="#libaudioverse.BiquadTypes.bandpass" title="Permalink to this definition">¶</a></dt>
+<code class="descname">bandpass</code><em class="property"> = 2</em><a class="headerlink" href="#libaudioverse.BiquadTypes.bandpass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Indicates a bandpass filter.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.BiquadTypes.highpass">
-<code class="descname">highpass</code><em class="property"> = &lt;BiquadTypes.highpass: 1&gt;</em><a class="headerlink" href="#libaudioverse.BiquadTypes.highpass" title="Permalink to this definition">¶</a></dt>
+<code class="descname">highpass</code><em class="property"> = 1</em><a class="headerlink" href="#libaudioverse.BiquadTypes.highpass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Indicates a highpass filter.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.BiquadTypes.highshelf">
-<code class="descname">highshelf</code><em class="property"> = &lt;BiquadTypes.highshelf: 7&gt;</em><a class="headerlink" href="#libaudioverse.BiquadTypes.highshelf" title="Permalink to this definition">¶</a></dt>
+<code class="descname">highshelf</code><em class="property"> = 7</em><a class="headerlink" href="#libaudioverse.BiquadTypes.highshelf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Indicates a highshelf filter.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.BiquadTypes.identity">
-<code class="descname">identity</code><em class="property"> = &lt;BiquadTypes.identity: 8&gt;</em><a class="headerlink" href="#libaudioverse.BiquadTypes.identity" title="Permalink to this definition">¶</a></dt>
+<code class="descname">identity</code><em class="property"> = 8</em><a class="headerlink" href="#libaudioverse.BiquadTypes.identity" title="Permalink to this definition">¶</a></dt>
 <dd><p>This filter does nothing.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.BiquadTypes.lowpass">
-<code class="descname">lowpass</code><em class="property"> = &lt;BiquadTypes.lowpass: 0&gt;</em><a class="headerlink" href="#libaudioverse.BiquadTypes.lowpass" title="Permalink to this definition">¶</a></dt>
+<code class="descname">lowpass</code><em class="property"> = 0</em><a class="headerlink" href="#libaudioverse.BiquadTypes.lowpass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Indicates a lowpass filter.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.BiquadTypes.lowshelf">
-<code class="descname">lowshelf</code><em class="property"> = &lt;BiquadTypes.lowshelf: 6&gt;</em><a class="headerlink" href="#libaudioverse.BiquadTypes.lowshelf" title="Permalink to this definition">¶</a></dt>
+<code class="descname">lowshelf</code><em class="property"> = 6</em><a class="headerlink" href="#libaudioverse.BiquadTypes.lowshelf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Indicates a lowshelf filter.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.BiquadTypes.notch">
-<code class="descname">notch</code><em class="property"> = &lt;BiquadTypes.notch: 3&gt;</em><a class="headerlink" href="#libaudioverse.BiquadTypes.notch" title="Permalink to this definition">¶</a></dt>
+<code class="descname">notch</code><em class="property"> = 3</em><a class="headerlink" href="#libaudioverse.BiquadTypes.notch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Indicates a notch filter.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.BiquadTypes.peaking">
-<code class="descname">peaking</code><em class="property"> = &lt;BiquadTypes.peaking: 5&gt;</em><a class="headerlink" href="#libaudioverse.BiquadTypes.peaking" title="Permalink to this definition">¶</a></dt>
+<code class="descname">peaking</code><em class="property"> = 5</em><a class="headerlink" href="#libaudioverse.BiquadTypes.peaking" title="Permalink to this definition">¶</a></dt>
 <dd><p>Indicates a peaking filter.</p>
 </dd></dl>
 
@@ -1067,13 +1067,13 @@ The time is relative to now.</p>
 <dd><p>Specifies how to treat inputs to this node for upmixing and downmixing.</p>
 <dl class="attribute">
 <dt id="libaudioverse.ChannelInterpretations.discrete">
-<code class="descname">discrete</code><em class="property"> = &lt;ChannelInterpretations.discrete: 0&gt;</em><a class="headerlink" href="#libaudioverse.ChannelInterpretations.discrete" title="Permalink to this definition">¶</a></dt>
+<code class="descname">discrete</code><em class="property"> = 0</em><a class="headerlink" href="#libaudioverse.ChannelInterpretations.discrete" title="Permalink to this definition">¶</a></dt>
 <dd><p>If channel counts mismatch, don&#8217;t apply mixing matrices. Either drop or fill with zeros as appropriate.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.ChannelInterpretations.speakers">
-<code class="descname">speakers</code><em class="property"> = &lt;ChannelInterpretations.speakers: 1&gt;</em><a class="headerlink" href="#libaudioverse.ChannelInterpretations.speakers" title="Permalink to this definition">¶</a></dt>
+<code class="descname">speakers</code><em class="property"> = 1</em><a class="headerlink" href="#libaudioverse.ChannelInterpretations.speakers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply mixing matrices if needed.</p>
 </dd></dl>
 
@@ -1444,19 +1444,19 @@ In the following, <code class="docutils literal"><span class="pre">distance</spa
 Libaudioverse also computes a second value called <code class="docutils literal"><span class="pre">distancePercent</span></code>; specifically, <code class="docutils literal"><span class="pre">distancePercent</span> <span class="pre">=</span> <span class="pre">distance/maxDistance</span></code>.</p>
 <dl class="attribute">
 <dt id="libaudioverse.DistanceModels.inverse">
-<code class="descname">inverse</code><em class="property"> = &lt;DistanceModels.inverse: 1&gt;</em><a class="headerlink" href="#libaudioverse.DistanceModels.inverse" title="Permalink to this definition">¶</a></dt>
+<code class="descname">inverse</code><em class="property"> = 1</em><a class="headerlink" href="#libaudioverse.DistanceModels.inverse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sounds fall off as <code class="docutils literal"><span class="pre">1/(1+315*distancePercent)</span></code>.  Just before <code class="docutils literal"><span class="pre">maxDistance</span></code>, the gain of the sound will be approximately -25 DB.  This distance model emphasizes distance changes when sounds are close, but treats distance changes of further away sources more subtly.  For full benefit of the effect of close sounds, this distance model must be used with fairly large values for <code class="docutils literal"><span class="pre">maxDistance</span></code>, usually around 300.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.DistanceModels.inverse_square">
-<code class="descname">inverse_square</code><em class="property"> = &lt;DistanceModels.inverse_square: 2&gt;</em><a class="headerlink" href="#libaudioverse.DistanceModels.inverse_square" title="Permalink to this definition">¶</a></dt>
+<code class="descname">inverse_square</code><em class="property"> = 2</em><a class="headerlink" href="#libaudioverse.DistanceModels.inverse_square" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sounds fall off as <code class="docutils literal"><span class="pre">1.0/(1+315*distancePercent*distancePercent)</span></code>.  This is a standard inverse square law, modified such that the sound volume just before <code class="docutils literal"><span class="pre">maxDistance</span></code> is about -25 DB.  Of the available distance models, this is the closest to an accurate simulation of large, wide-open places such as fields and stadiums.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.DistanceModels.linear">
-<code class="descname">linear</code><em class="property"> = &lt;DistanceModels.linear: 0&gt;</em><a class="headerlink" href="#libaudioverse.DistanceModels.linear" title="Permalink to this definition">¶</a></dt>
+<code class="descname">linear</code><em class="property"> = 0</em><a class="headerlink" href="#libaudioverse.DistanceModels.linear" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sound falls off as <code class="docutils literal"><span class="pre">1-distancePercent</span></code>.</p>
 </dd></dl>
 
@@ -1738,19 +1738,19 @@ When the buffer finishes playing, the source is automatically disposed of.</p>
 <dd><p>Possible filter types for a feedback delay network&#8217;s feedback path.</p>
 <dl class="attribute">
 <dt id="libaudioverse.FdnFilterTypes.disabled">
-<code class="descname">disabled</code><em class="property"> = &lt;FdnFilterTypes.disabled: 0&gt;</em><a class="headerlink" href="#libaudioverse.FdnFilterTypes.disabled" title="Permalink to this definition">¶</a></dt>
+<code class="descname">disabled</code><em class="property"> = 0</em><a class="headerlink" href="#libaudioverse.FdnFilterTypes.disabled" title="Permalink to this definition">¶</a></dt>
 <dd><p>Don&#8217;t insert filters on the feedback path.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.FdnFilterTypes.highpass">
-<code class="descname">highpass</code><em class="property"> = &lt;FdnFilterTypes.highpass: 2&gt;</em><a class="headerlink" href="#libaudioverse.FdnFilterTypes.highpass" title="Permalink to this definition">¶</a></dt>
+<code class="descname">highpass</code><em class="property"> = 2</em><a class="headerlink" href="#libaudioverse.FdnFilterTypes.highpass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Insert highpass filters on the FDN&#8217;s feedback path.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.FdnFilterTypes.lowpass">
-<code class="descname">lowpass</code><em class="property"> = &lt;FdnFilterTypes.lowpass: 1&gt;</em><a class="headerlink" href="#libaudioverse.FdnFilterTypes.lowpass" title="Permalink to this definition">¶</a></dt>
+<code class="descname">lowpass</code><em class="property"> = 1</em><a class="headerlink" href="#libaudioverse.FdnFilterTypes.lowpass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Insert lowpass filters on the FDN&#8217;s feedback path.</p>
 </dd></dl>
 
@@ -2858,7 +2858,7 @@ If you feed this node a signal that is zero, it will slowly decrease the output 
 
 <dl class="class">
 <dt id="libaudioverse.LibaudioverseProperty">
-<em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">LibaudioverseProperty</code><span class="sig-paren">(</span><em>handle</em>, <em>slot</em>, <em>getter</em>, <em>setter</em>, <em>converter=&lt;function LibaudioverseProperty.&lt;lambda&gt; at 0x00000014DC8EA268&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.LibaudioverseProperty" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">LibaudioverseProperty</code><span class="sig-paren">(</span><em>handle</em>, <em>slot</em>, <em>getter</em>, <em>setter</em>, <em>converter=&lt;function LibaudioverseProperty.&lt;lambda&gt; at 0x044540C0&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.LibaudioverseProperty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Proxy to Libaudioverse properties.</p>
 <p>All properties support resetting and type query.</p>
 <dl class="attribute">
@@ -2875,25 +2875,25 @@ If you feed this node a signal that is zero, it will slowly decrease the output 
 <dd><p>Possible levels for logging.</p>
 <dl class="attribute">
 <dt id="libaudioverse.LoggingLevels.critical">
-<code class="descname">critical</code><em class="property"> = &lt;LoggingLevels.critical: 10&gt;</em><a class="headerlink" href="#libaudioverse.LoggingLevels.critical" title="Permalink to this definition">¶</a></dt>
+<code class="descname">critical</code><em class="property"> = 10</em><a class="headerlink" href="#libaudioverse.LoggingLevels.critical" title="Permalink to this definition">¶</a></dt>
 <dd><p>Logs critical messages such as failures to initialize and error conditions.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.LoggingLevels.debug">
-<code class="descname">debug</code><em class="property"> = &lt;LoggingLevels.debug: 30&gt;</em><a class="headerlink" href="#libaudioverse.LoggingLevels.debug" title="Permalink to this definition">¶</a></dt>
+<code class="descname">debug</code><em class="property"> = 30</em><a class="headerlink" href="#libaudioverse.LoggingLevels.debug" title="Permalink to this definition">¶</a></dt>
 <dd><p>Logs everything possible.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.LoggingLevels.info">
-<code class="descname">info</code><em class="property"> = &lt;LoggingLevels.info: 20&gt;</em><a class="headerlink" href="#libaudioverse.LoggingLevels.info" title="Permalink to this definition">¶</a></dt>
+<code class="descname">info</code><em class="property"> = 20</em><a class="headerlink" href="#libaudioverse.LoggingLevels.info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Logs informative messages.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.LoggingLevels.off">
-<code class="descname">off</code><em class="property"> = &lt;LoggingLevels.off: 40&gt;</em><a class="headerlink" href="#libaudioverse.LoggingLevels.off" title="Permalink to this definition">¶</a></dt>
+<code class="descname">off</code><em class="property"> = 40</em><a class="headerlink" href="#libaudioverse.LoggingLevels.off" title="Permalink to this definition">¶</a></dt>
 <dd><p>No log messages will be generated.</p>
 </dd></dl>
 
@@ -3007,19 +3007,19 @@ For something more nontraditional, use an amplitude panner.</p>
 This is the value of the node&#8217;s state property and determins how the node is processed.</p>
 <dl class="attribute">
 <dt id="libaudioverse.NodeStates.always_playing">
-<code class="descname">always_playing</code><em class="property"> = &lt;NodeStates.always_playing: 2&gt;</em><a class="headerlink" href="#libaudioverse.NodeStates.always_playing" title="Permalink to this definition">¶</a></dt>
+<code class="descname">always_playing</code><em class="property"> = 2</em><a class="headerlink" href="#libaudioverse.NodeStates.always_playing" title="Permalink to this definition">¶</a></dt>
 <dd><p>This node advances always.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.NodeStates.paused">
-<code class="descname">paused</code><em class="property"> = &lt;NodeStates.paused: 0&gt;</em><a class="headerlink" href="#libaudioverse.NodeStates.paused" title="Permalink to this definition">¶</a></dt>
+<code class="descname">paused</code><em class="property"> = 0</em><a class="headerlink" href="#libaudioverse.NodeStates.paused" title="Permalink to this definition">¶</a></dt>
 <dd><p>This node is paused.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.NodeStates.playing">
-<code class="descname">playing</code><em class="property"> = &lt;NodeStates.playing: 1&gt;</em><a class="headerlink" href="#libaudioverse.NodeStates.playing" title="Permalink to this definition">¶</a></dt>
+<code class="descname">playing</code><em class="property"> = 1</em><a class="headerlink" href="#libaudioverse.NodeStates.playing" title="Permalink to this definition">¶</a></dt>
 <dd><p>This node advances if other nodes need audio from it.</p>
 </dd></dl>
 
@@ -3077,19 +3077,19 @@ Turning it on is sometimes helpful and sometimes not.</p>
 <dd><p>Specifies types of noise.</p>
 <dl class="attribute">
 <dt id="libaudioverse.NoiseTypes.brown">
-<code class="descname">brown</code><em class="property"> = &lt;NoiseTypes.brown: 2&gt;</em><a class="headerlink" href="#libaudioverse.NoiseTypes.brown" title="Permalink to this definition">¶</a></dt>
+<code class="descname">brown</code><em class="property"> = 2</em><a class="headerlink" href="#libaudioverse.NoiseTypes.brown" title="Permalink to this definition">¶</a></dt>
 <dd><p>Brown noise.  Brown noise decreases at 6 DB per octave.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.NoiseTypes.pink">
-<code class="descname">pink</code><em class="property"> = &lt;NoiseTypes.pink: 1&gt;</em><a class="headerlink" href="#libaudioverse.NoiseTypes.pink" title="Permalink to this definition">¶</a></dt>
+<code class="descname">pink</code><em class="property"> = 1</em><a class="headerlink" href="#libaudioverse.NoiseTypes.pink" title="Permalink to this definition">¶</a></dt>
 <dd><p>Pink noise.  Pink noise falls off at 3 DB per octave.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.NoiseTypes.white">
-<code class="descname">white</code><em class="property"> = &lt;NoiseTypes.white: 0&gt;</em><a class="headerlink" href="#libaudioverse.NoiseTypes.white" title="Permalink to this definition">¶</a></dt>
+<code class="descname">white</code><em class="property"> = 0</em><a class="headerlink" href="#libaudioverse.NoiseTypes.white" title="Permalink to this definition">¶</a></dt>
 <dd><p>gaussian white noise.</p>
 </dd></dl>
 
@@ -3198,31 +3198,31 @@ True if the filter is a highpass.</p>
 This is mostly for the <a class="reference internal" href="#libaudioverse.MultipannerNode" title="libaudioverse.MultipannerNode"><code class="xref py py-class docutils literal"><span class="pre">MultipannerNode</span></code></a> and the 3D components of this library.</p>
 <dl class="attribute">
 <dt id="libaudioverse.PanningStrategies.hrtf">
-<code class="descname">hrtf</code><em class="property"> = &lt;PanningStrategies.hrtf: 0&gt;</em><a class="headerlink" href="#libaudioverse.PanningStrategies.hrtf" title="Permalink to this definition">¶</a></dt>
+<code class="descname">hrtf</code><em class="property"> = 0</em><a class="headerlink" href="#libaudioverse.PanningStrategies.hrtf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Indicates HRTF panning.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.PanningStrategies.stereo">
-<code class="descname">stereo</code><em class="property"> = &lt;PanningStrategies.stereo: 1&gt;</em><a class="headerlink" href="#libaudioverse.PanningStrategies.stereo" title="Permalink to this definition">¶</a></dt>
+<code class="descname">stereo</code><em class="property"> = 1</em><a class="headerlink" href="#libaudioverse.PanningStrategies.stereo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Indicates stereo panning.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.PanningStrategies.surround40">
-<code class="descname">surround40</code><em class="property"> = &lt;PanningStrategies.surround40: 2&gt;</em><a class="headerlink" href="#libaudioverse.PanningStrategies.surround40" title="Permalink to this definition">¶</a></dt>
+<code class="descname">surround40</code><em class="property"> = 2</em><a class="headerlink" href="#libaudioverse.PanningStrategies.surround40" title="Permalink to this definition">¶</a></dt>
 <dd><p>Indicates 4.0 surround sound (quadraphonic) panning.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.PanningStrategies.surround51">
-<code class="descname">surround51</code><em class="property"> = &lt;PanningStrategies.surround51: 3&gt;</em><a class="headerlink" href="#libaudioverse.PanningStrategies.surround51" title="Permalink to this definition">¶</a></dt>
+<code class="descname">surround51</code><em class="property"> = 3</em><a class="headerlink" href="#libaudioverse.PanningStrategies.surround51" title="Permalink to this definition">¶</a></dt>
 <dd><p>Indicates 5.1 surround sound panning.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.PanningStrategies.surround71">
-<code class="descname">surround71</code><em class="property"> = &lt;PanningStrategies.surround71: 4&gt;</em><a class="headerlink" href="#libaudioverse.PanningStrategies.surround71" title="Permalink to this definition">¶</a></dt>
+<code class="descname">surround71</code><em class="property"> = 4</em><a class="headerlink" href="#libaudioverse.PanningStrategies.surround71" title="Permalink to this definition">¶</a></dt>
 <dd><p>Indicates 7.1 surround sound panning.</p>
 </dd></dl>
 
@@ -3240,55 +3240,55 @@ This is mostly for the <a class="reference internal" href="#libaudioverse.Multip
 <dd><p>Indicates the type of a property.</p>
 <dl class="attribute">
 <dt id="libaudioverse.PropertyTypes.buffer">
-<code class="descname">buffer</code><em class="property"> = &lt;PropertyTypes.buffer: 8&gt;</em><a class="headerlink" href="#libaudioverse.PropertyTypes.buffer" title="Permalink to this definition">¶</a></dt>
+<code class="descname">buffer</code><em class="property"> = 8</em><a class="headerlink" href="#libaudioverse.PropertyTypes.buffer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Property holds a handle to a buffer.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.PropertyTypes.double">
-<code class="descname">double</code><em class="property"> = &lt;PropertyTypes.double: 2&gt;</em><a class="headerlink" href="#libaudioverse.PropertyTypes.double" title="Permalink to this definition">¶</a></dt>
+<code class="descname">double</code><em class="property"> = 2</em><a class="headerlink" href="#libaudioverse.PropertyTypes.double" title="Permalink to this definition">¶</a></dt>
 <dd><p>Property holds a 64-bit double.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.PropertyTypes.float">
-<code class="descname">float</code><em class="property"> = &lt;PropertyTypes.float: 1&gt;</em><a class="headerlink" href="#libaudioverse.PropertyTypes.float" title="Permalink to this definition">¶</a></dt>
+<code class="descname">float</code><em class="property"> = 1</em><a class="headerlink" href="#libaudioverse.PropertyTypes.float" title="Permalink to this definition">¶</a></dt>
 <dd><p>Property holds a 32-bit floating point value.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.PropertyTypes.float3">
-<code class="descname">float3</code><em class="property"> = &lt;PropertyTypes.float3: 4&gt;</em><a class="headerlink" href="#libaudioverse.PropertyTypes.float3" title="Permalink to this definition">¶</a></dt>
+<code class="descname">float3</code><em class="property"> = 4</em><a class="headerlink" href="#libaudioverse.PropertyTypes.float3" title="Permalink to this definition">¶</a></dt>
 <dd><p>Property holds a float3, a vector of 3 floats.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.PropertyTypes.float6">
-<code class="descname">float6</code><em class="property"> = &lt;PropertyTypes.float6: 5&gt;</em><a class="headerlink" href="#libaudioverse.PropertyTypes.float6" title="Permalink to this definition">¶</a></dt>
+<code class="descname">float6</code><em class="property"> = 5</em><a class="headerlink" href="#libaudioverse.PropertyTypes.float6" title="Permalink to this definition">¶</a></dt>
 <dd><p>Property holds a float6, a vector of 6 floats.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.PropertyTypes.float_array">
-<code class="descname">float_array</code><em class="property"> = &lt;PropertyTypes.float_array: 6&gt;</em><a class="headerlink" href="#libaudioverse.PropertyTypes.float_array" title="Permalink to this definition">¶</a></dt>
+<code class="descname">float_array</code><em class="property"> = 6</em><a class="headerlink" href="#libaudioverse.PropertyTypes.float_array" title="Permalink to this definition">¶</a></dt>
 <dd><p>Property is an array of floats.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.PropertyTypes.int">
-<code class="descname">int</code><em class="property"> = &lt;PropertyTypes.int: 0&gt;</em><a class="headerlink" href="#libaudioverse.PropertyTypes.int" title="Permalink to this definition">¶</a></dt>
+<code class="descname">int</code><em class="property"> = 0</em><a class="headerlink" href="#libaudioverse.PropertyTypes.int" title="Permalink to this definition">¶</a></dt>
 <dd><p>Property holds a 32-bit integer.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.PropertyTypes.int_array">
-<code class="descname">int_array</code><em class="property"> = &lt;PropertyTypes.int_array: 7&gt;</em><a class="headerlink" href="#libaudioverse.PropertyTypes.int_array" title="Permalink to this definition">¶</a></dt>
+<code class="descname">int_array</code><em class="property"> = 7</em><a class="headerlink" href="#libaudioverse.PropertyTypes.int_array" title="Permalink to this definition">¶</a></dt>
 <dd><p>Property is an array of ints.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.PropertyTypes.string">
-<code class="descname">string</code><em class="property"> = &lt;PropertyTypes.string: 3&gt;</em><a class="headerlink" href="#libaudioverse.PropertyTypes.string" title="Permalink to this definition">¶</a></dt>
+<code class="descname">string</code><em class="property"> = 3</em><a class="headerlink" href="#libaudioverse.PropertyTypes.string" title="Permalink to this definition">¶</a></dt>
 <dd><p>Property holds a string.</p>
 </dd></dl>
 
@@ -4088,7 +4088,7 @@ You must call it before the interpreter shuts down. Failure to do so will allow 
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'build251',
+            VERSION:'build256',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
