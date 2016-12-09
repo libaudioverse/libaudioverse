@@ -53,7 +53,7 @@ install:
   - mkdir tmp
   - cd tmp
   - echo Downloading Pandoc
-  - appveyor DownloadFile http://camlorn.net/appveyor/pandoc.exe
+  - appveyor DownloadFile https://files.camlorn.net/appveyor/pandoc.exe
   - echo Downloading Libsndfile.
   - mkdir bin
   - cd bin
