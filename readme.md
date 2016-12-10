@@ -34,9 +34,11 @@ NOTE: This is pre-alpha and supports Windows and Linux.  Mac is planned.
 
 ##Licensing##
 
-Libaudioverse is dual-licensed under the [Mozilla Public License 2.0](https://www.mozilla.org/en-US/MPL/2.0/) and [the Gnu General Public License, Version 3 or Later](http://www.gnu.org/licenses/gpl-3.0.en.html).
-This means that you may use this code under the terms of either license.
-Specific information on copyright canb be found in the file `LICENSE`, a copy of the Mozilla Public License version 2.0 in the file `license.mpl`, and a copy of the Gnu General Public License version 3 in `license.gpl`.
+See the file `COPYRIGHT` for the legalese.  This file is definitive, and the following a summary only.
+
+The non-legalese version is that Libaudioverse is dual-licensed under
+GPL V3 or later (see [here](http://www.gnu.org/licenses/] for GPL V3)
+and [MPL2](https://www.mozilla.org/en-US/MPL/2.0/).
 
 ##Documentation and Examples##
 
@@ -50,7 +52,7 @@ The second source of documentation is the API reference for your language of cho
 At the moment, this means [the Python API reference](https://libaudioverse.github.io/libaudioverse/docs/branches/master/python/index.html).
 The API references contain installation instructions and any notes specific to the language in question.
 
-Examples for all supported languages may be found in the [GitHub repository](http://github.com/camlorn/libaudioverse).
+Examples for all supported languages may be found in the [GitHub repository](http://github.com/libaudioverse/libaudioverse).
 These sets of examples aim to be equivalent and to demonstrate most critical features of Libaudioverse.
 This library is easy.
 In many cases, the examples will be enough to get you started.
