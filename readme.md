@@ -37,7 +37,7 @@ NOTE: This is pre-alpha and supports Windows and Linux.  Mac is planned.
 See the file `COPYRIGHT` for the legalese.  This file is definitive, and the following a summary only.
 
 The non-legalese version is that Libaudioverse is dual-licensed under
-GPL V3 or later (see [here](http://www.gnu.org/licenses/] for GPL V3)
+GPL V3 or later (see [here](http://www.gnu.org/licenses/) for GPL V3)
 and [MPL2](https://www.mozilla.org/en-US/MPL/2.0/).
 
 ##Documentation and Examples##
