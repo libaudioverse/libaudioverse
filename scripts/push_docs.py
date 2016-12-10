@@ -11,7 +11,7 @@ root = os.path.split(os.path.split(os.path.abspath(__file__))[0])[0]
 os.chdir(root)
 
 try:
-    subprocess.check_output(['git', 'clone', 'https://github.com/camlorn/libaudioverse', '-b', 'gh-pages', '--single-branch', 'libaudioverse_docs'],
+    subprocess.check_output(['git', 'clone', 'https://github.com/libaudioverse/libaudioverse', '-b', 'gh-pages', '--single-branch', 'libaudioverse_docs'],
     stderr = subprocess.STDOUT, shell = True)
     os.chdir("libaudioverse_docs")
     if not os.path.exists("docs"):
