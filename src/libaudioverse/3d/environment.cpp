@@ -137,7 +137,7 @@ void EnvironmentNode::playAsync(std::shared_ptr<Buffer> buffer, float x, float y
 	b->getProperty(Lav_BUFFER_BUFFER).setBufferValue(buffer);
 	if(fromCache == false) b->connect(0, s, 0);
 	b->getProperty(Lav_BUFFER_POSITION).setDoubleValue(0.0);
-	s->getProperty(Lav_ENVIRONMENT_POSITION).setFloat3Value(x, y, z);
+	s->getProperty(Lav_SOURCE_POSITION).setFloat3Value(x, y, z);
 	if(isDry) {
 		for(int i = 0; i < effect_sends.size(); i++) {
 			s->stopFeedingEffect(i);
