@@ -170,8 +170,12 @@ void EnvironmentNode::playAsync(std::shared_ptr<Buffer> buffer, float x, float y
 			s->isolate();
 			b->isolate();
 		}
-		//We let go of them so that they can delete if they want to.
-		//We don't want to extend lifetime guarantees into the event firing, as this event may remain set for a time.
+		// We let go of them so that they can delete if they want to.
+		// This is complicated. Essentially, the node can release while the callback is still going, as callbacks have their own locks.
+		// So dispatch a closure behind us on the callback thread.
+		// Note: this needs to be reworked if multiple threads ever get used for callbacks.
+		// It should fix itself when we handle issue #21.
+		s->getServer()->enqueueTask([b, s, e] () {});
 		b.reset();
 		s.reset();
 		e.reset();
