@@ -50,23 +50,27 @@ int Buffer::getChannels() {
 
 void Buffer::loadFromArray(int sr, int channels, int frames, float* inputData) {
 	int serverSr= (int)server->getSr();
-	if(data) {
-		delete[] data;
-		data = nullptr;
-	}
-	staticResamplerKernel(sr, serverSr, channels, frames, inputData, &(this->frames), &data);
-	if(data==nullptr) ERROR(Lav_ERROR_MEMORY);
-	this->channels = channels;
-	if(this->channels == 1) return; //It's already uninterleaved.
-	//Uninterleave the data and delete the old one.
-	float* newData = new float[this->channels*this->frames];
-	for(int ch = 0; ch < this->channels; ch++) {
-		for(int i = 0; i < this->frames; i++) {
-			newData[ch*this->frames+i] = data[this->channels*i+ch];
+	float* newData;
+	int newFrames;
+	staticResamplerKernel(sr, serverSr, channels, frames, inputData, &newFrames, &newData);
+	if(newData==nullptr) ERROR(Lav_ERROR_MEMORY);
+	float* newDataUninterleaved;
+	if(channels != 1) {
+		//Uninterleave the data and delete the old one.
+		newDataUninterleaved = new float[channels*frames];
+		for(int ch = 0; ch < channels; ch++) {
+			for(int i = 0; i < newFrames; i++) {
+				newDataUninterleaved[ch*newFrames+i] = newData[channels*i+ch];
+			}
 		}
+	} else {
+		newDataUninterleaved = newData;
 	}
-	delete[] data;
-	data = newData;
+	LOCK(*this);
+	if(this->data) delete[] this->data;
+	this->channels = channels;
+	this->frames = newFrames;
+	this->data = newDataUninterleaved;
 }
 
 float Buffer::getSample(int frame, int channel) {
@@ -127,11 +131,10 @@ Lav_PUBLIC_FUNCTION LavError Lav_bufferGetServer(LavHandle handle, LavHandle* de
 void loadFromFileReader(Buffer& buff, FileReader& fr) {
 	float* data = allocArray<float>(fr.getSampleCount());
 	fr.readAll(data);
-	{
-		LOCK(buff);
-		buff.throwIfInUse();
-		buff.loadFromArray(fr.getSr(), fr.getChannelCount(), fr.getSampleCount()/fr.getChannelCount(), data);
-	}
+	// The following two calls manage locks themselves.
+	// This is because resampling can take a long time.
+	buff.throwIfInUse();
+	buff.loadFromArray(fr.getSr(), fr.getChannelCount(), fr.getSampleCount()/fr.getChannelCount(), data);
 	freeArray(data);
 }
 
