@@ -86,7 +86,6 @@ enum Lav_PROPERTY_TYPES {
 	Lav_PROPERTYTYPE_INT,
 	Lav_PROPERTYTYPE_FLOAT,
 	Lav_PROPERTYTYPE_DOUBLE,
-	Lav_PROPERTYTYPE_STRING,
 	Lav_PROPERTYTYPE_FLOAT3,
 	Lav_PROPERTYTYPE_FLOAT6,
 	Lav_PROPERTYTYPE_FLOAT_ARRAY,
@@ -254,13 +253,11 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeResetProperty(LavHandle nodeHandle, int pro
 Lav_PUBLIC_FUNCTION LavError Lav_nodeSetIntProperty(LavHandle nodeHandle, int propertyIndex, int value);
 Lav_PUBLIC_FUNCTION LavError Lav_nodeSetFloatProperty(LavHandle nodeHandle, int propertyIndex, float value);
 Lav_PUBLIC_FUNCTION LavError Lav_nodeSetDoubleProperty(LavHandle nodeHandle, int propertyIndex, double value);
-Lav_PUBLIC_FUNCTION LavError Lav_nodeSetStringProperty(LavHandle nodeHandle, int propertyIndex, char* value);
 Lav_PUBLIC_FUNCTION LavError Lav_nodeSetFloat3Property(LavHandle nodeHandle, int propertyIndex, float v1, float v2, float v3);
 Lav_PUBLIC_FUNCTION LavError Lav_nodeSetFloat6Property(LavHandle nodeHandle, int propertyIndex, float v1, float v2, float v3, float v4, float v5, float v6);
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetIntProperty(LavHandle nodeHandle, int propertyIndex, int *destination);
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetFloatProperty(LavHandle nodeHandle, int propertyIndex, float *destination);
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetDoubleProperty(LavHandle nodeHandle, int propertyIndex, double *destination);
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetStringProperty(LavHandle nodeHandle, int propertyIndex, const char** destination);
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetFloat3Property(LavHandle nodeHandle, int propertyIndex, float* destination1, float* destination2, float* destination3);
 Lav_PUBLIC_FUNCTION LavError Lav_nodeGetFloat6Property(LavHandle nodeHandle, int propertyIndex, float* destinationV1, float* destinationV2, float* destinationV3, float* destinationV4, float* destinationV5, float* destinationV6);
 

@@ -405,12 +405,6 @@ functions:
       Set the specified double property.
     params:
       value: the new value of the property.
-  Lav_nodeSetStringProperty:
-    category: nodes
-    doc_description: |
-      Set the specified string property.
-    params:
-      value: the new value of the property.  Note that the specified string is copied and the memory may be freed.
   Lav_nodeSetFloat3Property:
     category: nodes
     doc_description: |
@@ -442,12 +436,6 @@ functions:
     category: nodes
     doc_description: |
       Get the specified double property.
-  Lav_nodeGetStringProperty:
-    category: nodes
-    doc_description: |
-      Get the specified string property.
-    params:
-      destination: After a call to this function, contains a pointer to a newly allocated string that is a copy of the value of the property.  Free this string with {{"Lav_free"|function}}.
   Lav_nodeGetIntPropertyRange:
     category: nodes
     doc_description: |

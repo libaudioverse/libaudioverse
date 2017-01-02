@@ -139,12 +139,6 @@ class Property {
 	std::vector<int> getIntArrayDefault();
 	void setIntArrayDefault(std::vector<int> d);
 
-	//strings:
-	const char* getStringValue();
-	void setStringValue(const char* s, bool avoidCallbacks= false);
-	const char* getStringDefault();
-	void setStringDefault(const char* s);
-
 	//Buffer properties.
 	std::shared_ptr<Buffer> getBufferValue();
 	void setBufferValue(std::shared_ptr<Buffer> b, bool avoidCallbacks = false);
@@ -170,7 +164,7 @@ class Property {
 	private:
 	int type, tag;
 	PropertyValue value, default_value, minimum_value, maximum_value;
-	std::string name, string_value, default_string_value;
+	std::string name;
 	std::vector<float> farray_value, default_farray_value;
 	std::vector<int> iarray_value, default_iarray_value;
 	std::shared_ptr<Buffer> buffer_value = nullptr;
@@ -207,7 +201,6 @@ Property* createFloatProperty(const char* name, float defaultValue, float min, f
 Property* createDoubleProperty(const char* name, double defaultValue, double min, double max);
 Property* createFloat3Property(const char* name, float defaultValue[3]);
 Property* createFloat6Property(const char* name, float defaultValue[6]);
-Property* createStringProperty(const char* name, const char* defaultValue);
 Property* createIntArrayProperty(const char* name, unsigned int minLength, unsigned int maxLength, unsigned int defaultLength, int minVal, int maxVal, int* defaultData);
 Property* createFloatArrayProperty(const char* name, unsigned int minLength, unsigned int maxLength, unsigned int defaultLength, float min, float max, float* defaultData);
 Property* createBufferProperty(const char* name);

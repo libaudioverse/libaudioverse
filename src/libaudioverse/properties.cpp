@@ -43,7 +43,6 @@ void Property::associateServer(std::shared_ptr<Server> server) {
 
 void Property::reset(bool avoidCallbacks) {
 	value = default_value;
-	string_value = default_string_value;
 	farray_value = default_farray_value;
 	iarray_value = default_iarray_value;
 	if(buffer_value) buffer_value->decrementUseCount();
@@ -456,24 +455,6 @@ void Property::setIntArrayDefault(std::vector<int> d) {
 	default_iarray_value = d;
 }
 
-const char* Property::getStringValue() {
-	return string_value.c_str();
-}
-
-void Property::setStringValue(const char* s, bool avoidCallbacks) {
-	string_value = s;
-	last_modified=server->getTickCount();
-	if(avoidCallbacks == false) firePostChangedCallback();
-}
-
-const char* Property::getStringDefault() {
-	return default_string_value.c_str();
-}
-
-void Property::setStringDefault(const char* s) {
-	default_string_value = s;
-}
-
 std::shared_ptr<Buffer> Property::getBufferValue() {
 	return buffer_value;
 }
@@ -612,14 +593,6 @@ Property* createFloat6Property(const char* name, float defaultValue[6]) {
 	retval->reset();
 	return retval;
 }	
-
-Property* createStringProperty(const char* name, const char* defaultValue) {
-	Property* retval = new Property(Lav_PROPERTYTYPE_STRING);
-	retval->setStringDefault(defaultValue);
-	retval->setName(name);
-	retval->reset();
-	return retval;
-}
 
 Property* createIntArrayProperty(const char* name, unsigned int minLength, unsigned int maxLength, unsigned int defaultLength, int min, int max, int* defaultData) {
 	auto prop = new Property(Lav_PROPERTYTYPE_INT_ARRAY);

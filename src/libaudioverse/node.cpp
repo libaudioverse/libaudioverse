@@ -475,7 +475,6 @@ std::string msg = "Property is a ";\
 if(_t == Lav_PROPERTYTYPE_INT) msg+="int";\
 else if(_t == Lav_PROPERTYTYPE_FLOAT) msg += "float";\
 else if(_t == Lav_PROPERTYTYPE_DOUBLE) msg += "double";\
-else if(_t == Lav_PROPERTYTYPE_STRING) msg += "string";\
 else if(_t == Lav_PROPERTYTYPE_FLOAT3) msg += "float3";\
 else if(_t == Lav_PROPERTYTYPE_FLOAT6) msg += "float6";\
 else if(_t == Lav_PROPERTYTYPE_INT_ARRAY) msg += "int array";\
@@ -521,14 +520,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeSetDoubleProperty(LavHandle nodeHandle, int
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_nodeSetStringProperty(LavHandle nodeHandle, int slot, char* value) {
-	PUB_BEGIN
-	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_STRING);
-	READONLY_CHECK
-	prop.setStringValue(value);
-	PUB_END
-}
-
 Lav_PUBLIC_FUNCTION LavError Lav_nodeSetFloat3Property(LavHandle nodeHandle, int slot, float v1, float v2, float v3) {
 	PUB_BEGIN
 	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_FLOAT3);
@@ -563,13 +554,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_nodeGetDoubleProperty(LavHandle nodeHandle, int
 	PUB_BEGIN
 	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_DOUBLE);
 	*destination = prop.getDoubleValue();
-	PUB_END
-}
-
-Lav_PUBLIC_FUNCTION LavError Lav_nodeGetStringProperty(LavHandle nodeHandle, int slot, const char** destination) {
-	PUB_BEGIN
-	PROP_PREAMBLE(nodeHandle, slot, Lav_PROPERTYTYPE_STRING);
-	*destination = prop.getStringValue();
 	PUB_END
 }
 
