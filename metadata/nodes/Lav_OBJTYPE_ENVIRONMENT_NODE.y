@@ -99,7 +99,7 @@ properties:
       
       Behavior is undefined if this property is ever greater than the value of {{"Lav_ENVIRONMENT_MAX_REVERB_LEVEL"|property}}.
       
-      By default, sources look to their environmlent for the value of this property.
+      By default, sources look to their environment for the value of this property.
       If you wish to set it on a per-source basis, set {{"Lav_SOURCE_CONTROL_REVERB"|codelit}} to true on the source.
   Lav_ENVIRONMENT_MAX_REVERB_LEVEL:
     name: max_reverb_level

@@ -1,6 +1,6 @@
 """This is the base class for all bindings generator backends.
 
-See also bindings_language.py, which defines the classes that represent Libaudioverse objects. Your backend will receive instances of them.
+See also bindings_description.py, which defines the classes that represent Libaudioverse objects. Your backend will receive instances of them.
 """
 from abc import abstractmethod
 
