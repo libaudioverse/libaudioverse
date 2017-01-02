@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>The Libaudioverse API &mdash; Libaudioverse build279 documentation</title>
+  <title>The Libaudioverse API &mdash; Libaudioverse build280 documentation</title>
   
 
   
@@ -33,7 +33,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="Libaudioverse build279 documentation" href="index.html"/>
+    <link rel="top" title="Libaudioverse build280 documentation" href="index.html"/>
         <link rel="prev" title="Python-specific Notes" href="python-specifics.html"/> 
 
   
@@ -562,7 +562,7 @@ If crossfading is enabled, moving the panner will slowly fade it to the new posi
 
 <dl class="class">
 <dt id="libaudioverse.AutomatedProperty">
-<em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">AutomatedProperty</code><span class="sig-paren">(</span><em>handle</em>, <em>slot</em>, <em>getter</em>, <em>setter</em>, <em>converter=&lt;function LibaudioverseProperty.&lt;lambda&gt; at 0x0000003624B8A6A8&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.AutomatedProperty" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">AutomatedProperty</code><span class="sig-paren">(</span><em>handle</em>, <em>slot</em>, <em>getter</em>, <em>setter</em>, <em>converter=&lt;function LibaudioverseProperty.&lt;lambda&gt; at 0x0525DF60&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.AutomatedProperty" title="Permalink to this definition">¶</a></dt>
 <dd><p>A property that supports automation and node connection.</p>
 <dl class="method">
 <dt id="libaudioverse.AutomatedProperty.cancel_automators">
@@ -1667,7 +1667,7 @@ If you wish to set it on a per-source basis, set <code class="docutils literal">
 <p>The minimum reverb level allowed.</p>
 <p>if a send is configured to be a reverb send, this is the minimum amount of audio that will be diverted to it.</p>
 <p>Behavior is undefined if this property is ever greater than the value of Lav_ENVIRONMENT_MAX_REVERB_LEVEL.</p>
-<p>By default, sources look to their environmlent for the value of this property.
+<p>By default, sources look to their environment for the value of this property.
 If you wish to set it on a per-source basis, set <code class="docutils literal"><span class="pre">Lav_SOURCE_CONTROL_REVERB</span></code> to true on the source.</p>
 </dd></dl>
 
@@ -2858,7 +2858,7 @@ If you feed this node a signal that is zero, it will slowly decrease the output 
 
 <dl class="class">
 <dt id="libaudioverse.LibaudioverseProperty">
-<em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">LibaudioverseProperty</code><span class="sig-paren">(</span><em>handle</em>, <em>slot</em>, <em>getter</em>, <em>setter</em>, <em>converter=&lt;function LibaudioverseProperty.&lt;lambda&gt; at 0x0000003624B8A6A8&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.LibaudioverseProperty" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">LibaudioverseProperty</code><span class="sig-paren">(</span><em>handle</em>, <em>slot</em>, <em>getter</em>, <em>setter</em>, <em>converter=&lt;function LibaudioverseProperty.&lt;lambda&gt; at 0x0525DF60&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.LibaudioverseProperty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Proxy to Libaudioverse properties.</p>
 <p>All properties support resetting and type query.</p>
 <dl class="attribute">
@@ -3240,7 +3240,7 @@ This is mostly for the <a class="reference internal" href="#libaudioverse.Multip
 <dd><p>Indicates the type of a property.</p>
 <dl class="attribute">
 <dt id="libaudioverse.PropertyTypes.buffer">
-<code class="descname">buffer</code><em class="property"> = 8</em><a class="headerlink" href="#libaudioverse.PropertyTypes.buffer" title="Permalink to this definition">¶</a></dt>
+<code class="descname">buffer</code><em class="property"> = 7</em><a class="headerlink" href="#libaudioverse.PropertyTypes.buffer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Property holds a handle to a buffer.</p>
 </dd></dl>
 
@@ -3258,19 +3258,19 @@ This is mostly for the <a class="reference internal" href="#libaudioverse.Multip
 
 <dl class="attribute">
 <dt id="libaudioverse.PropertyTypes.float3">
-<code class="descname">float3</code><em class="property"> = 4</em><a class="headerlink" href="#libaudioverse.PropertyTypes.float3" title="Permalink to this definition">¶</a></dt>
+<code class="descname">float3</code><em class="property"> = 3</em><a class="headerlink" href="#libaudioverse.PropertyTypes.float3" title="Permalink to this definition">¶</a></dt>
 <dd><p>Property holds a float3, a vector of 3 floats.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.PropertyTypes.float6">
-<code class="descname">float6</code><em class="property"> = 5</em><a class="headerlink" href="#libaudioverse.PropertyTypes.float6" title="Permalink to this definition">¶</a></dt>
+<code class="descname">float6</code><em class="property"> = 4</em><a class="headerlink" href="#libaudioverse.PropertyTypes.float6" title="Permalink to this definition">¶</a></dt>
 <dd><p>Property holds a float6, a vector of 6 floats.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.PropertyTypes.float_array">
-<code class="descname">float_array</code><em class="property"> = 6</em><a class="headerlink" href="#libaudioverse.PropertyTypes.float_array" title="Permalink to this definition">¶</a></dt>
+<code class="descname">float_array</code><em class="property"> = 5</em><a class="headerlink" href="#libaudioverse.PropertyTypes.float_array" title="Permalink to this definition">¶</a></dt>
 <dd><p>Property is an array of floats.</p>
 </dd></dl>
 
@@ -3282,14 +3282,8 @@ This is mostly for the <a class="reference internal" href="#libaudioverse.Multip
 
 <dl class="attribute">
 <dt id="libaudioverse.PropertyTypes.int_array">
-<code class="descname">int_array</code><em class="property"> = 7</em><a class="headerlink" href="#libaudioverse.PropertyTypes.int_array" title="Permalink to this definition">¶</a></dt>
+<code class="descname">int_array</code><em class="property"> = 6</em><a class="headerlink" href="#libaudioverse.PropertyTypes.int_array" title="Permalink to this definition">¶</a></dt>
 <dd><p>Property is an array of ints.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="libaudioverse.PropertyTypes.string">
-<code class="descname">string</code><em class="property"> = 3</em><a class="headerlink" href="#libaudioverse.PropertyTypes.string" title="Permalink to this definition">¶</a></dt>
-<dd><p>Property holds a string.</p>
 </dd></dl>
 
 </dd></dl>
@@ -4088,7 +4082,7 @@ You must call it before the interpreter shuts down. Failure to do so will allow 
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'build279',
+            VERSION:'build280',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

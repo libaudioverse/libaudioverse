@@ -3724,45 +3724,6 @@ Properties with dynamic ranges change their ranges at specified times, as docume
 </table>
 </div>
 <div class="sect4">
-<h5 id="function-Lav_nodeGetStringProperty">Lav_nodeGetStringProperty</h5>
-<div class="paragraph">
-<p>Prototype: <code>LavError Lav_nodeGetStringProperty(LavHandle nodeHandle, int propertyIndex, const char** destination)</code></p>
-</div>
-<div class="paragraph">
-<p>Get the specified string property.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Parameters</caption>
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">nodeHandle</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The node to manipulate.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>int</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">propertyIndex</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The property to manipulate.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>const char**</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">destination</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">After a call to this function, contains a pointer to a newly allocated string that is a copy of the value of the property.  Free this string with Lav_free.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect4">
 <h5 id="function-Lav_nodeIsolate">Lav_nodeIsolate</h5>
 <div class="paragraph">
 <p>Prototype: <code>LavError Lav_nodeIsolate(LavHandle nodeHandle)</code></p>
@@ -4301,45 +4262,6 @@ Note that this function also applies to boolean properties, as these are actuall
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>int</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">value</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The new value of the property.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect4">
-<h5 id="function-Lav_nodeSetStringProperty">Lav_nodeSetStringProperty</h5>
-<div class="paragraph">
-<p>Prototype: <code>LavError Lav_nodeSetStringProperty(LavHandle nodeHandle, int propertyIndex, char* value)</code></p>
-</div>
-<div class="paragraph">
-<p>Set the specified string property.</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<caption class="title">Parameters</caption>
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LavHandle</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">nodeHandle</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The node to manipulate.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>int</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">propertyIndex</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The property to manipulate.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>char*</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">value</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">the new value of the property.  Note that the specified string is copied and the memory may be freed.</p></td>
 </tr>
 </tbody>
 </table>
@@ -7213,7 +7135,7 @@ If you wish to set it on a per-source basis, set <code>Lav_SOURCE_CONTROL_REVERB
 <p>Behavior is undefined if this property is ever greater than the value of Lav_ENVIRONMENT_MAX_REVERB_LEVEL.</p>
 </div>
 <div class="paragraph">
-<p>By default, sources look to their environmlent for the value of this property.
+<p>By default, sources look to their environment for the value of this property.
 If you wish to set it on a per-source basis, set <code>Lav_SOURCE_CONTROL_REVERB</code> to true on the source.</p>
 </div>
 </div>
@@ -11111,10 +11033,6 @@ This is mostly for the <a href="#node-Lav_OBJTYPE_MULTIPANNER_NODE">multipanner 
 <td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_INT_ARRAY</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Property is an array of ints.</p></td>
 </tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lav_PROPERTYTYPE_STRING</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Property holds a string.</p></td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -11123,7 +11041,7 @@ This is mostly for the <a href="#node-Lav_OBJTYPE_MULTIPANNER_NODE">multipanner 
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-12-30 19:12:52 Coordinated Universal Time
+Last updated 2017-01-02 22:53:08 Coordinated Universal Time
 </div>
 </div>
 <script type="text/x-mathjax-config">
