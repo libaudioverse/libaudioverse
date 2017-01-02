@@ -166,3 +166,10 @@ As a convenience, lines can be appended with +=."""
         """Convenient way to add lines."""
         self.write_line(other)
 
+    def indent(self):
+        self._indent += 1
+
+    def outdent(self):
+        self._indent -= 1
+        if self._indent < 0:
+            raise ValueError("Attempt to outdent more than you indented.")
