@@ -9,10 +9,11 @@ c_function(
     name = "{{name}}",
     category = "{{category}}",
     doc = r"""{{doc}}""",
-    {%if params|length%}param_docs = {
+{%if params|length%}    param_docs = {
         {%for i, j in params.items()%}"{{i}}": r"""{{j}}""",{%endfor%}
-    }{%endif-%}
+    }
 )
+{%else%}){%endif%}
 ''')
 
 
