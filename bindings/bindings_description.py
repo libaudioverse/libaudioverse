@@ -17,6 +17,21 @@ Whether or not this TypeInfo can represent a typedef depends on context. Objects
         self.quals = quals
 
 
+class FunctioNCategory:
+    """Holds information about a function category.
+
+name: The name of the category.
+doc_name: The heading for the category in documentation.
+doc_description: The description of the category in documentation.
+
+All functions which are documented and not associated with an object have a category.
+"""
+
+def __init__(self, name, doc_name, doc_descruiption):
+    self.name = name
+    self.doc_name = doc_name
+    self.doc_description = doc_description
+
 class FunctionInfo:
     """Describes a function.
 
@@ -26,15 +41,16 @@ return_type_pretty: The return type without typedefs translated.
 params: A list of parameters, either SimpleParam or ArrayParam.
 input_params: All parameters which are inputs.
 output_params: All parameters which are outputs.
+category: None, or a FunctionCategory instance. Describes what heading this function belongs under in the language-agnostic manual.
 """
 
-    def __init__(self, return_type, name, params):
+    def __init__(self, return_type, name, params, category):
         self.return_type = return_type
         self.name = name
         self.params = tuple(params)
         self.input_params = tuple([i for i in params if not i.output])
         self.output_params = tuple([i for i in params if i.output])
-
+        self.category = category
 
 class SimpleParam:
     """Describes a single parameter, passed as a single value.
