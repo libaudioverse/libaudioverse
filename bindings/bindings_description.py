@@ -11,13 +11,13 @@ indirection: the number of pointer indirections.
 quals: The qualifiers at each indirection. Keys are ints.
 
 Whether or not this TypeInfo can represent a typedef depends on context. Objects in this file that use TypeInfo will translate where necessary."""
-    def __init__(self, base, indirection, quals = dict(), typedef_from = None):
+    def __init__(self, base, indirection, quals = dict()):
         self.base = base
         self.indirection = indirection
         self.quals = quals
 
 
-class FunctioNCategory:
+class FunctionCategory:
     """Holds information about a function category.
 
 name: The name of the category.
@@ -27,10 +27,10 @@ doc_description: The description of the category in documentation.
 All functions which are documented and not associated with an object have a category.
 """
 
-def __init__(self, name, doc_name, doc_descruiption):
-    self.name = name
-    self.doc_name = doc_name
-    self.doc_description = doc_description
+    def __init__(self, name, doc_name, doc_description):
+        self.name = name
+        self.doc_name = doc_name
+        self.doc_description = doc_description
 
 class FunctionInfo:
     """Describes a function.
@@ -44,8 +44,9 @@ output_params: All parameters which are outputs.
 category: None, or a FunctionCategory instance. Describes what heading this function belongs under in the language-agnostic manual.
 """
 
-    def __init__(self, return_type, name, params, category):
+    def __init__(self, return_type, return_type_pretty, name, params, category):
         self.return_type = return_type
+        self.return_type_pretty = return_type_pretty
         self.name = name
         self.params = tuple(params)
         self.input_params = tuple([i for i in params if not i.output])
@@ -62,9 +63,15 @@ type_pretty: The type without typedefs translated.
 default: The default value of the param, represented as an appropriate Python object. None if there is no default, and 0 for null pointers.
 """
 
-    def __init__(self, type, name, output):
+    _uses = 1 # For part of the bindings DSL. How many parameters does this consume?
+
+    def __init__(self, name, type, type_pretty, doc_description, output = None):
         self.type = type
+        self.type_pretty = type_pretty
         self.name = name
+        self.doc_description = doc_description
+        if output is None:
+            output = "destination" in name.lower()
         self.output = output
 
 
@@ -77,8 +84,14 @@ This is essentially a pair of parameters, the first of which is always a length 
 params: params[0] is the ,length parameter. params[1] is the pointer.
 output: True if this is an output parameter.
 """
-    def __init__(self, params, output):
+
+    _uses = 2 # For part of the bindings DSL. How many parameters does this consume?
+    def __init__(self, params, output = None):
         self.params = params
+        if output is None:
+            if self.params[0].output != self.params[1].output:
+                raise ValueError("Array parameter with one input and one output parameter")
+                output = params[0].output
         self.output = output
 
 class Enum:
@@ -99,7 +112,7 @@ value: The value.
 doc: The description of the member.
 """
 
-    def _-init__(self, name, value, doc):
+    def __init__(self, name, value, doc):
         self.name = name
         self.value = value
         self.doc = doc
@@ -164,8 +177,8 @@ type: A FunctionInfo describing the callback's signature.
 """
     def __init__(self, name, getter, setter,
         in_audio_thread, type):
-    self.name = name
-    self.getter = getter
-    self.setter = setter
-    self.in_audio_thread = in_audio_thread
-    self.type = type
+        self.name = name
+        self.getter = getter
+        self.setter = setter
+        self.in_audio_thread = in_audio_thread
+        self.type = type
