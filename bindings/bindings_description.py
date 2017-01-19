@@ -142,15 +142,15 @@ channels: A number of channels if constant, None if set by the constructor of th
         self.channels = channels
 
 
-class Input(ConnectionPiont):
-    ""Represents an input to a node. See ConnectionPoint docs for details."""
+class Input(ConnectionPoint):
+    """Represents an input to a node. See ConnectionPoint docs for details."""
     pass
 
 class Output(ConnectionPoint):
     """Represents an output from a node. See ConnectionPoint docs for details."""
     pass
 
-    """
+
 class Node:
     """Represents a node.
 
@@ -159,7 +159,7 @@ doc_name: The description for this node, used as the header in the language-agno
 doc_description: The long-form description of this node.
 properties: A list of property instances, sorted in alphabetical order by name.
 callbacks: A list of callbacks, sorted in alphabetical order by name.
-extra_functions: A list of extra functions, sorted in alphabetical order by the name of the function representing them in C.
+extra_functions: A list of extra functions, sorted in alphabetical order by the name of the function representing them in C.  Uses instances of Function, annotated with documentation from the node's description.
 inputs: A list of input instances in order by index.
 outputs: A list of output instances in order by index.
 """
@@ -172,8 +172,8 @@ outputs: A list of output instances in order by index.
         self.extra_functions = extra_functions
 
 PropertyTypes = enum.Enum("PropertyTypes", "int float double float3 float6 buffer")
-RangeTypes = enum.Enum("RangeTypes", "specified dynamic constructor")
-DefaultTypes = enum.Enum("DefaultTypes", "specified constructor")
+RangeTypes = enum.Enum("RangeTypes", "constant dynamic constructor")
+DefaultTypes = enum.Enum("DefaultTypes", "constant constructor")
 AccessTypes = enum.Enum("AccessTypes", "writable readonly varies")
 
 class Property:
@@ -184,13 +184,14 @@ doc: The description.  Always present.
 identifier: The name of the C constant representing this property, as a string.
 type: A PropertyTypes.
 range_type: A RangeTypes.
-range: A tuple (min, max) if range is specified. Otherwise a string description for dynamic ranges or None if the range is set by the constructor.
+range: A tuple (min, max) if range is constant. Otherwise a string description for dynamic ranges or None if the range is set by the constructor.
 default_type: a DefaultTypes.
 default: Either a default value of appropriate type for the property or None in the case of buffer properties, array properties, and ranges set by constructors.
 access_type: AccessTypes.readonly if the property can only be read, AccessTypes.writable if the property can be written, or AccessTypes.varies if readonly status depends on complex conditions.
 access_type_notes: On properties that use AccessTypes.varies, describes how this varies.
 array_length_range: Either a tuple (min, max), a string describing the range, or None if it's from the constructor. Unspecified value for non-array properties.
 array_length_range_type: A RangeTypes constant, see docs on range and range_type.  Unspecified value for non-array properties.
+associated_enum: The name of the C enum from which this property gets its values, if specified. Otherwise None.  Applies only to int and int array properties.
 
 Note that range tuples may contain infinity, made available in this module as inf. For the array length ranges and any int properties, this means MIN_INT or MAX_INT depending on the sign.
 """

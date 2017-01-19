@@ -5,7 +5,7 @@ An instance of Builder is created by the bindings generator. Then, all .py files
 As a convenience, this module accepts strings anywhere an enum would be needed; in that case, it must be the name of the enum's member."""
 from . import bindings_description as desc
 
-class BuilderError(exception):
+class BuilderError(Exception):
     """An implementation detail. We want something specific to throw."""
     pass
 
@@ -15,6 +15,24 @@ def conv_enum(enum, name):
         return getattr(enum, name)
     return name
 
+# The following are useful string constants for use with the string constant converting functionality:
+constructor = "constructor"
+constant = "constant"
+specified = "specified"
+writable = "writable"
+readonly = "readonly"
+varies = "varies"
+dynamic = "dynamic"
+# Start with p_ because some conflict with builtins.
+p_int = "int"
+p_float = "float"
+p_double = "double"
+p_float3 = "float3"
+p_float6 = "float6"
+p_int_array = "int_array"
+p_float_array = "float_array"
+p_buffer = "buffer"
+
 class Builder:
     """Builds information for the bindings generator."""
 
@@ -22,6 +40,9 @@ class Builder:
         self.c_info = c_info
         self.categories = dict()
         self.functions = dict()
+        # We need to pre-register and annotate functions, as some functions are undocumented and uncategorized.
+        for name in c_info['functions']:
+            self._c_function_unvalidated(name = name, category = None, doc = None, param_docs = dict(), defaults = dict(), arrays = [], _is_preregister = Trueq)
 
     def register_c_category(self, name, doc_name, doc_description):
         """Registers a category for C functions to be in."""
@@ -42,7 +63,10 @@ arrays: A list of tuples containing the names of parameters forming a (length, a
             raise ValueError("{} is not a valid function.".format(name))
         if category not in self.categories:
             raiseValueError("Attempt to use category {} before registering it. Categories must be registered first.".format(category))
-        category = self.categories[category]
+        self._c_function_unvalidated(name = name, doc = doc, category = category, param_docs = param_docs, defaults = defaults, arrays = arrays)
+
+    def _c_function_unvalidated(self, name, category, doc, param_docs, defaults, arrays, _is_preregister = False):
+        category = self.categories.get(category, None)
         info = self.c_info['functions'][name]
         # info is the version of the class defined in get_info, i.e. the one that only knows about C stuff.
         return_type = self._convert_typeinfo(info.return_type, translate_typedef = True)
@@ -57,21 +81,22 @@ arrays: A list of tuples containing the names of parameters forming a (length, a
             # This is just boring and straightforward normalization to prevent redundancies in the metadata.
             # If docs aren't present, we can guess a default. Most functions have a parameter that hits one of these special cases.
             if paramname in param_docs:
-                doc = param_docs[paramname]
+                param_doc = param_docs[paramname]
             elif paramname == "destination":
-                doc = "Holds the result of a call to this function."
+                param_doc = "Holds the result of a call to this function."
             elif paramname == "serverHandle":
-                doc = "The server to manipulate."
+                param_doc = "The server to manipulate."
             elif paramname == "nodeHandle":
-                doc = "The node to manipulate."
+                param_doc = "The node to manipulate."
             elif paramname == "bufferHandle":
-                doc = "The buffer to manipulate."
+                param_doc = "The buffer to manipulate."
             elif paramname == "propertyIndex":
-                doc = "The property to manipulate."
+                param_doc = "The property to manipulate."
             else:
-                print("Warning: param {} of function {} is not documented.".format(paramname, name))
-                doc = "This parameter is undocumented."
-            params.append(desc.SimpleParam(name = name, type = type, type_pretty = type_pretty, doc_description = doc))
+                if not _is_preregister:
+                    print("Warning: param {} of function {} is not documented.".format(paramname, name))
+                param_doc = "This parameter is undocumented."
+            params.append(desc.SimpleParam(name = name, type = type, type_pretty = type_pretty, doc = param_doc))
         # Now we handle array params.
         complex_params = []
         for i, j in zip(params[:], params[1:]):
@@ -83,7 +108,7 @@ arrays: A list of tuples containing the names of parameters forming a (length, a
         used = sum([i._uses for i in complex_params])
         params = complex_params + params[used:]
         # Now, we can finally build the function itself.
-        func = desc.FunctionInfo(return_type = return_type, return_type_pretty = return_type_pretty,
+        func = desc.FunctionInfo(doc = doc, return_type = return_type, return_type_pretty = return_type_pretty,
             name = name, params = params, category = category)
         self.functions[name] = func
 
@@ -100,7 +125,7 @@ arrays: A list of tuples containing the names of parameters forming a (length, a
         return desc.TypeInfo(base = base, indirection = indirection, quals = quals)
 
     def node(self, components, identifier, doc_name, doc_description):
-    """Registers a node.
+        """Registers a node.
 
 Most parameters  are self-explanatory.  Components is a list of the return values from the following functions in this file. Do *not* reuse return values from these functions. Ever.
 
@@ -124,7 +149,7 @@ identifier is the Lav_OBJTYPE_xxx constant's name as a string."""
         #todo: put this somewhere.
 
     def _connection_builder(self, cls, doc, channel_type, channels):
-        """Builds connections.  User code should not use this function dierctly."""
+        """Builds connections.  User code should not use this function directly."""
         conv_enum(desc.ChannelTypes, channel_type)
         return cls(doc = doc, channels = channels, channel_type = channel_type)
 
