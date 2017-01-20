@@ -4,6 +4,9 @@ You want to see class dsl.Builder.  Files in metadata/* are executed with the bu
 
 import enum
 
+# Helpful constant for consumers: infinity.
+inf = float('inf')
+
 class TypeInfo:
     """Describes a type.  Members:
 
@@ -186,7 +189,7 @@ type: A PropertyTypes.
 range_type: A RangeTypes.
 range: A tuple (min, max) if range is constant. Otherwise a string description for dynamic ranges or None if the range is set by the constructor.
 default_type: a DefaultTypes.
-default: Either a default value of appropriate type for the property or None in the case of buffer properties, array properties, and ranges set by constructors.
+default: Either a default value of appropriate type for the property or None in the case of buffer properties, array properties, and ranges set by constructors.  For int properties using associated_enum, a string value, the name of the enum constant in C.
 access_type: AccessTypes.readonly if the property can only be read, AccessTypes.writable if the property can be written, or AccessTypes.varies if readonly status depends on complex conditions.
 access_type_notes: On properties that use AccessTypes.varies, describes how this varies.
 array_length_range: Either a tuple (min, max), a string describing the range, or None if it's from the constructor. Unspecified value for non-array properties.

@@ -4,6 +4,7 @@ An instance of Builder is created by the bindings generator. Then, all .py files
 
 As a convenience, this module accepts strings anywhere an enum would be needed; in that case, it must be the name of the enum's member."""
 from . import bindings_description as desc
+from desc import inf
 
 class BuilderError(Exception):
     """An implementation detail. We want something specific to throw."""
@@ -161,7 +162,7 @@ identifier is the Lav_OBJTYPE_xxx constant's name as a string."""
         """Builds an output. See docs in bindings_description.ConnectionPoint for parameters."""
         return self._connection_builder(cls = desc.Output, doc = doc, channel_type = channel_type, channels = channels)
 
-    def property(self, name, type, identifier, doc, default = None, default_type = None, range = None, range_type = None, access_type = None, access_type_notes = None):
+    def property(self, name, type, identifier, doc, default = None, default_type = None, range = None, range_type = None, access_type = None, access_type_notes = None, associated_enum = None):
         """Builds properties.  Parameters match bindings_description.Property but are validated.
 
 This function offers the following conveniences:
@@ -172,6 +173,7 @@ If range is exactly the string "constructor", range_type is RangeTypes.construct
 These conveniences are extended to array length ranges.
 
 If default is None, the default of this property is the appropriate default for the property's type.
+Note that the default of properties using associated_enum does not support this convenience.
 If default is exactly the string "constructor", then default_type is DefaultTypes.constructor.
 Otherwise, the default takes on the value specified.
 Default is ignored for buffer and array properties.
@@ -184,6 +186,13 @@ If left alone, access_type defaults to writable.  If access_type_notes is provid
         range_type = conv_enum(desc.RangeTypes, range_type)
         array_length_range_type = conv_enum(desc.RangeTypes, array_length_range_type)
         access_type = conv_enum(desc.AccessTypes, access_type)
+        if associated_enum and not isinstance(default, str):
+            raise builderError("Use of associated_enum without specifying default, or default is not a string.")
+        if associated_enum:
+            if associated_enum not in self.c_info['constants_by_enum']:
+                raise BuilderError("{} is not a valid enum.".format(assocaited_enuim))
+            if default not in self.c_info['constants_by_enum'][associated_enum]:
+                raise BuilderError("{} is not a constant of enum {}".format(default, associated_enum))
         defaults = {desc.PropertyTypes.int: 0, desc.PropertyTypes.float: 0.0,
             desc.PropertyTypes.double: 0.0, desc.PropertyTypes.float3: (0.0, 0.0, 0.0),
             desc.PropertyTypes.float6: (0.0, 0.0, 0.0, 0.0, 0.0, 0.0)}
@@ -218,4 +227,4 @@ If left alone, access_type defaults to writable.  If access_type_notes is provid
             default = default, default_type = default_type,
             range = range, range_type = range_type,
             array_length_range = array_length_range, array_length_range_type = array_length_range_type,
-            access_type = access_type, access_type_notes = access_type_notes)
+            access_type = access_type, access_type_notes = access_type_notes, associated_enum = associated_enum)
