@@ -78,6 +78,21 @@ Behavior is undefined if this property is ever less than {{propref("Lav_OBJTYPE_
 By default, sources look to their environmlent for the value of this property.
 If you wish to set it on a per-source basis, set {{propref("Lav_OBJTYPE_SOURCE_NODE", "Lav_SOURCE_CONTROL_REVERB")}} to true.
 """),
-# Todo: extra functions.
+    extra_function(name = "Lav_environmentNodePlayAsync", doc = """
+Play a buffer, using the specified position and the currently set defaults on the world for distance model and panning strategy.
+This is the same as creating a buffer and a source, but Libaudioverse retains control of these objects and caches them internally to avoid allocations.
+When the buffer finishes playing, the source is automatically disposed of.
+""", params = {
+        "bufferHandle": "The buffer to play",
+        "x": "The x-component of the position.",
+        "y": "The y-component of the position.",
+        "z": "The z-component of the position",
+        "isDry": "If true, we avoid sending to the effect sends.",
+    }, defaults = {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0",
+        "isDry": false,
+    }),
 output(channel_type = dynamic, doc = "The aggregate signal from all sources.  Number of channels depends on {{propref("Lav_OBJTYPE_ENVIRONMENT_NODE", "Lav_ENVIRONMENT_CHANNEL_COUNT")}}.")
 ])
