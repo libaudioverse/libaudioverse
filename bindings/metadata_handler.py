@@ -107,7 +107,7 @@ def make_metadata(all_info):
     metadata_dir = os.path.abspath(os.path.join(
     os.path.split(os.path.abspath(__file__))[0],
     "..",
-    "metadata"
+    "metadata_old"
     ))
 
     #First, build the base dict. This is metadata.yaml:
