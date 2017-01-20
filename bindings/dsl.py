@@ -172,6 +172,8 @@ If range is a string, range is RangeTypes.dynamic.
 If range is exactly the string "constructor", range_type is RangeTypes.constructor.
 These conveniences are extended to array length ranges.
 
+If associated_enum is specified, range is ignored and forced to cover the whole enum.
+
 If default is None, the default of this property is the appropriate default for the property's type.
 Note that the default of properties using associated_enum does not support this convenience.
 If default is exactly the string "constructor", then default_type is DefaultTypes.constructor.
@@ -193,6 +195,7 @@ If left alone, access_type defaults to writable.  If access_type_notes is provid
                 raise BuilderError("{} is not a valid enum.".format(assocaited_enuim))
             if default not in self.c_info['constants_by_enum'][associated_enum]:
                 raise BuilderError("{} is not a constant of enum {}".format(default, associated_enum))
+            range = min(self.c_info['constants_by_enum'][associated_enum].values()), max(self.c_info['constants_byu_enum'][associated_enum].values()))
         defaults = {desc.PropertyTypes.int: 0, desc.PropertyTypes.float: 0.0,
             desc.PropertyTypes.double: 0.0, desc.PropertyTypes.float3: (0.0, 0.0, 0.0),
             desc.PropertyTypes.float6: (0.0, 0.0, 0.0, 0.0, 0.0, 0.0)}
