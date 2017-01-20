@@ -60,13 +60,9 @@ param_docs: A dict representing the documentation of each param.
 defaults: A dict mapping params to defaults.
 arrays: A list of tuples containing the names of parameters forming a (length, array) pair.
 """
-        if name not in self.c_info['functions']:
-            raise ValueError("{} is not a valid function.".format(name))
-        if category not in self.categories:
-            raiseValueError("Attempt to use category {} before registering it. Categories must be registered first.".format(category))
-        self._c_function_unvalidated(name = name, doc = doc, category = category, param_docs = param_docs, defaults = defaults, arrays = arrays)
 
-    def _c_function_unvalidated(self, name, category, doc, param_docs, defaults, arrays, _is_preregister = False):
+
+    def _c_function_unvalidated(self, name, category, doc, param_docs, defaults, arrays, _is_preregister = False, _no_register = False):
         category = self.categories.get(category, None)
         info = self.c_info['functions'][name]
         # info is the version of the class defined in get_info, i.e. the one that only knows about C stuff.
@@ -111,7 +107,12 @@ arrays: A list of tuples containing the names of parameters forming a (length, a
         # Now, we can finally build the function itself.
         func = desc.FunctionInfo(doc = doc, return_type = return_type, return_type_pretty = return_type_pretty,
             name = name, params = params, category = category)
-        self.functions[name] = func
+        # This is to allow code reuse for extra functions.
+        if not _no_register:
+            self.functions[name] = func
+        else:
+            return func
+
 
     def _convert_typeinfo(self, type, translate_typedef):
         base = type.base
@@ -231,3 +232,12 @@ If left alone, access_type defaults to writable.  If access_type_notes is provid
             range = range, range_type = range_type,
             array_length_range = array_length_range, array_length_range_type = array_length_range_type,
             access_type = access_type, access_type_notes = access_type_notes, associated_enum = associated_enum)
+
+    def extra_function(self, doc, function, param_docs = dict(), defaults = dict(), arrays = []):
+        """Return a function object suitable to represent a node's extra function.
+
+The parameters here are the same as for c_function, save category which is not applicable."""
+        if name not in self.c_info['functions']:
+            raise ValueError("{} is not a valid function.".format(name))
+        return self._c_function_unvalidated(name = name, doc = doc, category = None, param_docs = param_docs, defaults = defaults, arrays = arrays, _no_register = True)
+
