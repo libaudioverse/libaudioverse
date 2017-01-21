@@ -25,6 +25,7 @@ readonly = "readonly"
 varies = "varies"
 dynamic = "dynamic"
 # Start with p_ because some conflict with builtins.
+p_boolean = "boolean"
 p_int = "int"
 p_float = "float"
 p_double = "double"
@@ -110,7 +111,7 @@ arrays: A list of tuples containing the names of parameters forming a (length, a
         return info
 
     def _convert_functioninfo(self, info):
-        # Convert a FunctionInfo from get_info to a FunctionInfo from bindings_description.
+        # Convert a FunctionInfo from get_info to a Function from bindings_description.
         # This is missing docs, etc, so we need to annotate it after return.
         # Engages with _convert_typeinfo to make a mutually recursive algorithm, that hits all FunctionInfos and TypeInfos involved; both functions are entry points.
         return_type = self._convert_typeinfo(info.return_type, translate_typedef = True)
@@ -135,7 +136,7 @@ arrays: A list of tuples containing the names of parameters forming a (length, a
             elif paramname == "propertyIndex":
                 param_doc = "The property to manipulate."
             params.append(desc.SimpleParam(name = paramname, type = type, type_pretty = type_pretty, doc = param_doc))
-        return desc.FunctionInfo(doc = None, return_type = return_type, return_type_pretty = return_type_pretty,
+        return desc.Function(doc = None, return_type = return_type, return_type_pretty = return_type_pretty,
             name = None, params = params, category = None)
 
     def _convert_typeinfo(self, type, translate_typedef):
@@ -148,7 +149,7 @@ arrays: A list of tuples containing the names of parameters forming a (length, a
             quals = {i[0]+td.indirection: i[1] for i in quals.items()}
             quals.update(td.quals)
             base = td.base
-        if isinstance(base, desc.FunctionInfo):
+        if isinstance(base, desc.Function):
             base = self._convert_functioninfo(base)
         return desc.TypeInfo(base = base, indirection = indirection, quals = quals)
 
@@ -170,8 +171,8 @@ identifier is the Lav_OBJTYPE_xxx constant's name as a string."""
         extra_functions = [i for i in components if isinstance(i, desc.Function)]
         extra_functions.sort(key = lambda e: e.name)
         inputs = [i for i in components if isinstance(i, desc.Input)]
-        outputs = [i for i in components if isinstance(i, desc.Outputs)]
-        node = desc.Node(identifier = identifier, name = name, doc_name = doc_name, doc_description = doc_description,
+        outputs = [i for i in components if isinstance(i, desc.Output)]
+        node = desc.Node(identifier = identifier, doc_name = doc_name, doc_description = doc_description,
             properties = properties, callbacks = callbacks, extra_functions = extra_functions,
             inputs = inputs, outputs = outputs)
         #todo: put this somewhere.
@@ -189,7 +190,8 @@ identifier is the Lav_OBJTYPE_xxx constant's name as a string."""
         """Builds an output. See docs in bindings_description.ConnectionPoint for parameters."""
         return self._connection_builder(cls = desc.Output, doc = doc, channel_type = channel_type, channels = channels)
 
-    def property(self, name, type, identifier, doc, default = None, default_type = None, range = None, range_type = None, access_type = None, access_type_notes = None, associated_enum = None):
+    def property(self, name, type, identifier, doc, default = None, default_type = None, range = None, range_type = None, access_type = None, access_type_notes = None, associated_enum = None,
+    array_length_range = None, array_length_range_type = None):
         """Builds properties.  Parameters match bindings_description.Property but are validated.
 
 This function offers the following conveniences:
@@ -222,8 +224,8 @@ If left alone, access_type defaults to writable.  If access_type_notes is provid
                 raise BuilderError("{} is not a valid enum.".format(assocaited_enuim))
             if default not in self.c_info['constants_by_enum'][associated_enum]:
                 raise BuilderError("{} is not a constant of enum {}".format(default, associated_enum))
-            range = (min(self.c_info['constants_by_enum'][associated_enum].values()), max(self.c_info['constants_byu_enum'][associated_enum].values()))
-        defaults = {desc.PropertyTypes.int: 0, desc.PropertyTypes.float: 0.0,
+            range = (min(self.c_info['constants_by_enum'][associated_enum].values()), max(self.c_info['constants_by_enum'][associated_enum].values()))
+        defaults = {desc.PropertyTypes.boolean: 0, desc.PropertyTypes.int: 0, desc.PropertyTypes.float: 0.0,
             desc.PropertyTypes.double: 0.0, desc.PropertyTypes.float3: (0.0, 0.0, 0.0),
             desc.PropertyTypes.float6: (0.0, 0.0, 0.0, 0.0, 0.0, 0.0)}
         if default == "constructor":
@@ -233,25 +235,28 @@ If left alone, access_type defaults to writable.  If access_type_notes is provid
             default_type = desc.DefaultTypes.constructor
         elif default is None and type in defaults:
             default = defaults[type]
-        elif type not in {PropertyTypes.buffer, PropertyTypes.int_array, PropertyTypes.float_array}:
+        elif default is None and type not in {desc.PropertyTypes.buffer, desc.PropertyTypes.int_array, desc.PropertyTypes.float_array}:
             raise BuilderError("You need to specify a property default.")
         # Range, range_types.
         def normalize_range(range, range_type, fail_msg):
             if isinstance(range, tuple) and len(range) == 2:
-                range_type = RangeTypes.specified
+                range_type = desc.RangeTypes.specified
             elif range == "constructor":
                 range_type = RangeTypes.constructor
             elif isinstance(range_type, str):
                 range_type = desc.RangeTypes.dynamic
+            elif type in {desc.PropertyTypes.boolean, desc.PropertyTypes.buffer, desc.PropertyTypes.float3, desc.PropertyTypes.float6}:
+                return (range, range_type)
             elif range is None or range_type is None:
                 raise BuilderError(fail_msg)
             return (range, range_type)
         (range, range_type) = normalize_range(range, range_type, "You must specify range and range_type")
-        (array_length_range, array_length_range_type) = normalize_range(array_length_range, array_length_range_type, "You must specify both array_length_range and array_length_range_type")
+        if type in {desc.PropertyTypes.int_array, desc.PropertyTypes.float_array}:
+            (array_length_range, array_length_range_type) = normalize_range(array_length_range, array_length_range_type, "You must specify both array_length_range and array_length_range_type")
         if access_type_notes is not None:
             access_type = desc.AccessTypes.varied
         elif access_type is None:
-            access_type = AccessTypes.writable
+            access_type = desc.AccessTypes.writable
         # that's it, finally. So...
         return desc.Property(name = name, identifier = identifier, doc = doc, type = type,
             default = default, default_type = default_type,
@@ -263,24 +268,21 @@ If left alone, access_type defaults to writable.  If access_type_notes is provid
         """Return a function object suitable to represent a node's extra function.
 
 The parameters here are the same as for c_function, save category which is not applicable."""
-        if name not in self.c_info['functions']:
+        if function not in self.c_info['functions']:
             raise ValueError("{} is not a valid function.".format(name))
-        return self._c_function_unvalidated(name = name, doc = doc, category = None, param_docs = param_docs, defaults = defaults, arrays = arrays)
+        return self._c_function_unvalidated(name = function, doc = doc, category = None, param_docs = param_docs, defaults = defaults, arrays = arrays)
 
-    def callback(self, name, getter, setter, in_audio_thread, doc):
+    def callback(self, name, setter, in_audio_thread, doc):
         """Make a callback.
 
-Getter and setter are getter and setter function names for the callback, of the form Lav_blaNodeGetCallback, Lav_blaNodeSetCallback.  We get the type of the function pointer from the second parameter of the setter callback.
+Setter  is the setter function name for the callback, of the form Lav_blaNodeSetCallback.  We get the type of the function pointer from the second parameter of the setter callback.
 
 in_audio_thread and doc are as in bindings_description."""
-        # The getter and setter are registerd, but don't necessarily contain docs.
-        if getter not in self.functions:
-            raise BuilderError("getter {} does not exist.".format(getter))
+        # The  setter is registerd, but doesn't necessarily contain docs.
         if setter not in self.functions:
             raise BuilderError("Setter {} does not exist.".format(setter))
-        getter = self.functions[getter]
         setter = self.functions[setter]
         # The signature is the converted TypeInfo of the setter's second parameter's base.
-        signature = self._convert_typeinfo(setter.params[1].type, translate_typedef = True).base.params[1]
-        signature_typedef = setter.params[1].type.base
-        return desc.Callback(doc = doc, getter = getter, setter = setter, signature =signature, signature_typedef = signature_typedef, in_audio_thread = in_audio_thread)
+        signature = setter.params[1].type.base
+        signature_typedef = setter.params[1].type_pretty.base
+        return desc.Callback(name = name, doc = doc, setter = setter, signature =signature, signature_typedef = signature_typedef, in_audio_thread = in_audio_thread)

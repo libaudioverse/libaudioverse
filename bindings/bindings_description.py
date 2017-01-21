@@ -38,7 +38,7 @@ All functions which are documented and not associated with an object have a cate
         self.doc_name = doc_name
         self.doc_description = doc_description
 
-class FunctionInfo:
+class Function:
     """Describes a function.
 
 name: The name of this function.
@@ -171,17 +171,19 @@ extra_functions: A list of extra functions, sorted in alphabetical order by the 
 inputs: A list of input instances in order by index.
 outputs: A list of output instances in order by index.
 """
-    def __init__(self, identifier, doc_name, doc_description, properties, callbacks, extra_functions):
+    def __init__(self, identifier, doc_name, doc_description, properties, callbacks, extra_functions, inputs, outputs):
         self.identifier = identifier
         self.doc_name = doc_name
         self.doc_description = doc_description
         self.properties = properties
         self.callbacks = callbacks
         self.extra_functions = extra_functions
+        self.inputs = inputs
+        self.outputs = outputs
 
-PropertyTypes = enum.Enum("PropertyTypes", "int float double float3 float6 buffer")
-RangeTypes = enum.Enum("RangeTypes", "constant dynamic constructor")
-DefaultTypes = enum.Enum("DefaultTypes", "constant constructor")
+PropertyTypes = enum.Enum("PropertyTypes", "boolean int float double float3 float6 buffer int_array float_array")
+RangeTypes = enum.Enum("RangeTypes", "specified dynamic constructor")
+DefaultTypes = enum.Enum("DefaultTypes", "specified constructor")
 AccessTypes = enum.Enum("AccessTypes", "writable readonly varies")
 
 class Property:
@@ -206,7 +208,7 @@ Note that range tuples may contain infinity, made available in this module as in
     def __init__(self, name, doc, type, identifier,
         range_type, range, default_type, default,
         access_type, access_type_notes,
-        array_length_range, array_length_range_type):
+        array_length_range, array_length_range_type, associated_enum):
         self.name = name
         self.doc = doc
         self.type = type
@@ -219,22 +221,21 @@ Note that range tuples may contain infinity, made available in this module as in
         self.access_type_notes = access_type_notes
         self.array_length_range = array_length_range
         self.array_length_range_type = array_length_range_type
+        self.associated_enum = associated_enum
 
 class Callback:
     """Represents a callback.
 
 name: The name of the callback.
 doc: The callback's documentation.
-getter: The C function which gets this callback.
 setter: The C function which sets this callback.
 signature: A FunctionInfo representing the callback's signature. Annotated with parameter docs, etc.
 signature_typedef: The name of the C typedef representing this callback.
 in_audio_thread: true if the callback is called in the audio thread.
 """
-    def __init__(self, name, getter, setter, signature, signature_typedef,
-        in_audio_thread, type, doc):
+    def __init__(self, name, setter, signature, signature_typedef,
+        in_audio_thread, doc):
         self.name = name
-        self.getter = getter
         self.setter = setter
         self.in_audio_thread = in_audio_thread
         self.signature = signature

@@ -84,7 +84,6 @@ Lav_PUBLIC_FUNCTION LavError Lav_createBufferNode(LavHandle serverHandle, LavHan
 	*destination = outgoingObject<Node>(retval);
 	PUB_END
 }
-
 Lav_PUBLIC_FUNCTION LavError Lav_bufferNodeSetEndCallback(LavHandle nodeHandle, LavParameterlessCallback callback, void* userdata) {
 	PUB_BEGIN
 	auto n = incomingObject<BufferNode>(nodeHandle);

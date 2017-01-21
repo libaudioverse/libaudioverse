@@ -1,4 +1,4 @@
-node(
+node(identifier = "Lav_OBJTYPE_ENVIRONMENT_NODE",
 doc_name = "Environment Node",
 doc_description = """
 This is the entry point to the 3D simulation capabilities.
@@ -40,13 +40,13 @@ Sources aare approximated as spheres, with 0 being the special case of a point s
 Size is used to determine the listener's distance from a source.
 This property is copied to sources upon creation, but changes to it thereafter do not affect already created sources.
 """),
-    property(Name = "panning_strategy", identifier = "Lav_ENVIRONMENT_PANNING_STRATEGY", type = p_int, default = "Lav_PANNING_STRATEGY_STEREO", associated_enum = "Lav_PANNING_STRATEGIES", doc = """
+    property(name = "panning_strategy", identifier = "Lav_ENVIRONMENT_PANNING_STRATEGY", type = p_int, default = "Lav_PANNING_STRATEGY_STEREO", associated_enum = "Lav_PANNING_STRATEGIES", doc = """
 The panning strategy for any source configured to delegate to the environment.
 All new sources delegate to the environment by default.
 
 If you want to change this property for a specific source, set {{propref("Lav_OBJTYPE_SOURCE_NODE", "Lav_SOURCE_CONTROL_PANNING")}} to true.
 """),
-    property(name = "output_channels", identifier = "Lav_ENVIRONMENT_OUTPUT_CHANNELS", tyupe = p_int, range = (0, 8), default = 2, doc = """
+    property(name = "output_channels", identifier = "Lav_ENVIRONMENT_OUTPUT_CHANNELS", type = p_int, range = (0, 8), default = 2, doc = """
 Environments are not smart enough to determine the number of channels their output needs to have.
 If you are using something greater than stereo, i.e. 5.1, you need to change this property.
 The specific issue solved by this property is the case in which one source is set to something different than all others, or where the app changes the panning strategies of sources after creation.
@@ -59,8 +59,8 @@ The distance at which a source will be heard only in the reverb.
 See documentation on the {{"Lav_OBJTYPE_SOURCE_NODE"|node}} for a specific explanation.
 By default, sources get the value of this property from the environment.
 To control this property on a per-source basis, set {{propref("Lav_OBJTYPE_SOURCE_NODE", "Lav_SOURCE_CONTROL_REVERB")}} to true.
-""),
-    property(name = "min_reverb_level", identifier = "Lav_ENVIRONMENT_MIN_REVERB_LEVEL", type = p_float, range = = (0.0, 1.0), default = 0.15, doc = """
+"""),
+    property(name = "min_reverb_level", identifier = "Lav_ENVIRONMENT_MIN_REVERB_LEVEL", type = p_float, range = (0.0, 1.0), default = 0.15, doc = """
 The minimum reverb level allowed.
 
 If a send is configured to be a reverb send, this is the minimum amount of audio that will be diverted to it.
@@ -78,11 +78,11 @@ Behavior is undefined if this property is ever less than {{propref("Lav_OBJTYPE_
 By default, sources look to their environmlent for the value of this property.
 If you wish to set it on a per-source basis, set {{propref("Lav_OBJTYPE_SOURCE_NODE", "Lav_SOURCE_CONTROL_REVERB")}} to true.
 """),
-    extra_function(name = "Lav_environmentNodePlayAsync", doc = """
+    extra_function(function = "Lav_environmentNodePlayAsync", doc = """
 Play a buffer, using the specified position and the currently set defaults on the world for distance model and panning strategy.
 This is the same as creating a buffer and a source, but Libaudioverse retains control of these objects and caches them internally to avoid allocations.
 When the buffer finishes playing, the source is automatically disposed of.
-""", params = {
+""", param_docs = {
         "bufferHandle": "The buffer to play",
         "x": "The x-component of the position.",
         "y": "The y-component of the position.",
@@ -91,8 +91,8 @@ When the buffer finishes playing, the source is automatically disposed of.
     }, defaults = {
         "x": 0.0,
         "y": 0.0,
-        "z": 0.0",
-        "isDry": false,
+        "z": 0.0,
+        "isDry": False,
     }),
-output(channel_type = dynamic, doc = "The aggregate signal from all sources.  Number of channels depends on {{propref("Lav_OBJTYPE_ENVIRONMENT_NODE", "Lav_ENVIRONMENT_CHANNEL_COUNT")}}.")
-])
+output(channel_type = dynamic, channels = r"""Depends on {{propref("Lav_OBJTYPE_ENVIRONMENT_NODE", "Lav_ENVIRONMENT__OUTPUT_CHANNELS")}}.""",
+doc = r"""The aggregate signal from all sources.""")])
