@@ -283,4 +283,4 @@ in_audio_thread and doc are as in bindings_description."""
         # The signature is the converted TypeInfo of the setter's second parameter's base.
         signature = self._convert_typeinfo(setter.params[1].type, translate_typedef = True).base.params[1]
         signature_typedef = setter.params[1].type.base
-        
+        return desc.Callback(doc = doc, getter = getter, setter = setter, signature =signature, signature_typedef = signature_typedef, in_audio_thread = in_audio_thread)
