@@ -4,7 +4,7 @@ An instance of Builder is created by the bindings generator. Then, all .py files
 
 As a convenience, this module accepts strings anywhere an enum would be needed; in that case, it must be the name of the enum's member."""
 from . import bindings_description as desc
-from desc import inf
+from .bindings_description import inf
 
 class BuilderError(Exception):
     """An implementation detail. We want something specific to throw."""
@@ -43,7 +43,8 @@ class Builder:
         self.functions = dict()
         # We need to pre-register and annotate functions, as some functions are undocumented and uncategorized.
         for name in c_info['functions']:
-            self._c_function_unvalidated(name = name, category = None, doc = None, param_docs = dict(), defaults = dict(), arrays = [], _is_preregister = Trueq)
+            f = self._c_function_unvalidated(name = name, category = None, doc = None, param_docs = dict(), defaults = dict(), arrays = [])
+            self.functions[name] = f
 
     def register_c_category(self, name, doc_name, doc_description):
         """Registers a category for C functions to be in."""
@@ -60,15 +61,60 @@ param_docs: A dict representing the documentation of each param.
 defaults: A dict mapping params to defaults.
 arrays: A list of tuples containing the names of parameters forming a (length, array) pair.
 """
+        if category not in self.categories:
+            raise BuilderError("Attempt to use category {} before registration.".format(category))
+        if doc is None:
+            raise BuilderError("Explicitly registered functions must always have documentation.")
+        f = self._c_function_unvalidated(category = category, doc = doc, name = name, param_docs = param_docs,
+            arrays = arrays, defaults = defaults)
+        undocumented_params = []
+        for i in f.params:
+            if isinstance(i, desc.SimpleParam):
+                if i.doc is None:
+                    undocumented_params.append(i)
+            else:
+                if i.params[0].doc is None:
+                    undocumented_params.append(i.params[0])
+                if i.params[1].doc is None:
+                    undocumented_params.append(i.params[1])
+        if len(undocumented_params):
+            undocumented_params = " ".join((i.name for i in undocumented_params))
+            print("Warning: function {}: the following parameters are undocumented:\n".format(name))
+            print(" "*2 + undocumented_params)
+        self.functions[name] = f
 
-
-    def _c_function_unvalidated(self, name, category, doc, param_docs, defaults, arrays, _is_preregister = False, _no_register = False):
+    def _c_function_unvalidated(self, name, category, doc, param_docs, defaults, arrays):
         category = self.categories.get(category, None)
         info = self.c_info['functions'][name]
-        # info is the version of the class defined in get_info, i.e. the one that only knows about C stuff.
+        info = self._convert_functioninfo(info)
+        info.category = category
+        # Annotate defaults and documentation.
+        for p in info.params:
+            if p.name in defaults:
+                p.default = defaults[p.name]
+                del defaults[p.name]
+            if p.name in param_docs:
+                p.doc = param_docs[p.name]
+        if len(defaults):
+            raise BuilderError("Defaults specified for parameters that don't exist: {}".format(" ".join(defaults.keys())))
+        # Now we handle array params.
+        complex_params = []
+        for i, j in zip(info.params[:], info.params[1:]):
+            if (i.name, j.name) in arrays:
+                complex_params.append(desc.ArrayParam(params = (i, j)))
+            else:
+                complex_params.append(i) # But not j, because the next two might be an array parameter.
+        # We might be one short.
+        used = sum([i._uses for i in complex_params])
+        info.params = complex_params + list(info.params[used:])
+        return info
+
+    def _convert_functioninfo(self, info):
+        # Convert a FunctionInfo from get_info to a FunctionInfo from bindings_description.
+        # This is missing docs, etc, so we need to annotate it after return.
+        # Engages with _convert_typeinfo to make a mutually recursive algorithm, that hits all FunctionInfos and TypeInfos involved; both functions are entry points.
         return_type = self._convert_typeinfo(info.return_type, translate_typedef = True)
         return_type_pretty = self._convert_typeinfo(info.return_type, translate_typedef = False)
-        # Build the simple parameters, we'll handle making them into arrays later.
         params = []
         for i in info.args:
             type = i.type
@@ -76,10 +122,9 @@ arrays: A list of tuples containing the names of parameters forming a (length, a
             type_pretty = self._convert_typeinfo(type, translate_typedef = False)
             type = self._convert_typeinfo(type, translate_typedef = True)
             # This is just boring and straightforward normalization to prevent redundancies in the metadata.
-            # If docs aren't present, we can guess a default. Most functions have a parameter that hits one of these special cases.
-            if paramname in param_docs:
-                param_doc = param_docs[paramname]
-            elif paramname == "destination":
+            # We can often guess defaults.
+            param_doc = None
+            if paramname == "destination":
                 param_doc = "Holds the result of a call to this function."
             elif paramname == "serverHandle":
                 param_doc = "The server to manipulate."
@@ -89,30 +134,9 @@ arrays: A list of tuples containing the names of parameters forming a (length, a
                 param_doc = "The buffer to manipulate."
             elif paramname == "propertyIndex":
                 param_doc = "The property to manipulate."
-            else:
-                if not _is_preregister:
-                    print("Warning: param {} of function {} is not documented.".format(paramname, name))
-                param_doc = "This parameter is undocumented."
-            params.append(desc.SimpleParam(name = name, type = type, type_pretty = type_pretty, doc = param_doc))
-        # Now we handle array params.
-        complex_params = []
-        for i, j in zip(params[:], params[1:]):
-            if (i.name, j.name) in arrays:
-                complex_params.append(desc.ArrayParam(params = (i, j)))
-            else:
-                complex_params.append(i) # But not j, because the next two might be an array parameter.
-        # We might be one short.
-        used = sum([i._uses for i in complex_params])
-        params = complex_params + params[used:]
-        # Now, we can finally build the function itself.
-        func = desc.FunctionInfo(doc = doc, return_type = return_type, return_type_pretty = return_type_pretty,
-            name = name, params = params, category = category)
-        # This is to allow code reuse for extra functions.
-        if not _no_register:
-            self.functions[name] = func
-        else:
-            return func
-
+            params.append(desc.SimpleParam(name = paramname, type = type, type_pretty = type_pretty, doc = param_doc))
+        return desc.FunctionInfo(doc = None, return_type = return_type, return_type_pretty = return_type_pretty,
+            name = None, params = params, category = None)
 
     def _convert_typeinfo(self, type, translate_typedef):
         base = type.base
@@ -124,6 +148,8 @@ arrays: A list of tuples containing the names of parameters forming a (length, a
             quals = {i[0]+td.indirection: i[1] for i in quals.items()}
             quals.update(td.quals)
             base = td.base
+        if isinstance(base, desc.FunctionInfo):
+            base = self._convert_functioninfo(base)
         return desc.TypeInfo(base = base, indirection = indirection, quals = quals)
 
     def node(self, components, identifier, doc_name, doc_description):
@@ -196,7 +222,7 @@ If left alone, access_type defaults to writable.  If access_type_notes is provid
                 raise BuilderError("{} is not a valid enum.".format(assocaited_enuim))
             if default not in self.c_info['constants_by_enum'][associated_enum]:
                 raise BuilderError("{} is not a constant of enum {}".format(default, associated_enum))
-            range = min(self.c_info['constants_by_enum'][associated_enum].values()), max(self.c_info['constants_byu_enum'][associated_enum].values()))
+            range = (min(self.c_info['constants_by_enum'][associated_enum].values()), max(self.c_info['constants_byu_enum'][associated_enum].values()))
         defaults = {desc.PropertyTypes.int: 0, desc.PropertyTypes.float: 0.0,
             desc.PropertyTypes.double: 0.0, desc.PropertyTypes.float3: (0.0, 0.0, 0.0),
             desc.PropertyTypes.float6: (0.0, 0.0, 0.0, 0.0, 0.0, 0.0)}
@@ -239,5 +265,22 @@ If left alone, access_type defaults to writable.  If access_type_notes is provid
 The parameters here are the same as for c_function, save category which is not applicable."""
         if name not in self.c_info['functions']:
             raise ValueError("{} is not a valid function.".format(name))
-        return self._c_function_unvalidated(name = name, doc = doc, category = None, param_docs = param_docs, defaults = defaults, arrays = arrays, _no_register = True)
+        return self._c_function_unvalidated(name = name, doc = doc, category = None, param_docs = param_docs, defaults = defaults, arrays = arrays)
 
+    def callback(self, name, getter, setter, in_audio_thread, doc):
+        """Make a callback.
+
+Getter and setter are getter and setter function names for the callback, of the form Lav_blaNodeGetCallback, Lav_blaNodeSetCallback.  We get the type of the function pointer from the second parameter of the setter callback.
+
+in_audio_thread and doc are as in bindings_description."""
+        # The getter and setter are registerd, but don't necessarily contain docs.
+        if getter not in self.functions:
+            raise BuilderError("getter {} does not exist.".format(getter))
+        if setter not in self.functions:
+            raise BuilderError("Setter {} does not exist.".format(setter))
+        getter = self.functions[getter]
+        setter = self.functions[setter]
+        # The signature is the converted TypeInfo of the setter's second parameter's base.
+        signature = self._convert_typeinfo(setter.params[1].type, translate_typedef = True).base.params[1]
+        signature_typedef = setter.params[1].type.base
+        

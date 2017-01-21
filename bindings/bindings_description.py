@@ -10,7 +10,7 @@ inf = float('inf')
 class TypeInfo:
     """Describes a type.  Members:
 
-base: The base type as a string.
+base: The base type as a string or FunctionInfo.  If FunctionInfo, indirection is at least 1.
 indirection: the number of pointer indirections.
 quals: The qualifiers at each indirection. Keys are ints.
 
@@ -71,7 +71,7 @@ output: true if this parameter is an output parameter, otherwise false.
 type: The type with typedefs translated.
 type_pretty: The type without typedefs translated.
 default: The default value of the param, represented as an appropriate Python object. None if there is no default, and 0 for null pointers.
-doc: The documentation for the parameter. May be None in any case; warnings are printed if this isn't because it's a callback getter/setter or undocumented function.
+doc: The documentation for the parameter. May be None in any case; warnings are printed in the bindings dsl if this isn't because it's a callback getter/setter or undocumented function.
 """
 
     _uses = 1 # For part of the bindings DSL. How many parameters does this consume?
@@ -91,9 +91,10 @@ class ArrayParam:
 
 This is essentially a pair of parameters, the first of which is always a length and the second of which is always a pointer.
 
-
 params: params[0] is the ,length parameter. params[1] is the pointer.
 output: True if this is an output parameter.
+
+When computing documentation, use the second parameter for languages which don't require explicitly passing lengths.  A property is provided here for convenience.
 """
 
     _uses = 2 # For part of the bindings DSL. How many parameters does this consume?
@@ -104,6 +105,10 @@ output: True if this is an output parameter.
                 raise ValueError("Array parameter with one input and one output parameter")
                 output = params[0].output
         self.output = output
+
+    @property
+    def doc(self):
+        return self.params[1].doc
 
 class Enum:
     """Represents a C enum
@@ -222,14 +227,16 @@ name: The name of the callback.
 doc: The callback's documentation.
 getter: The C function which gets this callback.
 setter: The C function which sets this callback.
+signature: A FunctionInfo representing the callback's signature. Annotated with parameter docs, etc.
+signature_typedef: The name of the C typedef representing this callback.
 in_audio_thread: true if the callback is called in the audio thread.
-type: A FunctionInfo describing the callback's signature.
 """
-    def __init__(self, name, getter, setter,
+    def __init__(self, name, getter, setter, signature, signature_typedef,
         in_audio_thread, type, doc):
         self.name = name
         self.getter = getter
         self.setter = setter
         self.in_audio_thread = in_audio_thread
-        self.type = type
+        self.signature = signature
+        self.signature_typedef = signature_typedef
         self.doc = doc
