@@ -1,10 +1,10 @@
 """This is the bindings DSL.
 
-An instance of Builder is created by the bindings generator. Then, all .py files in metadata/* are read into strings and executed with the methods of the Builder instance and contents of the bindings_description module in the global namespace.
+An instance of Builder is created by the bindings generator. Then, all .py files in metadata/* are read into strings and executed with the methods of the Builder instance and everything else public this module imports or defines in the global namespace.
 
 As a convenience, this module accepts strings anywhere an enum would be needed; in that case, it must be the name of the enum's member."""
-from . import bindings_description as desc
-from .bindings_description import inf
+from . import metadata_description as desc
+from .metadata_description import inf
 
 class BuilderError(Exception):
     """An implementation detail. We want something specific to throw."""
