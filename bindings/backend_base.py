@@ -1,6 +1,6 @@
 """This is the base class for all bindings generator backends.
 
-See also bindings_description.py, which defines the classes that represent Libaudioverse objects. Your backend will receive instances of them.
+See also metadata_description.py, which defines the classes that represent Libaudioverse objects. Your backend will receive instances of them.
 """
 from abc import abstractmethod
 
@@ -59,6 +59,7 @@ You can override one here with the jfilt_ mechanism. Don't.
         """End traversal of information extracted from the C header."""
         pass
 
+    @abstractmethod
     def write_manually_bound_objects(self):
         """Write all objects that this generator backend manually binds, i.e. servers, buffers, and classes to represent properties."""
         pass
@@ -105,17 +106,17 @@ You can override one here with the jfilt_ mechanism. Don't.
 
 
     @abstractmethod
-    def begin-extra_functions(self, node_info):
+    def begin_extra_functions(self, node_info):
         """Visit this node's extra functions."""
         pass
 
     @abstractmethod
-    def visit_extra_function9self, node_info, function_info):
+    def visit_extra_function(self, node_info, function_info):
         """Bind an extra function."""
         pass
 
     @abstractmethod
-    def end_extra_function9self, node_info):
+    def end_extra_function(self, node_info):
         """End binding of extra functions."""
         pass
 
@@ -146,7 +147,7 @@ Do not use this on a directory containing binary files."""
 class CodeBuilder:
     """This class represents a destination for code.  You need to use it instead of files.  Instantiate it with get_builder.
 
-As a convenience, lines can be appended with +=."""
+As a convenience, lines can be appended with +=.  If you append more than one line, all lines are indented to the current level."""
 
     def __init__(self, backend, path, indent = "    "):
         self.backend = backend.
@@ -157,14 +158,16 @@ As a convenience, lines can be appended with +=."""
         self._indent_level = 0
         self._indent = indent
 
-    def write_line(self, line, allow_indent = True):
-        if allow_indent and len(line):
-            line = self._indent*self._indent_level + line
-        self._text.append(line)
+    def write(self, text, allow_indent = True):
+        text = text.replace("\r", "").split("\n")
+        for l in text:
+            if allow_indent and len(line):
+                line = self._indent*self._indent_level + line
+            self._text.append(line)
 
     def __iadd__(self, other):
         """Convenient way to add lines."""
-        self.write_line(other)
+        self.write(other)
 
     def indent(self):
         self._indent += 1
