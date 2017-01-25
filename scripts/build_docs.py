@@ -4,10 +4,7 @@ import os.path
 import sys
 import shutil
 import subprocess
-
-#we have to have the root dir of the repository in sys.path.
-repository_root = os.path.split(os.path.split(os.path.abspath(__file__))[0])[0]
-sys.path = [repository_root] + sys.path
+# Libaudioverse imports
 import docgen
 import bindings.get_info
 

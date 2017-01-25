@@ -7,7 +7,7 @@ add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/default_hrtf.hrtf"
 COMMAND ${PYTHON_COMMAND}
 ARGS
 "${PYTHON_ARGS}"
-"${CMAKE_SOURCE_DIR}/scripts/diffuse_mit_hrtf.py"
+"${CMAKE_SOURCE_DIR}/scripts/run.py" diffuse_mit_hrtf
 "${CMAKE_SOURCE_DIR}/diffuse mit kemar dataset"
 "${CMAKE_CURRENT_BINARY_DIR}/default_hrtf.hrtf"
 DEPENDS
@@ -20,7 +20,7 @@ OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/data/default_hrtf.cpp"
 COMMAND "${PYTHON_COMMAND}"
 ARGS
 "${PYTHON_ARGS}"
-"${CMAKE_SOURCE_DIR}/scripts/convert_to_cpp_file.py" 
+"${CMAKE_SOURCE_DIR}/scripts/run.py" convert_to_cpp_file
 "libaudioverse_implementation"
 "default_hrtf"
 "${CMAKE_CURRENT_BINARY_DIR}/default_hrtf.hrtf"
@@ -177,11 +177,11 @@ file(APPEND "${CMAKE_BINARY_DIR}/compiler_flags.txt" "${CMAKE_SHARED_LINKER_FLAG
 #Docs.
 if(${LIBAUDIOVERSE_DEVMODE})
 ADD_CUSTOM_TARGET(libaudioverse_docs
-COMMAND ${PYTHON_COMMAND} ${PYTHON_ARGS} "\"${CMAKE_SOURCE_DIR}/scripts/build_docs.py\""
+COMMAND ${PYTHON_COMMAND} ${PYTHON_ARGS} "\"${CMAKE_SOURCE_DIR}/scripts/run.py\"" build_docs
 )
 else()
 ADD_CUSTOM_TARGET(libaudioverse_docs ALL
-COMMAND ${PYTHON_COMMAND} "\"${CMAKE_SOURCE_DIR}/scripts/build_docs.py\""
+COMMAND ${PYTHON_COMMAND} "\"${CMAKE_SOURCE_DIR}/scripts/run.py\"" build_docs
 )
 endif()
 
