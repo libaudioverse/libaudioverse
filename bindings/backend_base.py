@@ -23,10 +23,12 @@ Unless disabled, all text files you write will be passed through Jinja2 after ge
 
 The transformers in transformers.py are always available to your templates under their names in that file.
 You can override one here with the jfilt_ mechanism. Don't.
+
+Render all templates through self.render.
 """
 
     def __init__():
-        # Todo: set up Jinja2 contexts.
+        self.jinja2_environment = jinja2.Environment(trim_blocks = True)
         pass
 
     @abstractmethod
@@ -143,6 +145,11 @@ Do not use this on a directory containing binary files."""
     def get_builder(self, path):
         """Given a path, create a CodeBuilder."""
         pass
+
+    def render(self, text, **kwargs):
+        """Render a Jinja2 template, with kwargs as the context."""
+        template = self.jinja2_environment.from_string(text, globals = kwargs)
+        return template.render(kwargs)
 
 class CodeBuilder:
     """This class represents a destination for code.  You need to use it instead of files.  Instantiate it with get_builder.

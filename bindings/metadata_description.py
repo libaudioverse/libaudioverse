@@ -29,6 +29,7 @@ Function categories primarily exist to differentiate sections in the main manual
 name: The name of the category.
 doc_name: The heading for the category in documentation.
 doc_description: The description of the category in documentation.
+functions: the functions in this category, sorted by name.
 
 All functions which are documented and not associated with an object have a category.
 """
@@ -241,3 +242,20 @@ in_audio_thread: true if the callback is called in the audio thread.
         self.signature = signature
         self.signature_typedef = signature_typedef
         self.doc = doc
+
+class Metadata:
+    """Holds all the stuff.
+
+function_categories: A dict mapping category names to FunctionCategory instance.
+functions: A dict, maps function names to FunctionInfo.  Includes undocumented functions, callback setters, etc.
+nodes: A dict of node instances mapping identifier to node instance.
+enums: A dict of enums, including all undocumented ones.
+documented_enums: Documented enums.
+"""
+    def __init__(self, function_categories, functions, nodes, enums, documented_enums):
+        self.functions = functions
+        self.function_Categories = function_categories
+        self.enums = enums
+        self.documented_enums = documented_enums
+        self.nodes = nodes
+

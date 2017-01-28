@@ -5,6 +5,7 @@ An instance of Builder is created by the bindings generator. Then, all .py files
 As a convenience, this module accepts strings anywhere an enum would be needed; in that case, it must be the name of the enum's member."""
 from . import metadata_description as desc
 from .metadata_description import inf
+import copy
 
 class BuilderError(Exception):
     """An implementation detail. We want something specific to throw."""
@@ -46,6 +47,9 @@ class Builder:
         for name in c_info['functions']:
             f = self._c_function_unvalidated(name = name, category = None, doc = None, param_docs = dict(), defaults = dict(), arrays = [])
             self.functions[name] = f
+        self.nodes = dict()
+        self.documented_enums = dict() # holds tuples (description, members) where members is a dict.
+
 
     def register_c_category(self, name, doc_name, doc_description):
         """Registers a category for C functions to be in."""
@@ -83,6 +87,8 @@ arrays: A list of tuples containing the names of parameters forming a (length, a
             print("Warning: function {}: the following parameters are undocumented:\n".format(name))
             print(" "*2 + undocumented_params)
         self.functions[name] = f
+        self.categories[category].functions.append(f)
+
 
     def _c_function_unvalidated(self, name, category, doc, param_docs, defaults, arrays):
         category = self.categories.get(category, None)
@@ -153,6 +159,31 @@ arrays: A list of tuples containing the names of parameters forming a (length, a
             base = self._convert_functioninfo(base)
         return desc.TypeInfo(base = base, indirection = indirection, quals = quals)
 
+    def documented_enum(self, name, doc, members):
+        """Document an enum.
+
+name: the name of the enum.
+doc: The description of the enum.
+members: A dict mapping member identifiers to descriptions.
+"""
+        if name not in self.c_info.constants_by_enum:
+            raise BuilderError("{} is not an enum.".format(name))
+        for i in members.keys():
+            if i not in self.c_info.constants_by_enum[name]:
+                raise BuilderError("{} is not a member of {}".format(i, name))
+        if len(members) != len(self.c_info.constants_by_enum[name]):
+            missing = set(self.c_info.constants_by_enum[name].keys())
+            missing -= set(members.keys())
+            missing = " ".join(missing)
+            raise BuilderError("You didn't document all the members. Missing {}".format(missing))
+        tmp = dict()
+        for name, value in self.c_info.constants_by_enum[name].items():
+            doc = members[name]
+            tmp[name] = desc.EnumMember(name = name, doc = doc, value = value)
+        members = tmp
+        self.documented_enums[name] = desc.Enum(name = name, doc = doc, members = members)
+
+
     def node(self, components, identifier, doc_name, doc_description):
         """Registers a node.
 
@@ -175,7 +206,7 @@ identifier is the Lav_OBJTYPE_xxx constant's name as a string."""
         node = desc.Node(identifier = identifier, doc_name = doc_name, doc_description = doc_description,
             properties = properties, callbacks = callbacks, extra_functions = extra_functions,
             inputs = inputs, outputs = outputs)
-        #todo: put this somewhere.
+        self.nodes[identifier] = node
 
     def _connection_builder(self, cls, doc, channel_type, channels):
         """Builds connections.  User code should not use this function directly."""
@@ -286,3 +317,23 @@ in_audio_thread and doc are as in bindings_description."""
         signature = setter.params[1].type.base
         signature_typedef = setter.params[1].type_pretty.base
         return desc.Callback(name = name, doc = doc, setter = setter, signature =signature, signature_typedef = signature_typedef, in_audio_thread = in_audio_thread)
+
+    def finish(self):
+        """Compile the info we have collected into a metadata_description.Metadata instance."""
+        nodes = self.nodes
+        functions = self.functions
+        function_categories = self.categories
+        function_categories.sort(key = lambda x: x.name)
+        for i in functino_categories:
+            i.functions.sort(key = lambda x: x.name)
+        # We have a number of enum instances already, but need to make up the rest here.
+        undocumented_enums = dict()
+        for i, j in self.c_info['constants_by_enum'].items()
+            if i in self.documented_enums:
+                continue
+            members = {k[0]: desc.EnumMember(name = k[0], value = k[1], doc = None) for k in j.items()}
+            undocumented_enums[i] = desc.Enum(name = i, doc = None, members = members)
+        enums = dict(documented_enums)
+        enums.update(undocumented_enums)
+        return desc.Metadata(nodes = nodes, functions = functions, function_categores = function_categories,
+            enums = enums, undocumented_enums = undocumented_enums)
