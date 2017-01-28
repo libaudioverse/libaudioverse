@@ -34,10 +34,11 @@ functions: the functions in this category, sorted by name.
 All functions which are documented and not associated with an object have a category.
 """
 
-    def __init__(self, name, doc_name, doc_description):
+    def __init__(self, name, doc_name, doc_description, functions):
         self.name = name
         self.doc_name = doc_name
         self.doc_description = doc_description
+        self.functions = functions
 
 class Function:
     """Describes a function.
@@ -251,11 +252,12 @@ functions: A dict, maps function names to FunctionInfo.  Includes undocumented f
 nodes: A dict of node instances mapping identifier to node instance.
 enums: A dict of enums, including all undocumented ones.
 documented_enums: Documented enums.
+typedefs: A ordereddict of typedef name to TypeInfo representing it.  These are ordered by their appearance in the source.
 """
-    def __init__(self, function_categories, functions, nodes, enums, documented_enums):
+    def __init__(self, function_categories, functions, nodes, enums, documented_enums, typedefs):
         self.functions = functions
         self.function_Categories = function_categories
         self.enums = enums
         self.documented_enums = documented_enums
         self.nodes = nodes
-
+        self.typedefs = typedefs

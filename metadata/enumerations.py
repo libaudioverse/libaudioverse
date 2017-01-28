@@ -1,11 +1,11 @@
-document_enum(name = "Lav_ERRORS"
+document_enum(name = "Lav_ERRORS",
 doc = r"""
 All functions in this library return one of the following enum values, indicating their error condition.
 """,
 members = {
     "Lav_ERROR_NONE": "No error occured.",
     "Lav_ERROR_UNKNOWN": "Something went wrong.  This error indicates that we couldn't figure out what.",
-    "Lav_ERROR_NOT_INITIALIZED": "Failure to call {{"Lav_initialized"|codelit}}.",
+    "Lav_ERROR_NOT_INITIALIZED": """Failure to call {{"Lav_initialized"|codelit}}.""",
     "Lav_ERROR_TYPE_MISMATCH": "Indicates an attempt to manipulate a property through a function that does not work with that property's type.",
     "Lav_ERROR_INVALID_PROPERTY": "An attempt to access a property which does not exist on the specified node.",
     "Lav_ERROR_NULL_POINTER": "You passed a null pointer into Libaudioverse in a context where null pointers are not allowed.",
@@ -31,10 +31,9 @@ doc = """
 Indicates the type of a property.
 """,
 members = {
-    "Lav_PROPERTYTYPE_INT": "Property holds a 32-bit integer.",,
+    "Lav_PROPERTYTYPE_INT": "Property holds a 32-bit integer.",
     "Lav_PROPERTYTYPE_FLOAT": "Property holds a 32-bit floating point value.",
     "Lav_PROPERTYTYPE_DOUBLE": "Property holds a 64-bit double.",
-    "Lav_PROPERTYTYPE_STRING": "Property holds a string.",
     "Lav_PROPERTYTYPE_FLOAT3": "Property holds a float3, a vector of 3 floats.",
     "Lav_PROPERTYTYPE_FLOAT6": "Property holds a float6, a vector of 6 floats.",
     "Lav_PROPERTYTYPE_FLOAT_ARRAY": "Property is an array of floats.",

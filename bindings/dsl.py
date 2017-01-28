@@ -5,7 +5,7 @@ An instance of Builder is created by the bindings generator. Then, all .py files
 As a convenience, this module accepts strings anywhere an enum would be needed; in that case, it must be the name of the enum's member."""
 from . import metadata_description as desc
 from .metadata_description import inf
-import copy
+import collections
 
 class BuilderError(Exception):
     """An implementation detail. We want something specific to throw."""
@@ -53,7 +53,7 @@ class Builder:
 
     def register_c_category(self, name, doc_name, doc_description):
         """Registers a category for C functions to be in."""
-        cat = desc.FunctionCategory(name = name, doc_name = doc_name, doc_description = doc_description)
+        cat = desc.FunctionCategory(name = name, doc_name = doc_name, doc_description = doc_description, functions = [])
         self.categories[name] = cat
 
     def c_function(self, name, category, doc, param_docs = dict(), defaults = dict(), arrays = []):
@@ -143,7 +143,7 @@ arrays: A list of tuples containing the names of parameters forming a (length, a
                 param_doc = "The property to manipulate."
             params.append(desc.SimpleParam(name = paramname, type = type, type_pretty = type_pretty, doc = param_doc))
         return desc.Function(doc = None, return_type = return_type, return_type_pretty = return_type_pretty,
-            name = None, params = params, category = None)
+            name = info.name, params = params, category = None)
 
     def _convert_typeinfo(self, type, translate_typedef):
         base = type.base
@@ -159,25 +159,25 @@ arrays: A list of tuples containing the names of parameters forming a (length, a
             base = self._convert_functioninfo(base)
         return desc.TypeInfo(base = base, indirection = indirection, quals = quals)
 
-    def documented_enum(self, name, doc, members):
+    def document_enum(self, name, doc, members):
         """Document an enum.
 
 name: the name of the enum.
 doc: The description of the enum.
 members: A dict mapping member identifiers to descriptions.
 """
-        if name not in self.c_info.constants_by_enum:
+        if name not in self.c_info['constants_by_enum']:
             raise BuilderError("{} is not an enum.".format(name))
         for i in members.keys():
-            if i not in self.c_info.constants_by_enum[name]:
+            if i not in self.c_info['constants_by_enum'][name]:
                 raise BuilderError("{} is not a member of {}".format(i, name))
-        if len(members) != len(self.c_info.constants_by_enum[name]):
+        if len(members) != len(self.c_info['constants_by_enum'][name]):
             missing = set(self.c_info.constants_by_enum[name].keys())
             missing -= set(members.keys())
             missing = " ".join(missing)
             raise BuilderError("You didn't document all the members. Missing {}".format(missing))
         tmp = dict()
-        for name, value in self.c_info.constants_by_enum[name].items():
+        for name, value in self.c_info['constants_by_enum'][name].items():
             doc = members[name]
             tmp[name] = desc.EnumMember(name = name, doc = doc, value = value)
         members = tmp
@@ -323,17 +323,17 @@ in_audio_thread and doc are as in bindings_description."""
         nodes = self.nodes
         functions = self.functions
         function_categories = self.categories
-        function_categories.sort(key = lambda x: x.name)
-        for i in functino_categories:
+        for i in function_categories.values():
             i.functions.sort(key = lambda x: x.name)
         # We have a number of enum instances already, but need to make up the rest here.
         undocumented_enums = dict()
-        for i, j in self.c_info['constants_by_enum'].items()
+        for i, j in self.c_info['constants_by_enum'].items():
             if i in self.documented_enums:
                 continue
             members = {k[0]: desc.EnumMember(name = k[0], value = k[1], doc = None) for k in j.items()}
             undocumented_enums[i] = desc.Enum(name = i, doc = None, members = members)
-        enums = dict(documented_enums)
+        enums = dict(self.documented_enums)
         enums.update(undocumented_enums)
-        return desc.Metadata(nodes = nodes, functions = functions, function_categores = function_categories,
-            enums = enums, undocumented_enums = undocumented_enums)
+        typedefs = collections.OrderedDict([(i[0], self._convert_typeinfo(i[1], translate_typedef = False)) for i in self.c_info['typedefs'].items()])
+        return desc.Metadata(nodes = nodes, functions = functions, function_categories = function_categories,
+            enums = enums, documented_enums = dict(self.documented_enums), typedefs = typedefs)
