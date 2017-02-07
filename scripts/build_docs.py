@@ -1,4 +1,3 @@
-
 import os
 import os.path
 import sys
@@ -11,8 +10,9 @@ import bindings.get_info
 if __name__ == '__main__':
     print("Building documentation...")
     info=bindings.get_info.get_all_info()
+    root_directory = bindings.get_info.get_root_directory()
     docgen.prepare_docs(info)
-    dest_dir = os.path.join(repository_root, 'build', 'documentation')
+    dest_dir = os.path.join(root_directory, 'build', 'documentation')
 
     node_reference = docgen.make_node_reference(info)
     c_api_docs=docgen.make_c_api(info)
@@ -20,7 +20,7 @@ if __name__ == '__main__':
     if os.path.exists(dest_dir):
         shutil.rmtree(dest_dir)
 
-    shutil.copytree(os.path.join(repository_root, 'documentation'), dest_dir)
+    shutil.copytree(os.path.join(root_directory, 'documentation'), dest_dir)
 
     with open(os.path.join(dest_dir, 'node_reference.asciidoc'), 'w') as f:
         f.write(node_reference)
@@ -31,7 +31,7 @@ if __name__ == '__main__':
 
     subprocess.call(["asciidoctor", os.path.join(dest_dir, 'libaudioverse_manual.asciidoc')], stderr= subprocess.STDOUT, shell = True)
 
-    if not os.path.exists(os.path.join(repository_root, "build", "artifacts")):
-        os.makedirs(os.path.join(repository_root, "build", "artifacts"))
-    shutil.copy(os.path.join(repository_root, "build", "documentation", "libaudioverse_manual.html"),
-    os.path.join(repository_root, "build", "artifacts"))
+    if not os.path.exists(os.path.join(root_directory, "build", "artifacts")):
+        os.makedirs(os.path.join(root_directory, "build", "artifacts"))
+    shutil.copy(os.path.join(root_directory, "build", "documentation", "libaudioverse_manual.html"),
+    os.path.join(root_directory, "build", "artifacts"))
