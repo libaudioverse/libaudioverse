@@ -1,4 +1,4 @@
-{%import 'macros.t' as macros with context%}
+
 import ctypes
 import ctypes.util
 import os.path
@@ -27,23 +27,5 @@ else:
     try:
         libaudioverse_module = ctypes.cdll.LoadLibrary(libaudioverse_name)
     except:
-      #Assume it's in /usr/local and try that.
-      libaudioverse_module = ctypes.cdll.LoadLibrary("/usr/local/lib/"+libaudioverse_name)
-
-{%for name, val in constants.items() -%}
-{{name}} = {{val}}
-{%endfor%}
-
-{%for n, t in typedefs.items()%}
-{{n}} = {{t|ctypes_string}}
-{%endfor%}
-
-{%for name, info in functions.items()-%}
-{{name}} = ctypes.CFUNCTYPE({{info.return_type|ctypes_string}}
-{%-if info.args|length > 0%}, {%endif%}{#some functions don't have arguments; if it doesn't, we must avoid the first comma#}
-{%-for arg in info.args-%}
-{{arg.type|ctypes_string}}
-{%-if not loop.last%}, {%endif-%}{#put in a comma and space if needed#}
-{%-endfor-%}
-)(('{{name}}', libaudioverse_module))
-{%endfor%}
+        #Assume it's in /usr/local and try that.
+        libaudioverse_module = ctypes.cdll.LoadLibrary("/usr/local/lib/"+libaudioverse_name)
