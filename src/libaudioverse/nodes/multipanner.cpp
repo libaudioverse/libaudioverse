@@ -26,18 +26,17 @@ MultipannerNode::MultipannerNode(std::shared_ptr<Server> server, std::shared_ptr
 panner(server->getBlockSize(), server->getSr(), hrtf) {
 	appendInputConnection(0, 1);
 	appendOutputConnection(0, 2);
-	strategyChanged();
 }
 
 std::shared_ptr<Node> createMultipannerNode(std::shared_ptr<Server> server, std::shared_ptr<HrtfData> hrtf) {
 	auto retval = standardNodeCreation<MultipannerNode>(server, hrtf);
 	retval->strategyChanged();
-	server->registerNodeForWillTick(retval);
 	return retval;
 }
 
 void MultipannerNode::strategyChanged() {
 	int newStrategy = getProperty(Lav_PANNER_STRATEGY).getIntValue();
+	panner.setStrategy(newStrategy);
 	int channels=2;
 	switch(newStrategy) {
 		case Lav_PANNING_STRATEGY_HRTF:
@@ -62,7 +61,7 @@ void MultipannerNode::process() {
 	if(werePropertiesModified(this, Lav_PANNER_AZIMUTH)) panner.setAzimuth(getProperty(Lav_PANNER_AZIMUTH).getFloatValue());
 	if(werePropertiesModified(this, Lav_PANNER_ELEVATION)) panner.setElevation(getProperty(Lav_PANNER_ELEVATION).getFloatValue());
 	if(werePropertiesModified(this, Lav_PANNER_SHOULD_CROSSFADE)) panner.setShouldCrossfade(getProperty(Lav_PANNER_SHOULD_CROSSFADE).getIntValue() == 1);
-	if(werePropertiesModified(this, Lav_PANNER_STRATEGY)) panner.setStrategy(getProperty(Lav_PANNER_STRATEGY).getIntValue());
+	if(werePropertiesModified(this, Lav_PANNER_STRATEGY)) strategyChanged();
 	panner.process(input_buffers[0], &output_buffers[0]);
 }
 

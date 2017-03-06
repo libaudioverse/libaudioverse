@@ -30,7 +30,7 @@ int main(int argc, char** args) {
 	LavHandle bufferNode, hrtfNode, limit;
 	ERRCHECK(Lav_initialize());
 	ERRCHECK(Lav_createServer(44100, 1024, &server));
-	ERRCHECK(Lav_serverSetOutputDevice(server, "default", 2));
+	ERRCHECK(Lav_serverSetOutputDevice(server, "default", 2, 2));
 	ERRCHECK(Lav_createBufferNode(server, &bufferNode));
 	LavHandle buffer;
 	ERRCHECK(Lav_createBuffer(server, &buffer));

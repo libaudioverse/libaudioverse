@@ -1,6 +1,9 @@
 [submodule "audio_io"]
 	path = audio_io
 	url = https://github.com/libaudioverse/audio_io
+[submodule "glm"]
+	path = glm
+	url = https://github.com/g-truc/glm.git
 [submodule "powercores"]
 	path = powercores
 	url = https://github.com/libaudioverse/powercores

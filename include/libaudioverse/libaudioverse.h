@@ -212,7 +212,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_serverGetBlock(LavHandle serverHandle, unsigned
 Lav_PUBLIC_FUNCTION LavError Lav_serverGetSr(LavHandle serverHandle, int* destination);
 
 /**Set or clear the output device.*/
-Lav_PUBLIC_FUNCTION LavError Lav_serverSetOutputDevice(LavHandle serverHandle, const char* device, int channels);
+Lav_PUBLIC_FUNCTION LavError Lav_serverSetOutputDevice(LavHandle serverHandle, const char* device, int channels, int mixahead);
 Lav_PUBLIC_FUNCTION LavError Lav_serverClearOutputDevice(LavHandle serverHandle);
 
 Lav_PUBLIC_FUNCTION LavError Lav_serverLock(LavHandle serverHandle);

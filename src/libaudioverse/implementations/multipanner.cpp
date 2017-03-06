@@ -19,10 +19,11 @@ block_size(_block_size), sr(_sr), channels(2), strategy(Lav_PANNING_STRATEGY_STE
 hrtf_data(_hrtf_data),
 hrtf_panner(_block_size, _sr, _hrtf_data),
 amplitude_panner(_block_size, _sr) {
+	amplitude_panner.readMap(2, standard_panning_map_stereo);
 }
 
 void Multipanner::process(float* input, float** outputs) {
-	if(strategy = Lav_PANNING_STRATEGY_HRTF) {
+	if(strategy == Lav_PANNING_STRATEGY_HRTF) {
 		hrtf_panner.setShouldCrossfade(should_crossfade);
 		hrtf_panner.setCrossfadeThreshold(crossfade_threshold);
 		hrtf_panner.setAzimuth(azimuth);

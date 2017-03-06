@@ -32,7 +32,7 @@ int main(int argc, char** args) {
 	LavHandle node, world, source;
 	ERRCHECK(Lav_initialize());
 	ERRCHECK(Lav_createServer(44100, 1024, &server));
-	ERRCHECK(Lav_serverSetOutputDevice(server, "default", 2));
+	ERRCHECK(Lav_serverSetOutputDevice(server, "default", 2, 2));
 	ERRCHECK(Lav_createEnvironmentNode(server, hrtfFile, &world));
 	ERRCHECK(Lav_createBufferNode(server, &node));
 	LavHandle buffer;
