@@ -26,7 +26,7 @@ int main() {
 	LavHandle node;
 	ERRCHECK(Lav_initialize());
 	ERRCHECK(Lav_createServer(44100, 8192, &server));
-	ERRCHECK(Lav_serverSetOutputDevice(server, "default", 2));
+	ERRCHECK(Lav_serverSetOutputDevice(server, "default", 2, 2));
 	ERRCHECK(Lav_createSineNode(server, &node));
 	ERRCHECK(Lav_nodeSetFloatProperty(node, Lav_OSCILLATOR_FREQUENCY, 0));
 	ERRCHECK(Lav_nodeConnectServer(node, 0));

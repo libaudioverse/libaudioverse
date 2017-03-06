@@ -190,6 +190,7 @@ functions:
     params:
       device: The output device  the server is to play on.
       channels: The number of channels we wish to output.
+      mixahead: The number of audio blocks to prepare ahead of the audio device. Must be at least 1.
   Lav_serverClearOutputDevice:
     category: servers
     doc_description: |

@@ -112,7 +112,7 @@ void Server::doMaintenance() {
 	killDeadWeakPointers(will_tick_nodes);
 }
 
-void Server::setOutputDevice(int index, int channels) {
+void Server::setOutputDevice(int index, int channels, int mixahead) {
 	if(index < -1) ERROR(Lav_ERROR_RANGE, "Index -1 is default; all other negative numbers are invalid.");
 	if(output_device) {
 		output_device->stop();
@@ -132,7 +132,7 @@ void Server::setOutputDevice(int index, int channels) {
 		}
 	};
 	try {
-		output_device =factory->createDevice(cb, index, channels, getSr(), getBlockSize(), 0.0, 0.1, 0.2);
+		output_device =factory->createDevice(cb, index, channels, getSr(), getBlockSize(), mixahead);
 		if(output_device == nullptr) ERROR(Lav_ERROR_CANNOT_INIT_AUDIO, "Device could not be created.");
 	}
 	catch(std::exception &e) {
@@ -271,8 +271,9 @@ Lav_PUBLIC_FUNCTION LavError Lav_serverGetSr(LavHandle serverHandle, int* destin
 	PUB_END
 }
 
-Lav_PUBLIC_FUNCTION LavError Lav_serverSetOutputDevice(LavHandle serverHandle, const char* device, int channels) {
+Lav_PUBLIC_FUNCTION LavError Lav_serverSetOutputDevice(LavHandle serverHandle, const char* device, int channels, int mixahead) {
 	PUB_BEGIN
+	if(mixahead < 1) ERROR(Lav_ERROR_RANGE, "Mixahead must be at least 1.");
 	auto s = incomingObject<Server>(serverHandle);
 	int index;
 	auto device_string = std::string(device);
@@ -290,7 +291,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_serverSetOutputDevice(LavHandle serverHandle, c
 		if(processed == 0) {ERROR(Lav_ERROR_NO_SUCH_DEVICE, "Identifier string is invalid.");}
 	}
 	//This is threadsafe and needs to be entered properly so it can make sure we dont' deadlock in audio_io.
-	s->setOutputDevice(index, channels);
+	s->setOutputDevice(index, channels, mixahead);
 	PUB_END
 }
 
