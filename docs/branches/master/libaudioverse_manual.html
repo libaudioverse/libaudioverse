@@ -2622,7 +2622,7 @@ The one thing you should never do in this callback is access anything belonging 
 <div class="sect4">
 <h5 id="function-Lav_serverSetOutputDevice">Lav_serverSetOutputDevice</h5>
 <div class="paragraph">
-<p>Prototype: <code>LavError Lav_serverSetOutputDevice(LavHandle serverHandle, const char* device, int channels)</code></p>
+<p>Prototype: <code>LavError Lav_serverSetOutputDevice(LavHandle serverHandle, const char* device, int channels, int mixahead)</code></p>
 </div>
 <div class="paragraph">
 <p>Set the output device of the server.
@@ -2661,6 +2661,11 @@ Use the literal string "default" for the default audio device.</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>int</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">channels</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The number of channels we wish to output.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>int</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">mixahead</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The number of audio blocks to prepare ahead of the audio device. Must be at least 1.</p></td>
 </tr>
 </tbody>
 </table>
@@ -11123,7 +11128,7 @@ This is mostly for the <a href="#node-Lav_OBJTYPE_MULTIPANNER_NODE">multipanner 
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-01-20 15:40:43 Coordinated Universal Time
+Last updated 2017-03-06 21:23:11 Coordinated Universal Time
 </div>
 </div>
 <script type="text/x-mathjax-config">
