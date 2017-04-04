@@ -45,7 +45,9 @@ void initializeMemoryModule() {
 }
 
 void shutdownMemoryModule() {
-	std::lock_guard<std::recursive_mutex> l(*memory_lock);
+	// We need to keep objects alive until we reach the end of this function.
+	std::vector<std::shared_ptr<void>> keepAlive;
+	std::unique_lock<std::recursive_mutex> l(*memory_lock);
 	//We're about to shut down, but sometimes there are cycles.
 	//The most notable case of this is nodes connected to the server: the server holds them and they hold the server.
 	//In order to help prevent bugs, we therefore isolate all nodes that we can reach.
@@ -54,9 +56,9 @@ void shutdownMemoryModule() {
 	//This additionally results in a running thread that we never join.
 	for(auto &i: *weak_external_handles) {
 		auto obj = i.second.lock();
+		keepAlive.push_back(obj);
 		auto s = std::dynamic_pointer_cast<Server>(obj);
 		if(s) {
-			s->clearOutputDevice();
 			s->lock();
 		}
 	}
@@ -82,6 +84,11 @@ void shutdownMemoryModule() {
 	//This has to stay around so that the public API can be made safe after library shutdown.
 	//User code won't call us, but garbage collected languages might.
 	memory_initialized = false;
+	l.unlock();
+	// The reason we do this here is that callbacks may have something trying to call Lav_handleDecRef.
+	// This can happen in languages with GC integration.
+	// So we deinitialize (thus making Lav_handleDecRef no-op) and then allow the objects to die.
+	keepAlive.clear();
 }
 
 ExternalObject::ExternalObject(int type) {
