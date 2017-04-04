@@ -54,12 +54,21 @@ void shutdownMemoryModule() {
 	//This additionally results in a running thread that we never join.
 	for(auto &i: *weak_external_handles) {
 		auto obj = i.second.lock();
-		auto n = std::dynamic_pointer_cast<Node>(obj);
 		auto s = std::dynamic_pointer_cast<Server>(obj);
-		if(n) n->isolate();
-		else if(s) {
+		if(s) {
 			s->clearOutputDevice();
+			s->lock();
 		}
+	}
+	for(auto &i: *weak_external_handles) {
+		auto obj = i.second.lock();
+		auto n = std::dynamic_pointer_cast<Node>(obj);
+		if(n) n->isolate();
+	}
+	for(auto &i: *weak_external_handles) {
+		auto obj = i.second.lock();
+		auto s= std::dynamic_pointer_cast<Server>(obj);
+		if(s) s->unlock();
 	}
 	delete external_handles;
 	external_handles = nullptr;
