@@ -56,6 +56,11 @@ class _HandleBox(object):
     def _to_handle(self):
         return self.handle
 
+    def __bool__(self):
+        return bool(self.handle)
+
+    __nonzero__ = __bool__
+
 def reverse_handle(handle):
     return _HandleBox(handle)
 

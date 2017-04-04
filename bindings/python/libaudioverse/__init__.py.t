@@ -271,7 +271,7 @@ For full details of this class, see the Libaudioverse manual."""
                 _lav.server_set_block_callback(self, ctypes_callback, None)
                 self._state['block_callback'] = (callback, wrapper, ctypes_callback)
             else:
-                _lav.server_set_block_callback(self, None)
+                _lav.server_set_block_callback(self, _libaudioverse.LavTimeCallback(0), None)
                 self._state['block_callback'] = None
 
     def get_block_callback(self):
@@ -495,7 +495,16 @@ class LibaudioverseProperty(object):
     def __repr__(self):
         return "<{} {}>".format(self.__class__.__name__, self.value)
 
-class BooleanProperty(LibaudioverseProperty):
+# We don't want to type implementations for __bool__ and __nonzero__ over and over.
+# But we can't put them on all the properties.
+class _BooleanMixin(object):
+
+    def __bool__(self):
+        return bool(self.value)
+
+    __nonzero__ = __bool__
+
+class BooleanProperty(LibaudioverseProperty, _BooleanMixin):
     r"""Represents a boolean property.
     
     Note that boolean properties show up as int properties when their type is queried.
@@ -509,7 +518,7 @@ class BooleanProperty(LibaudioverseProperty):
         return bool(self._getter(self._handle, self._slot))
 
 
-class IntProperty(LibaudioverseProperty, numbers.Integral):
+class IntProperty(LibaudioverseProperty, numbers.Integral, _BooleanMixin):
     r"""Proxy to an integer property."""
 
     def __init__(self, handle, slot):
@@ -523,7 +532,7 @@ class IntProperty(LibaudioverseProperty, numbers.Integral):
     def __hex__(self):
         return hex(self.value)
 
-class EnumProperty(LibaudioverseProperty):
+class EnumProperty(LibaudioverseProperty, _BooleanMixin):
     r"""Proxy to an integer property taking an enum.
 
 This class is like IntProperty, but it will error if you try to yuse the wrong enum or a regular integer constant.
@@ -579,7 +588,7 @@ class AutomatedProperty(LibaudioverseProperty):
         _lav.automation_cancel_automators(self._handle, self._slot, float(time))
 
 
-class FloatProperty(AutomatedProperty, numbers.Real):
+class FloatProperty(AutomatedProperty, numbers.Real, _BooleanMixin):
     r"""Proxy to a float property."""
 
     def __init__(self, handle, slot):
@@ -588,7 +597,7 @@ class FloatProperty(AutomatedProperty, numbers.Real):
 {{define_operators(binary_operators, unary_operators, special_functions)}}
 
 
-class DoubleProperty(LibaudioverseProperty, numbers.Real):
+class DoubleProperty(LibaudioverseProperty, numbers.Real, _BooleanMixin):
     r"""Proxy to a double property."""
 
     def __init__(self, handle, slot):
@@ -596,13 +605,13 @@ class DoubleProperty(LibaudioverseProperty, numbers.Real):
 
 {{define_operators(binary_operators, unary_operators, special_functions)}}
 
-class StringProperty(LibaudioverseProperty):
+class StringProperty(LibaudioverseProperty, _BooleanMixin):
     r"""Proxy to a string property."""
 
     def __init__(self, handle, slot):
         super(StringProperty, self).__init__(handle = handle, slot = slot, getter = _lav.node_get_string_property, setter = _lav.node_set_string_property)
 
-class BufferProperty(LibaudioverseProperty):
+class BufferProperty(LibaudioverseProperty, _BooleanMixin):
     r"""Proxy to a buffer property.
     
     It is safe to set this property to None."""
@@ -614,12 +623,16 @@ class BufferProperty(LibaudioverseProperty):
 
     @property
     def value(self):
-        return _resurrect(_lav.node_get_buffer_property(self._handle, self._slot))
+        handle = _lav.node_get_buffer_property(self._handle, self._slot)
+        if handle:
+            return _resurrect(handle)
+        else:
+            return None
 
     @value.setter
     def value(self, val):
         if val is None or isinstance(val, Buffer):
-            _lav.node_set_buffer_property(self._handle, self._slot, val if val is not None else 0)
+            _lav.node_set_buffer_property(self._handle, self._slot, val)
         else:
             raise ValueError("Expected a Buffer or None.")
 
