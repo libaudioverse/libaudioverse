@@ -1,0 +1,315 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Python-specific Notes &mdash; Libaudioverse build19 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="Libaudioverse build19 documentation" href="index.html"/>
+        <link rel="next" title="The Libaudioverse API" href="api.html"/>
+        <link rel="prev" title="Welcome to Libaudioverse’s documentation!" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Libaudioverse
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.8
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Python-specific Notes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#comparing-objects">Comparing Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#properties">Properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#callbacks">Callbacks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#atomicity-and-simulation-locking">Atomicity and Simulation Locking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#name-conversion">name Conversion</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">The Libaudioverse API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Libaudioverse</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Python-specific Notes</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/python-specifics.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="python-specific-notes">
+<h1>Python-specific Notes<a class="headerlink" href="#python-specific-notes" title="Permalink to this headline">¶</a></h1>
+<p>The following are brief notes on Python-specific binding features and how the Libaudioverse API maps to Python.</p>
+<div class="section" id="comparing-objects">
+<h2>Comparing Objects<a class="headerlink" href="#comparing-objects" title="Permalink to this headline">¶</a></h2>
+<p>Libaudioverse objects are thin proxies over handles, with their global state stored elsewhere in the Libaudioverse module.
+Consequently, you need to use <cite>==</cite>, not <cite>is</cite>.
+<cite>is</cite> will work sometimes, but no guarantee is made that two node objects in different variables are the same proxy instance.</p>
+</div>
+<div class="section" id="properties">
+<h2>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h2>
+<p>Properties are bound as Python properties, set up so that you can simply set them as normal: <cite>sine.frequency = 32.5</cite>.
+In addition, the objects representing numeric properties overload all operators expected for their types.
+The <cite>value</cite> attribute also exists on all properties.
+It is most useful to get the value of other property types (namely string and integer properties set from enums).</p>
+<p>Some old code uses the <cite>.value</cite> suffix for all operations on the right-hand side of assignment, as well as on the left-hand side of compound assignment operators.
+For example, <cite>sine.frequency = sine.frequency.value + 2</cite> or <cite>sine.frequency.value += 2</cite>.
+This is no longer necessary because numeric properties now behave like numbers.</p>
+<p>Note the following important points:</p>
+<ul class="simple">
+<li>Properties do not implement <cite>__hash__</cite> because there is no sensible definition that can satisfy all cases.</li>
+<li>Storing the property proxy object keeps the node it came from alive.  If you need to store values of properties, it is much more efficient to extract the value.  <cite>x = sine.frequency</cite> keeps the sine node alive at least until <cite>x</cite> dies, but <cite>x = sine.frequency.value</cite> doesn&#8217;t.</li>
+<li>If you store a property object, changing it (i.e. assignment, <cite>*=</cite>, calling <cite>reset</cite>) will affect the node.</li>
+</ul>
+</div>
+<div class="section" id="callbacks">
+<h2>Callbacks<a class="headerlink" href="#callbacks" title="Permalink to this headline">¶</a></h2>
+<p>As you read the following section, note that callbacks need to be fast.
+The following could be abstracted more, but not without significant performance penalties.
+this is the only functionality which requires you to deal directly with ctypes.</p>
+<p>Callbacks are bound as <cite>node.set_XXX_callback</cite> for setting and <cite>node.get_XXX_callback</cite> from getting.
+The getter will always return the same callable as passed to the setter.</p>
+<p>Python holds a strong reference to the last set callback object at least until Libaudioverse deletes the handle.
+You can therefore use any callable safely.
+Libaudioverse does not guarantee when the callable will be deleted, so it is possible for large objects to be kept alive.</p>
+<p>In the reference, nodes with callbacks document the funcctionality of the callback with the setter and show the full C signature.
+For example, the callback used with the graph listener is <cite>void  (LavHandle  nodeHandle, unsigned int  frames, unsigned int  channels, float *   buffer, void *   userdata)</cite>.
+Libaudioverse performs the following transformations for you:</p>
+<ul class="simple">
+<li>Any arguments which are of type <cite>LavHandle</cite> are turned into appropriate instances of the appropriate classes.</li>
+<li>If the last argument is a <cite>void*</cite> to userdata, it is not visible to you and is abstracted over by the bindings.</li>
+<li>All other arguments are passed as-is using appropriate ctypes types.</li>
+</ul>
+<p>Arguments to the callback are always passed as the first <cite>n</cite> positional arguments.
+Setter functions also allow you to provide <cite>additional_args</cite> and <cite>additional_kwargs</cite> for convenience.
+These arguments are added <a href="#id1"><span class="problematic" id="id2">*</span></a>after*the arguments from Libaudioverse.</p>
+<p>If the callback returns <cite>void</cite>, you need to return None.
+Otherwise, you need to return something that can be converted to the appropriate ctypes type.
+Most callbacks do not expect you to return anything.
+It is more common to require you to write to a buffer of audio data.</p>
+</div>
+<div class="section" id="atomicity-and-simulation-locking">
+<h2>Atomicity and Simulation Locking<a class="headerlink" href="#atomicity-and-simulation-locking" title="Permalink to this headline">¶</a></h2>
+<p>instead of binding <cite>Lav_simulationLock</cite> and <cite>Lav_simulationUnlock</cite> directly, the simulation is a context manager.
+Using a with statement will make everything inside it inaudible until the with statement ends.
+They may be nested safely.</p>
+<p>For example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">my_simulation</span><span class="p">:</span>
+    <span class="c1"># some stuff</span>
+</pre></div>
+</div>
+<p>Note that all the concerns in the language-agnostic manual apply.
+If you use the simulation as a context manager on more than one thread, it behaves exactly like a lock; furthermore, all Libaudioverse functions that use the simulation or objects created from it will block on any thread but the one currently inside the critical section.</p>
+</div>
+<div class="section" id="name-conversion">
+<h2>name Conversion<a class="headerlink" href="#name-conversion" title="Permalink to this headline">¶</a></h2>
+<p>The names for Libaudioverse objects can be seen in the API reference.
+This section is provided in order to aid in translating examples in C to Python.
+This module follows PEP8 in the external API.
+The code decidedly does not, as it is generated from custom tools.</p>
+<p>Python class names  are generated by taking the <cite>Lav_OBJTYPE_FOOBAR</cite> enum constants, stripping the <cite>Lav_OBJTYPE_</cite> prefix, and converting the rest to camelcase.</p>
+<p>Enumerations are generated in a similar manner as objects: strip the <cite>Lav_</cite> prefix and convert the rest to camelcase.
+The members have their common prefix stripped and are then converted to lowercase, in accordance with the PEP8 class member standards.</p>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="api.html" class="btn btn-neutral float-right" title="The Libaudioverse API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Welcome to Libaudioverse’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Austin Hicks.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'build19',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
