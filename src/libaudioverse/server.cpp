@@ -55,6 +55,7 @@ void Server::completeInitialization() {
 }
 
 Server::~Server() {
+	clearOutputDevice();
 	//enqueue a task which will stop the background thread.
 	enqueueTask([]() {throw ThreadTerminationException();});
 	backgroundTaskThread.join();
