@@ -39,7 +39,7 @@ class HrtfPanner {
 	int response_length;
 	float sr;
 	float azimuth = 0, elevation = 0, prev_azimuth = 0, prev_elevation  = 0;
-	float crossfade_threshold = 5.0;
+	float crossfade_threshold = 0.1;
 	bool should_crossfade = true;
 };
 
