@@ -7,6 +7,8 @@ Libaudioverse
 
 [GitHub](http://github.com/libaudioverse/libaudioverse)
 
+I'm trying to raise money for this project, so I can put a few months of full-time work into it. Consequently, we have a [GoFundMe](https://gofundme.com/fund-libaudioverse-development).
+
 ## Introduction ##
 
 Libaudioverse is a highly flexible realtime audio synthesis library designed to be bound to as many languages as possible.
