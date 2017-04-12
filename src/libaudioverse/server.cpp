@@ -55,6 +55,7 @@ void Server::completeInitialization() {
 }
 
 Server::~Server() {
+	clearOutputDevice();
 	//enqueue a task which will stop the background thread.
 	enqueueTask([]() {throw ThreadTerminationException();});
 	backgroundTaskThread.join();
@@ -298,7 +299,7 @@ Lav_PUBLIC_FUNCTION LavError Lav_serverSetOutputDevice(LavHandle serverHandle, c
 Lav_PUBLIC_FUNCTION LavError Lav_serverClearOutputDevice(LavHandle serverHandle) {
 	PUB_BEGIN
 	auto s = incomingObject<Server>(serverHandle);
-	LOCK(*s);
+	// clearOutputDevice is itself threadsafe.
 	s->clearOutputDevice();
 	PUB_END
 }

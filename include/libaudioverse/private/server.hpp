@@ -64,6 +64,7 @@ class Server: public Job {
 	//associate with the specified device index.
 	//This must absolutely absolutely absolutely be called without the lock, it's threadsafe.
 	void setOutputDevice(int index, int channels, int mixahead);
+	// This one also must absolutely absolutely be called without the lock.
 	void clearOutputDevice();
 
 	//Tasks that need to run in the background.

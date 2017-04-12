@@ -7,7 +7,9 @@ Libaudioverse
 
 [GitHub](http://github.com/libaudioverse/libaudioverse)
 
-##Introduction##
+I'm trying to raise money for this project, so I can put a few months of full-time work into it. Consequently, we have a [GoFundMe](https://gofundme.com/fund-libaudioverse-development).
+
+## Introduction ##
 
 Libaudioverse is a highly flexible realtime audio synthesis library designed to be bound to as many languages as possible.
 Potential applications include games, realtime music synthesis, voice chat, implementations of WebAudio, and more.
@@ -32,7 +34,7 @@ here is an overview of the offered nodes:
 
 NOTE: This is pre-alpha and supports Windows and Linux.  Mac is planned.
 
-##Licensing##
+## Licensing ##
 
 See the file `COPYRIGHT` for the legalese.  This file is definitive, and the following a summary only.
 
@@ -40,7 +42,7 @@ The non-legalese version is that Libaudioverse is dual-licensed under
 GPL V3 or later (see [here](http://www.gnu.org/licenses/) for GPL V3)
 and [MPL2](https://www.mozilla.org/en-US/MPL/2.0/).
 
-##Documentation and Examples##
+## Documentation and Examples ##
 
 There are two sources of Libaudioverse documentation.
 
@@ -57,7 +59,7 @@ These sets of examples aim to be equivalent and to demonstrate most critical fea
 This library is easy.
 In many cases, the examples will be enough to get you started.
 
-##Getting Help##
+## Getting Help ##
 
 Libaudioverse has [a Google Group](https://groups.google.com/a/camlorn.net/d/forum/libaudioverse).
 You can subscribe directly and without a Gmail address via e-mailing an empty e-mail to `libaudioverse+subscribe@camlorn.net` and clicking the link in the confirmation e-mail sent to you.
@@ -66,11 +68,11 @@ If you need to contact me in real-time, you can do so via the Libaudioverse IRC 
 
 Please report bugs and make feature requests using the GitHub issue tracker; this saves me time for issues which I cannot fix immediately.
 
-##Building##
+## Building ##
 
 See the [info on supported platforms and build instructions](http://github.com/camlorn/libaudioverse/tree/master/platform_support.md).
 
-##Bindings##
+## Bindings ##
 
 At the moment, Python and C are the only supported languages.  You can get the Python bindings via `pip` on Windows, but Linux currently requires building Libaudioverse yourself.  As more languages become available, Libaudioverse  will attempt to upload binaries to package managers.  The goal is to minimize the number of use cases that require building Libaudioverse.
 
