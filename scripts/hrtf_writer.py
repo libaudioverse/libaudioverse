@@ -1,6 +1,7 @@
 """This is a helper class for scripts to import from various HRTF sources."""
 
 import numpy
+import scipy.signal as signal
 import numpy.fft as fft
 import struct
 import enum
@@ -115,9 +116,16 @@ class HrtfWriter(object):
             return new_response
         self.map(conv)
 
+    def minimum_phase(self):
+        """Convert the filters to minimum phase."""
+        def minphase(r):
+            return signal.minimum_phase(r, method = 'hilbert', n_fft= 8192)
+        self.map(minphase)
+
     def standard_build(self, path):
         """Does a standard build, that is the transformations that should be made on most HRIRs."""
         self.progress("Standard build requested.")
         self.data_to_float64()
+        self.minimum_phase()
         self.pack_data()
         self.write_file(path)
