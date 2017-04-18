@@ -18,7 +18,7 @@ backend_list = [
 def _run_backend(metadata, backend, destination, dry, build):
     path = os.path.split(os.path.abspath(backend.__file__))[0]
     metadata = copy.deepcopy(metadata) # We will change this in a minute by rendering docstrings.
-    backend = backend.Backend(backend_path = path)
+    backend = backend.Backend(metadata = metadata, backend_path = path)
     # Todo: render the documentation strings, with as-yet-unwritten helper methods in metadata_description.
     enums = list(metadata.enums.keys())
     enums.sort()
