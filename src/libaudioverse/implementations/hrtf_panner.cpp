@@ -119,10 +119,12 @@ void HrtfPanner::pan(float* input, float *left_output, float *right_output) {
 		left_delay->setDelay(-itd);
 		right_delay->setDelay(0);
 	}
+	/*
 	for(int i = 0; i < block_size; i++) {
 		left_output[i] = left_delay->tick(left_output[i]);
 		right_output[i] = right_delay->tick(right_output[i]);
 	}
+	*/
 }	
 
 void HrtfPanner::reset() {
