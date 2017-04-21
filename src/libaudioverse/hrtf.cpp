@@ -109,7 +109,7 @@ void HrtfData::loadFromDefault(unsigned int forSr) {
 }
 
 #define convi(b) safeConvertMemory<int32_t>(b)
-#define convf(b) safeConvertMemory<float>*(b)
+#define convf(b) safeConvertMemory<float>(b)
 
 void HrtfData::loadFromBuffer(unsigned int length, char* buffer, unsigned int forSr) {
 	char* iterator = buffer;
@@ -154,14 +154,17 @@ void HrtfData::loadFromBuffer(unsigned int length, char* buffer, unsigned int fo
 	unsigned int length_so_far = iterator-buffer;
 	size_t size_remaining = length-length_so_far;
 	//we must have enough remaining to be all hrir hrirs.
-	size_t hrir_size = before_hrir_length*hrir_count*sizeof(float);
+	// Plus the interaural time delays.
+	size_t hrir_size = (before_hrir_length+1)*hrir_count*sizeof(float);
 	if(hrir_size != size_remaining) ERROR(Lav_ERROR_HRTF_INVALID, "Not enough HRIR data.");
 
-	//last step.  Initialize the HRIR array.
+	// Initialize the HRIR array.
 	hrirs = new float**[elev_count];
+	hrir_delays = new float*[elev_count];
 	//do the azimuth dimension.
 	for(int i = 0; i < elev_count; i++) {
 		hrirs[i] = new float*[azimuth_counts[i]];
+		hrir_delays[i] = new float[azimuth_counts[i]];
 	}
 
 	//the above gives us what amounts to a 2d array.  The first dimension represents elevation.  The second dimension represents azimuth going clockwise.
@@ -173,6 +176,14 @@ void HrtfData::loadFromBuffer(unsigned int length, char* buffer, unsigned int fo
 			memcpy(tempBuffer, iterator, sizeof(float)*before_hrir_length);
 			staticResamplerKernel(samplerate, forSr, 1, before_hrir_length, tempBuffer, &final_hrir_length, &hrirs[elev][azimuth]);
 			iterator+=before_hrir_length*sizeof(float);
+		}
+	}
+
+	// Now do the same thing, but read the floats for the arrays.
+	for(int elev = 0; elev < elev_count; elev++) {
+		for(int az = 0; az < azimuth_counts[elev]; az++) {
+			hrir_delays[elev][az] = convf(iterator);
+			iterator += window_size;
 		}
 	}
 	hrir_length = final_hrir_length;

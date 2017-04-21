@@ -22,6 +22,7 @@ class HrtfWriter(object):
     "{}", #Hole for the azimuth counts.
     "i", #Length of each response in samples.
     "{}", #hole for the responses.
+    "{}", # the delays we factored out of each response.
     ])
 
     def __init__(self, samplerate, min_elevation, max_elevation, responses, endianness=EndiannessTypes.little, print_progress=True):
@@ -68,18 +69,20 @@ class HrtfWriter(object):
 
     def make_format_string(self):
         endianness_token= "<" if self.endianness == EndiannessTypes.little else ">"
-        self.format_string=self.format_template.format(endianness_token, str(len(self.azimuth_counts))+"i", str(self.response_count*self.response_length)+"f").encode('ascii')
+        self.format_string=self.format_template.format(endianness_token, str(len(self.azimuth_counts))+"i", str(self.response_count*self.response_length)+"f", str(self.response_count)+"f").encode('ascii')
         self.progress("Format string:", self.format_string)
 
     def pack_data(self):
         self.make_format_string()
         iter = itertools.chain(
-        uuid.uuid4().bytes, #Generate a 16-byte uuid.
-        [self.endianness_marker, self.samplerate, self.response_count,
-        self.elevation_count, self.min_elevation, self.max_elevation],
-        self.azimuth_counts,
-        [self.response_length],
-        *[list(response) for elevation in self.responses for response in  elevation])
+            uuid.uuid4().bytes, #Generate a 16-byte uuid.
+            [self.endianness_marker, self.samplerate, self.response_count,
+            self.elevation_count, self.min_elevation, self.max_elevation],
+            self.azimuth_counts,
+            [self.response_length],
+            *[list(response) for elevation in self.responses for response in  elevation],
+            self.delays,
+        )
         data=list(iter)
         self.packed_data = struct.pack(self.format_string, *data)
         self.progress("Data packed. Total size is {}.".format(len(self.packed_data)))
@@ -116,6 +119,12 @@ class HrtfWriter(object):
             return new_response
         self.map(conv)
 
+    def compute_delays(self):
+        """Computes an approximate delay for each impulse response.
+
+This is used by Libaudioverse to internally compute the interaural time difference."""
+        self.delays = [0.0]*self.response_count
+
     def minimum_phase(self):
         """Convert the filters to minimum phase."""
         def minphase(r):
@@ -126,6 +135,7 @@ class HrtfWriter(object):
         """Does a standard build, that is the transformations that should be made on most HRIRs."""
         self.progress("Standard build requested.")
         self.data_to_float64()
+        self.compute_delays()
         self.minimum_phase()
         self.pack_data()
         self.write_file(path)

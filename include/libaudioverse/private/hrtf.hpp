@@ -37,7 +37,7 @@ class HrtfData {
 	int min_elevation = 0, max_elevation = 0;
 	int *azimuth_counts = nullptr;
 	int samplerate = 0;
-	float ***hrirs = nullptr;
+	float ***hrirs = nullptr, **hrir_delays = nullptr;
 	//used for crossfading so we don't clobber the heap.
 	powercores::ThreadLocalVariable<float*> temporary_buffer1, temporary_buffer2;
 };
