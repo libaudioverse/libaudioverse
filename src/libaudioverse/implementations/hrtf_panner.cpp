@@ -38,8 +38,8 @@ HrtfPanner::HrtfPanner(int _block_size, float _sr, std::shared_ptr<HrtfData> _hr
 	left_delay = new CrossfadingDelayLine(ITD_DELAY_CAP, _sr);
 	right_delay = new CrossfadingDelayLine(ITD_DELAY_CAP, _sr);
 	// Move delay over 1 MS.
-	left_delay->setInterpolationTime(0.0001);
-	right_delay->setInterpolationTime(0.0001);
+	left_delay->setInterpolationTime(0.001);
+	right_delay->setInterpolationTime(0.001);
 }
 
 HrtfPanner::~HrtfPanner() {

@@ -12,6 +12,7 @@ carrying such notice may not be copied, modified, or distributed except accordin
 #include <stdint.h>
 #include <stddef.h>
 #include <libaudioverse/libaudioverse.h>
+#include <libaudioverse/private/constants.hpp>
 #include <libaudioverse/private/hrtf.hpp>
 #include <libaudioverse/private/dspmath.hpp>
 #include <libaudioverse/private/macros.hpp>
@@ -96,7 +97,7 @@ void HrtfData::loadFromFile(std::string path, unsigned int forSr) {
 		loadFromBuffer(map.size(), map.data(), forSr);
 		map.close();
 	}
-	catch(std::ios_base::failure &e) {
+	catch(std::ios_base::failure &) {
 		//We can't check to see why because at least Debian's GCC
 		//doesn't derive std::ios_base::failure from std::system_error.
 		//Consider using boost to find out why.
@@ -226,29 +227,71 @@ float HrtfData::computeCoefficientsMono(float elevation, float azimuth, float* o
 	elevationWeights[0] = (degreesPerElevation-ringmoddedElevation)/degreesPerElevation;
 	elevationWeights[1] = ringmoddedElevation/degreesPerElevation;
 
-	memset(out, 0, sizeof(float)*hrir_length);
+	// The crossfade we're going to do is based off dot products with vectors representing the impulse response directions.
+	double xs[4], ys[4], zs[4], delays[4];
+	float* response_pointers[4];
+
 	for(int i = 0; i < 2; i++) {
 		//ElevationIndex lets us get an array of azimuth coefficients.  Go ahead and pull it out now, so we can conceptually forget about all the above variables.
 		float** azimuths = hrirs[elevationIndex[i]];
+		double elevationAngle = min_elevation+degreesPerElevation*elevationIndex[i];
 		int azimuthCount = azimuth_counts[elevationIndex[i]];
 		float degreesPerAzimuth = 360.0f/azimuthCount;
 		int azimuthIndex1, azimuthIndex2;
 		azimuthIndex1 = (int)floorf(azimuth/degreesPerAzimuth);
 		azimuthIndex2 = azimuthIndex1+1;
-		float azimuthWeight1, azimuthWeight2;
-		//this is the same logic as a bunch of other places, with a minor variation.
-		azimuthWeight1 = ceilf(azimuthIndex2*degreesPerAzimuth-azimuth)/degreesPerAzimuth;
-		azimuthWeight2 = floorf(azimuth-azimuthIndex1*degreesPerAzimuth)/degreesPerAzimuth;
-		//now that we have some weights, we need to ringmod the azimuth indices. 360==0 in trig, but causes one of them to go past the end.
+		//We need to ringmod the azimuth indices. 360==0 in trig, but causes one of them to go past the end.
 		azimuthIndex1 = ringmodi(azimuthIndex1, azimuthCount);
 		azimuthIndex2 = ringmodi(azimuthIndex2, azimuthCount);
+		double azimuthAngle1 = azimuthIndex1*degreesPerAzimuth;
+		double azimuthAngle2 = azimuthIndex2*degreesPerAzimuth;
 
-		//this is probably the only part of this that can't go wrong, assuming the above calculations are all correct.  Interpolate between the two azimuths.
-		for(int j = 0; j < hrir_length; j++) {
-			out[j] += elevationWeights[i]*(azimuthWeight1*azimuths[azimuthIndex1][j]+azimuthWeight2*azimuths[azimuthIndex2][j]);
-		}
+		// Go to radians, so we can convert to cartesian.
+		azimuthAngle1 *= (PI/180.0);
+		azimuthAngle2 *= (PI/180.0);
+		elevationAngle *= (PI/180.0);
+
+		// These are the standard polar to cartesian formulas for the HRTF coordinate system.
+		xs[2*i] = sin(azimuthAngle1)*cos(elevationAngle);
+		ys[2*i] = cos(azimuthAngle1)*cos(elevationAngle);
+		zs[2*i] = sin(elevationAngle);
+		xs[2*i+1] = sin(azimuthAngle2)*cos(elevationAngle);
+		ys[2*i+1] = cos(azimuthAngle2)*cos(elevationAngle);
+		zs[2*i+1] = sin(elevationAngle);
+
+		delays[2*i] = hrir_delays[elevationIndex[i]][azimuthIndex1];
+		delays[2*i+1] = hrir_delays[elevationIndex[i]][azimuthIndex2];
+
+		response_pointers[2*i] = azimuths[azimuthIndex1];
+		response_pointers[2*i+1] = azimuths[azimuthIndex2];
 	}
-	return 0.0;
+
+	// Next, a vector from our elevation and azimuth angles.
+	azimuth *= (PI/180.0);
+	elevation *= (PI/180.0);
+	double x = sin(azimuth)*cos(elevation);
+	double y = cos(azimuth)*cos(elevation);
+	double z = sin(elevation);
+
+	// This assumes weights cannot ever go negative.
+	// This may be an invalid assumption for sufficiently sparse HRTF data.
+	double weights[4];
+	double weightSum = 0.0;
+	for(int i = 0; i < 4; i++) {
+		weights[i] = x*xs[i]+y*ys[i]+z*zs[i];
+		weightSum += weights[i];
+	}
+
+	for(int i = 0; i < 4; i++) weights[i] /= weightSum;
+
+	// Compute the response.
+	scalarMultiplicationKernel(hrir_length, weights[0], response_pointers[0], out);
+	for(int i = 1; i < 4; i++) multiplicationAdditionKernel(hrir_length, weights[i], response_pointers[i], out, out);
+
+	double delay = 0.0;
+	for(int i = 0; i < 4; i++) delay += weights[i]*delays[i];
+
+	return delay;
 }
 
 std::tuple<float, float> HrtfData::computeCoefficientsStereo(float elevation, float azimuth, float *left, float* right) {
