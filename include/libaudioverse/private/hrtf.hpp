@@ -10,6 +10,7 @@ carrying such notice may not be copied, modified, or distributed except accordin
 #include <string>
 #include <memory>
 #include <kiss_fftr.h>
+#include <tuple>
 
 namespace libaudioverse_implementation {
 
@@ -18,10 +19,11 @@ class HrtfData {
 	HrtfData();
 	~HrtfData();
 	//get the appropriate coefficients for one channel.  A stereo hrtf is two calls to this function.
-	void computeCoefficientsMono(float elevation, float azimuth, float* out);
+	float computeCoefficientsMono(float elevation, float azimuth, float* out);
 
 	//warning: writes directly to the output destination, doesn't allocate a new one.
-	void computeCoefficientsStereo(float elevation, float azimuth, float* left, float* right);
+	// Returns the delays for the left and right ear.
+	std::tuple<float, float> computeCoefficientsStereo(float elevation, float azimuth, float* left, float* right);
 
 	//load from a file.
 	void loadFromFile(std::string path, unsigned int forSr);

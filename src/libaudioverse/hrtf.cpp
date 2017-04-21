@@ -195,7 +195,7 @@ void HrtfData::loadFromBuffer(unsigned int length, char* buffer, unsigned int fo
 //some final preparation is done afterwords.
 //This is very complicated, thus the heavy commenting.
 //todo: can this be made simpler?
-void HrtfData::computeCoefficientsMono(float elevation, float azimuth, float* out) {
+float HrtfData::computeCoefficientsMono(float elevation, float azimuth, float* out) {
 	//clamp the elevation.
 	if(elevation < min_elevation) {elevation = (float)min_elevation;}
 	else if(elevation > max_elevation) {elevation = (float)max_elevation;}
@@ -248,16 +248,18 @@ void HrtfData::computeCoefficientsMono(float elevation, float azimuth, float* ou
 			out[j] += elevationWeights[i]*(azimuthWeight1*azimuths[azimuthIndex1][j]+azimuthWeight2*azimuths[azimuthIndex2][j]);
 		}
 	}
+	return 0.0;
 }
 
-void HrtfData::computeCoefficientsStereo(float elevation, float azimuth, float *left, float* right) {
+std::tuple<float, float> HrtfData::computeCoefficientsStereo(float elevation, float azimuth, float *left, float* right) {
 	//wrap azimuth to be > 0 and < 360.
 	azimuth = ringmodf(azimuth, 360.0f);
 	//the hrtf datasets are right ear coefficients.  Consequently, the right ear requires no changes.
-	computeCoefficientsMono(elevation, azimuth, right);
+	float rightDelay = computeCoefficientsMono(elevation, azimuth, right);
 	//the left ear is found at an azimuth which is reflectred about 0 degrees.
 	azimuth = ringmodf(360-azimuth, 360.0f);
-	computeCoefficientsMono(elevation, azimuth, left);
+	float leftDelay = computeCoefficientsMono(elevation, azimuth, left);
+	return std::make_tuple(leftDelay, rightDelay);
 }
 
 //Create and free buffers.

@@ -15,6 +15,7 @@ carrying such notice may not be copied, modified, or distributed except accordin
 #include <libaudioverse/implementations/convolvers.hpp>
 #include <algorithm>
 #include <memory>
+#include <tuple>
 #include <math.h>
 
 namespace libaudioverse_implementation {
@@ -50,37 +51,6 @@ HrtfPanner::~HrtfPanner() {
 	delete right_delay;
 }
 
-double computeITD(double azimuth, double elevation, double distance) {
-	// Compute the angle between the vector defined by azimuth and elevation and the right ear.
-	// Recall that azimuth is clockwise and elevation is up from the horizontal plane.
-	double fx = sin(azimuth);
-	double fy = cos(azimuth);
-	double fz = sin(elevation);
-	double magnitude = sqrt(fx*fx+fy*fy+fz*fz);
-	fx /= magnitude;
-	fy /= magnitude;
-	fz /= magnitude;
-	// We now dot this with the right ear's vector, (1, 0, 0).
-	// This works out to just working with x, consequently we can omit it.
-	double rightEarAngle = acos(fx);
-	if(fx < 0) rightEarAngle = PI-rightEarAngle;
-	double leftEarAngle = PI-rightEarAngle;
-	double headRadius = 0.05;
-	double circumference = headRadius*2*PI;
-	// The paths are the arklengths.
-	double leftPath = leftEarAngle/(2*PI)*circumference;
-	double rightPath = rightEarAngle/(2*PI)*circumference;
-	double speedOfSound = 343.0;
-	double leftDelay = leftPath/speedOfSound;
-	double rightDelay = rightPath/speedOfSound;
-	double itd = abs(leftDelay-rightDelay);
-	if(itd > ITD_DELAY_CAP) itd = ITD_DELAY_CAP;
-	//printf("%f\n", itd);
-	// Positive for when the right ear is greater.
-	if(rightDelay > leftDelay) return itd;
-	else return -itd;
-}
-
 void HrtfPanner::pan(float* input, float *left_output, float *right_output) {
 	//Do we need to crossfade? We do if we've moved more than the threshold and crossfading is being allowed.
 	bool needsCrossfade = should_crossfade && fabs(azimuth-prev_azimuth)+fabs(elevation-prev_elevation) >= crossfade_threshold;
@@ -93,9 +63,12 @@ void HrtfPanner::pan(float* input, float *left_output, float *right_output) {
 		}
 		float* left_response_ptr = left_response_workspace.get(response_length);
 		float* right_response_ptr = right_response_workspace.get(response_length);
-		hrtf->computeCoefficientsStereo(elevation, azimuth, left_response_ptr, right_response_ptr);
+		float leftDelay, rightDelay;
+		std::tie(leftDelay, rightDelay) = hrtf->computeCoefficientsStereo(elevation, azimuth, left_response_ptr, right_response_ptr);
 		left_convolver->setResponse(response_length, left_response_ptr);
 		right_convolver->setResponse(response_length, right_response_ptr);
+		left_delay->setDelay(leftDelay);
+		right_delay->setDelay(rightDelay);
 	}
 	//These two convolutions always happen.
 	left_convolver->convolve(input, left_output);
@@ -110,21 +83,10 @@ void HrtfPanner::pan(float* input, float *left_output, float *right_output) {
 	}
 	prev_azimuth = azimuth;
 	prev_elevation = elevation;
-	// Now set the ITD and apply.
-	double itd = computeITD(azimuth, elevation, 1.0); //distance is currently unused.
-	if(itd > 0) {
-		right_delay->setDelay(itd);
-		left_delay->setDelay(0);
-	} else {
-		left_delay->setDelay(-itd);
-		right_delay->setDelay(0);
-	}
-	/*
 	for(int i = 0; i < block_size; i++) {
 		left_output[i] = left_delay->tick(left_output[i]);
 		right_output[i] = right_delay->tick(right_output[i]);
 	}
-	*/
 }	
 
 void HrtfPanner::reset() {
