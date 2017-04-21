@@ -123,7 +123,23 @@ class HrtfWriter(object):
         """Computes an approximate delay for each impulse response.
 
 This is used by Libaudioverse to internally compute the interaural time difference."""
-        self.delays = [0.0]*self.response_count
+        self.delays = numpy.zeros(self.response_count, dtype = 'float64')
+        threshold = 0.5 # -6 db. We will have to experiment with this.
+        for index, response in enumerate((j for i in self.responses for j in i)):
+            # We want maximum accuracy, so upsample by a factor of 100.
+            upsampled_response = signal.resample(response, self.response_length*100)
+            abs_response = numpy.abs(upsampled_response)
+            desired = threshold*numpy.max(abs_response)
+            delay_samples = 0
+            while abs_response[delay_samples] < desired and delay_samples < len(abs_response):
+                delay_samples += 1
+            delay = delay_samples/(self.samplerate*100) # Remember we upsampled by 100.
+            self.delays[index] = delay
+        min_delay = min(self.delays)
+        max_delay = max(self.delays)
+        self.progress("Minimum response delay {} MS, maximum response delay {} MS".format(min_delay*1000, max_delay*1000))
+        self.delays -= min_delay
+        self.delays = numpy.abs(self.delays) # in case floating point error ever causes one of these to go negative.
 
     def minimum_phase(self):
         """Convert the filters to minimum phase."""
