@@ -63,8 +63,8 @@ class CrossfadingDelayLine {
 class DoppleringDelayLine {
 	public:
 	DoppleringDelayLine(float maxDelay, float sr);
-	void setDelay(double d);
-	void setDelayInSamples(double newDelay);
+	void setDelay(double d, bool shouldCrossfade = true);
+	void setDelayInSamples(double newDelay, bool shouldCrossfade = true);
 	void setInterpolationTime(float t);
 	float tick(float sample);
 	float computeSample();

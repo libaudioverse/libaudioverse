@@ -18,15 +18,18 @@ DoppleringDelayLine::DoppleringDelayLine(float maxDelay, float sr): line((int)(s
 	max_delay = (int)(sr*maxDelay)+1;
 }
 
-void DoppleringDelayLine::setDelay(double d) {
-	setDelayInSamples(d*sr);
+void DoppleringDelayLine::setDelay(double d, bool shouldCrossfade) {
+	setDelayInSamples(d*sr, shouldCrossfade);
 }
 
-void DoppleringDelayLine::setDelayInSamples(double newDelay) {
-	counter = interpolation_time*sr;
-	if(counter) {
-		delta = (delay-newDelay)/counter;
+void DoppleringDelayLine::setDelayInSamples(double newDelay, bool shouldCrossfade) {
+	if(shouldCrossfade) {
+		counter = interpolation_time*sr;
+		if(counter) {
+			delta = (delay-newDelay)/counter;
+		}
 	}
+	else counter = 0;
 	delay = newDelay;
 	if(slave) slave->setDelayInSamples(newDelay);
 }

@@ -67,8 +67,8 @@ void HrtfPanner::pan(float* input, float *left_output, float *right_output) {
 		std::tie(leftDelay, rightDelay) = hrtf->computeCoefficientsStereo(elevation, azimuth, left_response_ptr, right_response_ptr);
 		left_convolver->setResponse(response_length, left_response_ptr);
 		right_convolver->setResponse(response_length, right_response_ptr);
-		left_delay->setDelay(leftDelay);
-		right_delay->setDelay(rightDelay);
+		left_delay->setDelay(leftDelay, needsCrossfade);
+		right_delay->setDelay(rightDelay, needsCrossfade);
 	}
 	//These two convolutions always happen.
 	left_convolver->convolve(input, left_output);
