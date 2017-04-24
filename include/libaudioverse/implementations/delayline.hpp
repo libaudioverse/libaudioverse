@@ -69,6 +69,7 @@ class DoppleringDelayLine {
 	float tick(float sample);
 	float computeSample();
 	void advance(float sample);
+	void process(int count, float* in, float* out);
 	void reset();
 	DoppleringDelayLine* getSlave();
 	void setSlave(DoppleringDelayLine* s);

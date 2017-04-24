@@ -83,10 +83,8 @@ void HrtfPanner::pan(float* input, float *left_output, float *right_output) {
 	}
 	prev_azimuth = azimuth;
 	prev_elevation = elevation;
-	for(int i = 0; i < block_size; i++) {
-		left_output[i] = left_delay->tick(left_output[i]);
-		right_output[i] = right_delay->tick(right_output[i]);
-	}
+	left_delay->process(block_size, left_output, left_output);
+	right_delay->process(block_size, right_output, right_output);
 }	
 
 void HrtfPanner::reset() {

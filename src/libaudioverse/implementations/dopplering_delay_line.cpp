@@ -60,6 +60,25 @@ void DoppleringDelayLine::advance(float sample) {
 	if(counter) counter--;
 }
 
+void DoppleringDelayLine::process(int count, float* in, float* out) {
+	int i = 0;
+	// Take the slow path as long as we're crossfading.
+	for(; i < count && counter; i++) out[i] = tick(in[i]);
+	// then we can do this.
+	float w1 = delay-floorf(delay);
+	float w2 = 1-w1;
+	int i1 = (int)(delay);
+	int i2=i1+1;
+	//make sure neither of these is over max delay.
+	i1 =std::min(i1, max_delay);
+	i2=std::min(i2, max_delay);
+	for(; i < count; i++) {
+		float sample = in[i];
+		out[i] = w1*line.read(i1)+w2*line.read(i2);
+		line.advance(sample);
+	}
+}
+
 void DoppleringDelayLine::reset() {
 	counter = 0;
 	delta = 0.0;
