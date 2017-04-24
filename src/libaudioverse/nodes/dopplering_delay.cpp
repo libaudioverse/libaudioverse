@@ -52,8 +52,7 @@ void DoppleringDelayNode::process() {
 	if(werePropertiesModified(this, Lav_DELAY_DELAY)) delayChanged();
 	if(werePropertiesModified(this, Lav_DELAY_INTERPOLATION_TIME)) recomputeDelta();
 	for(int output = 0; output < num_output_buffers; output++) {
-		auto &line = *lines[output];
-		for(int i = 0; i < block_size; i++) output_buffers[output][i] = line.tick(input_buffers[output][i]);
+		lines[output]->process(block_size, input_buffers[output], output_buffers[output]);
 	}
 }
 
