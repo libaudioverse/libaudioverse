@@ -124,7 +124,7 @@ class HrtfWriter(object):
 
 This is used by Libaudioverse to internally compute the interaural time difference."""
         self.delays = numpy.zeros(self.response_count, dtype = 'float64')
-        threshold_db = -12
+        threshold_db = -6
         threshold = 10**(threshold_db/10)
         self.progress("Computing response delays using threshold {} db = {}".format(threshold_db, threshold))
         for index, response in enumerate((j for i in self.responses for j in i)):

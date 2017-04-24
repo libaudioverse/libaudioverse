@@ -35,11 +35,11 @@ HrtfPanner::HrtfPanner(int _block_size, float _sr, std::shared_ptr<HrtfData> _hr
 	prev_right_convolver = new BlockConvolver(block_size);
 	left_convolver->setResponse(response_length, left_response_ptr);
 	right_convolver->setResponse(response_length, right_response_ptr);
-	left_delay = new CrossfadingDelayLine(ITD_DELAY_CAP, _sr);
-	right_delay = new CrossfadingDelayLine(ITD_DELAY_CAP, _sr);
+	left_delay = new DoppleringDelayLine(hrtf->getMaxDelay(), _sr);
+	right_delay = new DoppleringDelayLine(hrtf->getMaxDelay(), _sr);
 	// Move delay over 1 MS.
-	left_delay->setInterpolationTime(0.001);
-	right_delay->setInterpolationTime(0.001);
+	left_delay->setInterpolationTime(0.003);
+	right_delay->setInterpolationTime(0.003);
 }
 
 HrtfPanner::~HrtfPanner() {
@@ -94,6 +94,8 @@ void HrtfPanner::reset() {
 	right_convolver->reset();
 	prev_left_convolver->reset();
 	prev_right_convolver->reset();
+	left_delay->reset();
+	right_delay->reset();
 }
 
 void HrtfPanner::setAzimuth(float angle) {

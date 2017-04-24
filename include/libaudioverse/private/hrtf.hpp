@@ -32,6 +32,8 @@ class HrtfData {
 
 	//get the hrir's length.
 	int getLength();
+	// Get the max delay we can return from computeCoefficientsStereo.
+	float getMaxDelay();
 	private:
 	float* createTemporaryBuffer();
 	void freeTemporaryBuffer(float* b);
@@ -40,6 +42,7 @@ class HrtfData {
 	int *azimuth_counts = nullptr;
 	int samplerate = 0;
 	float ***hrirs = nullptr, **hrir_delays = nullptr;
+	float max_hrir_delay = 0.0f;
 	//used for crossfading so we don't clobber the heap.
 	powercores::ThreadLocalVariable<float*> temporary_buffer1, temporary_buffer2;
 };

@@ -18,36 +18,22 @@ DoppleringDelayLine::DoppleringDelayLine(float maxDelay, float sr): line((int)(s
 	max_delay = (int)(sr*maxDelay)+1;
 }
 
-void DoppleringDelayLine::setDelay(float d) {
-	//stop if we're crossfading.
-	if(counter) {
-		delay = new_delay;
-		counter = 0;
-	}
-	new_delay = d*sr;
-	counter = interpolation_time*sr;
-	if(counter == 0) counter=1;
-	if(sr*interpolation_time !=0.0) velocity = (new_delay-delay)/(sr*interpolation_time);
-	else velocity = 0.0;
-	if(slave) slave->setDelay(d);
+void DoppleringDelayLine::setDelay(double d) {
+	setDelayInSamples(d*sr);
 }
 
-void DoppleringDelayLine::setDelayInSamples(int newDelay) {
-	//We change newDelay, so send it along first.
-	if(slave) slave->setDelayInSamples(newDelay);
-	if(counter) {
-		delay = new_delay;
-		counter = 0;
-	}
-	new_delay = std::min(newDelay, max_delay);
+void DoppleringDelayLine::setDelayInSamples(double newDelay) {
 	counter = interpolation_time*sr;
-	if(counter == 0) counter=1;
-	if(sr*interpolation_time !=0.0) velocity = (new_delay-delay)/(sr*interpolation_time);
-	else velocity = 0.0;
+	if(counter) {
+		delta = (delay-newDelay)/counter;
+	}
+	delay = newDelay;
+	if(slave) slave->setDelayInSamples(newDelay);
 }
 
 void DoppleringDelayLine::setInterpolationTime(float t) {
 	interpolation_time = t;
+	counter = 0;
 	if(slave) slave->setInterpolationTime(t);
 }
 
@@ -58,9 +44,10 @@ float DoppleringDelayLine::tick(float sample) {
 }
 
 float DoppleringDelayLine::computeSample() {
-	float w1 = delay-floorf(delay);
+	double targetDelay = delay+counter*delta;
+	float w1 = targetDelay-floorf(targetDelay);
 	float w2 = 1-w1;
-	int i1 = (int)(delay);
+	int i1 = (int)(targetDelay);
 	int i2=i1+1;
 	//make sure neither of these is over max delay.
 	i1 =std::min(i1, max_delay);
@@ -70,20 +57,14 @@ float DoppleringDelayLine::computeSample() {
 
 void DoppleringDelayLine::advance(float sample) {
 	line.advance(sample);
-	if(counter) {
-		delay += velocity;
-		counter--;
-		if(counter ==0) delay = new_delay; //make sure it's perfect.
-	}
+	if(counter) counter--;
 }
 
 void DoppleringDelayLine::reset() {
-	velocity = 0.0;
-	if(counter) {
-		delay=new_delay;
-		counter=0;
-	}
+	counter = 0;
+	delta = 0.0;
 	line.reset();
+	if(slave) slave->reset();
 }
 
 DoppleringDelayLine* DoppleringDelayLine::getSlave() {

@@ -90,6 +90,10 @@ int HrtfData::getLength() {
 	return hrir_length;
 }
 
+float HrtfData::getMaxDelay() {
+	return max_hrir_delay;
+}
+
 void HrtfData::loadFromFile(std::string path, unsigned int forSr) {
 	try {
 		auto p = boost::filesystem::path(utf8ToWide(path));
@@ -184,6 +188,7 @@ void HrtfData::loadFromBuffer(unsigned int length, char* buffer, unsigned int fo
 	for(int elev = 0; elev < elev_count; elev++) {
 		for(int az = 0; az < azimuth_counts[elev]; az++) {
 			hrir_delays[elev][az] = convf(iterator);
+			if(hrir_delays[elev][az] > max_hrir_delay) max_hrir_delay = hrir_delays[elev][az];
 			iterator += window_size;
 		}
 	}
@@ -220,12 +225,6 @@ float HrtfData::computeCoefficientsMono(float elevation, float azimuth, float* o
 	int elevationIndexOffset = degreesPerElevation ? abs(min_elevation)/degreesPerElevation : 0;
 	elevationIndex[0] += elevationIndexOffset;
 	elevationIndex[1] = std::min(elevationIndex[0]+1, elev_count-1);
-	double elevationWeights[2];
-	float ringmoddedElevation = ringmodf(elevation, degreesPerElevation);
-	if(ringmoddedElevation < 0) ringmoddedElevation =degreesPerElevation-ringmoddedElevation;
-	if(ringmoddedElevation > degreesPerElevation) ringmoddedElevation = degreesPerElevation;
-	elevationWeights[0] = (degreesPerElevation-ringmoddedElevation)/degreesPerElevation;
-	elevationWeights[1] = ringmoddedElevation/degreesPerElevation;
 
 	// The crossfade we're going to do is based off dot products with vectors representing the impulse response directions.
 	double xs[4], ys[4], zs[4], delays[4];
@@ -273,12 +272,27 @@ float HrtfData::computeCoefficientsMono(float elevation, float azimuth, float* o
 	double y = cos(azimuth)*cos(elevation);
 	double z = sin(elevation);
 
-	// This assumes weights cannot ever go negative.
+	// The distance is the angle between the direction vector and the 4 closest points.
+	// This assumes distances cannot ever go negative.
 	// This may be an invalid assumption for sufficiently sparse HRTF data.
+	double distances[4];
+	for(int i = 0; i < 4; i++) {
+		distances[i] = x*xs[i]+y*ys[i]+z*zs[i];
+		// We want to use acos, but if distances[i] > 1 because floating point rounding error then bad things happen.
+		if(distances[i] < -1.0) distances[i] = PI;
+		else if(distances[i] > 1.0) distances[i] = 0;
+		else distances[i] = acos(distances[i]);
+		// Guard against being too close to a dataset point for numeric stability.
+		if(distances[i] < 1e-4) {
+			std::copy(response_pointers[i], response_pointers[i]+hrir_length, out);
+			return delays[i];
+		}
+	}
+
 	double weights[4];
 	double weightSum = 0.0;
 	for(int i = 0; i < 4; i++) {
-		weights[i] = x*xs[i]+y*ys[i]+z*zs[i];
+		weights[i] = 1.0/(distances[i]*distances[i]);
 		weightSum += weights[i];
 	}
 

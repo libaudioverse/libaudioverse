@@ -63,8 +63,8 @@ class CrossfadingDelayLine {
 class DoppleringDelayLine {
 	public:
 	DoppleringDelayLine(float maxDelay, float sr);
-	void setDelay(float d);
-	void setDelayInSamples(int newDelay);
+	void setDelay(double d);
+	void setDelayInSamples(double newDelay);
 	void setInterpolationTime(float t);
 	float tick(float sample);
 	float computeSample();
@@ -74,9 +74,10 @@ class DoppleringDelayLine {
 	void setSlave(DoppleringDelayLine* s);
 	private:
 	int max_delay = 0, interpolating_direction = 0;
-	double delay = 0.0, new_delay = 0.0;
+	double delay = 0.0;
 	int counter = 0; //counts down delay changes
-	float velocity = 0.0; //what to change the delay by.
+	// new_delay-counter*delta = delay.
+	double delta = 0.0;
 	float interpolation_time =0.1f;
 	float sr = 0;
 	DelayRingbuffer line;
