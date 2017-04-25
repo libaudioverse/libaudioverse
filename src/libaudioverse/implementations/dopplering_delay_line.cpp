@@ -7,6 +7,7 @@ https://www.mozilla.org/en-US/MPL/2.0/> or the Gbnu General Public License, V3 o
 carrying such notice may not be copied, modified, or distributed except according to those terms. */
 #include <libaudioverse/private/dspmath.hpp>
 #include <libaudioverse/implementations/delayline.hpp>
+#include <libaudioverse/private/kernels.hpp>
 #include <algorithm>
 #include <functional>
 #include <math.h>
@@ -76,6 +77,18 @@ void DoppleringDelayLine::process(int count, float* in, float* out) {
 	i1 =std::min(i1, max_delay);
 	i2=std::min(i2, max_delay);
 	float last = line.read(i2);
+	float tmp[64];
+	while(i-count > 64) {
+		std::copy(in+i, in+i+64, tmp);
+		line.process(i1, 64, tmp, tmp);
+		// We can use scalarMultiplicationKernel with a bit of creativity.
+		scalarMultiplicationKernel(64, w1, tmp, out+i);
+		out[i] += w2*last;
+		multiplicationAdditionKernel(63, w2, tmp, out+i+1, out+i+1);
+		last = tmp[63];
+		i += 64;
+	}
+	skip:
 	for(; i < count; i++) {
 		float sample = in[i];
 		float newLast = line.read(i1);

@@ -20,6 +20,9 @@ class DelayRingbuffer {
 	float read(unsigned int offset);
 	unsigned int getLength();
 	void advance(float sample);
+	// Extract a bunch of samples efficiently.
+	// in-place usage is safe.
+	void process(unsigned int offset, int count, float* in, float* out);
 	void write(unsigned int offset, float value);
 	void add(unsigned int index, float value);
 	void reset();
