@@ -64,11 +64,24 @@ LavError createBuffer(LavHandle s, LavHandle& h) {
 	return Lav_ERROR_NONE;
 }
 
+LavError createCrossfadingDelay(LavHandle s, LavHandle& h) {
+	ERRCHECK(Lav_createCrossfadingDelayNode(s, 0.1, 1, &h));
+	ERRCHECK(Lav_nodeSetFloatProperty(h, Lav_DELAY_DELAY, 0.1));
+	return Lav_ERROR_NONE;
+}
+
+LavError createDoppleringDelay(LavHandle s, LavHandle& h) {
+	ERRCHECK(Lav_createDoppleringDelayNode(s, 0.1, 1, &h));
+	ERRCHECK(Lav_nodeSetFloatProperty(h, Lav_DELAY_DELAY, 0.1));
+	return Lav_ERROR_NONE;
+}
+
 std::tuple<std::string, int, std::function<std::vector<LavHandle>(LavHandle, int)>> to_profile[] = {
 ENTRY("sine", 1000, Lav_createSineNode(s, &h)),
 ENTRY("Blit", 1000, Lav_createBlitNode(s, &h)),
 ENTRY("4-channel buffer", 100, createBuffer(s, h)),
-ENTRY("crossfading delay line", 1000, Lav_createCrossfadingDelayNode(s, 0.1, 1, &h)),
+ENTRY("crossfading delay line", 1000, createCrossfadingDelay(s, h)),
+ENTRY("Dopplering delay line", 1000, createDoppleringDelay(s, h)),
 ENTRY("biquad", 1000, Lav_createBiquadNode(s, 1, &h)),
 ENTRY("One-pole filter", 1000, Lav_createOnePoleFilterNode(s, 1, &h)),
 ENTRY("2-channel 2-input crossfader", 500, createCrossfader(s, h)),
