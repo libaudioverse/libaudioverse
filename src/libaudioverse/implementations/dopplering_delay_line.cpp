@@ -75,10 +75,13 @@ void DoppleringDelayLine::process(int count, float* in, float* out) {
 	//make sure neither of these is over max delay.
 	i1 =std::min(i1, max_delay);
 	i2=std::min(i2, max_delay);
+	float last = line.read(i2);
 	for(; i < count; i++) {
 		float sample = in[i];
-		out[i] = w1*line.read(i1)+w2*line.read(i2);
+		float newLast = line.read(i1);
+		out[i] = w1*newLast+w2*last;
 		line.advance(sample);
+		last = newLast;
 	}
 }
 
