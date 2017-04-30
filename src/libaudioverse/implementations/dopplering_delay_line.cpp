@@ -64,6 +64,10 @@ void DoppleringDelayLine::advance(float sample) {
 	if(counter) counter--;
 }
 
+// Warning: bad things if this isn't a power of 2. See process below.
+const int doppleringProcessingWorkspaceSize = 1024;
+thread_local float doppleringProcessingWorkspace[doppleringProcessingWorkspaceSize];
+
 void DoppleringDelayLine::process(int count, float* in, float* out) {
 	int i = 0;
 	// Take the slow path as long as we're crossfading.
@@ -77,18 +81,17 @@ void DoppleringDelayLine::process(int count, float* in, float* out) {
 	i1 =std::min(i1, max_delay);
 	i2=std::min(i2, max_delay);
 	float last = line.read(i2);
-	unsigned int iterationSize = 128;
-	float tmp[128];
+	unsigned int iterationSize = (unsigned int)doppleringProcessingWorkspaceSize;
 	// Put a lower bound on this.
 	while(iterationSize > 8) {
 		while(count-i > iterationSize) {
-			std::copy(in+i, in+i+iterationSize, tmp);
-			line.process(i1, iterationSize, tmp, tmp);
+			std::copy(in+i, in+i+iterationSize, doppleringProcessingWorkspace);
+			line.process(i1, iterationSize, doppleringProcessingWorkspace, doppleringProcessingWorkspace);
 			// We can use scalarMultiplicationKernel with a bit of creativity.
-			scalarMultiplicationKernel(iterationSize, w1, tmp, out+i);
+			scalarMultiplicationKernel(iterationSize, w1, doppleringProcessingWorkspace, out+i);
 			out[i] += w2*last;
-			multiplicationAdditionKernel(iterationSize-1, w2, tmp, out+i+1, out+i+1);
-			last = tmp[iterationSize-1];
+			multiplicationAdditionKernel(iterationSize-1, w2, doppleringProcessingWorkspace, out+i+1, out+i+1);
+			last = doppleringProcessingWorkspace[iterationSize-1];
 			i += iterationSize;
 		}
 		iterationSize /= 2;

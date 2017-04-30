@@ -39,13 +39,16 @@ void DelayRingbuffer::advance(float sample) {
 	buffer[write_head] = sample;
 }
 
+// For the below function.
+const int ringbufferProcessingWorkspaceSize = 1024;
+thread_local float ringbufferProcessingWorkspace[ringbufferProcessingWorkspaceSize];
+
 // This is a very complicated function that took a lot of deep thought; touch carefully.
 // There's a lot of subtlety here, and getting it wrong is very easy.
 void DelayRingbuffer::process(unsigned int offset, int count, float* in, float* out) {
 	// We can't read more than the distance between the offset and the write pointer without also advancing the write pointer.
-	unsigned int maxIterationSize = offset < 64 ? offset: 64;
+	unsigned int maxIterationSize = offset < ringbufferProcessingWorkspaceSize ? offset : ringbufferProcessingWorkspaceSize;
 	maxIterationSize = maxIterationSize < (unsigned int) count ? maxIterationSize : (unsigned int) count;
-	float tmp[64];
 	// If we can't get enough to be worth copying, then we do this.
 	if(maxIterationSize < 4) {
 		for(int i = 0; i < count; i++) {
@@ -64,7 +67,7 @@ void DelayRingbuffer::process(unsigned int offset, int count, float* in, float* 
 		unsigned int copy = read < write_head ? write_head-read+1 : buffer_length-read;
 		copy = copy < (unsigned int) count ? copy : (unsigned int) count;
 		copy = copy < maxIterationSize ? copy : maxIterationSize;
-		std::copy(buffer+read, buffer+read+copy, tmp);
+		std::copy(buffer+read, buffer+read+copy, ringbufferProcessingWorkspace);
 		// We have theoretically used the sample under write_head, so advance by 1.
 		write_head = (write_head+1) & mask;
 		// Advancing is done by moving write_head to the end of the buffer, then wrapping it and going again.
@@ -78,7 +81,7 @@ void DelayRingbuffer::process(unsigned int offset, int count, float* in, float* 
 			i += thisIteration;
 		}
 		count -= copy;
-		std::copy(tmp, tmp+copy, out);
+		std::copy(ringbufferProcessingWorkspace, ringbufferProcessingWorkspace+copy, out);
 		out += copy;
 		in += copy;
 		// write_head is sitting on the first unwritten sample, but needs to be on the first written sample.
