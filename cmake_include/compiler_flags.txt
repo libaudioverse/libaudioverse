@@ -12,6 +12,12 @@ CMAKE_C_FLAGS_RELEASE CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELWITHDEBINFO)
 string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
 endforeach()
 endif()
+
+if(NOT ${LIBAUDIOVERSE_DEVMODE})
+message("MSVC release mode. Forcing /Ox, /GL")
+SET(CMAKE_CXX_FLAGS_RELEASE "/MT /Ox /GL /DNDEBUG")
+endif()
+
 endif()
 
 if(${CMAKE_COMPILER_IS_GNUCC})
