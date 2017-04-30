@@ -85,8 +85,7 @@ void DoppleringDelayLine::process(int count, float* in, float* out) {
 	// Put a lower bound on this.
 	while(iterationSize > 8) {
 		while(count-i > iterationSize) {
-			std::copy(in+i, in+i+iterationSize, doppleringProcessingWorkspace);
-			line.process(i1, iterationSize, doppleringProcessingWorkspace, doppleringProcessingWorkspace);
+			line.process(i1, iterationSize, in+i, doppleringProcessingWorkspace);
 			// We can use scalarMultiplicationKernel with a bit of creativity.
 			scalarMultiplicationKernel(iterationSize, w1, doppleringProcessingWorkspace, out+i);
 			out[i] += w2*last;
