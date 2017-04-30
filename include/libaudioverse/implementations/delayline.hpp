@@ -20,6 +20,9 @@ class DelayRingbuffer {
 	float read(unsigned int offset);
 	unsigned int getLength();
 	void advance(float sample);
+	// Extract a bunch of samples efficiently.
+	// in-place usage is safe.
+	void process(unsigned int offset, int count, float* in, float* out);
 	void write(unsigned int offset, float value);
 	void add(unsigned int index, float value);
 	void reset();
@@ -63,20 +66,22 @@ class CrossfadingDelayLine {
 class DoppleringDelayLine {
 	public:
 	DoppleringDelayLine(float maxDelay, float sr);
-	void setDelay(float d);
-	void setDelayInSamples(int newDelay);
+	void setDelay(double d, bool shouldCrossfade = true);
+	void setDelayInSamples(double newDelay, bool shouldCrossfade = true);
 	void setInterpolationTime(float t);
 	float tick(float sample);
 	float computeSample();
 	void advance(float sample);
+	void process(int count, float* in, float* out);
 	void reset();
 	DoppleringDelayLine* getSlave();
 	void setSlave(DoppleringDelayLine* s);
 	private:
 	int max_delay = 0, interpolating_direction = 0;
-	double delay = 0.0, new_delay = 0.0;
+	double delay = 0.0;
 	int counter = 0; //counts down delay changes
-	float velocity = 0.0; //what to change the delay by.
+	// new_delay-counter*delta = delay.
+	double delta = 0.0;
 	float interpolation_time =0.1f;
 	float sr = 0;
 	DelayRingbuffer line;

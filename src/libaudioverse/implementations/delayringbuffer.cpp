@@ -35,8 +35,58 @@ unsigned int DelayRingbuffer::getLength() {
 }
 
 void DelayRingbuffer::advance(float sample) {
-	write_head++;
-	buffer[write_head & mask] = sample;
+	write_head = (write_head +1) &mask;
+	buffer[write_head] = sample;
+}
+
+// For the below function.
+const int ringbufferProcessingWorkspaceSize = 1024;
+thread_local float ringbufferProcessingWorkspace[ringbufferProcessingWorkspaceSize];
+
+// This is a very complicated function that took a lot of deep thought; touch carefully.
+// There's a lot of subtlety here, and getting it wrong is very easy.
+void DelayRingbuffer::process(unsigned int offset, int count, float* in, float* out) {
+	// We can't read more than the distance between the offset and the write pointer without also advancing the write pointer.
+	unsigned int maxIterationSize = offset < ringbufferProcessingWorkspaceSize ? offset : ringbufferProcessingWorkspaceSize;
+	maxIterationSize = maxIterationSize < (unsigned int) count ? maxIterationSize : (unsigned int) count;
+	// If we can't get enough to be worth copying, then we do this.
+	if(maxIterationSize < 4) {
+		for(int i = 0; i < count; i++) {
+			float got = read(offset+1);
+			advance(in[i]);
+			out[i] = got;
+		}
+		return;
+	}
+	// Otherwise, we can grab entire sections at a time with std::copy, which should optimize to memcpy.
+	while(count) {
+		unsigned int read = (write_head-offset) & mask;
+		// Determine availability for this iteration.
+		// Our reads can and should include the position of write_head itself.
+		// This is because offset 0 *is* the write head, so that delay lines with no delay can function.
+		unsigned int copy = read < write_head ? write_head-read+1 : buffer_length-read;
+		copy = copy < (unsigned int) count ? copy : (unsigned int) count;
+		copy = copy < maxIterationSize ? copy : maxIterationSize;
+		std::copy(buffer+read, buffer+read+copy, ringbufferProcessingWorkspace);
+		// We have theoretically used the sample under write_head, so advance by 1.
+		write_head = (write_head+1) & mask;
+		// Advancing is done by moving write_head to the end of the buffer, then wrapping it and going again.
+		unsigned int i = 0;
+		while(i < copy) {
+			unsigned int thisIteration = buffer_length-write_head;
+			unsigned int remaining = copy-i;
+			thisIteration = thisIteration < remaining ? thisIteration : remaining;
+			std::copy(in+i, in+thisIteration+i, buffer+write_head);
+			write_head = (write_head+thisIteration) & mask;
+			i += thisIteration;
+		}
+		count -= copy;
+		std::copy(ringbufferProcessingWorkspace, ringbufferProcessingWorkspace+copy, out);
+		out += copy;
+		in += copy;
+		// write_head is sitting on the first unwritten sample, but needs to be on the first written sample.
+		write_head = (write_head-1) & mask;
+	}
 }
 
 void DelayRingbuffer::write(unsigned int offset, float value) {
