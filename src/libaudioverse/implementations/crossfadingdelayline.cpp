@@ -67,10 +67,9 @@ void CrossfadingDelayLine::processBuffer(int length, float* input, float* output
 		delay = new_delay;
 	}
 	//We might have a bit more.
-	for(int i = cf; i < length; i++) {
-		sample= input[i];
-		output[i] = line.read(delay);
-		line.advance(sample);
+	if(cf < length) {
+		int remaining = length-cf;
+		line.process(delay, remaining, input+cf, output+cf);
 	}
 }
 
