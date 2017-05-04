@@ -63,6 +63,7 @@ void Buffer::loadFromArray(int sr, int channels, int frames, float* inputData) {
 				newDataUninterleaved[ch*newFrames+i] = newData[channels*i+ch];
 			}
 		}
+		delete[] newData;
 	} else {
 		newDataUninterleaved = newData;
 	}
