@@ -14,14 +14,14 @@ environment:
   matrix:
     - ARCHITECTURE: x86
       LIBSNDFILE_URL: https://files.camlorn.net/appveyor/libsndfile32
-      NUMPY_URL: https://files.camlorn.net/appveyor/numpy-1.11.3+mkl-cp35-none-win32.whl
-      SCIPY_URL: https://files.camlorn.net/appveyor/scipy-0.19.0-cp35-none-win32.whl
+      NUMPY_URL: https://files.camlorn.net/appveyor/numpy-1.11.3+mkl-cp35-cp35m-win32.whl
+      SCIPY_URL: https://files.camlorn.net/appveyor/scipy-0.19.0-cp35-cp35m-win32.whl
       PYTHON_COMMAND: 'c:\python35\python'
       BOOST_LIB_PATH: 'c:\libraries\boost_1_59_0\lib32-msvc-14.0'
     - ARCHITECTURE: amd64
       LIBSNDFILE_URL: https://files.camlorn.net/appveyor/libsndfile64
-      NUMPY_URL: https://files.camlorn.net/appveyor/numpy-1.11.3+mkl-cp35-cp35m-win_amd64.whl
-      SCIPY_URL: https://files.camlorn.net/appveyor/scipy-0.19.0-cp35-cp35m-win_amd64.whl
+      NUMPY_URL: http://files.camlorn.net/appveyor/numpy-1.11.3+mkl-cp35-cp35m-win_amd64.whl
+      SCIPY_URL: http://files.camlorn.net/appveyor/scipy-0.19.0-cp35-cp35m-win_amd64.whl
       PYTHON_COMMAND: 'C:\Python35-x64\python'
       BOOST_LIB_PATH: 'c:\libraries\boost_1_59_0\lib64-msvc-14.0'
 
