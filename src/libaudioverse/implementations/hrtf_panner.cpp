@@ -9,20 +9,17 @@ carrying such notice may not be copied, modified, or distributed except accordin
 #include <libaudioverse/private/dspmath.hpp>
 #include <libaudioverse/private/memory.hpp>
 #include <libaudioverse/private/workspace.hpp>
-#include <libaudioverse/private/constants.hpp>
 #include <libaudioverse/implementations/hrtf_panner.hpp>
 #include <libaudioverse/implementations/delayline.hpp>
 #include <libaudioverse/implementations/convolvers.hpp>
 #include <algorithm>
 #include <memory>
-#include <tuple>
 #include <math.h>
 
 namespace libaudioverse_implementation {
 
 thread_local Workspace<float> left_response_workspace, right_response_workspace;
 thread_local Workspace<float> crossfade_workspace;
-float ITD_DELAY_CAP = 0.03;
 
 HrtfPanner::HrtfPanner(int _block_size, float _sr, std::shared_ptr<HrtfData> _hrtf): block_size(_block_size), sr(_sr), hrtf(_hrtf) {
 	response_length = hrtf->getLength();
@@ -35,11 +32,6 @@ HrtfPanner::HrtfPanner(int _block_size, float _sr, std::shared_ptr<HrtfData> _hr
 	prev_right_convolver = new BlockConvolver(block_size);
 	left_convolver->setResponse(response_length, left_response_ptr);
 	right_convolver->setResponse(response_length, right_response_ptr);
-	left_delay = new DoppleringDelayLine(hrtf->getMaxDelay(), _sr);
-	right_delay = new DoppleringDelayLine(hrtf->getMaxDelay(), _sr);
-	// Move delay over 1 MS.
-	left_delay->setInterpolationTime(0.003);
-	right_delay->setInterpolationTime(0.003);
 }
 
 HrtfPanner::~HrtfPanner() {
@@ -47,8 +39,6 @@ HrtfPanner::~HrtfPanner() {
 	delete right_convolver;
 	delete prev_left_convolver;
 	delete prev_right_convolver;
-	delete left_delay;
-	delete right_delay;
 }
 
 void HrtfPanner::pan(float* input, float *left_output, float *right_output) {
@@ -63,12 +53,9 @@ void HrtfPanner::pan(float* input, float *left_output, float *right_output) {
 		}
 		float* left_response_ptr = left_response_workspace.get(response_length);
 		float* right_response_ptr = right_response_workspace.get(response_length);
-		float leftDelay, rightDelay;
-		std::tie(leftDelay, rightDelay) = hrtf->computeCoefficientsStereo(elevation, azimuth, left_response_ptr, right_response_ptr);
+		hrtf->computeCoefficientsStereo(elevation, azimuth, left_response_ptr, right_response_ptr);
 		left_convolver->setResponse(response_length, left_response_ptr);
 		right_convolver->setResponse(response_length, right_response_ptr);
-		left_delay->setDelay(leftDelay, needsCrossfade);
-		right_delay->setDelay(rightDelay, needsCrossfade);
 	}
 	//These two convolutions always happen.
 	left_convolver->convolve(input, left_output);
@@ -83,8 +70,6 @@ void HrtfPanner::pan(float* input, float *left_output, float *right_output) {
 	}
 	prev_azimuth = azimuth;
 	prev_elevation = elevation;
-	left_delay->process(block_size, left_output, left_output);
-	right_delay->process(block_size, right_output, right_output);
 }	
 
 void HrtfPanner::reset() {
@@ -92,8 +77,6 @@ void HrtfPanner::reset() {
 	right_convolver->reset();
 	prev_left_convolver->reset();
 	prev_right_convolver->reset();
-	left_delay->reset();
-	right_delay->reset();
 }
 
 void HrtfPanner::setAzimuth(float angle) {

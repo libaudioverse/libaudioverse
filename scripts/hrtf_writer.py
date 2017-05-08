@@ -1,7 +1,6 @@
 """This is a helper class for scripts to import from various HRTF sources."""
 
 import numpy
-import scipy.signal as signal
 import numpy.fft as fft
 import struct
 import enum
@@ -22,7 +21,6 @@ class HrtfWriter(object):
     "{}", #Hole for the azimuth counts.
     "i", #Length of each response in samples.
     "{}", #hole for the responses.
-    "{}", # the delays we factored out of each response.
     ])
 
     def __init__(self, samplerate, min_elevation, max_elevation, responses, endianness=EndiannessTypes.little, print_progress=True):
@@ -69,20 +67,18 @@ class HrtfWriter(object):
 
     def make_format_string(self):
         endianness_token= "<" if self.endianness == EndiannessTypes.little else ">"
-        self.format_string=self.format_template.format(endianness_token, str(len(self.azimuth_counts))+"i", str(self.response_count*self.response_length)+"f", str(self.response_count)+"f").encode('ascii')
+        self.format_string=self.format_template.format(endianness_token, str(len(self.azimuth_counts))+"i", str(self.response_count*self.response_length)+"f").encode('ascii')
         self.progress("Format string:", self.format_string)
 
     def pack_data(self):
         self.make_format_string()
         iter = itertools.chain(
-            uuid.uuid4().bytes, #Generate a 16-byte uuid.
-            [self.endianness_marker, self.samplerate, self.response_count,
-            self.elevation_count, self.min_elevation, self.max_elevation],
-            self.azimuth_counts,
-            [self.response_length],
-            *[list(response) for elevation in self.responses for response in  elevation],
-            self.delays,
-        )
+        uuid.uuid4().bytes, #Generate a 16-byte uuid.
+        [self.endianness_marker, self.samplerate, self.response_count,
+        self.elevation_count, self.min_elevation, self.max_elevation],
+        self.azimuth_counts,
+        [self.response_length],
+        *[list(response) for elevation in self.responses for response in  elevation])
         data=list(iter)
         self.packed_data = struct.pack(self.format_string, *data)
         self.progress("Data packed. Total size is {}.".format(len(self.packed_data)))
@@ -119,41 +115,9 @@ class HrtfWriter(object):
             return new_response
         self.map(conv)
 
-    def compute_delays(self):
-        """Computes an approximate delay for each impulse response.
-
-This is used by Libaudioverse to internally compute the interaural time difference."""
-        self.delays = numpy.zeros(self.response_count, dtype = 'float64')
-        threshold_db = -6
-        threshold = 10**(threshold_db/10)
-        self.progress("Computing response delays using threshold {} db = {}".format(threshold_db, threshold))
-        for index, response in enumerate((j for i in self.responses for j in i)):
-            # We want maximum accuracy, so upsample by a factor of 100.
-            upsampled_response = signal.resample(response, self.response_length*100)
-            abs_response = numpy.abs(upsampled_response)
-            desired = threshold*numpy.max(abs_response)
-            delay_samples = 0
-            while abs_response[delay_samples] < desired and delay_samples < len(abs_response):
-                delay_samples += 1
-            delay = delay_samples/(self.samplerate*100) # Remember we upsampled by 100.
-            self.delays[index] = delay
-        min_delay = min(self.delays)
-        max_delay = max(self.delays)
-        self.progress("Minimum response delay {} MS, maximum response delay {} MS".format(min_delay*1000, max_delay*1000))
-        self.delays -= min_delay
-        self.delays = numpy.abs(self.delays) # in case floating point error ever causes one of these to go negative.
-
-    def minimum_phase(self):
-        """Convert the filters to minimum phase."""
-        def minphase(r):
-            return signal.minimum_phase(r, method = 'hilbert', n_fft= 8192)
-        self.map(minphase)
-
     def standard_build(self, path):
         """Does a standard build, that is the transformations that should be made on most HRIRs."""
         self.progress("Standard build requested.")
         self.data_to_float64()
-        self.compute_delays()
-        self.minimum_phase()
         self.pack_data()
         self.write_file(path)

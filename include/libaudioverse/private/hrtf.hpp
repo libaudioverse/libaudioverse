@@ -10,7 +10,6 @@ carrying such notice may not be copied, modified, or distributed except accordin
 #include <string>
 #include <memory>
 #include <kiss_fftr.h>
-#include <tuple>
 
 namespace libaudioverse_implementation {
 
@@ -19,11 +18,10 @@ class HrtfData {
 	HrtfData();
 	~HrtfData();
 	//get the appropriate coefficients for one channel.  A stereo hrtf is two calls to this function.
-	float computeCoefficientsMono(float elevation, float azimuth, float* out);
+	void computeCoefficientsMono(float elevation, float azimuth, float* out);
 
 	//warning: writes directly to the output destination, doesn't allocate a new one.
-	// Returns the delays for the left and right ear.
-	std::tuple<float, float> computeCoefficientsStereo(float elevation, float azimuth, float* left, float* right);
+	void computeCoefficientsStereo(float elevation, float azimuth, float* left, float* right);
 
 	//load from a file.
 	void loadFromFile(std::string path, unsigned int forSr);
@@ -32,8 +30,6 @@ class HrtfData {
 
 	//get the hrir's length.
 	int getLength();
-	// Get the max delay we can return from computeCoefficientsStereo.
-	float getMaxDelay();
 	private:
 	float* createTemporaryBuffer();
 	void freeTemporaryBuffer(float* b);
@@ -41,8 +37,7 @@ class HrtfData {
 	int min_elevation = 0, max_elevation = 0;
 	int *azimuth_counts = nullptr;
 	int samplerate = 0;
-	float ***hrirs = nullptr, **hrir_delays = nullptr;
-	float max_hrir_delay = 0.0f;
+	float ***hrirs = nullptr;
 	//used for crossfading so we don't clobber the heap.
 	powercores::ThreadLocalVariable<float*> temporary_buffer1, temporary_buffer2;
 };

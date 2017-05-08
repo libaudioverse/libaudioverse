@@ -1,7 +1,6 @@
 """Loads the Diffused MIT KEMAR HRTF dataset included with this repository and converts it to a .hrtf file.  Pass the path to the data as the parameter to this script."""
 import numpy
 import scipy.io.wavfile as wavfile
-import scipy.signal as signal
 from glob import glob
 import sys
 import os.path

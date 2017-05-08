@@ -35,12 +35,11 @@ class HrtfPanner {
 	std::shared_ptr<HrtfData> hrtf;
 	//Convolvers, current and previous.
 	BlockConvolver *left_convolver, *right_convolver, *prev_left_convolver, *prev_right_convolver;
-	DoppleringDelayLine* left_delay, *right_delay;
 	int block_size;
 	int response_length;
 	float sr;
 	float azimuth = 0, elevation = 0, prev_azimuth = 0, prev_elevation  = 0;
-	float crossfade_threshold = 3.0;
+	float crossfade_threshold = 0.1;
 	bool should_crossfade = true;
 };
 
