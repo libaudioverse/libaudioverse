@@ -46,7 +46,7 @@ void initializeMemoryModule() {
 
 void shutdownMemoryModule() {
 	// We need to keep objects alive until we reach the end of this function.
-	std::vector<std::shared_ptr<void>> keepAlive;
+	std::vector<std::shared_ptr<ExternalObject>> keepAlive;
 	std::unique_lock<std::recursive_mutex> l(*memory_lock);
 	//We're about to shut down, but sometimes there are cycles.
 	//The most notable case of this is nodes connected to the server: the server holds them and they hold the server.
@@ -57,20 +57,30 @@ void shutdownMemoryModule() {
 	for(auto &i: *weak_external_handles) {
 		auto obj = i.second.lock();
 		keepAlive.push_back(obj);
+	}
+	for(auto &i: *weak_external_handles) {
+		auto obj = i.second.lock();
+		keepAlive.push_back(obj);
+	}
+	// Clear output device of and lock all servers.
+	for(auto &obj: keepAlive) {
 		auto s = std::dynamic_pointer_cast<Server>(obj);
 		if(s) {
+			s->clearOutputDevice();
 			s->lock();
 		}
 	}
-	for(auto &i: *weak_external_handles) {
-		auto obj = i.second.lock();
+	// Isolate all nodes.
+	for(auto &obj: keepAlive) {
 		auto n = std::dynamic_pointer_cast<Node>(obj);
 		if(n) n->isolate();
 	}
-	for(auto &i: *weak_external_handles) {
-		auto obj = i.second.lock();
-		auto s= std::dynamic_pointer_cast<Server>(obj);
-		if(s) s->unlock();
+	// Unlock all servers.
+	for(auto &obj: keepAlive) {
+		auto s = std::dynamic_pointer_cast<Server>(obj);
+		if(s) {
+			s->unlock();
+		}
 	}
 	delete external_handles;
 	external_handles = nullptr;
