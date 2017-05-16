@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Python-specific Notes &mdash; Libaudioverse build49 documentation</title>
+  <title>Python-specific Notes &mdash; Libaudioverse build50 documentation</title>
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="Libaudioverse build49 documentation" href="index.html"/>
+    <link rel="top" title="Libaudioverse build50 documentation" href="index.html"/>
         <link rel="next" title="The Libaudioverse API" href="api.html"/>
         <link rel="prev" title="Welcome to Libaudioverse’s documentation!" href="index.html"/> 
 
@@ -184,7 +184,7 @@ This is no longer necessary because numeric properties now behave like numbers.<
 <p>Note the following important points:</p>
 <ul class="simple">
 <li>Properties do not implement <cite>__hash__</cite> because there is no sensible definition that can satisfy all cases.</li>
-<li>Storing the property proxy object keeps the node it came from alive.  If you need to store values of properties, it is much more efficient to extract the value.  <cite>x = sine.frequency</cite> keeps the sine node alive at least until <cite>x</cite> dies, but <cite>x = sine.frequency.value</cite> doesn&#8217;t.</li>
+<li>Storing the property proxy object keeps the node it came from alive.  If you need to store values of properties, it is much more efficient to extract the value.  <cite>x = sine.frequency</cite> keeps the sine node alive at least until <cite>x</cite> dies, but <cite>x = sine.frequency.value</cite> doesn’t.</li>
 <li>If you store a property object, changing it (i.e. assignment, <cite>*=</cite>, calling <cite>reset</cite>) will affect the node.</li>
 </ul>
 </div>
@@ -283,7 +283,7 @@ The members have their common prefix stripped and are then converted to lowercas
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'build49',
+            VERSION:'build50',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
