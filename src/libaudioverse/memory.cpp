@@ -142,16 +142,19 @@ std::function<void(ExternalObject*)> ObjectDeleter(std::shared_ptr<Server> serve
 		//To that end, we gather information as follows, and then queue it.
 		bool isExternal;
 		int handle;
-		LOCK(*server);
-		isExternal = obj->is_external_object;
-		handle = obj->external_object_handle;
-		//WARNING: this line can call this deleter recursively, if obj contains the final shared pointer to another ExternalObject.
-		delete obj;
-		//Because of the recursion, shell out to the server's task thread.
-		if(isExternal && handle_destroyed_callback) server->enqueueTask([handle] () {handle_destroyed_callback(handle);});
+		{
+			LOCK(*server);
+			isExternal = obj->is_external_object;
+			handle = obj->external_object_handle;
+			//WARNING: this line can call this deleter recursively, if obj contains the final shared pointer to another ExternalObject.
+			delete obj;
+			//Because of the recursion, shell out to the server's task thread.
+			if(isExternal && handle_destroyed_callback) server->enqueueTask([handle] () {handle_destroyed_callback(handle);});
+		}
 		//The server holds weak_ptrs to nodes.
 		//weak_ptrs hold references to this deleter.
 		//Therefore there is a cycle.
+		// We do this outside the lock because the server might delete, and cannot safely do so while locked.
 		server = nullptr;
 	};
 }
