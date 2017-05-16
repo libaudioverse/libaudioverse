@@ -68,7 +68,9 @@ void BufferNode::process() {
 	player.setEndedCount(endedCount);
 	int prevEndedCount = player.getEndedCount();
 	player.process(buff->getChannels(), &output_buffers[0]);
-	getProperty(Lav_BUFFER_POSITION).setDoubleValue(player.getPosition());
+	// Temporary cludge: the buffer player can return a position past the end of the buffer.
+	auto &pos = getProperty(Lav_BUFFER_POSITION);
+	pos.setDoubleValue(std::min(player.getPosition(), pos.getDoubleMax()));
 	for(int i = player.getEndedCount(); i > prevEndedCount; i--) {
 		server->enqueueTask([=] () {(*end_callback)();});
 	}
