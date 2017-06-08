@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>The Libaudioverse API &mdash; Libaudioverse build44 documentation</title>
+  <title>The Libaudioverse API &mdash; Libaudioverse build54 documentation</title>
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="Libaudioverse build44 documentation" href="index.html"/>
+    <link rel="top" title="Libaudioverse build54 documentation" href="index.html"/>
         <link rel="prev" title="Python-specific Notes" href="python-specifics.html"/> 
 
   
@@ -406,7 +406,7 @@ This is measured in periods, not in radians.</p>
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The signal to filter.</td>
 </tr>
 </tbody>
@@ -426,7 +426,7 @@ This is measured in periods, not in radians.</p>
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The filtered signal.</td>
 </tr>
 </tbody>
@@ -436,7 +436,7 @@ This is measured in periods, not in radians.</p>
 <code class="descname">coefficient</code><a class="headerlink" href="#libaudioverse.AllpassNode.coefficient" title="Permalink to this definition">¶</a></dt>
 <dd><p>Type: float</p>
 <p>Range: [-INFINITY, INFINITY]</p>
-<p>The coefficient of the allpass filter&#8217;s transfer function.</p>
+<p>The coefficient of the allpass filter’s transfer function.</p>
 <p>For those not familiar with digital signal processing, this controls how quickly the repeating echoes created by this filter decay.</p>
 </dd></dl>
 
@@ -445,7 +445,7 @@ This is measured in periods, not in radians.</p>
 <code class="descname">delay_max</code><a class="headerlink" href="#libaudioverse.AllpassNode.delay_max" title="Permalink to this definition">¶</a></dt>
 <dd><p>Type: int</p>
 <p>This property is read-only.</p>
-<p>The max delay as set at the node&#8217;s creation time.</p>
+<p>The max delay as set at the node’s creation time.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -600,7 +600,7 @@ If crossfading is enabled, moving the panner will slowly fade it to the new posi
 <dt id="libaudioverse.AutomatedProperty.envelope">
 <code class="descname">envelope</code><span class="sig-paren">(</span><em>time</em>, <em>duration</em>, <em>values</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.AutomatedProperty.envelope" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run an envelope.</p>
-<p>The property&#8217;s value will stay where it was after the last automator until the specified time is reached, whereupon it will follow the envelope until time+duration.</p>
+<p>The property’s value will stay where it was after the last automator until the specified time is reached, whereupon it will follow the envelope until time+duration.</p>
 <p>This function wraps Lav_automationEnvelope.</p>
 </dd></dl>
 
@@ -608,14 +608,14 @@ If crossfading is enabled, moving the panner will slowly fade it to the new posi
 <dt id="libaudioverse.AutomatedProperty.linear_ramp_to_value">
 <code class="descname">linear_ramp_to_value</code><span class="sig-paren">(</span><em>time</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.AutomatedProperty.linear_ramp_to_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Schedule a linear automator.</p>
-<p>The property&#8217;s value will change to the specified value by the specified time, starting at the end of the previous automator</p>
+<p>The property’s value will change to the specified value by the specified time, starting at the end of the previous automator</p>
 <p>This function wraps Lav_automationLinearRampToValue.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="libaudioverse.AutomatedProperty.set">
 <code class="descname">set</code><span class="sig-paren">(</span><em>time</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.AutomatedProperty.set" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets the property&#8217;s value to a specific value at a specific time.</p>
+<dd><p>Sets the property’s value to a specific value at a specific time.</p>
 <p>Wraps Lav_automationSet.</p>
 </dd></dl>
 
@@ -644,7 +644,7 @@ It may be found at:
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The signal to process.</td>
 </tr>
 </tbody>
@@ -664,7 +664,7 @@ It may be found at:
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The result of processing the audio via the filter.</td>
 </tr>
 </tbody>
@@ -958,7 +958,7 @@ Setting this property will reset position.</p>
 <dd><p>Type: int</p>
 <p>Range: [0, MAX_INT]</p>
 <p>Default value: 0</p>
-<p>Increments every time the buffer reaches it&#8217;s end.
+<p>Increments every time the buffer reaches it’s end.
 If the buffer is not looping, this can be used to determine when the buffer is ended, without using the callback.
 if the buffer is configured to loop, the counter will count up every time the end of a loop is reached.
 You can write to this property to reset it.</p>
@@ -1048,7 +1048,7 @@ There is no limit to the number of buffers which may be scheduled at any given t
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The sum of all playing buffers.</td>
 </tr>
 </tbody>
@@ -1093,7 +1093,7 @@ The time is relative to now.</p>
 <dl class="attribute">
 <dt id="libaudioverse.ChannelInterpretations.discrete">
 <code class="descname">discrete</code><em class="property"> = 0</em><a class="headerlink" href="#libaudioverse.ChannelInterpretations.discrete" title="Permalink to this definition">¶</a></dt>
-<dd><p>If channel counts mismatch, don&#8217;t apply mixing matrices. Either drop or fill with zeros as appropriate.</p>
+<dd><p>If channel counts mismatch, don’t apply mixing matrices. Either drop or fill with zeros as appropriate.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -1127,7 +1127,7 @@ modify the channels individually, and then merge them with this node.</p>
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The result of merging the input channels.</td>
 </tr>
 </tbody>
@@ -1156,7 +1156,7 @@ modify the channels individually, and then merge them with a <a class="reference
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The signal to split into component channels.</td>
 </tr>
 </tbody>
@@ -1184,7 +1184,7 @@ modify the channels individually, and then merge them with a <a class="reference
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The signal to be convolved.</td>
 </tr>
 </tbody>
@@ -1204,7 +1204,7 @@ modify the channels individually, and then merge them with a <a class="reference
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The convolved signal.</td>
 </tr>
 </tbody>
@@ -1333,7 +1333,7 @@ Delay lines have uses in echo and reverb, as well as many more esoteric effects.
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The signal to delay.</td>
 </tr>
 </tbody>
@@ -1353,7 +1353,7 @@ Delay lines have uses in echo and reverb, as well as many more esoteric effects.
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The delayed signal.</td>
 </tr>
 </tbody>
@@ -1374,7 +1374,7 @@ The range of this property depends on the maxDelay parameter to the constructor.
 <code class="descname">delay_max</code><a class="headerlink" href="#libaudioverse.CrossfadingDelayNode.delay_max" title="Permalink to this definition">¶</a></dt>
 <dd><p>Type: float</p>
 <p>This property is read-only.</p>
-<p>The max delay as set at the node&#8217;s creation time.</p>
+<p>The max delay as set at the node’s creation time.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -1423,7 +1423,7 @@ For any sampling rate, this node is the best first-order section for DC removal 
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>A signal with some DC.</td>
 </tr>
 </tbody>
@@ -1443,7 +1443,7 @@ For any sampling rate, this node is the best first-order section for DC removal 
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The same signal with DC cut using a first-order filter.</td>
 </tr>
 </tbody>
@@ -1507,7 +1507,7 @@ Delay lines have uses in echo and reverb, as well as many more esoteric effects.
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The signal to delay.</td>
 </tr>
 </tbody>
@@ -1527,7 +1527,7 @@ Delay lines have uses in echo and reverb, as well as many more esoteric effects.
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The delayed signal.</td>
 </tr>
 </tbody>
@@ -1548,7 +1548,7 @@ The range of this property depends on the maxDelay parameter to the constructor.
 <code class="descname">delay_max</code><a class="headerlink" href="#libaudioverse.DoppleringDelayNode.delay_max" title="Permalink to this definition">¶</a></dt>
 <dd><p>Type: float</p>
 <p>This property is read-only.</p>
-<p>The max delay as set at the node&#8217;s creation time.</p>
+<p>The max delay as set at the node’s creation time.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -1613,7 +1613,7 @@ Any functionality to change a property on all sources needs to be implemented by
 <code class="descname">add_effect_send</code><span class="sig-paren">(</span><em>node</em>, <em>channels</em>, <em>is_reverb</em>, <em>connect_by_default</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.EnvironmentNode.add_effect_send" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add an effect send.</p>
 <p>Effect sends are aggregates of all sources configured to make use of them.
-This function&#8217;s return value is the index of the newly created effecct send.</p>
+This function’s return value is the index of the newly created effecct send.</p>
 <p>The world gains an additional output for every added effect send.
 This output aggregates all audio of sources configured to send to it, including the panning effects on those sources.
 The returned index is the number of the newly created output.</p>
@@ -1645,7 +1645,7 @@ To control this property on a per-source basis, set <code class="docutils litera
 <p>Default value: 0.0</p>
 <p>The default size for new sources.
 Sources aare approximated as spheres, with 0 being the special case of a point source.
-Size is used to determine the listener&#8217;s distance from a source.</p>
+Size is used to determine the listener’s distance from a source.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -1703,7 +1703,7 @@ If you wish to set it on a per-source basis, set <code class="docutils literal">
 <p>Default value: [0.0, 0.0, -1.0, 0.0, 1.0, 0.0]</p>
 <p>The orientation of the listener.
 The first three elements are a vector representing the direction in which the listener is looking
-and the second 3 a vector representing the direction in which a rod pointing out of the top of the listener&#8217;s head would be pointing</p>
+and the second 3 a vector representing the direction in which a rod pointing out of the top of the listener’s head would be pointing</p>
 <p>This property packs these vectors because they must never be modified separately.
 Additionally, they should both be unit vectors and must also be orthoganal.</p>
 <p>the default situates the listener such that positive x is right, positive y is up, and positive z is behind the listener.
@@ -1760,23 +1760,23 @@ When the buffer finishes playing, the source is automatically disposed of.</p>
 <dl class="class">
 <dt id="libaudioverse.FdnFilterTypes">
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">FdnFilterTypes</code><a class="headerlink" href="#libaudioverse.FdnFilterTypes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Possible filter types for a feedback delay network&#8217;s feedback path.</p>
+<dd><p>Possible filter types for a feedback delay network’s feedback path.</p>
 <dl class="attribute">
 <dt id="libaudioverse.FdnFilterTypes.disabled">
 <code class="descname">disabled</code><em class="property"> = 0</em><a class="headerlink" href="#libaudioverse.FdnFilterTypes.disabled" title="Permalink to this definition">¶</a></dt>
-<dd><p>Don&#8217;t insert filters on the feedback path.</p>
+<dd><p>Don’t insert filters on the feedback path.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.FdnFilterTypes.highpass">
 <code class="descname">highpass</code><em class="property"> = 2</em><a class="headerlink" href="#libaudioverse.FdnFilterTypes.highpass" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert highpass filters on the FDN&#8217;s feedback path.</p>
+<dd><p>Insert highpass filters on the FDN’s feedback path.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="libaudioverse.FdnFilterTypes.lowpass">
 <code class="descname">lowpass</code><em class="property"> = 1</em><a class="headerlink" href="#libaudioverse.FdnFilterTypes.lowpass" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert lowpass filters on the FDN&#8217;s feedback path.</p>
+<dd><p>Insert lowpass filters on the FDN’s feedback path.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1787,7 +1787,7 @@ When the buffer finishes playing, the source is automatically disposed of.</p>
 <dd><p>An 8 delay line FDN reverberator, based off a householder reflection.</p>
 <p>This reverb takes as its input and outputs ats its output quadraphonic audio.
 Panning effects will still be observed at the output with some bias.
-If a stereo signal is fed into the reverb and the reverb is likewise connected to a stereo output, the input signal&#8217;s volume will effectively be halved.</p>
+If a stereo signal is fed into the reverb and the reverb is likewise connected to a stereo output, the input signal’s volume will effectively be halved.</p>
 <p>Inputs:</p>
 <table border="1" class="docutils">
 <colgroup>
@@ -1865,7 +1865,7 @@ This property acts as a multiplier, and the correspondance between it and physic
 <p>Range: [0.0, 1.0]</p>
 <p>Default value: 0.5</p>
 <p>Controls the density of the reverb.
-Extremely low values sound &#8220;grainy&#8221;; extremely high values tend to resonate.</p>
+Extremely low values sound “grainy”; extremely high values tend to resonate.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -1953,7 +1953,7 @@ The array for this property allows any floating point values, and must be exactl
 It is slower than the <a class="reference internal" href="#libaudioverse.ConvolverNode" title="libaudioverse.ConvolverNode"><code class="xref py py-class docutils literal"><span class="pre">ConvolverNode</span></code></a> for small impulse responses.</p>
 <p>The difference between this node and the <a class="reference internal" href="#libaudioverse.ConvolverNode" title="libaudioverse.ConvolverNode"><code class="xref py py-class docutils literal"><span class="pre">ConvolverNode</span></code></a> is the complexity of the algorithm.
 This node is capable of handling impulses longer than a second, a case for which the <a class="reference internal" href="#libaudioverse.ConvolverNode" title="libaudioverse.ConvolverNode"><code class="xref py py-class docutils literal"><span class="pre">ConvolverNode</span></code></a> will fail to run in realtime.</p>
-<p>Furthermore, as the most common operation for this node is reverb, it is possible to set each channel&#8217;s response separately.</p>
+<p>Furthermore, as the most common operation for this node is reverb, it is possible to set each channel’s response separately.</p>
 <p>Inputs:</p>
 <table border="1" class="docutils">
 <colgroup>
@@ -1969,7 +1969,7 @@ This node is capable of handling impulses longer than a second, a case for which
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The signal to be convolved.</td>
 </tr>
 </tbody>
@@ -1989,7 +1989,7 @@ This node is capable of handling impulses longer than a second, a case for which
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The convolved signal.</td>
 </tr>
 </tbody>
@@ -2128,7 +2128,7 @@ The difference between this node and a delay line and filter pair is that this n
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The signal to process.</td>
 </tr>
 </tbody>
@@ -2148,7 +2148,7 @@ The difference between this node and a delay line and filter pair is that this n
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The result of processing the audio via the filter and delay line.</td>
 </tr>
 </tbody>
@@ -2178,7 +2178,7 @@ The range of this property depends on the maxDelay parameter to the constructor.
 <code class="descname">delay_max</code><a class="headerlink" href="#libaudioverse.FilteredDelayNode.delay_max" title="Permalink to this definition">¶</a></dt>
 <dd><p>Type: float</p>
 <p>This property is read-only.</p>
-<p>The max delay as set at the node&#8217;s creation time.</p>
+<p>The max delay as set at the node’s creation time.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -2252,7 +2252,7 @@ Most applications will want  a <a class="reference internal" href="#libaudiovers
 <p>This filter is not controlled through frequency specifications.
 Instead, the position of the pole and the zero on the real axis are individually controllable with a-rate properties.
 Some helper functions exist to position them for common configurations, but other filter types do most of it better.
-The major advantage for this filter type is that it is incredibly inexpensive as compared to the <a class="reference internal" href="#libaudioverse.IirNode" title="libaudioverse.IirNode"><code class="xref py py-class docutils literal"><span class="pre">IirNode</span></code></a> and supports automation of the pole and zero&#8217;s position.</p>
+The major advantage for this filter type is that it is incredibly inexpensive as compared to the <a class="reference internal" href="#libaudioverse.IirNode" title="libaudioverse.IirNode"><code class="xref py py-class docutils literal"><span class="pre">IirNode</span></code></a> and supports automation of the pole and zero’s position.</p>
 <p>Inputs:</p>
 <table border="1" class="docutils">
 <colgroup>
@@ -2268,7 +2268,7 @@ The major advantage for this filter type is that it is incredibly inexpensive as
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The signal to filter.</td>
 </tr>
 </tbody>
@@ -2288,7 +2288,7 @@ The major advantage for this filter type is that it is incredibly inexpensive as
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The filtered signal.</td>
 </tr>
 </tbody>
@@ -2382,7 +2382,7 @@ One possible use is as a simple mixer: point all the nodes to be mixed at the in
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The signal whose gain is to be changed.</td>
 </tr>
 </tbody>
@@ -2402,7 +2402,7 @@ One possible use is as a simple mixer: point all the nodes to be mixed at the in
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The signal with its gain changed.</td>
 </tr>
 </tbody>
@@ -2426,7 +2426,7 @@ One possible use is as a simple mixer: point all the nodes to be mixed at the in
 <dd><p>Type: float</p>
 <p>Range: [-INFINITY, INFINITY]</p>
 <p>Default value: 0.0</p>
-<p>After mul is applied, we add the value to which this property is set to the node&#8217;s result.</p>
+<p>After mul is applied, we add the value to which this property is set to the node’s result.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -2461,7 +2461,7 @@ For more details on the subject of node lifetimes, see the Libaudioverse manual.
 <p>Eventually, this function will support all signatures of connect.  At the moment, we support:</p>
 <p>node.disconnect(output): disconnect all connections involving the specified output.
 node.disconnect(output, other, input): Disconnect the specific connection made with node.connect(output, other, input).</p>
-<p>This function does not allow key word arguments for the same reason connect doesn&#8217;t.</p>
+<p>This function does not allow key word arguments for the same reason connect doesn’t.</p>
 </dd></dl>
 
 <dl class="method">
@@ -2483,7 +2483,7 @@ node.disconnect(output, other, input): Disconnect the specific connection made w
 <p>Range: [-INFINITY, INFINITY]</p>
 <p>Default value: 1.0</p>
 <p>After this node processes, the value to which mul is set is used as a multiplier on the result.
-The most notable effect of this is to change the node&#8217;s volume.
+The most notable effect of this is to change the node’s volume.
 A variety of other uses exist, however, especially as regards to nodes which are connected to properties.
 Mul is applied before add.</p>
 </dd></dl>
@@ -2507,7 +2507,7 @@ Mul is applied before add.</p>
 <dd><p>Type: int</p>
 <p>Range: <a class="reference internal" href="#libaudioverse.NodeStates" title="libaudioverse.NodeStates"><code class="xref any py py-class docutils literal"><span class="pre">NodeStates</span></code></a></p>
 <p>Default value: <a class="reference internal" href="#libaudioverse.NodeStates.playing" title="libaudioverse.NodeStates.playing"><code class="xref any py py-attr docutils literal"><span class="pre">NodeStates.playing</span></code></a></p>
-<p>The node&#8217;s state.  See the basics section in the Libaudioverse manual for details.
+<p>The node’s state.  See the basics section in the Libaudioverse manual for details.
 The default is usually what you want.</p>
 </dd></dl>
 
@@ -2534,7 +2534,7 @@ The effect is that this node allows observing audio passing through any location
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The audio which will be passed to the associated callback.</td>
 </tr>
 </tbody>
@@ -2554,7 +2554,7 @@ The effect is that this node allows observing audio passing through any location
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The same audio as connected to the input without modification.</td>
 </tr>
 </tbody>
@@ -2579,7 +2579,7 @@ This callback is called inside the audio threads; do not block.</p>
 <dt>nodeHandle</dt>
 <dd>The node which called this callback.</dd>
 <dt>frames</dt>
-<dd>The number of frames of audio being made available to client code.  This should always be the same as the server&#8217;s block size.</dd>
+<dd>The number of frames of audio being made available to client code.  This should always be the same as the server’s block size.</dd>
 <dt>channels</dt>
 <dd>The number of channels of audio being made available to client code.</dd>
 <dt>buffer</dt>
@@ -2612,7 +2612,7 @@ Note that the 3D API handles hard limiting appropriately, and you do not need to
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The signal to limit</td>
 </tr>
 </tbody>
@@ -2632,7 +2632,7 @@ Note that the 3D API handles hard limiting appropriately, and you do not need to
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The limited signal: no sample shall have an absolute value greater than 1.0.</td>
 </tr>
 </tbody>
@@ -2649,7 +2649,7 @@ Note that the 3D API handles hard limiting appropriately, and you do not need to
 <dt id="libaudioverse.HrtfNode">
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">HrtfNode</code><span class="sig-paren">(</span><em>server</em>, <em>hrtf_path</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.HrtfNode" title="Permalink to this definition">¶</a></dt>
 <dd><p>This node implements an HRTF panner.
-You can use either Libaudioverse&#8217;s internal HRTF (The Diffuse MIT Kemar Dataset) by passing &#8220;default&#8221; as the HRTf file name,
+You can use either Libaudioverse’s internal HRTF (The Diffuse MIT Kemar Dataset) by passing “default” as the HRTf file name,
 or an HRTF of your own.</p>
 <p>Inputs:</p>
 <table border="1" class="docutils">
@@ -2745,7 +2745,7 @@ To configure this node, use the function Lav_iirNodeSetCoefficients.</p>
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The signal to filter.</td>
 </tr>
 </tbody>
@@ -2765,7 +2765,7 @@ To configure this node, use the function Lav_iirNodeSetCoefficients.</p>
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The signal with the IIR filter applied.</td>
 </tr>
 </tbody>
@@ -2801,7 +2801,7 @@ Since failure to call shutdown can cause crashes, this is the preferred method o
 <dl class="exception">
 <dt id="libaudioverse.InternalError">
 <em class="property">exception </em><code class="descclassname">libaudioverse.</code><code class="descname">InternalError</code><a class="headerlink" href="#libaudioverse.InternalError" title="Permalink to this definition">¶</a></dt>
-<dd><p>If you see this error, it&#8217;s a bug.</p>
+<dd><p>If you see this error, it’s a bug.</p>
 </dd></dl>
 
 <dl class="exception">
@@ -2813,7 +2813,7 @@ Since failure to call shutdown can cause crashes, this is the preferred method o
 <dl class="exception">
 <dt id="libaudioverse.InvalidPointerError">
 <em class="property">exception </em><code class="descclassname">libaudioverse.</code><code class="descname">InvalidPointerError</code><a class="headerlink" href="#libaudioverse.InvalidPointerError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Attempt to free a pointer that Libaudioverse doesn&#8217;t know about.</p>
+<dd><p>Attempt to free a pointer that Libaudioverse doesn’t know about.</p>
 </dd></dl>
 
 <dl class="exception">
@@ -2844,7 +2844,7 @@ If you feed this node a signal that is zero, it will slowly decrease the output 
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>A signal to integrate.</td>
 </tr>
 </tbody>
@@ -2864,7 +2864,7 @@ If you feed this node a signal that is zero, it will slowly decrease the output 
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The integral of the signal.</td>
 </tr>
 </tbody>
@@ -2876,7 +2876,7 @@ If you feed this node a signal that is zero, it will slowly decrease the output 
 <p>Range: [0.0, 1.0]</p>
 <p>Default value: 1.0</p>
 <p>The leakyness (or time constant) of the integrator.</p>
-<p>If you feed the leaky integrator a constant signal of 0, then this property&#8217;s value is the percent decrease as observed after 1 second.</p>
+<p>If you feed the leaky integrator a constant signal of 0, then this property’s value is the percent decrease as observed after 1 second.</p>
 </dd></dl>
 
 </dd></dl>
@@ -2889,7 +2889,7 @@ If you feed this node a signal that is zero, it will slowly decrease the output 
 <dl class="attribute">
 <dt id="libaudioverse.LibaudioverseProperty.type">
 <code class="descname">type</code><a class="headerlink" href="#libaudioverse.LibaudioverseProperty.type" title="Permalink to this definition">¶</a></dt>
-<dd><p>The property&#8217;s type.</p>
+<dd><p>The property’s type.</p>
 </dd></dl>
 
 </dd></dl>
@@ -3022,14 +3022,14 @@ For something more nontraditional, use an amplitude panner.</p>
 <dl class="exception">
 <dt id="libaudioverse.NoSuchDeviceError">
 <em class="property">exception </em><code class="descclassname">libaudioverse.</code><code class="descname">NoSuchDeviceError</code><a class="headerlink" href="#libaudioverse.NoSuchDeviceError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Attempt to use an I/O device that doesn&#8217;t exist.  In addition to being caused by your code, this can happen if the user unplugs the device.</p>
+<dd><p>Attempt to use an I/O device that doesn’t exist.  In addition to being caused by your code, this can happen if the user unplugs the device.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="libaudioverse.NodeStates">
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">NodeStates</code><a class="headerlink" href="#libaudioverse.NodeStates" title="Permalink to this definition">¶</a></dt>
 <dd><p>used to indicate the state of a node.
-This is the value of the node&#8217;s state property and determins how the node is processed.</p>
+This is the value of the node’s state property and determins how the node is processed.</p>
 <dl class="attribute">
 <dt id="libaudioverse.NodeStates.always_playing">
 <code class="descname">always_playing</code><em class="property"> = 2</em><a class="headerlink" href="#libaudioverse.NodeStates.always_playing" title="Permalink to this definition">¶</a></dt>
@@ -3164,7 +3164,7 @@ If said property is true, the filter becomes a highpass.</p>
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The signal to filter.</td>
 </tr>
 </tbody>
@@ -3184,7 +3184,7 @@ If said property is true, the filter becomes a highpass.</p>
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The filtered signal.</td>
 </tr>
 </tbody>
@@ -3340,7 +3340,7 @@ The purpose of this node is to inject audio from an external source that Libaudi
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The result of the configured callback.</td>
 </tr>
 </tbody>
@@ -3382,7 +3382,7 @@ The purpose of this node is to inject audio from an external source that Libaudi
 <dd><p>The purpose of this node is the same as the pull node, but it is used in situations wherein we do not know when we are going to get audio.
 Audio is queued as it is pushed to this node and then played as fast as possible.
 This node can be used to avoid writing a queue of audio yourself, as it essentially implements said functionality.
-If you need low latency audio or the ability to run something like the Opus encoder&#8217;s
+If you need low latency audio or the ability to run something like the Opus encoder’s
 ability to cover for missing frames, you need a pull node.</p>
 <p>This node has no inputs.</p>
 <p>Outputs:</p>
@@ -3400,7 +3400,7 @@ ability to cover for missing frames, you need a pull node.</p>
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>Either audio from the internal queue or zero.</td>
 </tr>
 </tbody>
@@ -3480,9 +3480,9 @@ ability to cover for missing frames, you need a pull node.</p>
 <dd><p>Records audio to files.</p>
 <p>The usage pattern for this node is simple:
 connect something to the input, call Lav_recorderNodeStartRecording, and ensure that the node is processed.
-In order to avoid potential problems with blocks of silence at the beginning of the recording, this node&#8217;s default state is playing.
-You should connect the output to something that will demand the recorder node&#8217;s audio or change the state to always playing, usually after a call to Lav_recorderNodeStartRecording.
-If you don&#8217;t, no recording will take place.</p>
+In order to avoid potential problems with blocks of silence at the beginning of the recording, this node’s default state is playing.
+You should connect the output to something that will demand the recorder node’s audio or change the state to always playing, usually after a call to Lav_recorderNodeStartRecording.
+If you don’t, no recording will take place.</p>
 <p>Unlike most other nodes in Libaudioverse, it is important that you call Lav_recorderNodeStopRecording when done recording.
 Failure to do so may lead to any of a number of surprising results.</p>
 <p>Inputs:</p>
@@ -3500,7 +3500,7 @@ Failure to do so may lead to any of a number of surprising results.</p>
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The signal to record.</td>
 </tr>
 </tbody>
@@ -3520,7 +3520,7 @@ Failure to do so may lead to any of a number of surprising results.</p>
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The same as the input signal.</td>
 </tr>
 </tbody>
@@ -3531,7 +3531,7 @@ Failure to do so may lead to any of a number of surprising results.</p>
 <dd><p>Begin recording to the specified files.
 The sample rate is the same as that of the server.
 The channel count is the same as this node was initialized with.
-The format of the file is determined from the extension: this function recognizes &#8221;.wav&#8221; and &#8221;.ogg&#8221; on all platforms.</p>
+The format of the file is determined from the extension: this function recognizes “.wav” and “.ogg” on all platforms.</p>
 </dd></dl>
 
 <dl class="method">
@@ -3599,7 +3599,7 @@ The two inputs will be converted to mono and then multiplied, before being sent 
 <dt id="libaudioverse.Server">
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">Server</code><span class="sig-paren">(</span><em>sample_rate=44100</em>, <em>block_size=1024</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.Server" title="Permalink to this definition">¶</a></dt>
 <dd><p>Represents a server.  All libaudioverse nodes must be passed a server at creation time as the first argument to their constructor and cannot migrate between them.  Furthermore, it is an error to try to connect objects from different servers.</p>
-<p>Instances of this class are context managers.  Using the with statement on an instance of this class invoke&#8217;s Libaudioverse&#8217;s atomic block support.</p>
+<p>Instances of this class are context managers.  Using the with statement on an instance of this class invoke’s Libaudioverse’s atomic block support.</p>
 <p>For full details of this class, see the Libaudioverse manual.</p>
 <dl class="method">
 <dt id="libaudioverse.Server.call_in">
@@ -3633,13 +3633,13 @@ The two inputs will be converted to mono and then multiplied, before being sent 
 <dt id="libaudioverse.Server.set_block_callback">
 <code class="descname">set_block_callback</code><span class="sig-paren">(</span><em>callback</em>, <em>additional_args=None</em>, <em>additional_kwargs=None</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.Server.set_block_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set a callback to be called every block.</p>
-<p>This callback is called as though inside a with block, and takes two positional argguments: the server and the servers&#8217; time.</p>
+<p>This callback is called as though inside a with block, and takes two positional argguments: the server and the servers’ time.</p>
 <p>Wraps lav_serverSetBlockCallback.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="libaudioverse.Server.set_output_device">
-<code class="descname">set_output_device</code><span class="sig-paren">(</span><em>identifier='default'</em>, <em>channels=2</em>, <em>mixahead=2</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.Server.set_output_device" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_output_device</code><span class="sig-paren">(</span><em>identifier=’default’</em>, <em>channels=2</em>, <em>mixahead=2</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.Server.set_output_device" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the output device.
 Use -1 for default system audio. 0 and greater are specific audio devices.
 To enumerate devices, use enumerate_devices.</p>
@@ -3722,7 +3722,7 @@ This is measured in periods, not in radians.</p>
 <em class="property">class </em><code class="descclassname">libaudioverse.</code><code class="descname">SourceNode</code><span class="sig-paren">(</span><em>server</em>, <em>environment</em><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.SourceNode" title="Permalink to this definition">¶</a></dt>
 <dd><p>The source node allows the spatialization of sound that passes through it.
 Sources have one input which is mono, to which a node should be connected.
-The audio from the input is spatialized according both to the source&#8217;s properties and those on its environment, and passed directly to the environment.
+The audio from the input is spatialized according both to the source’s properties and those on its environment, and passed directly to the environment.
 Sources have no outputs.
 To hear a source, you must connect its environment to something instead.</p>
 <p>Since the source communicates with the environment through a nonstandard mechanism, environments do not keep their sources alive.
@@ -3797,7 +3797,7 @@ By default, sources ignore this property in favor of the value provided by their
 <code class="descname">head_relative</code><a class="headerlink" href="#libaudioverse.SourceNode.head_relative" title="Permalink to this definition">¶</a></dt>
 <dd><p>Type: boolean</p>
 <p>Default value: False
-Whether or not to consider this source&#8217;s position to always be relative to the listener.</p>
+Whether or not to consider this source’s position to always be relative to the listener.</p>
 <p>Sources which are head relative interpret their positions in the default coordinate system, relative to the listener.
 Positive x is right, positive y is up, and positive z is behind the listener.
 The orientation and position properties of an environment do not affect head relative sources, making them ideal for such things as footsteps and/or HUD effects that should be panned.</p>
@@ -3823,7 +3823,7 @@ By default, sources do not respect this property and use the corresponding value
 <p>The maximum amount of audio to be diverted to reverb sends, if any.</p>
 <p>Behavior is undefined if this property is ever less than Lav_SOURCE_MIN_REVERB_LEVEL.</p>
 <p>The default value of this property is set from the corresponding property on the environment at source creation.
-By default, this property is ignored in favor of the value provided by this source&#8217;s environment.  Set Lav_SOURCE_CONTROL_REVERB to true to control it yourself.</p>
+By default, this property is ignored in favor of the value provided by this source’s environment.  Set Lav_SOURCE_CONTROL_REVERB to true to control it yourself.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -3836,7 +3836,7 @@ By default, this property is ignored in favor of the value provided by this sour
 <p>if a send is configured to be a reverb send, this is the minimum amount of audio that will be diverted to it.</p>
 <p>Behavior is undefined if this property is ever greater than the value you give to Lav_SOURCE_MAX_REVERB_LEVEL.</p>
 <p>The default value of this property is set from the corresponding property on the environment at source creation.
-By default, this property is ignored in favor of the value provided by this source&#8217;s environment.  Set Lav_SOURCE_CONTROL_REVERB to true to control it yourself.</p>
+By default, this property is ignored in favor of the value provided by this source’s environment.  Set Lav_SOURCE_CONTROL_REVERB to true to control it yourself.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -3959,7 +3959,7 @@ This is the least expensive of the Libaudioverse equalizers, and is sufficient f
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The signal to equalize.</td>
 </tr>
 </tbody>
@@ -3979,7 +3979,7 @@ This is the least expensive of the Libaudioverse equalizers, and is sufficient f
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
-<td>Depends on arguments to this node&#8217;s constructor.</td>
+<td>Depends on arguments to this node’s constructor.</td>
 <td>The equalized signal.</td>
 </tr>
 </tbody>
@@ -4035,13 +4035,13 @@ This is the least expensive of the Libaudioverse equalizers, and is sufficient f
 <dl class="exception">
 <dt id="libaudioverse.TypeMismatchError">
 <em class="property">exception </em><code class="descclassname">libaudioverse.</code><code class="descname">TypeMismatchError</code><a class="headerlink" href="#libaudioverse.TypeMismatchError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Indicates an attempt to manipulate a property through a function that does not work with that property&#8217;s type.</p>
+<dd><p>Indicates an attempt to manipulate a property through a function that does not work with that property’s type.</p>
 </dd></dl>
 
 <dl class="exception">
 <dt id="libaudioverse.UnknownError">
 <em class="property">exception </em><code class="descclassname">libaudioverse.</code><code class="descname">UnknownError</code><a class="headerlink" href="#libaudioverse.UnknownError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Something went wrong.  This error indicates that we couldn&#8217;t figure out what.</p>
+<dd><p>Something went wrong.  This error indicates that we couldn’t figure out what.</p>
 </dd></dl>
 
 <dl class="class">
@@ -4069,7 +4069,7 @@ This is the least expensive of the Libaudioverse equalizers, and is sufficient f
 <code class="descclassname">libaudioverse.</code><code class="descname">shutdown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#libaudioverse.shutdown" title="Permalink to this definition">¶</a></dt>
 <dd><p>Corresponds to Lav_shutdown.</p>
 <p>Call this at the end of your application.
-You must call it before the interpreter shuts down. Failure to do so will allow Libaudioverse to call your code during Python&#8217;s shutdown procedures.</p>
+You must call it before the interpreter shuts down. Failure to do so will allow Libaudioverse to call your code during Python’s shutdown procedures.</p>
 </dd></dl>
 
 </div>
@@ -4116,7 +4116,7 @@ You must call it before the interpreter shuts down. Failure to do so will allow 
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'build44',
+            VERSION:'build54',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
